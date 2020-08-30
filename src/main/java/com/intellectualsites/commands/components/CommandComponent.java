@@ -50,7 +50,7 @@ public class CommandComponent<T> {
     private final boolean required;
     /**
      * The command component name. This might be exposed
-     * to command senders and so should be choosen carefully.
+     * to command senders and so should be chosen carefully.
      */
     private final String name;
     /**
