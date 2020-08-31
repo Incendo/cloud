@@ -21,22 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.parser;
+package com.intellectualsites.commands.sender;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
-import javax.annotation.Nonnull;
-import java.util.Queue;
-
-@FunctionalInterface public interface ComponentParser<T> {
-
-    /**
-     * Parse command input into a command result
-     *
-     * @param sender Sender who sent the command
-     * @param inputQueue The queue of arguments
-     * @return Parsed command result
-     */
-    @Nonnull ComponentParseResult<T> parse(@Nonnull CommandSender sender, @Nonnull Queue<String> inputQueue);
-
+public interface CommandSender {
 }

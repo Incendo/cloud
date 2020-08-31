@@ -1,14 +1,37 @@
+//
+// MIT License
+//
+// Copyright (c) 2020 IntellectualSites
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
 package com.intellectualsites.commands;
 
 import com.google.common.base.Objects;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
+import com.intellectualsites.commands.parser.ComponentParseResult;
+import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Tree containing all commands and command paths
@@ -27,6 +50,41 @@ public class CommandTree {
      */
     @Nonnull public static CommandTree newTree() {
         return new CommandTree();
+    }
+
+    public Optional<Command> parse(@Nonnull final String[] args) {
+        final CommandSender tempSender = new CommandSender() {
+        };
+
+        final Queue<String> commandQueue = new LinkedList<>(Arrays.asList(args));
+        return parseCommand(tempSender, commandQueue, this.internalTree);
+    }
+
+    private Optional<Command> parseCommand(@Nonnull final CommandSender commandSender, @Nonnull final Queue<String> commandQueue,
+                                           @Nonnull final Node<CommandComponent<?>> root) {
+        final Iterator<Node<CommandComponent<?>>> childIterator = root.getChildren().iterator();
+        if (childIterator.hasNext()) {
+            while (childIterator.hasNext()) {
+                final Node<CommandComponent<?>> child = childIterator.next();
+                if (child.getValue() != null) {
+                    final ComponentParseResult<?> result = child.getValue().getParser().parse(commandSender, commandQueue);
+                    if (result.getParsedValue().isPresent()) {
+                        /* TODO: Add to some context */
+                        return this.parseCommand(commandSender, commandQueue, child);
+                    } else if (result.getFailure().isPresent() && root.children.size() == 1) {
+                        /* Return the error somehow :D */
+                    }
+                }
+            }
+        } else {
+            /* We are at the bottom. Check if there's a command attached, in which case we're done */
+            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+                return Optional.of(root.getValue().getOwningCommand());
+            } else {
+                /* TODO: Indicate that we could not resolve the command here */
+            }
+        }
+        return Optional.empty();
     }
 
     /**
