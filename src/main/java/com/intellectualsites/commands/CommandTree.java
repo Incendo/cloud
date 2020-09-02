@@ -24,6 +24,7 @@
 package com.intellectualsites.commands;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.parser.ComponentParseResult;
@@ -32,6 +33,7 @@ import com.intellectualsites.commands.sender.CommandSender;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Tree containing all commands and command paths
@@ -62,6 +64,72 @@ public class CommandTree {
 
     private Optional<Command> parseCommand(@Nonnull final CommandSender commandSender, @Nonnull final Queue<String> commandQueue,
                                            @Nonnull final Node<CommandComponent<?>> root) {
+
+        final List<Node<CommandComponent<?>>> children = root.getChildren();
+        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
+            // The value has to be a variable
+            final Node<CommandComponent<?>> child = children.get(0);
+            if (child.getValue() != null) {
+                final ComponentParseResult<?> result = child.getValue().getParser().parse(commandSender, commandQueue);
+                if (result.getParsedValue().isPresent()) {
+                    /* TODO: Add context */
+                    if (child.isLeaf()) {
+                        return Optional.ofNullable(child.getValue().getOwningCommand());
+                    } else {
+                        return this.parseCommand(commandSender, commandQueue, child);
+                    }
+                } else if (result.getFailure().isPresent()) {
+                    /* TODO: Return error */
+                }
+            }
+        }
+
+        /* There are 0 or more static components as children. No variable child components are present */
+        if (children.isEmpty()) {
+            /* We are at the bottom. Check if there's a command attached, in which case we're done */
+            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+                return Optional.of(root.getValue().getOwningCommand());
+            } else {
+                /* TODO: Indicate that we could not resolve the command here */
+                final List<CommandComponent<?>> components = this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList());
+            }
+        } else {
+            final String popped = commandQueue.poll();
+            if (popped == null) {
+                /* Not enough arguments */
+                /* TODO: Send correct usage */
+                return Optional.empty();
+            }
+
+            int low = 0;
+            int high = children.size() - 1;
+
+            while (low <= high) {
+                int mid = (low + high) / 2;
+
+                final Node<CommandComponent<?>> node = children.get(mid);
+                assert node.getValue() != null;
+
+                final int comparison = node.getValue().getName().compareToIgnoreCase(popped);
+                if (comparison < 0) {
+                    low = mid + 1;
+                } else if (comparison > 0) {
+                    high = mid - 1;
+                } else {
+                    /* We found a match */
+                    if (node.isLeaf()) {
+                        return Optional.ofNullable(node.getValue().getOwningCommand());
+                    } else {
+                        return parseCommand(commandSender, commandQueue, node);
+                    }
+                }
+            }
+
+            /* We could not find a match */
+            /* TODO: Send "No Such Command" */
+        }
+
+        /*
         final Iterator<Node<CommandComponent<?>>> childIterator = root.getChildren().iterator();
         if (childIterator.hasNext()) {
             while (childIterator.hasNext()) {
@@ -69,21 +137,14 @@ public class CommandTree {
                 if (child.getValue() != null) {
                     final ComponentParseResult<?> result = child.getValue().getParser().parse(commandSender, commandQueue);
                     if (result.getParsedValue().isPresent()) {
-                        /* TODO: Add to some context */
                         return this.parseCommand(commandSender, commandQueue, child);
                     } else if (result.getFailure().isPresent() && root.children.size() == 1) {
-                        /* Return the error somehow :D */
                     }
                 }
             }
-        } else {
-            /* We are at the bottom. Check if there's a command attached, in which case we're done */
-            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
-                return Optional.of(root.getValue().getOwningCommand());
-            } else {
-                /* TODO: Indicate that we could not resolve the command here */
-            }
         }
+        */
+
         return Optional.empty();
     }
 
@@ -98,6 +159,9 @@ public class CommandTree {
             Node<CommandComponent<?>> tempNode = node.getChild(component);
             if (tempNode == null) {
                 tempNode = node.addChild(component);
+            }
+            if (node.children.size() > 0) {
+                node.children.sort(Comparator.comparing(Node::getValue));
             }
             node = tempNode;
         }
@@ -154,11 +218,22 @@ public class CommandTree {
         return leaves;
     }
 
+    private List<Node<CommandComponent<?>>> getChain(@Nullable final Node<CommandComponent<?>> end) {
+        final List<Node<CommandComponent<?>>> chain = new LinkedList<>();
+        Node<CommandComponent<?>> tail = end;
+        while (tail != null) {
+            chain.add(tail);
+            tail = end.getParent();
+        }
+        return Lists.reverse(chain);
+    }
+
 
     private static final class Node<T> {
 
         private final List<Node<T>> children = new LinkedList<>();
         private final T value;
+        private Node<T> parent;
 
         private Node(@Nullable final T value) {
             this.value = value;
@@ -208,6 +283,15 @@ public class CommandTree {
         public int hashCode() {
             return Objects.hashCode(getChildren(), getValue());
         }
+
+        public void setParent(@Nullable final Node<T> parent) {
+            this.parent = parent;
+        }
+
+        @Nullable public Node<T> getParent() {
+            return this.parent;
+        }
+
     }
 
 }

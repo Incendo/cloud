@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  *
  * @param <T> The type that the component parses into
  */
-public class CommandComponent<T> {
+public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9]+");
 
@@ -150,6 +150,23 @@ public class CommandComponent<T> {
     @Override
     public int hashCode() {
         return com.google.common.base.Objects.hashCode(isRequired(), getName());
+    }
+
+    @Override
+    public int compareTo(@Nonnull final CommandComponent<?> o) {
+        if (this instanceof StaticComponent) {
+            if (o instanceof StaticComponent) {
+                return (this.getName().compareTo(o.getName()));
+            } else {
+                return -1;
+            }
+        } else {
+            if (o instanceof StaticComponent) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
     }
 
 
