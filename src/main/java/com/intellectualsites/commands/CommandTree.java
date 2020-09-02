@@ -27,6 +27,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
+import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.parser.ComponentParseResult;
 import com.intellectualsites.commands.sender.CommandSender;
 
@@ -37,8 +38,10 @@ import java.util.stream.Collectors;
 
 /**
  * Tree containing all commands and command paths
+ *
+ * @param <C> Command sender type
  */
-public class CommandTree {
+public class CommandTree<C extends CommandSender> {
 
     private final Node<CommandComponent<?>> internalTree = new Node<>(null);
 
@@ -48,22 +51,21 @@ public class CommandTree {
     /**
      * Create a new command tree instance
      *
+     * @param <C> Command sender type
      * @return New command tree
      */
-    @Nonnull public static CommandTree newTree() {
-        return new CommandTree();
+    @Nonnull
+    public static <C extends CommandSender> CommandTree<C> newTree() {
+        return new CommandTree<>();
     }
 
-    public Optional<Command> parse(@Nonnull final String[] args) {
-        final CommandSender tempSender = new CommandSender() {
-        };
-
+    public Optional<Command> parse(@Nonnull final C commandSender, @Nonnull final String[] args) throws NoSuchCommandException {
         final Queue<String> commandQueue = new LinkedList<>(Arrays.asList(args));
-        return parseCommand(tempSender, commandQueue, this.internalTree);
+        return parseCommand(commandSender, commandQueue, this.internalTree);
     }
 
-    private Optional<Command> parseCommand(@Nonnull final CommandSender commandSender, @Nonnull final Queue<String> commandQueue,
-                                           @Nonnull final Node<CommandComponent<?>> root) {
+    private Optional<Command> parseCommand(@Nonnull final C commandSender, @Nonnull final Queue<String> commandQueue,
+                                           @Nonnull final Node<CommandComponent<?>> root) throws NoSuchCommandException {
 
         final List<Node<CommandComponent<?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
@@ -126,7 +128,7 @@ public class CommandTree {
             }
 
             /* We could not find a match */
-            /* TODO: Send "No Such Command" */
+            throw new NoSuchCommandException(commandSender, getChain(root).stream().map(Node::getValue).collect(Collectors.toList()), popped);
         }
 
         /*
@@ -177,10 +179,10 @@ public class CommandTree {
     public void verifyAndRegister() {
         // All top level commands are supposed to be registered in the command manager
         this.internalTree.children.stream().map(Node::getValue).forEach(commandComponent -> {
-           if (!(commandComponent instanceof StaticComponent)) {
-               throw new IllegalStateException("Top level command component cannot be a variable");
-           }
-           // TODO: Register in the command handler
+            if (!(commandComponent instanceof StaticComponent)) {
+                throw new IllegalStateException("Top level command component cannot be a variable");
+            }
+            // TODO: Register in the command handler
         });
         this.checkAmbiguity(this.internalTree);
         // Verify that all leaf nodes have command registered
@@ -243,13 +245,15 @@ public class CommandTree {
             return Collections.unmodifiableList(this.children);
         }
 
-        @Nonnull private Node<T> addChild(@Nonnull final T child) {
+        @Nonnull
+        private Node<T> addChild(@Nonnull final T child) {
             final Node<T> node = new Node<>(child);
             this.children.add(node);
             return node;
         }
 
-        @Nullable private Node<T> getChild(@Nonnull final T type) {
+        @Nullable
+        private Node<T> getChild(@Nonnull final T type) {
             for (final Node<T> child : this.children) {
                 if (type.equals(child.getValue())) {
                     return child;
@@ -262,7 +266,8 @@ public class CommandTree {
             return this.children.isEmpty();
         }
 
-        @Nullable public T getValue() {
+        @Nullable
+        public T getValue() {
             return this.value;
         }
 
@@ -288,7 +293,8 @@ public class CommandTree {
             this.parent = parent;
         }
 
-        @Nullable public Node<T> getParent() {
+        @Nullable
+        public Node<T> getParent() {
             return this.parent;
         }
 
