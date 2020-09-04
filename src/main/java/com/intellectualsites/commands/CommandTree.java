@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
+import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.parser.ComponentParseResult;
 import com.intellectualsites.commands.sender.CommandSender;
 
@@ -44,19 +45,22 @@ import java.util.stream.Collectors;
 public class CommandTree<C extends CommandSender> {
 
     private final Node<CommandComponent<?>> internalTree = new Node<>(null);
+    private final CommandRegistrationHandler commandRegistrationHandler;
 
-    private CommandTree() {
+    private CommandTree(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+        this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
     /**
      * Create a new command tree instance
      *
-     * @param <C> Command sender type
+     * @param commandRegistrationHandler Command registration handler
+     * @param <C>                        Command sender type
      * @return New command tree
      */
     @Nonnull
-    public static <C extends CommandSender> CommandTree<C> newTree() {
-        return new CommandTree<>();
+    public static <C extends CommandSender> CommandTree<C> newTree(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+        return new CommandTree<>(commandRegistrationHandler);
     }
 
     public Optional<Command> parse(@Nonnull final C commandSender, @Nonnull final String[] args) throws NoSuchCommandException {
@@ -170,6 +174,8 @@ public class CommandTree<C extends CommandSender> {
         if (node.getValue() != null) {
             node.getValue().setOwningCommand(command);
         }
+        // Verify the command structure every time we add a new command
+        this.verifyAndRegister();
     }
 
     /**
@@ -182,7 +188,6 @@ public class CommandTree<C extends CommandSender> {
             if (!(commandComponent instanceof StaticComponent)) {
                 throw new IllegalStateException("Top level command component cannot be a variable");
             }
-            // TODO: Register in the command handler
         });
         this.checkAmbiguity(this.internalTree);
         // Verify that all leaf nodes have command registered
@@ -190,8 +195,11 @@ public class CommandTree<C extends CommandSender> {
             if (leaf.getOwningCommand() == null) {
                 // TODO: Custom exception type
                 throw new IllegalStateException("Leaf node does not have associated owning command");
+            } else {
+                this.commandRegistrationHandler.registerCommand(leaf.getOwningCommand());
             }
         });
+        /* TODO: Figure out a way to register all combinations along a command component path */
     }
 
     private void checkAmbiguity(@Nonnull final Node<CommandComponent<?>> node) {
