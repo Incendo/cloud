@@ -26,8 +26,12 @@ package com.intellectualsites.commands.jline;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.CommandTree;
+import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
+import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
+import com.intellectualsites.commands.parser.ComponentParseResult;
 import org.jline.reader.*;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
@@ -49,13 +53,36 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
                 .completer(jLineCommandManager).terminal(terminal).appName("Test").build();
         boolean[] shouldStop = new boolean[] { false };
         jLineCommandManager.registerCommand(Command.newBuilder("stop").withHandler(commandContext ->
-                shouldStop[0] = true).build());
+                shouldStop[0] = true).build()).registerCommand(Command.newBuilder("echo")
+                .withComponent(CommandComponent.ofType(String.class).named("string").asRequired()
+                        .withParser(((commandContext, inputQueue) -> {
+                            final StringBuilder stringBuilder = new StringBuilder();
+                            while (!inputQueue.isEmpty()) {
+                                stringBuilder.append(inputQueue.remove());
+                                if (!inputQueue.isEmpty()) {
+                                    stringBuilder.append(" ");
+                                }
+                            }
+                            return ComponentParseResult.success(stringBuilder.toString());
+                        })).build())
+                .withHandler(commandContext -> commandContext.get("string").ifPresent(System.out::println)).build());
         while (!shouldStop[0]) {
             final String line = lineReader.readLine();
             if (line == null || line.isEmpty() || !line.startsWith("/")) {
                 continue;
             }
-            jLineCommandManager.executeCommand(new JLineCommandSender(), line.substring(1)).join();
+            try {
+                jLineCommandManager.executeCommand(new JLineCommandSender(), line.substring(1)).join();
+            } catch (RuntimeException runtimeException) {
+                if (runtimeException.getCause() instanceof NoSuchCommandException) {
+                    System.out.println("No such command");
+                } else if (runtimeException.getCause() instanceof InvalidSyntaxException) {
+                    System.out.println(runtimeException.getCause().getMessage());
+                } else {
+                    System.out.printf("Something went wrong: %s\n", runtimeException.getCause().getMessage());
+                    runtimeException.printStackTrace();
+                }
+            }
             if (shouldStop[0]) {
                 System.out.println("Stopping.");
             }

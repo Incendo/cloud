@@ -28,6 +28,7 @@ import com.google.common.collect.Lists;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.parser.ComponentParseResult;
@@ -46,22 +47,26 @@ import java.util.stream.Collectors;
 public class CommandTree<C extends CommandSender> {
 
     private final Node<CommandComponent<C, ?>> internalTree = new Node<>(null);
+    private final CommandManager<C> commandManager;
     private final CommandRegistrationHandler commandRegistrationHandler;
 
-    private CommandTree(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+    private CommandTree(@Nonnull final CommandManager<C> commandManager, @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+        this.commandManager = commandManager;
         this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
     /**
      * Create a new command tree instance
      *
+     * @param commandManager             Command manager
      * @param commandRegistrationHandler Command registration handler
      * @param <C>                        Command sender type
      * @return New command tree
      */
     @Nonnull
-    public static <C extends CommandSender> CommandTree<C> newTree(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
-        return new CommandTree<>(commandRegistrationHandler);
+    public static <C extends CommandSender> CommandTree<C> newTree(@Nonnull final CommandManager<C> commandManager,
+                                                                   @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+        return new CommandTree<>(commandManager, commandRegistrationHandler);
     }
 
     public Optional<Command<C>> parse(@Nonnull final CommandContext<C> commandContext, @Nonnull final Queue<String> args) throws NoSuchCommandException {
@@ -76,11 +81,28 @@ public class CommandTree<C extends CommandSender> {
             // The value has to be a variable
             final Node<CommandComponent<C, ?>> child = children.get(0);
             if (child.getValue() != null) {
+                if (commandQueue.isEmpty()) {
+                    if (child.isLeaf()) {
+                        /* Not enough arguments */
+                        throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter().apply(Arrays.asList(child.getValue().getOwningCommand().getComponents())),
+                                commandContext.getCommandSender(), this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()));
+                    } else {
+                        throw new NoSuchCommandException(commandContext.getCommandSender(),
+                                this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
+                                "");
+                    }
+                }
                 final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                 if (result.getParsedValue().isPresent()) {
-                    /* TODO: Add context */
+                    commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     if (child.isLeaf()) {
-                        return Optional.ofNullable(child.getValue().getOwningCommand());
+                        if (commandQueue.isEmpty()) {
+                            return Optional.ofNullable(child.getValue().getOwningCommand());
+                        } else {
+                            /* Too many arguments. We have a unique path, so we can send the entire context */
+                            throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter().apply(Arrays.asList(child.getValue().getOwningCommand().getComponents())),
+                                    commandContext.getCommandSender(), this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()));
+                        }
                     } else {
                         return this.parseCommand(commandContext, commandQueue, child);
                     }
@@ -94,7 +116,13 @@ public class CommandTree<C extends CommandSender> {
         if (children.isEmpty()) {
             /* We are at the bottom. Check if there's a command attached, in which case we're done */
             if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
-                return Optional.of(root.getValue().getOwningCommand());
+                if (commandQueue.isEmpty()) {
+                    return Optional.of(root.getValue().getOwningCommand());
+                } else {
+                    /* Too many arguments. We have a unique path, so we can send the entire context */
+                    throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter().apply(Arrays.asList(root.getValue().getOwningCommand().getComponents())),
+                            commandContext.getCommandSender(), this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()));
+                }
             } else {
                 /* TODO: Indicate that we could not resolve the command here */
                 final List<CommandComponent<C, ?>> components = this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList());

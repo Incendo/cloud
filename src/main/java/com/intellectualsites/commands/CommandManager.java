@@ -23,6 +23,7 @@
 //
 package com.intellectualsites.commands;
 
+import com.intellectualsites.commands.components.CommandSyntaxFormatter;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandResult;
@@ -46,9 +47,11 @@ public abstract class CommandManager<C extends CommandSender> {
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
 
+    private CommandSyntaxFormatter commandSyntaxFormatter = CommandSyntaxFormatter.STANDARD_COMMAND_SYNTAX_FORMATTER;
+
     protected CommandManager(@Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                              @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
-        this.commandTree = CommandTree.newTree(commandRegistrationHandler);
+        this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
     }
 
@@ -66,9 +69,29 @@ public abstract class CommandManager<C extends CommandSender> {
      * Register a new command
      *
      * @param command Command to register
+     * @return The command manager instance
      */
-    public void registerCommand(@Nonnull final Command command) {
+    public CommandManager<C> registerCommand(@Nonnull final Command command) {
         this.commandTree.insertCommand(command);
+        return this;
+    }
+
+    /**
+     * Get the command syntax formatter
+     *
+     * @return Command syntax formatter
+     */
+    @Nonnull public CommandSyntaxFormatter getCommandSyntaxFormatter() {
+        return this.commandSyntaxFormatter;
+    }
+
+    /**
+     * Set the command syntax formatter
+     *
+     * @param commandSyntaxFormatter New formatter
+     */
+    public void setCommandSyntaxFormatter(@Nonnull final CommandSyntaxFormatter commandSyntaxFormatter) {
+        this.commandSyntaxFormatter = commandSyntaxFormatter;
     }
 
 }

@@ -26,9 +26,13 @@ package com.intellectualsites.commands.context;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class CommandContext<C extends CommandSender> {
 
+    private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;
 
     public CommandContext(@Nonnull final C commandSender) {
@@ -40,8 +44,38 @@ public class CommandContext<C extends CommandSender> {
      *
      * @return Command sender
      */
-    @Nonnull public C getCommandSender() {
+    @Nonnull
+    public C getCommandSender() {
         return this.commandSender;
+    }
+
+    /**
+     * Store a value in the context map
+     *
+     * @param key   Key
+     * @param value Value
+     * @param <T>   Value type
+     */
+    public <T> void store(@Nonnull final String key, @Nonnull final T value) {
+        this.internalStorage.put(key, value);
+    }
+
+    /**
+     * Get a value from its key
+     *
+     * @param key Key
+     * @param <T> Value type
+     * @return Value
+     */
+    public <T> Optional<T> get(@Nonnull final String key) {
+        final Object value = this.internalStorage.get(key);
+        if (value != null) {
+            @SuppressWarnings("ALL")
+            final T castedValue = (T) value;
+            return Optional.of(castedValue);
+        } else {
+            return Optional.empty();
+        }
     }
 
 }
