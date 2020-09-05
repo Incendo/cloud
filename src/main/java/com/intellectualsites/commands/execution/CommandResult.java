@@ -21,25 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.parser;
+package com.intellectualsites.commands.execution;
 
-import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
-
-import javax.annotation.Nonnull;
-import java.util.Queue;
-
-@FunctionalInterface
-public interface ComponentParser<C extends CommandSender, T> {
-
-    /**
-     * Parse command input into a command result
-     *
-     * @param commandContext Command context
-     * @param inputQueue     The queue of arguments
-     * @return Parsed command result
-     */
-    @Nonnull
-    ComponentParseResult<T> parse(@Nonnull CommandContext<C> commandContext, @Nonnull Queue<String> inputQueue);
-
+public class CommandResult {
 }

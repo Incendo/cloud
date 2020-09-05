@@ -25,6 +25,7 @@ package com.intellectualsites.commands.components;
 
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.parser.ComponentParser;
+import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,9 +35,10 @@ import java.util.regex.Pattern;
 /**
  * A component that belongs to a command
  *
+ * @param <C> Command sender type
  * @param <T> The type that the component parses into
  */
-public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
+public class CommandComponent<C extends CommandSender, T> implements Comparable<CommandComponent<?, ?>> {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9]+");
 
@@ -57,12 +59,12 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
      * The parser that is used to parse the command input
      * into the corresponding command type
      */
-    private final ComponentParser<T> parser;
+    private final ComponentParser<C, T> parser;
 
-    private Command owningCommand;
+    private Command<C> owningCommand;
 
     CommandComponent(final boolean required, @Nonnull final String name,
-                             @Nonnull final ComponentParser<T> parser) {
+                             @Nonnull final ComponentParser<C, T> parser) {
         this.required = required;
         this.name = Objects.requireNonNull(name, "Name may not be null");
         if (!NAME_PATTERN.asPredicate().test(name)) {
@@ -75,10 +77,11 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
      * Create a new command component
      *
      * @param clazz Argument class
+     * @param <C> Command sender type
      * @param <T> Argument Type
      * @return Component builder
      */
-    @Nonnull public static <T> CommandComponent.Builder<T> ofType(@Nonnull final Class<T> clazz) {
+    @Nonnull public static <C extends CommandSender, T> CommandComponent.Builder<C, T> ofType(@Nonnull final Class<T> clazz) {
         return new Builder<>();
     }
 
@@ -106,7 +109,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
      *
      * @return Command parser
      */
-    @Nonnull public ComponentParser<T> getParser() {
+    @Nonnull public ComponentParser<C, T> getParser() {
         return this.parser;
     }
 
@@ -119,7 +122,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
      *
      * @return Owning command
      */
-    @Nullable public Command getOwningCommand() {
+    @Nullable public Command<C> getOwningCommand() {
         return this.owningCommand;
     }
 
@@ -128,7 +131,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
      *
      * @param owningCommand Owning command
      */
-    public void setOwningCommand(@Nonnull final Command owningCommand) {
+    public void setOwningCommand(@Nonnull final Command<C> owningCommand) {
         if (this.owningCommand != null) {
             throw new IllegalStateException("Cannot replace owning command");
         }
@@ -143,7 +146,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final CommandComponent<?> that = (CommandComponent<?>) o;
+        final CommandComponent<?, ?> that = (CommandComponent<?, ?>) o;
         return isRequired() == that.isRequired() && com.google.common.base.Objects.equal(getName(), that.getName());
     }
 
@@ -153,7 +156,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
     }
 
     @Override
-    public int compareTo(@Nonnull final CommandComponent<?> o) {
+    public int compareTo(@Nonnull final CommandComponent<?, ?> o) {
         if (this instanceof StaticComponent) {
             if (o instanceof StaticComponent) {
                 return (this.getName().compareTo(o.getName()));
@@ -170,11 +173,11 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
     }
 
 
-    public static class Builder<T> {
+    public static class Builder<C extends CommandSender, T> {
 
         private String name;
         private boolean required = true;
-        private ComponentParser<T> parser;
+        private ComponentParser<C, T> parser;
 
         private Builder() {
         }
@@ -185,7 +188,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
          * @param name Alphanumeric component name
          * @return Builder instance
          */
-        @Nonnull public Builder<T> named(@Nonnull final String name) {
+        @Nonnull public Builder<C, T> named(@Nonnull final String name) {
             this.name = name;
             return this;
         }
@@ -199,7 +202,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
          *
          * @return Builder instance
          */
-        @Nonnull public Builder<T> asRequired() {
+        @Nonnull public Builder<C, T> asRequired() {
             this.required = true;
             return this;
         }
@@ -213,7 +216,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
          *
          * @return Builder instance
          */
-        @Nonnull public Builder<T> asOptional() {
+        @Nonnull public Builder<C, T> asOptional() {
             this.required = false;
             return this;
         }
@@ -224,7 +227,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
          * @param parser Component parser
          * @return Builder instance
          */
-        @Nonnull public Builder<T> withParser(@Nonnull final ComponentParser<T> parser) {
+        @Nonnull public Builder<C, T> withParser(@Nonnull final ComponentParser<C, T> parser) {
             this.parser = Objects.requireNonNull(parser, "Parser may not be null");
             return this;
         }
@@ -234,7 +237,7 @@ public class CommandComponent<T> implements Comparable<CommandComponent<?>> {
          *
          * @return Constructed component
          */
-        @Nonnull public CommandComponent<T> build() {
+        @Nonnull public CommandComponent<C, T> build() {
             return new CommandComponent<>(this.required, this.name, this.parser);
         }
 

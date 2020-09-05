@@ -21,52 +21,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.exceptions;
+package com.intellectualsites.commands.execution;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.List;
 
 /**
- * Exception thrown when parsing user input into a command
+ * Handler that is invoked whenever a {@link com.intellectualsites.commands.Command} is executed
+ * by a {@link com.intellectualsites.commands.sender.CommandSender}
+ *
+ * @param <C> Command sender type
  */
-public class CommandParseException extends IllegalArgumentException {
-
-    private final CommandSender commandSender;
-    private final List<CommandComponent<?, ?>> currentChain;
+@FunctionalInterface public interface CommandExecutionHandler<C extends CommandSender> {
 
     /**
-     * Construct a new command parse exception
+     * Handle command execution
      *
-     * @param commandSender Sender who executed the command
-     * @param currentChain  Chain leading up to the exception
+     * @param commandContext Command context
      */
-    protected CommandParseException(@Nonnull final CommandSender commandSender, @Nonnull final List<CommandComponent<?, ?>> currentChain) {
-        this.commandSender = commandSender;
-        this.currentChain = currentChain;
-    }
+    void execute(@Nonnull final CommandContext<C> commandContext);
 
-    /**
-     * Get the command sender
-     *
-     * @return Command sender
-     */
-    @Nonnull
-    public CommandSender getCommandSender() {
-        return this.commandSender;
-    }
 
-    /**
-     * Get the command chain leading up to the exception
-     *
-     * @return Unmodifiable list of command components
-     */
-    @Nonnull
-    public List<CommandComponent<?, ?>> getCurrentChain() {
-        return Collections.unmodifiableList(this.currentChain);
+    class NullCommandExecutionHandler<C extends CommandSender> implements CommandExecutionHandler<C> {
+
+        @Override
+        public void execute(@Nonnull final CommandContext<C> commandContext) {
+
+        }
+
     }
 
 }

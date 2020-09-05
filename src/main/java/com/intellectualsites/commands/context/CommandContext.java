@@ -21,52 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.exceptions;
+package com.intellectualsites.commands.context;
 
-import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.List;
 
-/**
- * Exception thrown when parsing user input into a command
- */
-public class CommandParseException extends IllegalArgumentException {
+public class CommandContext<C extends CommandSender> {
 
-    private final CommandSender commandSender;
-    private final List<CommandComponent<?, ?>> currentChain;
+    private final C commandSender;
 
-    /**
-     * Construct a new command parse exception
-     *
-     * @param commandSender Sender who executed the command
-     * @param currentChain  Chain leading up to the exception
-     */
-    protected CommandParseException(@Nonnull final CommandSender commandSender, @Nonnull final List<CommandComponent<?, ?>> currentChain) {
+    public CommandContext(@Nonnull final C commandSender) {
         this.commandSender = commandSender;
-        this.currentChain = currentChain;
     }
 
     /**
-     * Get the command sender
+     * Get the sender that executed the command
      *
      * @return Command sender
      */
-    @Nonnull
-    public CommandSender getCommandSender() {
+    @Nonnull public C getCommandSender() {
         return this.commandSender;
-    }
-
-    /**
-     * Get the command chain leading up to the exception
-     *
-     * @return Unmodifiable list of command components
-     */
-    @Nonnull
-    public List<CommandComponent<?, ?>> getCurrentChain() {
-        return Collections.unmodifiableList(this.currentChain);
     }
 
 }

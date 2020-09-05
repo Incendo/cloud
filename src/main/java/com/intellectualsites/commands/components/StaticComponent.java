@@ -23,6 +23,7 @@
 //
 package com.intellectualsites.commands.components;
 
+import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.parser.ComponentParseResult;
 import com.intellectualsites.commands.parser.ComponentParser;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -33,14 +34,22 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
-public final class StaticComponent extends CommandComponent<String> {
+public final class StaticComponent<C extends CommandSender> extends CommandComponent<C, String> {
 
     private StaticComponent(final boolean required, @Nonnull final String name, @Nonnull final String ... aliases) {
-        super(required, name, new StaticComponentParser(name, aliases));
+        super(required, name, new StaticComponentParser<>(name, aliases));
+    }
+
+    @Nonnull public static <C extends CommandSender> StaticComponent<C> required(@Nonnull final String name, @Nonnull final String ... aliases) {
+        return new StaticComponent<>(true, name, aliases);
+    }
+
+    @Nonnull public static <C extends CommandSender> StaticComponent<C> optional(@Nonnull final String name, @Nonnull final String ... aliases) {
+        return new StaticComponent<>(false, name, aliases);
     }
 
 
-    private static final class StaticComponentParser implements ComponentParser<String> {
+    private static final class StaticComponentParser<C extends CommandSender> implements ComponentParser<C, String> {
 
         private final String name;
         private final Set<String> acceptedStrings = new HashSet<>();
@@ -50,7 +59,7 @@ public final class StaticComponent extends CommandComponent<String> {
             this.acceptedStrings.addAll(Arrays.asList(aliases));
         }
 
-        @Nonnull @Override public ComponentParseResult<String> parse(@Nonnull final CommandSender sender, @Nonnull final Queue<String> inputQueue) {
+        @Nonnull @Override public ComponentParseResult<String> parse(@Nonnull final CommandContext<C> commandContext, @Nonnull final Queue<String> inputQueue) {
             final String string = inputQueue.peek();
             if (string == null) {
                 return ComponentParseResult.failure(this.name);
