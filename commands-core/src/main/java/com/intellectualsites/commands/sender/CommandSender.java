@@ -23,5 +23,12 @@
 //
 package com.intellectualsites.commands.sender;
 
+import javax.annotation.Nonnull;
+
 public interface CommandSender {
+
+    default boolean hasPermission(@Nonnull final String permission) {
+        return true;
+    }
+
 }

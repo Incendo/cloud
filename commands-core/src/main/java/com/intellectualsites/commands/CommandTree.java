@@ -36,9 +36,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -84,10 +86,18 @@ public class CommandTree<C extends CommandSender> {
     private Optional<Command<C>> parseCommand(@Nonnull final CommandContext<C> commandContext,
                                               @Nonnull final Queue<String> commandQueue,
                                               @Nonnull final Node<CommandComponent<C, ?>> root) throws NoSuchCommandException {
+        if (!this.isPermitted(commandContext.getCommandSender(), root)) {
+            /* TODO: Send not allowed */
+            throw new RuntimeException("Nope!");
+        }
         final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
             // The value has to be a variable
             final Node<CommandComponent<C, ?>> child = children.get(0);
+            if (!this.isPermitted(commandContext.getCommandSender(), child)) {
+                /* TODO: Send not allowed */
+                throw new RuntimeException("Nope!");
+            }
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
                     if (child.isLeaf()) {
@@ -120,7 +130,7 @@ public class CommandTree<C extends CommandSender> {
                             throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                                 .apply(Objects.requireNonNull(child.getValue()
                                                                                                                    .getOwningCommand())
-                                                                                              .getComponents()),
+                                                                                                                   .getComponents()),
                                                              commandContext.getCommandSender(), this.getChain(root)
                                                                                                     .stream()
                                                                                                     .map(Node::getValue)
@@ -153,11 +163,17 @@ public class CommandTree<C extends CommandSender> {
                                                                                             .collect(Collectors.toList()));
                 }
             } else {
-                /* TODO: Indicate that we could not resolve the command here */
-                final List<CommandComponent<C, ?>> components = this.getChain(root)
-                                                                    .stream()
-                                                                    .map(Node::getValue)
-                                                                    .collect(Collectors.toList());
+                /* Too many arguments. We have a unique path, so we can send the entire context */
+                throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
+                                                                    .apply(Objects.requireNonNull(
+                                                                            Objects.requireNonNull(root.getValue())
+                                                                                                       .getOwningCommand())
+                                                                                                       .getComponents()),
+                                                 commandContext.getCommandSender(), this.getChain(root)
+                                                                                        .stream()
+                                                                                        .map(Node::getValue)
+                                                                                        .collect(
+                                                                                                Collectors.toList()));
             }
         } else {
             final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
@@ -178,7 +194,6 @@ public class CommandTree<C extends CommandSender> {
                                              getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
                                              stringOrEmpty(commandQueue.peek()));
         }
-        return Optional.empty();
     }
 
     public List<String> getSuggestions(@Nonnull final CommandContext<C> context, @Nonnull final Queue<String> commandQueue) {
@@ -188,6 +203,11 @@ public class CommandTree<C extends CommandSender> {
     public List<String> getSuggestions(@Nonnull final CommandContext<C> commandContext,
                                        @Nonnull final Queue<String> commandQueue,
                                        @Nonnull final Node<CommandComponent<C, ?>> root) {
+
+        /* If the sender isn't allowed to access the root node, no suggestions are needed */
+        if (!this.isPermitted(commandContext.getCommandSender(), root)) {
+            return Collections.emptyList();
+        }
         final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
             // The value has to be a variable
@@ -235,11 +255,10 @@ public class CommandTree<C extends CommandSender> {
             }
             final List<String> suggestions = new LinkedList<>();
             for (final Node<CommandComponent<C, ?>> component : root.getChildren()) {
-                if (component.getValue() == null) {
+                if (component.getValue() == null || !this.isPermitted(commandContext.getCommandSender(), component)) {
                     continue;
                 }
-                suggestions.addAll(
-                        component.getValue().getParser().suggestions(commandContext, stringOrEmpty(commandQueue.peek())));
+                suggestions.addAll(component.getValue().getParser().suggestions(commandContext, stringOrEmpty(commandQueue.peek())));
             }
             return suggestions;
         }
@@ -278,6 +297,27 @@ public class CommandTree<C extends CommandSender> {
         this.verifyAndRegister();
     }
 
+    private boolean isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandComponent<C, ?>> node) {
+        final String permission = node.nodeMeta.get("permission");
+        if (permission != null) {
+            return sender.hasPermission(permission);
+        }
+        if (node.isLeaf()) {
+            // noinspection all
+            return sender.hasPermission(node.value.getOwningCommand().getCommandPermission());
+        }
+        /*
+          if any of the children would permit the execution, then the sender has a valid
+           chain to execute, and so we allow them to execute the root
+         */
+        for (final Node<CommandComponent<C, ?>> child : node.getChildren()) {
+            if (this.isPermitted(sender, child)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Go through all commands and register them, and verify the
      * command tree contracts
@@ -299,6 +339,24 @@ public class CommandTree<C extends CommandSender> {
                 this.commandRegistrationHandler.registerCommand(leaf.getOwningCommand());
             }
         });
+        // Register command permissions
+        this.getLeavesRaw(this.internalTree).forEach(node -> {
+            /* All leaves must necessarily have an owning command */
+            // noinspection all
+            node.nodeMeta.put("permission", node.getValue().getOwningCommand().getCommandPermission());
+            // Get chain and order it tail->head then skip the tail (leaf node)
+            List<Node<CommandComponent<C, ?>>> chain = this.getChain(node);
+            Collections.reverse(chain);
+            chain = chain.subList(1, chain.size());
+            // Go through all nodes from the tail upwards until a collision occurs
+            for (final Node<CommandComponent<C, ?>> commandComponentNode : chain) {
+                if (commandComponentNode.nodeMeta.containsKey("permission")) {
+                    commandComponentNode.nodeMeta.remove("permission");
+                    break;
+                }
+                commandComponentNode.nodeMeta.put("permission", node.nodeMeta.get("permission"));
+            }
+        });
         /* TODO: Figure out a way to register all combinations along a command component path */
     }
 
@@ -314,6 +372,18 @@ public class CommandTree<C extends CommandSender> {
             }
         }
         node.children.forEach(this::checkAmbiguity);
+    }
+
+    private List<Node<CommandComponent<C, ?>>> getLeavesRaw(@Nonnull final Node<CommandComponent<C, ?>> node) {
+        final List<Node<CommandComponent<C, ?>>> leaves = new LinkedList<>();
+        if (node.isLeaf()) {
+            if (node.getValue() != null) {
+                leaves.add(node);
+            }
+        } else {
+            node.children.forEach(child -> leaves.addAll(getLeavesRaw(child)));
+        }
+        return leaves;
     }
 
     private List<CommandComponent<C, ?>> getLeaves(@Nonnull final Node<CommandComponent<C, ?>> node) {
@@ -342,6 +412,7 @@ public class CommandTree<C extends CommandSender> {
 
     private static final class Node<T> {
 
+        private final Map<String, String> nodeMeta = new HashMap<>();
         private final List<Node<T>> children = new LinkedList<>();
         private final T value;
         private Node<T> parent;
