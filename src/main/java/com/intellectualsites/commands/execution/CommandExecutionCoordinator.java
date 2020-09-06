@@ -71,7 +71,8 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender> {
      *
      * @return Command tree
      */
-    @Nonnull protected CommandTree<C> getCommandTree() {
+    @Nonnull
+    protected CommandTree<C> getCommandTree() {
         return this.commandTree;
     }
 
@@ -83,7 +84,8 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender> {
         }
 
         @Override
-        public CompletableFuture<CommandResult> coordinateExecution(@Nonnull CommandContext<C> commandContext, @Nonnull Queue<String> input) {
+        public CompletableFuture<CommandResult> coordinateExecution(@Nonnull CommandContext<C> commandContext,
+                                                                    @Nonnull Queue<String> input) {
             final CompletableFuture<CommandResult> completableFuture = new CompletableFuture<>();
             try {
                 this.getCommandTree().parse(commandContext, input).ifPresent(

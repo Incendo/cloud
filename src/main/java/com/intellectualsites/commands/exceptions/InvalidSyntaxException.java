@@ -33,12 +33,15 @@ public class InvalidSyntaxException extends CommandParseException {
 
     private final String correctSyntax;
 
-    public InvalidSyntaxException(@Nonnull final String correctSyntax, @Nonnull final CommandSender commandSender, @Nonnull final List<CommandComponent<?, ?>> currentChain) {
+    public InvalidSyntaxException(@Nonnull final String correctSyntax,
+                                  @Nonnull final CommandSender commandSender,
+                                  @Nonnull final List<CommandComponent<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.correctSyntax = correctSyntax;
     }
 
-    @Nonnull public String getCorrectSyntax() {
+    @Nonnull
+    public String getCorrectSyntax() {
         return this.correctSyntax;
     }
 

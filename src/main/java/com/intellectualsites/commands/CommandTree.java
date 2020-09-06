@@ -36,7 +36,14 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
@@ -50,7 +57,8 @@ public class CommandTree<C extends CommandSender> {
     private final CommandManager<C> commandManager;
     private final CommandRegistrationHandler commandRegistrationHandler;
 
-    private CommandTree(@Nonnull final CommandManager<C> commandManager, @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+    private CommandTree(@Nonnull final CommandManager<C> commandManager,
+                        @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
         this.commandManager = commandManager;
         this.commandRegistrationHandler = commandRegistrationHandler;
     }
@@ -65,17 +73,19 @@ public class CommandTree<C extends CommandSender> {
      */
     @Nonnull
     public static <C extends CommandSender> CommandTree<C> newTree(@Nonnull final CommandManager<C> commandManager,
-                                                                   @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+                                                                   @Nonnull
+                                                                   final CommandRegistrationHandler commandRegistrationHandler) {
         return new CommandTree<>(commandManager, commandRegistrationHandler);
     }
 
-    public Optional<Command<C>> parse(@Nonnull final CommandContext<C> commandContext, @Nonnull final Queue<String> args) throws NoSuchCommandException {
+    public Optional<Command<C>> parse(@Nonnull final CommandContext<C> commandContext, @Nonnull final Queue<String> args) throws
+            NoSuchCommandException {
         return parseCommand(commandContext, args, this.internalTree);
     }
 
-    private Optional<Command<C>> parseCommand(@Nonnull final CommandContext<C> commandContext, @Nonnull final Queue<String> commandQueue,
-                                           @Nonnull final Node<CommandComponent<C, ?>> root) throws NoSuchCommandException {
-
+    private Optional<Command<C>> parseCommand(@Nonnull final CommandContext<C> commandContext,
+                                              @Nonnull final Queue<String> commandQueue,
+                                              @Nonnull final Node<CommandComponent<C, ?>> root) throws NoSuchCommandException {
         final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
             // The value has to be a variable
@@ -84,12 +94,21 @@ public class CommandTree<C extends CommandSender> {
                 if (commandQueue.isEmpty()) {
                     if (child.isLeaf()) {
                         /* Not enough arguments */
-                        throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter().apply(Arrays.asList(child.getValue().getOwningCommand().getComponents())),
-                                commandContext.getCommandSender(), this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()));
+                        throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
+                                                                            .apply(Arrays.asList(child.getValue()
+                                                                                                      .getOwningCommand()
+                                                                                                      .getComponents())),
+                                                         commandContext.getCommandSender(), this.getChain(root)
+                                                                                                .stream()
+                                                                                                .map(Node::getValue)
+                                                                                                .collect(Collectors.toList()));
                     } else {
                         throw new NoSuchCommandException(commandContext.getCommandSender(),
-                                this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
-                                "");
+                                                         this.getChain(root)
+                                                             .stream()
+                                                             .map(Node::getValue)
+                                                             .collect(Collectors.toList()),
+                                                         "");
                     }
                 }
                 final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
@@ -100,8 +119,15 @@ public class CommandTree<C extends CommandSender> {
                             return Optional.ofNullable(child.getValue().getOwningCommand());
                         } else {
                             /* Too many arguments. We have a unique path, so we can send the entire context */
-                            throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter().apply(Arrays.asList(child.getValue().getOwningCommand().getComponents())),
-                                    commandContext.getCommandSender(), this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()));
+                            throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
+                                                                                .apply(Arrays.asList(child.getValue()
+                                                                                                          .getOwningCommand()
+                                                                                                          .getComponents())),
+                                                             commandContext.getCommandSender(), this.getChain(root)
+                                                                                                    .stream()
+                                                                                                    .map(Node::getValue)
+                                                                                                    .collect(
+                                                                                                            Collectors.toList()));
                         }
                     } else {
                         return this.parseCommand(commandContext, commandQueue, child);
@@ -111,7 +137,6 @@ public class CommandTree<C extends CommandSender> {
                 }
             }
         }
-
         /* There are 0 or more static components as children. No variable child components are present */
         if (children.isEmpty()) {
             /* We are at the bottom. Check if there's a command attached, in which case we're done */
@@ -120,44 +145,23 @@ public class CommandTree<C extends CommandSender> {
                     return Optional.of(root.getValue().getOwningCommand());
                 } else {
                     /* Too many arguments. We have a unique path, so we can send the entire context */
-                    throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter().apply(Arrays.asList(root.getValue().getOwningCommand().getComponents())),
-                            commandContext.getCommandSender(), this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()));
+                    throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
+                                                                        .apply(Arrays.asList(root.getValue()
+                                                                                                 .getOwningCommand()
+                                                                                                 .getComponents())),
+                                                     commandContext.getCommandSender(), this.getChain(root)
+                                                                                            .stream()
+                                                                                            .map(Node::getValue)
+                                                                                            .collect(Collectors.toList()));
                 }
             } else {
                 /* TODO: Indicate that we could not resolve the command here */
-                final List<CommandComponent<C, ?>> components = this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList());
+                final List<CommandComponent<C, ?>> components = this.getChain(root)
+                                                                    .stream()
+                                                                    .map(Node::getValue)
+                                                                    .collect(Collectors.toList());
             }
         } else {
-            /*
-            final String popped = commandQueue.poll();
-            if (popped == null) {
-                return Optional.empty();
-            }
-
-            int low = 0;
-            int high = children.size() - 1;
-
-            while (low <= high) {
-                int mid = (low + high) / 2;
-
-                final Node<CommandComponent<?>> node = children.get(mid);
-                assert node.getValue() != null;
-
-                final int comparison = node.getValue().getName().compareToIgnoreCase(popped);
-                if (comparison < 0) {
-                    low = mid + 1;
-                } else if (comparison > 0) {
-                    high = mid - 1;
-                } else {
-                    if (node.isLeaf()) {
-                        return Optional.ofNullable(node.getValue().getOwningCommand());
-                    } else {
-                        return parseCommand(commandSender, commandQueue, node);
-                    }
-                }
-            }
-            */
-
             final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
             if (childIterator.hasNext()) {
                 while (childIterator.hasNext()) {
@@ -171,14 +175,84 @@ public class CommandTree<C extends CommandSender> {
                     }
                 }
             }
-
             /* We could not find a match */
             throw new NoSuchCommandException(commandContext.getCommandSender(),
-                    getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
-                    java.util.Objects.requireNonNull(commandQueue.peek()));
+                                             getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
+                                             stringOrEmpty(commandQueue.peek()));
         }
-
         return Optional.empty();
+    }
+
+    public List<String> getSuggestions(@Nonnull final CommandContext<C> context, @Nonnull final Queue<String> commandQueue) {
+        return getSuggestions(context, commandQueue, this.internalTree);
+    }
+
+    public List<String> getSuggestions(@Nonnull final CommandContext<C> commandContext,
+                                       @Nonnull final Queue<String> commandQueue,
+                                       @Nonnull final Node<CommandComponent<C, ?>> root) {
+        final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
+        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
+            // The value has to be a variable
+            final Node<CommandComponent<C, ?>> child = children.get(0);
+            if (child.getValue() != null) {
+                if (commandQueue.isEmpty()) {
+                    if (child.isLeaf()) {
+                        /* Child is leaf, and so no suggestions should be sent */
+                        return Collections.emptyList();
+                    } else {
+                        /* Send all suggestions */
+                        return child.getValue().getParser().suggestions(commandContext, "");
+                    }
+                }
+                final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                if (result.getParsedValue().isPresent()) {
+                    if (child.isLeaf()) {
+                        /* Child is leaf, and so no suggestions should be sent */
+                        return Collections.emptyList();
+                    }
+                    commandContext.store(child.getValue().getName(), result.getParsedValue().get());
+                    return this.getSuggestions(commandContext, commandQueue, child);
+                } else if (result.getFailure().isPresent()) {
+                    /* TODO: Return error */
+                    return Collections.emptyList();
+                }
+            }
+        }
+        /* There are 0 or more static components as children. No variable child components are present */
+        if (children.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
+            if (childIterator.hasNext()) {
+                while (childIterator.hasNext()) {
+                    final Node<CommandComponent<C, ?>> child = childIterator.next();
+                    if (child.getValue() != null) {
+                        final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                        if (result.getParsedValue().isPresent()) {
+                            return this.getSuggestions(commandContext, commandQueue, child);
+                        } else if (result.getFailure().isPresent() && root.children.size() == 1) {
+                        }
+                    }
+                }
+            }
+            final List<String> suggestions = new LinkedList<>();
+            for (final Node<CommandComponent<C, ?>> component : root.getChildren()) {
+                if (component.getValue() == null) {
+                    continue;
+                }
+                suggestions.addAll(
+                        component.getValue().getParser().suggestions(commandContext, stringOrEmpty(commandQueue.peek())));
+            }
+            return suggestions;
+        }
+    }
+
+    @Nonnull
+    private String stringOrEmpty(@Nullable final String string) {
+        if (string == null) {
+            return "";
+        }
+        return string;
     }
 
     /**
@@ -196,6 +270,7 @@ public class CommandTree<C extends CommandSender> {
             if (node.children.size() > 0) {
                 node.children.sort(Comparator.comparing(Node::getValue));
             }
+            tempNode.setParent(node);
             node = tempNode;
         }
         if (node.getValue() != null) {
@@ -260,7 +335,7 @@ public class CommandTree<C extends CommandSender> {
         Node<CommandComponent<C, ?>> tail = end;
         while (tail != null) {
             chain.add(tail);
-            tail = end.getParent();
+            tail = tail.getParent();
         }
         return Lists.reverse(chain);
     }
@@ -324,13 +399,13 @@ public class CommandTree<C extends CommandSender> {
             return Objects.hashCode(getChildren(), getValue());
         }
 
-        public void setParent(@Nullable final Node<T> parent) {
-            this.parent = parent;
-        }
-
         @Nullable
         public Node<T> getParent() {
             return this.parent;
+        }
+
+        public void setParent(@Nullable final Node<T> parent) {
+            this.parent = parent;
         }
 
     }

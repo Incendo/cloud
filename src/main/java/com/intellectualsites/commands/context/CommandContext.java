@@ -70,8 +70,7 @@ public class CommandContext<C extends CommandSender> {
     public <T> Optional<T> get(@Nonnull final String key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
-            @SuppressWarnings("ALL")
-            final T castedValue = (T) value;
+            @SuppressWarnings("ALL") final T castedValue = (T) value;
             return Optional.of(castedValue);
         } else {
             return Optional.empty();

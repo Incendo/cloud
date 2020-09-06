@@ -31,17 +31,21 @@ public abstract class ComponentParseResult<T> {
     private ComponentParseResult() {
     }
 
-    @Nonnull public static <T> ComponentParseResult<T> failure(@Nonnull final String failure) {
+    @Nonnull
+    public static <T> ComponentParseResult<T> failure(@Nonnull final String failure) {
         return new ParseFailure<>(failure);
     }
 
-    @Nonnull public static <T> ComponentParseResult<T> success(@Nonnull final T value) {
+    @Nonnull
+    public static <T> ComponentParseResult<T> success(@Nonnull final T value) {
         return new ParseSuccess<>(value);
     }
 
-    @Nonnull public abstract Optional<T> getParsedValue();
+    @Nonnull
+    public abstract Optional<T> getParsedValue();
 
-    @Nonnull public abstract Optional<String> getFailure();
+    @Nonnull
+    public abstract Optional<String> getFailure();
 
 
     private static final class ParseSuccess<T> extends ComponentParseResult<T> {
@@ -52,11 +56,15 @@ public abstract class ComponentParseResult<T> {
             this.value = value;
         }
 
-        @Nonnull @Override public Optional<T> getParsedValue() {
+        @Nonnull
+        @Override
+        public Optional<T> getParsedValue() {
             return Optional.of(this.value);
         }
 
-        @Nonnull @Override public Optional<String> getFailure() {
+        @Nonnull
+        @Override
+        public Optional<String> getFailure() {
             return Optional.empty();
         }
 
@@ -71,11 +79,15 @@ public abstract class ComponentParseResult<T> {
             this.failure = failure;
         }
 
-        @Nonnull @Override public Optional<T> getParsedValue() {
+        @Nonnull
+        @Override
+        public Optional<T> getParsedValue() {
             return Optional.empty();
         }
 
-        @Nonnull @Override public Optional<String> getFailure() {
+        @Nonnull
+        @Override
+        public Optional<String> getFailure() {
             return Optional.of(this.failure);
         }
     }

@@ -32,6 +32,7 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
@@ -56,13 +57,23 @@ public abstract class CommandManager<C extends CommandSender> {
     }
 
     public CompletableFuture<CommandResult> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
+        final CommandContext<C> context = new CommandContext<>(commandSender);
+        return this.commandExecutionCoordinator.coordinateExecution(context, tokenize(input));
+    }
+
+    public List<String> suggest(@Nonnull final C commandSender, @Nonnull final String input) {
+        final CommandContext<C> context = new CommandContext<>(commandSender);
+        return this.commandTree.getSuggestions(context, tokenize(input));
+    }
+
+    @Nonnull
+    private Queue<String> tokenize(@Nonnull final String input) {
         final StringTokenizer stringTokenizer = new StringTokenizer(input, " ");
         final Queue<String> tokens = new LinkedList<>();
         while (stringTokenizer.hasMoreElements()) {
             tokens.add(stringTokenizer.nextToken());
         }
-        final CommandContext<C> context = new CommandContext<>(commandSender);
-        return this.commandExecutionCoordinator.coordinateExecution(context, tokens);
+        return tokens;
     }
 
     /**
@@ -81,7 +92,8 @@ public abstract class CommandManager<C extends CommandSender> {
      *
      * @return Command syntax formatter
      */
-    @Nonnull public CommandSyntaxFormatter getCommandSyntaxFormatter() {
+    @Nonnull
+    public CommandSyntaxFormatter getCommandSyntaxFormatter() {
         return this.commandSyntaxFormatter;
     }
 

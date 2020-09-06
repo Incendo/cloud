@@ -32,7 +32,8 @@ import javax.annotation.Nonnull;
  * platform the library is used in. This can do nothing, if
  * the target platform does not have its own concept of commands
  */
-@FunctionalInterface public interface CommandRegistrationHandler {
+@FunctionalInterface
+public interface CommandRegistrationHandler {
 
     /**
      * Command registration handler that does nothing
@@ -44,7 +45,7 @@ import javax.annotation.Nonnull;
      *
      * @param command Command to register
      * @return {@code true} if the command was registered successfully,
-     *         else {@code false}
+     * else {@code false}
      */
     boolean registerCommand(@Nonnull final Command command);
 

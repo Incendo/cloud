@@ -34,7 +34,8 @@ import javax.annotation.Nonnull;
  *
  * @param <C> Command sender type
  */
-@FunctionalInterface public interface CommandExecutionHandler<C extends CommandSender> {
+@FunctionalInterface
+public interface CommandExecutionHandler<C extends CommandSender> {
 
     /**
      * Handle command execution

@@ -27,10 +27,13 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
 
-@FunctionalInterface public interface CommandSyntaxFormatter extends Function<List<CommandComponent<?, ?>>, String> {
+@FunctionalInterface
+public interface CommandSyntaxFormatter extends Function<List<CommandComponent<?, ?>>, String> {
 
     CommandSyntaxFormatter STANDARD_COMMAND_SYNTAX_FORMATTER = new StandardCommandSyntaxFormatter();
 
-    @Override @Nonnull String apply(@Nonnull List<CommandComponent<?, ?>> commandComponents);
+    @Override
+    @Nonnull
+    String apply(@Nonnull List<CommandComponent<?, ?>> commandComponents);
 
 }

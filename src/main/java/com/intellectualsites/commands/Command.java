@@ -29,7 +29,13 @@ import com.intellectualsites.commands.execution.CommandExecutionHandler;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A command consists out of a chain of {@link com.intellectualsites.commands.components.CommandComponent command components}.
@@ -38,10 +44,13 @@ import java.util.*;
  */
 public class Command<C extends CommandSender> {
 
-    private final CommandComponent<C, ?>[] components;
-    private final CommandExecutionHandler<C> commandExecutionHandler;
+    @Nonnull private final CommandComponent<C, ?>[] components;
+    @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
+    @Nullable private final Class<? extends C> senderType;
 
-    protected Command(@Nonnull final CommandComponent<C, ?>[] commandComponents, @Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
+    protected Command(@Nonnull final CommandComponent<C, ?>[] commandComponents,
+                      @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
+                      @Nullable final Class<? extends C> senderType) {
         this.components = Objects.requireNonNull(commandComponents, "Command components may not be null");
         if (this.components.length == 0) {
             throw new IllegalArgumentException("At least one command component is required");
@@ -50,12 +59,15 @@ public class Command<C extends CommandSender> {
         boolean foundOptional = false;
         for (final CommandComponent<C, ?> component : this.components) {
             if (foundOptional && component.isRequired()) {
-                throw new IllegalArgumentException(String.format("Command component '%s' cannot be placed after an optional component", component.getName()));
+                throw new IllegalArgumentException(
+                        String.format("Command component '%s' cannot be placed after an optional component",
+                                      component.getName()));
             } else if (!component.isRequired()) {
                 foundOptional = true;
             }
         }
         this.commandExecutionHandler = commandExecutionHandler;
+        this.senderType = senderType;
     }
 
     /**
@@ -66,8 +78,8 @@ public class Command<C extends CommandSender> {
      */
     @Nonnull
     public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String commandName) {
-        return new Builder<>(Collections.singletonList(StaticComponent.required(commandName)),
-                new CommandExecutionHandler.NullCommandExecutionHandler<>());
+        return new Builder<>(null, Collections.singletonList(StaticComponent.required(commandName)),
+                             new CommandExecutionHandler.NullCommandExecutionHandler<>());
     }
 
     /**
@@ -75,7 +87,8 @@ public class Command<C extends CommandSender> {
      *
      * @return Copy of the command component array
      */
-    @Nonnull @SuppressWarnings("ALL")
+    @Nonnull
+    @SuppressWarnings("ALL")
     public CommandComponent<C, ?>[] getComponents() {
         return (CommandComponent<C, ?>[]) Arrays.asList(this.components).toArray();
     }
@@ -85,8 +98,19 @@ public class Command<C extends CommandSender> {
      *
      * @return Command execution handler
      */
-    @Nonnull public CommandExecutionHandler<C> getCommandExecutionHandler() {
+    @Nonnull
+    public CommandExecutionHandler<C> getCommandExecutionHandler() {
         return this.commandExecutionHandler;
+    }
+
+    /**
+     * Get the required sender type, if one has been specified
+     *
+     * @return Required sender type
+     */
+    @Nonnull
+    public Optional<Class<? extends C>> getSenderType() {
+        return Optional.ofNullable(this.senderType);
     }
 
     /**
@@ -110,12 +134,16 @@ public class Command<C extends CommandSender> {
 
     public static class Builder<C extends CommandSender> {
 
-        private final List<CommandComponent<C, ?>> commandComponents;
-        private final CommandExecutionHandler<C> commandExecutionHandler;
+        @Nonnull private final List<CommandComponent<C, ?>> commandComponents;
+        @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
+        @Nullable private final Class<? extends C> senderType;
 
-        private Builder(@Nonnull final List<CommandComponent<C, ?>> commandComponents, @Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
+        private Builder(@Nullable final Class<? extends C> senderType,
+                        @Nonnull final List<CommandComponent<C, ?>> commandComponents,
+                        @Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
             this.commandComponents = commandComponents;
             this.commandExecutionHandler = commandExecutionHandler;
+            this.senderType = senderType;
         }
 
         /**
@@ -129,7 +157,7 @@ public class Command<C extends CommandSender> {
         public <T> Builder<C> withComponent(@Nonnull final CommandComponent<C, T> component) {
             final List<CommandComponent<C, ?>> commandComponents = new LinkedList<>(this.commandComponents);
             commandComponents.add(component);
-            return new Builder<>(commandComponents, this.commandExecutionHandler);
+            return new Builder<>(this.senderType, commandComponents, this.commandExecutionHandler);
         }
 
         /**
@@ -140,7 +168,18 @@ public class Command<C extends CommandSender> {
          */
         @Nonnull
         public Builder<C> withHandler(@Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
-            return new Builder<>(this.commandComponents, commandExecutionHandler);
+            return new Builder<>(this.senderType, this.commandComponents, commandExecutionHandler);
+        }
+
+        /**
+         * Specify a required sender type
+         *
+         * @param senderType Required sender type
+         * @return New builder instance using the command execution handler
+         */
+        @Nonnull
+        public Builder<C> withSenderType(@Nonnull final Class<? extends C> senderType) {
+            return new Builder<>(senderType, this.commandComponents, this.commandExecutionHandler);
         }
 
         /**
@@ -150,7 +189,8 @@ public class Command<C extends CommandSender> {
          */
         @Nonnull
         public Command<C> build() {
-            return new Command<>(this.commandComponents.toArray(new CommandComponent[0]), this.commandExecutionHandler);
+            return new Command<>(this.commandComponents.toArray(new CommandComponent[0]), this.commandExecutionHandler,
+                                 this.senderType);
         }
 
     }

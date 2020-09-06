@@ -44,7 +44,8 @@ public class CommandParseException extends IllegalArgumentException {
      * @param commandSender Sender who executed the command
      * @param currentChain  Chain leading up to the exception
      */
-    protected CommandParseException(@Nonnull final CommandSender commandSender, @Nonnull final List<CommandComponent<?, ?>> currentChain) {
+    protected CommandParseException(@Nonnull final CommandSender commandSender,
+                                    @Nonnull final List<CommandComponent<?, ?>> currentChain) {
         this.commandSender = commandSender;
         this.currentChain = currentChain;
     }

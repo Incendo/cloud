@@ -30,21 +30,28 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Set;
 
 public final class StaticComponent<C extends CommandSender> extends CommandComponent<C, String> {
 
-    private StaticComponent(final boolean required, @Nonnull final String name, @Nonnull final String ... aliases) {
+    private StaticComponent(final boolean required, @Nonnull final String name, @Nonnull final String... aliases) {
         super(required, name, new StaticComponentParser<>(name, aliases));
     }
 
-    @Nonnull public static <C extends CommandSender> StaticComponent<C> required(@Nonnull final String name, @Nonnull final String ... aliases) {
+    @Nonnull
+    public static <C extends CommandSender> StaticComponent<C> required(@Nonnull final String name,
+                                                                        @Nonnull final String... aliases) {
         return new StaticComponent<>(true, name, aliases);
     }
 
-    @Nonnull public static <C extends CommandSender> StaticComponent<C> optional(@Nonnull final String name, @Nonnull final String ... aliases) {
+    @Nonnull
+    public static <C extends CommandSender> StaticComponent<C> optional(@Nonnull final String name,
+                                                                        @Nonnull final String... aliases) {
         return new StaticComponent<>(false, name, aliases);
     }
 
@@ -54,12 +61,15 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
         private final String name;
         private final Set<String> acceptedStrings = new HashSet<>();
 
-        private StaticComponentParser(@Nonnull final String name, @Nonnull final String ... aliases) {
+        private StaticComponentParser(@Nonnull final String name, @Nonnull final String... aliases) {
             this.acceptedStrings.add(this.name = name);
             this.acceptedStrings.addAll(Arrays.asList(aliases));
         }
 
-        @Nonnull @Override public ComponentParseResult<String> parse(@Nonnull final CommandContext<C> commandContext, @Nonnull final Queue<String> inputQueue) {
+        @Nonnull
+        @Override
+        public ComponentParseResult<String> parse(@Nonnull final CommandContext<C> commandContext,
+                                                  @Nonnull final Queue<String> inputQueue) {
             final String string = inputQueue.peek();
             if (string == null) {
                 return ComponentParseResult.failure(this.name);
@@ -72,6 +82,15 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
                 }
             }
             return ComponentParseResult.failure(this.name);
+        }
+
+        @Nonnull
+        @Override
+        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
+            if (this.name.toLowerCase(Locale.ENGLISH).startsWith(input)) {
+                return Collections.singletonList(this.name);
+            }
+            return Collections.emptyList();
         }
 
     }

@@ -27,6 +27,8 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
 
 @FunctionalInterface
@@ -41,5 +43,10 @@ public interface ComponentParser<C extends CommandSender, T> {
      */
     @Nonnull
     ComponentParseResult<T> parse(@Nonnull CommandContext<C> commandContext, @Nonnull Queue<String> inputQueue);
+
+    @Nonnull
+    default List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
+        return Collections.emptyList();
+    }
 
 }
