@@ -8,7 +8,9 @@
     <artifactId>Commands</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>commands-jline</module>
+        <!--<module>commands-jline</module>-->
+        <module>commands-bukkit</module>
+        <module>commands-core</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>
@@ -125,11 +127,6 @@
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>3.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>29.0-jre</version>
         </dependency>
     </dependencies>
 </project>

@@ -21,19 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components;
+package com.intellectualsites.commands;import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
+import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.function.Function;
 
-@FunctionalInterface
-public interface CommandSyntaxFormatter extends Function<List<CommandComponent<?, ?>>, String> {
+public class BukkitCommandManager extends CommandManager<BukkitCommandSender> {
 
-    CommandSyntaxFormatter STANDARD_COMMAND_SYNTAX_FORMATTER = new StandardCommandSyntaxFormatter();
+    private final Plugin owningPlugin;
 
-    @Override
-    @Nonnull
-    String apply(@Nonnull List<CommandComponent<?, ?>> commandComponents);
+    public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
+                                @Nonnull final Function<CommandTree<BukkitCommandSender>,
+                                                        CommandExecutionCoordinator<BukkitCommandSender>> commandExecutionCoordinator)
+            throws Exception {
+        super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler());
+        ((BukkitPluginRegistrationHandler) this.getCommandRegistrationHandler()).initialize(this);
+        this.owningPlugin = owningPlugin;
+    }
+
+    @Nonnull public Plugin getOwningPlugin() {
+        return this.owningPlugin;
+    }
 
 }

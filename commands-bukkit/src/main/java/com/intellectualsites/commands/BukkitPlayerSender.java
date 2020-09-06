@@ -21,38 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components;
+package com.intellectualsites.commands;import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
-import java.util.Iterator;
-import java.util.List;
 
-public class StandardCommandSyntaxFormatter implements CommandSyntaxFormatter {
+public class BukkitPlayerSender extends BukkitCommandSender {
 
-    public StandardCommandSyntaxFormatter() {
+    BukkitPlayerSender(@Nonnull final Player player) {
+        super(player);
+    }
+
+    @Override
+    public boolean isPlayer() {
+        return true;
     }
 
     @Nonnull
     @Override
-    public String apply(@Nonnull final List<CommandComponent<?, ?>> commandComponents) {
-        final StringBuilder stringBuilder = new StringBuilder();
-        final Iterator<CommandComponent<?, ?>> iterator = commandComponents.iterator();
-        while (iterator.hasNext()) {
-            final CommandComponent<?, ?> commandComponent = iterator.next();
-            if (commandComponent instanceof StaticComponent) {
-                stringBuilder.append(commandComponent.getName());
-            } else {
-                if (commandComponent.isRequired()) {
-                    stringBuilder.append("<").append(commandComponent.getName()).append(">");
-                } else {
-                    stringBuilder.append("[").append(commandComponent.getName()).append("]");
-                }
-            }
-            if (iterator.hasNext()) {
-                stringBuilder.append(" ");
-            }
-        }
-        return stringBuilder.toString();
+    public Player asPlayer() {
+        return (Player) this.getInternalSender();
     }
-
 }

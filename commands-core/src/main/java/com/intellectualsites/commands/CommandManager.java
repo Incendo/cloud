@@ -24,6 +24,7 @@
 package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.components.CommandSyntaxFormatter;
+import com.intellectualsites.commands.components.StandardCommandSyntaxFormatter;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandResult;
@@ -46,14 +47,16 @@ import java.util.function.Function;
 public abstract class CommandManager<C extends CommandSender> {
 
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
+    private final CommandRegistrationHandler commandRegistrationHandler;
     private final CommandTree<C> commandTree;
 
-    private CommandSyntaxFormatter commandSyntaxFormatter = CommandSyntaxFormatter.STANDARD_COMMAND_SYNTAX_FORMATTER;
+    private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
 
     protected CommandManager(@Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                              @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
         this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
+        this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
     public CompletableFuture<CommandResult> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
@@ -82,7 +85,7 @@ public abstract class CommandManager<C extends CommandSender> {
      * @param command Command to register
      * @return The command manager instance
      */
-    public CommandManager<C> registerCommand(@Nonnull final Command command) {
+    public CommandManager<C> registerCommand(@Nonnull final Command<C> command) {
         this.commandTree.insertCommand(command);
         return this;
     }
@@ -93,7 +96,7 @@ public abstract class CommandManager<C extends CommandSender> {
      * @return Command syntax formatter
      */
     @Nonnull
-    public CommandSyntaxFormatter getCommandSyntaxFormatter() {
+    public CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
         return this.commandSyntaxFormatter;
     }
 
@@ -104,6 +107,10 @@ public abstract class CommandManager<C extends CommandSender> {
      */
     public void setCommandSyntaxFormatter(@Nonnull final CommandSyntaxFormatter commandSyntaxFormatter) {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
+    }
+
+    @Nonnull protected CommandRegistrationHandler getCommandRegistrationHandler() {
+        return this.commandRegistrationHandler;
     }
 
 }

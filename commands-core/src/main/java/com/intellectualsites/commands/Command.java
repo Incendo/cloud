@@ -30,7 +30,6 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,15 +43,15 @@ import java.util.Optional;
  */
 public class Command<C extends CommandSender> {
 
-    @Nonnull private final CommandComponent<C, ?>[] components;
+    @Nonnull private final List<CommandComponent<C, ?>> components;
     @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
     @Nullable private final Class<? extends C> senderType;
 
-    protected Command(@Nonnull final CommandComponent<C, ?>[] commandComponents,
+    protected Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
                       @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                       @Nullable final Class<? extends C> senderType) {
         this.components = Objects.requireNonNull(commandComponents, "Command components may not be null");
-        if (this.components.length == 0) {
+        if (this.components.size() == 0) {
             throw new IllegalArgumentException("At least one command component is required");
         }
         // Enforce ordering of command components
@@ -88,9 +87,8 @@ public class Command<C extends CommandSender> {
      * @return Copy of the command component array
      */
     @Nonnull
-    @SuppressWarnings("ALL")
-    public CommandComponent<C, ?>[] getComponents() {
-        return (CommandComponent<C, ?>[]) Arrays.asList(this.components).toArray();
+    public List<CommandComponent<C, ?>> getComponents() {
+        return Collections.unmodifiableList(this.components);
     }
 
     /**
@@ -121,9 +119,9 @@ public class Command<C extends CommandSender> {
      */
     public List<CommandComponent<C, ?>> getSharedComponentChain(@Nonnull final Command<C> other) {
         final List<CommandComponent<C, ?>> commandComponents = new LinkedList<>();
-        for (int i = 0; i < this.components.length && i < other.components.length; i++) {
-            if (this.components[i].equals(other.components[i])) {
-                commandComponents.add(this.components[i]);
+        for (int i = 0; i < this.components.size() && i < other.components.size(); i++) {
+            if (this.components.get(i).equals(other.components.get(i))) {
+                commandComponents.add(this.components.get(i));
             } else {
                 break;
             }
@@ -189,7 +187,8 @@ public class Command<C extends CommandSender> {
          */
         @Nonnull
         public Command<C> build() {
-            return new Command<>(this.commandComponents.toArray(new CommandComponent[0]), this.commandExecutionHandler,
+            return new Command<>(Collections.unmodifiableList(this.commandComponents),
+                                 this.commandExecutionHandler,
                                  this.senderType);
         }
 

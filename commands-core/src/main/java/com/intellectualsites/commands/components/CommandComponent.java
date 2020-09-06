@@ -153,12 +153,12 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
             return false;
         }
         final CommandComponent<?, ?> that = (CommandComponent<?, ?>) o;
-        return isRequired() == that.isRequired() && com.google.common.base.Objects.equal(getName(), that.getName());
+        return isRequired() == that.isRequired() && Objects.equals(getName(), that.getName());
     }
 
     @Override
     public int hashCode() {
-        return com.google.common.base.Objects.hashCode(isRequired(), getName());
+        return Objects.hash(isRequired(), getName());
     }
 
     @Override

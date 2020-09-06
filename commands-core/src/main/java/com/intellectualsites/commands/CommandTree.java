@@ -23,8 +23,6 @@
 //
 package com.intellectualsites.commands;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.context.CommandContext;
@@ -36,12 +34,12 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.stream.Collectors;
@@ -95,9 +93,8 @@ public class CommandTree<C extends CommandSender> {
                     if (child.isLeaf()) {
                         /* Not enough arguments */
                         throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                            .apply(Arrays.asList(child.getValue()
-                                                                                                      .getOwningCommand()
-                                                                                                      .getComponents())),
+                                                                            .apply(Objects.requireNonNull(
+                                                                                    child.getValue().getOwningCommand()).getComponents()),
                                                          commandContext.getCommandSender(), this.getChain(root)
                                                                                                 .stream()
                                                                                                 .map(Node::getValue)
@@ -120,9 +117,9 @@ public class CommandTree<C extends CommandSender> {
                         } else {
                             /* Too many arguments. We have a unique path, so we can send the entire context */
                             throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                                .apply(Arrays.asList(child.getValue()
-                                                                                                          .getOwningCommand()
-                                                                                                          .getComponents())),
+                                                                                .apply(Objects.requireNonNull(child.getValue()
+                                                                                                                   .getOwningCommand())
+                                                                                              .getComponents()),
                                                              commandContext.getCommandSender(), this.getChain(root)
                                                                                                     .stream()
                                                                                                     .map(Node::getValue)
@@ -146,9 +143,9 @@ public class CommandTree<C extends CommandSender> {
                 } else {
                     /* Too many arguments. We have a unique path, so we can send the entire context */
                     throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                        .apply(Arrays.asList(root.getValue()
-                                                                                                 .getOwningCommand()
-                                                                                                 .getComponents())),
+                                                                        .apply(root.getValue()
+                                                                                   .getOwningCommand()
+                                                                                   .getComponents()),
                                                      commandContext.getCommandSender(), this.getChain(root)
                                                                                             .stream()
                                                                                             .map(Node::getValue)
@@ -337,7 +334,8 @@ public class CommandTree<C extends CommandSender> {
             chain.add(tail);
             tail = tail.getParent();
         }
-        return Lists.reverse(chain);
+        Collections.reverse(chain);
+        return chain;
     }
 
 
@@ -390,13 +388,13 @@ public class CommandTree<C extends CommandSender> {
                 return false;
             }
             final Node<?> node = (Node<?>) o;
-            return Objects.equal(getChildren(), node.getChildren()) &&
-                    Objects.equal(getValue(), node.getValue());
+            return Objects.equals(getChildren(), node.getChildren()) &&
+                    Objects.equals(getValue(), node.getValue());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(getChildren(), getValue());
+            return Objects.hash(getChildren(), getValue());
         }
 
         @Nullable

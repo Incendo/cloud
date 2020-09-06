@@ -21,45 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.internal;
-
-import com.intellectualsites.commands.Command;
+package com.intellectualsites.commands;import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 
-/**
- * Utility that registers commands natively for whatever
- * platform the library is used in. This can do nothing, if
- * the target platform does not have its own concept of commands
- */
-@FunctionalInterface
-public interface CommandRegistrationHandler {
+public class BukkitConsoleSender extends BukkitCommandSender {
 
-    /**
-     * Command registration handler that does nothing
-     */
-    NullCommandRegistrationHandler NULL_COMMAND_REGISTRATION_HANDLER = new NullCommandRegistrationHandler();
+    BukkitConsoleSender() {
+        super(Bukkit.getConsoleSender());
+    }
 
-    /**
-     * Attempt to register the command
-     *
-     * @param command Command to register
-     * @return {@code true} if the command was registered successfully,
-     * else {@code false}
-     */
-    boolean registerCommand(@Nonnull final Command command);
+    @Override
+    public boolean isPlayer() {
+        return false;
+    }
 
-
-    final class NullCommandRegistrationHandler implements CommandRegistrationHandler {
-
-        private NullCommandRegistrationHandler() {
-        }
-
-        @Override
-        public boolean registerCommand(@Nonnull final Command command) {
-            return true;
-        }
-
+    @Nonnull
+    @Override
+    public Player asPlayer() {
+        throw new UnsupportedOperationException("Cannot convert console to player");
     }
 
 }
