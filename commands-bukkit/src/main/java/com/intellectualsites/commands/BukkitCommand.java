@@ -21,7 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;import com.intellectualsites.commands.components.CommandComponent;
+package com.intellectualsites.commands;
+
+import com.intellectualsites.commands.components.CommandComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
@@ -34,7 +36,8 @@ public class BukkitCommand extends org.bukkit.command.Command implements PluginI
     private final CommandComponent<BukkitCommandSender, ?> command;
     private final BukkitCommandManager bukkitCommandManager;
 
-    BukkitCommand(@Nonnull final CommandComponent<BukkitCommandSender, ?> command, @Nonnull final BukkitCommandManager bukkitCommandManager) {
+    BukkitCommand(@Nonnull final CommandComponent<BukkitCommandSender, ?> command,
+                  @Nonnull final BukkitCommandManager bukkitCommandManager) {
         super(command.getName());
         this.command = command;
         this.bukkitCommandManager = bukkitCommandManager;
@@ -47,19 +50,21 @@ public class BukkitCommand extends org.bukkit.command.Command implements PluginI
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        this.bukkitCommandManager.executeCommand(BukkitCommandSender.of(commandSender), builder.toString()).whenComplete(((commandResult, throwable) -> {
-            if (throwable != null) {
-                throwable.printStackTrace();
-            } else {
-                // Do something...
-                commandSender.sendMessage("All good!");
-            }
-        }));
+        this.bukkitCommandManager.executeCommand(BukkitCommandSender.of(commandSender), builder.toString())
+                                 .whenComplete(((commandResult, throwable) -> {
+                                     if (throwable != null) {
+                                         throwable.printStackTrace();
+                                     } else {
+                                         // Do something...
+                                         commandSender.sendMessage("All good!");
+                                     }
+                                 }));
         return true;
     }
 
     @Override
-    public List<String> tabComplete(final CommandSender sender, final String alias, final String[] args) throws IllegalArgumentException {
+    public List<String> tabComplete(final CommandSender sender, final String alias, final String[] args) throws
+            IllegalArgumentException {
         final StringBuilder builder = new StringBuilder(this.command.getName());
         for (final String string : args) {
             builder.append(" ").append(string);

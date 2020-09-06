@@ -21,7 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;import com.google.common.base.Objects;
+package com.intellectualsites.commands;
+
+import com.google.common.base.Objects;
 import com.intellectualsites.commands.sender.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -70,12 +72,14 @@ public abstract class BukkitCommandSender implements CommandSender {
         return Objects.hashCode(internalSender);
     }
 
-    @Nonnull public org.bukkit.command.CommandSender getInternalSender() {
+    @Nonnull
+    public org.bukkit.command.CommandSender getInternalSender() {
         return this.internalSender;
     }
 
     public abstract boolean isPlayer();
 
-    @Nonnull public abstract Player asPlayer();
+    @Nonnull
+    public abstract Player asPlayer();
 
 }

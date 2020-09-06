@@ -94,7 +94,8 @@ public class CommandTree<C extends CommandSender> {
                         /* Not enough arguments */
                         throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                             .apply(Objects.requireNonNull(
-                                                                                    child.getValue().getOwningCommand()).getComponents()),
+                                                                                    child.getValue().getOwningCommand())
+                                                                                          .getComponents()),
                                                          commandContext.getCommandSender(), this.getChain(root)
                                                                                                 .stream()
                                                                                                 .map(Node::getValue)

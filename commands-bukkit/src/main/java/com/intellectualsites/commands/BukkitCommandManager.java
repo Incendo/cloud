@@ -21,7 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
+package com.intellectualsites.commands;
+
+import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
@@ -33,14 +35,15 @@ public class BukkitCommandManager extends CommandManager<BukkitCommandSender> {
 
     public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
                                 @Nonnull final Function<CommandTree<BukkitCommandSender>,
-                                                        CommandExecutionCoordinator<BukkitCommandSender>> commandExecutionCoordinator)
+                                        CommandExecutionCoordinator<BukkitCommandSender>> commandExecutionCoordinator)
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler());
         ((BukkitPluginRegistrationHandler) this.getCommandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
     }
 
-    @Nonnull public Plugin getOwningPlugin() {
+    @Nonnull
+    public Plugin getOwningPlugin() {
         return this.owningPlugin;
     }
 

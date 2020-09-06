@@ -21,7 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;import org.bukkit.entity.Player;
+package com.intellectualsites.commands;
+
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 

@@ -109,7 +109,8 @@ public abstract class CommandManager<C extends CommandSender> {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
     }
 
-    @Nonnull protected CommandRegistrationHandler getCommandRegistrationHandler() {
+    @Nonnull
+    protected CommandRegistrationHandler getCommandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
 

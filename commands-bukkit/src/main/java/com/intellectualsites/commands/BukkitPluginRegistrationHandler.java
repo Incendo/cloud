@@ -21,7 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;import com.intellectualsites.commands.components.CommandComponent;
+package com.intellectualsites.commands;
+
+import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -50,7 +52,8 @@ public class BukkitPluginRegistrationHandler implements CommandRegistrationHandl
         final Field knownCommands = SimpleCommandMap.class.getDeclaredField("knownCommands");
         knownCommands.setAccessible(true);
         @SuppressWarnings("ALL")
-        final Map<String, org.bukkit.command.Command> bukkitCommands = (Map<String, org.bukkit.command.Command>) knownCommands.get(commandMap);
+        final Map<String, org.bukkit.command.Command> bukkitCommands = (Map<String, org.bukkit.command.Command>) knownCommands.get(
+                commandMap);
         this.bukkitCommands = bukkitCommands;
         this.bukkitCommandManager = bukkitCommandManager;
     }
@@ -68,7 +71,8 @@ public class BukkitPluginRegistrationHandler implements CommandRegistrationHandl
         } else {
             label = commandComponent.getName();
         }
-        this.bukkitCommands.put(label, new BukkitCommand((CommandComponent<BukkitCommandSender, ?>) commandComponent, this.bukkitCommandManager));
+        this.bukkitCommands.put(label, new BukkitCommand((CommandComponent<BukkitCommandSender, ?>) commandComponent,
+                                                         this.bukkitCommandManager));
         return true;
     }
 
