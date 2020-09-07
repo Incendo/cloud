@@ -27,6 +27,7 @@ import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
+import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.components.parser.ComponentParseResult;
@@ -86,17 +87,22 @@ public class CommandTree<C extends CommandSender> {
     private Optional<Command<C>> parseCommand(@Nonnull final CommandContext<C> commandContext,
                                               @Nonnull final Queue<String> commandQueue,
                                               @Nonnull final Node<CommandComponent<C, ?>> root) {
-        if (!this.isPermitted(commandContext.getCommandSender(), root)) {
-            /* TODO: Send not allowed */
-            throw new RuntimeException("Nope!");
+        String permission;
+        if ((permission = this.isPermitted(commandContext.getCommandSender(), root)) != null) {
+            throw new NoPermissionException(permission, commandContext.getCommandSender(),  this.getChain(root)
+                                                                                                .stream()
+                                                                                                .map(Node::getValue)
+                                                                                                .collect(Collectors.toList()));
         }
         final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
             // The value has to be a variable
             final Node<CommandComponent<C, ?>> child = children.get(0);
-            if (!this.isPermitted(commandContext.getCommandSender(), child)) {
-                /* TODO: Send not allowed */
-                throw new RuntimeException("Nope!");
+            if ((permission = this.isPermitted(commandContext.getCommandSender(), child)) != null) {
+                throw new NoPermissionException(permission, commandContext.getCommandSender(),  this.getChain(child)
+                                                                                                    .stream()
+                                                                                                    .map(Node::getValue)
+                                                                                                    .collect(Collectors.toList()));
             }
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
@@ -204,7 +210,7 @@ public class CommandTree<C extends CommandSender> {
                                        @Nonnull final Node<CommandComponent<C, ?>> root) {
 
         /* If the sender isn't allowed to access the root node, no suggestions are needed */
-        if (!this.isPermitted(commandContext.getCommandSender(), root)) {
+        if (this.isPermitted(commandContext.getCommandSender(), root) != null) {
             return Collections.emptyList();
         }
         final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
@@ -254,7 +260,7 @@ public class CommandTree<C extends CommandSender> {
             }
             final List<String> suggestions = new LinkedList<>();
             for (final Node<CommandComponent<C, ?>> component : root.getChildren()) {
-                if (component.getValue() == null || !this.isPermitted(commandContext.getCommandSender(), component)) {
+                if (component.getValue() == null || this.isPermitted(commandContext.getCommandSender(), component) != null) {
                     continue;
                 }
                 suggestions.addAll(
@@ -297,25 +303,31 @@ public class CommandTree<C extends CommandSender> {
         this.verifyAndRegister();
     }
 
-    private boolean isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandComponent<C, ?>> node) {
+    @Nullable
+    private String isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandComponent<C, ?>> node) {
         final String permission = node.nodeMeta.get("permission");
         if (permission != null) {
-            return sender.hasPermission(permission);
+            return sender.hasPermission(permission) ? null : permission;
         }
         if (node.isLeaf()) {
             // noinspection all
-            return sender.hasPermission(node.value.getOwningCommand().getCommandPermission());
+            return sender.hasPermission(node.value.getOwningCommand().getCommandPermission())
+                    ? null : node.value.getOwningCommand().getCommandPermission();
         }
         /*
           if any of the children would permit the execution, then the sender has a valid
            chain to execute, and so we allow them to execute the root
          */
+        final List<String> missingPermissions = new LinkedList<>();
         for (final Node<CommandComponent<C, ?>> child : node.getChildren()) {
-            if (this.isPermitted(sender, child)) {
-                return true;
+            final String check = this.isPermitted(sender, child);
+            if (check == null) {
+                return null;
+            } else {
+                missingPermissions.add(check);
             }
         }
-        return false;
+        return String.join(", ", missingPermissions);
     }
 
     /**
