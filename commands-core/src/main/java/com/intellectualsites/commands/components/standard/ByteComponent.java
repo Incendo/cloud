@@ -133,6 +133,7 @@ public class ByteComponent<C extends CommandSender> extends CommandComponent<C, 
                                                    this.min,
                                                    this.max));
                 }
+                inputQueue.remove();
                 return ComponentParseResult.success(value);
             } catch (final Exception e) {
                 return ComponentParseResult.failure(

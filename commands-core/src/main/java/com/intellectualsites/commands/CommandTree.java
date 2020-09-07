@@ -26,6 +26,7 @@ package com.intellectualsites.commands;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.ComponentParseException;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
@@ -147,7 +148,10 @@ public class CommandTree<C extends CommandSender> {
                         return this.parseCommand(commandContext, commandQueue, child);
                     }
                 } else if (result.getFailure().isPresent()) {
-                    /* TODO: Return error */
+                    throw new ComponentParseException(result.getFailure().get(), commandContext.getCommandSender(), this.getChain(child)
+                                                                                                                         .stream()
+                                                                                                                         .map(Node::getValue)
+                                                                                                                         .collect(Collectors.toList()));
                 }
             }
         }

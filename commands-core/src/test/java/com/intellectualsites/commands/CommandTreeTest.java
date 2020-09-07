@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -61,18 +62,8 @@ class CommandTreeTest {
 
     @Test
     void getSuggestions() {
-    }
-
-    @Test
-    void testGetSuggestions() {
-    }
-
-    @Test
-    void insertCommand() {
-    }
-
-    @Test
-    void verifyAndRegister() {
+        Assertions.assertFalse(commandManager.getCommandTree().getSuggestions(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
+                Collections.singletonList("test"))).isEmpty());
     }
 
 }

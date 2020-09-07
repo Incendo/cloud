@@ -125,6 +125,7 @@ public class IntegerComponent<C extends CommandSender> extends CommandComponent<
                 if (value < this.min || value > this.max) {
                     return ComponentParseResult.failure(new IntegerParseException(input, this.min, this.max));
                 }
+                inputQueue.remove();
                 return ComponentParseResult.success(value);
             } catch (final Exception e) {
                 return ComponentParseResult.failure(new IntegerParseException(input, this.min, this.max));
