@@ -29,10 +29,21 @@ import org.bukkit.plugin.Plugin;
 import javax.annotation.Nonnull;
 import java.util.function.Function;
 
+/**
+ * Command manager for the Bukkit platform, using {@link BukkitCommandSender} as the
+ * command sender type
+ */
 public class BukkitCommandManager extends CommandManager<BukkitCommandSender> {
 
     private final Plugin owningPlugin;
 
+    /**
+     * Construct a new Bukkit command manager
+     *
+     * @param owningPlugin                Plugin that is constructing the manager
+     * @param commandExecutionCoordinator Coordinator provider
+     * @throws Exception If the construction of the manager fails
+     */
     public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
                                 @Nonnull final Function<CommandTree<BukkitCommandSender>,
                                         CommandExecutionCoordinator<BukkitCommandSender>> commandExecutionCoordinator)
@@ -42,6 +53,11 @@ public class BukkitCommandManager extends CommandManager<BukkitCommandSender> {
         this.owningPlugin = owningPlugin;
     }
 
+    /**
+     * Get the plugin that owns the manager
+     *
+     * @return Owning plugin
+     */
     @Nonnull
     public Plugin getOwningPlugin() {
         return this.owningPlugin;

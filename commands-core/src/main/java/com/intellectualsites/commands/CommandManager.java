@@ -136,4 +136,15 @@ public abstract class CommandManager<C extends CommandSender> {
         return this.commandRegistrationHandler;
     }
 
+    /**
+     * Create a new command builder
+     *
+     * @param name Command name
+     * @return Builder instance
+     */
+    @Nonnull
+    public Command.Builder<C> commandBuilder(@Nonnull final String name) {
+        return Command.newBuilder(name);
+    }
+
 }

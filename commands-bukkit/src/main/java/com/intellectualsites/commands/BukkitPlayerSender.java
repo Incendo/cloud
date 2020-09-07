@@ -27,7 +27,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 
-public class BukkitPlayerSender extends BukkitCommandSender {
+final class BukkitPlayerSender extends BukkitCommandSender {
 
     BukkitPlayerSender(@Nonnull final Player player) {
         super(player);

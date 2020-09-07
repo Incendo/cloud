@@ -35,7 +35,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BukkitPluginRegistrationHandler implements CommandRegistrationHandler {
+final class BukkitPluginRegistrationHandler implements CommandRegistrationHandler {
 
     private final Map<CommandComponent<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
 
@@ -71,8 +71,10 @@ public class BukkitPluginRegistrationHandler implements CommandRegistrationHandl
         } else {
             label = commandComponent.getName();
         }
-        this.bukkitCommands.put(label, new BukkitCommand((CommandComponent<BukkitCommandSender, ?>) commandComponent,
-                                                         this.bukkitCommandManager));
+        final BukkitCommand bukkitCommand = new BukkitCommand((CommandComponent<BukkitCommandSender, ?>) commandComponent,
+                                                              this.bukkitCommandManager);
+        this.bukkitCommands.put(label, bukkitCommand);
+        this.registeredCommands.put(commandComponent, bukkitCommand);
         return true;
     }
 

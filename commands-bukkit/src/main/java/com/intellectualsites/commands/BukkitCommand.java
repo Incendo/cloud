@@ -31,7 +31,7 @@ import org.bukkit.plugin.Plugin;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class BukkitCommand extends org.bukkit.command.Command implements PluginIdentifiableCommand {
+final class BukkitCommand extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
     private final CommandComponent<BukkitCommandSender, ?> command;
     private final BukkitCommandManager bukkitCommandManager;

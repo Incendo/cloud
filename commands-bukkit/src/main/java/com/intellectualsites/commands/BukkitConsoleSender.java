@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 
-public class BukkitConsoleSender extends BukkitCommandSender {
+final class BukkitConsoleSender extends BukkitCommandSender {
 
     BukkitConsoleSender() {
         super(Bukkit.getConsoleSender());
