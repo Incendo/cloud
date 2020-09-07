@@ -29,7 +29,7 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
-import com.intellectualsites.commands.parser.ComponentParseResult;
+import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -85,7 +85,7 @@ public class CommandTree<C extends CommandSender> {
 
     private Optional<Command<C>> parseCommand(@Nonnull final CommandContext<C> commandContext,
                                               @Nonnull final Queue<String> commandQueue,
-                                              @Nonnull final Node<CommandComponent<C, ?>> root) throws NoSuchCommandException {
+                                              @Nonnull final Node<CommandComponent<C, ?>> root) {
         if (!this.isPermitted(commandContext.getCommandSender(), root)) {
             /* TODO: Send not allowed */
             throw new RuntimeException("Nope!");

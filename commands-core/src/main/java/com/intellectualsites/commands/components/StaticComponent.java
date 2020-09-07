@@ -24,8 +24,8 @@
 package com.intellectualsites.commands.components;
 
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.parser.ComponentParseResult;
-import com.intellectualsites.commands.parser.ComponentParser;
+import com.intellectualsites.commands.components.parser.ComponentParseResult;
+import com.intellectualsites.commands.components.parser.ComponentParser;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;

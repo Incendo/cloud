@@ -24,7 +24,7 @@
 package com.intellectualsites.commands.components;
 
 import com.intellectualsites.commands.Command;
-import com.intellectualsites.commands.parser.ComponentParser;
+import com.intellectualsites.commands.components.parser.ComponentParser;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
  * @param <C> Command sender type
  * @param <T> The type that the component parses into
  */
+@SuppressWarnings("unused")
 public class CommandComponent<C extends CommandSender, T> implements Comparable<CommandComponent<?, ?>> {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9]+");
@@ -63,7 +64,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
 
     private Command<C> owningCommand;
 
-    CommandComponent(final boolean required, @Nonnull final String name,
+    public CommandComponent(final boolean required, @Nonnull final String name,
                      @Nonnull final ComponentParser<C, T> parser) {
         this.required = required;
         this.name = Objects.requireNonNull(name, "Name may not be null");
@@ -78,7 +79,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      *
      * @param clazz Argument class
      * @param <C>   Command sender type
-     * @param <T>   Argument Type
+     * @param <T>   Argument Type. Used to make the compiler happy.
      * @return Component builder
      */
     @Nonnull
@@ -185,13 +186,13 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * @param <C> Command sender type
      * @param <T> Component value type
      */
-    public static final class Builder<C extends CommandSender, T> {
+    public static class Builder<C extends CommandSender, T> {
 
-        private String name;
-        private boolean required = true;
-        private ComponentParser<C, T> parser;
+        protected String name;
+        protected boolean required = true;
+        protected ComponentParser<C, T> parser;
 
-        private Builder() {
+        protected Builder() {
         }
 
         /**

@@ -32,7 +32,7 @@ import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
-import com.intellectualsites.commands.parser.ComponentParseResult;
+import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
