@@ -49,10 +49,10 @@ public class Command<C extends CommandSender> {
     @Nullable private final Class<? extends C> senderType;
     @Nonnull private final String commandPermission;
 
-    protected Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
-                      @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
-                      @Nullable final Class<? extends C> senderType,
-                      @Nonnull final String commandPermission) {
+    public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
+                   @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
+                   @Nullable final Class<? extends C> senderType,
+                   @Nonnull final String commandPermission) {
         this.components = Objects.requireNonNull(commandComponents, "Command components may not be null");
         if (this.components.size() == 0) {
             throw new IllegalArgumentException("At least one command component is required");
