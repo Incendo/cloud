@@ -77,7 +77,12 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender> {
     }
 
 
-    public static class SimpleCoordinator<C extends CommandSender> extends CommandExecutionCoordinator<C> {
+    /**
+     * A simple command execution coordinator that executes all commands immediately, on the calling thread
+     *
+     * @param <C> Command sender type
+     */
+    public static final class SimpleCoordinator<C extends CommandSender> extends CommandExecutionCoordinator<C> {
 
         private SimpleCoordinator(@Nonnull final CommandTree<C> commandTree) {
             super(commandTree);

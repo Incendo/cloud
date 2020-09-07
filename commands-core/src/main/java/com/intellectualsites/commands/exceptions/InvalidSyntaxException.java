@@ -29,6 +29,9 @@ import com.intellectualsites.commands.sender.CommandSender;
 import javax.annotation.Nonnull;
 import java.util.List;
 
+/**
+ * Exception sent when a {@link CommandSender} inputs invalid command syntax
+ */
 public class InvalidSyntaxException extends CommandParseException {
 
     private final String correctSyntax;
@@ -40,6 +43,11 @@ public class InvalidSyntaxException extends CommandParseException {
         this.correctSyntax = correctSyntax;
     }
 
+    /**
+     * Get the correct syntax of the command
+     *
+     * @return Correct command syntax
+     */
     @Nonnull
     public String getCorrectSyntax() {
         return this.correctSyntax;

@@ -130,7 +130,7 @@ public class CommandTree<C extends CommandSender> {
                             throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                                 .apply(Objects.requireNonNull(child.getValue()
                                                                                                                    .getOwningCommand())
-                                                                                                                   .getComponents()),
+                                                                                              .getComponents()),
                                                              commandContext.getCommandSender(), this.getChain(root)
                                                                                                     .stream()
                                                                                                     .map(Node::getValue)
@@ -167,13 +167,12 @@ public class CommandTree<C extends CommandSender> {
                 throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                     .apply(Objects.requireNonNull(
                                                                             Objects.requireNonNull(root.getValue())
-                                                                                                       .getOwningCommand())
-                                                                                                       .getComponents()),
+                                                                                   .getOwningCommand())
+                                                                                  .getComponents()),
                                                  commandContext.getCommandSender(), this.getChain(root)
                                                                                         .stream()
                                                                                         .map(Node::getValue)
-                                                                                        .collect(
-                                                                                                Collectors.toList()));
+                                                                                        .collect(Collectors.toList()));
             }
         } else {
             final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
@@ -258,7 +257,8 @@ public class CommandTree<C extends CommandSender> {
                 if (component.getValue() == null || !this.isPermitted(commandContext.getCommandSender(), component)) {
                     continue;
                 }
-                suggestions.addAll(component.getValue().getParser().suggestions(commandContext, stringOrEmpty(commandQueue.peek())));
+                suggestions.addAll(
+                        component.getValue().getParser().suggestions(commandContext, stringOrEmpty(commandQueue.peek())));
             }
             return suggestions;
         }
@@ -410,6 +410,11 @@ public class CommandTree<C extends CommandSender> {
     }
 
 
+    /**
+     * Very simple tree structure
+     *
+     * @param <T> Node value type
+     */
     private static final class Node<T> {
 
         private final Map<String, String> nodeMeta = new HashMap<>();

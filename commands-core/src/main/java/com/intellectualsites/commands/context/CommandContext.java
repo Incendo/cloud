@@ -30,11 +30,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Command context used to assist in the parsing of commands
+ *
+ * @param <C> Command sender type
+ */
 public class CommandContext<C extends CommandSender> {
 
     private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;
 
+    /**
+     * Create a new command context instance
+     *
+     * @param commandSender Sender of the command
+     */
     public CommandContext(@Nonnull final C commandSender) {
         this.commandSender = commandSender;
     }

@@ -82,4 +82,8 @@ public abstract class BukkitCommandSender implements CommandSender {
     @Nonnull
     public abstract Player asPlayer();
 
+    @Override
+    public boolean hasPermission(@Nonnull final String permission) {
+        return this.internalSender.hasPermission(permission);
+    }
 }

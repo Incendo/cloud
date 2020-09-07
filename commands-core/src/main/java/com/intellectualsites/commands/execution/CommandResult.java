@@ -23,5 +23,8 @@
 //
 package com.intellectualsites.commands.execution;
 
+/**
+ * The result of a command execution
+ */
 public class CommandResult {
 }

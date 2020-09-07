@@ -45,11 +45,15 @@ public interface CommandExecutionHandler<C extends CommandSender> {
     void execute(@Nonnull final CommandContext<C> commandContext);
 
 
+    /**
+     * Command execution handler that does nothing
+     *
+     * @param <C> Command sender type
+     */
     class NullCommandExecutionHandler<C extends CommandSender> implements CommandExecutionHandler<C> {
 
         @Override
         public void execute(@Nonnull final CommandContext<C> commandContext) {
-
         }
 
     }

@@ -37,18 +37,39 @@ import java.util.Locale;
 import java.util.Queue;
 import java.util.Set;
 
+/**
+ * {@link CommandComponent} type that recognizes fixed strings. This type does not parse variables.
+ *
+ * @param <C> Command sender type
+ */
 public final class StaticComponent<C extends CommandSender> extends CommandComponent<C, String> {
 
     private StaticComponent(final boolean required, @Nonnull final String name, @Nonnull final String... aliases) {
         super(required, name, new StaticComponentParser<>(name, aliases));
     }
 
+    /**
+     * Create a new static component instance for a required command component
+     *
+     * @param name    Component name
+     * @param aliases Component aliases
+     * @param <C>     Command sender type
+     * @return Constructed component
+     */
     @Nonnull
     public static <C extends CommandSender> StaticComponent<C> required(@Nonnull final String name,
                                                                         @Nonnull final String... aliases) {
         return new StaticComponent<>(true, name, aliases);
     }
 
+    /**
+     * Create a new static component instance for an optional command component
+     *
+     * @param name    Component name
+     * @param aliases Component aliases
+     * @param <C>     Command sender type
+     * @return Constructed component
+     */
     @Nonnull
     public static <C extends CommandSender> StaticComponent<C> optional(@Nonnull final String name,
                                                                         @Nonnull final String... aliases) {
@@ -72,7 +93,7 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
                                                   @Nonnull final Queue<String> inputQueue) {
             final String string = inputQueue.peek();
             if (string == null) {
-                return ComponentParseResult.failure(this.name);
+                return ComponentParseResult.failure(new NullPointerException("No input provided"));
             }
             for (final String acceptedString : this.acceptedStrings) {
                 if (string.equalsIgnoreCase(acceptedString)) {
@@ -81,7 +102,7 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
                     return ComponentParseResult.success(this.name);
                 }
             }
-            return ComponentParseResult.failure(this.name);
+            return ComponentParseResult.failure(new IllegalArgumentException(string));
         }
 
         @Nonnull

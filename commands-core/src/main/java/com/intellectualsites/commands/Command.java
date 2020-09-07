@@ -144,7 +144,13 @@ public class Command<C extends CommandSender> {
     }
 
 
-    public static class Builder<C extends CommandSender> {
+    /**
+     * Builder for {@link Command} instances. The builder is immutable, and each
+     * setter method will return a new builder instance.
+     *
+     * @param <C> Command sender type
+     */
+    public static final class Builder<C extends CommandSender> {
 
         @Nonnull private final List<CommandComponent<C, ?>> commandComponents;
         @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
@@ -155,10 +161,10 @@ public class Command<C extends CommandSender> {
                         @Nonnull final List<CommandComponent<C, ?>> commandComponents,
                         @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                         @Nonnull final String commandPermission) {
-            this.commandComponents = commandComponents;
-            this.commandExecutionHandler = commandExecutionHandler;
             this.senderType = senderType;
-            this.commandPermission = commandPermission;
+            this.commandComponents = Objects.requireNonNull(commandComponents, "Components may not be null");
+            this.commandExecutionHandler = Objects.requireNonNull(commandExecutionHandler, "Execution handler may not be null");
+            this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
         }
 
         /**

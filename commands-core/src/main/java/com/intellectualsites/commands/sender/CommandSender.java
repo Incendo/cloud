@@ -27,8 +27,11 @@ import javax.annotation.Nonnull;
 
 public interface CommandSender {
 
-    default boolean hasPermission(@Nonnull final String permission) {
-        return true;
-    }
+    /**
+     * Check if the command sender has a given permission node
+     *
+     * @param permission Permission node
+     */
+    boolean hasPermission(@Nonnull String permission);
 
 }

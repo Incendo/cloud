@@ -59,11 +59,28 @@ public abstract class CommandManager<C extends CommandSender> {
         this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
+    /**
+     * Execute a command and get a future that completes with the result
+     *
+     * @param commandSender Sender of the command
+     * @param input         Input provided by the sender
+     * @return Command result
+     */
+    @Nonnull
     public CompletableFuture<CommandResult> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
         final CommandContext<C> context = new CommandContext<>(commandSender);
         return this.commandExecutionCoordinator.coordinateExecution(context, tokenize(input));
     }
 
+    /**
+     * Get command suggestions for the "next" argument that would yield a correctly
+     * parsing command input
+     *
+     * @param commandSender Sender of the command
+     * @param input         Input provided by the sender
+     * @return List of suggestions
+     */
+    @Nonnull
     public List<String> suggest(@Nonnull final C commandSender, @Nonnull final String input) {
         final CommandContext<C> context = new CommandContext<>(commandSender);
         return this.commandTree.getSuggestions(context, tokenize(input));
@@ -105,10 +122,15 @@ public abstract class CommandManager<C extends CommandSender> {
      *
      * @param commandSyntaxFormatter New formatter
      */
-    public void setCommandSyntaxFormatter(@Nonnull final CommandSyntaxFormatter commandSyntaxFormatter) {
+    public void setCommandSyntaxFormatter(@Nonnull final CommandSyntaxFormatter<C> commandSyntaxFormatter) {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
     }
 
+    /**
+     * Get the command registration handler
+     *
+     * @return Command registration handler
+     */
     @Nonnull
     protected CommandRegistrationHandler getCommandRegistrationHandler() {
         return this.commandRegistrationHandler;

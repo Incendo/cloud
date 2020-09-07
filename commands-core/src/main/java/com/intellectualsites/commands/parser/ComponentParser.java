@@ -31,6 +31,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 
+/**
+ * Parser that parses strings into values of a specific type
+ *
+ * @param <C> Command sender type
+ * @param <T> Value type
+ */
 @FunctionalInterface
 public interface ComponentParser<C extends CommandSender, T> {
 
@@ -44,6 +50,13 @@ public interface ComponentParser<C extends CommandSender, T> {
     @Nonnull
     ComponentParseResult<T> parse(@Nonnull CommandContext<C> commandContext, @Nonnull Queue<String> inputQueue);
 
+    /**
+     * Get a list of suggested arguments that would be correctly parsed by this parser
+     *
+     * @param commandContext Command context
+     * @param input          Input string
+     * @return List of suggestions
+     */
     @Nonnull
     default List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
         return Collections.emptyList();

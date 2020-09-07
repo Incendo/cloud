@@ -29,6 +29,11 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Utility that formats chains of {@link CommandComponent command components} into syntax strings
+ *
+ * @param <C> Command sender type
+ */
 @FunctionalInterface
 public interface CommandSyntaxFormatter<C extends CommandSender> extends Function<List<CommandComponent<C, ?>>, String> {
 

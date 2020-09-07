@@ -179,7 +179,13 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     }
 
 
-    public static class Builder<C extends CommandSender, T> {
+    /**
+     * Mutable builder for {@link CommandComponent} instances
+     *
+     * @param <C> Command sender type
+     * @param <T> Component value type
+     */
+    public static final class Builder<C extends CommandSender, T> {
 
         private String name;
         private boolean required = true;

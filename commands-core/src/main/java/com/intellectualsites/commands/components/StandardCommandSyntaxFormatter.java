@@ -29,6 +29,16 @@ import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * {@link CommandSyntaxFormatter} implementation that uses the following rules:
+ * <ul>
+ *     <li>static components are serialized as their name, without a bracket</li>
+ *     <li>required components are serialized as their name, surrounded by angle brackets</li>
+ *     <li>optional components are serialized as their name, surrounded by square brackets</li>
+ * </ul>
+ *
+ * @param <C> Command sender type
+ */
 public class StandardCommandSyntaxFormatter<C extends CommandSender> implements CommandSyntaxFormatter<C> {
 
     public StandardCommandSyntaxFormatter() {
