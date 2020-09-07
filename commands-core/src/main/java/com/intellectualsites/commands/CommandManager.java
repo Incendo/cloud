@@ -147,4 +147,14 @@ public abstract class CommandManager<C extends CommandSender> {
         return Command.newBuilder(name);
     }
 
+    /**
+     * Get the internal command tree. This should not be accessed unless you know what you
+     * are doing
+     *
+     * @return Command tree
+     */
+    @Nonnull CommandTree<C> getCommandTree() {
+        return this.commandTree;
+    }
+
 }

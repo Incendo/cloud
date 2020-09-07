@@ -21,37 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.exceptions;
+package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
-/**
- * Exception thrown when a {@link CommandSender} misses a permission required
- * to execute a {@link com.intellectualsites.commands.Command}
- */
-public class NoPermissionException extends CommandParseException {
-
-    private final String missingPermission;
-
-    public NoPermissionException(@Nonnull final String missingPermission,
-                                 @Nonnull final CommandSender commandSender,
-                                 @Nonnull final List<CommandComponent<?, ?>> currentChain) {
-        super(commandSender, currentChain);
-        this.missingPermission = missingPermission;
-    }
+public class TestCommandSender implements CommandSender {
 
     @Override
-    public String getMessage() {
-        return String.format("Missing permission '%s'", this.missingPermission);
-    }
-
-    @Nonnull
-    public String getMissingPermission() {
-        return this.missingPermission;
+    public boolean hasPermission(@Nonnull final String permission) {
+        if (permission.equalsIgnoreCase("no")) {
+            return false;
+        }
+        return true;
     }
 
 }

@@ -310,8 +310,8 @@ public class CommandTree<C extends CommandSender> {
             return sender.hasPermission(permission) ? null : permission;
         }
         if (node.isLeaf()) {
-            // noinspection all
-            return sender.hasPermission(node.value.getOwningCommand().getCommandPermission())
+            return sender.hasPermission(Objects.requireNonNull(Objects.requireNonNull(node.value, "node.value").getOwningCommand(),
+                                                               "owning command").getCommandPermission())
                     ? null : node.value.getOwningCommand().getCommandPermission();
         }
         /*
@@ -351,6 +351,7 @@ public class CommandTree<C extends CommandSender> {
                 this.commandRegistrationHandler.registerCommand(leaf.getOwningCommand());
             }
         });
+
         // Register command permissions
         this.getLeavesRaw(this.internalTree).forEach(node -> {
             /* All leaves must necessarily have an owning command */
@@ -362,11 +363,12 @@ public class CommandTree<C extends CommandSender> {
             chain = chain.subList(1, chain.size());
             // Go through all nodes from the tail upwards until a collision occurs
             for (final Node<CommandComponent<C, ?>> commandComponentNode : chain) {
-                if (commandComponentNode.nodeMeta.containsKey("permission")) {
-                    commandComponentNode.nodeMeta.remove("permission");
-                    break;
+                if (commandComponentNode.nodeMeta.containsKey("permission") && !commandComponentNode.nodeMeta.get("permission")
+                                                                                                             .equalsIgnoreCase(node.nodeMeta.get("permission"))) {
+                    commandComponentNode.nodeMeta.put("permission", "");
+                } else {
+                    commandComponentNode.nodeMeta.put("permission", node.nodeMeta.get("permission"));
                 }
-                commandComponentNode.nodeMeta.put("permission", node.nodeMeta.get("permission"));
             }
         });
         /* TODO: Figure out a way to register all combinations along a command component path */
@@ -477,13 +479,12 @@ public class CommandTree<C extends CommandSender> {
                 return false;
             }
             final Node<?> node = (Node<?>) o;
-            return Objects.equals(getChildren(), node.getChildren()) &&
-                    Objects.equals(getValue(), node.getValue());
+            return Objects.equals(getValue(), node.getValue());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(getChildren(), getValue());
+            return Objects.hash(getValue());
         }
 
         @Nullable
@@ -495,6 +496,10 @@ public class CommandTree<C extends CommandSender> {
             this.parent = parent;
         }
 
+        @Override
+        public String toString() {
+            return "Node{value=" + value + '}';
+        }
     }
 
 }

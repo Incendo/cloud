@@ -60,6 +60,9 @@ public class Command<C extends CommandSender> {
         // Enforce ordering of command components
         boolean foundOptional = false;
         for (final CommandComponent<C, ?> component : this.components) {
+            if (component.getName().isEmpty()) {
+                throw new IllegalArgumentException("Component names may not be empty");
+            }
             if (foundOptional && component.isRequired()) {
                 throw new IllegalArgumentException(
                         String.format("Command component '%s' cannot be placed after an optional component",
