@@ -76,6 +76,18 @@ public class Command<C extends CommandSender> {
         this.commandPermission = commandPermission;
     }
 
+    public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
+                   @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
+                   @Nullable final Class<? extends C> senderType) {
+        this(commandComponents, commandExecutionHandler, senderType, "");
+    }
+
+    public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
+                   @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
+                   @Nonnull final String commandPermission) {
+        this(commandComponents, commandExecutionHandler, null, "");
+    }
+
     /**
      * Create a new command builder
      *
