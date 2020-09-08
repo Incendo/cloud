@@ -1,4 +1,8 @@
-# commands
+<div align="center">
+    <img src="https://raw.githubusercontent.com/Sauilitired/cloud/master/cloud_logo.png" />
+</div>
+
+# Command Library Of (yo)Ur Dreams
 
 This is going to be a general-purpose Java command library. It will allow programmers
 to define command chains that users can use to execute pre-defined actions.
