@@ -45,7 +45,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
 
     /**
      * Indicates whether or not the component is required
-     * or not. All components prior to any other required
+     * or not. All c$ git ls-files | xargs wc -lomponents prior to any other required
      * component must also be required, such that the predicate
      * (∀ c_i ∈ required)({c_0, ..., c_i-1} ⊂ required) holds true,
      * where {c_0, ..., c_n-1} is the set of command components.
@@ -61,17 +61,27 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * into the corresponding command type
      */
     private final ComponentParser<C, T> parser;
+    /**
+     * Default value, will be empty if none was supplied
+     */
+    private final String defaultValue;
 
     private Command<C> owningCommand;
 
     public CommandComponent(final boolean required, @Nonnull final String name,
-                     @Nonnull final ComponentParser<C, T> parser) {
+                            @Nonnull final ComponentParser<C, T> parser, @Nonnull final String defaultValue) {
         this.required = required;
         this.name = Objects.requireNonNull(name, "Name may not be null");
         if (!NAME_PATTERN.asPredicate().test(name)) {
             throw new IllegalArgumentException("Name must be alphanumeric");
         }
         this.parser = Objects.requireNonNull(parser, "Parser may not be null");
+        this.defaultValue = defaultValue;
+    }
+
+    public CommandComponent(final boolean required, @Nonnull final String name,
+                            @Nonnull final ComponentParser<C, T> parser) {
+        this(required, name, parser, "");
     }
 
     /**
@@ -179,6 +189,25 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         }
     }
 
+    /**
+     * Get the default value
+     *
+     * @return Default value
+     */
+    @Nonnull public String getDefaultValue() {
+        return this.defaultValue;
+    }
+
+    /**
+     * Check if the component has a default value
+     *
+     * @return {@code true} if the component has a default value, {@code false} if not
+     */
+    public boolean hasDefaultValue() {
+        return !this.isRequired() &&
+               !this.getDefaultValue().isEmpty();
+    }
+
 
     /**
      * Mutable builder for {@link CommandComponent} instances
@@ -191,6 +220,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         protected String name;
         protected boolean required = true;
         protected ComponentParser<C, T> parser;
+        protected String defaultValue = "";
 
         protected Builder() {
         }
@@ -238,6 +268,23 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         }
 
         /**
+         * Indicates that the component is optional.
+         * All components prior to any other required
+         * component must also be required, such that the predicate
+         * (∀ c_i ∈ required)({c_0, ..., c_i-1} ⊂ required) holds true,
+         * where {c_0, ..., c_n-1} is the set of command components.
+         *
+         * @param defaultValue Default value that will be used if none was supplied
+         * @return Builder instance
+         */
+        @Nonnull
+        public Builder<C, T> asOptionalWithDefault(@Nonnull final String defaultValue) {
+            this.defaultValue = defaultValue;
+            this.required = false;
+            return this;
+        }
+
+        /**
          * Set the component parser
          *
          * @param parser Component parser
@@ -256,7 +303,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
          */
         @Nonnull
         public CommandComponent<C, T> build() {
-            return new CommandComponent<>(this.required, this.name, this.parser);
+            return new CommandComponent<>(this.required, this.name, this.parser, this.defaultValue);
         }
 
     }

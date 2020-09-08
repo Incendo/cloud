@@ -34,91 +34,90 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public class ByteComponent<C extends CommandSender> extends CommandComponent<C, Byte> {
+public class IntegerComponent<C extends CommandSender> extends CommandComponent<C, Integer> {
 
-    private final byte min;
-    private final byte max;
+    private final int min;
+    private final int max;
 
-    private ByteComponent(final boolean required, @Nonnull final String name, final byte min, final byte max) {
-        super(required, name, new ByteParser<>(min, max));
+    private IntegerComponent(final boolean required, @Nonnull final String name, final int min, final int max, final String defaultValue) {
+        super(required, name, new IntegerParser<>(min, max), defaultValue);
         this.min = min;
         this.max = max;
     }
 
-    @Nonnull
-    public static <C extends CommandSender> Builder<C> newBuilder() {
+    @Nonnull public static <C extends CommandSender> Builder<C> newBuilder() {
         return new Builder<>();
     }
 
-    @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Byte> required(@Nonnull final String name) {
-        return ByteComponent.<C>newBuilder().named(name).asRequired().build();
+    @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> required(@Nonnull final String name) {
+        return IntegerComponent.<C>newBuilder().named(name).asRequired().build();
     }
 
-    @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Byte> optional(@Nonnull final String name) {
-        return ByteComponent.<C>newBuilder().named(name).asOptional().build();
+    @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name) {
+        return IntegerComponent.<C>newBuilder().named(name).asOptional().build();
+    }
+
+    @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name, final int defaultNum) {
+        return IntegerComponent.<C>newBuilder().named(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Byte> {
+    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Integer> {
 
-        private byte min = Byte.MIN_VALUE;
-        private byte max = Byte.MAX_VALUE;
+        private int min = Integer.MIN_VALUE;
+        private int max = Integer.MAX_VALUE;
 
-        @Nonnull
-        public Builder<C> withMin(final byte min) {
+        @Nonnull public Builder<C> withMin(final int min) {
             this.min = min;
             return this;
         }
 
-        @Nonnull
-        public Builder<C> withMax(final byte max) {
+        @Nonnull public Builder<C> withMax(final int max) {
             this.max = max;
             return this;
         }
 
         @Nonnull
         @Override
-        public ByteComponent<C> build() {
-            return new ByteComponent<>(this.required, this.name, this.min, this.max);
+        public IntegerComponent<C> build() {
+            return new IntegerComponent<>(this.required, this.name, this.min, this.max, this.defaultValue);
         }
 
     }
 
 
     /**
-     * Get the minimum accepted byteeger that could have been parsed
+     * Get the minimum accepted integer that could have been parsed
      *
-     * @return Minimum byteeger
+     * @return Minimum integer
      */
-    public byte getMin() {
+    public int getMin() {
         return this.min;
     }
 
     /**
-     * Get the maximum accepted byteeger that could have been parsed
+     * Get the maximum accepted integer that could have been parsed
      *
-     * @return Maximum byteeger
+     * @return Maximum integer
      */
-    public byte getMax() {
+    public int getMax() {
         return this.max;
     }
 
 
-    private static final class ByteParser<C extends CommandSender> implements ComponentParser<C, Byte> {
+    private static final class IntegerParser<C extends CommandSender> implements ComponentParser<C, Integer> {
 
-        private final byte min;
-        private final byte max;
+        private final int min;
+        private final int max;
 
-        public ByteParser(final byte min, final byte max) {
+        public IntegerParser(final int min, final int max) {
             this.min = min;
             this.max = max;
         }
 
         @Nonnull
         @Override
-        public ComponentParseResult<Byte> parse(
+        public ComponentParseResult<Integer> parse(
                 @Nonnull final CommandContext<C> commandContext,
                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
@@ -126,44 +125,39 @@ public class ByteComponent<C extends CommandSender> extends CommandComponent<C, 
                 return ComponentParseResult.failure(new NullPointerException("No input was provided"));
             }
             try {
-                final byte value = Byte.parseByte(input);
+                final int value = Integer.parseInt(input);
                 if (value < this.min || value > this.max) {
-                    return ComponentParseResult.failure(
-                            new ByteParseException(input,
-                                                   this.min,
-                                                   this.max));
+                    return ComponentParseResult.failure(new IntegerParseException(input, this.min, this.max));
                 }
                 inputQueue.remove();
                 return ComponentParseResult.success(value);
             } catch (final Exception e) {
-                return ComponentParseResult.failure(
-                        new ByteParseException(input, this.min,
-                                               this.max));
+                return ComponentParseResult.failure(new IntegerParseException(input, this.min, this.max));
             }
         }
 
     }
 
 
-    public static final class ByteParseException extends NumberParseException {
+    public static final class IntegerParseException extends NumberParseException {
 
-        public ByteParseException(@Nonnull final String input, final byte min, final byte max) {
+        public IntegerParseException(@Nonnull final String input, final int min, final int max) {
             super(input, min, max);
         }
 
         @Override
         public boolean hasMin() {
-            return this.getMin().byteValue() == Byte.MIN_VALUE;
+            return this.getMin().intValue() != Integer.MIN_VALUE;
         }
 
         @Override
         public boolean hasMax() {
-            return this.getMax().byteValue() == Byte.MAX_VALUE;
+            return this.getMax().intValue() != Integer.MAX_VALUE;
         }
 
         @Override
         public String getNumberType() {
-            return "byte";
+            return "integer";
         }
 
     }

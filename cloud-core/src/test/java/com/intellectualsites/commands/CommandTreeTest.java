@@ -24,6 +24,7 @@
 package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.components.StaticComponent;
+import com.intellectualsites.commands.components.standard.IntegerComponent;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -36,8 +37,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class CommandTreeTest {
 
     private static CommandManager<CommandSender> commandManager;
@@ -48,7 +47,10 @@ class CommandTreeTest {
         commandManager.registerCommand(commandManager.commandBuilder("test")
                                                      .withComponent(StaticComponent.required("one")).build())
                       .registerCommand(commandManager.commandBuilder("test")
-                                                     .withComponent(StaticComponent.required("two")).withPermission("no").build());
+                                                     .withComponent(StaticComponent.required("two")).withPermission("no").build())
+                      .registerCommand(commandManager.commandBuilder("test")
+                                                     .withComponent(StaticComponent.required("opt"))
+                                                     .withComponent(IntegerComponent.optional("num", 15)).build());
     }
 
     @Test
@@ -58,6 +60,10 @@ class CommandTreeTest {
         Assertions.assertTrue(command.isPresent());
         Assertions.assertThrows(NoPermissionException.class, () -> commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
                 Arrays.asList("test", "two"))));
+        commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt")))
+                      .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
+        commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt", "12")))
+                      .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
     }
 
     @Test

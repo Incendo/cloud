@@ -107,7 +107,11 @@ public class CommandTree<C extends CommandSender> {
             }
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
-                    if (child.isLeaf()) {
+                    if (child.getValue().hasDefaultValue()) {
+                        commandQueue.add(child.getValue().getDefaultValue());
+                    } else if (!child.getValue().isRequired()) {
+                        return Optional.ofNullable(child.getValue().getOwningCommand());
+                    } else if (child.isLeaf()) {
                         /* Not enough arguments */
                         throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                             .apply(Objects.requireNonNull(

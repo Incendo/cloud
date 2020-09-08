@@ -5,22 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.intellectualsites</groupId>
-    <artifactId>Commands</artifactId>
+    <artifactId>cloud</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
         <!--<module>commands-jline</module>-->
-        <module>commands-bukkit</module>
-        <module>commands-core</module>
+        <module>cloud-bukkit</module>
+        <module>cloud-core</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>https://raw.githubusercontent.com/Sauilitired/Commands/master/LICENSE</url>
+            <url>https://raw.githubusercontent.com/Sauilitired/cloud/master/LICENSE</url>
         </license>
     </licenses>
-    <name>Commands</name>
+    <name>cloud</name>
     <description>Commands for Java</description>
     <properties>
         <java.version>1.8</java.version>

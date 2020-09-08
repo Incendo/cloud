@@ -35,7 +35,7 @@ import java.util.Optional;
  *
  * @param <C> Command sender type
  */
-public class CommandContext<C extends CommandSender> {
+public final class CommandContext<C extends CommandSender> {
 
     private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;

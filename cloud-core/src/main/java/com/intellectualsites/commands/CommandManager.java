@@ -25,7 +25,8 @@ package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.components.CommandSyntaxFormatter;
 import com.intellectualsites.commands.components.StandardCommandSyntaxFormatter;
-import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.context.CommandContextFactory;
+import com.intellectualsites.commands.context.StandardCommandContextFactory;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandResult;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
@@ -46,13 +47,15 @@ import java.util.function.Function;
  */
 public abstract class CommandManager<C extends CommandSender> {
 
+    private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
+
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandRegistrationHandler commandRegistrationHandler;
     private final CommandTree<C> commandTree;
 
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
 
-    protected CommandManager(@Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+    public CommandManager(@Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                              @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
         this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
@@ -68,8 +71,7 @@ public abstract class CommandManager<C extends CommandSender> {
      */
     @Nonnull
     public CompletableFuture<CommandResult> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
-        final CommandContext<C> context = new CommandContext<>(commandSender);
-        return this.commandExecutionCoordinator.coordinateExecution(context, tokenize(input));
+        return this.commandExecutionCoordinator.coordinateExecution(this.commandContextFactory.create(commandSender), tokenize(input));
     }
 
     /**
@@ -82,8 +84,7 @@ public abstract class CommandManager<C extends CommandSender> {
      */
     @Nonnull
     public List<String> suggest(@Nonnull final C commandSender, @Nonnull final String input) {
-        final CommandContext<C> context = new CommandContext<>(commandSender);
-        return this.commandTree.getSuggestions(context, tokenize(input));
+        return this.commandTree.getSuggestions(this.commandContextFactory.create(commandSender), tokenize(input));
     }
 
     @Nonnull
