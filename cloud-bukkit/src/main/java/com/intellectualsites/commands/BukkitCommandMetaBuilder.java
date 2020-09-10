@@ -21,45 +21,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.internal;
+package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.meta.CommandMeta;
 
 import javax.annotation.Nonnull;
 
-/**
- * Utility that registers commands natively for whatever
- * platform the library is used in. This can do nothing, if
- * the target platform does not have its own concept of commands
- *
- * @param <M> Command meta type
- */
-@FunctionalInterface
-public interface CommandRegistrationHandler<M extends CommandMeta> {
+public final class BukkitCommandMetaBuilder {
 
-    /**
-     * Attempt to register the command
-     *
-     * @param command Command to register
-     * @return {@code true} if the command was registered successfully,
-     * else {@code false}
-     */
-    boolean registerCommand(@Nonnull final Command<?, M> command);
+    private BukkitCommandMetaBuilder() {
+    }
 
-    static <M extends CommandMeta> CommandRegistrationHandler<M> nullCommandRegistrationHandler() {
-        return new NullCommandRegistrationHandler<>();
+    @Nonnull public static BuilderStage1 builder() {
+        return new BuilderStage1();
+    }
+
+    public static final class BuilderStage1 {
+
+        private BuilderStage1() {
+        }
+
+        @Nonnull public BuilderStage2 withDescription(@Nonnull final String description) {
+            return new BuilderStage2(description);
+        }
+
     }
 
 
-    final class NullCommandRegistrationHandler<M extends CommandMeta> implements CommandRegistrationHandler<M> {
+    public static final class BuilderStage2 {
 
-        private NullCommandRegistrationHandler() {
+        private final String description;
+
+        private BuilderStage2(@Nonnull final String description) {
+            this.description = description;
         }
 
-        @Override
-        public boolean registerCommand(@Nonnull final Command<?, M> command) {
-            return true;
+        @Nonnull public BukkitCommandMeta build() {
+            return new BukkitCommandMeta(CommandMeta.simple().with("description", this.description).build());
         }
 
     }

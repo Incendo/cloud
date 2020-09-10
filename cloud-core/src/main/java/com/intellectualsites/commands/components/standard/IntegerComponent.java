@@ -45,20 +45,20 @@ public class IntegerComponent<C extends CommandSender> extends CommandComponent<
         this.max = max;
     }
 
-    @Nonnull public static <C extends CommandSender> Builder<C> newBuilder() {
-        return new Builder<>();
+    @Nonnull public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String name) {
+        return new Builder<>(name);
     }
 
     @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> required(@Nonnull final String name) {
-        return IntegerComponent.<C>newBuilder().named(name).asRequired().build();
+        return IntegerComponent.<C>newBuilder(name).asRequired().build();
     }
 
     @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name) {
-        return IntegerComponent.<C>newBuilder().named(name).asOptional().build();
+        return IntegerComponent.<C>newBuilder(name).asOptional().build();
     }
 
     @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name, final int defaultNum) {
-        return IntegerComponent.<C>newBuilder().named(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
+        return IntegerComponent.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
     }
 
 
@@ -66,6 +66,10 @@ public class IntegerComponent<C extends CommandSender> extends CommandComponent<
 
         private int min = Integer.MIN_VALUE;
         private int max = Integer.MAX_VALUE;
+
+        protected Builder(@Nonnull final String name) {
+            super(name);
+        }
 
         @Nonnull public Builder<C> withMin(final int min) {
             this.min = min;

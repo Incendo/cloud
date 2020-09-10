@@ -25,5 +25,13 @@ package com.intellectualsites.commands.jline;
 
 import com.intellectualsites.commands.sender.CommandSender;
 
+import javax.annotation.Nonnull;
+
 public class JLineCommandSender implements CommandSender {
+
+    @Override
+    public boolean hasPermission(@Nonnull final String permission) {
+        return true;
+    }
+
 }

@@ -23,16 +23,14 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
-import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
 
-public class TestCommandManager extends CommandManager<CommandSender, SimpleCommandMeta> {
+import javax.annotation.Nonnull;
 
-    protected TestCommandManager() {
-        super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
+public class BukkitCommandMeta extends SimpleCommandMeta {
+
+    public BukkitCommandMeta(@Nonnull final SimpleCommandMeta simpleCommandMeta) {
+        super(simpleCommandMeta.getAll());
     }
 
 }
-

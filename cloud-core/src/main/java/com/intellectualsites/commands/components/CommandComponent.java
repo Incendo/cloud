@@ -24,6 +24,7 @@
 package com.intellectualsites.commands.components;
 
 import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import com.intellectualsites.commands.components.parser.ComponentParser;
 import com.intellectualsites.commands.sender.CommandSender;
 
@@ -45,7 +46,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
 
     /**
      * Indicates whether or not the component is required
-     * or not. All c$ git ls-files | xargs wc -lomponents prior to any other required
+     * or not. All components prior to any other required
      * component must also be required, such that the predicate
      * (∀ c_i ∈ required)({c_0, ..., c_i-1} ⊂ required) holds true,
      * where {c_0, ..., c_n-1} is the set of command components.
@@ -66,7 +67,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      */
     private final String defaultValue;
 
-    private Command<C> owningCommand;
+    private Command<C, ?> owningCommand;
 
     public CommandComponent(final boolean required, @Nonnull final String name,
                             @Nonnull final ComponentParser<C, T> parser, @Nonnull final String defaultValue) {
@@ -88,13 +89,14 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * Create a new command component
      *
      * @param clazz Argument class
+     * @param name  Component name
      * @param <C>   Command sender type
      * @param <T>   Argument Type. Used to make the compiler happy.
      * @return Component builder
      */
     @Nonnull
-    public static <C extends CommandSender, T> CommandComponent.Builder<C, T> ofType(@Nonnull final Class<T> clazz) {
-        return new Builder<>();
+    public static <C extends CommandSender, T> CommandComponent.Builder<C, T> ofType(@Nonnull final Class<T> clazz, @Nonnull final String name) {
+        return new Builder<>(name);
     }
 
     /**
@@ -139,7 +141,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * @return Owning command
      */
     @Nullable
-    public Command<C> getOwningCommand() {
+    public Command<C, ?> getOwningCommand() {
         return this.owningCommand;
     }
 
@@ -148,7 +150,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      *
      * @param owningCommand Owning command
      */
-    public void setOwningCommand(@Nonnull final Command<C> owningCommand) {
+    public void setOwningCommand(@Nonnull final Command<C, ?> owningCommand) {
         if (this.owningCommand != null) {
             throw new IllegalStateException("Cannot replace owning command");
         }
@@ -217,24 +219,13 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      */
     public static class Builder<C extends CommandSender, T> {
 
-        protected String name;
+        protected final String name;
         protected boolean required = true;
-        protected ComponentParser<C, T> parser;
+        protected ComponentParser<C, T> parser = (c, i) -> ComponentParseResult.failure(new UnsupportedOperationException("No parser was specified"));
         protected String defaultValue = "";
 
-        protected Builder() {
-        }
-
-        /**
-         * Set the component name. Must be alphanumeric
-         *
-         * @param name Alphanumeric component name
-         * @return Builder instance
-         */
-        @Nonnull
-        public Builder<C, T> named(@Nonnull final String name) {
+        protected Builder(@Nonnull final String name) {
             this.name = name;
-            return this;
         }
 
         /**

@@ -24,23 +24,22 @@
 package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.components.StaticComponent;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class CommandTest {
 
     @Test()
     void noComponents() {
-        Assertions.assertEquals(1, Command.newBuilder("test").build().getComponents().size());
+        Assertions.assertEquals(1, Command.newBuilder("test", SimpleCommandMeta.empty()).build().getComponents().size());
     }
 
     @Test
     void ensureOrdering() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                Command.newBuilder("test").withComponent(StaticComponent.optional("something"))
-                                                       .withComponent(StaticComponent.required("somethingelse")).build());
+                Command.newBuilder("test", SimpleCommandMeta.empty()).withComponent(StaticComponent.optional("something"))
+                       .withComponent(StaticComponent.required("somethingelse")).build());
     }
 
 }

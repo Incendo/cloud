@@ -21,18 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;
+package com.intellectualsites.commands.meta;
 
-import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
-import com.intellectualsites.commands.internal.CommandRegistrationHandler;
-import com.intellectualsites.commands.meta.SimpleCommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
+import javax.annotation.Nonnull;
 
-public class TestCommandManager extends CommandManager<CommandSender, SimpleCommandMeta> {
+public class CommandMeta {
 
-    protected TestCommandManager() {
-        super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
+    @Nonnull public static SimpleCommandMeta.Builder simple() {
+        return SimpleCommandMeta.builder();
     }
 
 }
-

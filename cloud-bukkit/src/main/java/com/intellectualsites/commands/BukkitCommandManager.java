@@ -33,7 +33,7 @@ import java.util.function.Function;
  * Command manager for the Bukkit platform, using {@link BukkitCommandSender} as the
  * command sender type
  */
-public class BukkitCommandManager extends CommandManager<BukkitCommandSender> {
+public class BukkitCommandManager extends CommandManager<BukkitCommandSender, BukkitCommandMeta> {
 
     private final Plugin owningPlugin;
 
@@ -45,8 +45,8 @@ public class BukkitCommandManager extends CommandManager<BukkitCommandSender> {
      * @throws Exception If the construction of the manager fails
      */
     public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
-                                @Nonnull final Function<CommandTree<BukkitCommandSender>,
-                                        CommandExecutionCoordinator<BukkitCommandSender>> commandExecutionCoordinator)
+                                @Nonnull final Function<CommandTree<BukkitCommandSender, BukkitCommandMeta>,
+                                        CommandExecutionCoordinator<BukkitCommandSender, BukkitCommandMeta>> commandExecutionCoordinator)
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler());
         ((BukkitPluginRegistrationHandler) this.getCommandRegistrationHandler()).initialize(this);

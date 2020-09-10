@@ -30,6 +30,7 @@ import com.intellectualsites.commands.context.StandardCommandContextFactory;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandResult;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
+import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -44,19 +45,20 @@ import java.util.function.Function;
  * The manager is responsible for command registration, parsing delegation, etc.
  *
  * @param <C> Command sender type
+ * @param <M> Commamd meta type
  */
-public abstract class CommandManager<C extends CommandSender> {
+public abstract class CommandManager<C extends CommandSender, M extends CommandMeta> {
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
 
-    private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
-    private final CommandRegistrationHandler commandRegistrationHandler;
-    private final CommandTree<C> commandTree;
+    private final CommandExecutionCoordinator<C, M> commandExecutionCoordinator;
+    private final CommandRegistrationHandler<M> commandRegistrationHandler;
+    private final CommandTree<C, M> commandTree;
 
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
 
-    public CommandManager(@Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                             @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+    public CommandManager(@Nonnull final Function<CommandTree<C, M>, CommandExecutionCoordinator<C, M>> commandExecutionCoordinator,
+                             @Nonnull final CommandRegistrationHandler<M> commandRegistrationHandler) {
         this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
@@ -103,7 +105,7 @@ public abstract class CommandManager<C extends CommandSender> {
      * @param command Command to register
      * @return The command manager instance
      */
-    public CommandManager<C> registerCommand(@Nonnull final Command<C> command) {
+    public CommandManager<C, M> registerCommand(@Nonnull final Command<C, M> command) {
         this.commandTree.insertCommand(command);
         return this;
     }
@@ -141,11 +143,12 @@ public abstract class CommandManager<C extends CommandSender> {
      * Create a new command builder
      *
      * @param name Command name
+     * @param meta Command meta
      * @return Builder instance
      */
     @Nonnull
-    public Command.Builder<C> commandBuilder(@Nonnull final String name) {
-        return Command.newBuilder(name);
+    public Command.Builder<C, M> commandBuilder(@Nonnull final String name, @Nonnull final M meta) {
+        return Command.newBuilder(name, meta);
     }
 
     /**
@@ -154,7 +157,7 @@ public abstract class CommandManager<C extends CommandSender> {
      *
      * @return Command tree
      */
-    @Nonnull CommandTree<C> getCommandTree() {
+    @Nonnull CommandTree<C, M> getCommandTree() {
         return this.commandTree;
     }
 

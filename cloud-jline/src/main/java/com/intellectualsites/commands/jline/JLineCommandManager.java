@@ -23,16 +23,15 @@
 //
 package com.intellectualsites.commands.jline;
 
-import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.CommandTree;
-import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
+import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -48,11 +47,11 @@ import java.util.function.Function;
 /**
  * Command manager for use with JLine
  */
-public class JLineCommandManager extends CommandManager<JLineCommandSender> implements Completer {
+public class JLineCommandManager extends CommandManager<JLineCommandSender, SimpleCommandMeta> implements Completer {
 
-    public JLineCommandManager(@Nonnull
-                               final Function<CommandTree<JLineCommandSender>, CommandExecutionCoordinator<JLineCommandSender>> executionCoordinatorFunction) {
-        super(executionCoordinatorFunction, CommandRegistrationHandler.NULL_COMMAND_REGISTRATION_HANDLER);
+    public JLineCommandManager(@Nonnull final Function<CommandTree<JLineCommandSender, SimpleCommandMeta>,
+            CommandExecutionCoordinator<JLineCommandSender, SimpleCommandMeta>> executionCoordinatorFunction) {
+        super(executionCoordinatorFunction, CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
 
     public static void main(String[] args) throws Exception {
@@ -66,30 +65,34 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
                                                  .appName("Test")
                                                  .build();
         boolean[] shouldStop = new boolean[]{false};
-        jLineCommandManager.registerCommand(Command.newBuilder("stop").withHandler(commandContext ->
-                                                                                           shouldStop[0] = true).build())
-                           .registerCommand(Command.newBuilder("echo")
-                                                   .withComponent(
-                                                           CommandComponent.ofType(String.class).named("string").asRequired()
-                                                                           .withParser(((commandContext, inputQueue) -> {
-                                                                               final StringBuilder stringBuilder = new StringBuilder();
-                                                                               while (!inputQueue.isEmpty()) {
-                                                                                   stringBuilder.append(inputQueue.remove());
-                                                                                   if (!inputQueue.isEmpty()) {
-                                                                                       stringBuilder.append(" ");
-                                                                                   }
-                                                                               }
-                                                                               return ComponentParseResult.success(
-                                                                                       stringBuilder.toString());
-                                                                           })).build())
-                                                   .withHandler(commandContext -> commandContext.get("string")
-                                                                                                .ifPresent(System.out::println))
-                                                   .build())
-                           .registerCommand(Command.newBuilder("test")
+        jLineCommandManager.registerCommand(
+                jLineCommandManager.commandBuilder("stop", SimpleCommandMeta.empty())
+                                   .withHandler(commandContext ->
+                                                        shouldStop[0] = true)
+                                   .build())
+                           .registerCommand(jLineCommandManager.commandBuilder("echo", SimpleCommandMeta.empty())
+                                                               .withComponent(String.class, "string", builder ->
+                                                                       builder.asRequired()
+                                                                              .withParser(((commandContext, inputQueue) -> {
+                                                                                  final StringBuilder stringBuilder = new StringBuilder();
+                                                                                  while (!inputQueue.isEmpty()) {
+                                                                                      stringBuilder.append(inputQueue.remove());
+                                                                                      if (!inputQueue.isEmpty()) {
+                                                                                          stringBuilder.append(" ");
+                                                                                      }
+                                                                                  }
+                                                                                  return ComponentParseResult.success(
+                                                                                          stringBuilder.toString());
+                                                                              })).build())
+                                                               .withHandler(commandContext -> commandContext.get("string")
+                                                                                                            .ifPresent(
+                                                                                                                    System.out::println))
+                                                               .build())
+                           .registerCommand(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
                                                    .withComponent(StaticComponent.required("one"))
                                                    .withHandler(commandContext -> System.out.println("Test (1)"))
                                                    .build())
-                           .registerCommand(Command.newBuilder("test")
+                           .registerCommand(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
                                                    .withComponent(StaticComponent.required("two"))
                                                    .withHandler(commandContext -> System.out.println("Test (2)"))
                                                    .build());

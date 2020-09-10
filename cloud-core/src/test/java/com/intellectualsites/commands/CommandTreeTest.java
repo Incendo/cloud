@@ -27,6 +27,7 @@ import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.components.standard.IntegerComponent;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,23 +40,23 @@ import java.util.Optional;
 
 class CommandTreeTest {
 
-    private static CommandManager<CommandSender> commandManager;
+    private static CommandManager<CommandSender, SimpleCommandMeta> commandManager;
 
     @BeforeAll
     static void newTree() {
         commandManager = new TestCommandManager();
-        commandManager.registerCommand(commandManager.commandBuilder("test")
+        commandManager.registerCommand(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                                                      .withComponent(StaticComponent.required("one")).build())
-                      .registerCommand(commandManager.commandBuilder("test")
+                      .registerCommand(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                                                      .withComponent(StaticComponent.required("two")).withPermission("no").build())
-                      .registerCommand(commandManager.commandBuilder("test")
+                      .registerCommand(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                                                      .withComponent(StaticComponent.required("opt"))
                                                      .withComponent(IntegerComponent.optional("num", 15)).build());
     }
 
     @Test
     void parse() {
-        final Optional<Command<CommandSender>> command = commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
+        final Optional<Command<CommandSender, SimpleCommandMeta>> command = commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
                 Arrays.asList("test", "one")));
         Assertions.assertTrue(command.isPresent());
         Assertions.assertThrows(NoPermissionException.class, () -> commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(

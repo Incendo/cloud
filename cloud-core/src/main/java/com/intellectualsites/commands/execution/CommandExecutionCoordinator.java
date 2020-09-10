@@ -23,6 +23,7 @@
 //
 package com.intellectualsites.commands.execution;
 
+import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -39,17 +40,18 @@ import java.util.function.Function;
  * not command may be executed in parallel, etc.
  *
  * @param <C> Command sender type
+ * @param <M> Command meta type
  */
-public abstract class CommandExecutionCoordinator<C extends CommandSender> {
+public abstract class CommandExecutionCoordinator<C extends CommandSender, M extends CommandMeta> {
 
-    private final CommandTree<C> commandTree;
+    private final CommandTree<C, M> commandTree;
 
     /**
      * Construct a new command execution coordinator
      *
      * @param commandTree Command tree
      */
-    public CommandExecutionCoordinator(@Nonnull final CommandTree<C> commandTree) {
+    public CommandExecutionCoordinator(@Nonnull final CommandTree<C, M> commandTree) {
         this.commandTree = commandTree;
     }
 
@@ -57,9 +59,10 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender> {
      * Returns a simple command execution coordinator that executes all commands immediately, on the calling thread
      *
      * @param <C> Command sender type
+     * @param <M> Command meta type
      * @return New coordinator instance
      */
-    public static <C extends CommandSender> Function<CommandTree<C>, CommandExecutionCoordinator<C>> simpleCoordinator() {
+    public static <C extends CommandSender, M extends CommandMeta> Function<CommandTree<C, M>, CommandExecutionCoordinator<C, M>> simpleCoordinator() {
         return SimpleCoordinator::new;
     }
 
@@ -72,7 +75,7 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender> {
      * @return Command tree
      */
     @Nonnull
-    protected CommandTree<C> getCommandTree() {
+    protected CommandTree<C, M> getCommandTree() {
         return this.commandTree;
     }
 
@@ -81,10 +84,11 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender> {
      * A simple command execution coordinator that executes all commands immediately, on the calling thread
      *
      * @param <C> Command sender type
+     * @param <M> Command meta type
      */
-    public static final class SimpleCoordinator<C extends CommandSender> extends CommandExecutionCoordinator<C> {
+    public static final class SimpleCoordinator<C extends CommandSender, M extends CommandMeta> extends CommandExecutionCoordinator<C, M> {
 
-        private SimpleCoordinator(@Nonnull final CommandTree<C> commandTree) {
+        private SimpleCoordinator(@Nonnull final CommandTree<C, M> commandTree) {
             super(commandTree);
         }
 

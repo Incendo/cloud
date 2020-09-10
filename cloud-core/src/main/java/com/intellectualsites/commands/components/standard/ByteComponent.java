@@ -46,18 +46,22 @@ public class ByteComponent<C extends CommandSender> extends CommandComponent<C, 
     }
 
     @Nonnull
-    public static <C extends CommandSender> Builder<C> newBuilder() {
-        return new Builder<>();
+    public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String name) {
+        return new Builder<>(name);
     }
 
     @Nonnull
     public static <C extends CommandSender> CommandComponent<C, Byte> required(@Nonnull final String name) {
-        return ByteComponent.<C>newBuilder().named(name).asRequired().build();
+        return ByteComponent.<C>newBuilder(name).asRequired().build();
     }
 
     @Nonnull
     public static <C extends CommandSender> CommandComponent<C, Byte> optional(@Nonnull final String name) {
-        return ByteComponent.<C>newBuilder().named(name).asOptional().build();
+        return ByteComponent.<C>newBuilder(name).asOptional().build();
+    }
+
+    @Nonnull public static <C extends CommandSender> CommandComponent<C, Byte> optional(@Nonnull final String name, final byte defaultNum) {
+        return ByteComponent.<C>newBuilder(name).asOptionalWithDefault(Byte.toString(defaultNum)).build();
     }
 
 
@@ -65,6 +69,10 @@ public class ByteComponent<C extends CommandSender> extends CommandComponent<C, 
 
         private byte min = Byte.MIN_VALUE;
         private byte max = Byte.MAX_VALUE;
+
+        protected Builder(@Nonnull final String name) {
+            super(name);
+        }
 
         @Nonnull
         public Builder<C> withMin(final byte min) {
