@@ -63,4 +63,10 @@ public class BukkitCommandManager extends CommandManager<BukkitCommandSender, Bu
         return this.owningPlugin;
     }
 
+    @Nonnull
+    @Override
+    public BukkitCommandMeta createDefaultCommandMeta() {
+        return BukkitCommandMetaBuilder.builder().withDescription("").build();
+    }
+
 }

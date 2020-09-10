@@ -25,9 +25,16 @@ package com.intellectualsites.commands.meta;
 
 import javax.annotation.Nonnull;
 
+/**
+ * Object that is associated with a {@link com.intellectualsites.commands.Command}.
+ * Command meta should not be mutable, as one fixed instance will be used per command.
+ * <p>
+ * Appropriate use for command meta would be fixed state, such as command descriptions.
+ */
 public class CommandMeta {
 
-    @Nonnull public static SimpleCommandMeta.Builder simple() {
+    @Nonnull
+    public static SimpleCommandMeta.Builder simple() {
         return SimpleCommandMeta.builder();
     }
 

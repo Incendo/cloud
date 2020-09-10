@@ -138,4 +138,10 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
         System.out.printf("Trying to complete '%s'\n", line);
     }
 
+    @Nonnull
+    @Override
+    public SimpleCommandMeta createDefaultCommandMeta() {
+        return SimpleCommandMeta.empty();
+    }
+
 }

@@ -57,8 +57,9 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
 
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
 
-    public CommandManager(@Nonnull final Function<CommandTree<C, M>, CommandExecutionCoordinator<C, M>> commandExecutionCoordinator,
-                             @Nonnull final CommandRegistrationHandler<M> commandRegistrationHandler) {
+    public CommandManager(
+            @Nonnull final Function<CommandTree<C, M>, CommandExecutionCoordinator<C, M>> commandExecutionCoordinator,
+            @Nonnull final CommandRegistrationHandler<M> commandRegistrationHandler) {
         this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
@@ -73,7 +74,8 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      */
     @Nonnull
     public CompletableFuture<CommandResult> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
-        return this.commandExecutionCoordinator.coordinateExecution(this.commandContextFactory.create(commandSender), tokenize(input));
+        return this.commandExecutionCoordinator.coordinateExecution(this.commandContextFactory.create(commandSender),
+                                                                    tokenize(input));
     }
 
     /**
@@ -135,7 +137,7 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      * @return Command registration handler
      */
     @Nonnull
-    protected CommandRegistrationHandler getCommandRegistrationHandler() {
+    protected CommandRegistrationHandler<M> getCommandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
 
@@ -152,13 +154,37 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
     }
 
     /**
+     * Create a new command builder using a default command meta instance.
+     *
+     * @param name Command name
+     * @return Builder instance
+     * @throws UnsupportedOperationException If the command manager does not support default command meta creation
+     * @see #createDefaultCommandMeta() Default command meta creation
+     */
+    @Nonnull
+    public Command.Builder<C, M> commandBuilder(@Nonnull final String name) {
+        return Command.newBuilder(name, this.createDefaultCommandMeta());
+    }
+
+
+    /**
      * Get the internal command tree. This should not be accessed unless you know what you
      * are doing
      *
      * @return Command tree
      */
-    @Nonnull CommandTree<C, M> getCommandTree() {
+    @Nonnull
+    CommandTree<C, M> getCommandTree() {
         return this.commandTree;
     }
+
+    /**
+     * Construct a default command meta instance
+     *
+     * @return Default command meta
+     * @throws UnsupportedOperationException If the command manager does not support this operation
+     */
+    @Nonnull
+    public abstract M createDefaultCommandMeta();
 
 }

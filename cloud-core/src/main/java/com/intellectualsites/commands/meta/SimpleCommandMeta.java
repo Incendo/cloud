@@ -60,7 +60,6 @@ public class SimpleCommandMeta extends CommandMeta {
         return SimpleCommandMeta.builder().build();
     }
 
-
     /**
      * Get the value associated with a key
      *
