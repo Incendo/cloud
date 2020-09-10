@@ -28,10 +28,18 @@ import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
 
+import javax.annotation.Nonnull;
+
 public class TestCommandManager extends CommandManager<CommandSender, SimpleCommandMeta> {
 
     protected TestCommandManager() {
         super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
+    }
+
+    @Nonnull
+    @Override
+    public SimpleCommandMeta createDefaultCommandMeta() {
+        return SimpleCommandMeta.empty();
     }
 
 }
