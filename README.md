@@ -4,6 +4,8 @@
 
 # Command Library Of (yo)Ur Dreams
 
+[![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/cloud/badge)](https://www.codefactor.io/repository/github/sauilitired/cloud)
+
 This is going to be a general-purpose Java command library. It will allow programmers
 to define command chains that users can use to execute pre-defined actions.
 
@@ -25,3 +27,27 @@ Once the core functionality is present additional goals are:
 - Create a Minecraft specific implementation and add appropriate bindings (bukkit, paper, velocity and bungee) with Brigadier mappings where appropriate
 - Create a Discord implementation
 - Create a Java CLI implementation
+
+## Links
+
+- Discord: discord.gg/KxkjDVg
+
+
+## Maven
+
+cloud is available from [IntellectualSites](https://intellectualsites.com)' maven repository:
+
+```xml
+<repository>
+    <id>intellectualsites-snapshots</id>
+    <url>https://mvn.intellectualsites.com/content/repositories/snapshots</url>
+</repository>
+```
+
+```xml
+<dependency>
+    <groupId>com.intellectualsites</groupId>
+    <artifactId></artifactId>
+    <version></version>
+</dependency>
+```
