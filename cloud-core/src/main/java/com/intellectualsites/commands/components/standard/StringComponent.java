@@ -73,6 +73,7 @@ public class StringComponent<C extends CommandSender> extends CommandComponent<C
     }
 
     private static final class StringParser<C extends CommandSender> implements ComponentParser<C, String> {
+
         private final boolean greedy;
 
         public StringParser(final boolean greedy) {
