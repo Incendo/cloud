@@ -29,6 +29,8 @@ import javax.annotation.Nonnull;
 
 /**
  * Factory for {@link CommandContext} instances
+ *
+ * @param <C> Command sender
  */
 public interface CommandContextFactory<C extends CommandSender> {
 

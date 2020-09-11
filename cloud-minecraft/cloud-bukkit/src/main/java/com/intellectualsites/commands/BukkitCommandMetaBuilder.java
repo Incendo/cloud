@@ -32,15 +32,27 @@ public final class BukkitCommandMetaBuilder {
     private BukkitCommandMetaBuilder() {
     }
 
+    /**
+     * Create a new builder stage 1
+     *
+     * @return Builder instance
+     */
     @Nonnull public static BuilderStage1 builder() {
         return new BuilderStage1();
     }
+
 
     public static final class BuilderStage1 {
 
         private BuilderStage1() {
         }
 
+        /**
+         * Set the command description
+         *
+         * @param description Command description
+         * @return Builder instance
+         */
         @Nonnull public BuilderStage2 withDescription(@Nonnull final String description) {
             return new BuilderStage2(description);
         }
@@ -56,6 +68,11 @@ public final class BukkitCommandMetaBuilder {
             this.description = description;
         }
 
+        /**
+         * Build the command meta instance
+         *
+         * @return Meta instance
+         */
         @Nonnull public BukkitCommandMeta build() {
             return new BukkitCommandMeta(CommandMeta.simple().with("description", this.description).build());
         }

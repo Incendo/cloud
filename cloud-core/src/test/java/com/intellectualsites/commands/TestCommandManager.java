@@ -38,7 +38,7 @@ public class TestCommandManager extends CommandManager<CommandSender, SimpleComm
 
     @Nonnull
     @Override
-    public SimpleCommandMeta createDefaultCommandMeta() {
+    public final SimpleCommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
 

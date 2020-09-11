@@ -42,7 +42,7 @@ public interface CommandExecutionHandler<C extends CommandSender> {
      *
      * @param commandContext Command context
      */
-    void execute(@Nonnull final CommandContext<C> commandContext);
+    void execute(@Nonnull CommandContext<C> commandContext);
 
 
     /**

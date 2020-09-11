@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
 public class JLineCommandSender implements CommandSender {
 
     @Override
-    public boolean hasPermission(@Nonnull final String permission) {
+    public final boolean hasPermission(@Nonnull final String permission) {
         return true;
     }
 

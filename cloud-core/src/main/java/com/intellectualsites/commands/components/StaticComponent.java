@@ -83,7 +83,8 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
         private final Set<String> acceptedStrings = new HashSet<>();
 
         private StaticComponentParser(@Nonnull final String name, @Nonnull final String... aliases) {
-            this.acceptedStrings.add(this.name = name);
+            this.name = name;
+            this.acceptedStrings.add(this.name);
             this.acceptedStrings.addAll(Arrays.asList(aliases));
         }
 

@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
 public class TestCommandSender implements CommandSender {
 
     @Override
-    public boolean hasPermission(@Nonnull final String permission) {
+    public final boolean hasPermission(@Nonnull final String permission) {
         if (permission.equalsIgnoreCase("no")) {
             return false;
         }

@@ -34,30 +34,68 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public class IntegerComponent<C extends CommandSender> extends CommandComponent<C, Integer> {
+public final class IntegerComponent<C extends CommandSender> extends CommandComponent<C, Integer> {
 
     private final int min;
     private final int max;
 
-    private IntegerComponent(final boolean required, @Nonnull final String name, final int min, final int max, final String defaultValue) {
+    private IntegerComponent(final boolean required,
+                             @Nonnull final String name,
+                             final int min,
+                             final int max,
+                             final String defaultValue) {
         super(required, name, new IntegerParser<>(min, max), defaultValue);
         this.min = min;
         this.max = max;
     }
 
-    @Nonnull public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String name) {
+    /**
+     * Create a new builder
+     *
+     * @param name Name of the component
+     * @param <C>  Command sender type
+     * @return Created builder
+     */
+    @Nonnull
+    public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
-    @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> required(@Nonnull final String name) {
+    /**
+     * Create a new required command component
+     *
+     * @param name Component name
+     * @param <C>  Command sender type
+     * @return Created component
+     */
+    @Nonnull
+    public static <C extends CommandSender> CommandComponent<C, Integer> required(@Nonnull final String name) {
         return IntegerComponent.<C>newBuilder(name).asRequired().build();
     }
 
-    @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name) {
+    /**
+     * Create a new optional command component
+     *
+     * @param name Component name
+     * @param <C>  Command sender type
+     * @return Created component
+     */
+    @Nonnull
+    public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name) {
         return IntegerComponent.<C>newBuilder(name).asOptional().build();
     }
 
-    @Nonnull public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name, final int defaultNum) {
+    /**
+     * Create a new required command component with a default value
+     *
+     * @param name       Component name
+     * @param defaultNum Default num
+     * @param <C>        Command sender type
+     * @return Created component
+     */
+    @Nonnull
+    public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name,
+                                                                                  final int defaultNum) {
         return IntegerComponent.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
     }
 
@@ -71,20 +109,39 @@ public class IntegerComponent<C extends CommandSender> extends CommandComponent<
             super(name);
         }
 
-        @Nonnull public Builder<C> withMin(final int min) {
+        /**
+         * Set a minimum value
+         *
+         * @param min Minimum value
+         * @return Builder instance
+         */
+        @Nonnull
+        public Builder<C> withMin(final int min) {
             this.min = min;
             return this;
         }
 
-        @Nonnull public Builder<C> withMax(final int max) {
+        /**
+         * Set a maximum value
+         *
+         * @param max Maximum value
+         * @return Builder instance
+         */
+        @Nonnull
+        public Builder<C> withMax(final int max) {
             this.max = max;
             return this;
         }
 
+        /**
+         * Builder a new integer component
+         *
+         * @return Constructed component
+         */
         @Nonnull
         @Override
         public IntegerComponent<C> build() {
-            return new IntegerComponent<>(this.required, this.name, this.min, this.max, this.defaultValue);
+            return new IntegerComponent<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
         }
 
     }
@@ -114,7 +171,7 @@ public class IntegerComponent<C extends CommandSender> extends CommandComponent<
         private final int min;
         private final int max;
 
-        public IntegerParser(final int min, final int max) {
+        private IntegerParser(final int min, final int max) {
             this.min = min;
             this.max = max;
         }
@@ -145,6 +202,13 @@ public class IntegerComponent<C extends CommandSender> extends CommandComponent<
 
     public static final class IntegerParseException extends NumberParseException {
 
+        /**
+         * Construct a new integer parse exception
+         *
+         * @param input String input
+         * @param min   Minimum value
+         * @param max   Maximum value
+         */
         public IntegerParseException(@Nonnull final String input, final int min, final int max) {
             super(input, min, max);
         }
@@ -160,6 +224,7 @@ public class IntegerComponent<C extends CommandSender> extends CommandComponent<
         }
 
         @Override
+        @Nonnull
         public String getNumberType() {
             return "integer";
         }

@@ -42,6 +42,9 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public class CommandComponent<C extends CommandSender, T> implements Comparable<CommandComponent<?, ?>> {
 
+    /**
+     * Pattern for command component names
+     */
     private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9]+");
 
     /**
@@ -69,6 +72,14 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
 
     private Command<C, ?> owningCommand;
 
+    /**
+     * Construct a new command component
+     *
+     * @param required     Whether or not the component is required
+     * @param name         The component name
+     * @param parser       The component parser
+     * @param defaultValue Default value used when no value is provided by the command sender
+     */
     public CommandComponent(final boolean required, @Nonnull final String name,
                             @Nonnull final ComponentParser<C, T> parser, @Nonnull final String defaultValue) {
         this.required = required;
@@ -80,6 +91,13 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         this.defaultValue = defaultValue;
     }
 
+    /**
+     * Construct a new command component
+     *
+     * @param required     Whether or not the component is required
+     * @param name         The component name
+     * @param parser       The component parser
+     */
     public CommandComponent(final boolean required, @Nonnull final String name,
                             @Nonnull final ComponentParser<C, T> parser) {
         this(required, name, parser, "");
@@ -95,7 +113,8 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * @return Component builder
      */
     @Nonnull
-    public static <C extends CommandSender, T> CommandComponent.Builder<C, T> ofType(@Nonnull final Class<T> clazz, @Nonnull final String name) {
+    public static <C extends CommandSender, T> CommandComponent.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
+                                                                                     @Nonnull final String name) {
         return new Builder<>(name);
     }
 
@@ -131,7 +150,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
 
     @Nonnull
     @Override
-    public String toString() {
+    public final String toString() {
         return String.format("CommandComponent{name=%s}", this.name);
     }
 
@@ -158,7 +177,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public final boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -170,12 +189,12 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(isRequired(), getName());
     }
 
     @Override
-    public int compareTo(@Nonnull final CommandComponent<?, ?> o) {
+    public final int compareTo(@Nonnull final CommandComponent<?, ?> o) {
         if (this instanceof StaticComponent) {
             if (o instanceof StaticComponent) {
                 return (this.getName().compareTo(o.getName()));
@@ -196,7 +215,8 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      *
      * @return Default value
      */
-    @Nonnull public String getDefaultValue() {
+    @Nonnull
+    public String getDefaultValue() {
         return this.defaultValue;
     }
 
@@ -206,8 +226,8 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * @return {@code true} if the component has a default value, {@code false} if not
      */
     public boolean hasDefaultValue() {
-        return !this.isRequired() &&
-               !this.getDefaultValue().isEmpty();
+        return !this.isRequired()
+                && !this.getDefaultValue().isEmpty();
     }
 
 
@@ -219,10 +239,11 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      */
     public static class Builder<C extends CommandSender, T> {
 
-        protected final String name;
-        protected boolean required = true;
-        protected ComponentParser<C, T> parser = (c, i) -> ComponentParseResult.failure(new UnsupportedOperationException("No parser was specified"));
-        protected String defaultValue = "";
+        private final String name;
+        private boolean required = true;
+        private ComponentParser<C, T> parser = (c, i) -> ComponentParseResult.failure(
+                new UnsupportedOperationException("No parser was specified"));
+        private String defaultValue = "";
 
         protected Builder(@Nonnull final String name) {
             this.name = name;
@@ -297,6 +318,24 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
             return new CommandComponent<>(this.required, this.name, this.parser, this.defaultValue);
         }
 
+        @Nonnull
+        protected final String getName() {
+            return this.name;
+        }
+
+        protected final boolean isRequired() {
+            return this.required;
+        }
+
+        @Nonnull
+        protected final ComponentParser<C, T> getParser() {
+            return this.parser;
+        }
+
+        @Nonnull
+        protected final String getDefaultValue() {
+            return this.defaultValue;
+        }
     }
 
 }

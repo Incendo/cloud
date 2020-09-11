@@ -33,9 +33,20 @@ import javax.annotation.Nonnull;
  */
 public class CommandMeta {
 
+    /**
+     * Create a new simple command meta builder
+     *
+     * @return Builder instance
+     */
     @Nonnull
     public static SimpleCommandMeta.Builder simple() {
         return SimpleCommandMeta.builder();
+    }
+
+    @Nonnull
+    @Override
+    public final String toString() {
+        return "";
     }
 
 }

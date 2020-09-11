@@ -77,7 +77,7 @@ public abstract class BukkitCommandSender implements CommandSender {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public final boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -89,7 +89,7 @@ public abstract class BukkitCommandSender implements CommandSender {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hashCode(internalSender);
     }
 
@@ -120,7 +120,7 @@ public abstract class BukkitCommandSender implements CommandSender {
     public abstract Player asPlayer();
 
     @Override
-    public boolean hasPermission(@Nonnull final String permission) {
+    public final boolean hasPermission(@Nonnull final String permission) {
         return this.internalSender.hasPermission(permission);
     }
 

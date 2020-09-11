@@ -41,12 +41,9 @@ import java.util.List;
  */
 public class StandardCommandSyntaxFormatter<C extends CommandSender> implements CommandSyntaxFormatter<C> {
 
-    public StandardCommandSyntaxFormatter() {
-    }
-
     @Nonnull
     @Override
-    public String apply(@Nonnull final List<CommandComponent<C, ?>> commandComponents) {
+    public final String apply(@Nonnull final List<CommandComponent<C, ?>> commandComponents) {
         final StringBuilder stringBuilder = new StringBuilder();
         final Iterator<CommandComponent<C, ?>> iterator = commandComponents.iterator();
         while (iterator.hasNext()) {

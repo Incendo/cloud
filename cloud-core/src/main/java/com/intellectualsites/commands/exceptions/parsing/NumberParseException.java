@@ -31,6 +31,13 @@ public abstract class NumberParseException extends IllegalArgumentException {
     private final Number min;
     private final Number max;
 
+    /**
+     * Construct a new number parse exception
+     *
+     * @param input Input
+     * @param min   Maximum value
+     * @param max   Minimum value
+     */
     public NumberParseException(@Nonnull final String input, final int min, final int max) {
         this.input = input;
         this.min = min;
@@ -38,9 +45,10 @@ public abstract class NumberParseException extends IllegalArgumentException {
     }
 
     @Override
-    public String getMessage() {
+    public final String getMessage() {
         if (this.hasMin() && this.hasMax()) {
-            return "'" + this.input + "' is not a valid " + this.getNumberType() + " in the range [" + this.min + ", " + this.max + "]";
+            return "'" + this.input + "' is not a valid " + this.getNumberType() + " in the range ["
+                    + this.min + ", " + this.max + "]";
         } else if (this.hasMin()) {
             return "'" + this.input + "' is not a valid " + this.getNumberType() + " above " + this.min;
         } else if (this.hasMax()) {
@@ -50,10 +58,26 @@ public abstract class NumberParseException extends IllegalArgumentException {
         }
     }
 
+    /**
+     * Get the number type
+     *
+     * @return Number type
+     */
+    @Nonnull
     public abstract String getNumberType();
 
+    /**
+     * If the parser had a maximum value
+     *
+     * @return {@code true} if there was a maximum value, else {@code false}
+     */
     public abstract boolean hasMax();
 
+    /**
+     * If the parser had a minimum value
+     *
+     * @return {@code true} if there was a minimum value, else {@code false}
+     */
     public abstract boolean hasMin();
 
     /**
@@ -61,7 +85,8 @@ public abstract class NumberParseException extends IllegalArgumentException {
      *
      * @return Input
      */
-    @Nonnull public String getInput() {
+    @Nonnull
+    public String getInput() {
         return this.input;
     }
 

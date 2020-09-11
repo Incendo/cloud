@@ -33,11 +33,25 @@ public class ComponentParseException extends CommandParseException {
 
     private final Throwable cause;
 
-    public ComponentParseException(@Nonnull final Throwable throwable, @Nonnull final CommandSender commandSender, @Nonnull final List<CommandComponent<?, ?>> currentChain) {
+    /**
+     * Create a new command parse exception
+     *
+     * @param throwable     Exception that caused the parsing error
+     * @param commandSender Command sender
+     * @param currentChain  Chain leading up to the exception
+     */
+    public ComponentParseException(@Nonnull final Throwable throwable,
+                                   @Nonnull final CommandSender commandSender,
+                                   @Nonnull final List<CommandComponent<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.cause = throwable;
     }
 
+    /**
+     * Get the cause of the exception
+     *
+     * @return Cause
+     */
     @Nonnull
     public Throwable getCause() {
         return this.cause;

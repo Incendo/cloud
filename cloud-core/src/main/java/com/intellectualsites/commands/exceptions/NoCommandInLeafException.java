@@ -36,6 +36,11 @@ public final class NoCommandInLeafException extends IllegalStateException {
 
     private final CommandComponent<?, ?> commandComponent;
 
+    /**
+     * Create a new no command in leaf exception instance
+     *
+     * @param commandComponent Command component that caused the exception
+     */
     public NoCommandInLeafException(@Nonnull final CommandComponent<?, ?> commandComponent) {
         super(String.format("Leaf node '%s' does not have associated owning command", commandComponent.getName()));
         this.commandComponent = commandComponent;

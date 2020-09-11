@@ -49,13 +49,23 @@ import java.util.function.Function;
  */
 public class JLineCommandManager extends CommandManager<JLineCommandSender, SimpleCommandMeta> implements Completer {
 
+    /**
+     * Construct a new JLine command manager
+     *
+     * @param executionCoordinatorFunction Function producing a new coordinator
+     */
     public JLineCommandManager(@Nonnull final Function<CommandTree<JLineCommandSender, SimpleCommandMeta>,
             CommandExecutionCoordinator<JLineCommandSender, SimpleCommandMeta>> executionCoordinatorFunction) {
         super(executionCoordinatorFunction, CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
 
-    public static void main(String[] args) throws Exception {
-        // TODO: REMOVE THIS!!!!
+    /**
+     * Main method
+     *
+     * @param args Arguments
+     * @throws Exception Any and all exceptions
+     */
+    public static void main(final String[] args) throws Exception {
         final JLineCommandManager jLineCommandManager = new JLineCommandManager(CommandExecutionCoordinator.simpleCoordinator());
         final Terminal terminal = TerminalBuilder.builder().build();
         LineReader lineReader = LineReaderBuilder.builder()
@@ -74,7 +84,8 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
                                                                .withComponent(String.class, "string", builder ->
                                                                        builder.asRequired()
                                                                               .withParser(((commandContext, inputQueue) -> {
-                                                                                  final StringBuilder stringBuilder = new StringBuilder();
+                                                                                  final StringBuilder stringBuilder =
+                                                                                          new StringBuilder();
                                                                                   while (!inputQueue.isEmpty()) {
                                                                                       stringBuilder.append(inputQueue.remove());
                                                                                       if (!inputQueue.isEmpty()) {
@@ -86,16 +97,16 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
                                                                               })).build())
                                                                .withHandler(commandContext -> commandContext.get("string")
                                                                                                             .ifPresent(
-                                                                                                                    System.out::println))
+                                                                                                             System.out::println))
                                                                .build())
                            .registerCommand(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                   .withComponent(StaticComponent.required("one"))
-                                                   .withHandler(commandContext -> System.out.println("Test (1)"))
-                                                   .build())
+                                                               .withComponent(StaticComponent.required("one"))
+                                                               .withHandler(commandContext -> System.out.println("Test (1)"))
+                                                               .build())
                            .registerCommand(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                   .withComponent(StaticComponent.required("two"))
-                                                   .withHandler(commandContext -> System.out.println("Test (2)"))
-                                                   .build());
+                                                               .withComponent(StaticComponent.required("two"))
+                                                               .withHandler(commandContext -> System.out.println("Test (2)"))
+                                                               .build());
         System.out.println("Ready...");
         while (!shouldStop[0]) {
             final String line = lineReader.readLine();
@@ -127,7 +138,7 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
     }
 
     @Override
-    public void complete(@Nonnull final LineReader lineReader,
+    public final void complete(@Nonnull final LineReader lineReader,
                          @Nonnull final ParsedLine parsedLine,
                          @Nonnull final List<Candidate> list) {
         final String line = parsedLine.line();
@@ -140,7 +151,7 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
 
     @Nonnull
     @Override
-    public SimpleCommandMeta createDefaultCommandMeta() {
+    public final SimpleCommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
 

@@ -38,6 +38,13 @@ public class NoPermissionException extends CommandParseException {
 
     private final String missingPermission;
 
+    /**
+     * Construct a new no permission exception
+     *
+     * @param missingPermission Missing permission node
+     * @param commandSender     Command sender
+     * @param currentChain      Chain leading up to the exception
+     */
     public NoPermissionException(@Nonnull final String missingPermission,
                                  @Nonnull final CommandSender commandSender,
                                  @Nonnull final List<CommandComponent<?, ?>> currentChain) {
@@ -46,10 +53,15 @@ public class NoPermissionException extends CommandParseException {
     }
 
     @Override
-    public String getMessage() {
+    public final String getMessage() {
         return String.format("Missing permission '%s'", this.missingPermission);
     }
 
+    /**
+     * Get the missing permission node
+     *
+     * @return Get the missing permission node
+     */
     @Nonnull
     public String getMissingPermission() {
         return this.missingPermission;

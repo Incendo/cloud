@@ -45,8 +45,14 @@ public interface CommandRegistrationHandler<M extends CommandMeta> {
      * @return {@code true} if the command was registered successfully,
      * else {@code false}
      */
-    boolean registerCommand(@Nonnull final Command<?, M> command);
+    boolean registerCommand(@Nonnull Command<?, M> command);
 
+    /**
+     * Create a new {@link CommandRegistrationHandler} that does nothing
+     *
+     * @param <M> Command meta type
+     * @return Constructed registration
+     */
     static <M extends CommandMeta> CommandRegistrationHandler<M> nullCommandRegistrationHandler() {
         return new NullCommandRegistrationHandler<>();
     }

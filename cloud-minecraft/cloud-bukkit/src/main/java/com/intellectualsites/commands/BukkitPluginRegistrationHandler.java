@@ -52,8 +52,8 @@ final class BukkitPluginRegistrationHandler implements CommandRegistrationHandle
         final Field knownCommands = SimpleCommandMap.class.getDeclaredField("knownCommands");
         knownCommands.setAccessible(true);
         @SuppressWarnings("ALL")
-        final Map<String, org.bukkit.command.Command> bukkitCommands = (Map<String, org.bukkit.command.Command>) knownCommands.get(
-                commandMap);
+        final Map<String, org.bukkit.command.Command> bukkitCommands =
+                (Map<String, org.bukkit.command.Command>) knownCommands.get(commandMap);
         this.bukkitCommands = bukkitCommands;
         this.bukkitCommandManager = bukkitCommandManager;
     }

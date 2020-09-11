@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
  * @param <C> Command sender type
  * @param <M> Command meta type
  */
-public class CommandTree<C extends CommandSender, M extends CommandMeta> {
+public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
 
     private final Object commandLock = new Object();
 
@@ -106,8 +106,8 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
     private Optional<Command<C, M>> parseCommand(@Nonnull final CommandContext<C> commandContext,
                                                  @Nonnull final Queue<String> commandQueue,
                                                  @Nonnull final Node<CommandComponent<C, ?>> root) {
-        String permission;
-        if ((permission = this.isPermitted(commandContext.getCommandSender(), root)) != null) {
+        String permission = this.isPermitted(commandContext.getCommandSender(), root);
+        if (permission != null) {
             throw new NoPermissionException(permission, commandContext.getCommandSender(), this.getChain(root)
                                                                                                .stream()
                                                                                                .map(Node::getValue)
@@ -179,7 +179,8 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
             // The value has to be a variable
             final Node<CommandComponent<C, ?>> child = children.get(0);
-            if ((permission = this.isPermitted(commandContext.getCommandSender(), child)) != null) {
+            permission = this.isPermitted(commandContext.getCommandSender(), child);
+            if (permission != null) {
                 throw new NoPermissionException(permission, commandContext.getCommandSender(), this.getChain(child)
                                                                                                    .stream()
                                                                                                    .map(Node::getValue)
@@ -220,7 +221,7 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
                             /* Too many arguments. We have a unique path, so we can send the entire context */
                             throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                                 .apply(Objects.requireNonNull(child.getValue()
-                                                                                                                   .getOwningCommand())
+                                                                                                             .getOwningCommand())
                                                                                               .getComponents()),
                                                              commandContext.getCommandSender(), this.getChain(root)
                                                                                                     .stream()
@@ -244,13 +245,20 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
         return null;
     }
 
+    /**
+     * Get suggestions from the input queue
+     *
+     * @param context      Context instance
+     * @param commandQueue Input queue
+     * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
+     */
     @Nonnull
     public List<String> getSuggestions(@Nonnull final CommandContext<C> context, @Nonnull final Queue<String> commandQueue) {
         return getSuggestions(context, commandQueue, this.internalTree);
     }
 
     @Nonnull
-    public List<String> getSuggestions(@Nonnull final CommandContext<C> commandContext,
+    private List<String> getSuggestions(@Nonnull final CommandContext<C> commandContext,
                                        @Nonnull final Queue<String> commandQueue,
                                        @Nonnull final Node<CommandComponent<C, ?>> root) {
 
@@ -281,7 +289,7 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     return this.getSuggestions(commandContext, commandQueue, child);
                 } else if (result.getFailure().isPresent()) {
-                    /* TODO: Return error */
+                    /* I need to return ze error */
                     return Collections.emptyList();
                 }
             }
@@ -417,7 +425,7 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 if (commandComponentNode.nodeMeta.containsKey("permission") && !commandComponentNode.nodeMeta.get("permission")
                                                                                                              .equalsIgnoreCase(
                                                                                                                      node.nodeMeta
-                                                                                                                             .get("permission"))) {
+                                                                                                           .get("permission"))) {
                     commandComponentNode.nodeMeta.put("permission", "");
                 } else {
                     commandComponentNode.nodeMeta.put("permission", node.nodeMeta.get("permission"));

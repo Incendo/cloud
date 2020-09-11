@@ -79,6 +79,9 @@ public abstract class ComponentParseResult<T> {
 
     private static final class ParseSuccess<T> extends ComponentParseResult<T> {
 
+        /**
+         * Parsed value
+         */
         private final T value;
 
         private ParseSuccess(@Nonnull final T value) {
@@ -102,6 +105,9 @@ public abstract class ComponentParseResult<T> {
 
     private static final class ParseFailure<T> extends ComponentParseResult<T> {
 
+        /**
+         * Parse failure
+         */
         private final Throwable failure;
 
         private ParseFailure(@Nonnull final Throwable failure) {

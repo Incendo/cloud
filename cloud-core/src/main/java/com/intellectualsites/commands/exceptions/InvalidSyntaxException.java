@@ -37,6 +37,13 @@ public class InvalidSyntaxException extends CommandParseException {
 
     private final String correctSyntax;
 
+    /**
+     * Create a new invalid syntax exception instance
+     *
+     * @param correctSyntax Expected syntax
+     * @param commandSender Sender that sent the command
+     * @param currentChain  Chain leading up to issue
+     */
     public InvalidSyntaxException(@Nonnull final String correctSyntax,
                                   @Nonnull final CommandSender commandSender,
                                   @Nonnull final List<CommandComponent<?, ?>> currentChain) {
@@ -54,8 +61,9 @@ public class InvalidSyntaxException extends CommandParseException {
         return this.correctSyntax;
     }
 
+
     @Override
-    public String getMessage() {
+    public final String getMessage() {
         return String.format("Invalid command syntax. Correct syntax is: %s", this.correctSyntax);
     }
 

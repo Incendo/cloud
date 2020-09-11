@@ -58,6 +58,12 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
 
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
 
+    /**
+     * Create a new command manager instance
+     *
+     * @param commandExecutionCoordinator Execution coordinator instance
+     * @param commandRegistrationHandler  Command registration handler
+     */
     public CommandManager(
             @Nonnull final Function<CommandTree<C, M>, CommandExecutionCoordinator<C, M>> commandExecutionCoordinator,
             @Nonnull final CommandRegistrationHandler<M> commandRegistrationHandler) {

@@ -29,6 +29,11 @@ import javax.annotation.Nonnull;
 
 public class BukkitCommandMeta extends SimpleCommandMeta {
 
+    /**
+     * Bukkit command meta data
+     *
+     * @param simpleCommandMeta Simple command meta data instance that gets mirrored
+     */
     public BukkitCommandMeta(@Nonnull final SimpleCommandMeta simpleCommandMeta) {
         super(simpleCommandMeta.getAll());
     }

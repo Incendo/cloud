@@ -31,7 +31,11 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -49,6 +53,15 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
     @Nonnull private final String commandPermission;
     @Nonnull private final M commandMeta;
 
+    /**
+     * Construct a new command
+     *
+     * @param commandComponents       Command components
+     * @param commandExecutionHandler Execution handler
+     * @param senderType              Required sender type. May be {@code null}
+     * @param commandPermission       Command permission
+     * @param commandMeta             Command meta instance
+     */
     public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
@@ -78,6 +91,14 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
         this.commandMeta = commandMeta;
     }
 
+    /**
+     * Construct a new command
+     *
+     * @param commandComponents       Command components
+     * @param commandExecutionHandler Execution handler
+     * @param senderType              Required sender type. May be {@code null}
+     * @param commandMeta             Command meta instance
+     */
     public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
@@ -85,6 +106,14 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
         this(commandComponents, commandExecutionHandler, senderType, "", commandMeta);
     }
 
+    /**
+     * Construct a new command
+     *
+     * @param commandComponents       Command components
+     * @param commandExecutionHandler Execution handler
+     * @param commandPermission       Command permission
+     * @param commandMeta             Command meta instance
+     */
     public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nonnull final String commandPermission,

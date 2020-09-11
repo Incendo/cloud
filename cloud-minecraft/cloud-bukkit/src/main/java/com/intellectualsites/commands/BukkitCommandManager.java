@@ -46,7 +46,7 @@ public class BukkitCommandManager extends CommandManager<BukkitCommandSender, Bu
      */
     public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
                                 @Nonnull final Function<CommandTree<BukkitCommandSender, BukkitCommandMeta>,
-                                        CommandExecutionCoordinator<BukkitCommandSender, BukkitCommandMeta>> commandExecutionCoordinator)
+                                CommandExecutionCoordinator<BukkitCommandSender, BukkitCommandMeta>> commandExecutionCoordinator)
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler());
         ((BukkitPluginRegistrationHandler) this.getCommandRegistrationHandler()).initialize(this);
@@ -63,6 +63,11 @@ public class BukkitCommandManager extends CommandManager<BukkitCommandSender, Bu
         return this.owningPlugin;
     }
 
+    /**
+     * Create default command meta data
+     *
+     * @return Meta data
+     */
     @Nonnull
     @Override
     public BukkitCommandMeta createDefaultCommandMeta() {

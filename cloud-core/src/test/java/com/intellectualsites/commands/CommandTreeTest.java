@@ -40,6 +40,7 @@ import java.util.Optional;
 
 class CommandTreeTest {
 
+    private static final int EXPECTED_INPUT_NUMBER = 15;
     private static CommandManager<CommandSender, SimpleCommandMeta> commandManager;
 
     @BeforeAll
@@ -51,26 +52,38 @@ class CommandTreeTest {
                                                      .withComponent(StaticComponent.required("two")).withPermission("no").build())
                       .registerCommand(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                                                      .withComponent(StaticComponent.required("opt"))
-                                                     .withComponent(IntegerComponent.optional("num", 15)).build());
+                                                     .withComponent(IntegerComponent
+                                                                            .optional("num", EXPECTED_INPUT_NUMBER))
+                                                     .build());
     }
 
     @Test
     void parse() {
-        final Optional<Command<CommandSender, SimpleCommandMeta>> command = commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
-                Arrays.asList("test", "one")));
+        final Optional<Command<CommandSender, SimpleCommandMeta>> command = commandManager.getCommandTree()
+                                                                                          .parse(new CommandContext<>(
+                                                                                                         new TestCommandSender()),
+                                                                                                 new LinkedList<>(
+                                                                                                         Arrays.asList("test",
+                                                                                                                       "one")));
         Assertions.assertTrue(command.isPresent());
-        Assertions.assertThrows(NoPermissionException.class, () -> commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
-                Arrays.asList("test", "two"))));
-        commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt")))
+        Assertions.assertThrows(NoPermissionException.class, () -> commandManager.getCommandTree()
+                                                                                 .parse(new CommandContext<>(
+                                                                                                new TestCommandSender()),
+                                                                                        new LinkedList<>(
+                                                                                                Arrays.asList("test", "two"))));
+        commandManager.getCommandTree()
+                      .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt")))
                       .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
-        commandManager.getCommandTree().parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt", "12")))
+        commandManager.getCommandTree()
+                      .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt", "12")))
                       .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
     }
 
     @Test
     void getSuggestions() {
-        Assertions.assertFalse(commandManager.getCommandTree().getSuggestions(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
-                Collections.singletonList("test"))).isEmpty());
+        Assertions.assertFalse(
+                commandManager.getCommandTree().getSuggestions(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
+                        Collections.singletonList("test"))).isEmpty());
     }
 
 }

@@ -23,9 +23,9 @@
 //
 package com.intellectualsites.commands.execution;
 
-import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -62,12 +62,20 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender, M ext
      * @param <M> Command meta type
      * @return New coordinator instance
      */
-    public static <C extends CommandSender, M extends CommandMeta> Function<CommandTree<C, M>, CommandExecutionCoordinator<C, M>> simpleCoordinator() {
+    public static <C extends CommandSender, M extends CommandMeta> Function<CommandTree<C, M>,
+            CommandExecutionCoordinator<C, M>> simpleCoordinator() {
         return SimpleCoordinator::new;
     }
 
-    public abstract CompletableFuture<CommandResult> coordinateExecution(@Nonnull final CommandContext<C> commandContext,
-                                                                         @Nonnull final Queue<String> input);
+    /**
+     * Coordinate the execution of a command and return the result
+     *
+     * @param commandContext Command context
+     * @param input          Command input
+     * @return Future that completes with the result
+     */
+    public abstract CompletableFuture<CommandResult> coordinateExecution(@Nonnull CommandContext<C> commandContext,
+                                                                         @Nonnull Queue<String> input);
 
     /**
      * Get the command tree
@@ -86,15 +94,16 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender, M ext
      * @param <C> Command sender type
      * @param <M> Command meta type
      */
-    public static final class SimpleCoordinator<C extends CommandSender, M extends CommandMeta> extends CommandExecutionCoordinator<C, M> {
+    public static final class SimpleCoordinator<C extends CommandSender, M extends CommandMeta> extends
+            CommandExecutionCoordinator<C, M> {
 
         private SimpleCoordinator(@Nonnull final CommandTree<C, M> commandTree) {
             super(commandTree);
         }
 
         @Override
-        public CompletableFuture<CommandResult> coordinateExecution(@Nonnull CommandContext<C> commandContext,
-                                                                    @Nonnull Queue<String> input) {
+        public CompletableFuture<CommandResult> coordinateExecution(@Nonnull final CommandContext<C> commandContext,
+                                                                    @Nonnull final Queue<String> input) {
             final CompletableFuture<CommandResult> completableFuture = new CompletableFuture<>();
             try {
                 this.getCommandTree().parse(commandContext, input).ifPresent(

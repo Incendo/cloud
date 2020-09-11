@@ -21,24 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.context;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
-import javax.annotation.Nonnull;
-
-public final class StandardCommandContextFactory<C extends CommandSender> implements CommandContextFactory<C> {
-
-    /**
-     * Construct a new command context
-     *
-     * @param sender Command sender
-     * @return Created context
-     */
-    @Nonnull
-    @Override
-    public CommandContext<C> create(@Nonnull final C sender) {
-        return new CommandContext<>(sender);
-    }
-
-}
+/**
+ * cloud API main package
+ * @see com.intellectualsites.commands.CommandManager Command manager class
+ */
+package com.intellectualsites.commands;
