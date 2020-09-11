@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/Sauilitired/cloud/master/cloud_logo.png" />
+    <img src="icons/cloud.svg" />
 </div>
 
 # Command Library Of (yo)Ur Dreams
