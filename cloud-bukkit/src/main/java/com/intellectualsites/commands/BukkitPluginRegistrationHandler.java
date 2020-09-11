@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 IntellectualSites
+// Copyright (c) 2020 Alexander Söderberg
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

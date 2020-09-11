@@ -22,11 +22,21 @@ The code is based on a paper that can be found [here](https://github.com/Sauilit
 - Allow for command pre-processing
 - Allow for command suggestion outputs
 
-Once the core functionality is present additional goals are:
+Once the core functionality is present, the framework will offer implementation modules, supporting a wide variety of platforms.
 
-- Create a Minecraft specific implementation and add appropriate bindings (bukkit, paper, velocity and bungee) with Brigadier mappings where appropriate
-- Create a Discord implementation
-- Create a Java CLI implementation
+### Implementations
+
+- Minecraft:
+  - Generic Brigadier module
+  - Bukkit module
+  - Paper module, with optional Brigadier support
+  - Sponge module
+  - Cloudburst
+  - Bungee module
+  - Velocity module
+
+- Create a Discord implementation (JDA)
+- Create a Java CLI implementation (JLine3)
 
 ## Links
 
@@ -51,3 +61,13 @@ cloud is available from [IntellectualSites](https://intellectualsites.com)' mave
     <version></version>
 </dependency>
 ```
+
+### Attributions, links &amp; acknowledgements
+
+This library is licensed under the <a href="https://opensource.org/licenses/MIT">MIT</a> license, and the code copyright
+belongs to Alexander Söderberg. The implementation is based on a paper written by the copyright holder, and this paper exists
+under the <a href="https://creativecommons.org/licenses/by/4.0/legalcode">CC Attribution 4</a> license.
+
+The <a href="https://iconscout.com/icons/cloud" target="_blank">Cloud</a> icon was created by by 
+<a href="https://iconscout.com/contributors/oviyan">Thanga Vignesh P</a> on <a href="https://iconscout.com">Iconscout</a>
+and Digital rights were purchased under a premium plan.
