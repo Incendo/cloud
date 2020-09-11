@@ -11,30 +11,59 @@ import java.util.StringJoiner;
 import javax.annotation.Nonnull;
 
 @SuppressWarnings("unused")
-public class StringComponent<C extends CommandSender> extends CommandComponent<C, String> {
+public final class StringComponent<C extends CommandSender> extends CommandComponent<C, String> {
     private final boolean greedy;
 
-    public StringComponent(final boolean required, @Nonnull final String name,
-                           final boolean greedy, @Nonnull final String defaultValue) {
+    private StringComponent(final boolean required, @Nonnull final String name,
+                            final boolean greedy, @Nonnull final String defaultValue) {
         super(required, name, new StringParser<>(greedy), defaultValue);
         this.greedy = greedy;
     }
 
+    /**
+     * Create a new builder
+     *
+     * @param name Name of the component
+     * @param <C>  Command sender type
+     * @return Created builder
+     */
     @Nonnull
     public static <C extends CommandSender> StringComponent.Builder<C> newBuilder(@Nonnull final String name) {
         return new StringComponent.Builder<>(name);
     }
 
+    /**
+     * Create a new required command component
+     *
+     * @param name Component name
+     * @param <C>  Command sender type
+     * @return Created component
+     */
     @Nonnull
     public static <C extends CommandSender> CommandComponent<C, String> required(@Nonnull final String name) {
         return StringComponent.<C>newBuilder(name).asRequired().build();
     }
 
+    /**
+     * Create a new optional command component
+     *
+     * @param name Component name
+     * @param <C>  Command sender type
+     * @return Created component
+     */
     @Nonnull
     public static <C extends CommandSender> CommandComponent<C, String> optional(@Nonnull final String name) {
         return StringComponent.<C>newBuilder(name).asOptional().build();
     }
 
+    /**
+     * Create a new required command component with a default value
+     *
+     * @param name       Component name
+     * @param defaultNum Default num
+     * @param <C>        Command sender type
+     * @return Created component
+     */
     @Nonnull
     public static <C extends CommandSender> CommandComponent<C, String> optional(@Nonnull final String name,
                                                                                  final String defaultNum) {
@@ -49,16 +78,27 @@ public class StringComponent<C extends CommandSender> extends CommandComponent<C
             super(name);
         }
 
+        /**
+         * Set the greedy toggle
+         *
+         * @param greedy greedy value
+         * @return Builder instance
+         */
         @Nonnull
         public Builder<C> withGreedy(final boolean greedy) {
             this.greedy = greedy;
             return this;
         }
 
+        /**
+         * Builder a new string component
+         *
+         * @return Constructed component
+         */
         @Nonnull
         @Override
         public StringComponent<C> build() {
-            return new StringComponent<>(this.required, this.name, this.greedy, this.defaultValue);
+            return new StringComponent<>(this.isRequired(), this.getName(), this.greedy, this.getDefaultValue());
         }
 
     }
@@ -76,7 +116,7 @@ public class StringComponent<C extends CommandSender> extends CommandComponent<C
 
         private final boolean greedy;
 
-        public StringParser(final boolean greedy) {
+        private StringParser(final boolean greedy) {
             this.greedy = greedy;
         }
 
