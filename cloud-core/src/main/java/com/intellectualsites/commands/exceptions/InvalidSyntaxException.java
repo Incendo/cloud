@@ -32,6 +32,7 @@ import java.util.List;
 /**
  * Exception sent when a {@link CommandSender} inputs invalid command syntax
  */
+@SuppressWarnings("unused")
 public class InvalidSyntaxException extends CommandParseException {
 
     private final String correctSyntax;

@@ -27,8 +27,10 @@ import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.AmbiguousNodeException;
 import com.intellectualsites.commands.exceptions.ComponentParseException;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
+import com.intellectualsites.commands.exceptions.NoCommandInLeafException;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
@@ -61,10 +63,10 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
 
     private final Node<CommandComponent<C, ?>> internalTree = new Node<>(null);
     private final CommandManager<C, M> commandManager;
-    private final CommandRegistrationHandler commandRegistrationHandler;
+    private final CommandRegistrationHandler<M> commandRegistrationHandler;
 
     private CommandTree(@Nonnull final CommandManager<C, M> commandManager,
-                        @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+                        @Nonnull final CommandRegistrationHandler<M> commandRegistrationHandler) {
         this.commandManager = commandManager;
         this.commandRegistrationHandler = commandRegistrationHandler;
     }
@@ -81,13 +83,23 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
     @Nonnull
     public static <C extends CommandSender, M extends CommandMeta> CommandTree<C, M> newTree(
             @Nonnull final CommandManager<C, M> commandManager,
-            @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+            @Nonnull final CommandRegistrationHandler<M> commandRegistrationHandler) {
         return new CommandTree<>(commandManager, commandRegistrationHandler);
     }
 
+    /**
+     * Attempt to parse string input into a command
+     *
+     * @param commandContext Command context instance
+     * @param args           Input
+     * @return Parsed command, if one could be found
+     * @throws NoSuchCommandException If there is no command matching the input
+     * @throws NoPermissionException  If the sender lacks permission to execute the command
+     * @throws InvalidSyntaxException If the command syntax is invalid
+     */
     public Optional<Command<C, M>> parse(@Nonnull final CommandContext<C> commandContext,
                                          @Nonnull final Queue<String> args) throws
-            NoSuchCommandException {
+            NoSuchCommandException, NoPermissionException, InvalidSyntaxException {
         return parseCommand(commandContext, args, this.internalTree);
     }
 
@@ -101,6 +113,68 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
                                                                                                .map(Node::getValue)
                                                                                                .collect(Collectors.toList()));
         }
+
+        final Optional<Command<C, M>> parsedChild = this.attemptParseUnambiguousChild(commandContext, root, commandQueue);
+        // noinspection all
+        if (parsedChild != null) {
+            return parsedChild;
+        }
+
+        /* There are 0 or more static components as children. No variable child components are present */
+        if (root.children.isEmpty()) {
+            /* We are at the bottom. Check if there's a command attached, in which case we're done */
+            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+                if (commandQueue.isEmpty()) {
+                    return Optional.ofNullable(this.cast(root.getValue().getOwningCommand()));
+                } else {
+                    /* Too many arguments. We have a unique path, so we can send the entire context */
+                    throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
+                                                                        .apply(root.getValue()
+                                                                                   .getOwningCommand()
+                                                                                   .getComponents()),
+                                                     commandContext.getCommandSender(), this.getChain(root)
+                                                                                            .stream()
+                                                                                            .map(Node::getValue)
+                                                                                            .collect(Collectors.toList()));
+                }
+            } else {
+                /* Too many arguments. We have a unique path, so we can send the entire context */
+                throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
+                                                                    .apply(Objects.requireNonNull(
+                                                                            Objects.requireNonNull(root.getValue())
+                                                                                   .getOwningCommand())
+                                                                                  .getComponents()),
+                                                 commandContext.getCommandSender(), this.getChain(root)
+                                                                                        .stream()
+                                                                                        .map(Node::getValue)
+                                                                                        .collect(Collectors.toList()));
+            }
+        } else {
+            final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
+            if (childIterator.hasNext()) {
+                while (childIterator.hasNext()) {
+                    final Node<CommandComponent<C, ?>> child = childIterator.next();
+                    if (child.getValue() != null) {
+                        final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                        if (result.getParsedValue().isPresent()) {
+                            return this.parseCommand(commandContext, commandQueue, child);
+                        } /*else if (result.getFailure().isPresent() && root.children.size() == 1) {
+                        }*/
+                    }
+                }
+            }
+            /* We could not find a match */
+            throw new NoSuchCommandException(commandContext.getCommandSender(),
+                                             getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
+                                             stringOrEmpty(commandQueue.peek()));
+        }
+    }
+
+    @Nullable
+    private Optional<Command<C, M>> attemptParseUnambiguousChild(@Nonnull final CommandContext<C> commandContext,
+                                                                 @Nonnull final Node<CommandComponent<C, ?>> root,
+                                                                 @Nonnull final Queue<String> commandQueue) {
+        String permission;
         final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
             // The value has to be a variable
@@ -166,60 +240,16 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 }
             }
         }
-        /* There are 0 or more static components as children. No variable child components are present */
-        if (children.isEmpty()) {
-            /* We are at the bottom. Check if there's a command attached, in which case we're done */
-            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
-                if (commandQueue.isEmpty()) {
-                    return Optional.ofNullable(this.cast(root.getValue().getOwningCommand()));
-                } else {
-                    /* Too many arguments. We have a unique path, so we can send the entire context */
-                    throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                        .apply(root.getValue()
-                                                                                   .getOwningCommand()
-                                                                                   .getComponents()),
-                                                     commandContext.getCommandSender(), this.getChain(root)
-                                                                                            .stream()
-                                                                                            .map(Node::getValue)
-                                                                                            .collect(Collectors.toList()));
-                }
-            } else {
-                /* Too many arguments. We have a unique path, so we can send the entire context */
-                throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                    .apply(Objects.requireNonNull(
-                                                                            Objects.requireNonNull(root.getValue())
-                                                                                   .getOwningCommand())
-                                                                                  .getComponents()),
-                                                 commandContext.getCommandSender(), this.getChain(root)
-                                                                                        .stream()
-                                                                                        .map(Node::getValue)
-                                                                                        .collect(Collectors.toList()));
-            }
-        } else {
-            final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
-            if (childIterator.hasNext()) {
-                while (childIterator.hasNext()) {
-                    final Node<CommandComponent<C, ?>> child = childIterator.next();
-                    if (child.getValue() != null) {
-                        final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
-                        if (result.getParsedValue().isPresent()) {
-                            return this.parseCommand(commandContext, commandQueue, child);
-                        } else if (result.getFailure().isPresent() && root.children.size() == 1) {
-                        }
-                    }
-                }
-            }
-            /* We could not find a match */
-            throw new NoSuchCommandException(commandContext.getCommandSender(),
-                                             getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
-                                             stringOrEmpty(commandQueue.peek()));
-        }
+        // noinspection all
+        return null;
     }
 
+    @Nonnull
     public List<String> getSuggestions(@Nonnull final CommandContext<C> context, @Nonnull final Queue<String> commandQueue) {
         return getSuggestions(context, commandQueue, this.internalTree);
     }
 
+    @Nonnull
     public List<String> getSuggestions(@Nonnull final CommandContext<C> commandContext,
                                        @Nonnull final Queue<String> commandQueue,
                                        @Nonnull final Node<CommandComponent<C, ?>> root) {
@@ -268,8 +298,8 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
                         final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                         if (result.getParsedValue().isPresent()) {
                             return this.getSuggestions(commandContext, commandQueue, child);
-                        } else if (result.getFailure().isPresent() && root.children.size() == 1) {
-                        }
+                        } /* else if (result.getFailure().isPresent() && root.children.size() == 1) {
+                        }*/
                     }
                 }
             }
@@ -330,7 +360,7 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
             return sender.hasPermission(
                     Objects.requireNonNull(Objects.requireNonNull(node.value, "node.value").getOwningCommand(),
                                            "owning command").getCommandPermission())
-                   ? null : node.value.getOwningCommand().getCommandPermission();
+                   ? null : Objects.requireNonNull(node.value.getOwningCommand(), "owning command").getCommandPermission();
         }
         /*
           if any of the children would permit the execution, then the sender has a valid
@@ -359,14 +389,17 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 throw new IllegalStateException("Top level command component cannot be a variable");
             }
         });
+
         this.checkAmbiguity(this.internalTree);
+
         // Verify that all leaf nodes have command registered
         this.getLeaves(this.internalTree).forEach(leaf -> {
             if (leaf.getOwningCommand() == null) {
-                // TODO: Custom exception type
-                throw new IllegalStateException("Leaf node does not have associated owning command");
+                throw new NoCommandInLeafException(leaf);
             } else {
-                this.commandRegistrationHandler.registerCommand(leaf.getOwningCommand());
+                // noinspection unchecked
+                final Command<C, M> owningCommand = (Command<C, M>) leaf.getOwningCommand();
+                this.commandRegistrationHandler.registerCommand(owningCommand);
             }
         });
 
@@ -391,18 +424,18 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 }
             }
         });
-        /* TODO: Figure out a way to register all combinations along a command component path */
     }
 
-    private void checkAmbiguity(@Nonnull final Node<CommandComponent<C, ?>> node) {
+    private void checkAmbiguity(@Nonnull final Node<CommandComponent<C, ?>> node) throws AmbiguousNodeException {
         if (node.isLeaf()) {
             return;
         }
         final int size = node.children.size();
         for (final Node<CommandComponent<C, ?>> child : node.children) {
             if (child.getValue() != null && !child.getValue().isRequired() && size > 1) {
-                // TODO: Use a custom exception type here
-                throw new IllegalStateException("Ambiguous command node found: " + node.getValue());
+                throw new AmbiguousNodeException(node.getValue(),
+                                                 child.getValue(),
+                                                 node.getChildren().stream().map(Node::getValue).collect(Collectors.toList()));
             }
         }
         node.children.forEach(this::checkAmbiguity);
@@ -443,12 +476,12 @@ public class CommandTree<C extends CommandSender, M extends CommandMeta> {
         return chain;
     }
 
-    @Nullable private Command<C, M> cast(@Nullable final Command<C, ?> command) {
+    @Nullable
+    private Command<C, M> cast(@Nullable final Command<C, ?> command) {
         if (command == null) {
             return null;
         }
-        @SuppressWarnings("unchecked")
-        final Command<C, M> casted = (Command<C, M>) command;
+        @SuppressWarnings("unchecked") final Command<C, M> casted = (Command<C, M>) command;
         return casted;
     }
 

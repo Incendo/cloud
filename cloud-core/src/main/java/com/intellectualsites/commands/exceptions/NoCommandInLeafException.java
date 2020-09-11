@@ -24,35 +24,31 @@
 package com.intellectualsites.commands.exceptions;
 
 import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
- * Exception thrown when a {@link CommandSender} misses a permission required
- * to execute a {@link com.intellectualsites.commands.Command}
+ * Thrown when a {@link com.intellectualsites.commands.components.CommandComponent}
+ * that is registered as a leaf node, does not contain an owning {@link com.intellectualsites.commands.Command}
  */
 @SuppressWarnings("unused")
-public class NoPermissionException extends CommandParseException {
+public final class NoCommandInLeafException extends IllegalStateException {
 
-    private final String missingPermission;
+    private final CommandComponent<?, ?> commandComponent;
 
-    public NoPermissionException(@Nonnull final String missingPermission,
-                                 @Nonnull final CommandSender commandSender,
-                                 @Nonnull final List<CommandComponent<?, ?>> currentChain) {
-        super(commandSender, currentChain);
-        this.missingPermission = missingPermission;
+    public NoCommandInLeafException(@Nonnull final CommandComponent<?, ?> commandComponent) {
+        super(String.format("Leaf node '%s' does not have associated owning command", commandComponent.getName()));
+        this.commandComponent = commandComponent;
     }
 
-    @Override
-    public String getMessage() {
-        return String.format("Missing permission '%s'", this.missingPermission);
-    }
-
+    /**
+     * Get the command component
+     *
+     * @return Command component
+     */
     @Nonnull
-    public String getMissingPermission() {
-        return this.missingPermission;
+    public CommandComponent<?, ?> getCommandComponent() {
+        return this.commandComponent;
     }
 
 }

@@ -33,6 +33,7 @@ import java.util.List;
 /**
  * Exception thrown when parsing user input into a command
  */
+@SuppressWarnings("unused")
 public class CommandParseException extends IllegalArgumentException {
 
     private final CommandSender commandSender;

@@ -45,8 +45,9 @@ import java.util.function.Function;
  * The manager is responsible for command registration, parsing delegation, etc.
  *
  * @param <C> Command sender type
- * @param <M> Commamd meta type
+ * @param <M> Command meta type
  */
+@SuppressWarnings("unused")
 public abstract class CommandManager<C extends CommandSender, M extends CommandMeta> {
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();

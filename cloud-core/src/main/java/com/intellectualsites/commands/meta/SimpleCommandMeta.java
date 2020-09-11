@@ -33,6 +33,7 @@ import java.util.Optional;
 /**
  * A simple immutable string-string map containing command meta
  */
+@SuppressWarnings("unused")
 public class SimpleCommandMeta extends CommandMeta {
 
     private final Map<String, String> metaMap;

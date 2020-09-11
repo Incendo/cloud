@@ -33,6 +33,7 @@ import java.util.List;
  * Exception thrown when a command sender tries to execute
  * a command that doesn't exist
  */
+@SuppressWarnings("unused")
 public class NoSuchCommandException extends CommandParseException {
 
     private final String suppliedCommand;
