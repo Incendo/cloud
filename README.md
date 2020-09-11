@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="icons/cloud.svg" />
+    <img src="icons/cloud.svg" width="300px"/>
 </div>
 
 # Command Library Of (yo)Ur Dreams
