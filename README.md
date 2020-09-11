@@ -2,20 +2,22 @@
     <img src="icons/cloud.svg" width="300px"/>
 </div>
 
-# Command Library Of (yo)Ur Dreams
+# cloud command framework
 
 [![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/cloud/badge)](https://www.codefactor.io/repository/github/sauilitired/cloud)
 
-This is going to be a general-purpose Java command library. It will allow programmers
-to define command chains that users can use to execute pre-defined actions.
+This is going to be a general-purpose Java command dispatcher &amp; framework.
+It will allow programmers to define command chains that users can use to execute pre-defined actions.
 
-The library was named cloud because using it makes you feel like you're floating around on a cloud in heaven. It's an experience of pure bliss and joy. This is unlike the experience of using **a**ny **c**ommand **f**ramework that currently exists for the JVM, which can be compared to drowning in a pool of lava while watching your family get eaten by a pack of wolves. 
+The library was named cloud because using it makes you feel like you're floating around on a cloud in heaven. It's an experience of pure bliss and joy.
+This is unlike the experience of using **a**ny **c**ommand **f**ramework that currently exists for the JVM, which can be compared to drowning in a pool of lava while watching your family get eaten by a pack of wolves. 
 
-Its feature set is derived from **a**lready existing **c**ommand **f**rameworks, while being less restrictive, opinionated and confusing. CLOUD is built to be completely deterministic and your commands will behave exactly as you've programmed them to. No fluff and no mess, just a smooth cloud-like experience.
+Its feature set is derived from **a**lready existing **c**ommand **f**rameworks, while being less restrictive, opinionated and confusing.
+CLOUD is built to be completely deterministic and your commands will behave exactly as you've programmed them to. No fluff and no mess, just a smooth cloud-like experience.
 
 The code is based on a paper that can be found [here](https://github.com/Sauilitired/Sauilitired/blob/master/AS_2020_09_Commands.pdf).
 
-## Goals
+## goals
 
 - Allow for commands to be defined using builder patterns
 - Allow for commands to be defined using annotated methods
@@ -24,7 +26,7 @@ The code is based on a paper that can be found [here](https://github.com/Sauilit
 
 Once the core functionality is present, the framework will offer implementation modules, supporting a wide variety of platforms.
 
-### Implementations
+### implementations
 
 - Minecraft:
   - Generic Brigadier module
@@ -38,12 +40,11 @@ Once the core functionality is present, the framework will offer implementation 
 - Create a Discord implementation (JDA)
 - Create a Java CLI implementation (JLine3)
 
-## Links
+## links
 
-- Discord: discord.gg/KxkjDVg
+- Discord: https://discord.gg/KxkjDVg
 
-
-## Maven
+## maven
 
 cloud is available from [IntellectualSites](https://intellectualsites.com)' maven repository:
 
@@ -62,7 +63,7 @@ cloud is available from [IntellectualSites](https://intellectualsites.com)' mave
 </dependency>
 ```
 
-### Attributions, links &amp; acknowledgements
+### attributions, links &amp; acknowledgements
 
 This library is licensed under the <a href="https://opensource.org/licenses/MIT">MIT</a> license, and the code copyright
 belongs to Alexander Söderberg. The implementation is based on a paper written by the copyright holder, and this paper exists
