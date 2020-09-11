@@ -31,11 +31,7 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -100,6 +96,9 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
      * Create a new command builder
      *
      * @param commandName Base command component
+     * @param commandMeta Command meta instance
+     * @param <C>         Command sender type
+     * @param <M>         Command meta type
      * @return Command builder
      */
     @Nonnull
@@ -163,6 +162,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
      * Get the longest chain of similar components for
      * two commands
      *
+     * @param other Command to compare to
      * @return List containing the longest shared component chain
      */
     public List<CommandComponent<C, ?>> getSharedComponentChain(@Nonnull final Command<C, M> other) {
@@ -216,7 +216,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
         public <T> Builder<C, M> withComponent(@Nonnull final CommandComponent<C, T> component) {
             final List<CommandComponent<C, ?>> commandComponents = new LinkedList<>(this.commandComponents);
             commandComponents.add(component);
-            return new Builder<>(this.commandMeta, this.senderType, commandComponents, this.commandExecutionHandler, this.commandPermission);
+            return new Builder<>(this.commandMeta, this.senderType, commandComponents, this.commandExecutionHandler,
+                                 this.commandPermission);
         }
 
         /**
@@ -230,8 +231,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public <T> Builder<C, M> withComponent(@Nonnull final Class<T> clazz,
-                                            @Nonnull final String name,
-                                            @Nonnull final Consumer<CommandComponent.Builder<C, T>> builderConsumer) {
+                                               @Nonnull final String name,
+                                               @Nonnull final Consumer<CommandComponent.Builder<C, T>> builderConsumer) {
             final CommandComponent.Builder<C, T> builder = CommandComponent.ofType(clazz, name);
             builderConsumer.accept(builder);
             return this.withComponent(builder.build());
@@ -245,7 +246,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> withHandler(@Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
-            return new Builder<>(this.commandMeta, this.senderType, this.commandComponents, commandExecutionHandler, this.commandPermission);
+            return new Builder<>(this.commandMeta, this.senderType, this.commandComponents, commandExecutionHandler,
+                                 this.commandPermission);
         }
 
         /**
@@ -256,7 +258,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> withSenderType(@Nonnull final Class<? extends C> senderType) {
-            return new Builder<>(this.commandMeta, senderType, this.commandComponents, this.commandExecutionHandler, this.commandPermission);
+            return new Builder<>(this.commandMeta, senderType, this.commandComponents, this.commandExecutionHandler,
+                                 this.commandPermission);
         }
 
         /**
@@ -267,7 +270,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> withPermission(@Nonnull final String permission) {
-            return new Builder<>(this.commandMeta, this.senderType, this.commandComponents, this.commandExecutionHandler, permission);
+            return new Builder<>(this.commandMeta, this.senderType, this.commandComponents, this.commandExecutionHandler,
+                                 permission);
         }
 
         /**

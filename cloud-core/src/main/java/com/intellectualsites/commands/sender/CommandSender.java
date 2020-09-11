@@ -31,6 +31,7 @@ public interface CommandSender {
      * Check if the command sender has a given permission node
      *
      * @param permission Permission node
+     * @return {@code true} if the sender has the given permission node, else {@code false}
      */
     boolean hasPermission(@Nonnull String permission);
 
