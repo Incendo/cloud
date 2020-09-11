@@ -7,6 +7,8 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
@@ -72,6 +74,10 @@ public class BooleanComponent<C extends CommandSender> extends CommandComponent<
     }
 
     private static final class BooleanParser<C extends CommandSender> implements ComponentParser<C, Boolean> {
+        // todo
+        private static final List<String> LIBERAL = Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF");
+        private static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");
+        private static final List<String> LIBERAL_FALSE = Arrays.asList("FALSE", "NO", "OFF");
 
         private final boolean liberal;
 
@@ -101,18 +107,28 @@ public class BooleanComponent<C extends CommandSender> extends CommandComponent<
                 return ComponentParseResult.failure(new BooleanParseException(input, false));
             }
 
-            switch (input.toUpperCase()) {
-                case "TRUE":
-                case "YES":
-                case "ON":
-                    return ComponentParseResult.success(true);
-                case "FALSE":
-                case "NO":
-                case "OFF":
-                    return ComponentParseResult.success(false);
-                default:
-                    return ComponentParseResult.failure(new BooleanParseException(input, true));
+            final String uppercaseInput = input.toUpperCase();
+
+            if (LIBERAL_TRUE.contains(uppercaseInput)) {
+                return ComponentParseResult.success(true);
             }
+
+            if (LIBERAL_FALSE.contains(uppercaseInput)) {
+                return ComponentParseResult.success(false);
+            }
+
+            return ComponentParseResult.failure(new BooleanParseException(input, true));
+        }
+
+        @Nonnull
+        @Override
+        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
+                                        @Nonnull final String input) {
+            if (!liberal) {
+                return Arrays.asList("TRUE", "FALSE");
+            }
+
+            return LIBERAL;
         }
     }
 
