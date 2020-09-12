@@ -31,9 +31,11 @@ import com.intellectualsites.commands.context.CommandContextFactory;
 import com.intellectualsites.commands.context.StandardCommandContextFactory;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandResult;
-import com.intellectualsites.commands.execution.preprocessor.CommandPreProcessor;
+import com.intellectualsites.commands.execution.CommandSuggestionProcessor;
+import com.intellectualsites.commands.execution.FilteringCommandSuggestionProcessor;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
-import com.intellectualsites.commands.execution.preprocessor.NullCommandPreProcessor;
+import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessor;
+import com.intellectualsites.commands.execution.preprocessor.NullCommandPreprocessor;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -41,7 +43,11 @@ import com.intellectualsites.services.ServicePipeline;
 import com.intellectualsites.services.State;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -55,13 +61,14 @@ import java.util.function.Function;
 public abstract class CommandManager<C extends CommandSender, M extends CommandMeta> {
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
-
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
+
     private final CommandExecutionCoordinator<C, M> commandExecutionCoordinator;
     private final CommandRegistrationHandler<M> commandRegistrationHandler;
     private final CommandTree<C, M> commandTree;
 
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
+    private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
 
     /**
      * Create a new command manager instance
@@ -75,8 +82,8 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
         this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
-        this.servicePipeline.registerServiceType(new TypeToken<CommandPreProcessor<C>>() {
-        }, new NullCommandPreProcessor<>());
+        this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
+        }, new NullCommandPreprocessor<>());
     }
 
     /**
@@ -88,8 +95,20 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      */
     @Nonnull
     public CompletableFuture<CommandResult> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
-        return this.commandExecutionCoordinator.coordinateExecution(this.commandContextFactory.create(commandSender),
-                                                                    tokenize(input));
+        final CommandContext<C> context = this.commandContextFactory.create(commandSender);
+        final Queue<String> inputQueue = this.tokenize(input);
+        try {
+            if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
+                return this.commandExecutionCoordinator.coordinateExecution(this.commandContextFactory.create(commandSender),
+                                                                            tokenize(input));
+            }
+        } catch (final Exception e) {
+            final CompletableFuture<CommandResult> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+        /* Wasn't allowed to execute the command */
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
@@ -102,7 +121,16 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      */
     @Nonnull
     public List<String> suggest(@Nonnull final C commandSender, @Nonnull final String input) {
-        return this.commandTree.getSuggestions(this.commandContextFactory.create(commandSender), tokenize(input));
+        final CommandContext<C> context = this.commandContextFactory.create(commandSender);
+        final Queue<String> inputQueue = this.tokenize(input);
+        if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
+            return this.commandSuggestionProcessor.apply(new CommandPreprocessingContext<>(context, inputQueue),
+                                                         this.commandTree.getSuggestions(
+                                                                 this.commandContextFactory.create(commandSender),
+                                                                 tokenize(input)));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Nonnull
@@ -207,8 +235,8 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      *
      * @param processor Processor to register
      */
-    public void registerCommandPreProcessor(@Nonnull final CommandPreProcessor<C> processor) {
-        this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPreProcessor<C>>() {
+    public void registerCommandPreProcessor(@Nonnull final CommandPreprocessor<C> processor) {
+        this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPreprocessor<C>>() {
                                                            }, processor,
                                                            Collections.emptyList());
     }
@@ -222,9 +250,28 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      */
     public State preprocessContext(@Nonnull final CommandContext<C> context, @Nonnull final Queue<String> inputQueue) {
         return this.servicePipeline.pump(new CommandPreprocessingContext<>(context, inputQueue))
-                                   .through(new TypeToken<CommandPreProcessor<C>>() {
+                                   .through(new TypeToken<CommandPreprocessor<C>>() {
                                    })
                                    .getResult() == State.ACCEPTED ? State.REJECTED : State.ACCEPTED;
+    }
+
+    /**
+     * Get the command suggestions processor instance currently used in this command manager
+     *
+     * @return Command suggestions processor
+     */
+    @Nonnull
+    public CommandSuggestionProcessor<C> getCommandSuggestionProcessor() {
+        return this.commandSuggestionProcessor;
+    }
+
+    /**
+     * Set the command suggestions processor for this command manager
+     *
+     * @param commandSuggestionProcessor New command suggestions processor
+     */
+    public void setCommandSuggestionProcessor(@Nonnull final CommandSuggestionProcessor<C> commandSuggestionProcessor) {
+        this.commandSuggestionProcessor = commandSuggestionProcessor;
     }
 
 }

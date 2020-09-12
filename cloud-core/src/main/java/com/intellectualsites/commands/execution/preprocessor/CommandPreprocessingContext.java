@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Queue;
 
 /**
- * Context for {@link CommandPreProcessor command preprocessors}
+ * Context for {@link CommandPreprocessor command preprocessors}
  *
  * @param <C> Command sender type
  */

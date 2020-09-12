@@ -21,20 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.execution.preprocessor;
+package com.intellectualsites.commands.execution;
 
+import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.sender.CommandSender;
-import com.intellectualsites.services.types.ConsumerService;
+
+import java.util.List;
+import java.util.function.BiFunction;
 
 /**
- * Command preprocessor that gets to act on command input
- * before it's sent to the command parser.
- * <p>
- * Command preprocessors may filter out invalid commands by using
- * {@link ConsumerService#interrupt()}
+ * Processor that formats command suggestions
  *
  * @param <C> Command sender type
- * {@inheritDoc}
  */
-public interface CommandPreProcessor<C extends CommandSender> extends ConsumerService<CommandPreprocessingContext<C>> {
+public interface CommandSuggestionProcessor<C extends CommandSender> extends
+        BiFunction<CommandPreprocessingContext<C>, List<String>, List<String>> {
+
 }

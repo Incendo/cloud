@@ -24,18 +24,17 @@
 package com.intellectualsites.commands.execution.preprocessor;
 
 import com.intellectualsites.commands.sender.CommandSender;
-
-import javax.annotation.Nonnull;
+import com.intellectualsites.services.types.ConsumerService;
 
 /**
- * {@link CommandPreProcessor} that does nothing
+ * Command preprocessor that gets to act on command input
+ * before it's sent to the command parser.
+ * <p>
+ * Command preprocessors may filter out invalid commands by using
+ * {@link ConsumerService#interrupt()}
  *
  * @param <C> Command sender type
+ * {@inheritDoc}
  */
-public final class NullCommandPreProcessor<C extends CommandSender> implements CommandPreProcessor<C> {
-
-    @Override
-    public void accept(@Nonnull final CommandPreprocessingContext<C> cCommandPreprocessingContext) {
-    }
-
+public interface CommandPreprocessor<C extends CommandSender> extends ConsumerService<CommandPreprocessingContext<C>> {
 }
