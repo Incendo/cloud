@@ -44,6 +44,16 @@ Once the core functionality is present, the framework will offer implementation 
 
 - Discord: https://discord.gg/KxkjDVg
 
+## develop &amp; build
+
+To clone the repository, use `git clone --recursive https://github.com/Sauilitired/cloud.git`.
+To then build it, use `mvn clean package`. If you've already cloned the repository without
+doing it recursively, use `git submodule update --remote` to update the submodule. This is
+only needed the first time, as Maven will perform this operation when building. 
+
+There is a bash script (`build.sh`) that performs the submodule updating &amp; builds the project.
+Feel free to use this if you want to.
+
 ## maven
 
 cloud is available from [IntellectualSites](https://intellectualsites.com)' maven repository:
