@@ -90,6 +90,7 @@ public final class CharComponent<C extends CommandSender> extends CommandCompone
         return CharComponent.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
+
     public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Character> {
 
         protected Builder(@Nonnull final String name) {
@@ -130,6 +131,9 @@ public final class CharComponent<C extends CommandSender> extends CommandCompone
     }
 
 
+    /**
+     * Char parse exception
+     */
     public static final class CharParseException extends IllegalArgumentException {
 
         private final String input;

@@ -94,6 +94,7 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
         return BooleanComponent.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
+
     public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Boolean> {
 
         private boolean liberal = false;
@@ -135,6 +136,7 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
     public boolean isLiberal() {
         return liberal;
     }
+
 
     private static final class BooleanParser<C extends CommandSender> implements ComponentParser<C, Boolean> {
 
@@ -195,8 +197,13 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
         }
     }
 
+
+    /**
+     * Boolean parse exception
+     */
     public static final class BooleanParseException extends IllegalArgumentException {
 
+        private final String input;
         private final boolean liberal;
 
         /**
@@ -206,8 +213,17 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
          * @param liberal Liberal value
          */
         public BooleanParseException(@Nonnull final String input, final boolean liberal) {
-            super(input);
+            this.input = input;
             this.liberal = liberal;
+        }
+
+        /**
+         * Get the supplied input
+         *
+         * @return String value
+         */
+        public String getInput() {
+            return input;
         }
 
         /**
