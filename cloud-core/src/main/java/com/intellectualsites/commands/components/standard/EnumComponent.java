@@ -31,6 +31,7 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
@@ -158,6 +159,11 @@ public class EnumComponent<C extends CommandSender, E extends Enum<E>> extends C
             return ComponentParseResult.failure(new EnumParseException(input, this.enumClass));
         }
 
+        @Nonnull
+        @Override
+        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
+            return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase()).collect(Collectors.toList());
+        }
     }
 
 
