@@ -23,21 +23,25 @@
 //
 package com.intellectualsites.commands;
 
+import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.components.CommandSyntaxFormatter;
 import com.intellectualsites.commands.components.StandardCommandSyntaxFormatter;
+import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.context.CommandContextFactory;
 import com.intellectualsites.commands.context.StandardCommandContextFactory;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandResult;
+import com.intellectualsites.commands.execution.preprocessor.CommandPreProcessor;
+import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
+import com.intellectualsites.commands.execution.preprocessor.NullCommandPreProcessor;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
+import com.intellectualsites.services.ServicePipeline;
+import com.intellectualsites.services.State;
 
 import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -52,6 +56,7 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
 
+    private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final CommandExecutionCoordinator<C, M> commandExecutionCoordinator;
     private final CommandRegistrationHandler<M> commandRegistrationHandler;
     private final CommandTree<C, M> commandTree;
@@ -70,6 +75,8 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
         this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
+        this.servicePipeline.registerServiceType(new TypeToken<CommandPreProcessor<C>>() {
+        }, new NullCommandPreProcessor<>());
     }
 
     /**
@@ -193,5 +200,31 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      */
     @Nonnull
     public abstract M createDefaultCommandMeta();
+
+    /**
+     * Register a new command preprocessor. The order they are registered in is respected, and they
+     * are called in LIFO order
+     *
+     * @param processor Processor to register
+     */
+    public void registerCommandPreProcessor(@Nonnull final CommandPreProcessor<C> processor) {
+        this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPreProcessor<C>>() {
+                                                           }, processor,
+                                                           Collections.emptyList());
+    }
+
+    /**
+     * Preprocess a command context instance
+     *
+     * @param context    Command context
+     * @param inputQueue Command input as supplied by sender
+     * @return {@link State#ACCEPTED} if the command should be parsed and executed, else {@link State#REJECTED}
+     */
+    public State preprocessContext(@Nonnull final CommandContext<C> context, @Nonnull final Queue<String> inputQueue) {
+        return this.servicePipeline.pump(new CommandPreprocessingContext<>(context, inputQueue))
+                                   .through(new TypeToken<CommandPreProcessor<C>>() {
+                                   })
+                                   .getResult() == State.ACCEPTED ? State.REJECTED : State.ACCEPTED;
+    }
 
 }
