@@ -29,18 +29,19 @@ import com.intellectualsites.commands.components.parser.ComponentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
+import javax.annotation.Nonnull;
 import java.util.Queue;
 import java.util.StringJoiner;
-import javax.annotation.Nonnull;
 
 @SuppressWarnings("unused")
 public final class StringComponent<C extends CommandSender> extends CommandComponent<C, String> {
-    private final boolean greedy;
+
+    private final StringMode stringMode;
 
     private StringComponent(final boolean required, @Nonnull final String name,
-                            final boolean greedy, @Nonnull final String defaultValue) {
-        super(required, name, new StringParser<>(greedy), defaultValue);
-        this.greedy = greedy;
+                            @Nonnull final StringMode stringMode, @Nonnull final String defaultValue) {
+        super(required, name, new StringParser<>(stringMode), defaultValue);
+        this.stringMode = stringMode;
     }
 
     /**
@@ -93,24 +94,62 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
         return StringComponent.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
+    /**
+     * Get the string mode
+     *
+     * @return String mode
+     */
+    @Nonnull
+    public StringMode getStringMode() {
+        return this.stringMode;
+    }
+
+
+    public enum StringMode {
+        SINGLE,
+        GREEDY,
+        QUOTED
+    }
+
 
     public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, String> {
 
-        private boolean greedy = false;
+        private StringMode stringMode = StringMode.SINGLE;
 
         protected Builder(@Nonnull final String name) {
             super(name);
         }
 
         /**
-         * Set the greedy toggle
+         * Set the string mode to greedy
          *
-         * @param greedy greedy value
          * @return Builder instance
          */
         @Nonnull
-        public Builder<C> withGreedy(final boolean greedy) {
-            this.greedy = greedy;
+        public Builder<C> greedy() {
+            this.stringMode = StringMode.GREEDY;
+            return this;
+        }
+
+        /**
+         * Set the string mode to single
+         *
+         * @return Builder instance
+         */
+        @Nonnull
+        public Builder<C> single() {
+            this.stringMode = StringMode.SINGLE;
+            return this;
+        }
+
+        /**
+         * Set the string mode to greedy
+         *
+         * @return Builder instance
+         */
+        @Nonnull
+        public Builder<C> quoted() {
+            this.stringMode = StringMode.QUOTED;
             return this;
         }
 
@@ -122,27 +161,18 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
         @Nonnull
         @Override
         public StringComponent<C> build() {
-            return new StringComponent<>(this.isRequired(), this.getName(), this.greedy, this.getDefaultValue());
+            return new StringComponent<>(this.isRequired(), this.getName(), this.stringMode, this.getDefaultValue());
         }
 
-    }
-
-    /**
-     * Get the greedy boolean
-     *
-     * @return Greedy boolean
-     */
-    public boolean isGreedy() {
-        return greedy;
     }
 
 
     private static final class StringParser<C extends CommandSender> implements ComponentParser<C, String> {
 
-        private final boolean greedy;
+        private final StringMode stringMode;
 
-        private StringParser(final boolean greedy) {
-            this.greedy = greedy;
+        private StringParser(@Nonnull final StringMode stringMode) {
+            this.stringMode = stringMode;
         }
 
         @Nonnull
@@ -154,7 +184,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
                 return ComponentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
-            if (!greedy) {
+            if (this.stringMode == StringMode.SINGLE) {
                 inputQueue.remove();
                 return ComponentParseResult.success(input);
             }
@@ -162,11 +192,90 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
             final StringJoiner sj = new StringJoiner(" ");
             final int size = inputQueue.size();
 
+
+            boolean started = false;
+            boolean finished = false;
+
             for (int i = 0; i < size; i++) {
+                final String string = inputQueue.peek();
+
+                if (string == null) {
+                    break;
+                }
+
+                if (this.stringMode == StringMode.QUOTED) {
+                    if (!started) {
+                        if (string.startsWith("\"")) {
+                            sj.add(string.substring(1));
+                            started = true;
+                        } else {
+                            return ComponentParseResult.failure(new StringParseException(string, StringMode.GREEDY));
+                        }
+                    } else if (string.endsWith("\"")) {
+                        sj.add(string.substring(0, string.length() - 1));
+                        inputQueue.remove();
+                        finished = true;
+                        break;
+                    }
+                }
+
                 sj.add(inputQueue.remove());
+            }
+
+            if (this.stringMode == StringMode.QUOTED && (!started || !finished)) {
+                return ComponentParseResult.failure(new StringParseException(sj.toString(), StringMode.GREEDY));
             }
 
             return ComponentParseResult.success(sj.toString());
         }
     }
+
+
+    public static final class StringParseException extends IllegalArgumentException {
+
+        private final String input;
+        private final StringMode stringMode;
+
+        /**
+         * Construct a new string parse exception
+         *
+         * @param input      Input
+         * @param stringMode String mode
+         */
+        public StringParseException(@Nonnull final String input, @Nonnull final StringMode stringMode) {
+            this.input = input;
+            this.stringMode = stringMode;
+        }
+
+
+        /**
+         * Get the input provided by the sender
+         *
+         * @return Input
+         */
+        @Nonnull
+        public String getInput() {
+            return this.input;
+        }
+
+        /**
+         * Get the string mode
+         *
+         * @return String mode
+         */
+        @Nonnull
+        public StringMode getStringMode() {
+            return this.stringMode;
+        }
+
+        @Override
+        public String getMessage() {
+            if (this.stringMode == StringMode.QUOTED) {
+                return "The string needs to be surrounded by quotation marks";
+            }
+            return String.format("'%s' is not a valid string", this.input);
+        }
+
+    }
+
 }
