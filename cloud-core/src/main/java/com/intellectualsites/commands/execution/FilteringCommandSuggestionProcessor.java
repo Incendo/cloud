@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @param <C> Command sender type
  */
-public class FilteringCommandSuggestionProcessor<C extends CommandSender> implements CommandSuggestionProcessor<C> {
+public final class FilteringCommandSuggestionProcessor<C extends CommandSender> implements CommandSuggestionProcessor<C> {
 
     @Nonnull
     @Override

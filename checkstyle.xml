@@ -32,6 +32,7 @@
 -->
 
 <module name="Checker">
+
     <!--
         If you set the basedir property below, then all reported file
         names will be relative to the specified directory. See
@@ -41,7 +42,7 @@
     -->
     <property name="severity" value="error"/>
 
-    <property name="fileExtensions" value="java, properties, xml"/>
+    <property name="fileExtensions" value="java, properties"/>
 
     <!-- Excludes all 'module-info.java' files              -->
     <!-- See https://checkstyle.org/config_filefilters.html -->

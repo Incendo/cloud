@@ -23,8 +23,36 @@
 //
 package com.intellectualsites.commands.execution;
 
+import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.sender.CommandSender;
+
+import javax.annotation.Nonnull;
+
 /**
  * The result of a command execution
+ *
+ * @param <C> Command sender type
  */
-public class CommandResult {
+public class CommandResult<C extends CommandSender> {
+
+    private final CommandContext<C> commandContext;
+
+    /**
+     * Construct a new command result instance
+     *
+     * @param context Command context
+     */
+    public CommandResult(@Nonnull final CommandContext<C> context) {
+        this.commandContext = context;
+    }
+
+    /**
+     * Get the command context
+     *
+     * @return Command context
+     */
+    @Nonnull public CommandContext<C> getCommandContext() {
+        return this.commandContext;
+    }
+
 }

@@ -34,7 +34,7 @@ import java.util.List;
  * a command that doesn't exist
  */
 @SuppressWarnings("unused")
-public class NoSuchCommandException extends CommandParseException {
+public final class NoSuchCommandException extends CommandParseException {
 
     private final String suppliedCommand;
 
@@ -50,6 +50,19 @@ public class NoSuchCommandException extends CommandParseException {
                                   @Nonnull final String command) {
         super(commandSender, currentChain);
         this.suppliedCommand = command;
+    }
+
+
+    @Override
+    public String getMessage() {
+        final StringBuilder builder = new StringBuilder();
+        for (final CommandComponent<?, ?> commandComponent : this.getCurrentChain()) {
+            if (commandComponent == null) {
+                continue;
+            }
+            builder.append(" ").append(commandComponent.getName());
+        }
+        return String.format("Unrecognized command input '%s' following chain%s", this.suppliedCommand, builder.toString());
     }
 
     /**

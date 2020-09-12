@@ -74,7 +74,7 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender, M ext
      * @param input          Command input
      * @return Future that completes with the result
      */
-    public abstract CompletableFuture<CommandResult> coordinateExecution(@Nonnull CommandContext<C> commandContext,
+    public abstract CompletableFuture<CommandResult<C>> coordinateExecution(@Nonnull CommandContext<C> commandContext,
                                                                          @Nonnull Queue<String> input);
 
     /**
@@ -102,13 +102,13 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender, M ext
         }
 
         @Override
-        public CompletableFuture<CommandResult> coordinateExecution(@Nonnull final CommandContext<C> commandContext,
+        public CompletableFuture<CommandResult<C>> coordinateExecution(@Nonnull final CommandContext<C> commandContext,
                                                                     @Nonnull final Queue<String> input) {
-            final CompletableFuture<CommandResult> completableFuture = new CompletableFuture<>();
+            final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
             try {
                 this.getCommandTree().parse(commandContext, input).ifPresent(
                         command -> command.getCommandExecutionHandler().execute(commandContext));
-                completableFuture.complete(new CommandResult());
+                completableFuture.complete(new CommandResult<>(commandContext));
             } catch (final Exception e) {
                 completableFuture.completeExceptionally(e);
             }

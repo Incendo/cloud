@@ -27,8 +27,8 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Queue;
 
 /**
  * Context for {@link CommandPreprocessor command preprocessors}
@@ -38,7 +38,7 @@ import java.util.Queue;
 public final class CommandPreprocessingContext<C extends CommandSender> {
 
     private final CommandContext<C> commandContext;
-    private final Queue<String> inputQueue;
+    private final LinkedList<String> inputQueue;
 
     /**
      * Construct a new command preprocessing context
@@ -47,7 +47,7 @@ public final class CommandPreprocessingContext<C extends CommandSender> {
      * @param inputQueue     Command input as supplied by sender
      */
     public CommandPreprocessingContext(@Nonnull final CommandContext<C> commandContext,
-                                       @Nonnull final Queue<String> inputQueue) {
+                                       @Nonnull final LinkedList<String> inputQueue) {
         this.commandContext = commandContext;
         this.inputQueue = inputQueue;
     }
@@ -69,12 +69,12 @@ public final class CommandPreprocessingContext<C extends CommandSender> {
      * @return Input queue
      */
     @Nonnull
-    public Queue<String> getInputQueue() {
+    public LinkedList<String> getInputQueue() {
         return this.inputQueue;
     }
 
     @Override
-    public final boolean equals(final Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -82,12 +82,12 @@ public final class CommandPreprocessingContext<C extends CommandSender> {
             return false;
         }
         final CommandPreprocessingContext<?> that = (CommandPreprocessingContext<?>) o;
-        return Objects.equals(getCommandContext(), that.getCommandContext()) &&
-                Objects.equals(getInputQueue(), that.getInputQueue());
+        return Objects.equals(getCommandContext(), that.getCommandContext())
+                && Objects.equals(getInputQueue(), that.getInputQueue());
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return Objects.hash(getCommandContext(), getInputQueue());
     }
 
