@@ -37,5 +37,11 @@
 
     <artifactId>cloud-core</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>com.intellectualsites</groupId>
+            <artifactId>cloud-pipeline</artifactId>
+            <version>1.5.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>
