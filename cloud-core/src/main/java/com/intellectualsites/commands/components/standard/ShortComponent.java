@@ -34,17 +34,17 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class LongComponent<C extends CommandSender> extends CommandComponent<C, Long> {
+public final class ShortComponent<C extends CommandSender> extends CommandComponent<C, Short> {
 
-    private final long min;
-    private final long max;
+    private final short min;
+    private final short max;
 
-    private LongComponent(final boolean required,
-                             @Nonnull final String name,
-                             final long min,
-                             final long max,
-                             final String defaultValue) {
-        super(required, name, new LongParser<>(min, max), defaultValue);
+    private ShortComponent(final boolean required,
+                          @Nonnull final String name,
+                          final short min,
+                          final short max,
+                          final String defaultValue) {
+        super(required, name, new ShortParser<>(min, max), defaultValue);
         this.min = min;
         this.max = max;
     }
@@ -57,7 +57,7 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> LongComponent.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C extends CommandSender> ShortComponent.Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
@@ -69,8 +69,8 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
      * @return Created component
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Long> required(@Nonnull final String name) {
-        return LongComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandComponent<C, Short> required(@Nonnull final String name) {
+        return ShortComponent.<C>newBuilder(name).asRequired().build();
     }
 
     /**
@@ -81,8 +81,8 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
      * @return Created component
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Long> optional(@Nonnull final String name) {
-        return LongComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandComponent<C, Short> optional(@Nonnull final String name) {
+        return ShortComponent.<C>newBuilder(name).asOptional().build();
     }
 
     /**
@@ -94,16 +94,16 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
      * @return Created component
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Long> optional(@Nonnull final String name,
-                                                                                  final long defaultNum) {
-        return LongComponent.<C>newBuilder(name).asOptionalWithDefault(Long.toString(defaultNum)).build();
+    public static <C extends CommandSender> CommandComponent<C, Short> optional(@Nonnull final String name,
+                                                                               final short defaultNum) {
+        return ShortComponent.<C>newBuilder(name).asOptionalWithDefault(Short.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Long> {
+    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Short> {
 
-        private long min = Long.MIN_VALUE;
-        private long max = Long.MAX_VALUE;
+        private short min = Short.MIN_VALUE;
+        private short max = Short.MAX_VALUE;
 
         protected Builder(@Nonnull final String name) {
             super(name);
@@ -116,7 +116,7 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
          * @return Builder instance
          */
         @Nonnull
-        public Builder<C> withMin(final long min) {
+        public Builder<C> withMin(final short min) {
             this.min = min;
             return this;
         }
@@ -128,57 +128,57 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
          * @return Builder instance
          */
         @Nonnull
-        public Builder<C> withMax(final long max) {
+        public Builder<C> withMax(final short max) {
             this.max = max;
             return this;
         }
 
         /**
-         * Builder a new long component
+         * Builder a new short component
          *
          * @return Constructed component
          */
         @Nonnull
         @Override
-        public LongComponent<C> build() {
-            return new LongComponent<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+        public ShortComponent<C> build() {
+            return new ShortComponent<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
         }
 
     }
 
 
     /**
-     * Get the minimum accepted long that could have been parsed
+     * Get the minimum accepted short that could have been parsed
      *
-     * @return Minimum long
+     * @return Minimum short
      */
-    public long getMin() {
+    public short getMin() {
         return this.min;
     }
 
     /**
-     * Get the maximum accepted long that could have been parsed
+     * Get the maximum accepted short that could have been parsed
      *
-     * @return Maximum long
+     * @return Maximum short
      */
-    public long getMax() {
+    public short getMax() {
         return this.max;
     }
 
 
-    private static final class LongParser<C extends CommandSender> implements ComponentParser<C, Long> {
+    private static final class ShortParser<C extends CommandSender> implements ComponentParser<C, Short> {
 
-        private final long min;
-        private final long max;
+        private final short min;
+        private final short max;
 
-        private LongParser(final long min, final long max) {
+        private ShortParser(final short min, final short max) {
             this.min = min;
             this.max = max;
         }
 
         @Nonnull
         @Override
-        public ComponentParseResult<Long> parse(
+        public ComponentParseResult<Short> parse(
                 @Nonnull final CommandContext<C> commandContext,
                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
@@ -186,47 +186,47 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
                 return ComponentParseResult.failure(new NullPointerException("No input was provided"));
             }
             try {
-                final long value = Long.parseLong(input);
+                final short value = Short.parseShort(input);
                 if (value < this.min || value > this.max) {
-                    return ComponentParseResult.failure(new LongParseException(input, this.min, this.max));
+                    return ComponentParseResult.failure(new ShortParseException(input, this.min, this.max));
                 }
                 inputQueue.remove();
                 return ComponentParseResult.success(value);
             } catch (final Exception e) {
-                return ComponentParseResult.failure(new LongParseException(input, this.min, this.max));
+                return ComponentParseResult.failure(new ShortParseException(input, this.min, this.max));
             }
         }
 
     }
 
 
-    public static final class LongParseException extends NumberParseException {
+    public static final class ShortParseException extends NumberParseException {
 
         /**
-         * Construct a new long parse exception
+         * Construct a new short parse exception
          *
          * @param input String input
          * @param min   Minimum value
          * @param max   Maximum value
          */
-        public LongParseException(@Nonnull final String input, final long min, final long max) {
+        public ShortParseException(@Nonnull final String input, final short min, final short max) {
             super(input, min, max);
         }
 
         @Override
         public boolean hasMin() {
-            return this.getMin().longValue() != Long.MIN_VALUE;
+            return this.getMin().shortValue() != Short.MIN_VALUE;
         }
 
         @Override
         public boolean hasMax() {
-            return this.getMax().longValue() != Long.MAX_VALUE;
+            return this.getMax().shortValue() != Short.MAX_VALUE;
         }
 
         @Override
         @Nonnull
         public String getNumberType() {
-            return "long";
+            return "short";
         }
 
     }
