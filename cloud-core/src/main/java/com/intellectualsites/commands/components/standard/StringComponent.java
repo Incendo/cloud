@@ -93,6 +93,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
         return StringComponent.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
+
     public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, String> {
 
         private boolean greedy = false;
@@ -134,6 +135,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
     public boolean isGreedy() {
         return greedy;
     }
+
 
     private static final class StringParser<C extends CommandSender> implements ComponentParser<C, String> {
 
