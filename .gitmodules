@@ -1,0 +1,3 @@
+[submodule "cloud-pipeline"]
+	path = cloud-pipeline
+	url = https://github.com/Sauilitired/Rorledning

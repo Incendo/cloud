@@ -11,6 +11,7 @@
         <module>cloud-jline</module>
         <module>cloud-minecraft/cloud-bukkit</module>
         <module>cloud-core</module>
+        <module>cloud-pipeline</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>
