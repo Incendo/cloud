@@ -27,6 +27,11 @@ jobs:
             -   run: git checkout HEAD^2
                 if: ${{ github.event_name == 'pull_request' }}
 
+            -   name: Checkout submodules
+                uses: srt32/git-actions@v0.0.3
+                with:
+                    args: git submodule update --init --recursive
+
             # Initializes the CodeQL tools for scanning.
             -   name: Initialize CodeQL
                 uses: github/codeql-action/init@v1
