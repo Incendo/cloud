@@ -23,9 +23,9 @@
 //
 package com.intellectualsites.commands.components;
 
-import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Queue;
 import java.util.Set;
 
@@ -109,10 +108,7 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
         @Nonnull
         @Override
         public List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
-            if (this.name.toLowerCase(Locale.ENGLISH).startsWith(input)) {
-                return Collections.singletonList(this.name);
-            }
-            return Collections.emptyList();
+            return Collections.singletonList(this.name);
         }
 
     }

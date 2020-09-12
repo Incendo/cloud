@@ -23,36 +23,18 @@
 //
 package com.intellectualsites.commands.execution;
 
-import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
-import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.function.BiFunction;
 
 /**
- * The result of a command execution
+ * Processor that formats command suggestions
  *
  * @param <C> Command sender type
  */
-public class CommandResult<C extends CommandSender> {
-
-    private final CommandContext<C> commandContext;
-
-    /**
-     * Construct a new command result instance
-     *
-     * @param context Command context
-     */
-    public CommandResult(@Nonnull final CommandContext<C> context) {
-        this.commandContext = context;
-    }
-
-    /**
-     * Get the command context
-     *
-     * @return Command context
-     */
-    @Nonnull public CommandContext<C> getCommandContext() {
-        return this.commandContext;
-    }
+public interface CommandSuggestionProcessor<C extends CommandSender> extends
+        BiFunction<CommandPreprocessingContext<C>, List<String>, List<String>> {
 
 }

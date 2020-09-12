@@ -21,38 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.execution;
+package com.intellectualsites.commands.execution.preprocessor;
 
-import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 
 /**
- * The result of a command execution
+ * {@link CommandPreprocessor} that does nothing besides indicating that the context
+ * has been properly processed
  *
  * @param <C> Command sender type
  */
-public class CommandResult<C extends CommandSender> {
-
-    private final CommandContext<C> commandContext;
+public final class AcceptingCommandPreprocessor<C extends CommandSender> implements CommandPreprocessor<C> {
 
     /**
-     * Construct a new command result instance
-     *
-     * @param context Command context
+     * Key used to access the context meta that indicates that the context has been fully processed
      */
-    public CommandResult(@Nonnull final CommandContext<C> context) {
-        this.commandContext = context;
-    }
+    public static final String PROCESSED_INDICATOR_KEY = "__COMMAND_PRE_PROCESSED__";
 
-    /**
-     * Get the command context
-     *
-     * @return Command context
-     */
-    @Nonnull public CommandContext<C> getCommandContext() {
-        return this.commandContext;
+    @Override
+    public void accept(@Nonnull final CommandPreprocessingContext<C> context) {
+        context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
     }
 
 }

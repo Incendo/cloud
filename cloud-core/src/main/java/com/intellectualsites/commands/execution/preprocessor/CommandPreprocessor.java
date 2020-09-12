@@ -21,38 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.execution;
+package com.intellectualsites.commands.execution.preprocessor;
 
-import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
-
-import javax.annotation.Nonnull;
+import com.intellectualsites.services.types.ConsumerService;
 
 /**
- * The result of a command execution
+ * Command preprocessor that gets to act on command input
+ * before it's sent to the command parser.
+ * <p>
+ * Command preprocessors may filter out invalid commands by using
+ * {@link ConsumerService#interrupt()}
  *
  * @param <C> Command sender type
+ * {@inheritDoc}
  */
-public class CommandResult<C extends CommandSender> {
-
-    private final CommandContext<C> commandContext;
-
-    /**
-     * Construct a new command result instance
-     *
-     * @param context Command context
-     */
-    public CommandResult(@Nonnull final CommandContext<C> context) {
-        this.commandContext = context;
-    }
-
-    /**
-     * Get the command context
-     *
-     * @return Command context
-     */
-    @Nonnull public CommandContext<C> getCommandContext() {
-        return this.commandContext;
-    }
-
+public interface CommandPreprocessor<C extends CommandSender> extends ConsumerService<CommandPreprocessingContext<C>> {
 }

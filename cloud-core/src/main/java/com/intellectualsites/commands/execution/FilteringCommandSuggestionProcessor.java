@@ -23,36 +23,36 @@
 //
 package com.intellectualsites.commands.execution;
 
-import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * The result of a command execution
+ * Command suggestions processor that checks the input queue head and filters based on that
  *
  * @param <C> Command sender type
  */
-public class CommandResult<C extends CommandSender> {
+public final class FilteringCommandSuggestionProcessor<C extends CommandSender> implements CommandSuggestionProcessor<C> {
 
-    private final CommandContext<C> commandContext;
-
-    /**
-     * Construct a new command result instance
-     *
-     * @param context Command context
-     */
-    public CommandResult(@Nonnull final CommandContext<C> context) {
-        this.commandContext = context;
-    }
-
-    /**
-     * Get the command context
-     *
-     * @return Command context
-     */
-    @Nonnull public CommandContext<C> getCommandContext() {
-        return this.commandContext;
+    @Nonnull
+    @Override
+    public List<String> apply(@Nonnull final CommandPreprocessingContext<C> context, @Nonnull final List<String> strings) {
+        final String input;
+        if (context.getInputQueue().isEmpty()) {
+            input = "";
+        } else {
+            input = context.getInputQueue().peek();
+        }
+        final List<String> suggestions = new LinkedList<>();
+        for (final String suggestion : strings) {
+            if (suggestion.startsWith(input)) {
+                suggestions.add(suggestion);
+            }
+        }
+        return suggestions;
     }
 
 }
