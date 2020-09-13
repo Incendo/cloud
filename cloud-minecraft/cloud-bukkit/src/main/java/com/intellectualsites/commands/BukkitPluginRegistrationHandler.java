@@ -28,6 +28,7 @@ import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.help.GenericCommandHelpTopic;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -41,6 +42,7 @@ final class BukkitPluginRegistrationHandler implements CommandRegistrationHandle
 
     private Map<String, org.bukkit.command.Command> bukkitCommands;
     private BukkitCommandManager bukkitCommandManager;
+    private CommandMap commandMap;
 
     BukkitPluginRegistrationHandler() {
     }
@@ -48,14 +50,14 @@ final class BukkitPluginRegistrationHandler implements CommandRegistrationHandle
     void initialize(@Nonnull final BukkitCommandManager bukkitCommandManager) throws Exception {
         final Method getCommandMap = Bukkit.getServer().getClass().getDeclaredMethod("getCommandMap");
         getCommandMap.setAccessible(true);
-        final CommandMap commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());
+        this.commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());
         final Field knownCommands = SimpleCommandMap.class.getDeclaredField("knownCommands");
         knownCommands.setAccessible(true);
-        @SuppressWarnings("ALL")
-        final Map<String, org.bukkit.command.Command> bukkitCommands =
+        @SuppressWarnings("ALL") final Map<String, org.bukkit.command.Command> bukkitCommands =
                 (Map<String, org.bukkit.command.Command>) knownCommands.get(commandMap);
         this.bukkitCommands = bukkitCommands;
         this.bukkitCommandManager = bukkitCommandManager;
+        Bukkit.getHelpMap().registerHelpTopicFactory(BukkitCommand.class, GenericCommandHelpTopic::new);
     }
 
     @Override
@@ -71,11 +73,13 @@ final class BukkitPluginRegistrationHandler implements CommandRegistrationHandle
         } else {
             label = commandComponent.getName();
         }
-        @SuppressWarnings("unchecked")
-        final BukkitCommand bukkitCommand = new BukkitCommand((CommandComponent<BukkitCommandSender, ?>) commandComponent,
-                                                              this.bukkitCommandManager);
-        this.bukkitCommands.put(label, bukkitCommand);
+        @SuppressWarnings("unchecked") final BukkitCommand bukkitCommand = new BukkitCommand(
+                (Command<BukkitCommandSender, BukkitCommandMeta>) command,
+                (CommandComponent<BukkitCommandSender, ?>) commandComponent,
+                this.bukkitCommandManager);
         this.registeredCommands.put(commandComponent, bukkitCommand);
+        this.commandMap.register(commandComponent.getName(), this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
+                                 bukkitCommand);
         return true;
     }
 

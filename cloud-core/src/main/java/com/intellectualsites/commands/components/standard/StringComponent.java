@@ -30,17 +30,23 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
 import java.util.Queue;
 import java.util.StringJoiner;
+import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class StringComponent<C extends CommandSender> extends CommandComponent<C, String> {
 
     private final StringMode stringMode;
 
-    private StringComponent(final boolean required, @Nonnull final String name,
-                            @Nonnull final StringMode stringMode, @Nonnull final String defaultValue) {
-        super(required, name, new StringParser<>(stringMode), defaultValue);
+    private StringComponent(final boolean required,
+                            @Nonnull final String name,
+                            @Nonnull final StringMode stringMode,
+                            @Nonnull final String defaultValue,
+                            @Nonnull final  BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new StringParser<>(stringMode, suggestionsProvider), defaultValue);
         this.stringMode = stringMode;
     }
 
@@ -115,6 +121,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
     public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, String> {
 
         private StringMode stringMode = StringMode.SINGLE;
+        private  BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
 
         protected Builder(@Nonnull final String name) {
             super(name);
@@ -154,6 +161,19 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
         }
 
         /**
+         * Set the suggestions provider
+         *
+         * @param suggestionsProvider Suggestions provider
+         * @return Builder instance
+         */
+        @Nonnull
+        public Builder<C> withSuggestionsProvider(@Nonnull final BiFunction<CommandContext<C>,
+                String, List<String>> suggestionsProvider) {
+            this.suggestionsProvider = suggestionsProvider;
+            return this;
+        }
+
+        /**
          * Builder a new string component
          *
          * @return Constructed component
@@ -161,7 +181,8 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
         @Nonnull
         @Override
         public StringComponent<C> build() {
-            return new StringComponent<>(this.isRequired(), this.getName(), this.stringMode, this.getDefaultValue());
+            return new StringComponent<>(this.isRequired(), this.getName(), this.stringMode,
+                                         this.getDefaultValue(), this.suggestionsProvider);
         }
 
     }
@@ -170,9 +191,12 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
     private static final class StringParser<C extends CommandSender> implements ComponentParser<C, String> {
 
         private final StringMode stringMode;
+        private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
 
-        private StringParser(@Nonnull final StringMode stringMode) {
+        private StringParser(@Nonnull final StringMode stringMode,
+                             @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
             this.stringMode = stringMode;
+            this.suggestionsProvider = suggestionsProvider;
         }
 
         @Nonnull
@@ -227,6 +251,12 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
             }
 
             return ComponentParseResult.success(sj.toString());
+        }
+
+        @Nonnull
+        @Override
+        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
+            return this.suggestionsProvider.apply(commandContext, input);
         }
     }
 

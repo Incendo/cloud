@@ -1,0 +1,5 @@
+name: Command-Test
+author: Citymonstret
+main: com.intellectualsites.commands.BukkitTest
+version: 1.0
+api-version: 1.13

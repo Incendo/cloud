@@ -12,6 +12,8 @@
         <module>cloud-minecraft/cloud-bukkit</module>
         <module>cloud-core</module>
         <module>cloud-pipeline</module>
+        <!-- REMOVE THIS -->
+        <module>cloud-minecraft/cloud-bukkit-test</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>

@@ -35,12 +35,15 @@ final class BukkitCommand extends org.bukkit.command.Command implements PluginId
 
     private final CommandComponent<BukkitCommandSender, ?> command;
     private final BukkitCommandManager bukkitCommandManager;
+    private final com.intellectualsites.commands.Command<BukkitCommandSender, BukkitCommandMeta> cloudCommand;
 
-    BukkitCommand(@Nonnull final CommandComponent<BukkitCommandSender, ?> command,
+    BukkitCommand(@Nonnull final com.intellectualsites.commands.Command<BukkitCommandSender, BukkitCommandMeta> cloudCommand,
+                  @Nonnull final CommandComponent<BukkitCommandSender, ?> command,
                   @Nonnull final BukkitCommandManager bukkitCommandManager) {
         super(command.getName());
         this.command = command;
         this.bukkitCommandManager = bukkitCommandManager;
+        this.cloudCommand = cloudCommand;
     }
 
     @Override
@@ -60,6 +63,11 @@ final class BukkitCommand extends org.bukkit.command.Command implements PluginId
                                      }
                                  }));
         return true;
+    }
+
+    @Override
+    public String getDescription() {
+        return this.cloudCommand.getCommandMeta().getOrDefault("description", "");
     }
 
     @Override

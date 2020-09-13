@@ -272,25 +272,18 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             final Node<CommandComponent<C, ?>> child = children.get(0);
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
-                    if (child.isLeaf()) {
-                        /* Child is leaf, and so no suggestions should be sent */
-                        return Collections.emptyList();
-                    } else {
-                        /* Send all suggestions */
-                        return child.getValue().getParser().suggestions(commandContext, "");
-                    }
+                    return child.getValue().getParser().suggestions(commandContext, "");
+                } else if (child.isLeaf() && commandQueue.size() < 2) {
+                    return child.getValue().getParser().suggestions(commandContext, commandQueue.peek());
+                } else if (child.isLeaf()) {
+                    return Collections.emptyList();
                 }
                 final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                 if (result.getParsedValue().isPresent()) {
-                    if (child.isLeaf()) {
-                        /* Child is leaf, and so no suggestions should be sent */
-                        return Collections.emptyList();
-                    }
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     return this.getSuggestions(commandContext, commandQueue, child);
                 } else if (result.getFailure().isPresent()) {
-                    /* I need to return ze error */
-                    return Collections.emptyList();
+                    return child.getValue().getParser().suggestions(commandContext, commandQueue.peek());
                 }
             }
         }

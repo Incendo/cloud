@@ -141,6 +141,9 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
         while (stringTokenizer.hasMoreElements()) {
             tokens.add(stringTokenizer.nextToken());
         }
+        if (input.endsWith(" ")) {
+            tokens.add("");
+        }
         return tokens;
     }
 
