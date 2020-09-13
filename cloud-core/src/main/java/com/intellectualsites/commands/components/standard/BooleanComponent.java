@@ -138,7 +138,7 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
     }
 
 
-    private static final class BooleanParser<C extends CommandSender> implements ComponentParser<C, Boolean> {
+    public static final class BooleanParser<C extends CommandSender> implements ComponentParser<C, Boolean> {
 
         private static final List<String> LIBERAL = Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF");
         private static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");

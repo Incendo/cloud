@@ -26,6 +26,8 @@ package com.intellectualsites.commands;
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.components.CommandSyntaxFormatter;
 import com.intellectualsites.commands.components.StandardCommandSyntaxFormatter;
+import com.intellectualsites.commands.components.parser.ParserRegistry;
+import com.intellectualsites.commands.components.parser.StandardParserRegistry;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.context.CommandContextFactory;
 import com.intellectualsites.commands.context.StandardCommandContextFactory;
@@ -61,6 +63,7 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
+    private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
 
     private final CommandExecutionCoordinator<C, M> commandExecutionCoordinator;
     private final CommandRegistrationHandler<M> commandRegistrationHandler;
@@ -272,6 +275,16 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      */
     public void setCommandSuggestionProcessor(@Nonnull final CommandSuggestionProcessor<C> commandSuggestionProcessor) {
         this.commandSuggestionProcessor = commandSuggestionProcessor;
+    }
+
+    /**
+     * Get the parser registry instance
+     *
+     * @return Parser registry instance
+     */
+    @Nonnull
+    public ParserRegistry<C> getParserRegistry() {
+        return this.parserRegistry;
     }
 
 }

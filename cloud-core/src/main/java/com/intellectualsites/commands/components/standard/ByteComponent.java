@@ -162,7 +162,7 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
     }
 
 
-    private static final class ByteParser<C extends CommandSender> implements ComponentParser<C, Byte> {
+    public static final class ByteParser<C extends CommandSender> implements ComponentParser<C, Byte> {
 
         private final byte min;
         private final byte max;

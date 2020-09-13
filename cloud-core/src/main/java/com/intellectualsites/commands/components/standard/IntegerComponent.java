@@ -166,12 +166,12 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
     }
 
 
-    private static final class IntegerParser<C extends CommandSender> implements ComponentParser<C, Integer> {
+    public static final class IntegerParser<C extends CommandSender> implements ComponentParser<C, Integer> {
 
         private final int min;
         private final int max;
 
-        private IntegerParser(final int min, final int max) {
+        public IntegerParser(final int min, final int max) {
             this.min = min;
             this.max = max;
         }
@@ -195,6 +195,24 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
             } catch (final Exception e) {
                 return ComponentParseResult.failure(new IntegerParseException(input, this.min, this.max));
             }
+        }
+
+        /**
+         * Get the minimum value accepted by this parser
+         *
+         * @return Min value
+         */
+        public int getMin() {
+            return this.min;
+        }
+
+        /**
+         * Get the maximum value accepted by this parser
+         *
+         * @return Max value
+         */
+        public int getMax() {
+            return this.max;
         }
 
     }
