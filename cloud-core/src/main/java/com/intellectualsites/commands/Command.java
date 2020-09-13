@@ -126,14 +126,16 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
      *
      * @param commandName Base command component
      * @param commandMeta Command meta instance
+     * @param aliases     Command aliases
      * @param <C>         Command sender type
      * @param <M>         Command meta type
      * @return Command builder
      */
     @Nonnull
     public static <C extends CommandSender, M extends CommandMeta> Builder<C, M> newBuilder(@Nonnull final String commandName,
-                                                                                            @Nonnull final M commandMeta) {
-        return new Builder<>(commandMeta, null, Collections.singletonList(StaticComponent.required(commandName)),
+                                                                                            @Nonnull final M commandMeta,
+                                                                                            @Nonnull final String... aliases) {
+        return new Builder<>(commandMeta, null, Collections.singletonList(StaticComponent.required(commandName, aliases)),
                              new CommandExecutionHandler.NullCommandExecutionHandler<>(), "");
     }
 

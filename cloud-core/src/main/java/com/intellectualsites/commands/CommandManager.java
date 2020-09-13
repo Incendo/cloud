@@ -35,9 +35,9 @@ import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandResult;
 import com.intellectualsites.commands.execution.CommandSuggestionProcessor;
 import com.intellectualsites.commands.execution.FilteringCommandSuggestionProcessor;
+import com.intellectualsites.commands.execution.preprocessor.AcceptingCommandPreprocessor;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessor;
-import com.intellectualsites.commands.execution.preprocessor.AcceptingCommandPreprocessor;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -48,6 +48,7 @@ import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -186,12 +187,28 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
     /**
      * Create a new command builder
      *
-     * @param name Command name
-     * @param meta Command meta
+     * @param name    Command name
+     * @param aliases Command aliases
+     * @param meta    Command meta
      * @return Builder instance
      */
     @Nonnull
-    public Command.Builder<C, M> commandBuilder(@Nonnull final String name, @Nonnull final M meta) {
+    public Command.Builder<C, M> commandBuilder(@Nonnull final String name,
+                                                @Nonnull final Set<String> aliases,
+                                                @Nonnull final M meta) {
+        return Command.newBuilder(name, meta, aliases.toArray(new String[0]));
+    }
+
+    /**
+     * Create a new command builder
+     *
+     * @param name    Command name
+     * @param meta    Command meta
+     * @return Builder instance
+     */
+    @Nonnull
+    public Command.Builder<C, M> commandBuilder(@Nonnull final String name,
+                                                @Nonnull final M meta) {
         return Command.newBuilder(name, meta);
     }
 
@@ -207,7 +224,6 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
     public Command.Builder<C, M> commandBuilder(@Nonnull final String name) {
         return Command.newBuilder(name, this.createDefaultCommandMeta());
     }
-
 
     /**
      * Get the internal command tree. This should not be accessed unless you know what you

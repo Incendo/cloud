@@ -50,8 +50,9 @@ class CommandTreeTest {
                                                      .withComponent(StaticComponent.required("one")).build())
                       .registerCommand(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                                                      .withComponent(StaticComponent.required("two")).withPermission("no").build())
-                      .registerCommand(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                     .withComponent(StaticComponent.required("opt"))
+                      .registerCommand(commandManager.commandBuilder("test", Collections.singleton("other"),
+                                                                     SimpleCommandMeta.empty())
+                                                     .withComponent(StaticComponent.required("opt", "öpt"))
                                                      .withComponent(IntegerComponent
                                                                             .optional("num", EXPECTED_INPUT_NUMBER))
                                                      .build());
@@ -76,6 +77,13 @@ class CommandTreeTest {
                       .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
         commandManager.getCommandTree()
                       .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt", "12")))
+                      .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
+    }
+
+    @Test
+    void testAlias() {
+        commandManager.getCommandTree()
+                      .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("other", "öpt", "12")))
                       .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
     }
 

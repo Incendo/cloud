@@ -336,6 +336,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
      *
      * @param command Command to insert
      */
+    @SuppressWarnings("unchecked")
     public void insertCommand(@Nonnull final Command<C, M> command) {
         synchronized (this.commandLock) {
             Node<CommandComponent<C, ?>> node = this.internalTree;
@@ -343,6 +344,10 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 Node<CommandComponent<C, ?>> tempNode = node.getChild(component);
                 if (tempNode == null) {
                     tempNode = node.addChild(component);
+                } else if (component instanceof StaticComponent && tempNode.getValue() != null) {
+                    for (final String alias : ((StaticComponent<C>) component).getAliases()) {
+                        ((StaticComponent<C>) tempNode.getValue()).registerAlias(alias);
+                    }
                 }
                 if (node.children.size() > 0) {
                     node.children.sort(Comparator.comparing(Node::getValue));

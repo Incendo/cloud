@@ -75,6 +75,25 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
         return new StaticComponent<>(false, name, aliases);
     }
 
+    /**
+     * Register a new alias
+     *
+     * @param alias New alias
+     */
+    public void registerAlias(@Nonnull final String alias) {
+        ((StaticComponentParser<C>) this.getParser()).acceptedStrings.add(alias);
+    }
+
+    /**
+     * Get an immutable view of the aliases
+     *
+     * @return Immutable view of the component aliases
+     */
+    @Nonnull
+    public Set<String> getAliases() {
+        return Collections.unmodifiableSet(((StaticComponentParser<C>) this.getParser()).getAcceptedStrings());
+    }
+
 
     private static final class StaticComponentParser<C extends CommandSender> implements ComponentParser<C, String> {
 
@@ -111,6 +130,15 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
             return Collections.singletonList(this.name);
         }
 
+        /**
+         * Get the accepted strings
+         *
+         * @return Accepted strings
+         */
+        @Nonnull
+        public Set<String> getAcceptedStrings() {
+            return this.acceptedStrings;
+        }
     }
 
 }
