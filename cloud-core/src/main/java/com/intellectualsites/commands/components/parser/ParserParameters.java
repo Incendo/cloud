@@ -36,9 +36,6 @@ public final class ParserParameters {
 
     private final Map<ParserParameter<?>, Object> internalMap = Maps.newHashMap();
 
-    public ParserParameters() {
-    }
-
     /**
      * Get an empty {@link ParserParameters} instance
      *

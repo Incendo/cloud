@@ -21,34 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.annotations.specifier;
-
-import javax.annotation.Nonnull;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
- * Used to specify min and max values of numerical
- * {@link com.intellectualsites.commands.components.parser.ComponentParser parsers}
+ * Standard annotations used to match {@link com.intellectualsites.commands.components.parser.ComponentParser}
+ * in {@link com.intellectualsites.commands.components.parser.ParserRegistry}
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface Range {
-
-    /**
-     * Minimum value accepted by the parser
-     *
-     * @return String serialized number
-     */
-     @Nonnull String min() default "";
-
-    /**
-     * Maximum value accepted by the parser
-     *
-     * @return String serialized number
-     */
-     @Nonnull String max() default "";
-
-}
+package com.intellectualsites.commands.annotations.specifier;

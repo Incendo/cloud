@@ -50,8 +50,8 @@ public interface ParserRegistry<C extends CommandSender> {
      *                 to configure the parser, many of which are documented in {@link StandardParameters}
      * @param <T>      Generic type specifying what is produced by the parser
      */
-    <T> void registerParserSupplier(@Nonnull final TypeToken<T> type,
-                                    @Nonnull final Function<ParserParameters, ComponentParser<C, ?>> supplier);
+    <T> void registerParserSupplier(@Nonnull TypeToken<T> type,
+                                    @Nonnull Function<ParserParameters, ComponentParser<C, ?>> supplier);
 
     /**
      * Register a mapper that maps annotation instances to a map of parameter-object pairs
@@ -62,8 +62,8 @@ public interface ParserRegistry<C extends CommandSender> {
      * @param <A>        Annotation type
      * @param <T>        Type of the object that the parser is retrieved for
      */
-    <A extends Annotation, T> void registerAnnotationMapper(@Nonnull final Class<A> annotation,
-                                                            @Nonnull final BiFunction<A, TypeToken<?>,
+    <A extends Annotation, T> void registerAnnotationMapper(@Nonnull Class<A> annotation,
+                                                            @Nonnull BiFunction<A, TypeToken<?>,
                                                                     ParserParameters> mapper);
 
     /**
@@ -74,7 +74,7 @@ public interface ParserRegistry<C extends CommandSender> {
      * @return Parsed parameters
      */
     @Nonnull
-    ParserParameters parseAnnotations(@Nonnull final TypeToken<?> parsingType, @Nonnull final Collection<? extends Annotation> annotations);
+    ParserParameters parseAnnotations(@Nonnull TypeToken<?> parsingType, @Nonnull Collection<? extends Annotation> annotations);
 
     /**
      * Attempt to create a {@link ComponentParser} for a specified type, using
@@ -86,7 +86,7 @@ public interface ParserRegistry<C extends CommandSender> {
      * @return Parser, if one can be created
      */
     @Nonnull
-    <T> Optional<ComponentParser<C, T>> createParser(@Nonnull final TypeToken<T> type,
-                                                     @Nonnull final ParserParameters parserParameters);
+    <T> Optional<ComponentParser<C, T>> createParser(@Nonnull TypeToken<T> type,
+                                                     @Nonnull ParserParameters parserParameters);
 
 }

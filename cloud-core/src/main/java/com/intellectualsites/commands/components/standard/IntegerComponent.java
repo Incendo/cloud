@@ -171,6 +171,12 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
         private final int min;
         private final int max;
 
+        /**
+         * Construct a new integer parser
+         *
+         * @param min Minimum acceptable value
+         * @param max Maximum acceptable value
+         */
         public IntegerParser(final int min, final int max) {
             this.min = min;
             this.max = max;

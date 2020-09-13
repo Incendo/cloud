@@ -43,9 +43,9 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public class StandardParserRegistry<C extends CommandSender> implements ParserRegistry<C> {
+public final class StandardParserRegistry<C extends CommandSender> implements ParserRegistry<C> {
 
-    private static final Map<Class<?>, Class<?>> primitiveMappings = ImmutableMap.<Class<?>, Class<?>>builder()
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = ImmutableMap.<Class<?>, Class<?>>builder()
             .put(char.class, Character.class)
             .put(int.class, Integer.class)
             .put(short.class, Short.class)
@@ -60,6 +60,10 @@ public class StandardParserRegistry<C extends CommandSender> implements ParserRe
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
             annotationMappers = new HashMap<>();
 
+    /**
+     * Construct a new {@link StandardParserRegistry} instance. This will also
+     * register all standard annotation mappers and parser suppliers
+     */
     public StandardParserRegistry() {
         /* Register standard mappers */
         this.<Range, Number>registerAnnotationMapper(Range.class, new RangeMapper<>());
@@ -107,7 +111,7 @@ public class StandardParserRegistry<C extends CommandSender> implements ParserRe
                                                             @Nonnull final ParserParameters parserParameters) {
         final TypeToken<?> actualType;
         if (type.isPrimitive()) {
-            actualType = TypeToken.of(primitiveMappings.get(type.getRawType()));
+            actualType = TypeToken.of(PRIMITIVE_MAPPINGS.get(type.getRawType()));
         } else {
             actualType = type;
         }
@@ -127,7 +131,7 @@ public class StandardParserRegistry<C extends CommandSender> implements ParserRe
         public ParserParameters apply(final Range range, final TypeToken<?> type) {
             final Class<?> clazz;
             if (type.isPrimitive()) {
-                clazz = primitiveMappings.get(type.getRawType());
+                clazz = PRIMITIVE_MAPPINGS.get(type.getRawType());
             } else {
                 clazz = type.getRawType();
             }

@@ -76,8 +76,8 @@ public class ParserParameter<T> {
             return false;
         }
         final ParserParameter<?> that = (ParserParameter<?>) o;
-        return Objects.equals(key, that.key) &&
-                Objects.equals(expectedType, that.expectedType);
+        return Objects.equals(key, that.key)
+                && Objects.equals(expectedType, that.expectedType);
     }
 
     @Override
