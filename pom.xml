@@ -48,11 +48,11 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
+        <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
-                <inherited>false</inherited> <!-- only execute these in the parent -->
+                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <id>git submodule update</id>
@@ -62,8 +62,8 @@
                             <arguments>
                                 <argument>submodule</argument>
                                 <argument>update</argument>
-                                <argument>--init</argument>
-                                <argument>--recursive</argument>
+                                <argument>-init</argument>
+                                <argument>-recursive</argument>
                             </arguments>
                         </configuration>
                         <goals>
@@ -71,7 +71,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
