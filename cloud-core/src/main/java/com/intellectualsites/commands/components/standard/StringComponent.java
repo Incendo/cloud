@@ -209,7 +209,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
                             sj.add(string.substring(1));
                             started = true;
                         } else {
-                            return ComponentParseResult.failure(new StringParseException(string, StringMode.GREEDY));
+                            return ComponentParseResult.failure(new StringParseException(string, StringMode.QUOTED));
                         }
                     } else if (string.endsWith("\"")) {
                         sj.add(string.substring(0, string.length() - 1));
