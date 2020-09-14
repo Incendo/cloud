@@ -90,6 +90,25 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
     }
 
     /**
+     * Tokenize an input string
+     *
+     * @param input Input string
+     * @return List of tokens
+     */
+    @Nonnull
+    public static LinkedList<String> tokenize(@Nonnull final String input) {
+        final StringTokenizer stringTokenizer = new StringTokenizer(input, " ");
+        final LinkedList<String> tokens = new LinkedList<>();
+        while (stringTokenizer.hasMoreElements()) {
+            tokens.add(stringTokenizer.nextToken());
+        }
+        if (input.endsWith(" ")) {
+            tokens.add("");
+        }
+        return tokens;
+    }
+
+    /**
      * Execute a command and get a future that completes with the result
      *
      * @param commandSender Sender of the command
@@ -132,19 +151,6 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
         } else {
             return Collections.emptyList();
         }
-    }
-
-    @Nonnull
-    private LinkedList<String> tokenize(@Nonnull final String input) {
-        final StringTokenizer stringTokenizer = new StringTokenizer(input, " ");
-        final LinkedList<String> tokens = new LinkedList<>();
-        while (stringTokenizer.hasMoreElements()) {
-            tokens.add(stringTokenizer.nextToken());
-        }
-        if (input.endsWith(" ")) {
-            tokens.add("");
-        }
-        return tokens;
     }
 
     /**
@@ -235,7 +241,7 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      * @return Command tree
      */
     @Nonnull
-    CommandTree<C, M> getCommandTree() {
+    public CommandTree<C, M> getCommandTree() {
         return this.commandTree;
     }
 

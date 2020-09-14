@@ -197,6 +197,10 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
             }
         }
 
+        @Override
+        public boolean isContextFree() {
+            return true;
+        }
     }
 
 

@@ -166,12 +166,18 @@ public final class FloatComponent<C extends CommandSender> extends CommandCompon
     }
 
 
-    private static final class FloatParser<C extends CommandSender> implements ComponentParser<C, Float> {
+    public static final class FloatParser<C extends CommandSender> implements ComponentParser<C, Float> {
 
         private final float min;
         private final float max;
 
-        private FloatParser(final float min, final float max) {
+        /**
+         * Construct a new float parser
+         *
+         * @param min Minimum value
+         * @param max Maximum value
+         */
+        public FloatParser(final float min, final float max) {
             this.min = min;
             this.max = max;
         }
@@ -197,6 +203,10 @@ public final class FloatComponent<C extends CommandSender> extends CommandCompon
             }
         }
 
+        @Override
+        public boolean isContextFree() {
+            return true;
+        }
     }
 
 

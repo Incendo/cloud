@@ -45,7 +45,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
                             @Nonnull final String name,
                             @Nonnull final StringMode stringMode,
                             @Nonnull final String defaultValue,
-                            @Nonnull final  BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+                            @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
         super(required, name, new StringParser<>(stringMode, suggestionsProvider), defaultValue);
         this.stringMode = stringMode;
     }
@@ -121,7 +121,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
     public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, String> {
 
         private StringMode stringMode = StringMode.SINGLE;
-        private  BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
+        private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
 
         protected Builder(@Nonnull final String name) {
             super(name);
@@ -188,13 +188,19 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
     }
 
 
-    private static final class StringParser<C extends CommandSender> implements ComponentParser<C, String> {
+    public static final class StringParser<C extends CommandSender> implements ComponentParser<C, String> {
 
         private final StringMode stringMode;
         private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
 
-        private StringParser(@Nonnull final StringMode stringMode,
-                             @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        /**
+         * Construct a new string parser
+         *
+         * @param stringMode          String parsing mode
+         * @param suggestionsProvider Suggestions provider
+         */
+        public StringParser(@Nonnull final StringMode stringMode,
+                            @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
             this.stringMode = stringMode;
             this.suggestionsProvider = suggestionsProvider;
         }
@@ -257,6 +263,11 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
         @Override
         public List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
             return this.suggestionsProvider.apply(commandContext, input);
+        }
+
+        @Override
+        public boolean isContextFree() {
+            return true;
         }
     }
 

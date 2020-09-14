@@ -166,12 +166,18 @@ public final class ShortComponent<C extends CommandSender> extends CommandCompon
     }
 
 
-    private static final class ShortParser<C extends CommandSender> implements ComponentParser<C, Short> {
+    public static final class ShortParser<C extends CommandSender> implements ComponentParser<C, Short> {
 
         private final short min;
         private final short max;
 
-        private ShortParser(final short min, final short max) {
+        /**
+         * Construct a new short parser
+         *
+         * @param min Minimum value
+         * @param max Maximum value
+         */
+        public ShortParser(final short min, final short max) {
             this.min = min;
             this.max = max;
         }
@@ -197,6 +203,10 @@ public final class ShortComponent<C extends CommandSender> extends CommandCompon
             }
         }
 
+        @Override
+        public boolean isContextFree() {
+            return true;
+        }
     }
 
 

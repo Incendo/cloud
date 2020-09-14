@@ -166,12 +166,18 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
     }
 
 
-    private static final class DoubleParser<C extends CommandSender> implements ComponentParser<C, Double> {
+    public static final class DoubleParser<C extends CommandSender> implements ComponentParser<C, Double> {
 
         private final double min;
         private final double max;
 
-        private DoubleParser(final double min, final double max) {
+        /**
+         * Construct a new double parser
+         *
+         * @param min Minimum value
+         * @param max Maximum value
+         */
+        public DoubleParser(final double min, final double max) {
             this.min = min;
             this.max = max;
         }
@@ -197,6 +203,10 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
             }
         }
 
+        @Override
+        public boolean isContextFree() {
+            return true;
+        }
     }
 
 

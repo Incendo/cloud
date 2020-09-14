@@ -130,12 +130,17 @@ public class EnumComponent<C extends CommandSender, E extends Enum<E>> extends C
     }
 
 
-    private static final class EnumParser<C extends CommandSender, E extends Enum<E>> implements ComponentParser<C, E> {
+    public static final class EnumParser<C extends CommandSender, E extends Enum<E>> implements ComponentParser<C, E> {
 
         private final Class<E> enumClass;
         private final EnumSet<E> allowedValues;
 
-        private EnumParser(@Nonnull final Class<E> enumClass) {
+        /**
+         * Construct a new enum parser
+         *
+         * @param enumClass Enum class
+         */
+        public EnumParser(@Nonnull final Class<E> enumClass) {
             this.enumClass = enumClass;
             this.allowedValues = EnumSet.allOf(enumClass);
         }
@@ -163,6 +168,11 @@ public class EnumComponent<C extends CommandSender, E extends Enum<E>> extends C
         @Override
         public List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
             return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase()).collect(Collectors.toList());
+        }
+
+        @Override
+        public boolean isContextFree() {
+            return true;
         }
     }
 

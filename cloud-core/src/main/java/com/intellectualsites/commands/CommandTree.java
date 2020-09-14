@@ -39,6 +39,7 @@ import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -491,13 +492,35 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
         return casted;
     }
 
+    /**
+     * Get an immutable collection containing all of the root nodes
+     * in the tree
+     *
+     * @return Root nodes
+     */
+    @Nonnull
+    public Collection<Node<CommandComponent<C, ?>>> getRootNodes() {
+        return this.internalTree.getChildren();
+    }
+
+    /**
+     * Get a named root node, if it exists
+     *
+     * @param name Root node name
+     * @return Root node, or {@code null}
+     */
+    @Nullable
+    public Node<CommandComponent<C, ?>> getNamedNode(@Nullable final String name) {
+        return this.getRootNodes().stream().filter(node -> node.getValue() != null
+                && node.getValue().getName().equalsIgnoreCase(name)).findAny().orElse(null);
+    }
 
     /**
      * Very simple tree structure
      *
      * @param <T> Node value type
      */
-    private static final class Node<T> {
+    public static final class Node<T> {
 
         private final Map<String, String> nodeMeta = new HashMap<>();
         private final List<Node<T>> children = new LinkedList<>();
@@ -508,7 +531,13 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             this.value = value;
         }
 
-        private List<Node<T>> getChildren() {
+        /**
+         * Get an immutable copy of the node's child list
+         *
+         * @return Children
+         */
+        @Nonnull
+        public List<Node<T>> getChildren() {
             return Collections.unmodifiableList(this.children);
         }
 
@@ -529,10 +558,30 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             return null;
         }
 
-        private boolean isLeaf() {
+        /**
+         * Check if the node is a leaf node
+         *
+         * @return {@code true} if the node is a leaf node, else {@code false}
+         */
+        public boolean isLeaf() {
             return this.children.isEmpty();
         }
 
+        /**
+         * Get the node meta instance
+         *
+         * @return Node meta
+         */
+        @Nonnull
+        public Map<String, String> getNodeMeta() {
+            return this.nodeMeta;
+        }
+
+        /**
+         * Get the node value
+         *
+         * @return Node value
+         */
         @Nullable
         public T getValue() {
             return this.value;
@@ -555,11 +604,21 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             return Objects.hash(getValue());
         }
 
+        /**
+         * Get the parent node
+         *
+         * @return Parent node
+         */
         @Nullable
         public Node<T> getParent() {
             return this.parent;
         }
 
+        /**
+         * Set the parent node
+         *
+         * @param parent new parent node
+         */
         public void setParent(@Nullable final Node<T> parent) {
             this.parent = parent;
         }

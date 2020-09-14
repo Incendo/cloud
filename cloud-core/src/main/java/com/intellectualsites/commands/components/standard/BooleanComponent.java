@@ -146,7 +146,12 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
 
         private final boolean liberal;
 
-        private BooleanParser(final boolean liberal) {
+        /**
+         * Construct a new boolean parser
+         *
+         * @param liberal Whether or not it'll accept boolean-esque strings, or just booleans
+         */
+        public BooleanParser(final boolean liberal) {
             this.liberal = liberal;
         }
 
@@ -194,6 +199,11 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
             }
 
             return LIBERAL;
+        }
+
+        @Override
+        public boolean isContextFree() {
+            return true;
         }
     }
 

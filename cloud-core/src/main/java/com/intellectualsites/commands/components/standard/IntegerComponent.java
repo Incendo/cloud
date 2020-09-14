@@ -221,6 +221,10 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
             return this.max;
         }
 
+        @Override
+        public boolean isContextFree() {
+            return true;
+        }
     }
 
 

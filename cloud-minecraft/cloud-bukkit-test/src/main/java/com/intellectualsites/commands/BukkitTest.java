@@ -25,6 +25,7 @@ package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.components.standard.EnumComponent;
+import com.intellectualsites.commands.components.standard.IntegerComponent;
 import com.intellectualsites.commands.components.standard.StringComponent;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import org.bukkit.Bukkit;
@@ -39,32 +40,57 @@ import java.util.stream.Collectors;
 
 public final class BukkitTest extends JavaPlugin {
 
+    private static final int PERC_MIN = 0;
+    private static final int PERC_MAX = 100;
+
     @Override
-    public void onLoad() {
+    public void onEnable() {
         try {
-            final BukkitCommandManager commandManager = new BukkitCommandManager(this,
-                                                                                 CommandExecutionCoordinator.simpleCoordinator());
+            final PaperCommandManager commandManager = new PaperCommandManager(this,
+                                                                               CommandExecutionCoordinator.simpleCoordinator());
+            commandManager.registerBrigadier();
             commandManager.registerCommand(commandManager.commandBuilder("gamemode",
-                             Collections.singleton("gajmöde"),
-                             BukkitCommandMetaBuilder.builder()
-                                                     .withDescription("Your ugli")
-                                                     .build())
-             .withComponent(EnumComponent.required(GameMode.class, "gamemode"))
-             .withComponent(StringComponent.<BukkitCommandSender>newBuilder("player")
-                                           .withSuggestionsProvider((v1, v2) -> {
-                                               final List<String> suggestions = new ArrayList<>(Bukkit.getOnlinePlayers().stream()
-                                                                          .map(Player::getName).collect(Collectors.toList()));
-                                               suggestions.add("dog");
-                                               suggestions.add("cat");
-                                               return suggestions;
-                                           }).build())
-             .withHandler(c -> c.getCommandSender()
-                                .asPlayer()
-                                .setGameMode(c.<GameMode>get("gamemode")
-                                              .orElse(GameMode.SURVIVAL)))
-             .build())
+                                                                         Collections.singleton("gajmöde"),
+                                                                         BukkitCommandMetaBuilder.builder()
+                                                                                                 .withDescription("Your ugli")
+                                                                                                 .build())
+                                                         .withComponent(EnumComponent.required(GameMode.class, "gamemode"))
+                                                         .withComponent(StringComponent.<BukkitCommandSender>newBuilder("player")
+                                                                                .withSuggestionsProvider((v1, v2) -> {
+                                                                                    final List<String> suggestions =
+                                                                                            new ArrayList<>(
+                                                                                            Bukkit.getOnlinePlayers()
+                                                                                                  .stream()
+                                                                                                  .map(Player::getName)
+                                                                                                  .collect(Collectors.toList()));
+                                                                                    suggestions.add("dog");
+                                                                                    suggestions.add("cat");
+                                                                                    return suggestions;
+                                                                                }).build())
+                                                         .withHandler(c -> c.getCommandSender()
+                                                                            .asPlayer()
+                                                                            .setGameMode(c.<GameMode>get("gamemode")
+                                                                                                 .orElse(GameMode.SURVIVAL)))
+                                                         .build())
                           .registerCommand(commandManager.commandBuilder("kenny")
                                                          .withComponent(StaticComponent.required("sux"))
+                                                         .withComponent(IntegerComponent
+                                                                                .<BukkitCommandSender>newBuilder("perc")
+                                                                                .withMin(PERC_MIN).withMax(PERC_MAX).build())
+                                                         .withHandler(context -> {
+                                                             context.getCommandSender().asPlayer().sendMessage(String.format(
+                                                                     "Kenny sux %d%%",
+                                                                     context.<Integer>get("perc").orElse(PERC_MIN)
+                                                             ));
+                                                         })
+                                                         .build())
+                          .registerCommand(commandManager.commandBuilder("test")
+                                                         .withComponent(StaticComponent.required("one"))
+                                                         .withHandler(c -> c.getCommandSender().sendMessage("One!"))
+                                                         .build())
+                          .registerCommand(commandManager.commandBuilder("test")
+                                                         .withComponent(StaticComponent.required("two"))
+                                                         .withHandler(c -> c.getCommandSender().sendMessage("Two!"))
                                                          .build());
         } catch (final Exception e) {
             e.printStackTrace();

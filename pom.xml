@@ -9,11 +9,13 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>cloud-jline</module>
-        <module>cloud-minecraft/cloud-bukkit</module>
         <module>cloud-core</module>
         <module>cloud-pipeline</module>
         <!-- REMOVE THIS -->
         <module>cloud-minecraft/cloud-bukkit-test</module>
+        <module>cloud-minecraft/cloud-bukkit</module>
+        <module>cloud-minecraft/cloud-paper</module>
+        <module>cloud-minecraft/cloud-brigadier</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>

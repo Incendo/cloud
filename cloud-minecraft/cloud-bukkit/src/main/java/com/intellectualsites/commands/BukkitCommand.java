@@ -24,6 +24,7 @@
 package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.components.CommandComponent;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
@@ -56,6 +57,7 @@ final class BukkitCommand extends org.bukkit.command.Command implements PluginId
         this.bukkitCommandManager.executeCommand(BukkitCommandSender.of(commandSender), builder.toString())
                                  .whenComplete(((commandResult, throwable) -> {
                                      if (throwable != null) {
+                                         commandSender.sendMessage(ChatColor.RED + throwable.getCause().getMessage());
                                          throwable.printStackTrace();
                                      } else {
                                          // Do something...

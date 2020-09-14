@@ -62,4 +62,14 @@ public interface ComponentParser<C extends CommandSender, T> {
         return Collections.emptyList();
     }
 
+    /**
+     * Check whether or not this component parser is context free. A context free
+     * parser will not use the provided command context, and so supports impromptu parsing
+     *
+     * @return {@code true} if the parser is context free, else {@code false}
+     */
+    default boolean isContextFree() {
+        return false;
+    }
+
 }

@@ -111,7 +111,7 @@ public final class CharComponent<C extends CommandSender> extends CommandCompone
     }
 
 
-    private static final class CharacterParser<C extends CommandSender> implements ComponentParser<C, Character> {
+    public static final class CharacterParser<C extends CommandSender> implements ComponentParser<C, Character> {
 
         @Nonnull
         @Override
@@ -127,6 +127,11 @@ public final class CharComponent<C extends CommandSender> extends CommandCompone
             }
 
             return ComponentParseResult.success(input.charAt(0));
+        }
+
+        @Override
+        public boolean isContextFree() {
+            return true;
         }
     }
 

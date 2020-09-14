@@ -167,7 +167,13 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
         private final byte min;
         private final byte max;
 
-        private ByteParser(final byte min, final byte max) {
+        /**
+         * Construct a new byte parser
+         *
+         * @param min Minimum value
+         * @param max Maximum value
+         */
+        public ByteParser(final byte min, final byte max) {
             this.min = min;
             this.max = max;
         }
@@ -198,6 +204,10 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
             }
         }
 
+        @Override
+        public boolean isContextFree() {
+            return true;
+        }
     }
 
 
