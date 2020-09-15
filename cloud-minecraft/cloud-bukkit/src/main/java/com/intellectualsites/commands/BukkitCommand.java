@@ -32,7 +32,8 @@ import org.bukkit.plugin.Plugin;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-final class BukkitCommand<C extends BukkitCommandSender> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
+final class BukkitCommand<C extends com.intellectualsites.commands.sender.CommandSender>
+        extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
     private final CommandComponent<C, ?> command;
     private final BukkitCommandManager<C> bukkitCommandManager;
@@ -54,7 +55,8 @@ final class BukkitCommand<C extends BukkitCommandSender> extends org.bukkit.comm
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        this.bukkitCommandManager.executeCommand((C) BukkitCommandSender.of(commandSender), builder.toString())
+        this.bukkitCommandManager.executeCommand(this.bukkitCommandManager.getCommandSenderMapper().apply(commandSender),
+                                                 builder.toString())
                                  .whenComplete(((commandResult, throwable) -> {
                                      if (throwable != null) {
                                          commandSender.sendMessage(ChatColor.RED + throwable.getCause().getMessage());
@@ -79,7 +81,8 @@ final class BukkitCommand<C extends BukkitCommandSender> extends org.bukkit.comm
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.bukkitCommandManager.suggest((C) BukkitCommandSender.of(sender), builder.toString());
+        return this.bukkitCommandManager.suggest(this.bukkitCommandManager.getCommandSenderMapper().apply(sender),
+                                                 builder.toString());
     }
 
     @Override

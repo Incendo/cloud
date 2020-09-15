@@ -53,7 +53,9 @@ public final class BukkitTest extends JavaPlugin {
     public void onEnable() {
         try {
             final PaperCommandManager<BukkitCommandSender> mgr = new PaperCommandManager<>(this,
-                                                                    CommandExecutionCoordinator.simpleCoordinator());
+                                                                                           CommandExecutionCoordinator
+                                                                                                   .simpleCoordinator(),
+                                                                                           BukkitCommandSender::of);
             mgr.registerBrigadier();
             mgr.command(mgr.commandBuilder("gamemode",
                                            Collections.singleton("gajmöde"),

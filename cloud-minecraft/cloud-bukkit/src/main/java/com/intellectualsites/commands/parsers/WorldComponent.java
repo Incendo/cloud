@@ -23,11 +23,11 @@
 //
 package com.intellectualsites.commands.parsers;
 
-import com.intellectualsites.commands.BukkitCommandSender;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import com.intellectualsites.commands.components.parser.ComponentParser;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.sender.CommandSender;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  *
  * @param <C> Command sender type
  */
-public class WorldComponent<C extends BukkitCommandSender> extends CommandComponent<C, World> {
+public class WorldComponent<C extends CommandSender> extends CommandComponent<C, World> {
 
     protected WorldComponent(final boolean required,
                              @Nonnull final String name,
@@ -57,7 +57,7 @@ public class WorldComponent<C extends BukkitCommandSender> extends CommandCompon
      * @return Created builder
      */
     @Nonnull
-    public static <C extends BukkitCommandSender> CommandComponent.Builder<C, World> newBuilder(@Nonnull final String name) {
+    public static <C extends CommandSender> CommandComponent.Builder<C, World> newBuilder(@Nonnull final String name) {
         return new WorldComponent.Builder<>(name);
     }
 
@@ -69,7 +69,7 @@ public class WorldComponent<C extends BukkitCommandSender> extends CommandCompon
      * @return Created component
      */
     @Nonnull
-    public static <C extends BukkitCommandSender> CommandComponent<C, World> required(@Nonnull final String name) {
+    public static <C extends CommandSender> CommandComponent<C, World> required(@Nonnull final String name) {
         return WorldComponent.<C>newBuilder(name).asRequired().build();
     }
 
@@ -81,7 +81,7 @@ public class WorldComponent<C extends BukkitCommandSender> extends CommandCompon
      * @return Created component
      */
     @Nonnull
-    public static <C extends BukkitCommandSender> CommandComponent<C, World> optional(@Nonnull final String name) {
+    public static <C extends CommandSender> CommandComponent<C, World> optional(@Nonnull final String name) {
         return WorldComponent.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,13 +94,13 @@ public class WorldComponent<C extends BukkitCommandSender> extends CommandCompon
      * @return Created component
      */
     @Nonnull
-    public static <C extends BukkitCommandSender> CommandComponent<C, World> optional(@Nonnull final String name,
-                                                                                      @Nonnull final String defaultValue) {
+    public static <C extends CommandSender> CommandComponent<C, World> optional(@Nonnull final String name,
+                                                                                @Nonnull final String defaultValue) {
         return WorldComponent.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
-    public static final class Builder<C extends BukkitCommandSender> extends CommandComponent.Builder<C, World> {
+    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, World> {
 
         protected Builder(@Nonnull final String name) {
             super(World.class, name);
@@ -114,7 +114,7 @@ public class WorldComponent<C extends BukkitCommandSender> extends CommandCompon
     }
 
 
-    public static final class WorldParser<C extends BukkitCommandSender> implements ComponentParser<C, World> {
+    public static final class WorldParser<C extends CommandSender> implements ComponentParser<C, World> {
 
         @Nonnull
         @Override

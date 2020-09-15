@@ -27,6 +27,7 @@ import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
 import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
 import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.sender.CommandSender;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -41,28 +42,29 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
-class PaperBrigadierListener implements Listener {
+class PaperBrigadierListener<C extends CommandSender> implements Listener {
 
-    private final CloudBrigadierManager<BukkitCommandSender, BukkitBrigadierCommandSource> brigadierManager;
-    private final PaperCommandManager paperCommandManager;
+    private final CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager;
+    private final PaperCommandManager<C> paperCommandManager;
+    private final String nmsVersion;
 
-    PaperBrigadierListener(@Nonnull final PaperCommandManager paperCommandManager) throws Exception {
+    PaperBrigadierListener(@Nonnull final PaperCommandManager<C> paperCommandManager) throws Exception {
         this.paperCommandManager = paperCommandManager;
         this.brigadierManager = new CloudBrigadierManager<>();
         /* Register default mappings */
         final String version = Bukkit.getServer().getClass().getPackage().getName();
-        final String nms = version.substring(version.lastIndexOf(".") + 1);
+        this.nmsVersion = version.substring(version.lastIndexOf(".") + 1);
         try {
             /* Map UUID */
-            this.mapSimpleNMS(UUID.class, this.getNMSArgument("UUID", nms).getConstructor());
+            this.mapSimpleNMS(UUID.class, this.getNMSArgument("UUID").getConstructor());
             /* Map World */
-            this.mapSimpleNMS(World.class, this.getNMSArgument("Dimension", nms).getConstructor());
+            this.mapSimpleNMS(World.class, this.getNMSArgument("Dimension").getConstructor());
             /* Map Enchantment */
-            this.mapSimpleNMS(Enchantment.class, this.getNMSArgument("Enchantment", nms).getConstructor());
+            this.mapSimpleNMS(Enchantment.class, this.getNMSArgument("Enchantment").getConstructor());
             /* Map EntityType */
-            this.mapSimpleNMS(EntityType.class, this.getNMSArgument("EntitySummon", nms).getConstructor());
+            this.mapSimpleNMS(EntityType.class, this.getNMSArgument("EntitySummon").getConstructor());
             /* Map Material */
-            this.mapSimpleNMS(Material.class, this.getNMSArgument("ItemStack", nms).getConstructor());
+            this.mapSimpleNMS(Material.class, this.getNMSArgument("ItemStack").getConstructor());
         } catch (final Exception e) {
             this.paperCommandManager.getOwningPlugin()
                                     .getLogger()
@@ -70,13 +72,26 @@ class PaperBrigadierListener implements Listener {
         }
     }
 
+    /**
+     * Attempt to retrieve an NMS argument type
+     *
+     * @param argument Argument type name
+     * @return Argument class
+     * @throws Exception If the type cannot be retrieved
+     */
     @Nonnull
-    private Class<?> getNMSArgument(@Nonnull final String argument, @Nonnull final String nms) throws Exception {
-        return Class.forName(String.format("net.minecraft.server.%s.Argument%s", nms, argument));
+    private Class<?> getNMSArgument(@Nonnull final String argument) throws Exception {
+        return Class.forName(String.format("net.minecraft.server.%s.Argument%s", this.nmsVersion, argument));
     }
 
-    private void mapSimpleNMS(@Nonnull final Class<?> type,
-                              @Nonnull final Constructor<?> constructor) {
+    /**
+     * Attempt to register a mapping between a type and a NMS argument type
+     *
+     * @param type        Type to map
+     * @param constructor Constructor that construct the NMS argument type
+     */
+    public void mapSimpleNMS(@Nonnull final Class<?> type,
+                             @Nonnull final Constructor<?> constructor) {
         try {
             this.brigadierManager.registerDefaultArgumentTypeSupplier(type, () -> {
                 try {
@@ -96,8 +111,8 @@ class PaperBrigadierListener implements Listener {
 
     @EventHandler
     public void onCommandRegister(@Nonnull final CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
-        final CommandTree<BukkitCommandSender, BukkitCommandMeta> commandTree = this.paperCommandManager.getCommandTree();
-        final CommandTree.Node<CommandComponent<BukkitCommandSender, ?>> node = commandTree.getNamedNode(event.getCommandLabel());
+        final CommandTree<C, BukkitCommandMeta> commandTree = this.paperCommandManager.getCommandTree();
+        final CommandTree.Node<CommandComponent<C, ?>> node = commandTree.getNamedNode(event.getCommandLabel());
         if (node == null) {
             return;
         }

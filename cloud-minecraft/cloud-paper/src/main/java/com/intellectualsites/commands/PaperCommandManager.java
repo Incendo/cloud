@@ -25,41 +25,55 @@ package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.function.Function;
 
 /**
  * Paper command manager that extends {@link BukkitCommandManager}
+ *
+ * @param <C> Command sender type
  */
-public class PaperCommandManager<C extends BukkitCommandSender> extends BukkitCommandManager<C> {
+public class PaperCommandManager<C extends com.intellectualsites.commands.sender.CommandSender>
+        extends BukkitCommandManager<C> {
 
     /**
      * Construct a new Paper command manager
      *
      * @param owningPlugin                Plugin that is constructing the manager
      * @param commandExecutionCoordinator Coordinator provider
+     * @param commandSenderMapper         Function that maps {@link CommandSender} to the command sender type
      * @throws Exception If the construction of the manager fails
      */
     public PaperCommandManager(@Nonnull final Plugin owningPlugin,
                                @Nonnull final Function<CommandTree<C, BukkitCommandMeta>,
-                          CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator) throws
+                          CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator,
+                               @Nonnull final Function<CommandSender, C> commandSenderMapper) throws
             Exception {
-        super(owningPlugin, commandExecutionCoordinator);
+        super(owningPlugin, commandExecutionCoordinator, commandSenderMapper);
     }
 
     /**
-     * Register the brigadier listener
+     * Attempt to register the Brigadier mapper, and return it.
+     *
+     * @return {@link PaperBrigadierListener} instance, if it could be created. If it cannot
+     *         be created {@code null} is returned
      */
-    public void registerBrigadier() {
+    @Nullable
+    public PaperBrigadierListener<C> registerBrigadier() {
         try {
-            Bukkit.getPluginManager().registerEvents(new PaperBrigadierListener(this),
+            final PaperBrigadierListener<C> brigadierListener = new PaperBrigadierListener<>(this);
+            Bukkit.getPluginManager().registerEvents(brigadierListener,
                                                      this.getOwningPlugin());
+            return brigadierListener;
         } catch (final Exception e) {
             this.getOwningPlugin().getLogger().severe("Failed to register Brigadier listener");
             e.printStackTrace();
         }
+        return null;
     }
 
 }
