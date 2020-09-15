@@ -59,8 +59,10 @@ final class BukkitCommand<C extends com.intellectualsites.commands.sender.Comman
                                                  builder.toString())
                                  .whenComplete(((commandResult, throwable) -> {
                                      if (throwable != null) {
+                                         commandSender.sendMessage(ChatColor.RED + throwable.getMessage());
                                          commandSender.sendMessage(ChatColor.RED + throwable.getCause().getMessage());
                                          throwable.printStackTrace();
+                                         throwable.getCause().printStackTrace();
                                      } else {
                                          // Do something...
                                          commandSender.sendMessage("All good!");

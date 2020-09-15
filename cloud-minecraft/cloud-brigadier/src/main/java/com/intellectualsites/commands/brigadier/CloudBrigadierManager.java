@@ -25,6 +25,7 @@ package com.intellectualsites.commands.brigadier;
 
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
+import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.StaticComponent;
@@ -35,21 +36,31 @@ import com.intellectualsites.commands.components.standard.FloatComponent;
 import com.intellectualsites.commands.components.standard.IntegerComponent;
 import com.intellectualsites.commands.components.standard.ShortComponent;
 import com.intellectualsites.commands.components.standard.StringComponent;
+import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.sender.CommandSender;
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -69,13 +80,22 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
     private final Map<Class<?>, Function<? extends CommandComponent<C, ?>,
             ? extends ArgumentType<?>>> mappers;
     private final Map<Class<?>, Supplier<ArgumentType<?>>> defaultArgumentTypeSuppliers;
+    private final Supplier<com.intellectualsites.commands.context.CommandContext<C>> dummyContextProvider;
+    private final CommandManager<C, ?> commandManager;
 
     /**
      * Create a new cloud brigadier manager
+     *
+     * @param commandManager       Command manager
+     * @param dummyContextProvider Provider of dummy context for completions
      */
-    public CloudBrigadierManager() {
+    public CloudBrigadierManager(@Nonnull final CommandManager<C, ?> commandManager,
+                                 @Nonnull final Supplier<com.intellectualsites.commands.context.CommandContext<C>>
+                                         dummyContextProvider) {
         this.mappers = Maps.newHashMap();
         this.defaultArgumentTypeSuppliers = Maps.newHashMap();
+        this.commandManager = commandManager;
+        this.dummyContextProvider = dummyContextProvider;
         this.registerInternalMappings();
     }
 
@@ -195,25 +215,29 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
      * @param <K>           cloud component type (generic)
      * @return Brigadier argument type
      */
-    @Nonnull
+    @Nullable
     @SuppressWarnings("all")
-    public <T, K extends CommandComponent<?, ?>> ArgumentType<?> getArgument(@Nonnull final TypeToken<T> componentType,
-                                                                             @Nonnull final K component) {
+    private <T, K extends CommandComponent<?, ?>> Pair<ArgumentType<?>, Boolean> getArgument(
+            @Nonnull final TypeToken<T> componentType,
+            @Nonnull final K component) {
         final CommandComponent<C, ?> commandComponent = (CommandComponent<C, ?>) component;
-        final Function function = this.mappers.getOrDefault(componentType.getRawType(), t ->
-                createDefaultMapper((CommandComponent<C, T>) component));
-        return (ArgumentType<?>) function.apply(commandComponent);
+        Function function = this.mappers.get(componentType.getRawType());
+        if (function == null) {
+            return this.createDefaultMapper(commandComponent);
+        }
+        return new Pair<>((ArgumentType<?>) function.apply(commandComponent), !component.getValueType().equals(String.class));
     }
 
     @Nonnull
-    private <T, K extends CommandComponent<C, T>> ArgumentType<?> createDefaultMapper(@Nonnull final CommandComponent<C, T>
-                                                                                              component) {
+    private <T, K extends CommandComponent<C, T>> Pair<ArgumentType<?>, Boolean> createDefaultMapper(
+            @Nonnull final CommandComponent<C, T>
+                    component) {
         final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers.get(component.getValueType());
         if (argumentTypeSupplier != null) {
-            return argumentTypeSupplier.get();
+            return new Pair<>(argumentTypeSupplier.get(), true);
         }
         System.err.printf("Found not native mapping for '%s'\n", component.getValueType().getCanonicalName());
-        return StringArgumentType.string();
+        return new Pair<>(StringArgumentType.string(), false);
     }
 
     /**
@@ -233,45 +257,106 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
                                                           @Nonnull final com.mojang.brigadier.Command<S> executor,
                                                           @Nonnull final BiPredicate<S, String> permissionChecker) {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
-                .requires(sender -> permissionChecker.test(sender, cloudCommand.getNodeMeta().getOrDefault("permission", "")));
-        if (cloudCommand.isLeaf() && cloudCommand.getValue() != null && cloudCommand.getValue().getOwningCommand() != null) {
-            literalArgumentBuilder.executes(executor);
-        }
+                .requires(sender -> permissionChecker.test(sender, cloudCommand.getNodeMeta().getOrDefault("permission", "")))
+                .executes(executor);
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandComponent<C, ?>> child : cloudCommand.getChildren()) {
-            constructedRoot.addChild(this.constructCommandNode(child, permissionChecker, executor, suggestionProvider));
+            constructedRoot.addChild(this.constructCommandNode(child, permissionChecker, executor, suggestionProvider).build());
         }
         return constructedRoot;
     }
 
-    private CommandNode<S> constructCommandNode(@Nonnull final CommandTree.Node<CommandComponent<C, ?>> root,
+    private ArgumentBuilder<S, ?> constructCommandNode(@Nonnull final CommandTree.Node<CommandComponent<C, ?>> root,
                                                 @Nonnull final BiPredicate<S, String> permissionChecker,
                                                 @Nonnull final com.mojang.brigadier.Command<S> executor,
                                                 @Nonnull final SuggestionProvider<S> suggestionProvider) {
-        CommandNode<S> commandNode;
+
+        ArgumentBuilder<S, ?> argumentBuilder;
         if (root.getValue() instanceof StaticComponent) {
-            final LiteralArgumentBuilder<S> argumentBuilder = LiteralArgumentBuilder.<S>literal(root.getValue().getName())
-                    .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")));
-            if (root.isLeaf()) {
-                argumentBuilder.executes(executor);
-            }
-            commandNode = argumentBuilder.build();
+            argumentBuilder = LiteralArgumentBuilder.<S>literal(root.getValue().getName())
+                    .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")))
+                    .executes(executor);
         } else {
-            @SuppressWarnings("unchecked") final RequiredArgumentBuilder<S, Object> builder = RequiredArgumentBuilder
-                    .<S, Object>argument(root.getValue().getName(),
-                                         (ArgumentType<Object>) getArgument(TypeToken.of(root.getValue().getClass()),
-                                                                            root.getValue()))
-                    .suggests(suggestionProvider)
-                    .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")));
-            if (root.isLeaf() || !root.getValue().isRequired()) {
-                builder.executes(executor);
-            }
-            commandNode = builder.build();
+            final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(TypeToken.of(root.getValue().getClass()),
+                                                                         root.getValue());
+            final SuggestionProvider<S> provider = pair.getRight() ? null : suggestionProvider;
+            argumentBuilder = RequiredArgumentBuilder
+                    .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getLeft())
+                    .suggests(provider)
+                    .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")))
+                    .executes(executor);
         }
         for (final CommandTree.Node<CommandComponent<C, ?>> node : root.getChildren()) {
-            commandNode.addChild(constructCommandNode(node, permissionChecker, executor, suggestionProvider));
+            argumentBuilder.then(constructCommandNode(node, permissionChecker, executor, suggestionProvider));
         }
-        return commandNode;
+        return argumentBuilder;
+    }
+
+    @Nonnull
+    private CompletableFuture<Suggestions> buildSuggestions(@Nonnull final CommandComponent<C, ?> component,
+                                                            @Nonnull final CommandContext<S> s,
+                                                            @Nonnull final SuggestionsBuilder builder) {
+        final com.intellectualsites.commands.context.CommandContext<C> commandContext = this.dummyContextProvider.get();
+        final LinkedList<String> inputQueue = new LinkedList<>(Collections.singletonList(builder.getInput()));
+        final CommandPreprocessingContext<C> commandPreprocessingContext =
+                new CommandPreprocessingContext<>(commandContext, inputQueue);
+        /*
+          List<String> results = server.tabComplete(context.getSource().getBukkitSender(), builder.getInput(),
+           context.getSource().getWorld(), context.getSource().getPosition(), true);
+         */
+
+        String command = builder.getInput();
+        if (command.startsWith("/") /* Minecraft specific */) {
+            command = command.substring(1);
+        }
+        final List<String> suggestions = this.commandManager.suggest(commandContext.getSender(), command);
+        /*component.getParser().suggestions(commandContext, builder.getInput());*/
+        for (final String suggestion : suggestions) {
+            System.out.printf("- %s\n", suggestion);
+        }
+        /*
+        System.out.println("Filtering out with: " + builder.getInput());
+        final CommandSuggestionProcessor<C> processor = this.commandManager.getCommandSuggestionProcessor();
+        final List<String> filteredSuggestions = processor.apply(commandPreprocessingContext, suggestions);
+        System.out.println("Current suggestions: ");
+        for (final String suggestion : filteredSuggestions) {
+            System.out.printf("- %s\n", suggestion);
+        }*/
+        for (final String suggestion : suggestions) {
+            String tooltip = component.getName();
+            if (!(component instanceof StaticComponent)) {
+                if (component.isRequired()) {
+                    tooltip = '<' + tooltip + '>';
+                } else {
+                    tooltip = '[' + tooltip + ']';
+                }
+            }
+            builder.suggest(suggestion, new LiteralMessage(tooltip));
+        }
+        return builder.buildFuture();
+    }
+
+
+    private static final class Pair<L, R> {
+
+        private final L left;
+        private final R right;
+
+        private Pair(@Nonnull final L left, @Nonnull final R right) {
+            this.left = left;
+            this.right = right;
+        }
+
+        @Nonnull
+        private L getLeft() {
+            return this.left;
+        }
+
+        @Nonnull
+        private R getRight() {
+            return this.right;
+        }
+
     }
 
 }

@@ -67,4 +67,14 @@ public class NoPermissionException extends CommandParseException {
         return this.missingPermission;
     }
 
+    @Override
+    public final synchronized Throwable fillInStackTrace() {
+        return this;
+    }
+
+    @Override
+    public final synchronized Throwable initCause(final Throwable cause) {
+        return this;
+    }
+
 }

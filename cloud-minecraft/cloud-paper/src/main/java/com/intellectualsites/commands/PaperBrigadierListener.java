@@ -27,11 +27,11 @@ import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
 import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
 import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -50,15 +50,15 @@ class PaperBrigadierListener<C extends CommandSender> implements Listener {
 
     PaperBrigadierListener(@Nonnull final PaperCommandManager<C> paperCommandManager) throws Exception {
         this.paperCommandManager = paperCommandManager;
-        this.brigadierManager = new CloudBrigadierManager<>();
+        this.brigadierManager = new CloudBrigadierManager<>(this.paperCommandManager,
+                () -> new CommandContext<>(this.paperCommandManager.getCommandSenderMapper()
+                                                                   .apply(Bukkit.getConsoleSender())));
         /* Register default mappings */
         final String version = Bukkit.getServer().getClass().getPackage().getName();
         this.nmsVersion = version.substring(version.lastIndexOf(".") + 1);
         try {
             /* Map UUID */
             this.mapSimpleNMS(UUID.class, this.getNMSArgument("UUID").getConstructor());
-            /* Map World */
-            this.mapSimpleNMS(World.class, this.getNMSArgument("Dimension").getConstructor());
             /* Map Enchantment */
             this.mapSimpleNMS(Enchantment.class, this.getNMSArgument("Enchantment").getConstructor());
             /* Map EntityType */
@@ -120,7 +120,8 @@ class PaperBrigadierListener<C extends CommandSender> implements Listener {
                                                                         event.getLiteral(),
                                                                         event.getBrigadierCommand(),
                                                                         event.getBrigadierCommand(),
-                                                                        (s, p) -> s.getBukkitSender().hasPermission(p)));
+                                                                        (s, p) -> p.isEmpty()
+                                                                                || s.getBukkitSender().hasPermission(p)));
     }
 
 }

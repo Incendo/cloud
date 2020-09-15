@@ -75,4 +75,14 @@ public final class NoSuchCommandException extends CommandParseException {
         return this.suppliedCommand;
     }
 
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
+    }
+
+    @Override
+    public synchronized Throwable initCause(final Throwable cause) {
+        return this;
+    }
+
 }
