@@ -55,7 +55,7 @@
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>brigadier</artifactId>
-            <version>1.0.17</version>
+            <version>1.0.500</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
