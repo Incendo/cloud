@@ -257,8 +257,10 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
                                                           @Nonnull final com.mojang.brigadier.Command<S> executor,
                                                           @Nonnull final BiPredicate<S, String> permissionChecker) {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
-                .requires(sender -> permissionChecker.test(sender, cloudCommand.getNodeMeta().getOrDefault("permission", "")))
-                .executes(executor);
+                .requires(sender -> permissionChecker.test(sender, cloudCommand.getNodeMeta().getOrDefault("permission", "")));
+        if (cloudCommand.isLeaf() && cloudCommand.getValue() != null) {
+            literalArgumentBuilder.executes(executor);
+        }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandComponent<C, ?>> child : cloudCommand.getChildren()) {
             constructedRoot.addChild(this.constructCommandNode(child, permissionChecker, executor, suggestionProvider).build());
@@ -283,8 +285,10 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
             argumentBuilder = RequiredArgumentBuilder
                     .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getLeft())
                     .suggests(provider)
-                    .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")))
-                    .executes(executor);
+                    .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")));
+        }
+        if (root.isLeaf() || !root.getValue().isRequired()) {
+            argumentBuilder.executes(executor);
         }
         for (final CommandTree.Node<CommandComponent<C, ?>> node : root.getChildren()) {
             argumentBuilder.then(constructCommandNode(node, permissionChecker, executor, suggestionProvider));

@@ -25,7 +25,10 @@ package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.components.StaticComponent;
 import com.intellectualsites.commands.components.parser.ComponentParseResult;
+import com.intellectualsites.commands.components.standard.BooleanComponent;
+import com.intellectualsites.commands.components.standard.DoubleComponent;
 import com.intellectualsites.commands.components.standard.EnumComponent;
+import com.intellectualsites.commands.components.standard.FloatComponent;
 import com.intellectualsites.commands.components.standard.IntegerComponent;
 import com.intellectualsites.commands.components.standard.StringComponent;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
@@ -136,6 +139,13 @@ public final class BukkitTest extends JavaPlugin {
                                c.getSender().asPlayer().teleport(world.getSpawnLocation());
                                c.getSender().sendMessage("Teleported.");
                            })
+                           .build())
+               .command(mgr.commandBuilder("brigadier")
+                           .component(FloatComponent.required("float"))
+                           .component(DoubleComponent.required("double"))
+                           .component(IntegerComponent.required("int"))
+                           .component(BooleanComponent.required("bool"))
+                           .component(StringComponent.required("string"))
                            .build());
         } catch (final Exception e) {
             e.printStackTrace();
