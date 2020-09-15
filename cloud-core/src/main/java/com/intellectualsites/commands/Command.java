@@ -244,7 +244,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          * @return New builder instance with the command component inserted into the component list
          */
         @Nonnull
-        public <T> Builder<C, M> withComponent(@Nonnull final CommandComponent<C, T> component) {
+        public <T> Builder<C, M> component(@Nonnull final CommandComponent<C, T> component) {
             final List<CommandComponent<C, ?>> commandComponents = new LinkedList<>(this.commandComponents);
             commandComponents.add(component);
             return new Builder<>(this.commandMeta, this.senderType, commandComponents, this.commandExecutionHandler,
@@ -261,12 +261,12 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          * @return New builder instance with the command component inserted into the component list
          */
         @Nonnull
-        public <T> Builder<C, M> withComponent(@Nonnull final Class<T> clazz,
-                                               @Nonnull final String name,
-                                               @Nonnull final Consumer<CommandComponent.Builder<C, T>> builderConsumer) {
+        public <T> Builder<C, M> component(@Nonnull final Class<T> clazz,
+                                           @Nonnull final String name,
+                                           @Nonnull final Consumer<CommandComponent.Builder<C, T>> builderConsumer) {
             final CommandComponent.Builder<C, T> builder = CommandComponent.ofType(clazz, name);
             builderConsumer.accept(builder);
-            return this.withComponent(builder.build());
+            return this.component(builder.build());
         }
 
         /**
@@ -276,7 +276,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          * @return New builder instance using the command execution handler
          */
         @Nonnull
-        public Builder<C, M> withHandler(@Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
+        public Builder<C, M> handler(@Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
             return new Builder<>(this.commandMeta, this.senderType, this.commandComponents, commandExecutionHandler,
                                  this.commandPermission);
         }

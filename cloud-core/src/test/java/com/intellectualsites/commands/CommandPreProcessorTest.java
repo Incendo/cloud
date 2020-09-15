@@ -42,9 +42,9 @@ public class CommandPreProcessorTest {
     @BeforeAll
     static void newTree() {
         manager = new TestCommandManager();
-        manager.registerCommand(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                                       .withComponent(EnumComponent.required(SampleEnum.class, "enum"))
-                                       .withHandler(
+        manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
+                                       .component(EnumComponent.required(SampleEnum.class, "enum"))
+                                       .handler(
                                                commandContext -> System.out.printf("enum = %s | integer = %d\n",
                                                                                    commandContext.<SampleEnum>get(
                                                                                            "enum").orElse(

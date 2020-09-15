@@ -41,7 +41,7 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
 
     private ByteComponent(final boolean required, @Nonnull final String name, final byte min,
                           final byte max, final String defaultValue) {
-        super(required, name, new ByteParser<>(min, max), defaultValue);
+        super(required, name, new ByteParser<>(min, max), defaultValue, Byte.class);
         this.min = min;
         this.max = max;
     }
@@ -102,7 +102,7 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
         private byte max = Byte.MAX_VALUE;
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(Byte.class, name);
         }
 
         /**

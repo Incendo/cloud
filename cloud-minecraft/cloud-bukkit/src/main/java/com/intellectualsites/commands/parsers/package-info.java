@@ -21,25 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.StaticComponent;
-import com.intellectualsites.commands.meta.SimpleCommandMeta;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-class CommandTest {
-
-    @Test()
-    void noComponents() {
-        Assertions.assertEquals(1, Command.newBuilder("test", SimpleCommandMeta.empty()).build().getComponents().size());
-    }
-
-    @Test
-    void ensureOrdering() {
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-                Command.newBuilder("test", SimpleCommandMeta.empty()).component(StaticComponent.optional("something"))
-                       .component(StaticComponent.required("somethingelse")).build());
-    }
-
-}
+/**
+ * Bukkit specific command components
+ */
+package com.intellectualsites.commands.parsers;

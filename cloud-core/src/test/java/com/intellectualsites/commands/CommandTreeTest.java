@@ -46,14 +46,14 @@ class CommandTreeTest {
     @BeforeAll
     static void newTree() {
         commandManager = new TestCommandManager();
-        commandManager.registerCommand(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                     .withComponent(StaticComponent.required("one")).build())
-                      .registerCommand(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                     .withComponent(StaticComponent.required("two")).withPermission("no").build())
-                      .registerCommand(commandManager.commandBuilder("test", Collections.singleton("other"),
+        commandManager.command(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
+                                                     .component(StaticComponent.required("one")).build())
+                      .command(commandManager.commandBuilder("test", SimpleCommandMeta.empty())
+                                                     .component(StaticComponent.required("two")).withPermission("no").build())
+                      .command(commandManager.commandBuilder("test", Collections.singleton("other"),
                                                                      SimpleCommandMeta.empty())
-                                                     .withComponent(StaticComponent.required("opt", "öpt"))
-                                                     .withComponent(IntegerComponent
+                                                     .component(StaticComponent.required("opt", "öpt"))
+                                                     .component(IntegerComponent
                                                                             .optional("num", EXPECTED_INPUT_NUMBER))
                                                      .build());
     }

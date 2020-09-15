@@ -23,7 +23,10 @@
 //
 package com.intellectualsites.commands;
 
+import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
+import com.intellectualsites.commands.parsers.WorldComponent;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
@@ -33,7 +36,7 @@ import java.util.function.Function;
  * Command manager for the Bukkit platform, using {@link BukkitCommandSender} as the
  * command sender type
  */
-public class BukkitCommandManager extends CommandManager<BukkitCommandSender, BukkitCommandMeta> {
+public class BukkitCommandManager<C extends BukkitCommandSender> extends CommandManager<C, BukkitCommandMeta> {
 
     private final Plugin owningPlugin;
 
@@ -45,12 +48,15 @@ public class BukkitCommandManager extends CommandManager<BukkitCommandSender, Bu
      * @throws Exception If the construction of the manager fails
      */
     public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
-                                @Nonnull final Function<CommandTree<BukkitCommandSender, BukkitCommandMeta>,
-                                CommandExecutionCoordinator<BukkitCommandSender, BukkitCommandMeta>> commandExecutionCoordinator)
+                                @Nonnull final Function<CommandTree<C, BukkitCommandMeta>,
+                                CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator)
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler());
         ((BukkitPluginRegistrationHandler) this.getCommandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
+
+        /* Register Bukkit parsers */
+        this.getParserRegistry().registerParserSupplier(TypeToken.of(World.class), params -> new WorldComponent.WorldParser<>());
     }
 
     /**

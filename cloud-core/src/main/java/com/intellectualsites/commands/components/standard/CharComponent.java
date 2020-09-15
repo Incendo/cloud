@@ -37,7 +37,7 @@ public final class CharComponent<C extends CommandSender> extends CommandCompone
 
     private CharComponent(final boolean required, @Nonnull final String name,
                           @Nonnull final String defaultValue) {
-        super(required, name, new CharacterParser<>(), defaultValue);
+        super(required, name, new CharacterParser<>(), defaultValue, Character.class);
     }
 
     /**
@@ -94,7 +94,7 @@ public final class CharComponent<C extends CommandSender> extends CommandCompone
     public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Character> {
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(Character.class, name);
         }
 
         /**

@@ -159,7 +159,7 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      * @param command Command to register
      * @return The command manager instance
      */
-    public CommandManager<C, M> registerCommand(@Nonnull final Command<C, M> command) {
+    public CommandManager<C, M> command(@Nonnull final Command<C, M> command) {
         this.commandTree.insertCommand(command);
         return this;
     }

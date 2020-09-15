@@ -48,7 +48,7 @@ public class EnumComponent<C extends CommandSender, E extends Enum<E>> extends C
                          final boolean required,
                          @Nonnull final String name,
                          @Nonnull final String defaultValue) {
-        super(required, name, new EnumParser<>(enumClass), defaultValue);
+        super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass);
     }
 
     /**
@@ -118,7 +118,7 @@ public class EnumComponent<C extends CommandSender, E extends Enum<E>> extends C
         private final Class<E> enumClass;
 
         protected Builder(@Nonnull final String name, @Nonnull final Class<E> enumClass) {
-            super(name);
+            super(enumClass, name);
             this.enumClass = enumClass;
         }
 

@@ -69,6 +69,10 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * Default value, will be empty if none was supplied
      */
     private final String defaultValue;
+    /**
+     * The type that is produces by the component's parser
+     */
+    private final Class<T> valueType;
 
     private Command<C, ?> owningCommand;
 
@@ -79,9 +83,13 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * @param name         The component name
      * @param parser       The component parser
      * @param defaultValue Default value used when no value is provided by the command sender
+     * @param valueType    Type produced by the parser
      */
-    public CommandComponent(final boolean required, @Nonnull final String name,
-                            @Nonnull final ComponentParser<C, T> parser, @Nonnull final String defaultValue) {
+    public CommandComponent(final boolean required,
+                            @Nonnull final String name,
+                            @Nonnull final ComponentParser<C, T> parser,
+                            @Nonnull final String defaultValue,
+                            @Nonnull final Class<T> valueType) {
         this.required = required;
         this.name = Objects.requireNonNull(name, "Name may not be null");
         if (!NAME_PATTERN.asPredicate().test(name)) {
@@ -89,6 +97,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         }
         this.parser = Objects.requireNonNull(parser, "Parser may not be null");
         this.defaultValue = defaultValue;
+        this.valueType = valueType;
     }
 
     /**
@@ -97,10 +106,13 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * @param required     Whether or not the component is required
      * @param name         The component name
      * @param parser       The component parser
+     * @param valueType    Type produced by the parser
      */
-    public CommandComponent(final boolean required, @Nonnull final String name,
-                            @Nonnull final ComponentParser<C, T> parser) {
-        this(required, name, parser, "");
+    public CommandComponent(final boolean required,
+                            @Nonnull final String name,
+                            @Nonnull final ComponentParser<C, T> parser,
+                            @Nonnull final Class<T> valueType) {
+        this(required, name, parser, "", valueType);
     }
 
     /**
@@ -115,7 +127,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     @Nonnull
     public static <C extends CommandSender, T> CommandComponent.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
                                                                                      @Nonnull final String name) {
-        return new Builder<>(name);
+        return new Builder<>(clazz, name);
     }
 
     /**
@@ -230,6 +242,15 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
                 && !this.getDefaultValue().isEmpty();
     }
 
+    /**
+     * Get the type of this component's value
+     *
+     * @return Value type
+     */
+    @Nonnull
+    public Class<T> getValueType() {
+        return this.valueType;
+    }
 
     /**
      * Mutable builder for {@link CommandComponent} instances
@@ -239,13 +260,17 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      */
     public static class Builder<C extends CommandSender, T> {
 
+        private final Class<T> valueType;
         private final String name;
+
         private boolean required = true;
         private ComponentParser<C, T> parser = (c, i) -> ComponentParseResult.failure(
                 new UnsupportedOperationException("No parser was specified"));
         private String defaultValue = "";
 
-        protected Builder(@Nonnull final String name) {
+        protected Builder(@Nonnull final Class<T> valueType,
+                          @Nonnull final String name) {
+            this.valueType = valueType;
             this.name = name;
         }
 
@@ -315,7 +340,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
          */
         @Nonnull
         public CommandComponent<C, T> build() {
-            return new CommandComponent<>(this.required, this.name, this.parser, this.defaultValue);
+            return new CommandComponent<>(this.required, this.name, this.parser, this.defaultValue, this.valueType);
         }
 
         @Nonnull

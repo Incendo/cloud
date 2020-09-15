@@ -44,7 +44,7 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
                             final double min,
                             final double max,
                             final String defaultValue) {
-        super(required, name, new DoubleParser<>(min, max), defaultValue);
+        super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class);
         this.min = min;
         this.max = max;
     }
@@ -106,7 +106,7 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
         private double max = Double.MAX_VALUE;
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(Double.class, name);
         }
 
         /**

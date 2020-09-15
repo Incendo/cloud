@@ -33,7 +33,7 @@ import java.util.function.Function;
 /**
  * Paper command manager that extends {@link BukkitCommandManager}
  */
-public class PaperCommandManager extends BukkitCommandManager {
+public class PaperCommandManager<C extends BukkitCommandSender> extends BukkitCommandManager<C> {
 
     /**
      * Construct a new Paper command manager
@@ -43,8 +43,8 @@ public class PaperCommandManager extends BukkitCommandManager {
      * @throws Exception If the construction of the manager fails
      */
     public PaperCommandManager(@Nonnull final Plugin owningPlugin,
-                               @Nonnull final Function<CommandTree<BukkitCommandSender, BukkitCommandMeta>,
-                          CommandExecutionCoordinator<BukkitCommandSender, BukkitCommandMeta>> commandExecutionCoordinator) throws
+                               @Nonnull final Function<CommandTree<C, BukkitCommandMeta>,
+                          CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator) throws
             Exception {
         super(owningPlugin, commandExecutionCoordinator);
     }

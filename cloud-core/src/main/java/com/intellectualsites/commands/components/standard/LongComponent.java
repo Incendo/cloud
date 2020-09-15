@@ -44,7 +44,7 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
                              final long min,
                              final long max,
                              final String defaultValue) {
-        super(required, name, new LongParser<>(min, max), defaultValue);
+        super(required, name, new LongParser<>(min, max), defaultValue, Long.class);
         this.min = min;
         this.max = max;
     }
@@ -106,7 +106,7 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
         private long max = Long.MAX_VALUE;
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(Long.class, name);
         }
 
         /**

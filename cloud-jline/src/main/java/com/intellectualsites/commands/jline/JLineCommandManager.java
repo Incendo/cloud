@@ -75,13 +75,13 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
                                                  .appName("Test")
                                                  .build();
         boolean[] shouldStop = new boolean[]{false};
-        jLineCommandManager.registerCommand(
+        jLineCommandManager.command(
                 jLineCommandManager.commandBuilder("stop", SimpleCommandMeta.empty())
-                                   .withHandler(commandContext ->
+                                   .handler(commandContext ->
                                                         shouldStop[0] = true)
                                    .build())
-                           .registerCommand(jLineCommandManager.commandBuilder("echo", SimpleCommandMeta.empty())
-                                                               .withComponent(String.class, "string", builder ->
+                           .command(jLineCommandManager.commandBuilder("echo", SimpleCommandMeta.empty())
+                                                               .component(String.class, "string", builder ->
                                                                        builder.asRequired()
                                                                               .withParser(((commandContext, inputQueue) -> {
                                                                                   final StringBuilder stringBuilder =
@@ -95,17 +95,17 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
                                                                                   return ComponentParseResult.success(
                                                                                           stringBuilder.toString());
                                                                               })).build())
-                                                               .withHandler(commandContext -> commandContext.get("string")
+                                                               .handler(commandContext -> commandContext.get("string")
                                                                                                             .ifPresent(
                                                                                                              System.out::println))
                                                                .build())
-                           .registerCommand(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                               .withComponent(StaticComponent.required("one"))
-                                                               .withHandler(commandContext -> System.out.println("Test (1)"))
+                           .command(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
+                                                               .component(StaticComponent.required("one"))
+                                                               .handler(commandContext -> System.out.println("Test (1)"))
                                                                .build())
-                           .registerCommand(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                               .withComponent(StaticComponent.required("two"))
-                                                               .withHandler(commandContext -> System.out.println("Test (2)"))
+                           .command(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
+                                                               .component(StaticComponent.required("two"))
+                                                               .handler(commandContext -> System.out.println("Test (2)"))
                                                                .build());
         System.out.println("Ready...");
         while (!shouldStop[0]) {

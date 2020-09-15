@@ -52,6 +52,7 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Manager used to map cloud {@link com.intellectualsites.commands.Command}
@@ -67,12 +68,14 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
 
     private final Map<Class<?>, Function<? extends CommandComponent<C, ?>,
             ? extends ArgumentType<?>>> mappers;
+    private final Map<Class<?>, Supplier<ArgumentType<?>>> defaultArgumentTypeSuppliers;
 
     /**
      * Create a new cloud brigadier manager
      */
     public CloudBrigadierManager() {
         this.mappers = Maps.newHashMap();
+        this.defaultArgumentTypeSuppliers = Maps.newHashMap();
         this.registerInternalMappings();
     }
 
@@ -106,9 +109,6 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
         }, component -> {
             final boolean hasMin = component.getMin() != Integer.MIN_VALUE;
             final boolean hasMax = component.getMax() != Integer.MAX_VALUE;
-
-            System.out.println("Constructing new IntegerArgumentType with min " + hasMin + " | max " + hasMax);
-
             if (hasMin) {
                 return IntegerArgumentType.integer(component.getMin(), component.getMax());
             } else if (hasMax) {
@@ -150,8 +150,6 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
         this.registerMapping(new TypeToken<StringComponent<C>>() {
         }, component -> {
             switch (component.getStringMode()) {
-                case SINGLE:
-                    return StringArgumentType.word();
                 case QUOTED:
                     return StringArgumentType.string();
                 case GREEDY:
@@ -178,6 +176,17 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
     }
 
     /**
+     * Register a default mapping to between a class and a Brigadier argument type
+     *
+     * @param clazz    Type to map
+     * @param supplier Supplier that supplies the argument type
+     */
+    public void registerDefaultArgumentTypeSupplier(@Nonnull final Class<?> clazz,
+                                                    @Nonnull final Supplier<ArgumentType<?>> supplier) {
+        this.defaultArgumentTypeSuppliers.put(clazz, supplier);
+    }
+
+    /**
      * Get a Brigadier {@link ArgumentType} from a cloud {@link CommandComponent}
      *
      * @param componentType cloud component type
@@ -199,6 +208,11 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
     @Nonnull
     private <T, K extends CommandComponent<C, T>> ArgumentType<?> createDefaultMapper(@Nonnull final CommandComponent<C, T>
                                                                                               component) {
+        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers.get(component.getValueType());
+        if (argumentTypeSupplier != null) {
+            return argumentTypeSupplier.get();
+        }
+        System.err.printf("Found not native mapping for '%s'\n", component.getValueType().getCanonicalName());
         return StringArgumentType.string();
     }
 

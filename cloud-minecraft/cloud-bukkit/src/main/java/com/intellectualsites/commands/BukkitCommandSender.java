@@ -37,7 +37,12 @@ public abstract class BukkitCommandSender implements CommandSender {
 
     private final org.bukkit.command.CommandSender internalSender;
 
-    BukkitCommandSender(@Nonnull final org.bukkit.command.CommandSender internalSender) {
+    /**
+     * Create a new command sender from a Bukkit {@link CommandSender}
+     *
+     * @param internalSender Bukkit command sender
+     */
+    public BukkitCommandSender(@Nonnull final org.bukkit.command.CommandSender internalSender) {
         this.internalSender = internalSender;
     }
 

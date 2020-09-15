@@ -55,7 +55,7 @@ public final class CommandContext<C extends CommandSender> {
      * @return Command sender
      */
     @Nonnull
-    public C getCommandSender() {
+    public C getSender() {
         return this.commandSender;
     }
 
@@ -77,6 +77,7 @@ public final class CommandContext<C extends CommandSender> {
      * @param <T> Value type
      * @return Value
      */
+    @Nonnull
     public <T> Optional<T> get(@Nonnull final String key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
@@ -85,6 +86,24 @@ public final class CommandContext<C extends CommandSender> {
         } else {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Get a required argument from the context
+     *
+     * @param key Argument key
+     * @param <T> Argument type
+     * @return Argument
+     * @throws NullPointerException If no such argument is stored
+     */
+    @Nonnull
+    @SuppressWarnings("unchecked")
+    public <T> T getRequired(@Nonnull final String key) {
+        final Object value = this.internalStorage.get(key);
+        if (value == null) {
+            throw new NullPointerException("No such object stored in the context: " + key);
+        }
+        return (T) value;
     }
 
 }

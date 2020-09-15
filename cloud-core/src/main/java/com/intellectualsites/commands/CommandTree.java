@@ -107,12 +107,12 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
     private Optional<Command<C, M>> parseCommand(@Nonnull final CommandContext<C> commandContext,
                                                  @Nonnull final Queue<String> commandQueue,
                                                  @Nonnull final Node<CommandComponent<C, ?>> root) {
-        String permission = this.isPermitted(commandContext.getCommandSender(), root);
+        String permission = this.isPermitted(commandContext.getSender(), root);
         if (permission != null) {
-            throw new NoPermissionException(permission, commandContext.getCommandSender(), this.getChain(root)
-                                                                                               .stream()
-                                                                                               .map(Node::getValue)
-                                                                                               .collect(Collectors.toList()));
+            throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(root)
+                                                                                        .stream()
+                                                                                        .map(Node::getValue)
+                                                                                        .collect(Collectors.toList()));
         }
 
         final Optional<Command<C, M>> parsedChild = this.attemptParseUnambiguousChild(commandContext, root, commandQueue);
@@ -133,10 +133,10 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                                                                         .apply(root.getValue()
                                                                                    .getOwningCommand()
                                                                                    .getComponents()),
-                                                     commandContext.getCommandSender(), this.getChain(root)
-                                                                                            .stream()
-                                                                                            .map(Node::getValue)
-                                                                                            .collect(Collectors.toList()));
+                                                     commandContext.getSender(), this.getChain(root)
+                                                                                     .stream()
+                                                                                     .map(Node::getValue)
+                                                                                     .collect(Collectors.toList()));
                 }
             } else {
                 /* Too many arguments. We have a unique path, so we can send the entire context */
@@ -145,10 +145,10 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                                                                             Objects.requireNonNull(root.getValue())
                                                                                    .getOwningCommand())
                                                                                   .getComponents()),
-                                                 commandContext.getCommandSender(), this.getChain(root)
-                                                                                        .stream()
-                                                                                        .map(Node::getValue)
-                                                                                        .collect(Collectors.toList()));
+                                                 commandContext.getSender(), this.getChain(root)
+                                                                                 .stream()
+                                                                                 .map(Node::getValue)
+                                                                                 .collect(Collectors.toList()));
             }
         } else {
             final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
@@ -165,7 +165,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 }
             }
             /* We could not find a match */
-            throw new NoSuchCommandException(commandContext.getCommandSender(),
+            throw new NoSuchCommandException(commandContext.getSender(),
                                              getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
                                              stringOrEmpty(commandQueue.peek()));
         }
@@ -180,12 +180,12 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
             // The value has to be a variable
             final Node<CommandComponent<C, ?>> child = children.get(0);
-            permission = this.isPermitted(commandContext.getCommandSender(), child);
+            permission = this.isPermitted(commandContext.getSender(), child);
             if (permission != null) {
-                throw new NoPermissionException(permission, commandContext.getCommandSender(), this.getChain(child)
-                                                                                                   .stream()
-                                                                                                   .map(Node::getValue)
-                                                                                                   .collect(Collectors.toList()));
+                throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(child)
+                                                                                            .stream()
+                                                                                            .map(Node::getValue)
+                                                                                            .collect(Collectors.toList()));
             }
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
@@ -199,12 +199,12 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                                                                             .apply(Objects.requireNonNull(
                                                                                     child.getValue().getOwningCommand())
                                                                                           .getComponents()),
-                                                         commandContext.getCommandSender(), this.getChain(root)
-                                                                                                .stream()
-                                                                                                .map(Node::getValue)
-                                                                                                .collect(Collectors.toList()));
+                                                         commandContext.getSender(), this.getChain(root)
+                                                                                         .stream()
+                                                                                         .map(Node::getValue)
+                                                                                         .collect(Collectors.toList()));
                     } else {
-                        throw new NoSuchCommandException(commandContext.getCommandSender(),
+                        throw new NoSuchCommandException(commandContext.getSender(),
                                                          this.getChain(root)
                                                              .stream()
                                                              .map(Node::getValue)
@@ -224,17 +224,17 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                                                                                 .apply(Objects.requireNonNull(child.getValue()
                                                                                                              .getOwningCommand())
                                                                                               .getComponents()),
-                                                             commandContext.getCommandSender(), this.getChain(root)
-                                                                                                    .stream()
-                                                                                                    .map(Node::getValue)
-                                                                                                    .collect(
+                                                             commandContext.getSender(), this.getChain(root)
+                                                                                             .stream()
+                                                                                             .map(Node::getValue)
+                                                                                             .collect(
                                                                                                             Collectors.toList()));
                         }
                     } else {
                         return this.parseCommand(commandContext, commandQueue, child);
                     }
                 } else if (result.getFailure().isPresent()) {
-                    throw new ComponentParseException(result.getFailure().get(), commandContext.getCommandSender(),
+                    throw new ComponentParseException(result.getFailure().get(), commandContext.getSender(),
                                                       this.getChain(child)
                                                           .stream()
                                                           .map(Node::getValue)
@@ -264,7 +264,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                                        @Nonnull final Node<CommandComponent<C, ?>> root) {
 
         /* If the sender isn't allowed to access the root node, no suggestions are needed */
-        if (this.isPermitted(commandContext.getCommandSender(), root) != null) {
+        if (this.isPermitted(commandContext.getSender(), root) != null) {
             return Collections.emptyList();
         }
         final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
@@ -307,7 +307,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             }
             final List<String> suggestions = new LinkedList<>();
             for (final Node<CommandComponent<C, ?>> component : root.getChildren()) {
-                if (component.getValue() == null || this.isPermitted(commandContext.getCommandSender(), component) != null) {
+                if (component.getValue() == null || this.isPermitted(commandContext.getSender(), component) != null) {
                     continue;
                 }
                 suggestions.addAll(

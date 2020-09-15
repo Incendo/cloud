@@ -32,15 +32,15 @@ import org.bukkit.plugin.Plugin;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-final class BukkitCommand extends org.bukkit.command.Command implements PluginIdentifiableCommand {
+final class BukkitCommand<C extends BukkitCommandSender> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
-    private final CommandComponent<BukkitCommandSender, ?> command;
-    private final BukkitCommandManager bukkitCommandManager;
-    private final com.intellectualsites.commands.Command<BukkitCommandSender, BukkitCommandMeta> cloudCommand;
+    private final CommandComponent<C, ?> command;
+    private final BukkitCommandManager<C> bukkitCommandManager;
+    private final com.intellectualsites.commands.Command<C, BukkitCommandMeta> cloudCommand;
 
-    BukkitCommand(@Nonnull final com.intellectualsites.commands.Command<BukkitCommandSender, BukkitCommandMeta> cloudCommand,
-                  @Nonnull final CommandComponent<BukkitCommandSender, ?> command,
-                  @Nonnull final BukkitCommandManager bukkitCommandManager) {
+    BukkitCommand(@Nonnull final com.intellectualsites.commands.Command<C, BukkitCommandMeta> cloudCommand,
+                  @Nonnull final CommandComponent<C, ?> command,
+                  @Nonnull final BukkitCommandManager<C> bukkitCommandManager) {
         super(command.getName());
         this.command = command;
         this.bukkitCommandManager = bukkitCommandManager;
@@ -54,7 +54,7 @@ final class BukkitCommand extends org.bukkit.command.Command implements PluginId
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        this.bukkitCommandManager.executeCommand(BukkitCommandSender.of(commandSender), builder.toString())
+        this.bukkitCommandManager.executeCommand((C) BukkitCommandSender.of(commandSender), builder.toString())
                                  .whenComplete(((commandResult, throwable) -> {
                                      if (throwable != null) {
                                          commandSender.sendMessage(ChatColor.RED + throwable.getCause().getMessage());
@@ -79,7 +79,7 @@ final class BukkitCommand extends org.bukkit.command.Command implements PluginId
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.bukkitCommandManager.suggest(BukkitCommandSender.of(sender), builder.toString());
+        return this.bukkitCommandManager.suggest((C) BukkitCommandSender.of(sender), builder.toString());
     }
 
     @Override

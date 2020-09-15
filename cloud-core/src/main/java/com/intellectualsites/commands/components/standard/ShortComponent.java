@@ -44,7 +44,7 @@ public final class ShortComponent<C extends CommandSender> extends CommandCompon
                           final short min,
                           final short max,
                           final String defaultValue) {
-        super(required, name, new ShortParser<>(min, max), defaultValue);
+        super(required, name, new ShortParser<>(min, max), defaultValue, Short.class);
         this.min = min;
         this.max = max;
     }
@@ -106,7 +106,7 @@ public final class ShortComponent<C extends CommandSender> extends CommandCompon
         private short max = Short.MAX_VALUE;
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(Short.class, name);
         }
 
         /**

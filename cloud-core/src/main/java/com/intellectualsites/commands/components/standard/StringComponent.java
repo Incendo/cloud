@@ -46,7 +46,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
                             @Nonnull final StringMode stringMode,
                             @Nonnull final String defaultValue,
                             @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
-        super(required, name, new StringParser<>(stringMode, suggestionsProvider), defaultValue);
+        super(required, name, new StringParser<>(stringMode, suggestionsProvider), defaultValue, String.class);
         this.stringMode = stringMode;
     }
 
@@ -124,7 +124,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
         private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(String.class, name);
         }
 
         /**

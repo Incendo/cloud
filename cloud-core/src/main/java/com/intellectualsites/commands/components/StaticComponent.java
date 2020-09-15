@@ -44,7 +44,7 @@ import java.util.Set;
 public final class StaticComponent<C extends CommandSender> extends CommandComponent<C, String> {
 
     private StaticComponent(final boolean required, @Nonnull final String name, @Nonnull final String... aliases) {
-        super(required, name, new StaticComponentParser<>(name, aliases));
+        super(required, name, new StaticComponentParser<>(name, aliases), String.class);
     }
 
     /**

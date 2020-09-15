@@ -40,7 +40,7 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
 
     private BooleanComponent(final boolean required, @Nonnull final String name,
                              final boolean liberal, @Nonnull final String defaultValue) {
-        super(required, name, new BooleanParser<>(liberal), defaultValue);
+        super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class);
         this.liberal = liberal;
     }
 
@@ -100,7 +100,7 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
         private boolean liberal = false;
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(Boolean.class, name);
         }
 
         /**

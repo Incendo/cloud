@@ -44,7 +44,7 @@ public final class FloatComponent<C extends CommandSender> extends CommandCompon
                            final float min,
                            final float max,
                            final String defaultValue) {
-        super(required, name, new FloatParser<>(min, max), defaultValue);
+        super(required, name, new FloatParser<>(min, max), defaultValue, Float.class);
         this.min = min;
         this.max = max;
     }
@@ -106,7 +106,7 @@ public final class FloatComponent<C extends CommandSender> extends CommandCompon
         private float max = Float.MAX_VALUE;
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(Float.class, name);
         }
 
         /**

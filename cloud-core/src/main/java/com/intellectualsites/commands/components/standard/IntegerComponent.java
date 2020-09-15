@@ -44,7 +44,7 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
                              final int min,
                              final int max,
                              final String defaultValue) {
-        super(required, name, new IntegerParser<>(min, max), defaultValue);
+        super(required, name, new IntegerParser<>(min, max), defaultValue, Integer.class);
         this.min = min;
         this.max = max;
     }
@@ -106,7 +106,7 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
         private int max = Integer.MAX_VALUE;
 
         protected Builder(@Nonnull final String name) {
-            super(name);
+            super(Integer.class, name);
         }
 
         /**
