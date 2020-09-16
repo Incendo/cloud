@@ -58,8 +58,8 @@ public class BukkitCommandManager<C extends com.intellectualsites.commands.sende
                                         CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator,
                                 @Nonnull final Function<CommandSender, C> commandSenderMapper)
             throws Exception {
-        super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler());
-        ((BukkitPluginRegistrationHandler) this.getCommandRegistrationHandler()).initialize(this);
+        super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
+        ((BukkitPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
 

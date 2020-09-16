@@ -29,6 +29,7 @@ import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.AmbiguousNodeException;
 import com.intellectualsites.commands.exceptions.ComponentParseException;
+import com.intellectualsites.commands.exceptions.InvalidCommandSenderException;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoCommandInLeafException;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
@@ -101,7 +102,13 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
     public Optional<Command<C, M>> parse(@Nonnull final CommandContext<C> commandContext,
                                          @Nonnull final Queue<String> args) throws
             NoSuchCommandException, NoPermissionException, InvalidSyntaxException {
-        return parseCommand(commandContext, args, this.internalTree);
+        final Optional<Command<C, M>> commandOptional = parseCommand(commandContext, args, this.internalTree);
+        commandOptional.flatMap(Command::getSenderType).ifPresent(requiredType -> {
+            if (!requiredType.isAssignableFrom(commandContext.getSender().getClass())) {
+                throw new InvalidCommandSenderException(commandContext.getSender(), requiredType, Collections.emptyList());
+            }
+        });
+        return commandOptional;
     }
 
     private Optional<Command<C, M>> parseCommand(@Nonnull final CommandContext<C> commandContext,

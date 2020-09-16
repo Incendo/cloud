@@ -69,7 +69,7 @@ public class PaperCommandManager<C extends com.intellectualsites.commands.sender
             Bukkit.getPluginManager().registerEvents(brigadierListener,
                                                      this.getOwningPlugin());
             return brigadierListener;
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             this.getOwningPlugin().getLogger().severe("Failed to register Brigadier listener");
             e.printStackTrace();
         }

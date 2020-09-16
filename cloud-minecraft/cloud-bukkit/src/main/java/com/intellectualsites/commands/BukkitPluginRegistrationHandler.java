@@ -25,6 +25,7 @@ package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
+import com.intellectualsites.commands.sender.CommandSender;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.SimpleCommandMap;
@@ -36,18 +37,18 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-final class BukkitPluginRegistrationHandler implements CommandRegistrationHandler<BukkitCommandMeta> {
+final class BukkitPluginRegistrationHandler<C extends CommandSender> implements CommandRegistrationHandler<BukkitCommandMeta> {
 
     private final Map<CommandComponent<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
 
     private Map<String, org.bukkit.command.Command> bukkitCommands;
-    private BukkitCommandManager bukkitCommandManager;
+    private BukkitCommandManager<C> bukkitCommandManager;
     private CommandMap commandMap;
 
     BukkitPluginRegistrationHandler() {
     }
 
-    void initialize(@Nonnull final BukkitCommandManager bukkitCommandManager) throws Exception {
+    void initialize(@Nonnull final BukkitCommandManager<C> bukkitCommandManager) throws Exception {
         final Method getCommandMap = Bukkit.getServer().getClass().getDeclaredMethod("getCommandMap");
         getCommandMap.setAccessible(true);
         this.commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());
@@ -73,9 +74,9 @@ final class BukkitPluginRegistrationHandler implements CommandRegistrationHandle
         } else {
             label = commandComponent.getName();
         }
-        @SuppressWarnings("unchecked") final BukkitCommand bukkitCommand = new BukkitCommand(
-                (Command<BukkitCommandSender, BukkitCommandMeta>) command,
-                (CommandComponent<BukkitCommandSender, ?>) commandComponent,
+        @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
+                (Command<C, BukkitCommandMeta>) command,
+                (CommandComponent<C, ?>) commandComponent,
                 this.bukkitCommandManager);
         this.registeredCommands.put(commandComponent, bukkitCommand);
         this.commandMap.register(commandComponent.getName(), this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
