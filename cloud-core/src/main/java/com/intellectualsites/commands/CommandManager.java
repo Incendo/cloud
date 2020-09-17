@@ -45,10 +45,10 @@ import com.intellectualsites.services.ServicePipeline;
 import com.intellectualsites.services.State;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -212,7 +212,7 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      */
     @Nonnull
     public Command.Builder<C, M> commandBuilder(@Nonnull final String name,
-                                                @Nonnull final Set<String> aliases,
+                                                @Nonnull final Collection<String> aliases,
                                                 @Nonnull final M meta) {
         return Command.newBuilder(name, meta, aliases.toArray(new String[0]));
     }

@@ -16,6 +16,7 @@
         <module>cloud-minecraft/cloud-bukkit</module>
         <module>cloud-minecraft/cloud-paper</module>
         <module>cloud-minecraft/cloud-brigadier</module>
+        <module>cloud-annotations</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>
