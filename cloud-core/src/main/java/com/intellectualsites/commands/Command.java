@@ -135,7 +135,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
     public static <C extends CommandSender, M extends CommandMeta> Builder<C, M> newBuilder(@Nonnull final String commandName,
                                                                                             @Nonnull final M commandMeta,
                                                                                             @Nonnull final String... aliases) {
-        return new Builder<>(commandMeta, null, Collections.singletonList(StaticComponent.required(commandName, aliases)),
+        return new Builder<>(null, commandMeta, null,
+                             Collections.singletonList(StaticComponent.required(commandName, aliases)),
                              new CommandExecutionHandler.NullCommandExecutionHandler<>(), "");
     }
 
@@ -223,17 +224,34 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
         @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
         @Nullable private final Class<? extends C> senderType;
         @Nonnull private final String commandPermission;
+        @Nullable private final CommandManager<C, M> commandManager;
 
-        private Builder(@Nonnull final M commandMeta,
+        private Builder(@Nullable final CommandManager<C, M> commandManager,
+                        @Nonnull final M commandMeta,
                         @Nullable final Class<? extends C> senderType,
                         @Nonnull final List<CommandComponent<C, ?>> commandComponents,
                         @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                         @Nonnull final String commandPermission) {
+            this.commandManager = commandManager;
             this.senderType = senderType;
             this.commandComponents = Objects.requireNonNull(commandComponents, "Components may not be null");
             this.commandExecutionHandler = Objects.requireNonNull(commandExecutionHandler, "Execution handler may not be null");
             this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
             this.commandMeta = Objects.requireNonNull(commandMeta, "Meta may not be null");
+        }
+
+        /**
+         * Supply a command manager instance to the builder. This will be used when attempting to
+         * retrieve command component parsers, in the case that they're needed. This
+         * is optional
+         *
+         * @param commandManager Command manager
+         * @return New builder instance using the provided command manager
+         */
+        @Nonnull
+        public Builder<C, M> manager(@Nullable final CommandManager<C, M> commandManager) {
+            return new Builder<>(commandManager, this.commandMeta, this.senderType, this.commandComponents,
+                                 this.commandExecutionHandler, this.commandPermission);
         }
 
         /**
@@ -247,8 +265,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
         public <T> Builder<C, M> component(@Nonnull final CommandComponent<C, T> component) {
             final List<CommandComponent<C, ?>> commandComponents = new LinkedList<>(this.commandComponents);
             commandComponents.add(component);
-            return new Builder<>(this.commandMeta, this.senderType, commandComponents, this.commandExecutionHandler,
-                                 this.commandPermission);
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandComponents,
+                                 this.commandExecutionHandler, this.commandPermission);
         }
 
         /**
@@ -265,6 +283,9 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
                                            @Nonnull final String name,
                                            @Nonnull final Consumer<CommandComponent.Builder<C, T>> builderConsumer) {
             final CommandComponent.Builder<C, T> builder = CommandComponent.ofType(clazz, name);
+            if (this.commandManager != null) {
+                builder.manager(this.commandManager);
+            }
             builderConsumer.accept(builder);
             return this.component(builder.build());
         }
@@ -277,8 +298,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> handler(@Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
-            return new Builder<>(this.commandMeta, this.senderType, this.commandComponents, commandExecutionHandler,
-                                 this.commandPermission);
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandComponents,
+                                 commandExecutionHandler, this.commandPermission);
         }
 
         /**
@@ -289,8 +310,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> withSenderType(@Nonnull final Class<? extends C> senderType) {
-            return new Builder<>(this.commandMeta, senderType, this.commandComponents, this.commandExecutionHandler,
-                                 this.commandPermission);
+            return new Builder<>(this.commandManager, this.commandMeta, senderType, this.commandComponents,
+                                 this.commandExecutionHandler, this.commandPermission);
         }
 
         /**
@@ -301,8 +322,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> withPermission(@Nonnull final String permission) {
-            return new Builder<>(this.commandMeta, this.senderType, this.commandComponents, this.commandExecutionHandler,
-                                 permission);
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandComponents,
+                                 this.commandExecutionHandler, permission);
         }
 
         /**
@@ -312,8 +333,8 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Command<C, M> build() {
-            return new Command<>(Collections.unmodifiableList(this.commandComponents), this.commandExecutionHandler,
-                                 this.senderType, this.commandPermission, this.commandMeta);
+            return new Command<>(Collections.unmodifiableList(this.commandComponents),
+                                 this.commandExecutionHandler, this.senderType, this.commandPermission, this.commandMeta);
         }
 
     }

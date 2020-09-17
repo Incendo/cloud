@@ -23,9 +23,12 @@
 //
 package com.intellectualsites.commands.components;
 
+import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.components.parser.ComponentParseResult;
 import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.components.parser.ParserParameters;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -263,15 +266,28 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         private final Class<T> valueType;
         private final String name;
 
+        private CommandManager<C, ?> manager;
         private boolean required = true;
-        private ComponentParser<C, T> parser = (c, i) -> ComponentParseResult.failure(
-                new UnsupportedOperationException("No parser was specified"));
+        private ComponentParser<C, T> parser;
         private String defaultValue = "";
 
         protected Builder(@Nonnull final Class<T> valueType,
                           @Nonnull final String name) {
             this.valueType = valueType;
             this.name = name;
+        }
+
+        /**
+         * Set the command manager. Will be used to create a default parser
+         * if none was provided
+         *
+         * @param manager Command manager
+         * @return Builder instance
+         */
+        @Nonnull
+        public Builder<C, T> manager(@Nonnull final CommandManager<C, ?> manager) {
+            this.manager = manager;
+            return this;
         }
 
         /**
@@ -340,6 +356,14 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
          */
         @Nonnull
         public CommandComponent<C, T> build() {
+            if (this.parser == null && this.manager != null) {
+                this.parser = this.manager.getParserRegistry().createParser(TypeToken.of(valueType), ParserParameters.empty())
+                                    .orElse(null);
+            }
+            if (this.parser == null) {
+                this.parser = (c, i) -> ComponentParseResult
+                        .failure(new UnsupportedOperationException("No parser was specified"));
+            }
             return new CommandComponent<>(this.required, this.name, this.parser, this.defaultValue, this.valueType);
         }
 

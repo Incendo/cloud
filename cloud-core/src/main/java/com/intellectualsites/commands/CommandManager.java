@@ -24,6 +24,7 @@
 package com.intellectualsites.commands;
 
 import com.google.common.reflect.TypeToken;
+import com.intellectualsites.commands.components.CommandComponent;
 import com.intellectualsites.commands.components.CommandSyntaxFormatter;
 import com.intellectualsites.commands.components.StandardCommandSyntaxFormatter;
 import com.intellectualsites.commands.components.parser.ParserRegistry;
@@ -231,7 +232,20 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
      */
     @Nonnull
     public Command.Builder<C, M> commandBuilder(@Nonnull final String name) {
-        return Command.newBuilder(name, this.createDefaultCommandMeta());
+        return Command.<C, M>newBuilder(name, this.createDefaultCommandMeta()).manager(this);
+    }
+
+    /**
+     * Create a new command component builder
+     *
+     * @param type Component type
+     * @param name Component name
+     * @param <T>  Generic component name
+     * @return Component builder
+     */
+    @Nonnull
+    public <T> CommandComponent.Builder<C, T> componentBuilder(@Nonnull final Class<T> type, @Nonnull final String name) {
+        return CommandComponent.<C, T>ofType(type, name).manager(this);
     }
 
     /**
