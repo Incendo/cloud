@@ -58,20 +58,26 @@ public class CommandSuggestionsTest {
     void testSimple() {
         final String input = "test";
         final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("one", "two", "var"), suggestions);
+        Assertions.assertTrue(suggestions.isEmpty());
+        final String input2 = "test ";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("one", "two","var"), suggestions2);
     }
 
     @Test
     void testVar() {
         final String input = "test var";
         final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("one", "two"), suggestions);
+        Assertions.assertTrue(suggestions.isEmpty());
         final String input2 = "test var one";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions2);
+        Assertions.assertTrue(suggestions2.isEmpty());
         final String input3 = "test var one f";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.singletonList("foo"), suggestions3);
+        final String input4 = "test var one ";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions4);
     }
 
     @Test

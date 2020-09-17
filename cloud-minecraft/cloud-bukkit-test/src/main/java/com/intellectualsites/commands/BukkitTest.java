@@ -146,6 +146,7 @@ public final class BukkitTest extends JavaPlugin {
                            .component(IntegerComponent.required("int"))
                            .component(BooleanComponent.required("bool"))
                            .component(StringComponent.required("string"))
+                           .handler(c -> c.getSender().sendMessage("Executed the command"))
                            .build());
         } catch (final Exception e) {
             e.printStackTrace();

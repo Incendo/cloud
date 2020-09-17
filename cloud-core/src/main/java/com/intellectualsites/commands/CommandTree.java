@@ -280,7 +280,8 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             final Node<CommandComponent<C, ?>> child = children.get(0);
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
-                    return child.getValue().getParser().suggestions(commandContext, "");
+                    return Collections.emptyList();
+                    // return child.getValue().getParser().suggestions(commandContext, "");
                 } else if (child.isLeaf() && commandQueue.size() < 2) {
                     return child.getValue().getParser().suggestions(commandContext, commandQueue.peek());
                 } else if (child.isLeaf()) {
@@ -296,7 +297,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             }
         }
         /* There are 0 or more static components as children. No variable child components are present */
-        if (children.isEmpty()) {
+        if (children.isEmpty() || commandQueue.isEmpty()) {
             return Collections.emptyList();
         } else {
             final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();

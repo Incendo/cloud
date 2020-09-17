@@ -93,7 +93,7 @@ class CommandTreeTest {
     void getSuggestions() {
         Assertions.assertFalse(
                 commandManager.getCommandTree().getSuggestions(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
-                        Collections.singletonList("test"))).isEmpty());
+                        Collections.singletonList("test "))).isEmpty());
     }
 
     @Test
