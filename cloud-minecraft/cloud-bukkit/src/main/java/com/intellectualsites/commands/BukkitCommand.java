@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
@@ -35,12 +35,12 @@ import java.util.List;
 final class BukkitCommand<C extends com.intellectualsites.commands.sender.CommandSender>
         extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
-    private final CommandComponent<C, ?> command;
+    private final CommandArgument<C, ?> command;
     private final BukkitCommandManager<C> bukkitCommandManager;
     private final com.intellectualsites.commands.Command<C, BukkitCommandMeta> cloudCommand;
 
     BukkitCommand(@Nonnull final com.intellectualsites.commands.Command<C, BukkitCommandMeta> cloudCommand,
-                  @Nonnull final CommandComponent<C, ?> command,
+                  @Nonnull final CommandArgument<C, ?> command,
                   @Nonnull final BukkitCommandManager<C> bukkitCommandManager) {
         super(command.getName());
         this.command = command;

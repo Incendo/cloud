@@ -21,32 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.parser;
-
-import com.google.common.reflect.TypeToken;
-
-import javax.annotation.Nonnull;
 
 /**
- * Common parser parameters used when resolving types in the {@link ParserRegistry}
+ * Parser classes used to parse {@link com.intellectualsites.commands.arguments.CommandArgument}
  */
-public final class StandardParameters {
-
-    private StandardParameters() {
-    }
-
-    /**
-     * Minimum value accepted by a numerical parser
-     */
-    public static final ParserParameter<Number> RANGE_MIN = create("min", TypeToken.of(Number.class));
-
-    /**
-     * Maximum value accepted by a numerical parser
-     */
-    public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.of(Number.class));
-
-    private static <T> ParserParameter<T> create(@Nonnull final String key, @Nonnull final TypeToken<T> expectedType) {
-        return new ParserParameter<>(key, expectedType);
-    }
-
-}
+package com.intellectualsites.commands.arguments.parser;

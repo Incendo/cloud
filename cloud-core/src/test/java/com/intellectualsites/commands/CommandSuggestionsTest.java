@@ -23,9 +23,9 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.StaticComponent;
-import com.intellectualsites.commands.components.standard.EnumComponent;
-import com.intellectualsites.commands.components.standard.StringComponent;
+import com.intellectualsites.commands.arguments.StaticArgument;
+import com.intellectualsites.commands.arguments.standard.EnumArgument;
+import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
 import org.junit.jupiter.api.Assertions;
@@ -43,14 +43,14 @@ public class CommandSuggestionsTest {
     @BeforeAll
     static void setupManager() {
         manager = new TestCommandManager();
-        manager.command(manager.commandBuilder("test").component(StaticComponent.required("one")).build());
-        manager.command(manager.commandBuilder("test").component(StaticComponent.required("two")).build());
+        manager.command(manager.commandBuilder("test").argument(StaticArgument.required("one")).build());
+        manager.command(manager.commandBuilder("test").argument(StaticArgument.required("two")).build());
         manager.command(manager.commandBuilder("test")
-                               .component(StaticComponent.required("var"))
-                               .component(StringComponent.newBuilder("str")
-                                                         .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two"))
-                                                         .build())
-                               .component(EnumComponent.required(TestEnum.class, "enum"))
+                               .argument(StaticArgument.required("var"))
+                               .argument(StringArgument.newBuilder("str")
+                                                        .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two"))
+                                                        .build())
+                               .argument(EnumArgument.required(TestEnum.class, "enum"))
                                .build());
     }
 

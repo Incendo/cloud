@@ -25,12 +25,12 @@ package com.intellectualsites.commands;
 
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.annotations.specifier.Range;
-import com.intellectualsites.commands.components.parser.ComponentParser;
-import com.intellectualsites.commands.components.parser.ParserParameters;
-import com.intellectualsites.commands.components.parser.ParserRegistry;
-import com.intellectualsites.commands.components.parser.StandardParameters;
-import com.intellectualsites.commands.components.parser.StandardParserRegistry;
-import com.intellectualsites.commands.components.standard.IntegerComponent;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
+import com.intellectualsites.commands.arguments.parser.ParserParameters;
+import com.intellectualsites.commands.arguments.parser.ParserRegistry;
+import com.intellectualsites.commands.arguments.parser.StandardParameters;
+import com.intellectualsites.commands.arguments.parser.StandardParserRegistry;
+import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.sender.CommandSender;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -72,13 +72,13 @@ public class ParserRegistryTest {
         final ParserParameters parserParameters = parserRegistry.parseAnnotations(parsedType, Collections.singleton(range));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MIN));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MAX));
-        final ComponentParser<CommandSender, ?> parser = parserRegistry.createParser(parsedType,
-                                                                                     parserParameters)
-                                                                       .orElseThrow(
+        final ArgumentParser<CommandSender, ?> parser = parserRegistry.createParser(parsedType,
+                                                                                    parserParameters)
+                                                                      .orElseThrow(
                                                                                () -> new NullPointerException("No parser found"));
-        Assertions.assertTrue(parser instanceof IntegerComponent.IntegerParser);
+        Assertions.assertTrue(parser instanceof IntegerArgument.IntegerParser);
         @SuppressWarnings("unchecked")
-        final IntegerComponent.IntegerParser<CommandSender> integerParser = (IntegerComponent.IntegerParser<CommandSender>) parser;
+        final IntegerArgument.IntegerParser<CommandSender> integerParser = (IntegerArgument.IntegerParser<CommandSender>) parser;
         Assertions.assertEquals(RANGE_MIN, integerParser.getMin());
         Assertions.assertEquals(RANGE_MAX, integerParser.getMax());
     }

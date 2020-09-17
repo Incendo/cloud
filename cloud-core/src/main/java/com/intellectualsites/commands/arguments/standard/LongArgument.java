@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -34,16 +34,16 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class LongComponent<C extends CommandSender> extends CommandComponent<C, Long> {
+public final class LongArgument<C extends CommandSender> extends CommandArgument<C, Long> {
 
     private final long min;
     private final long max;
 
-    private LongComponent(final boolean required,
-                             @Nonnull final String name,
-                             final long min,
-                             final long max,
-                             final String defaultValue) {
+    private LongArgument(final boolean required,
+                         @Nonnull final String name,
+                         final long min,
+                         final long max,
+                         final String defaultValue) {
         super(required, name, new LongParser<>(min, max), defaultValue, Long.class);
         this.min = min;
         this.max = max;
@@ -52,55 +52,55 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> LongComponent.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C extends CommandSender> LongArgument.Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Long> required(@Nonnull final String name) {
-        return LongComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, Long> required(@Nonnull final String name) {
+        return LongArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Long> optional(@Nonnull final String name) {
-        return LongComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, Long> optional(@Nonnull final String name) {
+        return LongArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new required command argument with a default value
      *
-     * @param name       Component name
+     * @param name       Argument name
      * @param defaultNum Default num
      * @param <C>        Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Long> optional(@Nonnull final String name,
-                                                                                  final long defaultNum) {
-        return LongComponent.<C>newBuilder(name).asOptionalWithDefault(Long.toString(defaultNum)).build();
+    public static <C extends CommandSender> CommandArgument<C, Long> optional(@Nonnull final String name,
+                                                                              final long defaultNum) {
+        return LongArgument.<C>newBuilder(name).asOptionalWithDefault(Long.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Long> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Long> {
 
         private long min = Long.MIN_VALUE;
         private long max = Long.MAX_VALUE;
@@ -134,14 +134,14 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
         }
 
         /**
-         * Builder a new long component
+         * Builder a new long argument
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
         @Override
-        public LongComponent<C> build() {
-            return new LongComponent<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+        public LongArgument<C> build() {
+            return new LongArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
         }
 
     }
@@ -166,7 +166,7 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
     }
 
 
-    private static final class LongParser<C extends CommandSender> implements ComponentParser<C, Long> {
+    private static final class LongParser<C extends CommandSender> implements ArgumentParser<C, Long> {
 
         private final long min;
         private final long max;
@@ -178,22 +178,22 @@ public final class LongComponent<C extends CommandSender> extends CommandCompone
 
         @Nonnull
         @Override
-        public ComponentParseResult<Long> parse(
+        public ArgumentParseResult<Long> parse(
                 @Nonnull final CommandContext<C> commandContext,
                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
             try {
                 final long value = Long.parseLong(input);
                 if (value < this.min || value > this.max) {
-                    return ComponentParseResult.failure(new LongParseException(input, this.min, this.max));
+                    return ArgumentParseResult.failure(new LongParseException(input, this.min, this.max));
                 }
                 inputQueue.remove();
-                return ComponentParseResult.success(value);
+                return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ComponentParseResult.failure(new LongParseException(input, this.min, this.max));
+                return ArgumentParseResult.failure(new LongParseException(input, this.min, this.max));
             }
         }
 

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.parser;
+package com.intellectualsites.commands.arguments.parser;
 
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -38,7 +38,7 @@ import java.util.Queue;
  * @param <T> Value type
  */
 @FunctionalInterface
-public interface ComponentParser<C extends CommandSender, T> {
+public interface ArgumentParser<C extends CommandSender, T> {
 
     /**
      * Parse command input into a command result
@@ -48,7 +48,7 @@ public interface ComponentParser<C extends CommandSender, T> {
      * @return Parsed command result
      */
     @Nonnull
-    ComponentParseResult<T> parse(@Nonnull CommandContext<C> commandContext, @Nonnull Queue<String> inputQueue);
+    ArgumentParseResult<T> parse(@Nonnull CommandContext<C> commandContext, @Nonnull Queue<String> inputQueue);
 
     /**
      * Get a list of suggested arguments that would be correctly parsed by this parser
@@ -63,7 +63,7 @@ public interface ComponentParser<C extends CommandSender, T> {
     }
 
     /**
-     * Check whether or not this component parser is context free. A context free
+     * Check whether or not this argument parser is context free. A context free
      * parser will not use the provided command context, and so supports impromptu parsing
      *
      * @return {@code true} if the parser is context free, else {@code false}

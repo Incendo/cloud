@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.parser;
+package com.intellectualsites.commands.arguments.parser;
 
 import com.google.common.collect.Maps;
 

@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.standard.EnumComponent;
+import com.intellectualsites.commands.arguments.standard.EnumArgument;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessor;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
@@ -43,7 +43,7 @@ public class CommandPreProcessorTest {
     static void newTree() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                                       .component(EnumComponent.required(SampleEnum.class, "enum"))
+                                       .argument(EnumArgument.required(SampleEnum.class, "enum"))
                                        .handler(
                                                commandContext -> System.out.printf("enum = %s | integer = %d\n",
                                                                                    commandContext.<SampleEnum>get(

@@ -23,8 +23,8 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.StaticComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.execution.CommandExecutionHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -39,7 +39,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * A command consists out of a chain of {@link com.intellectualsites.commands.components.CommandComponent command components}.
+ * A command consists out of a chain of {@link CommandArgument command arguments}.
  *
  * @param <C> Command sender type
  * @param <M> Command meta type
@@ -47,7 +47,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class Command<C extends CommandSender, M extends CommandMeta> {
 
-    @Nonnull private final List<CommandComponent<C, ?>> components;
+    @Nonnull private final List<CommandArgument<C, ?>> arguments;
     @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
     @Nullable private final Class<? extends C> senderType;
     @Nonnull private final String commandPermission;
@@ -56,32 +56,32 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
     /**
      * Construct a new command
      *
-     * @param commandComponents       Command components
+     * @param commandArguments       Command arguments
      * @param commandExecutionHandler Execution handler
      * @param senderType              Required sender type. May be {@code null}
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
+    public Command(@Nonnull final List<CommandArgument<C, ?>> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
                    @Nonnull final String commandPermission,
                    @Nonnull final M commandMeta) {
-        this.components = Objects.requireNonNull(commandComponents, "Command components may not be null");
-        if (this.components.size() == 0) {
-            throw new IllegalArgumentException("At least one command component is required");
+        this.arguments = Objects.requireNonNull(commandArguments, "Command arguments may not be null");
+        if (this.arguments.size() == 0) {
+            throw new IllegalArgumentException("At least one command argument is required");
         }
-        // Enforce ordering of command components
+        // Enforce ordering of command arguments
         boolean foundOptional = false;
-        for (final CommandComponent<C, ?> component : this.components) {
-            if (component.getName().isEmpty()) {
-                throw new IllegalArgumentException("Component names may not be empty");
+        for (final CommandArgument<C, ?> argument : this.arguments) {
+            if (argument.getName().isEmpty()) {
+                throw new IllegalArgumentException("Argument names may not be empty");
             }
-            if (foundOptional && component.isRequired()) {
+            if (foundOptional && argument.isRequired()) {
                 throw new IllegalArgumentException(
-                        String.format("Command component '%s' cannot be placed after an optional component",
-                                      component.getName()));
-            } else if (!component.isRequired()) {
+                        String.format("Command argument '%s' cannot be placed after an optional argument",
+                                      argument.getName()));
+            } else if (!argument.isRequired()) {
                 foundOptional = true;
             }
         }
@@ -94,37 +94,37 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
     /**
      * Construct a new command
      *
-     * @param commandComponents       Command components
+     * @param commandArguments       Command arguments
      * @param commandExecutionHandler Execution handler
      * @param senderType              Required sender type. May be {@code null}
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
+    public Command(@Nonnull final List<CommandArgument<C, ?>> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
                    @Nonnull final M commandMeta) {
-        this(commandComponents, commandExecutionHandler, senderType, "", commandMeta);
+        this(commandArguments, commandExecutionHandler, senderType, "", commandMeta);
     }
 
     /**
      * Construct a new command
      *
-     * @param commandComponents       Command components
+     * @param commandArguments       Command arguments
      * @param commandExecutionHandler Execution handler
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final List<CommandComponent<C, ?>> commandComponents,
+    public Command(@Nonnull final List<CommandArgument<C, ?>> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nonnull final String commandPermission,
                    @Nonnull final M commandMeta) {
-        this(commandComponents, commandExecutionHandler, null, "", commandMeta);
+        this(commandArguments, commandExecutionHandler, null, "", commandMeta);
     }
 
     /**
      * Create a new command builder
      *
-     * @param commandName Base command component
+     * @param commandName Base command argument
      * @param commandMeta Command meta instance
      * @param aliases     Command aliases
      * @param <C>         Command sender type
@@ -136,18 +136,18 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
                                                                                             @Nonnull final M commandMeta,
                                                                                             @Nonnull final String... aliases) {
         return new Builder<>(null, commandMeta, null,
-                             Collections.singletonList(StaticComponent.required(commandName, aliases)),
+                             Collections.singletonList(StaticArgument.required(commandName, aliases)),
                              new CommandExecutionHandler.NullCommandExecutionHandler<>(), "");
     }
 
     /**
-     * Return a copy of the command component array
+     * Return a copy of the command argument array
      *
-     * @return Copy of the command component array
+     * @return Copy of the command argument array
      */
     @Nonnull
-    public List<CommandComponent<C, ?>> getComponents() {
-        return Collections.unmodifiableList(this.components);
+    public List<CommandArgument<C, ?>> getArguments() {
+        return Collections.unmodifiableList(this.arguments);
     }
 
     /**
@@ -191,22 +191,22 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
     }
 
     /**
-     * Get the longest chain of similar components for
+     * Get the longest chain of similar arguments for
      * two commands
      *
      * @param other Command to compare to
-     * @return List containing the longest shared component chain
+     * @return List containing the longest shared argument chain
      */
-    public List<CommandComponent<C, ?>> getSharedComponentChain(@Nonnull final Command<C, M> other) {
-        final List<CommandComponent<C, ?>> commandComponents = new LinkedList<>();
-        for (int i = 0; i < this.components.size() && i < other.components.size(); i++) {
-            if (this.components.get(i).equals(other.components.get(i))) {
-                commandComponents.add(this.components.get(i));
+    public List<CommandArgument<C, ?>> getSharedArgumentChain(@Nonnull final Command<C, M> other) {
+        final List<CommandArgument<C, ?>> commandArguments = new LinkedList<>();
+        for (int i = 0; i < this.arguments.size() && i < other.arguments.size(); i++) {
+            if (this.arguments.get(i).equals(other.arguments.get(i))) {
+                commandArguments.add(this.arguments.get(i));
             } else {
                 break;
             }
         }
-        return commandComponents;
+        return commandArguments;
     }
 
 
@@ -220,7 +220,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
     public static final class Builder<C extends CommandSender, M extends CommandMeta> {
 
         @Nonnull private final M commandMeta;
-        @Nonnull private final List<CommandComponent<C, ?>> commandComponents;
+        @Nonnull private final List<CommandArgument<C, ?>> commandArguments;
         @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
         @Nullable private final Class<? extends C> senderType;
         @Nonnull private final String commandPermission;
@@ -229,12 +229,12 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
         private Builder(@Nullable final CommandManager<C, M> commandManager,
                         @Nonnull final M commandMeta,
                         @Nullable final Class<? extends C> senderType,
-                        @Nonnull final List<CommandComponent<C, ?>> commandComponents,
+                        @Nonnull final List<CommandArgument<C, ?>> commandArguments,
                         @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                         @Nonnull final String commandPermission) {
             this.commandManager = commandManager;
             this.senderType = senderType;
-            this.commandComponents = Objects.requireNonNull(commandComponents, "Components may not be null");
+            this.commandArguments = Objects.requireNonNull(commandArguments, "Arguments may not be null");
             this.commandExecutionHandler = Objects.requireNonNull(commandExecutionHandler, "Execution handler may not be null");
             this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
             this.commandMeta = Objects.requireNonNull(commandMeta, "Meta may not be null");
@@ -242,7 +242,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
 
         /**
          * Supply a command manager instance to the builder. This will be used when attempting to
-         * retrieve command component parsers, in the case that they're needed. This
+         * retrieve command argument parsers, in the case that they're needed. This
          * is optional
          *
          * @param commandManager Command manager
@@ -250,44 +250,44 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> manager(@Nullable final CommandManager<C, M> commandManager) {
-            return new Builder<>(commandManager, this.commandMeta, this.senderType, this.commandComponents,
+            return new Builder<>(commandManager, this.commandMeta, this.senderType, this.commandArguments,
                                  this.commandExecutionHandler, this.commandPermission);
         }
 
         /**
-         * Add a new command component to the command
+         * Add a new command argument to the command
          *
-         * @param component Component to add
-         * @param <T>       Component type
-         * @return New builder instance with the command component inserted into the component list
+         * @param argument Argument to add
+         * @param <T>       Argument type
+         * @return New builder instance with the command argument inserted into the argument list
          */
         @Nonnull
-        public <T> Builder<C, M> component(@Nonnull final CommandComponent<C, T> component) {
-            final List<CommandComponent<C, ?>> commandComponents = new LinkedList<>(this.commandComponents);
-            commandComponents.add(component);
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandComponents,
+        public <T> Builder<C, M> argument(@Nonnull final CommandArgument<C, T> argument) {
+            final List<CommandArgument<C, ?>> commandArguments = new LinkedList<>(this.commandArguments);
+            commandArguments.add(argument);
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandArguments,
                                  this.commandExecutionHandler, this.commandPermission);
         }
 
         /**
-         * Add a new command component by interacting with a constructed command component builder
+         * Add a new command argument by interacting with a constructed command argument builder
          *
-         * @param clazz           Component class
-         * @param name            Component name
+         * @param clazz           Argument class
+         * @param name            Argument name
          * @param builderConsumer Builder consumer
-         * @param <T>             Component type
-         * @return New builder instance with the command component inserted into the component list
+         * @param <T>             Argument type
+         * @return New builder instance with the command argument inserted into the argument list
          */
         @Nonnull
-        public <T> Builder<C, M> component(@Nonnull final Class<T> clazz,
+        public <T> Builder<C, M> argument(@Nonnull final Class<T> clazz,
                                            @Nonnull final String name,
-                                           @Nonnull final Consumer<CommandComponent.Builder<C, T>> builderConsumer) {
-            final CommandComponent.Builder<C, T> builder = CommandComponent.ofType(clazz, name);
+                                           @Nonnull final Consumer<CommandArgument.Builder<C, T>> builderConsumer) {
+            final CommandArgument.Builder<C, T> builder = CommandArgument.ofType(clazz, name);
             if (this.commandManager != null) {
                 builder.manager(this.commandManager);
             }
             builderConsumer.accept(builder);
-            return this.component(builder.build());
+            return this.argument(builder.build());
         }
 
         /**
@@ -298,7 +298,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> handler(@Nonnull final CommandExecutionHandler<C> commandExecutionHandler) {
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandComponents,
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandArguments,
                                  commandExecutionHandler, this.commandPermission);
         }
 
@@ -310,7 +310,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> withSenderType(@Nonnull final Class<? extends C> senderType) {
-            return new Builder<>(this.commandManager, this.commandMeta, senderType, this.commandComponents,
+            return new Builder<>(this.commandManager, this.commandMeta, senderType, this.commandArguments,
                                  this.commandExecutionHandler, this.commandPermission);
         }
 
@@ -322,7 +322,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Builder<C, M> withPermission(@Nonnull final String permission) {
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandComponents,
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandArguments,
                                  this.commandExecutionHandler, permission);
         }
 
@@ -333,7 +333,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
          */
         @Nonnull
         public Command<C, M> build() {
-            return new Command<>(Collections.unmodifiableList(this.commandComponents),
+            return new Command<>(Collections.unmodifiableList(this.commandArguments),
                                  this.commandExecutionHandler, this.senderType, this.commandPermission, this.commandMeta);
         }
 

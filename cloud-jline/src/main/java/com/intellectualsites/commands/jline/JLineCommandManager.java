@@ -25,8 +25,8 @@ package com.intellectualsites.commands.jline;
 
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.CommandTree;
-import com.intellectualsites.commands.components.StaticComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
+import com.intellectualsites.commands.arguments.StaticArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
@@ -81,7 +81,7 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
                                                         shouldStop[0] = true)
                                    .build())
                            .command(jLineCommandManager.commandBuilder("echo", SimpleCommandMeta.empty())
-                                                               .component(String.class, "string", builder ->
+                                                               .argument(String.class, "string", builder ->
                                                                        builder.asRequired()
                                                                               .withParser(((commandContext, inputQueue) -> {
                                                                                   final StringBuilder stringBuilder =
@@ -92,7 +92,7 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
                                                                                           stringBuilder.append(" ");
                                                                                       }
                                                                                   }
-                                                                                  return ComponentParseResult.success(
+                                                                                  return ArgumentParseResult.success(
                                                                                           stringBuilder.toString());
                                                                               })).build())
                                                                .handler(commandContext -> commandContext.get("string")
@@ -100,11 +100,11 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
                                                                                                              System.out::println))
                                                                .build())
                            .command(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                               .component(StaticComponent.required("one"))
+                                                               .argument(StaticArgument.required("one"))
                                                                .handler(commandContext -> System.out.println("Test (1)"))
                                                                .build())
                            .command(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                               .component(StaticComponent.required("two"))
+                                                               .argument(StaticArgument.required("two"))
                                                                .handler(commandContext -> System.out.println("Test (2)"))
                                                                .build());
         System.out.println("Ready...");

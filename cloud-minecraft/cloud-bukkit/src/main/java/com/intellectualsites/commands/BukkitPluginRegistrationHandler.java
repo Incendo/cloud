@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.sender.CommandSender;
 import org.bukkit.Bukkit;
@@ -39,7 +39,7 @@ import java.util.Map;
 
 final class BukkitPluginRegistrationHandler<C extends CommandSender> implements CommandRegistrationHandler<BukkitCommandMeta> {
 
-    private final Map<CommandComponent<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
+    private final Map<CommandArgument<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
 
     private Map<String, org.bukkit.command.Command> bukkitCommands;
     private BukkitCommandManager<C> bukkitCommandManager;
@@ -63,23 +63,23 @@ final class BukkitPluginRegistrationHandler<C extends CommandSender> implements 
 
     @Override
     public boolean registerCommand(@Nonnull final Command<?, BukkitCommandMeta> command) {
-        /* We only care about the root command component */
-        final CommandComponent<?, ?> commandComponent = command.getComponents().get(0);
-        if (this.registeredCommands.containsKey(commandComponent)) {
+        /* We only care about the root command argument */
+        final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
+        if (this.registeredCommands.containsKey(commandArgument)) {
             return false;
         }
         final String label;
-        if (bukkitCommands.containsKey(commandComponent.getName())) {
-            label = String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(), commandComponent.getName());
+        if (bukkitCommands.containsKey(commandArgument.getName())) {
+            label = String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(), commandArgument.getName());
         } else {
-            label = commandComponent.getName();
+            label = commandArgument.getName();
         }
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
                 (Command<C, BukkitCommandMeta>) command,
-                (CommandComponent<C, ?>) commandComponent,
+                (CommandArgument<C, ?>) commandArgument,
                 this.bukkitCommandManager);
-        this.registeredCommands.put(commandComponent, bukkitCommand);
-        this.commandMap.register(commandComponent.getName(), this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
+        this.registeredCommands.put(commandArgument, bukkitCommand);
+        this.commandMap.register(commandArgument.getName(), this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
                                  bukkitCommand);
         return true;
     }

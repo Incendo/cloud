@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
@@ -37,15 +37,15 @@ import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
-public final class StringComponent<C extends CommandSender> extends CommandComponent<C, String> {
+public final class StringArgument<C extends CommandSender> extends CommandArgument<C, String> {
 
     private final StringMode stringMode;
 
-    private StringComponent(final boolean required,
-                            @Nonnull final String name,
-                            @Nonnull final StringMode stringMode,
-                            @Nonnull final String defaultValue,
-                            @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+    private StringArgument(final boolean required,
+                           @Nonnull final String name,
+                           @Nonnull final StringMode stringMode,
+                           @Nonnull final String defaultValue,
+                           @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
         super(required, name, new StringParser<>(stringMode, suggestionsProvider), defaultValue, String.class);
         this.stringMode = stringMode;
     }
@@ -53,51 +53,51 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> StringComponent.Builder<C> newBuilder(@Nonnull final String name) {
-        return new StringComponent.Builder<>(name);
+    public static <C extends CommandSender> StringArgument.Builder<C> newBuilder(@Nonnull final String name) {
+        return new StringArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, String> required(@Nonnull final String name) {
-        return StringComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, String> required(@Nonnull final String name) {
+        return StringArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, String> optional(@Nonnull final String name) {
-        return StringComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, String> optional(@Nonnull final String name) {
+        return StringArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new required command argument with a default value
      *
-     * @param name       Component name
+     * @param name       Argument name
      * @param defaultNum Default num
      * @param <C>        Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, String> optional(@Nonnull final String name,
-                                                                                 final String defaultNum) {
-        return StringComponent.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+    public static <C extends CommandSender> CommandArgument<C, String> optional(@Nonnull final String name,
+                                                                                final String defaultNum) {
+        return StringArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**
@@ -118,7 +118,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, String> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, String> {
 
         private StringMode stringMode = StringMode.SINGLE;
         private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
@@ -174,21 +174,21 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
         }
 
         /**
-         * Builder a new string component
+         * Builder a new string argument
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
         @Override
-        public StringComponent<C> build() {
-            return new StringComponent<>(this.isRequired(), this.getName(), this.stringMode,
-                                         this.getDefaultValue(), this.suggestionsProvider);
+        public StringArgument<C> build() {
+            return new StringArgument<>(this.isRequired(), this.getName(), this.stringMode,
+                                        this.getDefaultValue(), this.suggestionsProvider);
         }
 
     }
 
 
-    public static final class StringParser<C extends CommandSender> implements ComponentParser<C, String> {
+    public static final class StringParser<C extends CommandSender> implements ArgumentParser<C, String> {
 
         private final StringMode stringMode;
         private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
@@ -207,16 +207,16 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
 
         @Nonnull
         @Override
-        public ComponentParseResult<String> parse(@Nonnull final CommandContext<C> commandContext,
-                                                  @Nonnull final Queue<String> inputQueue) {
+        public ArgumentParseResult<String> parse(@Nonnull final CommandContext<C> commandContext,
+                                                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
             if (this.stringMode == StringMode.SINGLE) {
                 inputQueue.remove();
-                return ComponentParseResult.success(input);
+                return ArgumentParseResult.success(input);
             }
 
             final StringJoiner sj = new StringJoiner(" ");
@@ -239,7 +239,7 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
                             sj.add(string.substring(1));
                             started = true;
                         } else {
-                            return ComponentParseResult.failure(new StringParseException(string, StringMode.QUOTED));
+                            return ArgumentParseResult.failure(new StringParseException(string, StringMode.QUOTED));
                         }
                     } else if (string.endsWith("\"")) {
                         sj.add(string.substring(0, string.length() - 1));
@@ -253,10 +253,10 @@ public final class StringComponent<C extends CommandSender> extends CommandCompo
             }
 
             if (this.stringMode == StringMode.QUOTED && (!started || !finished)) {
-                return ComponentParseResult.failure(new StringParseException(sj.toString(), StringMode.GREEDY));
+                return ArgumentParseResult.failure(new StringParseException(sj.toString(), StringMode.GREEDY));
             }
 
-            return ComponentParseResult.success(sj.toString());
+            return ArgumentParseResult.success(sj.toString());
         }
 
         @Nonnull

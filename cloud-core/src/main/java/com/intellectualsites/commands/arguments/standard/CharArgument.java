@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
@@ -33,100 +33,100 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class CharComponent<C extends CommandSender> extends CommandComponent<C, Character> {
+public final class CharArgument<C extends CommandSender> extends CommandArgument<C, Character> {
 
-    private CharComponent(final boolean required, @Nonnull final String name,
-                          @Nonnull final String defaultValue) {
+    private CharArgument(final boolean required, @Nonnull final String name,
+                         @Nonnull final String defaultValue) {
         super(required, name, new CharacterParser<>(), defaultValue, Character.class);
     }
 
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> CharComponent.Builder<C> newBuilder(@Nonnull final String name) {
-        return new CharComponent.Builder<>(name);
+    public static <C extends CommandSender> CharArgument.Builder<C> newBuilder(@Nonnull final String name) {
+        return new CharArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Character> required(@Nonnull final String name) {
-        return CharComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, Character> required(@Nonnull final String name) {
+        return CharArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Character> optional(@Nonnull final String name) {
-        return CharComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, Character> optional(@Nonnull final String name) {
+        return CharArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new required command argument with a default value
      *
-     * @param name       Component name
+     * @param name       Argument name
      * @param defaultNum Default num
      * @param <C>        Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Character> optional(@Nonnull final String name,
-                                                                                 final String defaultNum) {
-        return CharComponent.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+    public static <C extends CommandSender> CommandArgument<C, Character> optional(@Nonnull final String name,
+                                                                                   final String defaultNum) {
+        return CharArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Character> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Character> {
 
         protected Builder(@Nonnull final String name) {
             super(Character.class, name);
         }
 
         /**
-         * Builder a new char component
+         * Builder a new char argument
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
         @Override
-        public CharComponent<C> build() {
-            return new CharComponent<>(this.isRequired(), this.getName(), this.getDefaultValue());
+        public CharArgument<C> build() {
+            return new CharArgument<>(this.isRequired(), this.getName(), this.getDefaultValue());
         }
 
     }
 
 
-    public static final class CharacterParser<C extends CommandSender> implements ComponentParser<C, Character> {
+    public static final class CharacterParser<C extends CommandSender> implements ArgumentParser<C, Character> {
 
         @Nonnull
         @Override
-        public ComponentParseResult<Character> parse(@Nonnull final CommandContext<C> commandContext,
-                                                  @Nonnull final Queue<String> inputQueue) {
+        public ArgumentParseResult<Character> parse(@Nonnull final CommandContext<C> commandContext,
+                                                    @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
             if (input.length() != 1) {
-                return ComponentParseResult.failure(new CharParseException(input));
+                return ArgumentParseResult.failure(new CharParseException(input));
             }
 
-            return ComponentParseResult.success(input.charAt(0));
+            return ArgumentParseResult.success(input.charAt(0));
         }
 
         @Override

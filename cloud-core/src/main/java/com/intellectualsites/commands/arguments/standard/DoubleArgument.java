@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -34,16 +34,16 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class DoubleComponent<C extends CommandSender> extends CommandComponent<C, Double> {
+public final class DoubleArgument<C extends CommandSender> extends CommandArgument<C, Double> {
 
     private final double min;
     private final double max;
 
-    private DoubleComponent(final boolean required,
-                            @Nonnull final String name,
-                            final double min,
-                            final double max,
-                            final String defaultValue) {
+    private DoubleArgument(final boolean required,
+                           @Nonnull final String name,
+                           final double min,
+                           final double max,
+                           final String defaultValue) {
         super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class);
         this.min = min;
         this.max = max;
@@ -52,7 +52,7 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
@@ -62,45 +62,45 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Double> required(@Nonnull final String name) {
-        return DoubleComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, Double> required(@Nonnull final String name) {
+        return DoubleArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Double> optional(@Nonnull final String name) {
-        return DoubleComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, Double> optional(@Nonnull final String name) {
+        return DoubleArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new required command argument with a default value
      *
-     * @param name       Component name
+     * @param name       Argument name
      * @param defaultNum Default num
      * @param <C>        Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Double> optional(@Nonnull final String name,
-                                                                                 final double defaultNum) {
-        return DoubleComponent.<C>newBuilder(name).asOptionalWithDefault(Double.toString(defaultNum)).build();
+    public static <C extends CommandSender> CommandArgument<C, Double> optional(@Nonnull final String name,
+                                                                                final double defaultNum) {
+        return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(Double.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Double> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Double> {
 
         private double min = Double.MIN_VALUE;
         private double max = Double.MAX_VALUE;
@@ -134,14 +134,14 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
         }
 
         /**
-         * Builder a new double component
+         * Builder a new double argument
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
         @Override
-        public DoubleComponent<C> build() {
-            return new DoubleComponent<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+        public DoubleArgument<C> build() {
+            return new DoubleArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
         }
 
     }
@@ -166,7 +166,7 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
     }
 
 
-    public static final class DoubleParser<C extends CommandSender> implements ComponentParser<C, Double> {
+    public static final class DoubleParser<C extends CommandSender> implements ArgumentParser<C, Double> {
 
         private final double min;
         private final double max;
@@ -184,22 +184,22 @@ public final class DoubleComponent<C extends CommandSender> extends CommandCompo
 
         @Nonnull
         @Override
-        public ComponentParseResult<Double> parse(
+        public ArgumentParseResult<Double> parse(
                 @Nonnull final CommandContext<C> commandContext,
                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
             try {
                 final double value = Double.parseDouble(input);
                 if (value < this.min || value > this.max) {
-                    return ComponentParseResult.failure(new DoubleParseException(input, this.min, this.max));
+                    return ArgumentParseResult.failure(new DoubleParseException(input, this.min, this.max));
                 }
                 inputQueue.remove();
-                return ComponentParseResult.success(value);
+                return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ComponentParseResult.failure(new DoubleParseException(input, this.min, this.max));
+                return ArgumentParseResult.failure(new DoubleParseException(input, this.min, this.max));
             }
         }
 

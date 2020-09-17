@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.StaticComponent;
+import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,15 +31,15 @@ import org.junit.jupiter.api.Test;
 class CommandTest {
 
     @Test()
-    void noComponents() {
-        Assertions.assertEquals(1, Command.newBuilder("test", SimpleCommandMeta.empty()).build().getComponents().size());
+    void noArguments() {
+        Assertions.assertEquals(1, Command.newBuilder("test", SimpleCommandMeta.empty()).build().getArguments().size());
     }
 
     @Test
     void ensureOrdering() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                Command.newBuilder("test", SimpleCommandMeta.empty()).component(StaticComponent.optional("something"))
-                       .component(StaticComponent.required("somethingelse")).build());
+                Command.newBuilder("test", SimpleCommandMeta.empty()).argument(StaticArgument.optional("something"))
+                       .argument(StaticArgument.required("somethingelse")).build());
     }
 
 }

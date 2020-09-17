@@ -23,37 +23,37 @@
 //
 package com.intellectualsites.commands.exceptions;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 
 import javax.annotation.Nonnull;
 
 /**
- * Thrown when a {@link com.intellectualsites.commands.components.CommandComponent}
+ * Thrown when a {@link CommandArgument}
  * that is registered as a leaf node, does not contain an owning {@link com.intellectualsites.commands.Command}
  */
 @SuppressWarnings("unused")
 public final class NoCommandInLeafException extends IllegalStateException {
 
-    private final CommandComponent<?, ?> commandComponent;
+    private final CommandArgument<?, ?> commandArgument;
 
     /**
      * Create a new no command in leaf exception instance
      *
-     * @param commandComponent Command component that caused the exception
+     * @param commandArgument Command argument that caused the exception
      */
-    public NoCommandInLeafException(@Nonnull final CommandComponent<?, ?> commandComponent) {
-        super(String.format("Leaf node '%s' does not have associated owning command", commandComponent.getName()));
-        this.commandComponent = commandComponent;
+    public NoCommandInLeafException(@Nonnull final CommandArgument<?, ?> commandArgument) {
+        super(String.format("Leaf node '%s' does not have associated owning command", commandArgument.getName()));
+        this.commandArgument = commandArgument;
     }
 
     /**
-     * Get the command component
+     * Get the command argument
      *
-     * @return Command component
+     * @return Command argument
      */
     @Nonnull
-    public CommandComponent<?, ?> getCommandComponent() {
-        return this.commandComponent;
+    public CommandArgument<?, ?> getCommandArgument() {
+        return this.commandArgument;
     }
 
 }

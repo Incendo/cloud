@@ -21,19 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.parser;
+package com.intellectualsites.commands.arguments.parser;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
 /**
- * Result of the parsing done by a {@link ComponentParser}
+ * Result of the parsing done by a {@link ArgumentParser}
  *
  * @param <T> Parser return type
  */
-public abstract class ComponentParseResult<T> {
+public abstract class ArgumentParseResult<T> {
 
-    private ComponentParseResult() {
+    private ArgumentParseResult() {
     }
 
     /**
@@ -44,7 +44,7 @@ public abstract class ComponentParseResult<T> {
      * @return Failed parse result
      */
     @Nonnull
-    public static <T> ComponentParseResult<T> failure(@Nonnull final Throwable failure) {
+    public static <T> ArgumentParseResult<T> failure(@Nonnull final Throwable failure) {
         return new ParseFailure<>(failure);
     }
 
@@ -56,7 +56,7 @@ public abstract class ComponentParseResult<T> {
      * @return Succeeded parse result
      */
     @Nonnull
-    public static <T> ComponentParseResult<T> success(@Nonnull final T value) {
+    public static <T> ArgumentParseResult<T> success(@Nonnull final T value) {
         return new ParseSuccess<>(value);
     }
 
@@ -77,7 +77,7 @@ public abstract class ComponentParseResult<T> {
     public abstract Optional<Throwable> getFailure();
 
 
-    private static final class ParseSuccess<T> extends ComponentParseResult<T> {
+    private static final class ParseSuccess<T> extends ArgumentParseResult<T> {
 
         /**
          * Parsed value
@@ -103,7 +103,7 @@ public abstract class ComponentParseResult<T> {
     }
 
 
-    private static final class ParseFailure<T> extends ComponentParseResult<T> {
+    private static final class ParseFailure<T> extends ArgumentParseResult<T> {
 
         /**
          * Parse failure

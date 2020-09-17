@@ -21,24 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components;
-
-import com.intellectualsites.commands.sender.CommandSender;
-
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.function.Function;
 
 /**
- * Utility that formats chains of {@link CommandComponent command components} into syntax strings
- *
- * @param <C> Command sender type
+ * Standard command argument types
  */
-@FunctionalInterface
-public interface CommandSyntaxFormatter<C extends CommandSender> extends Function<List<CommandComponent<C, ?>>, String> {
-
-    @Override
-    @Nonnull
-    String apply(@Nonnull List<CommandComponent<C, ?>> commandComponents);
-
-}
+package com.intellectualsites.commands.arguments.standard;

@@ -27,15 +27,15 @@ import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.CommandTree;
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.StaticComponent;
-import com.intellectualsites.commands.components.standard.BooleanComponent;
-import com.intellectualsites.commands.components.standard.ByteComponent;
-import com.intellectualsites.commands.components.standard.DoubleComponent;
-import com.intellectualsites.commands.components.standard.FloatComponent;
-import com.intellectualsites.commands.components.standard.IntegerComponent;
-import com.intellectualsites.commands.components.standard.ShortComponent;
-import com.intellectualsites.commands.components.standard.StringComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.StaticArgument;
+import com.intellectualsites.commands.arguments.standard.BooleanArgument;
+import com.intellectualsites.commands.arguments.standard.ByteArgument;
+import com.intellectualsites.commands.arguments.standard.DoubleArgument;
+import com.intellectualsites.commands.arguments.standard.FloatArgument;
+import com.intellectualsites.commands.arguments.standard.IntegerArgument;
+import com.intellectualsites.commands.arguments.standard.ShortArgument;
+import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.sender.CommandSender;
 import com.mojang.brigadier.LiteralMessage;
@@ -77,7 +77,7 @@ import java.util.function.Supplier;
  */
 public final class CloudBrigadierManager<C extends CommandSender, S> {
 
-    private final Map<Class<?>, Function<? extends CommandComponent<C, ?>,
+    private final Map<Class<?>, Function<? extends CommandArgument<C, ?>,
             ? extends ArgumentType<?>>> mappers;
     private final Map<Class<?>, Supplier<ArgumentType<?>>> defaultArgumentTypeSuppliers;
     private final Supplier<com.intellectualsites.commands.context.CommandContext<C>> dummyContextProvider;
@@ -101,75 +101,75 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
 
     private void registerInternalMappings() {
         /* Map byte, short and int to IntegerArgumentType */
-        this.registerMapping(new TypeToken<ByteComponent<C>>() {
-        }, component -> {
-            final boolean hasMin = component.getMin() != Byte.MIN_VALUE;
-            final boolean hasMax = component.getMax() != Byte.MAX_VALUE;
+        this.registerMapping(new TypeToken<ByteArgument<C>>() {
+        }, argument -> {
+            final boolean hasMin = argument.getMin() != Byte.MIN_VALUE;
+            final boolean hasMax = argument.getMax() != Byte.MAX_VALUE;
             if (hasMin) {
-                return IntegerArgumentType.integer(component.getMin(), component.getMax());
+                return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
             } else if (hasMax) {
-                return IntegerArgumentType.integer(Byte.MIN_VALUE, component.getMax());
+                return IntegerArgumentType.integer(Byte.MIN_VALUE, argument.getMax());
             } else {
                 return IntegerArgumentType.integer();
             }
         });
-        this.registerMapping(new TypeToken<ShortComponent<C>>() {
-        }, component -> {
-            final boolean hasMin = component.getMin() != Short.MIN_VALUE;
-            final boolean hasMax = component.getMax() != Short.MAX_VALUE;
+        this.registerMapping(new TypeToken<ShortArgument<C>>() {
+        }, argument -> {
+            final boolean hasMin = argument.getMin() != Short.MIN_VALUE;
+            final boolean hasMax = argument.getMax() != Short.MAX_VALUE;
             if (hasMin) {
-                return IntegerArgumentType.integer(component.getMin(), component.getMax());
+                return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
             } else if (hasMax) {
-                return IntegerArgumentType.integer(Short.MIN_VALUE, component.getMax());
+                return IntegerArgumentType.integer(Short.MIN_VALUE, argument.getMax());
             } else {
                 return IntegerArgumentType.integer();
             }
         });
-        this.registerMapping(new TypeToken<IntegerComponent<C>>() {
-        }, component -> {
-            final boolean hasMin = component.getMin() != Integer.MIN_VALUE;
-            final boolean hasMax = component.getMax() != Integer.MAX_VALUE;
+        this.registerMapping(new TypeToken<IntegerArgument<C>>() {
+        }, argument -> {
+            final boolean hasMin = argument.getMin() != Integer.MIN_VALUE;
+            final boolean hasMax = argument.getMax() != Integer.MAX_VALUE;
             if (hasMin) {
-                return IntegerArgumentType.integer(component.getMin(), component.getMax());
+                return IntegerArgumentType.integer(argument.getMin(), argument.getMax());
             } else if (hasMax) {
-                return IntegerArgumentType.integer(Integer.MIN_VALUE, component.getMax());
+                return IntegerArgumentType.integer(Integer.MIN_VALUE, argument.getMax());
             } else {
                 return IntegerArgumentType.integer();
             }
         });
         /* Map float to FloatArgumentType */
-        this.registerMapping(new TypeToken<FloatComponent<C>>() {
-        }, component -> {
-            final boolean hasMin = component.getMin() != Float.MIN_VALUE;
-            final boolean hasMax = component.getMax() != Float.MAX_VALUE;
+        this.registerMapping(new TypeToken<FloatArgument<C>>() {
+        }, argument -> {
+            final boolean hasMin = argument.getMin() != Float.MIN_VALUE;
+            final boolean hasMax = argument.getMax() != Float.MAX_VALUE;
             if (hasMin) {
-                return FloatArgumentType.floatArg(component.getMin(), component.getMax());
+                return FloatArgumentType.floatArg(argument.getMin(), argument.getMax());
             } else if (hasMax) {
-                return FloatArgumentType.floatArg(Float.MIN_VALUE, component.getMax());
+                return FloatArgumentType.floatArg(Float.MIN_VALUE, argument.getMax());
             } else {
                 return FloatArgumentType.floatArg();
             }
         });
         /* Map double to DoubleArgumentType */
-        this.registerMapping(new TypeToken<DoubleComponent<C>>() {
-        }, component -> {
-            final boolean hasMin = component.getMin() != Double.MIN_VALUE;
-            final boolean hasMax = component.getMax() != Double.MAX_VALUE;
+        this.registerMapping(new TypeToken<DoubleArgument<C>>() {
+        }, argument -> {
+            final boolean hasMin = argument.getMin() != Double.MIN_VALUE;
+            final boolean hasMax = argument.getMax() != Double.MAX_VALUE;
             if (hasMin) {
-                return DoubleArgumentType.doubleArg(component.getMin(), component.getMax());
+                return DoubleArgumentType.doubleArg(argument.getMin(), argument.getMax());
             } else if (hasMax) {
-                return DoubleArgumentType.doubleArg(Double.MIN_VALUE, component.getMax());
+                return DoubleArgumentType.doubleArg(Double.MIN_VALUE, argument.getMax());
             } else {
                 return DoubleArgumentType.doubleArg();
             }
         });
         /* Map boolean to BoolArgumentType */
-        this.registerMapping(new TypeToken<BooleanComponent<C>>() {
-        }, component -> BoolArgumentType.bool());
+        this.registerMapping(new TypeToken<BooleanArgument<C>>() {
+        }, argument -> BoolArgumentType.bool());
         /* Map String properly to StringArgumentType */
-        this.registerMapping(new TypeToken<StringComponent<C>>() {
-        }, component -> {
-            switch (component.getStringMode()) {
+        this.registerMapping(new TypeToken<StringArgument<C>>() {
+        }, argument -> {
+            switch (argument.getStringMode()) {
                 case QUOTED:
                     return StringArgumentType.string();
                 case GREEDY:
@@ -183,16 +183,16 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
     /**
      * Register a cloud-Brigadier mapping
      *
-     * @param componentType cloud component type
+     * @param argumentType cloud argument type
      * @param mapper        mapper function
-     * @param <T>           cloud component value type
-     * @param <K>           cloud component type
+     * @param <T>           cloud argument value type
+     * @param <K>           cloud argument type
      * @param <O>           Brigadier argument type value
      */
-    public <T, K extends CommandComponent<C, T>, O> void registerMapping(@Nonnull final TypeToken<K> componentType,
-                                                                         @Nonnull final Function<? extends K,
+    public <T, K extends CommandArgument<C, T>, O> void registerMapping(@Nonnull final TypeToken<K> argumentType,
+                                                                        @Nonnull final Function<? extends K,
                                                                                  ? extends ArgumentType<O>> mapper) {
-        this.mappers.put(componentType.getRawType(), mapper);
+        this.mappers.put(argumentType.getRawType(), mapper);
     }
 
     /**
@@ -207,36 +207,36 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
     }
 
     /**
-     * Get a Brigadier {@link ArgumentType} from a cloud {@link CommandComponent}
+     * Get a Brigadier {@link ArgumentType} from a cloud {@link CommandArgument}
      *
-     * @param componentType cloud component type
-     * @param component     cloud component
-     * @param <T>           cloud component value type (generic)
-     * @param <K>           cloud component type (generic)
+     * @param argumentType cloud argument type
+     * @param argument     cloud argument
+     * @param <T>           cloud argument value type (generic)
+     * @param <K>           cloud argument type (generic)
      * @return Brigadier argument type
      */
     @Nullable
     @SuppressWarnings("all")
-    private <T, K extends CommandComponent<?, ?>> Pair<ArgumentType<?>, Boolean> getArgument(
-            @Nonnull final TypeToken<T> componentType,
-            @Nonnull final K component) {
-        final CommandComponent<C, ?> commandComponent = (CommandComponent<C, ?>) component;
-        Function function = this.mappers.get(componentType.getRawType());
+    private <T, K extends CommandArgument<?, ?>> Pair<ArgumentType<?>, Boolean> getArgument(
+            @Nonnull final TypeToken<T> argumentType,
+            @Nonnull final K argument) {
+        final CommandArgument<C, ?> commandArgument = (CommandArgument<C, ?>) argument;
+        Function function = this.mappers.get(argumentType.getRawType());
         if (function == null) {
-            return this.createDefaultMapper(commandComponent);
+            return this.createDefaultMapper(commandArgument);
         }
-        return new Pair<>((ArgumentType<?>) function.apply(commandComponent), !component.getValueType().equals(String.class));
+        return new Pair<>((ArgumentType<?>) function.apply(commandArgument), !argument.getValueType().equals(String.class));
     }
 
     @Nonnull
-    private <T, K extends CommandComponent<C, T>> Pair<ArgumentType<?>, Boolean> createDefaultMapper(
-            @Nonnull final CommandComponent<C, T>
-                    component) {
-        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers.get(component.getValueType());
+    private <T, K extends CommandArgument<C, T>> Pair<ArgumentType<?>, Boolean> createDefaultMapper(
+            @Nonnull final CommandArgument<C, T>
+                    argument) {
+        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers.get(argument.getValueType());
         if (argumentTypeSupplier != null) {
             return new Pair<>(argumentTypeSupplier.get(), true);
         }
-        System.err.printf("Found not native mapping for '%s'\n", component.getValueType().getCanonicalName());
+        System.err.printf("Found not native mapping for '%s'\n", argument.getValueType().getCanonicalName());
         return new Pair<>(StringArgumentType.string(), false);
     }
 
@@ -251,7 +251,7 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
      * @return Constructed literal command node
      */
     @Nonnull
-    public LiteralCommandNode<S> createLiteralCommandNode(@Nonnull final CommandTree.Node<CommandComponent<C, ?>> cloudCommand,
+    public LiteralCommandNode<S> createLiteralCommandNode(@Nonnull final CommandTree.Node<CommandArgument<C, ?>> cloudCommand,
                                                           @Nonnull final LiteralCommandNode<S> root,
                                                           @Nonnull final SuggestionProvider<S> suggestionProvider,
                                                           @Nonnull final com.mojang.brigadier.Command<S> executor,
@@ -262,19 +262,19 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
             literalArgumentBuilder.executes(executor);
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
-        for (final CommandTree.Node<CommandComponent<C, ?>> child : cloudCommand.getChildren()) {
+        for (final CommandTree.Node<CommandArgument<C, ?>> child : cloudCommand.getChildren()) {
             constructedRoot.addChild(this.constructCommandNode(child, permissionChecker, executor, suggestionProvider).build());
         }
         return constructedRoot;
     }
 
-    private ArgumentBuilder<S, ?> constructCommandNode(@Nonnull final CommandTree.Node<CommandComponent<C, ?>> root,
+    private ArgumentBuilder<S, ?> constructCommandNode(@Nonnull final CommandTree.Node<CommandArgument<C, ?>> root,
                                                 @Nonnull final BiPredicate<S, String> permissionChecker,
                                                 @Nonnull final com.mojang.brigadier.Command<S> executor,
                                                 @Nonnull final SuggestionProvider<S> suggestionProvider) {
 
         ArgumentBuilder<S, ?> argumentBuilder;
-        if (root.getValue() instanceof StaticComponent) {
+        if (root.getValue() instanceof StaticArgument) {
             argumentBuilder = LiteralArgumentBuilder.<S>literal(root.getValue().getName())
                     .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")))
                     .executes(executor);
@@ -290,14 +290,14 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
         if (root.isLeaf() || !root.getValue().isRequired()) {
             argumentBuilder.executes(executor);
         }
-        for (final CommandTree.Node<CommandComponent<C, ?>> node : root.getChildren()) {
+        for (final CommandTree.Node<CommandArgument<C, ?>> node : root.getChildren()) {
             argumentBuilder.then(constructCommandNode(node, permissionChecker, executor, suggestionProvider));
         }
         return argumentBuilder;
     }
 
     @Nonnull
-    private CompletableFuture<Suggestions> buildSuggestions(@Nonnull final CommandComponent<C, ?> component,
+    private CompletableFuture<Suggestions> buildSuggestions(@Nonnull final CommandArgument<C, ?> argument,
                                                             @Nonnull final CommandContext<S> s,
                                                             @Nonnull final SuggestionsBuilder builder) {
         final com.intellectualsites.commands.context.CommandContext<C> commandContext = this.dummyContextProvider.get();
@@ -314,7 +314,7 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
             command = command.substring(1);
         }
         final List<String> suggestions = this.commandManager.suggest(commandContext.getSender(), command);
-        /*component.getParser().suggestions(commandContext, builder.getInput());*/
+        /*argument.getParser().suggestions(commandContext, builder.getInput());*/
         for (final String suggestion : suggestions) {
             System.out.printf("- %s\n", suggestion);
         }
@@ -327,9 +327,9 @@ public final class CloudBrigadierManager<C extends CommandSender, S> {
             System.out.printf("- %s\n", suggestion);
         }*/
         for (final String suggestion : suggestions) {
-            String tooltip = component.getName();
-            if (!(component instanceof StaticComponent)) {
-                if (component.isRequired()) {
+            String tooltip = argument.getName();
+            if (!(argument instanceof StaticArgument)) {
+                if (argument.isRequired()) {
                     tooltip = '<' + tooltip + '>';
                 } else {
                     tooltip = '[' + tooltip + ']';

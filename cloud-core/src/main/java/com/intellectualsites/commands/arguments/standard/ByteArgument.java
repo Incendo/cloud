@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -34,13 +34,13 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class ByteComponent<C extends CommandSender> extends CommandComponent<C, Byte> {
+public final class ByteArgument<C extends CommandSender> extends CommandArgument<C, Byte> {
 
     private final byte min;
     private final byte max;
 
-    private ByteComponent(final boolean required, @Nonnull final String name, final byte min,
-                          final byte max, final String defaultValue) {
+    private ByteArgument(final boolean required, @Nonnull final String name, final byte min,
+                         final byte max, final String defaultValue) {
         super(required, name, new ByteParser<>(min, max), defaultValue, Byte.class);
         this.min = min;
         this.max = max;
@@ -49,7 +49,7 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
@@ -59,44 +59,44 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Byte> required(@Nonnull final String name) {
-        return ByteComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, Byte> required(@Nonnull final String name) {
+        return ByteArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Byte> optional(@Nonnull final String name) {
-        return ByteComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, Byte> optional(@Nonnull final String name) {
+        return ByteArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new required command argument with a default value
      *
-     * @param name       Component name
+     * @param name       Argument name
      * @param defaultNum Default num
      * @param <C>        Command sender type
-     * @return Created component
+     * @return Created argument
      */
-    @Nonnull public static <C extends CommandSender> CommandComponent<C, Byte> optional(@Nonnull final String name,
-                                                                                        final byte defaultNum) {
-        return ByteComponent.<C>newBuilder(name).asOptionalWithDefault(Byte.toString(defaultNum)).build();
+    @Nonnull public static <C extends CommandSender> CommandArgument<C, Byte> optional(@Nonnull final String name,
+                                                                                       final byte defaultNum) {
+        return ByteArgument.<C>newBuilder(name).asOptionalWithDefault(Byte.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Byte> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Byte> {
 
         private byte min = Byte.MIN_VALUE;
         private byte max = Byte.MAX_VALUE;
@@ -130,14 +130,14 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
         }
 
         /**
-         * Builder a new byte component
+         * Builder a new byte argument
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
         @Override
-        public ByteComponent<C> build() {
-            return new ByteComponent<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+        public ByteArgument<C> build() {
+            return new ByteArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
         }
 
     }
@@ -162,7 +162,7 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
     }
 
 
-    public static final class ByteParser<C extends CommandSender> implements ComponentParser<C, Byte> {
+    public static final class ByteParser<C extends CommandSender> implements ArgumentParser<C, Byte> {
 
         private final byte min;
         private final byte max;
@@ -180,25 +180,25 @@ public final class ByteComponent<C extends CommandSender> extends CommandCompone
 
         @Nonnull
         @Override
-        public ComponentParseResult<Byte> parse(
+        public ArgumentParseResult<Byte> parse(
                 @Nonnull final CommandContext<C> commandContext,
                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
             try {
                 final byte value = Byte.parseByte(input);
                 if (value < this.min || value > this.max) {
-                    return ComponentParseResult.failure(
+                    return ArgumentParseResult.failure(
                             new ByteParseException(input,
                                                    this.min,
                                                    this.max));
                 }
                 inputQueue.remove();
-                return ComponentParseResult.success(value);
+                return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ComponentParseResult.failure(
+                return ArgumentParseResult.failure(
                         new ByteParseException(input, this.min,
                                                this.max));
             }

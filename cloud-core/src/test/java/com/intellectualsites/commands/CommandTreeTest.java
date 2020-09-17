@@ -23,8 +23,8 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.StaticComponent;
-import com.intellectualsites.commands.components.standard.IntegerComponent;
+import com.intellectualsites.commands.arguments.StaticArgument;
+import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
@@ -48,13 +48,13 @@ class CommandTreeTest {
     static void newTree() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .component(StaticComponent.required("one")).build())
+                               .argument(StaticArgument.required("one")).build())
                .command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .component(StaticComponent.required("two")).withPermission("no").build())
+                               .argument(StaticArgument.required("two")).withPermission("no").build())
                .command(manager.commandBuilder("test", Collections.singleton("other"),
                                                SimpleCommandMeta.empty())
-                               .component(StaticComponent.required("opt", "öpt"))
-                               .component(IntegerComponent
+                               .argument(StaticArgument.required("opt", "öpt"))
+                               .argument(IntegerArgument
                                                                 .optional("num", EXPECTED_INPUT_NUMBER))
                                .build())
                .command(manager.commandBuilder("req").withSenderType(SpecificCommandSender.class).build());
@@ -106,7 +106,7 @@ class CommandTreeTest {
     void testDefaultParser() {
         manager.command(
                 manager.commandBuilder("default")
-                       .component(manager.componentBuilder(Integer.class, "int").build())
+                       .argument(manager.argumentBuilder(Integer.class, "int").build())
                        .handler(context -> {
                             final int number = context.getRequired("int");
                             System.out.printf("Supplied number is: %d\n", number);

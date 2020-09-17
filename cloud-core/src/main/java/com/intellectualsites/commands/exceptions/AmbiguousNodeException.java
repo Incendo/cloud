@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands.exceptions;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,9 +38,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 public final class AmbiguousNodeException extends IllegalStateException {
 
-    private final CommandComponent<?, ?> parentNode;
-    private final CommandComponent<?, ?> ambiguousNode;
-    private final List<CommandComponent<?, ?>> children;
+    private final CommandArgument<?, ?> parentNode;
+    private final CommandArgument<?, ?> ambiguousNode;
+    private final List<CommandArgument<?, ?>> children;
 
     /**
      * Construct a new ambiguous node exception
@@ -49,9 +49,9 @@ public final class AmbiguousNodeException extends IllegalStateException {
      * @param ambiguousNode Node that caused exception
      * @param children      All children of the parent
      */
-    public AmbiguousNodeException(@Nullable final CommandComponent<?, ?> parentNode,
-                                  @Nonnull final CommandComponent<?, ?> ambiguousNode,
-                                  @Nonnull final List<CommandComponent<?, ?>> children) {
+    public AmbiguousNodeException(@Nullable final CommandArgument<?, ?> parentNode,
+                                  @Nonnull final CommandArgument<?, ?> ambiguousNode,
+                                  @Nonnull final List<CommandArgument<?, ?>> children) {
         this.parentNode = parentNode;
         this.ambiguousNode = ambiguousNode;
         this.children = children;
@@ -63,7 +63,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      * @return Parent node
      */
     @Nullable
-    public CommandComponent<?, ?> getParentNode() {
+    public CommandArgument<?, ?> getParentNode() {
         return this.parentNode;
     }
 
@@ -73,7 +73,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      * @return Ambiguous node
      */
     @Nonnull
-    public CommandComponent<?, ?> getAmbiguousNode() {
+    public CommandArgument<?, ?> getAmbiguousNode() {
         return this.ambiguousNode;
     }
 
@@ -83,7 +83,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      * @return Child nodes
      */
     @Nonnull
-    public List<CommandComponent<?, ?>> getChildren() {
+    public List<CommandArgument<?, ?>> getChildren() {
         return this.children;
     }
 
@@ -94,7 +94,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
                 .append(" cannot be added as a child to ")
                 .append(parentNode == null ? "<root>" : parentNode.getName())
                 .append(" (All children: ");
-        final Iterator<CommandComponent<?, ?>> childIterator = this.children.iterator();
+        final Iterator<CommandArgument<?, ?>> childIterator = this.children.iterator();
         while (childIterator.hasNext()) {
             stringBuilder.append(childIterator.next().getName());
             if (childIterator.hasNext()) {

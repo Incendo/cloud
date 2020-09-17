@@ -21,20 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.parser;
+package com.intellectualsites.commands.arguments.parser;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.annotations.specifier.Range;
-import com.intellectualsites.commands.components.standard.BooleanComponent;
-import com.intellectualsites.commands.components.standard.ByteComponent;
-import com.intellectualsites.commands.components.standard.CharComponent;
-import com.intellectualsites.commands.components.standard.DoubleComponent;
-import com.intellectualsites.commands.components.standard.EnumComponent;
-import com.intellectualsites.commands.components.standard.FloatComponent;
-import com.intellectualsites.commands.components.standard.IntegerComponent;
-import com.intellectualsites.commands.components.standard.ShortComponent;
-import com.intellectualsites.commands.components.standard.StringComponent;
+import com.intellectualsites.commands.arguments.standard.BooleanArgument;
+import com.intellectualsites.commands.arguments.standard.ByteArgument;
+import com.intellectualsites.commands.arguments.standard.CharArgument;
+import com.intellectualsites.commands.arguments.standard.DoubleArgument;
+import com.intellectualsites.commands.arguments.standard.EnumArgument;
+import com.intellectualsites.commands.arguments.standard.FloatArgument;
+import com.intellectualsites.commands.arguments.standard.IntegerArgument;
+import com.intellectualsites.commands.arguments.standard.ShortArgument;
+import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -65,7 +65,7 @@ public final class StandardParserRegistry<C extends CommandSender> implements Pa
             .put(boolean.class, Boolean.class)
             .build();
 
-    private final Map<TypeToken<?>, Function<ParserParameters, ComponentParser<C, ?>>> parserSuppliers = new HashMap<>();
+    private final Map<TypeToken<?>, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new HashMap<>();
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
             annotationMappers = new HashMap<>();
 
@@ -79,31 +79,31 @@ public final class StandardParserRegistry<C extends CommandSender> implements Pa
 
         /* Register standard types */
         this.registerParserSupplier(TypeToken.of(Byte.class), options ->
-                new ByteComponent.ByteParser<C>((byte) options.get(StandardParameters.RANGE_MIN, Byte.MIN_VALUE),
-                                                (byte) options.get(StandardParameters.RANGE_MAX, Byte.MAX_VALUE)));
+                new ByteArgument.ByteParser<C>((byte) options.get(StandardParameters.RANGE_MIN, Byte.MIN_VALUE),
+                                               (byte) options.get(StandardParameters.RANGE_MAX, Byte.MAX_VALUE)));
         this.registerParserSupplier(TypeToken.of(Short.class), options ->
-                new ShortComponent.ShortParser<C>((short) options.get(StandardParameters.RANGE_MIN, Short.MIN_VALUE),
-                                                  (short) options.get(StandardParameters.RANGE_MAX, Short.MAX_VALUE)));
+                new ShortArgument.ShortParser<C>((short) options.get(StandardParameters.RANGE_MIN, Short.MIN_VALUE),
+                                                 (short) options.get(StandardParameters.RANGE_MAX, Short.MAX_VALUE)));
         this.registerParserSupplier(TypeToken.of(Integer.class), options ->
-                new IntegerComponent.IntegerParser<C>((int) options.get(StandardParameters.RANGE_MIN, Integer.MIN_VALUE),
-                                                      (int) options.get(StandardParameters.RANGE_MAX, Integer.MAX_VALUE)));
+                new IntegerArgument.IntegerParser<C>((int) options.get(StandardParameters.RANGE_MIN, Integer.MIN_VALUE),
+                                                     (int) options.get(StandardParameters.RANGE_MAX, Integer.MAX_VALUE)));
         this.registerParserSupplier(TypeToken.of(Float.class), options ->
-                new FloatComponent.FloatParser<C>((float) options.get(StandardParameters.RANGE_MIN, Float.MIN_VALUE),
-                                                  (float) options.get(StandardParameters.RANGE_MAX, Float.MAX_VALUE)));
+                new FloatArgument.FloatParser<C>((float) options.get(StandardParameters.RANGE_MIN, Float.MIN_VALUE),
+                                                 (float) options.get(StandardParameters.RANGE_MAX, Float.MAX_VALUE)));
         this.registerParserSupplier(TypeToken.of(Double.class), options ->
-                new DoubleComponent.DoubleParser<C>((double) options.get(StandardParameters.RANGE_MIN, Double.MIN_VALUE),
-                                                    (double) options.get(StandardParameters.RANGE_MAX, Double.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Character.class), options -> new CharComponent.CharacterParser<C>());
+                new DoubleArgument.DoubleParser<C>((double) options.get(StandardParameters.RANGE_MIN, Double.MIN_VALUE),
+                                                   (double) options.get(StandardParameters.RANGE_MAX, Double.MAX_VALUE)));
+        this.registerParserSupplier(TypeToken.of(Character.class), options -> new CharArgument.CharacterParser<C>());
         /* Make this one less awful */
-        this.registerParserSupplier(TypeToken.of(String.class), options -> new StringComponent.StringParser<C>(
-                StringComponent.StringMode.SINGLE, (context, s) -> Collections.emptyList()));
+        this.registerParserSupplier(TypeToken.of(String.class), options -> new StringArgument.StringParser<C>(
+                StringArgument.StringMode.SINGLE, (context, s) -> Collections.emptyList()));
         /* Add options to this */
-        this.registerParserSupplier(TypeToken.of(Boolean.class), options -> new BooleanComponent.BooleanParser<>(false));
+        this.registerParserSupplier(TypeToken.of(Boolean.class), options -> new BooleanArgument.BooleanParser<>(false));
     }
 
     @Override
     public <T> void registerParserSupplier(@Nonnull final TypeToken<T> type,
-                                           @Nonnull final Function<ParserParameters, ComponentParser<C, ?>> supplier) {
+                                           @Nonnull final Function<ParserParameters, ArgumentParser<C, ?>> supplier) {
         this.parserSuppliers.put(type, supplier);
     }
 
@@ -134,27 +134,27 @@ public final class StandardParserRegistry<C extends CommandSender> implements Pa
 
     @Nonnull
     @Override
-    public <T> Optional<ComponentParser<C, T>> createParser(@Nonnull final TypeToken<T> type,
-                                                            @Nonnull final ParserParameters parserParameters) {
+    public <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull final TypeToken<T> type,
+                                                           @Nonnull final ParserParameters parserParameters) {
         final TypeToken<?> actualType;
         if (type.isPrimitive()) {
             actualType = TypeToken.of(PRIMITIVE_MAPPINGS.get(type.getRawType()));
         } else {
             actualType = type;
         }
-        final Function<ParserParameters, ComponentParser<C, ?>> producer = this.parserSuppliers.get(actualType);
+        final Function<ParserParameters, ArgumentParser<C, ?>> producer = this.parserSuppliers.get(actualType);
         if (producer == null) {
             /* Give enums special treatment */
             if (actualType.isSubtypeOf(Enum.class)) {
                 @SuppressWarnings("all")
-                final EnumComponent.EnumParser enumComponent = new EnumComponent.EnumParser((Class<Enum>)
+                final EnumArgument.EnumParser enumArgument = new EnumArgument.EnumParser((Class<Enum>)
                                                                                             actualType.getRawType());
                 // noinspection all
-                return Optional.of(enumComponent);
+                return Optional.of(enumArgument);
             }
             return Optional.empty();
         }
-        @SuppressWarnings("unchecked") final ComponentParser<C, T> parser = (ComponentParser<C, T>) producer.apply(
+        @SuppressWarnings("unchecked") final ArgumentParser<C, T> parser = (ArgumentParser<C, T>) producer.apply(
                 parserParameters);
         return Optional.of(parser);
     }

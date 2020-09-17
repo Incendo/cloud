@@ -21,14 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components;
+package com.intellectualsites.commands.arguments;
 
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
-import com.intellectualsites.commands.components.parser.ParserParameters;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
+import com.intellectualsites.commands.arguments.parser.ParserParameters;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -37,29 +37,29 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * A component that belongs to a command
+ * A argument that belongs to a command
  *
  * @param <C> Command sender type
- * @param <T> The type that the component parses into
+ * @param <T> The type that the argument parses into
  */
 @SuppressWarnings("unused")
-public class CommandComponent<C extends CommandSender, T> implements Comparable<CommandComponent<?, ?>> {
+public class CommandArgument<C extends CommandSender, T> implements Comparable<CommandArgument<?, ?>> {
 
     /**
-     * Pattern for command component names
+     * Pattern for command argument names
      */
     private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9]+");
 
     /**
-     * Indicates whether or not the component is required
-     * or not. All components prior to any other required
-     * component must also be required, such that the predicate
+     * Indicates whether or not the argument is required
+     * or not. All arguments prior to any other required
+     * argument must also be required, such that the predicate
      * (∀ c_i ∈ required)({c_0, ..., c_i-1} ⊂ required) holds true,
-     * where {c_0, ..., c_n-1} is the set of command components.
+     * where {c_0, ..., c_n-1} is the set of command arguments.
      */
     private final boolean required;
     /**
-     * The command component name. This might be exposed
+     * The command argument name. This might be exposed
      * to command senders and so should be chosen carefully.
      */
     private final String name;
@@ -67,32 +67,32 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * The parser that is used to parse the command input
      * into the corresponding command type
      */
-    private final ComponentParser<C, T> parser;
+    private final ArgumentParser<C, T> parser;
     /**
      * Default value, will be empty if none was supplied
      */
     private final String defaultValue;
     /**
-     * The type that is produces by the component's parser
+     * The type that is produces by the argument's parser
      */
     private final Class<T> valueType;
 
     private Command<C, ?> owningCommand;
 
     /**
-     * Construct a new command component
+     * Construct a new command argument
      *
-     * @param required     Whether or not the component is required
-     * @param name         The component name
-     * @param parser       The component parser
+     * @param required     Whether or not the argument is required
+     * @param name         The argument name
+     * @param parser       The argument parser
      * @param defaultValue Default value used when no value is provided by the command sender
      * @param valueType    Type produced by the parser
      */
-    public CommandComponent(final boolean required,
-                            @Nonnull final String name,
-                            @Nonnull final ComponentParser<C, T> parser,
-                            @Nonnull final String defaultValue,
-                            @Nonnull final Class<T> valueType) {
+    public CommandArgument(final boolean required,
+                           @Nonnull final String name,
+                           @Nonnull final ArgumentParser<C, T> parser,
+                           @Nonnull final String defaultValue,
+                           @Nonnull final Class<T> valueType) {
         this.required = required;
         this.name = Objects.requireNonNull(name, "Name may not be null");
         if (!NAME_PATTERN.asPredicate().test(name)) {
@@ -104,48 +104,48 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     }
 
     /**
-     * Construct a new command component
+     * Construct a new command argument
      *
-     * @param required     Whether or not the component is required
-     * @param name         The component name
-     * @param parser       The component parser
+     * @param required     Whether or not the argument is required
+     * @param name         The argument name
+     * @param parser       The argument parser
      * @param valueType    Type produced by the parser
      */
-    public CommandComponent(final boolean required,
-                            @Nonnull final String name,
-                            @Nonnull final ComponentParser<C, T> parser,
-                            @Nonnull final Class<T> valueType) {
+    public CommandArgument(final boolean required,
+                           @Nonnull final String name,
+                           @Nonnull final ArgumentParser<C, T> parser,
+                           @Nonnull final Class<T> valueType) {
         this(required, name, parser, "", valueType);
     }
 
     /**
-     * Create a new command component
+     * Create a new command argument
      *
      * @param clazz Argument class
-     * @param name  Component name
+     * @param name  Argument name
      * @param <C>   Command sender type
      * @param <T>   Argument Type. Used to make the compiler happy.
-     * @return Component builder
+     * @return Argument builder
      */
     @Nonnull
-    public static <C extends CommandSender, T> CommandComponent.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
-                                                                                     @Nonnull final String name) {
+    public static <C extends CommandSender, T> CommandArgument.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
+                                                                                    @Nonnull final String name) {
         return new Builder<>(clazz, name);
     }
 
     /**
-     * Check whether or not the command component is required
+     * Check whether or not the command argument is required
      *
-     * @return {@code true} if the component is required, {@code false} if not
+     * @return {@code true} if the argument is required, {@code false} if not
      */
     public boolean isRequired() {
         return this.required;
     }
 
     /**
-     * Get the command component name;
+     * Get the command argument name;
      *
-     * @return Component name
+     * @return Argument name
      */
     @Nonnull
     public String getName() {
@@ -159,14 +159,14 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
      * @return Command parser
      */
     @Nonnull
-    public ComponentParser<C, T> getParser() {
+    public ArgumentParser<C, T> getParser() {
         return this.parser;
     }
 
     @Nonnull
     @Override
     public final String toString() {
-        return String.format("CommandComponent{name=%s}", this.name);
+        return String.format("CommandArgument{name=%s}", this.name);
     }
 
     /**
@@ -199,7 +199,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final CommandComponent<?, ?> that = (CommandComponent<?, ?>) o;
+        final CommandArgument<?, ?> that = (CommandArgument<?, ?>) o;
         return isRequired() == that.isRequired() && Objects.equals(getName(), that.getName());
     }
 
@@ -209,15 +209,15 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     }
 
     @Override
-    public final int compareTo(@Nonnull final CommandComponent<?, ?> o) {
-        if (this instanceof StaticComponent) {
-            if (o instanceof StaticComponent) {
+    public final int compareTo(@Nonnull final CommandArgument<?, ?> o) {
+        if (this instanceof StaticArgument) {
+            if (o instanceof StaticArgument) {
                 return (this.getName().compareTo(o.getName()));
             } else {
                 return -1;
             }
         } else {
-            if (o instanceof StaticComponent) {
+            if (o instanceof StaticArgument) {
                 return 1;
             } else {
                 return 0;
@@ -236,9 +236,9 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     }
 
     /**
-     * Check if the component has a default value
+     * Check if the argument has a default value
      *
-     * @return {@code true} if the component has a default value, {@code false} if not
+     * @return {@code true} if the argument has a default value, {@code false} if not
      */
     public boolean hasDefaultValue() {
         return !this.isRequired()
@@ -246,7 +246,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     }
 
     /**
-     * Get the type of this component's value
+     * Get the type of this argument's value
      *
      * @return Value type
      */
@@ -256,10 +256,10 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
     }
 
     /**
-     * Mutable builder for {@link CommandComponent} instances
+     * Mutable builder for {@link CommandArgument} instances
      *
      * @param <C> Command sender type
-     * @param <T> Component value type
+     * @param <T> Argument value type
      */
     public static class Builder<C extends CommandSender, T> {
 
@@ -268,7 +268,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
 
         private CommandManager<C, ?> manager;
         private boolean required = true;
-        private ComponentParser<C, T> parser;
+        private ArgumentParser<C, T> parser;
         private String defaultValue = "";
 
         protected Builder(@Nonnull final Class<T> valueType,
@@ -291,11 +291,11 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         }
 
         /**
-         * Indicates that the component is required.
-         * All components prior to any other required
-         * component must also be required, such that the predicate
+         * Indicates that the argument is required.
+         * All arguments prior to any other required
+         * argument must also be required, such that the predicate
          * (∀ c_i ∈ required)({c_0, ..., c_i-1} ⊂ required) holds true,
-         * where {c_0, ..., c_n-1} is the set of command components.
+         * where {c_0, ..., c_n-1} is the set of command arguments.
          *
          * @return Builder instance
          */
@@ -306,11 +306,11 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         }
 
         /**
-         * Indicates that the component is optional.
-         * All components prior to any other required
-         * component must also be required, such that the predicate
+         * Indicates that the argument is optional.
+         * All arguments prior to any other required
+         * argument must also be required, such that the predicate
          * (∀ c_i ∈ required)({c_0, ..., c_i-1} ⊂ required) holds true,
-         * where {c_0, ..., c_n-1} is the set of command components.
+         * where {c_0, ..., c_n-1} is the set of command arguments.
          *
          * @return Builder instance
          */
@@ -321,11 +321,11 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         }
 
         /**
-         * Indicates that the component is optional.
-         * All components prior to any other required
-         * component must also be required, such that the predicate
+         * Indicates that the argument is optional.
+         * All arguments prior to any other required
+         * argument must also be required, such that the predicate
          * (∀ c_i ∈ required)({c_0, ..., c_i-1} ⊂ required) holds true,
-         * where {c_0, ..., c_n-1} is the set of command components.
+         * where {c_0, ..., c_n-1} is the set of command arguments.
          *
          * @param defaultValue Default value that will be used if none was supplied
          * @return Builder instance
@@ -338,33 +338,33 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         }
 
         /**
-         * Set the component parser
+         * Set the argument parser
          *
-         * @param parser Component parser
+         * @param parser Argument parser
          * @return Builder instance
          */
         @Nonnull
-        public Builder<C, T> withParser(@Nonnull final ComponentParser<C, T> parser) {
+        public Builder<C, T> withParser(@Nonnull final ArgumentParser<C, T> parser) {
             this.parser = Objects.requireNonNull(parser, "Parser may not be null");
             return this;
         }
 
         /**
-         * Construct a command component from the builder settings
+         * Construct a command argument from the builder settings
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
-        public CommandComponent<C, T> build() {
+        public CommandArgument<C, T> build() {
             if (this.parser == null && this.manager != null) {
                 this.parser = this.manager.getParserRegistry().createParser(TypeToken.of(valueType), ParserParameters.empty())
                                     .orElse(null);
             }
             if (this.parser == null) {
-                this.parser = (c, i) -> ComponentParseResult
+                this.parser = (c, i) -> ArgumentParseResult
                         .failure(new UnsupportedOperationException("No parser was specified"));
             }
-            return new CommandComponent<>(this.required, this.name, this.parser, this.defaultValue, this.valueType);
+            return new CommandArgument<>(this.required, this.name, this.parser, this.defaultValue, this.valueType);
         }
 
         @Nonnull
@@ -377,7 +377,7 @@ public class CommandComponent<C extends CommandSender, T> implements Comparable<
         }
 
         @Nonnull
-        protected final ComponentParser<C, T> getParser() {
+        protected final ArgumentParser<C, T> getParser() {
             return this.parser;
         }
 

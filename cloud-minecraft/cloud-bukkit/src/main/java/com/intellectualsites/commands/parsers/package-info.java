@@ -23,6 +23,6 @@
 //
 
 /**
- * Bukkit specific command components
+ * Bukkit specific command arguments
  */
 package com.intellectualsites.commands.parsers;

@@ -24,11 +24,11 @@
 package com.intellectualsites.commands;
 
 import com.google.common.reflect.TypeToken;
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.CommandSyntaxFormatter;
-import com.intellectualsites.commands.components.StandardCommandSyntaxFormatter;
-import com.intellectualsites.commands.components.parser.ParserRegistry;
-import com.intellectualsites.commands.components.parser.StandardParserRegistry;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.CommandSyntaxFormatter;
+import com.intellectualsites.commands.arguments.StandardCommandSyntaxFormatter;
+import com.intellectualsites.commands.arguments.parser.ParserRegistry;
+import com.intellectualsites.commands.arguments.parser.StandardParserRegistry;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.context.CommandContextFactory;
 import com.intellectualsites.commands.context.StandardCommandContextFactory;
@@ -236,16 +236,16 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
     }
 
     /**
-     * Create a new command component builder
+     * Create a new command argument builder
      *
-     * @param type Component type
-     * @param name Component name
-     * @param <T>  Generic component name
-     * @return Component builder
+     * @param type Argument type
+     * @param name Argument name
+     * @param <T>  Generic argument name
+     * @return Argument builder
      */
     @Nonnull
-    public <T> CommandComponent.Builder<C, T> componentBuilder(@Nonnull final Class<T> type, @Nonnull final String name) {
-        return CommandComponent.<C, T>ofType(type, name).manager(this);
+    public <T> CommandArgument.Builder<C, T> argumentBuilder(@Nonnull final Class<T> type, @Nonnull final String name) {
+        return CommandArgument.<C, T>ofType(type, name).manager(this);
     }
 
     /**

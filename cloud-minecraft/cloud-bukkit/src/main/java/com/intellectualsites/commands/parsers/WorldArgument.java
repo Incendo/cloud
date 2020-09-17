@@ -23,9 +23,9 @@
 //
 package com.intellectualsites.commands.parsers;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 import org.bukkit.Bukkit;
@@ -37,70 +37,70 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
- * cloud component type that parses Bukkit {@link org.bukkit.World worlds}
+ * cloud argument type that parses Bukkit {@link org.bukkit.World worlds}
  *
  * @param <C> Command sender type
  */
-public class WorldComponent<C extends CommandSender> extends CommandComponent<C, World> {
+public class WorldArgument<C extends CommandSender> extends CommandArgument<C, World> {
 
-    protected WorldComponent(final boolean required,
-                             @Nonnull final String name,
-                             @Nonnull final String defaultValue) {
+    protected WorldArgument(final boolean required,
+                            @Nonnull final String name,
+                            @Nonnull final String defaultValue) {
         super(required, name, new WorldParser<>(), defaultValue, World.class);
     }
 
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent.Builder<C, World> newBuilder(@Nonnull final String name) {
-        return new WorldComponent.Builder<>(name);
+    public static <C extends CommandSender> CommandArgument.Builder<C, World> newBuilder(@Nonnull final String name) {
+        return new WorldArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required component
+     * Create a new required argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, World> required(@Nonnull final String name) {
-        return WorldComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, World> required(@Nonnull final String name) {
+        return WorldArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional component
+     * Create a new optional argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, World> optional(@Nonnull final String name) {
-        return WorldComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, World> optional(@Nonnull final String name) {
+        return WorldArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional component with a default value
+     * Create a new optional argument with a default value
      *
-     * @param name         Component name
+     * @param name         Argument name
      * @param defaultValue Default value
      * @param <C>          Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, World> optional(@Nonnull final String name,
-                                                                                @Nonnull final String defaultValue) {
-        return WorldComponent.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
+    public static <C extends CommandSender> CommandArgument<C, World> optional(@Nonnull final String name,
+                                                                               @Nonnull final String defaultValue) {
+        return WorldArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, World> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, World> {
 
         protected Builder(@Nonnull final String name) {
             super(World.class, name);
@@ -108,30 +108,30 @@ public class WorldComponent<C extends CommandSender> extends CommandComponent<C,
 
         @Nonnull
         @Override
-        public CommandComponent<C, World> build() {
-            return new WorldComponent<>(this.isRequired(), this.getName(), this.getDefaultValue());
+        public CommandArgument<C, World> build() {
+            return new WorldArgument<>(this.isRequired(), this.getName(), this.getDefaultValue());
         }
     }
 
 
-    public static final class WorldParser<C extends CommandSender> implements ComponentParser<C, World> {
+    public static final class WorldParser<C extends CommandSender> implements ArgumentParser<C, World> {
 
         @Nonnull
         @Override
-        public ComponentParseResult<World> parse(@Nonnull final CommandContext<C> commandContext,
-                                                 @Nonnull final Queue<String> inputQueue) {
+        public ArgumentParseResult<World> parse(@Nonnull final CommandContext<C> commandContext,
+                                                @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
             final World world = Bukkit.getWorld(input);
             if (world == null) {
-                return ComponentParseResult.failure(new WorldParseException(input));
+                return ArgumentParseResult.failure(new WorldParseException(input));
             }
 
             inputQueue.remove();
-            return ComponentParseResult.success(world);
+            return ArgumentParseResult.success(world);
         }
 
         @Nonnull

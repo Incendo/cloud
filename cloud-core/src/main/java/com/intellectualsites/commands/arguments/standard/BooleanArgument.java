@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class BooleanComponent<C extends CommandSender> extends CommandComponent<C, Boolean> {
+public final class BooleanArgument<C extends CommandSender> extends CommandArgument<C, Boolean> {
     private final boolean liberal;
 
-    private BooleanComponent(final boolean required, @Nonnull final String name,
-                             final boolean liberal, @Nonnull final String defaultValue) {
+    private BooleanArgument(final boolean required, @Nonnull final String name,
+                            final boolean liberal, @Nonnull final String defaultValue) {
         super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class);
         this.liberal = liberal;
     }
@@ -47,7 +47,7 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
@@ -57,45 +57,45 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Boolean> required(@Nonnull final String name) {
-        return BooleanComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, Boolean> required(@Nonnull final String name) {
+        return BooleanArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Boolean> optional(@Nonnull final String name) {
-        return BooleanComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, Boolean> optional(@Nonnull final String name) {
+        return BooleanArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new required command argument with a default value
      *
-     * @param name       Component name
+     * @param name       Argument name
      * @param defaultNum Default num
      * @param <C>        Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Boolean> optional(@Nonnull final String name,
-                                                                                  final String defaultNum) {
-        return BooleanComponent.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+    public static <C extends CommandSender> CommandArgument<C, Boolean> optional(@Nonnull final String name,
+                                                                                 final String defaultNum) {
+        return BooleanArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Boolean> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Boolean> {
 
         private boolean liberal = false;
 
@@ -116,14 +116,14 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
         }
 
         /**
-         * Builder a new boolean component
+         * Builder a new boolean argument
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
         @Override
-        public BooleanComponent<C> build() {
-            return new BooleanComponent<>(this.isRequired(), this.getName(), this.liberal, this.getDefaultValue());
+        public BooleanArgument<C> build() {
+            return new BooleanArgument<>(this.isRequired(), this.getName(), this.liberal, this.getDefaultValue());
         }
 
     }
@@ -138,7 +138,7 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
     }
 
 
-    public static final class BooleanParser<C extends CommandSender> implements ComponentParser<C, Boolean> {
+    public static final class BooleanParser<C extends CommandSender> implements ArgumentParser<C, Boolean> {
 
         private static final List<String> LIBERAL = Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF");
         private static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");
@@ -157,37 +157,37 @@ public final class BooleanComponent<C extends CommandSender> extends CommandComp
 
         @Nonnull
         @Override
-        public ComponentParseResult<Boolean> parse(@Nonnull final CommandContext<C> commandContext,
-                                                   @Nonnull final Queue<String> inputQueue) {
+        public ArgumentParseResult<Boolean> parse(@Nonnull final CommandContext<C> commandContext,
+                                                  @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
             inputQueue.remove();
 
             if (!liberal) {
                 if (input.equalsIgnoreCase("true")) {
-                    return ComponentParseResult.success(true);
+                    return ArgumentParseResult.success(true);
                 }
 
                 if (input.equalsIgnoreCase("false")) {
-                    return ComponentParseResult.success(false);
+                    return ArgumentParseResult.success(false);
                 }
 
-                return ComponentParseResult.failure(new BooleanParseException(input, false));
+                return ArgumentParseResult.failure(new BooleanParseException(input, false));
             }
 
             final String uppercaseInput = input.toUpperCase();
 
             if (LIBERAL_TRUE.contains(uppercaseInput)) {
-                return ComponentParseResult.success(true);
+                return ArgumentParseResult.success(true);
             }
 
             if (LIBERAL_FALSE.contains(uppercaseInput)) {
-                return ComponentParseResult.success(false);
+                return ArgumentParseResult.success(false);
             }
 
-            return ComponentParseResult.failure(new BooleanParseException(input, true));
+            return ArgumentParseResult.failure(new BooleanParseException(input, true));
         }
 
         @Nonnull

@@ -23,12 +23,12 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.StaticComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.StaticArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.AmbiguousNodeException;
-import com.intellectualsites.commands.exceptions.ComponentParseException;
+import com.intellectualsites.commands.exceptions.ArgumentParseException;
 import com.intellectualsites.commands.exceptions.InvalidCommandSenderException;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoCommandInLeafException;
@@ -63,7 +63,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
 
     private final Object commandLock = new Object();
 
-    private final Node<CommandComponent<C, ?>> internalTree = new Node<>(null);
+    private final Node<CommandArgument<C, ?>> internalTree = new Node<>(null);
     private final CommandManager<C, M> commandManager;
     private final CommandRegistrationHandler<M> commandRegistrationHandler;
 
@@ -113,7 +113,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
 
     private Optional<Command<C, M>> parseCommand(@Nonnull final CommandContext<C> commandContext,
                                                  @Nonnull final Queue<String> commandQueue,
-                                                 @Nonnull final Node<CommandComponent<C, ?>> root) {
+                                                 @Nonnull final Node<CommandArgument<C, ?>> root) {
         String permission = this.isPermitted(commandContext.getSender(), root);
         if (permission != null) {
             throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(root)
@@ -128,7 +128,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             return parsedChild;
         }
 
-        /* There are 0 or more static components as children. No variable child components are present */
+        /* There are 0 or more static arguments as children. No variable child arguments are present */
         if (root.children.isEmpty()) {
             /* We are at the bottom. Check if there's a command attached, in which case we're done */
             if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
@@ -139,7 +139,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                     throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                         .apply(root.getValue()
                                                                                    .getOwningCommand()
-                                                                                   .getComponents()),
+                                                                                   .getArguments()),
                                                      commandContext.getSender(), this.getChain(root)
                                                                                      .stream()
                                                                                      .map(Node::getValue)
@@ -151,19 +151,19 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                                                                     .apply(Objects.requireNonNull(
                                                                             Objects.requireNonNull(root.getValue())
                                                                                    .getOwningCommand())
-                                                                                  .getComponents()),
+                                                                                  .getArguments()),
                                                  commandContext.getSender(), this.getChain(root)
                                                                                  .stream()
                                                                                  .map(Node::getValue)
                                                                                  .collect(Collectors.toList()));
             }
         } else {
-            final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
+            final Iterator<Node<CommandArgument<C, ?>>> childIterator = root.getChildren().iterator();
             if (childIterator.hasNext()) {
                 while (childIterator.hasNext()) {
-                    final Node<CommandComponent<C, ?>> child = childIterator.next();
+                    final Node<CommandArgument<C, ?>> child = childIterator.next();
                     if (child.getValue() != null) {
-                        final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                        final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                         if (result.getParsedValue().isPresent()) {
                             return this.parseCommand(commandContext, commandQueue, child);
                         } /*else if (result.getFailure().isPresent() && root.children.size() == 1) {
@@ -180,13 +180,13 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
 
     @Nullable
     private Optional<Command<C, M>> attemptParseUnambiguousChild(@Nonnull final CommandContext<C> commandContext,
-                                                                 @Nonnull final Node<CommandComponent<C, ?>> root,
+                                                                 @Nonnull final Node<CommandArgument<C, ?>> root,
                                                                  @Nonnull final Queue<String> commandQueue) {
         String permission;
-        final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
-        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
+        final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
+        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
             // The value has to be a variable
-            final Node<CommandComponent<C, ?>> child = children.get(0);
+            final Node<CommandArgument<C, ?>> child = children.get(0);
             permission = this.isPermitted(commandContext.getSender(), child);
             if (permission != null) {
                 throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(child)
@@ -205,7 +205,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                         throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                             .apply(Objects.requireNonNull(
                                                                                     child.getValue().getOwningCommand())
-                                                                                          .getComponents()),
+                                                                                          .getArguments()),
                                                          commandContext.getSender(), this.getChain(root)
                                                                                          .stream()
                                                                                          .map(Node::getValue)
@@ -219,7 +219,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                                                          "");
                     }
                 }
-                final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                 if (result.getParsedValue().isPresent()) {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     if (child.isLeaf()) {
@@ -230,7 +230,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                             throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                                 .apply(Objects.requireNonNull(child.getValue()
                                                                                                              .getOwningCommand())
-                                                                                              .getComponents()),
+                                                                                              .getArguments()),
                                                              commandContext.getSender(), this.getChain(root)
                                                                                              .stream()
                                                                                              .map(Node::getValue)
@@ -241,8 +241,8 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                         return this.parseCommand(commandContext, commandQueue, child);
                     }
                 } else if (result.getFailure().isPresent()) {
-                    throw new ComponentParseException(result.getFailure().get(), commandContext.getSender(),
-                                                      this.getChain(child)
+                    throw new ArgumentParseException(result.getFailure().get(), commandContext.getSender(),
+                                                     this.getChain(child)
                                                           .stream()
                                                           .map(Node::getValue)
                                                           .collect(Collectors.toList()));
@@ -268,16 +268,16 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
     @Nonnull
     private List<String> getSuggestions(@Nonnull final CommandContext<C> commandContext,
                                        @Nonnull final Queue<String> commandQueue,
-                                       @Nonnull final Node<CommandComponent<C, ?>> root) {
+                                       @Nonnull final Node<CommandArgument<C, ?>> root) {
 
         /* If the sender isn't allowed to access the root node, no suggestions are needed */
         if (this.isPermitted(commandContext.getSender(), root) != null) {
             return Collections.emptyList();
         }
-        final List<Node<CommandComponent<C, ?>>> children = root.getChildren();
-        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticComponent)) {
+        final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
+        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
             // The value has to be a variable
-            final Node<CommandComponent<C, ?>> child = children.get(0);
+            final Node<CommandArgument<C, ?>> child = children.get(0);
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
                     return Collections.emptyList();
@@ -287,7 +287,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 } else if (child.isLeaf()) {
                     return Collections.emptyList();
                 }
-                final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                 if (result.getParsedValue().isPresent()) {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     return this.getSuggestions(commandContext, commandQueue, child);
@@ -296,16 +296,16 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 }
             }
         }
-        /* There are 0 or more static components as children. No variable child components are present */
+        /* There are 0 or more static arguments as children. No variable child arguments are present */
         if (children.isEmpty() || commandQueue.isEmpty()) {
             return Collections.emptyList();
         } else {
-            final Iterator<Node<CommandComponent<C, ?>>> childIterator = root.getChildren().iterator();
+            final Iterator<Node<CommandArgument<C, ?>>> childIterator = root.getChildren().iterator();
             if (childIterator.hasNext()) {
                 while (childIterator.hasNext()) {
-                    final Node<CommandComponent<C, ?>> child = childIterator.next();
+                    final Node<CommandArgument<C, ?>> child = childIterator.next();
                     if (child.getValue() != null) {
-                        final ComponentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                        final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                         if (result.getParsedValue().isPresent()) {
                             return this.getSuggestions(commandContext, commandQueue, child);
                         } /* else if (result.getFailure().isPresent() && root.children.size() == 1) {
@@ -314,12 +314,12 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
                 }
             }
             final List<String> suggestions = new LinkedList<>();
-            for (final Node<CommandComponent<C, ?>> component : root.getChildren()) {
-                if (component.getValue() == null || this.isPermitted(commandContext.getSender(), component) != null) {
+            for (final Node<CommandArgument<C, ?>> argument : root.getChildren()) {
+                if (argument.getValue() == null || this.isPermitted(commandContext.getSender(), argument) != null) {
                     continue;
                 }
                 suggestions.addAll(
-                        component.getValue().getParser().suggestions(commandContext, stringOrEmpty(commandQueue.peek())));
+                        argument.getValue().getParser().suggestions(commandContext, stringOrEmpty(commandQueue.peek())));
             }
             return suggestions;
         }
@@ -341,14 +341,14 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
     @SuppressWarnings("unchecked")
     public void insertCommand(@Nonnull final Command<C, M> command) {
         synchronized (this.commandLock) {
-            Node<CommandComponent<C, ?>> node = this.internalTree;
-            for (final CommandComponent<C, ?> component : command.getComponents()) {
-                Node<CommandComponent<C, ?>> tempNode = node.getChild(component);
+            Node<CommandArgument<C, ?>> node = this.internalTree;
+            for (final CommandArgument<C, ?> argument : command.getArguments()) {
+                Node<CommandArgument<C, ?>> tempNode = node.getChild(argument);
                 if (tempNode == null) {
-                    tempNode = node.addChild(component);
-                } else if (component instanceof StaticComponent && tempNode.getValue() != null) {
-                    for (final String alias : ((StaticComponent<C>) component).getAliases()) {
-                        ((StaticComponent<C>) tempNode.getValue()).registerAlias(alias);
+                    tempNode = node.addChild(argument);
+                } else if (argument instanceof StaticArgument && tempNode.getValue() != null) {
+                    for (final String alias : ((StaticArgument<C>) argument).getAliases()) {
+                        ((StaticArgument<C>) tempNode.getValue()).registerAlias(alias);
                     }
                 }
                 if (node.children.size() > 0) {
@@ -366,7 +366,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
     }
 
     @Nullable
-    private String isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandComponent<C, ?>> node) {
+    private String isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandArgument<C, ?>> node) {
         final String permission = node.nodeMeta.get("permission");
         if (permission != null) {
             return sender.hasPermission(permission) ? null : permission;
@@ -382,7 +382,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
            chain to execute, and so we allow them to execute the root
          */
         final List<String> missingPermissions = new LinkedList<>();
-        for (final Node<CommandComponent<C, ?>> child : node.getChildren()) {
+        for (final Node<CommandArgument<C, ?>> child : node.getChildren()) {
             final String check = this.isPermitted(sender, child);
             if (check == null) {
                 return null;
@@ -399,9 +399,9 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
      */
     public void verifyAndRegister() {
         // All top level commands are supposed to be registered in the command manager
-        this.internalTree.children.stream().map(Node::getValue).forEach(commandComponent -> {
-            if (!(commandComponent instanceof StaticComponent)) {
-                throw new IllegalStateException("Top level command component cannot be a variable");
+        this.internalTree.children.stream().map(Node::getValue).forEach(commandArgument -> {
+            if (!(commandArgument instanceof StaticArgument)) {
+                throw new IllegalStateException("Top level command argument cannot be a variable");
             }
         });
 
@@ -424,29 +424,29 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
             // noinspection all
             node.nodeMeta.put("permission", node.getValue().getOwningCommand().getCommandPermission());
             // Get chain and order it tail->head then skip the tail (leaf node)
-            List<Node<CommandComponent<C, ?>>> chain = this.getChain(node);
+            List<Node<CommandArgument<C, ?>>> chain = this.getChain(node);
             Collections.reverse(chain);
             chain = chain.subList(1, chain.size());
             // Go through all nodes from the tail upwards until a collision occurs
-            for (final Node<CommandComponent<C, ?>> commandComponentNode : chain) {
-                if (commandComponentNode.nodeMeta.containsKey("permission") && !commandComponentNode.nodeMeta.get("permission")
+            for (final Node<CommandArgument<C, ?>> commandArgumentNode : chain) {
+                if (commandArgumentNode.nodeMeta.containsKey("permission") && !commandArgumentNode.nodeMeta.get("permission")
                                                                                                              .equalsIgnoreCase(
                                                                                                                      node.nodeMeta
                                                                                                            .get("permission"))) {
-                    commandComponentNode.nodeMeta.put("permission", "");
+                    commandArgumentNode.nodeMeta.put("permission", "");
                 } else {
-                    commandComponentNode.nodeMeta.put("permission", node.nodeMeta.get("permission"));
+                    commandArgumentNode.nodeMeta.put("permission", node.nodeMeta.get("permission"));
                 }
             }
         });
     }
 
-    private void checkAmbiguity(@Nonnull final Node<CommandComponent<C, ?>> node) throws AmbiguousNodeException {
+    private void checkAmbiguity(@Nonnull final Node<CommandArgument<C, ?>> node) throws AmbiguousNodeException {
         if (node.isLeaf()) {
             return;
         }
         final int size = node.children.size();
-        for (final Node<CommandComponent<C, ?>> child : node.children) {
+        for (final Node<CommandArgument<C, ?>> child : node.children) {
             if (child.getValue() != null && !child.getValue().isRequired() && size > 1) {
                 throw new AmbiguousNodeException(node.getValue(),
                                                  child.getValue(),
@@ -456,8 +456,8 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
         node.children.forEach(this::checkAmbiguity);
     }
 
-    private List<Node<CommandComponent<C, ?>>> getLeavesRaw(@Nonnull final Node<CommandComponent<C, ?>> node) {
-        final List<Node<CommandComponent<C, ?>>> leaves = new LinkedList<>();
+    private List<Node<CommandArgument<C, ?>>> getLeavesRaw(@Nonnull final Node<CommandArgument<C, ?>> node) {
+        final List<Node<CommandArgument<C, ?>>> leaves = new LinkedList<>();
         if (node.isLeaf()) {
             if (node.getValue() != null) {
                 leaves.add(node);
@@ -468,8 +468,8 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
         return leaves;
     }
 
-    private List<CommandComponent<C, ?>> getLeaves(@Nonnull final Node<CommandComponent<C, ?>> node) {
-        final List<CommandComponent<C, ?>> leaves = new LinkedList<>();
+    private List<CommandArgument<C, ?>> getLeaves(@Nonnull final Node<CommandArgument<C, ?>> node) {
+        final List<CommandArgument<C, ?>> leaves = new LinkedList<>();
         if (node.isLeaf()) {
             if (node.getValue() != null) {
                 leaves.add(node.getValue());
@@ -480,9 +480,9 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
         return leaves;
     }
 
-    private List<Node<CommandComponent<C, ?>>> getChain(@Nullable final Node<CommandComponent<C, ?>> end) {
-        final List<Node<CommandComponent<C, ?>>> chain = new LinkedList<>();
-        Node<CommandComponent<C, ?>> tail = end;
+    private List<Node<CommandArgument<C, ?>>> getChain(@Nullable final Node<CommandArgument<C, ?>> end) {
+        final List<Node<CommandArgument<C, ?>>> chain = new LinkedList<>();
+        Node<CommandArgument<C, ?>> tail = end;
         while (tail != null) {
             chain.add(tail);
             tail = tail.getParent();
@@ -507,7 +507,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
      * @return Root nodes
      */
     @Nonnull
-    public Collection<Node<CommandComponent<C, ?>>> getRootNodes() {
+    public Collection<Node<CommandArgument<C, ?>>> getRootNodes() {
         return this.internalTree.getChildren();
     }
 
@@ -518,7 +518,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
      * @return Root node, or {@code null}
      */
     @Nullable
-    public Node<CommandComponent<C, ?>> getNamedNode(@Nullable final String name) {
+    public Node<CommandArgument<C, ?>> getNamedNode(@Nullable final String name) {
         return this.getRootNodes().stream().filter(node -> node.getValue() != null
                 && node.getValue().getName().equalsIgnoreCase(name)).findAny().orElse(null);
     }

@@ -21,8 +21,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+package com.intellectualsites.commands.exceptions;
 
-/**
- * Standard command component types
- */
-package com.intellectualsites.commands.components.standard;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.sender.CommandSender;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+
+public class ArgumentParseException extends CommandParseException {
+
+    private final Throwable cause;
+
+    /**
+     * Create a new command parse exception
+     *
+     * @param throwable     Exception that caused the parsing error
+     * @param commandSender Command sender
+     * @param currentChain  Chain leading up to the exception
+     */
+    public ArgumentParseException(@Nonnull final Throwable throwable,
+                                  @Nonnull final CommandSender commandSender,
+                                  @Nonnull final List<CommandArgument<?, ?>> currentChain) {
+        super(commandSender, currentChain);
+        this.cause = throwable;
+    }
+
+    /**
+     * Get the cause of the exception
+     *
+     * @return Cause
+     */
+    @Nonnull
+    public Throwable getCause() {
+        return this.cause;
+    }
+
+}

@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands.exceptions;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -46,7 +46,7 @@ public class InvalidSyntaxException extends CommandParseException {
      */
     public InvalidSyntaxException(@Nonnull final String correctSyntax,
                                   @Nonnull final CommandSender commandSender,
-                                  @Nonnull final List<CommandComponent<?, ?>> currentChain) {
+                                  @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.correctSyntax = correctSyntax;
     }

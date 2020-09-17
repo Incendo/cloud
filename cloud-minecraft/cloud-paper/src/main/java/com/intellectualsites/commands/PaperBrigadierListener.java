@@ -26,7 +26,7 @@ package com.intellectualsites.commands;
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
 import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -112,7 +112,7 @@ class PaperBrigadierListener<C extends CommandSender> implements Listener {
     @EventHandler
     public void onCommandRegister(@Nonnull final CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
         final CommandTree<C, BukkitCommandMeta> commandTree = this.paperCommandManager.getCommandTree();
-        final CommandTree.Node<CommandComponent<C, ?>> node = commandTree.getNamedNode(event.getCommandLabel());
+        final CommandTree.Node<CommandArgument<C, ?>> node = commandTree.getNamedNode(event.getCommandLabel());
         if (node == null) {
             return;
         }

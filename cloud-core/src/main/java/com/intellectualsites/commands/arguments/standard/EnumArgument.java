@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
@@ -36,84 +36,84 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
- * Component type that recognizes enums
+ * Argument type that recognizes enums
  *
- * @param <C> Component sender
+ * @param <C> Argument sender
  * @param <E> Enum type
  */
 @SuppressWarnings("unused")
-public class EnumComponent<C extends CommandSender, E extends Enum<E>> extends CommandComponent<C, E> {
+public class EnumArgument<C extends CommandSender, E extends Enum<E>> extends CommandArgument<C, E> {
 
-    protected EnumComponent(@Nonnull final Class<E> enumClass,
-                         final boolean required,
-                         @Nonnull final String name,
-                         @Nonnull final String defaultValue) {
+    protected EnumArgument(@Nonnull final Class<E> enumClass,
+                           final boolean required,
+                           @Nonnull final String name,
+                           @Nonnull final String defaultValue) {
         super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass);
     }
 
     /**
      * Create a new builder
      *
-     * @param name      Name of the component
+     * @param name      Name of the argument
      * @param enumClass Enum class
      * @param <C>       Command sender type
      * @param <E>       Enum type
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender, E extends Enum<E>> EnumComponent.Builder<C, E> newBuilder(
+    public static <C extends CommandSender, E extends Enum<E>> EnumArgument.Builder<C, E> newBuilder(
             @Nonnull final Class<E> enumClass, @Nonnull final String name) {
-        return new EnumComponent.Builder<>(name, enumClass);
+        return new EnumArgument.Builder<>(name, enumClass);
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
      * @param enumClass Enum class
-     * @param name      Name of the component
+     * @param name      Name of the argument
      * @param <C>       Command sender type
      * @param <E>       Enum type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender, E extends Enum<E>> CommandComponent<C, E> required(
+    public static <C extends CommandSender, E extends Enum<E>> CommandArgument<C, E> required(
             @Nonnull final Class<E> enumClass, @Nonnull final String name) {
-        return EnumComponent.<C, E>newBuilder(enumClass, name).asRequired().build();
+        return EnumArgument.<C, E>newBuilder(enumClass, name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
      * @param enumClass Enum class
-     * @param name      Name of the component
+     * @param name      Name of the argument
      * @param <C>       Command sender type
      * @param <E>       Enum type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender, E extends Enum<E>> CommandComponent<C, E> optional(
+    public static <C extends CommandSender, E extends Enum<E>> CommandArgument<C, E> optional(
             @Nonnull final Class<E> enumClass, @Nonnull final String name) {
-        return EnumComponent.<C, E>newBuilder(enumClass, name).asOptional().build();
+        return EnumArgument.<C, E>newBuilder(enumClass, name).asOptional().build();
     }
 
     /**
-     * Create a new optional command component with a default value
+     * Create a new optional command argument with a default value
      *
      * @param enumClass    Enum class
-     * @param name         Name of the component
+     * @param name         Name of the argument
      * @param defaultValue Default value
      * @param <C>          Command sender type
      * @param <E>          Enum type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender, E extends Enum<E>> CommandComponent<C, E> optional(
+    public static <C extends CommandSender, E extends Enum<E>> CommandArgument<C, E> optional(
             @Nonnull final Class<E> enumClass, @Nonnull final String name, @Nonnull final E defaultValue) {
-        return EnumComponent.<C, E>newBuilder(enumClass, name).asOptionalWithDefault(defaultValue.name().toLowerCase()).build();
+        return EnumArgument.<C, E>newBuilder(enumClass, name).asOptionalWithDefault(defaultValue.name().toLowerCase()).build();
     }
 
 
-    public static final class Builder<C extends CommandSender, E extends Enum<E>> extends CommandComponent.Builder<C, E> {
+    public static final class Builder<C extends CommandSender, E extends Enum<E>> extends CommandArgument.Builder<C, E> {
 
         private final Class<E> enumClass;
 
@@ -124,13 +124,13 @@ public class EnumComponent<C extends CommandSender, E extends Enum<E>> extends C
 
         @Nonnull
         @Override
-        public CommandComponent<C, E> build() {
-            return new EnumComponent<>(this.enumClass, this.isRequired(), this.getName(), this.getDefaultValue());
+        public CommandArgument<C, E> build() {
+            return new EnumArgument<>(this.enumClass, this.isRequired(), this.getName(), this.getDefaultValue());
         }
     }
 
 
-    public static final class EnumParser<C extends CommandSender, E extends Enum<E>> implements ComponentParser<C, E> {
+    public static final class EnumParser<C extends CommandSender, E extends Enum<E>> implements ArgumentParser<C, E> {
 
         private final Class<E> enumClass;
         private final EnumSet<E> allowedValues;
@@ -147,21 +147,21 @@ public class EnumComponent<C extends CommandSender, E extends Enum<E>> extends C
 
         @Nonnull
         @Override
-        public ComponentParseResult<E> parse(@Nonnull final CommandContext<C> commandContext,
-                                             @Nonnull final Queue<String> inputQueue) {
+        public ArgumentParseResult<E> parse(@Nonnull final CommandContext<C> commandContext,
+                                            @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
             for (final E value : this.allowedValues) {
                 if (value.name().equalsIgnoreCase(input)) {
                     inputQueue.remove();
-                    return ComponentParseResult.success(value);
+                    return ArgumentParseResult.success(value);
                 }
             }
 
-            return ComponentParseResult.failure(new EnumParseException(input, this.enumClass));
+            return ArgumentParseResult.failure(new EnumParseException(input, this.enumClass));
         }
 
         @Nonnull

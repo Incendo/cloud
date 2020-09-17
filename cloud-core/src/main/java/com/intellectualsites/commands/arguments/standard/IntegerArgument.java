@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -34,16 +34,16 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class IntegerComponent<C extends CommandSender> extends CommandComponent<C, Integer> {
+public final class IntegerArgument<C extends CommandSender> extends CommandArgument<C, Integer> {
 
     private final int min;
     private final int max;
 
-    private IntegerComponent(final boolean required,
-                             @Nonnull final String name,
-                             final int min,
-                             final int max,
-                             final String defaultValue) {
+    private IntegerArgument(final boolean required,
+                            @Nonnull final String name,
+                            final int min,
+                            final int max,
+                            final String defaultValue) {
         super(required, name, new IntegerParser<>(min, max), defaultValue, Integer.class);
         this.min = min;
         this.max = max;
@@ -52,7 +52,7 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
@@ -62,45 +62,45 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Integer> required(@Nonnull final String name) {
-        return IntegerComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, Integer> required(@Nonnull final String name) {
+        return IntegerArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name) {
-        return IntegerComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, Integer> optional(@Nonnull final String name) {
+        return IntegerArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new required command argument with a default value
      *
-     * @param name       Component name
+     * @param name       Argument name
      * @param defaultNum Default num
      * @param <C>        Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Integer> optional(@Nonnull final String name,
-                                                                                  final int defaultNum) {
-        return IntegerComponent.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
+    public static <C extends CommandSender> CommandArgument<C, Integer> optional(@Nonnull final String name,
+                                                                                 final int defaultNum) {
+        return IntegerArgument.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Integer> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Integer> {
 
         private int min = Integer.MIN_VALUE;
         private int max = Integer.MAX_VALUE;
@@ -134,14 +134,14 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
         }
 
         /**
-         * Builder a new integer component
+         * Builder a new integer argument
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
         @Override
-        public IntegerComponent<C> build() {
-            return new IntegerComponent<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+        public IntegerArgument<C> build() {
+            return new IntegerArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
         }
 
     }
@@ -166,7 +166,7 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
     }
 
 
-    public static final class IntegerParser<C extends CommandSender> implements ComponentParser<C, Integer> {
+    public static final class IntegerParser<C extends CommandSender> implements ArgumentParser<C, Integer> {
 
         private final int min;
         private final int max;
@@ -184,22 +184,22 @@ public final class IntegerComponent<C extends CommandSender> extends CommandComp
 
         @Nonnull
         @Override
-        public ComponentParseResult<Integer> parse(
+        public ArgumentParseResult<Integer> parse(
                 @Nonnull final CommandContext<C> commandContext,
                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
             try {
                 final int value = Integer.parseInt(input);
                 if (value < this.min || value > this.max) {
-                    return ComponentParseResult.failure(new IntegerParseException(input, this.min, this.max));
+                    return ArgumentParseResult.failure(new IntegerParseException(input, this.min, this.max));
                 }
                 inputQueue.remove();
-                return ComponentParseResult.success(value);
+                return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ComponentParseResult.failure(new IntegerParseException(input, this.min, this.max));
+                return ArgumentParseResult.failure(new IntegerParseException(input, this.min, this.max));
             }
         }
 

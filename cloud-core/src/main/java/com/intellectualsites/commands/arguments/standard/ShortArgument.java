@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.standard;
+package com.intellectualsites.commands.arguments.standard;
 
-import com.intellectualsites.commands.components.CommandComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -34,12 +34,12 @@ import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class ShortComponent<C extends CommandSender> extends CommandComponent<C, Short> {
+public final class ShortArgument<C extends CommandSender> extends CommandArgument<C, Short> {
 
     private final short min;
     private final short max;
 
-    private ShortComponent(final boolean required,
+    private ShortArgument(final boolean required,
                           @Nonnull final String name,
                           final short min,
                           final short max,
@@ -52,55 +52,55 @@ public final class ShortComponent<C extends CommandSender> extends CommandCompon
     /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> ShortComponent.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C extends CommandSender> ShortArgument.Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Short> required(@Nonnull final String name) {
-        return ShortComponent.<C>newBuilder(name).asRequired().build();
+    public static <C extends CommandSender> CommandArgument<C, Short> required(@Nonnull final String name) {
+        return ShortArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument
      *
-     * @param name Component name
+     * @param name Argument name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Short> optional(@Nonnull final String name) {
-        return ShortComponent.<C>newBuilder(name).asOptional().build();
+    public static <C extends CommandSender> CommandArgument<C, Short> optional(@Nonnull final String name) {
+        return ShortArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new required command argument with a default value
      *
-     * @param name       Component name
+     * @param name       Argument name
      * @param defaultNum Default num
      * @param <C>        Command sender type
-     * @return Created component
+     * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandComponent<C, Short> optional(@Nonnull final String name,
+    public static <C extends CommandSender> CommandArgument<C, Short> optional(@Nonnull final String name,
                                                                                final short defaultNum) {
-        return ShortComponent.<C>newBuilder(name).asOptionalWithDefault(Short.toString(defaultNum)).build();
+        return ShortArgument.<C>newBuilder(name).asOptionalWithDefault(Short.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandComponent.Builder<C, Short> {
+    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Short> {
 
         private short min = Short.MIN_VALUE;
         private short max = Short.MAX_VALUE;
@@ -134,14 +134,14 @@ public final class ShortComponent<C extends CommandSender> extends CommandCompon
         }
 
         /**
-         * Builder a new short component
+         * Builder a new short argument
          *
-         * @return Constructed component
+         * @return Constructed argument
          */
         @Nonnull
         @Override
-        public ShortComponent<C> build() {
-            return new ShortComponent<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+        public ShortArgument<C> build() {
+            return new ShortArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
         }
 
     }
@@ -166,7 +166,7 @@ public final class ShortComponent<C extends CommandSender> extends CommandCompon
     }
 
 
-    public static final class ShortParser<C extends CommandSender> implements ComponentParser<C, Short> {
+    public static final class ShortParser<C extends CommandSender> implements ArgumentParser<C, Short> {
 
         private final short min;
         private final short max;
@@ -184,22 +184,22 @@ public final class ShortComponent<C extends CommandSender> extends CommandCompon
 
         @Nonnull
         @Override
-        public ComponentParseResult<Short> parse(
+        public ArgumentParseResult<Short> parse(
                 @Nonnull final CommandContext<C> commandContext,
                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
             try {
                 final short value = Short.parseShort(input);
                 if (value < this.min || value > this.max) {
-                    return ComponentParseResult.failure(new ShortParseException(input, this.min, this.max));
+                    return ArgumentParseResult.failure(new ShortParseException(input, this.min, this.max));
                 }
                 inputQueue.remove();
-                return ComponentParseResult.success(value);
+                return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ComponentParseResult.failure(new ShortParseException(input, this.min, this.max));
+                return ArgumentParseResult.failure(new ShortParseException(input, this.min, this.max));
             }
         }
 

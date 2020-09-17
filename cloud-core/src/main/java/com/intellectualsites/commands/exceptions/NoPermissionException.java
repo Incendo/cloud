@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands.exceptions;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -47,7 +47,7 @@ public class NoPermissionException extends CommandParseException {
      */
     public NoPermissionException(@Nonnull final String missingPermission,
                                  @Nonnull final CommandSender commandSender,
-                                 @Nonnull final List<CommandComponent<?, ?>> currentChain) {
+                                 @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.missingPermission = missingPermission;
     }

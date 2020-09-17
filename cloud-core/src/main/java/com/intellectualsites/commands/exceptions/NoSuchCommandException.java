@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands.exceptions;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -46,7 +46,7 @@ public final class NoSuchCommandException extends CommandParseException {
      * @param command       Entered command (following the command chain)
      */
     public NoSuchCommandException(@Nonnull final CommandSender commandSender,
-                                  @Nonnull final List<CommandComponent<?, ?>> currentChain,
+                                  @Nonnull final List<CommandArgument<?, ?>> currentChain,
                                   @Nonnull final String command) {
         super(commandSender, currentChain);
         this.suppliedCommand = command;
@@ -56,11 +56,11 @@ public final class NoSuchCommandException extends CommandParseException {
     @Override
     public String getMessage() {
         final StringBuilder builder = new StringBuilder();
-        for (final CommandComponent<?, ?> commandComponent : this.getCurrentChain()) {
-            if (commandComponent == null) {
+        for (final CommandArgument<?, ?> commandArgument : this.getCurrentChain()) {
+            if (commandArgument == null) {
                 continue;
             }
-            builder.append(" ").append(commandComponent.getName());
+            builder.append(" ").append(commandArgument.getName());
         }
         return String.format("Unrecognized command input '%s' following chain%s", this.suppliedCommand, builder.toString());
     }

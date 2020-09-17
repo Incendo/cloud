@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components.parser;
+package com.intellectualsites.commands.arguments.parser;
 
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.sender.CommandSender;
@@ -34,7 +34,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * Registry of {@link ComponentParser} that allows these components to be
+ * Registry of {@link ArgumentParser} that allows these arguments to be
  * referenced by a {@link Class} (or really, a {@link com.google.common.reflect.TypeToken})
  * or a {@link String} key
  *
@@ -51,7 +51,7 @@ public interface ParserRegistry<C extends CommandSender> {
      * @param <T>      Generic type specifying what is produced by the parser
      */
     <T> void registerParserSupplier(@Nonnull TypeToken<T> type,
-                                    @Nonnull Function<ParserParameters, ComponentParser<C, ?>> supplier);
+                                    @Nonnull Function<ParserParameters, ArgumentParser<C, ?>> supplier);
 
     /**
      * Register a mapper that maps annotation instances to a map of parameter-object pairs
@@ -77,7 +77,7 @@ public interface ParserRegistry<C extends CommandSender> {
     ParserParameters parseAnnotations(@Nonnull TypeToken<?> parsingType, @Nonnull Collection<? extends Annotation> annotations);
 
     /**
-     * Attempt to create a {@link ComponentParser} for a specified type, using
+     * Attempt to create a {@link ArgumentParser} for a specified type, using
      * an instance of {@link ParserParameter} to configure the parser settings
      *
      * @param type             Type that should be produced by the parser
@@ -86,7 +86,7 @@ public interface ParserRegistry<C extends CommandSender> {
      * @return Parser, if one can be created
      */
     @Nonnull
-    <T> Optional<ComponentParser<C, T>> createParser(@Nonnull TypeToken<T> type,
-                                                     @Nonnull ParserParameters parserParameters);
+    <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull TypeToken<T> type,
+                                                    @Nonnull ParserParameters parserParameters);
 
 }

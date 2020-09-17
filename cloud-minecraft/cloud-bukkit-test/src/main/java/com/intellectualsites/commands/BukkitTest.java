@@ -23,16 +23,16 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.components.StaticComponent;
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.standard.BooleanComponent;
-import com.intellectualsites.commands.components.standard.DoubleComponent;
-import com.intellectualsites.commands.components.standard.EnumComponent;
-import com.intellectualsites.commands.components.standard.FloatComponent;
-import com.intellectualsites.commands.components.standard.IntegerComponent;
-import com.intellectualsites.commands.components.standard.StringComponent;
+import com.intellectualsites.commands.arguments.StaticArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.standard.BooleanArgument;
+import com.intellectualsites.commands.arguments.standard.DoubleArgument;
+import com.intellectualsites.commands.arguments.standard.EnumArgument;
+import com.intellectualsites.commands.arguments.standard.FloatArgument;
+import com.intellectualsites.commands.arguments.standard.IntegerArgument;
+import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
-import com.intellectualsites.commands.parsers.WorldComponent;
+import com.intellectualsites.commands.parsers.WorldArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -65,8 +65,8 @@ public final class BukkitTest extends JavaPlugin {
                                            BukkitCommandMetaBuilder.builder()
                                                                    .withDescription("Your ugli")
                                                                    .build())
-                           .component(EnumComponent.required(GameMode.class, "gamemode"))
-                           .component(StringComponent.<BukkitCommandSender>newBuilder("player")
+                           .argument(EnumArgument.required(GameMode.class, "gamemode"))
+                           .argument(StringArgument.<BukkitCommandSender>newBuilder("player")
                                               .withSuggestionsProvider((v1, v2) -> {
                                                   final List<String> suggestions =
                                                           new ArrayList<>(
@@ -84,8 +84,8 @@ public final class BukkitTest extends JavaPlugin {
                                                                .orElse(GameMode.SURVIVAL)))
                            .build())
                .command(mgr.commandBuilder("kenny")
-                           .component(StaticComponent.required("sux"))
-                           .component(IntegerComponent
+                           .argument(StaticArgument.required("sux"))
+                           .argument(IntegerArgument
                                               .<BukkitCommandSender>newBuilder("perc")
                                               .withMin(PERC_MIN).withMax(PERC_MAX).build())
                            .handler(context -> {
@@ -96,32 +96,32 @@ public final class BukkitTest extends JavaPlugin {
                            })
                            .build())
                .command(mgr.commandBuilder("test")
-                           .component(StaticComponent.required("one"))
+                           .argument(StaticArgument.required("one"))
                            .handler(c -> c.getSender().sendMessage("One!"))
                            .build())
                .command(mgr.commandBuilder("test")
-                           .component(StaticComponent.required("two"))
+                           .argument(StaticArgument.required("two"))
                            .handler(c -> c.getSender().sendMessage("Two!"))
                            .build())
                .command(mgr.commandBuilder("uuidtest")
-                           .component(UUID.class, "uuid", builder -> builder
+                           .argument(UUID.class, "uuid", builder -> builder
                                    .asRequired()
                                    .withParser((c, i) -> {
                                        final String string = i.peek();
                                        try {
                                            final UUID uuid = UUID.fromString(string);
                                            i.remove();
-                                           return ComponentParseResult.success(uuid);
+                                           return ArgumentParseResult.success(uuid);
                                        } catch (final Exception e) {
-                                           return ComponentParseResult.failure(e);
+                                           return ArgumentParseResult.failure(e);
                                        }
                                    }).build())
                            .handler(c -> c.getSender()
                                           .sendMessage(String.format("UUID: %s\n", c.<UUID>get("uuid").orElse(null))))
                            .build())
                .command(mgr.commandBuilder("give")
-                           .component(EnumComponent.required(Material.class, "material"))
-                           .component(IntegerComponent.required("amount"))
+                           .argument(EnumArgument.required(Material.class, "material"))
+                           .argument(IntegerArgument.required("amount"))
                            .handler(c -> {
                                final Material material = c.getRequired("material");
                                final int amount = c.getRequired("amount");
@@ -133,7 +133,7 @@ public final class BukkitTest extends JavaPlugin {
                .command(mgr.commandBuilder("worldtp", BukkitCommandMetaBuilder.builder()
                                                                               .withDescription("Teleport to a world")
                                                                               .build())
-                           .component(WorldComponent.required("world"))
+                           .argument(WorldArgument.required("world"))
                            .handler(c -> {
                                final World world = c.getRequired("world");
                                c.getSender().asPlayer().teleport(world.getSpawnLocation());
@@ -141,11 +141,11 @@ public final class BukkitTest extends JavaPlugin {
                            })
                            .build())
                .command(mgr.commandBuilder("brigadier")
-                           .component(FloatComponent.required("float"))
-                           .component(DoubleComponent.required("double"))
-                           .component(IntegerComponent.required("int"))
-                           .component(BooleanComponent.required("bool"))
-                           .component(StringComponent.required("string"))
+                           .argument(FloatArgument.required("float"))
+                           .argument(DoubleArgument.required("double"))
+                           .argument(IntegerArgument.required("int"))
+                           .argument(BooleanArgument.required("bool"))
+                           .argument(StringArgument.required("string"))
                            .handler(c -> c.getSender().sendMessage("Executed the command"))
                            .build());
         } catch (final Exception e) {

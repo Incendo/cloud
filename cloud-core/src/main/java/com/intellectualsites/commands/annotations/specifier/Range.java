@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 
 /**
  * Used to specify min and max values of numerical
- * {@link com.intellectualsites.commands.components.parser.ComponentParser parsers}
+ * {@link com.intellectualsites.commands.arguments.parser.ArgumentParser parsers}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

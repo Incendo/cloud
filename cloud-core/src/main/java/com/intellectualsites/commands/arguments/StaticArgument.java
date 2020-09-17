@@ -21,10 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.components;
+package com.intellectualsites.commands.arguments;
 
-import com.intellectualsites.commands.components.parser.ComponentParseResult;
-import com.intellectualsites.commands.components.parser.ComponentParser;
+import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.sender.CommandSender;
 
@@ -37,42 +37,42 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- * {@link CommandComponent} type that recognizes fixed strings. This type does not parse variables.
+ * {@link CommandArgument} type that recognizes fixed strings. This type does not parse variables.
  *
  * @param <C> Command sender type
  */
-public final class StaticComponent<C extends CommandSender> extends CommandComponent<C, String> {
+public final class StaticArgument<C extends CommandSender> extends CommandArgument<C, String> {
 
-    private StaticComponent(final boolean required, @Nonnull final String name, @Nonnull final String... aliases) {
-        super(required, name, new StaticComponentParser<>(name, aliases), String.class);
+    private StaticArgument(final boolean required, @Nonnull final String name, @Nonnull final String... aliases) {
+        super(required, name, new StaticArgumentParser<>(name, aliases), String.class);
     }
 
     /**
-     * Create a new static component instance for a required command component
+     * Create a new static argument instance for a required command argument
      *
-     * @param name    Component name
-     * @param aliases Component aliases
+     * @param name    Argument name
+     * @param aliases Argument aliases
      * @param <C>     Command sender type
-     * @return Constructed component
+     * @return Constructed argument
      */
     @Nonnull
-    public static <C extends CommandSender> StaticComponent<C> required(@Nonnull final String name,
-                                                                        @Nonnull final String... aliases) {
-        return new StaticComponent<>(true, name, aliases);
+    public static <C extends CommandSender> StaticArgument<C> required(@Nonnull final String name,
+                                                                       @Nonnull final String... aliases) {
+        return new StaticArgument<>(true, name, aliases);
     }
 
     /**
-     * Create a new static component instance for an optional command component
+     * Create a new static argument instance for an optional command argument
      *
-     * @param name    Component name
-     * @param aliases Component aliases
+     * @param name    Argument name
+     * @param aliases Argument aliases
      * @param <C>     Command sender type
-     * @return Constructed component
+     * @return Constructed argument
      */
     @Nonnull
-    public static <C extends CommandSender> StaticComponent<C> optional(@Nonnull final String name,
-                                                                        @Nonnull final String... aliases) {
-        return new StaticComponent<>(false, name, aliases);
+    public static <C extends CommandSender> StaticArgument<C> optional(@Nonnull final String name,
+                                                                       @Nonnull final String... aliases) {
+        return new StaticArgument<>(false, name, aliases);
     }
 
     /**
@@ -81,26 +81,26 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
      * @param alias New alias
      */
     public void registerAlias(@Nonnull final String alias) {
-        ((StaticComponentParser<C>) this.getParser()).acceptedStrings.add(alias);
+        ((StaticArgumentParser<C>) this.getParser()).acceptedStrings.add(alias);
     }
 
     /**
      * Get an immutable view of the aliases
      *
-     * @return Immutable view of the component aliases
+     * @return Immutable view of the argument aliases
      */
     @Nonnull
     public Set<String> getAliases() {
-        return Collections.unmodifiableSet(((StaticComponentParser<C>) this.getParser()).getAcceptedStrings());
+        return Collections.unmodifiableSet(((StaticArgumentParser<C>) this.getParser()).getAcceptedStrings());
     }
 
 
-    private static final class StaticComponentParser<C extends CommandSender> implements ComponentParser<C, String> {
+    private static final class StaticArgumentParser<C extends CommandSender> implements ArgumentParser<C, String> {
 
         private final String name;
         private final Set<String> acceptedStrings = new HashSet<>();
 
-        private StaticComponentParser(@Nonnull final String name, @Nonnull final String... aliases) {
+        private StaticArgumentParser(@Nonnull final String name, @Nonnull final String... aliases) {
             this.name = name;
             this.acceptedStrings.add(this.name);
             this.acceptedStrings.addAll(Arrays.asList(aliases));
@@ -108,20 +108,20 @@ public final class StaticComponent<C extends CommandSender> extends CommandCompo
 
         @Nonnull
         @Override
-        public ComponentParseResult<String> parse(@Nonnull final CommandContext<C> commandContext,
-                                                  @Nonnull final Queue<String> inputQueue) {
+        public ArgumentParseResult<String> parse(@Nonnull final CommandContext<C> commandContext,
+                                                 @Nonnull final Queue<String> inputQueue) {
             final String string = inputQueue.peek();
             if (string == null) {
-                return ComponentParseResult.failure(new NullPointerException("No input provided"));
+                return ArgumentParseResult.failure(new NullPointerException("No input provided"));
             }
             for (final String acceptedString : this.acceptedStrings) {
                 if (string.equalsIgnoreCase(acceptedString)) {
                     // Remove the head of the queue
                     inputQueue.remove();
-                    return ComponentParseResult.success(this.name);
+                    return ArgumentParseResult.success(this.name);
                 }
             }
-            return ComponentParseResult.failure(new IllegalArgumentException(string));
+            return ArgumentParseResult.failure(new IllegalArgumentException(string));
         }
 
         @Nonnull

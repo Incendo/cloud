@@ -23,7 +23,7 @@
 //
 package com.intellectualsites.commands.exceptions;
 
-import com.intellectualsites.commands.components.CommandComponent;
+import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
@@ -37,7 +37,7 @@ import java.util.List;
 public class CommandParseException extends IllegalArgumentException {
 
     private final CommandSender commandSender;
-    private final List<CommandComponent<?, ?>> currentChain;
+    private final List<CommandArgument<?, ?>> currentChain;
 
     /**
      * Construct a new command parse exception
@@ -46,7 +46,7 @@ public class CommandParseException extends IllegalArgumentException {
      * @param currentChain  Chain leading up to the exception
      */
     protected CommandParseException(@Nonnull final CommandSender commandSender,
-                                    @Nonnull final List<CommandComponent<?, ?>> currentChain) {
+                                    @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         this.commandSender = commandSender;
         this.currentChain = currentChain;
     }
@@ -64,10 +64,10 @@ public class CommandParseException extends IllegalArgumentException {
     /**
      * Get the command chain leading up to the exception
      *
-     * @return Unmodifiable list of command components
+     * @return Unmodifiable list of command arguments
      */
     @Nonnull
-    public List<CommandComponent<?, ?>> getCurrentChain() {
+    public List<CommandArgument<?, ?>> getCurrentChain() {
         return Collections.unmodifiableList(this.currentChain);
     }
 

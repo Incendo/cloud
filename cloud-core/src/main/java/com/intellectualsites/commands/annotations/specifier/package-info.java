@@ -23,7 +23,7 @@
 //
 
 /**
- * Standard annotations used to match {@link com.intellectualsites.commands.components.parser.ComponentParser}
- * in {@link com.intellectualsites.commands.components.parser.ParserRegistry}
+ * Standard annotations used to match {@link com.intellectualsites.commands.arguments.parser.ArgumentParser}
+ * in {@link com.intellectualsites.commands.arguments.parser.ParserRegistry}
  */
 package com.intellectualsites.commands.annotations.specifier;
