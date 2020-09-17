@@ -35,7 +35,6 @@ import com.intellectualsites.commands.arguments.standard.FloatArgument;
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.arguments.standard.ShortArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
@@ -52,7 +51,7 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public final class StandardParserRegistry<C extends CommandSender> implements ParserRegistry<C> {
+public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
     private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = ImmutableMap.<Class<?>, Class<?>>builder()
             .put(char.class, Character.class)

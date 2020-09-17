@@ -23,8 +23,6 @@
 //
 package com.intellectualsites.commands.arguments;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
@@ -35,7 +33,7 @@ import java.util.function.Function;
  * @param <C> Command sender type
  */
 @FunctionalInterface
-public interface CommandSyntaxFormatter<C extends CommandSender> extends Function<List<CommandArgument<C, ?>>, String> {
+public interface CommandSyntaxFormatter<C> extends Function<List<CommandArgument<C, ?>>, String> {
 
     @Override
     @Nonnull

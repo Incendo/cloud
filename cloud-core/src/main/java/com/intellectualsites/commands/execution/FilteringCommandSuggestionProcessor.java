@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.execution;
 
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedList;
@@ -35,7 +34,7 @@ import java.util.List;
  *
  * @param <C> Command sender type
  */
-public final class FilteringCommandSuggestionProcessor<C extends CommandSender> implements CommandSuggestionProcessor<C> {
+public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
 
     @Nonnull
     @Override

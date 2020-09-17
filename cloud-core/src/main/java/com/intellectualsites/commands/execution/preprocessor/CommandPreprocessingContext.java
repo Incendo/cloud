@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.execution.preprocessor;
 
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedList;
@@ -35,7 +34,7 @@ import java.util.Objects;
  *
  * @param <C> Command sender type
  */
-public final class CommandPreprocessingContext<C extends CommandSender> {
+public final class CommandPreprocessingContext<C> {
 
     private final CommandContext<C> commandContext;
     private final LinkedList<String> inputQueue;

@@ -155,4 +155,9 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
         return SimpleCommandMeta.empty();
     }
 
+    @Override
+    public final boolean hasPermission(@Nonnull final JLineCommandSender sender, @Nonnull final String permission) {
+       return true;
+    }
+
 }

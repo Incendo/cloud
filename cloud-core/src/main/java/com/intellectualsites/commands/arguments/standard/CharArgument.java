@@ -27,13 +27,12 @@ import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class CharArgument<C extends CommandSender> extends CommandArgument<C, Character> {
+public final class CharArgument<C> extends CommandArgument<C, Character> {
 
     private CharArgument(final boolean required, @Nonnull final String name,
                          @Nonnull final String defaultValue) {
@@ -48,7 +47,7 @@ public final class CharArgument<C extends CommandSender> extends CommandArgument
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> CharArgument.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> CharArgument.Builder<C> newBuilder(@Nonnull final String name) {
         return new CharArgument.Builder<>(name);
     }
 
@@ -60,7 +59,7 @@ public final class CharArgument<C extends CommandSender> extends CommandArgument
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Character> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Character> required(@Nonnull final String name) {
         return CharArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -72,7 +71,7 @@ public final class CharArgument<C extends CommandSender> extends CommandArgument
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Character> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Character> optional(@Nonnull final String name) {
         return CharArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -85,13 +84,13 @@ public final class CharArgument<C extends CommandSender> extends CommandArgument
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Character> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, Character> optional(@Nonnull final String name,
                                                                                    final String defaultNum) {
         return CharArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Character> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Character> {
 
         protected Builder(@Nonnull final String name) {
             super(Character.class, name);
@@ -111,7 +110,7 @@ public final class CharArgument<C extends CommandSender> extends CommandArgument
     }
 
 
-    public static final class CharacterParser<C extends CommandSender> implements ArgumentParser<C, Character> {
+    public static final class CharacterParser<C> implements ArgumentParser<C, Character> {
 
         @Nonnull
         @Override

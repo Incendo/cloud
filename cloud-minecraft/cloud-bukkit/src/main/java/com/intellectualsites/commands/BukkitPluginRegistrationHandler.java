@@ -25,7 +25,6 @@ package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
-import com.intellectualsites.commands.sender.CommandSender;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.SimpleCommandMap;
@@ -37,7 +36,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-final class BukkitPluginRegistrationHandler<C extends CommandSender> implements CommandRegistrationHandler<BukkitCommandMeta> {
+final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler<BukkitCommandMeta> {
 
     private final Map<CommandArgument<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
 

@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.exceptions;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -43,7 +42,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @param requiredSender The sender type that is required
      * @param currentChain   Chain leading up to the exception
      */
-    public InvalidCommandSenderException(@Nonnull final CommandSender commandSender,
+    public InvalidCommandSenderException(@Nonnull final Object commandSender,
                                          @Nonnull final Class<?> requiredSender,
                                          @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);

@@ -28,13 +28,12 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class DoubleArgument<C extends CommandSender> extends CommandArgument<C, Double> {
+public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
     private final double min;
     private final double max;
@@ -57,7 +56,7 @@ public final class DoubleArgument<C extends CommandSender> extends CommandArgume
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
@@ -69,7 +68,7 @@ public final class DoubleArgument<C extends CommandSender> extends CommandArgume
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Double> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Double> required(@Nonnull final String name) {
         return DoubleArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -81,7 +80,7 @@ public final class DoubleArgument<C extends CommandSender> extends CommandArgume
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Double> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Double> optional(@Nonnull final String name) {
         return DoubleArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,13 +93,13 @@ public final class DoubleArgument<C extends CommandSender> extends CommandArgume
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Double> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, Double> optional(@Nonnull final String name,
                                                                                 final double defaultNum) {
         return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(Double.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Double> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Double> {
 
         private double min = Double.MIN_VALUE;
         private double max = Double.MAX_VALUE;
@@ -166,7 +165,7 @@ public final class DoubleArgument<C extends CommandSender> extends CommandArgume
     }
 
 
-    public static final class DoubleParser<C extends CommandSender> implements ArgumentParser<C, Double> {
+    public static final class DoubleParser<C> implements ArgumentParser<C, Double> {
 
         private final double min;
         private final double max;

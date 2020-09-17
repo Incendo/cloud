@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.exceptions;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -41,7 +40,7 @@ public class ArgumentParseException extends CommandParseException {
      * @param currentChain  Chain leading up to the exception
      */
     public ArgumentParseException(@Nonnull final Throwable throwable,
-                                  @Nonnull final CommandSender commandSender,
+                                  @Nonnull final Object commandSender,
                                   @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.cause = throwable;

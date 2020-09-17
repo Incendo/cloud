@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.execution;
 
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 
@@ -33,7 +32,7 @@ import javax.annotation.Nonnull;
  *
  * @param <C> Command sender type
  */
-public class CommandResult<C extends CommandSender> {
+public class CommandResult<C> {
 
     private final CommandContext<C> commandContext;
 

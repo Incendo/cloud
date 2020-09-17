@@ -23,7 +23,6 @@
 //
 package com.intellectualsites.commands.execution.preprocessor;
 
-import com.intellectualsites.commands.sender.CommandSender;
 import com.intellectualsites.services.types.ConsumerService;
 
 /**
@@ -36,5 +35,5 @@ import com.intellectualsites.services.types.ConsumerService;
  * @param <C> Command sender type
  * {@inheritDoc}
  */
-public interface CommandPreprocessor<C extends CommandSender> extends ConsumerService<CommandPreprocessingContext<C>> {
+public interface CommandPreprocessor<C> extends ConsumerService<CommandPreprocessingContext<C>> {
 }

@@ -39,29 +39,34 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public class BukkitCommandManager<C extends com.intellectualsites.commands.sender.CommandSender>
+public class BukkitCommandManager<C>
         extends CommandManager<C, BukkitCommandMeta> {
 
     private final Plugin owningPlugin;
+
     private final Function<CommandSender, C> commandSenderMapper;
+    private final Function<C, CommandSender> backwardsCommandSenderMapper;
 
     /**
      * Construct a new Bukkit command manager
      *
-     * @param owningPlugin                Plugin that is constructing the manager
-     * @param commandExecutionCoordinator Coordinator provider
-     * @param commandSenderMapper         Function that maps {@link CommandSender} to the command sender type
+     * @param owningPlugin                 Plugin that is constructing the manager
+     * @param commandExecutionCoordinator  Coordinator provider
+     * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
+     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
     public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
                                 @Nonnull final Function<CommandTree<C, BukkitCommandMeta>,
                                         CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator,
-                                @Nonnull final Function<CommandSender, C> commandSenderMapper)
+                                @Nonnull final Function<CommandSender, C> commandSenderMapper,
+                                @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper)
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
         ((BukkitPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
+        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
 
         /* Register Bukkit parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.of(World.class), params -> new WorldArgument.WorldParser<>());
@@ -91,6 +96,11 @@ public class BukkitCommandManager<C extends com.intellectualsites.commands.sende
     @Nonnull
     final Function<CommandSender, C> getCommandSenderMapper() {
         return this.commandSenderMapper;
+    }
+
+    @Override
+    public final boolean hasPermission(@Nonnull final C sender, @Nonnull final String permission) {
+        return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 
 }

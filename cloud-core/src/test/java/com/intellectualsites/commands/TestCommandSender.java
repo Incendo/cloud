@@ -23,18 +23,6 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
-import javax.annotation.Nonnull;
-
-public class TestCommandSender implements CommandSender {
-
-    @Override
-    public final boolean hasPermission(@Nonnull final String permission) {
-        if (permission.equalsIgnoreCase("no")) {
-            return false;
-        }
-        return true;
-    }
+public class TestCommandSender {
 
 }

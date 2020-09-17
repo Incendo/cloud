@@ -23,7 +23,7 @@
 //
 
 /**
- * Command context stores values for a {@link com.intellectualsites.commands.sender.CommandSender}
+ * Command context stores values for a command sender
  * before and during command execution and parsing
  */
 package com.intellectualsites.commands.context;

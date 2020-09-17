@@ -23,8 +23,6 @@
 //
 package com.intellectualsites.commands.arguments;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +37,7 @@ import java.util.List;
  *
  * @param <C> Command sender type
  */
-public class StandardCommandSyntaxFormatter<C extends CommandSender> implements CommandSyntaxFormatter<C> {
+public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
 
     @Nonnull
     @Override

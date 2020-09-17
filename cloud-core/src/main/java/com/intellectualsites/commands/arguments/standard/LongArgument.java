@@ -28,13 +28,12 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class LongArgument<C extends CommandSender> extends CommandArgument<C, Long> {
+public final class LongArgument<C> extends CommandArgument<C, Long> {
 
     private final long min;
     private final long max;
@@ -57,7 +56,7 @@ public final class LongArgument<C extends CommandSender> extends CommandArgument
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> LongArgument.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> LongArgument.Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
@@ -69,7 +68,7 @@ public final class LongArgument<C extends CommandSender> extends CommandArgument
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Long> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Long> required(@Nonnull final String name) {
         return LongArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -81,7 +80,7 @@ public final class LongArgument<C extends CommandSender> extends CommandArgument
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Long> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Long> optional(@Nonnull final String name) {
         return LongArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,13 +93,13 @@ public final class LongArgument<C extends CommandSender> extends CommandArgument
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Long> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, Long> optional(@Nonnull final String name,
                                                                               final long defaultNum) {
         return LongArgument.<C>newBuilder(name).asOptionalWithDefault(Long.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Long> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Long> {
 
         private long min = Long.MIN_VALUE;
         private long max = Long.MAX_VALUE;
@@ -166,7 +165,7 @@ public final class LongArgument<C extends CommandSender> extends CommandArgument
     }
 
 
-    private static final class LongParser<C extends CommandSender> implements ArgumentParser<C, Long> {
+    private static final class LongParser<C> implements ArgumentParser<C, Long> {
 
         private final long min;
         private final long max;

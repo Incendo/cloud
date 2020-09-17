@@ -37,7 +37,6 @@ import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.arguments.standard.ShortArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
-import com.intellectualsites.commands.sender.CommandSender;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -75,7 +74,7 @@ import java.util.function.Supplier;
  * @param <C> Command sender type
  * @param <S> Brigadier sender type
  */
-public final class CloudBrigadierManager<C extends CommandSender, S> {
+public final class CloudBrigadierManager<C, S> {
 
     private final Map<Class<?>, Function<? extends CommandArgument<C, ?>,
             ? extends ArgumentType<?>>> mappers;

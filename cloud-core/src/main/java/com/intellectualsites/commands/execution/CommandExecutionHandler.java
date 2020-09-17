@@ -24,18 +24,17 @@
 package com.intellectualsites.commands.execution;
 
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 
 /**
  * Handler that is invoked whenever a {@link com.intellectualsites.commands.Command} is executed
- * by a {@link com.intellectualsites.commands.sender.CommandSender}
+ * by a command sender
  *
  * @param <C> Command sender type
  */
 @FunctionalInterface
-public interface CommandExecutionHandler<C extends CommandSender> {
+public interface CommandExecutionHandler<C> {
 
     /**
      * Handle command execution
@@ -50,7 +49,7 @@ public interface CommandExecutionHandler<C extends CommandSender> {
      *
      * @param <C> Command sender type
      */
-    class NullCommandExecutionHandler<C extends CommandSender> implements CommandExecutionHandler<C> {
+    class NullCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
 
         @Override
         public void execute(@Nonnull final CommandContext<C> commandContext) {

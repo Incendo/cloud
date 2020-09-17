@@ -36,7 +36,6 @@ import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,7 +58,7 @@ import java.util.stream.Collectors;
  * @param <C> Command sender type
  * @param <M> Command meta type
  */
-public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
+public final class CommandTree<C, M extends CommandMeta> {
 
     private final Object commandLock = new Object();
 
@@ -83,7 +82,7 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
      * @return New command tree
      */
     @Nonnull
-    public static <C extends CommandSender, M extends CommandMeta> CommandTree<C, M> newTree(
+    public static <C, M extends CommandMeta> CommandTree<C, M> newTree(
             @Nonnull final CommandManager<C, M> commandManager,
             @Nonnull final CommandRegistrationHandler<M> commandRegistrationHandler) {
         return new CommandTree<>(commandManager, commandRegistrationHandler);
@@ -369,10 +368,10 @@ public final class CommandTree<C extends CommandSender, M extends CommandMeta> {
     private String isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandArgument<C, ?>> node) {
         final String permission = node.nodeMeta.get("permission");
         if (permission != null) {
-            return sender.hasPermission(permission) ? null : permission;
+            return this.commandManager.hasPermission(sender, permission) ? null : permission;
         }
         if (node.isLeaf()) {
-            return sender.hasPermission(
+            return this.commandManager.hasPermission(sender,
                     Objects.requireNonNull(Objects.requireNonNull(node.value, "node.value").getOwningCommand(),
                                            "owning command").getCommandPermission())
                    ? null : Objects.requireNonNull(node.value.getOwningCommand(), "owning command").getCommandPermission();

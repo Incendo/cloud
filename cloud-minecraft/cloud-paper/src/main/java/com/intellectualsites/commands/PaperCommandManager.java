@@ -37,7 +37,7 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public class PaperCommandManager<C extends com.intellectualsites.commands.sender.CommandSender>
+public class PaperCommandManager<C>
         extends BukkitCommandManager<C> {
 
     /**
@@ -46,14 +46,16 @@ public class PaperCommandManager<C extends com.intellectualsites.commands.sender
      * @param owningPlugin                Plugin that is constructing the manager
      * @param commandExecutionCoordinator Coordinator provider
      * @param commandSenderMapper         Function that maps {@link CommandSender} to the command sender type
+     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
     public PaperCommandManager(@Nonnull final Plugin owningPlugin,
                                @Nonnull final Function<CommandTree<C, BukkitCommandMeta>,
                           CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator,
-                               @Nonnull final Function<CommandSender, C> commandSenderMapper) throws
+                               @Nonnull final Function<CommandSender, C> commandSenderMapper,
+                               @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper) throws
             Exception {
-        super(owningPlugin, commandExecutionCoordinator, commandSenderMapper);
+        super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
     }
 
     /**

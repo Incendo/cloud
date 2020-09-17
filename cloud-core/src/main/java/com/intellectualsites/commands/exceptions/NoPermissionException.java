@@ -24,13 +24,12 @@
 package com.intellectualsites.commands.exceptions;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
- * Exception thrown when a {@link CommandSender} misses a permission required
+ * Exception thrown when a command sender misses a permission required
  * to execute a {@link com.intellectualsites.commands.Command}
  */
 @SuppressWarnings("unused")
@@ -46,7 +45,7 @@ public class NoPermissionException extends CommandParseException {
      * @param currentChain      Chain leading up to the exception
      */
     public NoPermissionException(@Nonnull final String missingPermission,
-                                 @Nonnull final CommandSender commandSender,
+                                 @Nonnull final Object commandSender,
                                  @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.missingPermission = missingPermission;

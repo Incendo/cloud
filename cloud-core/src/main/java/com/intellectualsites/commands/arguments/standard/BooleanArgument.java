@@ -27,7 +27,6 @@ import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -35,7 +34,7 @@ import java.util.List;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class BooleanArgument<C extends CommandSender> extends CommandArgument<C, Boolean> {
+public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     private final boolean liberal;
 
     private BooleanArgument(final boolean required, @Nonnull final String name,
@@ -52,7 +51,7 @@ public final class BooleanArgument<C extends CommandSender> extends CommandArgum
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
@@ -64,7 +63,7 @@ public final class BooleanArgument<C extends CommandSender> extends CommandArgum
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Boolean> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Boolean> required(@Nonnull final String name) {
         return BooleanArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -76,7 +75,7 @@ public final class BooleanArgument<C extends CommandSender> extends CommandArgum
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Boolean> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Boolean> optional(@Nonnull final String name) {
         return BooleanArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -89,13 +88,13 @@ public final class BooleanArgument<C extends CommandSender> extends CommandArgum
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Boolean> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, Boolean> optional(@Nonnull final String name,
                                                                                  final String defaultNum) {
         return BooleanArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Boolean> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Boolean> {
 
         private boolean liberal = false;
 
@@ -138,7 +137,7 @@ public final class BooleanArgument<C extends CommandSender> extends CommandArgum
     }
 
 
-    public static final class BooleanParser<C extends CommandSender> implements ArgumentParser<C, Boolean> {
+    public static final class BooleanParser<C> implements ArgumentParser<C, Boolean> {
 
         private static final List<String> LIBERAL = Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF");
         private static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");

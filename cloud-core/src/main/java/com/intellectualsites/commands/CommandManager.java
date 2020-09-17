@@ -41,7 +41,6 @@ import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessin
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessor;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
 import com.intellectualsites.services.ServicePipeline;
 import com.intellectualsites.services.State;
 
@@ -61,7 +60,7 @@ import java.util.function.Function;
  * @param <M> Command meta type
  */
 @SuppressWarnings("unused")
-public abstract class CommandManager<C extends CommandSender, M extends CommandMeta> {
+public abstract class CommandManager<C, M extends CommandMeta> {
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
@@ -193,6 +192,15 @@ public abstract class CommandManager<C extends CommandSender, M extends CommandM
     protected CommandRegistrationHandler<M> getCommandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
+
+    /**
+     * Check if the command sender has the required permission
+     *
+     * @param sender     Command sender
+     * @param permission Permission node
+     * @return {@code true} if the sender has the permission, else {@code false}
+     */
+    public abstract boolean hasPermission(@Nonnull C sender, @Nonnull String permission);
 
     /**
      * Create a new command builder

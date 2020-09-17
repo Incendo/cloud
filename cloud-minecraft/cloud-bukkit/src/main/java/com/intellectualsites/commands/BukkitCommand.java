@@ -32,7 +32,7 @@ import org.bukkit.plugin.Plugin;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-final class BukkitCommand<C extends com.intellectualsites.commands.sender.CommandSender>
+final class BukkitCommand<C>
         extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
     private final CommandArgument<C, ?> command;

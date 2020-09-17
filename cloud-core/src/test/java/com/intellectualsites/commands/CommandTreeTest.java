@@ -28,7 +28,6 @@ import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,7 @@ import java.util.concurrent.CompletionException;
 class CommandTreeTest {
 
     private static final int EXPECTED_INPUT_NUMBER = 15;
-    private static CommandManager<CommandSender, SimpleCommandMeta> manager;
+    private static CommandManager<TestCommandSender, SimpleCommandMeta> manager;
 
     @BeforeAll
     static void newTree() {
@@ -62,7 +61,7 @@ class CommandTreeTest {
 
     @Test
     void parse() {
-        final Optional<Command<CommandSender, SimpleCommandMeta>> command = manager.getCommandTree()
+        final Optional<Command<TestCommandSender, SimpleCommandMeta>> command = manager.getCommandTree()
                                                                                    .parse(new CommandContext<>(
                                                                                                          new TestCommandSender()),
                                                                                                  new LinkedList<>(

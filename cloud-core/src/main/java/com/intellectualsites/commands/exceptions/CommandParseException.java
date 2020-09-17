@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.exceptions;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -36,7 +35,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class CommandParseException extends IllegalArgumentException {
 
-    private final CommandSender commandSender;
+    private final Object commandSender;
     private final List<CommandArgument<?, ?>> currentChain;
 
     /**
@@ -45,7 +44,7 @@ public class CommandParseException extends IllegalArgumentException {
      * @param commandSender Sender who executed the command
      * @param currentChain  Chain leading up to the exception
      */
-    protected CommandParseException(@Nonnull final CommandSender commandSender,
+    protected CommandParseException(@Nonnull final Object commandSender,
                                     @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         this.commandSender = commandSender;
         this.currentChain = currentChain;
@@ -57,7 +56,7 @@ public class CommandParseException extends IllegalArgumentException {
      * @return Command sender
      */
     @Nonnull
-    public CommandSender getCommandSender() {
+    public Object getCommandSender() {
         return this.commandSender;
     }
 

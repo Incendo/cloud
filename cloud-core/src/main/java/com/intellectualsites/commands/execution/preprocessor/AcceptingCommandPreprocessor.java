@@ -23,8 +23,6 @@
 //
 package com.intellectualsites.commands.execution.preprocessor;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -33,7 +31,7 @@ import javax.annotation.Nonnull;
  *
  * @param <C> Command sender type
  */
-public final class AcceptingCommandPreprocessor<C extends CommandSender> implements CommandPreprocessor<C> {
+public final class AcceptingCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
     /**
      * Key used to access the context meta that indicates that the context has been fully processed

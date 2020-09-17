@@ -31,7 +31,6 @@ import com.intellectualsites.commands.arguments.parser.ParserRegistry;
 import com.intellectualsites.commands.arguments.parser.StandardParameters;
 import com.intellectualsites.commands.arguments.parser.StandardParserRegistry;
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
-import com.intellectualsites.commands.sender.CommandSender;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +45,7 @@ public class ParserRegistryTest {
 
     @Test
     void testParserRegistry() {
-        final ParserRegistry<CommandSender> parserRegistry = new StandardParserRegistry<>();
+        final ParserRegistry<TestCommandSender> parserRegistry = new StandardParserRegistry<>();
         final Range range = new Range() {
 
             @Override
@@ -72,13 +71,14 @@ public class ParserRegistryTest {
         final ParserParameters parserParameters = parserRegistry.parseAnnotations(parsedType, Collections.singleton(range));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MIN));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MAX));
-        final ArgumentParser<CommandSender, ?> parser = parserRegistry.createParser(parsedType,
+        final ArgumentParser<TestCommandSender, ?> parser = parserRegistry.createParser(parsedType,
                                                                                     parserParameters)
                                                                       .orElseThrow(
                                                                                () -> new NullPointerException("No parser found"));
         Assertions.assertTrue(parser instanceof IntegerArgument.IntegerParser);
         @SuppressWarnings("unchecked")
-        final IntegerArgument.IntegerParser<CommandSender> integerParser = (IntegerArgument.IntegerParser<CommandSender>) parser;
+        final IntegerArgument.IntegerParser<TestCommandSender> integerParser =
+                (IntegerArgument.IntegerParser<TestCommandSender>) parser;
         Assertions.assertEquals(RANGE_MIN, integerParser.getMin());
         Assertions.assertEquals(RANGE_MAX, integerParser.getMax());
     }

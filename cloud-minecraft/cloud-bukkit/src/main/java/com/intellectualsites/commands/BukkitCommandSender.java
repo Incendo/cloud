@@ -24,7 +24,6 @@
 package com.intellectualsites.commands;
 
 import com.google.common.base.Objects;
-import com.intellectualsites.commands.sender.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
@@ -33,12 +32,12 @@ import javax.annotation.Nonnull;
  * Command sender that proxies {@link org.bukkit.command.CommandSender}
  * {@inheritDoc}
  */
-public abstract class BukkitCommandSender implements CommandSender {
+public abstract class BukkitCommandSender {
 
     private final org.bukkit.command.CommandSender internalSender;
 
     /**
-     * Create a new command sender from a Bukkit {@link CommandSender}
+     * Create a new command sender from a Bukkit {@link org.bukkit.command.CommandSender}
      *
      * @param internalSender Bukkit command sender
      */
@@ -68,7 +67,7 @@ public abstract class BukkitCommandSender implements CommandSender {
     }
 
     /**
-     * Construct a new {@link BukkitCommandSender} from a Bukkit {@link CommandSender}
+     * Construct a new {@link BukkitCommandSender} from a Bukkit {@link org.bukkit.command.CommandSender}
      *
      * @param sender Bukkit command sender
      * @return Constructed command sender
@@ -123,11 +122,6 @@ public abstract class BukkitCommandSender implements CommandSender {
      */
     @Nonnull
     public abstract Player asPlayer();
-
-    @Override
-    public final boolean hasPermission(@Nonnull final String permission) {
-        return this.internalSender.hasPermission(permission);
-    }
 
     /**
      * Send a message to the command sender

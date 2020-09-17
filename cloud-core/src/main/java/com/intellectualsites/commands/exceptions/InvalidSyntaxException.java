@@ -24,13 +24,12 @@
 package com.intellectualsites.commands.exceptions;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
- * Exception sent when a {@link CommandSender} inputs invalid command syntax
+ * Exception sent when a command sender inputs invalid command syntax
  */
 @SuppressWarnings("unused")
 public class InvalidSyntaxException extends CommandParseException {
@@ -45,7 +44,7 @@ public class InvalidSyntaxException extends CommandParseException {
      * @param currentChain  Chain leading up to issue
      */
     public InvalidSyntaxException(@Nonnull final String correctSyntax,
-                                  @Nonnull final CommandSender commandSender,
+                                  @Nonnull final Object commandSender,
                                   @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.correctSyntax = correctSyntax;

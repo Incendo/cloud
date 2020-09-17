@@ -23,8 +23,6 @@
 //
 package com.intellectualsites.commands.context;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +33,7 @@ import java.util.Optional;
  *
  * @param <C> Command sender type
  */
-public final class CommandContext<C extends CommandSender> {
+public final class CommandContext<C> {
 
     private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;

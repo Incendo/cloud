@@ -26,11 +26,10 @@ package com.intellectualsites.commands;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 
-public class TestCommandManager extends CommandManager<CommandSender, SimpleCommandMeta> {
+public class TestCommandManager extends CommandManager<TestCommandSender, SimpleCommandMeta> {
 
     protected TestCommandManager() {
         super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
@@ -40,6 +39,12 @@ public class TestCommandManager extends CommandManager<CommandSender, SimpleComm
     @Override
     public final SimpleCommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
+    }
+
+    @Override
+    public final boolean hasPermission(@Nonnull final TestCommandSender sender,
+                                       @Nonnull final String permission) {
+        return !permission.equalsIgnoreCase("no");
     }
 
 }

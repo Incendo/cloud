@@ -26,7 +26,6 @@ package com.intellectualsites.commands.execution;
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.meta.CommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
@@ -42,7 +41,7 @@ import java.util.function.Function;
  * @param <C> Command sender type
  * @param <M> Command meta type
  */
-public abstract class CommandExecutionCoordinator<C extends CommandSender, M extends CommandMeta> {
+public abstract class CommandExecutionCoordinator<C, M extends CommandMeta> {
 
     private final CommandTree<C, M> commandTree;
 
@@ -62,7 +61,7 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender, M ext
      * @param <M> Command meta type
      * @return New coordinator instance
      */
-    public static <C extends CommandSender, M extends CommandMeta> Function<CommandTree<C, M>,
+    public static <C, M extends CommandMeta> Function<CommandTree<C, M>,
             CommandExecutionCoordinator<C, M>> simpleCoordinator() {
         return SimpleCoordinator::new;
     }
@@ -94,7 +93,7 @@ public abstract class CommandExecutionCoordinator<C extends CommandSender, M ext
      * @param <C> Command sender type
      * @param <M> Command meta type
      */
-    public static final class SimpleCoordinator<C extends CommandSender, M extends CommandMeta> extends
+    public static final class SimpleCoordinator<C, M extends CommandMeta> extends
             CommandExecutionCoordinator<C, M> {
 
         private SimpleCoordinator(@Nonnull final CommandTree<C, M> commandTree) {

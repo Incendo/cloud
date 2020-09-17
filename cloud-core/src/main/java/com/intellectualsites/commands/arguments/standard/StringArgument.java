@@ -27,7 +27,6 @@ import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -37,7 +36,7 @@ import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
-public final class StringArgument<C extends CommandSender> extends CommandArgument<C, String> {
+public final class StringArgument<C> extends CommandArgument<C, String> {
 
     private final StringMode stringMode;
 
@@ -58,7 +57,7 @@ public final class StringArgument<C extends CommandSender> extends CommandArgume
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> StringArgument.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> StringArgument.Builder<C> newBuilder(@Nonnull final String name) {
         return new StringArgument.Builder<>(name);
     }
 
@@ -70,7 +69,7 @@ public final class StringArgument<C extends CommandSender> extends CommandArgume
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, String> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, String> required(@Nonnull final String name) {
         return StringArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -82,7 +81,7 @@ public final class StringArgument<C extends CommandSender> extends CommandArgume
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, String> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, String> optional(@Nonnull final String name) {
         return StringArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -95,7 +94,7 @@ public final class StringArgument<C extends CommandSender> extends CommandArgume
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, String> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, String> optional(@Nonnull final String name,
                                                                                 final String defaultNum) {
         return StringArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
@@ -118,7 +117,7 @@ public final class StringArgument<C extends CommandSender> extends CommandArgume
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, String> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, String> {
 
         private StringMode stringMode = StringMode.SINGLE;
         private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
@@ -188,7 +187,7 @@ public final class StringArgument<C extends CommandSender> extends CommandArgume
     }
 
 
-    public static final class StringParser<C extends CommandSender> implements ArgumentParser<C, String> {
+    public static final class StringParser<C> implements ArgumentParser<C, String> {
 
         private final StringMode stringMode;
         private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;

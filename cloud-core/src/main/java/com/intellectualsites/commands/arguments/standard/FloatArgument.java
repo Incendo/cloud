@@ -28,13 +28,12 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class FloatArgument<C extends CommandSender> extends CommandArgument<C, Float> {
+public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
     private final float min;
     private final float max;
@@ -57,7 +56,7 @@ public final class FloatArgument<C extends CommandSender> extends CommandArgumen
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
@@ -69,7 +68,7 @@ public final class FloatArgument<C extends CommandSender> extends CommandArgumen
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Float> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Float> required(@Nonnull final String name) {
         return FloatArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -81,7 +80,7 @@ public final class FloatArgument<C extends CommandSender> extends CommandArgumen
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Float> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Float> optional(@Nonnull final String name) {
         return FloatArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,13 +93,13 @@ public final class FloatArgument<C extends CommandSender> extends CommandArgumen
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Float> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, Float> optional(@Nonnull final String name,
                                                                                final float defaultNum) {
         return FloatArgument.<C>newBuilder(name).asOptionalWithDefault(Float.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Float> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Float> {
 
         private float min = Float.MIN_VALUE;
         private float max = Float.MAX_VALUE;
@@ -166,7 +165,7 @@ public final class FloatArgument<C extends CommandSender> extends CommandArgumen
     }
 
 
-    public static final class FloatParser<C extends CommandSender> implements ArgumentParser<C, Float> {
+    public static final class FloatParser<C> implements ArgumentParser<C, Float> {
 
         private final float min;
         private final float max;

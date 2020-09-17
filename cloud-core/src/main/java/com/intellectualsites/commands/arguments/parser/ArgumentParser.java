@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.arguments.parser;
 
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -38,7 +37,7 @@ import java.util.Queue;
  * @param <T> Value type
  */
 @FunctionalInterface
-public interface ArgumentParser<C extends CommandSender, T> {
+public interface ArgumentParser<C, T> {
 
     /**
      * Parse command input into a command result

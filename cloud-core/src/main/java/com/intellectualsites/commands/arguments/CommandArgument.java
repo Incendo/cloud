@@ -29,7 +29,6 @@ import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.arguments.parser.ParserParameters;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +42,7 @@ import java.util.regex.Pattern;
  * @param <T> The type that the argument parses into
  */
 @SuppressWarnings("unused")
-public class CommandArgument<C extends CommandSender, T> implements Comparable<CommandArgument<?, ?>> {
+public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> {
 
     /**
      * Pattern for command argument names
@@ -128,7 +127,7 @@ public class CommandArgument<C extends CommandSender, T> implements Comparable<C
      * @return Argument builder
      */
     @Nonnull
-    public static <C extends CommandSender, T> CommandArgument.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
+    public static <C, T> CommandArgument.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
                                                                                     @Nonnull final String name) {
         return new Builder<>(clazz, name);
     }
@@ -261,7 +260,7 @@ public class CommandArgument<C extends CommandSender, T> implements Comparable<C
      * @param <C> Command sender type
      * @param <T> Argument value type
      */
-    public static class Builder<C extends CommandSender, T> {
+    public static class Builder<C, T> {
 
         private final Class<T> valueType;
         private final String name;

@@ -26,7 +26,6 @@ package com.intellectualsites.commands.arguments;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -41,7 +40,7 @@ import java.util.Set;
  *
  * @param <C> Command sender type
  */
-public final class StaticArgument<C extends CommandSender> extends CommandArgument<C, String> {
+public final class StaticArgument<C> extends CommandArgument<C, String> {
 
     private StaticArgument(final boolean required, @Nonnull final String name, @Nonnull final String... aliases) {
         super(required, name, new StaticArgumentParser<>(name, aliases), String.class);
@@ -56,7 +55,7 @@ public final class StaticArgument<C extends CommandSender> extends CommandArgume
      * @return Constructed argument
      */
     @Nonnull
-    public static <C extends CommandSender> StaticArgument<C> required(@Nonnull final String name,
+    public static <C> StaticArgument<C> required(@Nonnull final String name,
                                                                        @Nonnull final String... aliases) {
         return new StaticArgument<>(true, name, aliases);
     }
@@ -70,7 +69,7 @@ public final class StaticArgument<C extends CommandSender> extends CommandArgume
      * @return Constructed argument
      */
     @Nonnull
-    public static <C extends CommandSender> StaticArgument<C> optional(@Nonnull final String name,
+    public static <C> StaticArgument<C> optional(@Nonnull final String name,
                                                                        @Nonnull final String... aliases) {
         return new StaticArgument<>(false, name, aliases);
     }
@@ -95,7 +94,7 @@ public final class StaticArgument<C extends CommandSender> extends CommandArgume
     }
 
 
-    private static final class StaticArgumentParser<C extends CommandSender> implements ArgumentParser<C, String> {
+    private static final class StaticArgumentParser<C> implements ArgumentParser<C, String> {
 
         private final String name;
         private final Set<String> acceptedStrings = new HashSet<>();

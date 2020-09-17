@@ -27,7 +27,6 @@ import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.execution.CommandExecutionHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,7 +44,7 @@ import java.util.function.Consumer;
  * @param <M> Command meta type
  */
 @SuppressWarnings("unused")
-public class Command<C extends CommandSender, M extends CommandMeta> {
+public class Command<C, M extends CommandMeta> {
 
     @Nonnull private final List<CommandArgument<C, ?>> arguments;
     @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
@@ -132,7 +131,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
      * @return Command builder
      */
     @Nonnull
-    public static <C extends CommandSender, M extends CommandMeta> Builder<C, M> newBuilder(@Nonnull final String commandName,
+    public static <C, M extends CommandMeta> Builder<C, M> newBuilder(@Nonnull final String commandName,
                                                                                             @Nonnull final M commandMeta,
                                                                                             @Nonnull final String... aliases) {
         return new Builder<>(null, commandMeta, null,
@@ -217,7 +216,7 @@ public class Command<C extends CommandSender, M extends CommandMeta> {
      * @param <C> Command sender type
      * @param <M> Command meta type
      */
-    public static final class Builder<C extends CommandSender, M extends CommandMeta> {
+    public static final class Builder<C, M extends CommandMeta> {
 
         @Nonnull private final M commandMeta;
         @Nonnull private final List<CommandArgument<C, ?>> commandArguments;

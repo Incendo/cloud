@@ -27,7 +27,6 @@ import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -41,7 +40,7 @@ import java.util.stream.Collectors;
  *
  * @param <C> Command sender type
  */
-public class WorldArgument<C extends CommandSender> extends CommandArgument<C, World> {
+public class WorldArgument<C> extends CommandArgument<C, World> {
 
     protected WorldArgument(final boolean required,
                             @Nonnull final String name,
@@ -57,7 +56,7 @@ public class WorldArgument<C extends CommandSender> extends CommandArgument<C, W
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument.Builder<C, World> newBuilder(@Nonnull final String name) {
+    public static <C> CommandArgument.Builder<C, World> newBuilder(@Nonnull final String name) {
         return new WorldArgument.Builder<>(name);
     }
 
@@ -69,7 +68,7 @@ public class WorldArgument<C extends CommandSender> extends CommandArgument<C, W
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, World> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, World> required(@Nonnull final String name) {
         return WorldArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -81,7 +80,7 @@ public class WorldArgument<C extends CommandSender> extends CommandArgument<C, W
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, World> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, World> optional(@Nonnull final String name) {
         return WorldArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,13 +93,13 @@ public class WorldArgument<C extends CommandSender> extends CommandArgument<C, W
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, World> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, World> optional(@Nonnull final String name,
                                                                                @Nonnull final String defaultValue) {
         return WorldArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, World> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, World> {
 
         protected Builder(@Nonnull final String name) {
             super(World.class, name);
@@ -114,7 +113,7 @@ public class WorldArgument<C extends CommandSender> extends CommandArgument<C, W
     }
 
 
-    public static final class WorldParser<C extends CommandSender> implements ArgumentParser<C, World> {
+    public static final class WorldParser<C> implements ArgumentParser<C, World> {
 
         @Nonnull
         @Override

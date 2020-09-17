@@ -23,11 +23,9 @@
 //
 package com.intellectualsites.commands.context;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
 import javax.annotation.Nonnull;
 
-public final class StandardCommandContextFactory<C extends CommandSender> implements CommandContextFactory<C> {
+public final class StandardCommandContextFactory<C> implements CommandContextFactory<C> {
 
     /**
      * Construct a new command context

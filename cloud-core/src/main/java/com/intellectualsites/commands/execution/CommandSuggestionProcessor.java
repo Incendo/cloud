@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.execution;
 
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -34,7 +33,7 @@ import java.util.function.BiFunction;
  *
  * @param <C> Command sender type
  */
-public interface CommandSuggestionProcessor<C extends CommandSender> extends
+public interface CommandSuggestionProcessor<C> extends
         BiFunction<CommandPreprocessingContext<C>, List<String>, List<String>> {
 
 }

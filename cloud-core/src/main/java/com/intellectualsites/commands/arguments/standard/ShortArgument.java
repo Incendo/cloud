@@ -28,13 +28,12 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class ShortArgument<C extends CommandSender> extends CommandArgument<C, Short> {
+public final class ShortArgument<C> extends CommandArgument<C, Short> {
 
     private final short min;
     private final short max;
@@ -57,7 +56,7 @@ public final class ShortArgument<C extends CommandSender> extends CommandArgumen
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> ShortArgument.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> ShortArgument.Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
@@ -69,7 +68,7 @@ public final class ShortArgument<C extends CommandSender> extends CommandArgumen
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Short> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Short> required(@Nonnull final String name) {
         return ShortArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -81,7 +80,7 @@ public final class ShortArgument<C extends CommandSender> extends CommandArgumen
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Short> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Short> optional(@Nonnull final String name) {
         return ShortArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,13 +93,13 @@ public final class ShortArgument<C extends CommandSender> extends CommandArgumen
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Short> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, Short> optional(@Nonnull final String name,
                                                                                final short defaultNum) {
         return ShortArgument.<C>newBuilder(name).asOptionalWithDefault(Short.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Short> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Short> {
 
         private short min = Short.MIN_VALUE;
         private short max = Short.MAX_VALUE;
@@ -166,7 +165,7 @@ public final class ShortArgument<C extends CommandSender> extends CommandArgumen
     }
 
 
-    public static final class ShortParser<C extends CommandSender> implements ArgumentParser<C, Short> {
+    public static final class ShortParser<C> implements ArgumentParser<C, Short> {
 
         private final short min;
         private final short max;

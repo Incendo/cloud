@@ -28,13 +28,12 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
-public final class IntegerArgument<C extends CommandSender> extends CommandArgument<C, Integer> {
+public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
     private final int min;
     private final int max;
@@ -57,7 +56,7 @@ public final class IntegerArgument<C extends CommandSender> extends CommandArgum
      * @return Created builder
      */
     @Nonnull
-    public static <C extends CommandSender> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
         return new Builder<>(name);
     }
 
@@ -69,7 +68,7 @@ public final class IntegerArgument<C extends CommandSender> extends CommandArgum
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Integer> required(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Integer> required(@Nonnull final String name) {
         return IntegerArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -81,7 +80,7 @@ public final class IntegerArgument<C extends CommandSender> extends CommandArgum
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Integer> optional(@Nonnull final String name) {
+    public static <C> CommandArgument<C, Integer> optional(@Nonnull final String name) {
         return IntegerArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,13 +93,13 @@ public final class IntegerArgument<C extends CommandSender> extends CommandArgum
      * @return Created argument
      */
     @Nonnull
-    public static <C extends CommandSender> CommandArgument<C, Integer> optional(@Nonnull final String name,
+    public static <C> CommandArgument<C, Integer> optional(@Nonnull final String name,
                                                                                  final int defaultNum) {
         return IntegerArgument.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
     }
 
 
-    public static final class Builder<C extends CommandSender> extends CommandArgument.Builder<C, Integer> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Integer> {
 
         private int min = Integer.MIN_VALUE;
         private int max = Integer.MAX_VALUE;
@@ -166,7 +165,7 @@ public final class IntegerArgument<C extends CommandSender> extends CommandArgum
     }
 
 
-    public static final class IntegerParser<C extends CommandSender> implements ArgumentParser<C, Integer> {
+    public static final class IntegerParser<C> implements ArgumentParser<C, Integer> {
 
         private final int min;
         private final int max;

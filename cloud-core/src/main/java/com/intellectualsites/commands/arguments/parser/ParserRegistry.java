@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.arguments.parser;
 
 import com.google.common.reflect.TypeToken;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
@@ -40,7 +39,7 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public interface ParserRegistry<C extends CommandSender> {
+public interface ParserRegistry<C> {
 
     /**
      * Register a parser supplier

@@ -23,8 +23,6 @@
 //
 package com.intellectualsites.commands.context;
 
-import com.intellectualsites.commands.sender.CommandSender;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -32,7 +30,7 @@ import javax.annotation.Nonnull;
  *
  * @param <C> Command sender
  */
-public interface CommandContextFactory<C extends CommandSender> {
+public interface CommandContextFactory<C> {
 
     /**
      * Create a new command context

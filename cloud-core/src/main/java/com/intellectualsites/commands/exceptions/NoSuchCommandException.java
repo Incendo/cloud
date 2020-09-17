@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.exceptions;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
-import com.intellectualsites.commands.sender.CommandSender;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -45,7 +44,7 @@ public final class NoSuchCommandException extends CommandParseException {
      * @param currentChain  Chain leading up to the exception
      * @param command       Entered command (following the command chain)
      */
-    public NoSuchCommandException(@Nonnull final CommandSender commandSender,
+    public NoSuchCommandException(@Nonnull final Object commandSender,
                                   @Nonnull final List<CommandArgument<?, ?>> currentChain,
                                   @Nonnull final String command) {
         super(commandSender, currentChain);

@@ -27,7 +27,6 @@ import com.intellectualsites.commands.arguments.standard.EnumArgument;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessor;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
-import com.intellectualsites.commands.sender.CommandSender;
 import com.intellectualsites.services.types.ConsumerService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,7 +36,7 @@ import javax.annotation.Nonnull;
 
 public class CommandPreProcessorTest {
 
-    private static CommandManager<CommandSender, SimpleCommandMeta> manager;
+    private static CommandManager<TestCommandSender, SimpleCommandMeta> manager;
 
     @BeforeAll
     static void newTree() {
@@ -70,10 +69,10 @@ public class CommandPreProcessorTest {
     }
 
 
-    static final class SamplePreprocessor implements CommandPreprocessor<CommandSender> {
+    static final class SamplePreprocessor implements CommandPreprocessor<TestCommandSender> {
 
         @Override
-        public void accept(@Nonnull final CommandPreprocessingContext<CommandSender> context) {
+        public void accept(@Nonnull final CommandPreprocessingContext<TestCommandSender> context) {
             try {
                 final int num = Integer.parseInt(context.getInputQueue().removeFirst());
                 context.getCommandContext().store("int", num);

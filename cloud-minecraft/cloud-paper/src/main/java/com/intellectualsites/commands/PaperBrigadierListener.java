@@ -25,10 +25,9 @@ package com.intellectualsites.commands;
 
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
-import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
 import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.sender.CommandSender;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -42,7 +41,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
-class PaperBrigadierListener<C extends CommandSender> implements Listener {
+class PaperBrigadierListener<C> implements Listener {
 
     private final CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager;
     private final PaperCommandManager<C> paperCommandManager;
