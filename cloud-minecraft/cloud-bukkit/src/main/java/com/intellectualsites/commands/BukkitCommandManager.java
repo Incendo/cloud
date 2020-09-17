@@ -25,7 +25,9 @@ package com.intellectualsites.commands;
 
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
+import com.intellectualsites.commands.parsers.MaterialArgument;
 import com.intellectualsites.commands.parsers.WorldArgument;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -70,6 +72,8 @@ public class BukkitCommandManager<C>
 
         /* Register Bukkit parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.of(World.class), params -> new WorldArgument.WorldParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.of(Material.class),
+                                                        params -> new MaterialArgument.MaterialParser<>());
     }
 
     /**
