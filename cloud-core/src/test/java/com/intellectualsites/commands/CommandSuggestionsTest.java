@@ -23,7 +23,6 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.arguments.standard.EnumArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
@@ -42,10 +41,10 @@ public class CommandSuggestionsTest {
     @BeforeAll
     static void setupManager() {
         manager = new TestCommandManager();
-        manager.command(manager.commandBuilder("test").argument(StaticArgument.required("one")).build());
-        manager.command(manager.commandBuilder("test").argument(StaticArgument.required("two")).build());
+        manager.command(manager.commandBuilder("test").literal("one").build());
+        manager.command(manager.commandBuilder("test").literal("two").build());
         manager.command(manager.commandBuilder("test")
-                               .argument(StaticArgument.required("var"))
+                               .literal("var")
                                .argument(StringArgument.<TestCommandSender>newBuilder("str")
                                                         .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two"))
                                                         .build())

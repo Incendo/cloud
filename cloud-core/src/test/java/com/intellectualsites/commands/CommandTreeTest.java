@@ -23,7 +23,6 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
@@ -47,12 +46,12 @@ class CommandTreeTest {
     static void newTree() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .argument(StaticArgument.required("one")).build())
+                               .literal("one").build())
                .command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .argument(StaticArgument.required("two")).withPermission("no").build())
+                               .literal("two").withPermission("no").build())
                .command(manager.commandBuilder("test", Collections.singleton("other"),
                                                SimpleCommandMeta.empty())
-                               .argument(StaticArgument.required("opt", "öpt"))
+                               .literal("opt", "öpt")
                                .argument(IntegerArgument
                                                                 .optional("num", EXPECTED_INPUT_NUMBER))
                                .build())

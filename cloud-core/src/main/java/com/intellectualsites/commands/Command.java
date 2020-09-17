@@ -254,6 +254,18 @@ public class Command<C, M extends CommandMeta> {
         }
 
         /**
+         * Inserts a required {@link StaticArgument} into the command chain
+         *
+         * @param main    Main argument name
+         * @param aliases Argument aliases
+         * @return New builder instance with the modified command chain
+         */
+        @Nonnull
+        public Builder<C, M> literal(@Nonnull final String main, @Nonnull final String... aliases) {
+            return this.argument(StaticArgument.required(main, aliases));
+        }
+
+        /**
          * Add a new command argument to the command
          *
          * @param argument Argument to add

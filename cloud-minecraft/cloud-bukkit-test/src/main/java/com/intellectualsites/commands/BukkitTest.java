@@ -23,7 +23,6 @@
 //
 package com.intellectualsites.commands;
 
-import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.standard.BooleanArgument;
 import com.intellectualsites.commands.arguments.standard.DoubleArgument;
@@ -87,7 +86,7 @@ public final class BukkitTest extends JavaPlugin {
                                                                .orElse(GameMode.SURVIVAL)))
                            .build())
                .command(mgr.commandBuilder("kenny")
-                           .argument(StaticArgument.required("sux"))
+                           .literal("sux")
                            .argument(IntegerArgument
                                               .<BukkitCommandSender>newBuilder("perc")
                                               .withMin(PERC_MIN).withMax(PERC_MAX).build())
@@ -99,11 +98,11 @@ public final class BukkitTest extends JavaPlugin {
                            })
                            .build())
                .command(mgr.commandBuilder("test")
-                           .argument(StaticArgument.required("one"))
+                           .literal("one")
                            .handler(c -> c.getSender().sendMessage("One!"))
                            .build())
                .command(mgr.commandBuilder("test")
-                           .argument(StaticArgument.required("two"))
+                           .literal("two")
                            .handler(c -> c.getSender().sendMessage("Two!"))
                            .build())
                .command(mgr.commandBuilder("uuidtest")
