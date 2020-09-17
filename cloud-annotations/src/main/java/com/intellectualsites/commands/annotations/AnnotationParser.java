@@ -50,11 +50,11 @@ import java.util.regex.Pattern;
  * @param <C> Command sender type
  * @param <M> Command meta type
  */
-public class AnnotationParser<C, M extends CommandMeta> {
+public final class AnnotationParser<C, M extends CommandMeta> {
 
     private static final Predicate<String> PATTERN_ARGUMENT_LITERAL  = Pattern.compile("([A-Za-z0-9]+)(|([A-Za-z0-9]+))*")
                                                                               .asPredicate();
-    private static final Predicate<String> PATTERN_ARGUMENT_REQUIRED = Pattern.compile("<(A-Za-z0-9]+)>").asPredicate();
+    private static final Predicate<String> PATTERN_ARGUMENT_REQUIRED = Pattern.compile("<([A-Za-z0-9]+)>").asPredicate();
     private static final Predicate<String> PATTERN_ARGUMENT_OPTIONAL = Pattern.compile("\\[([A-Za-z0-9]+)\\]").asPredicate();
 
     private final CommandManager<C, M> manager;
@@ -126,7 +126,7 @@ public class AnnotationParser<C, M extends CommandMeta> {
     }
 
     @Nonnull
-    private LinkedHashMap<String, ArgumentMode> parseSyntax(@Nonnull final String syntax) {
+    LinkedHashMap<String, ArgumentMode> parseSyntax(@Nonnull final String syntax) {
         final StringTokenizer stringTokenizer = new StringTokenizer(syntax, " ");
         final LinkedHashMap<String, ArgumentMode> map = new LinkedHashMap<>();
         while (stringTokenizer.hasMoreTokens()) {
@@ -203,7 +203,7 @@ public class AnnotationParser<C, M extends CommandMeta> {
     }
 
 
-    private enum ArgumentMode {
+    enum ArgumentMode {
         LITERAL, OPTIONAL, REQUIRED
     }
 
