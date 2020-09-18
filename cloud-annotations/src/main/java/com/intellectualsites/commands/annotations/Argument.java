@@ -43,17 +43,17 @@ public @interface Argument {
     String value();
 
     /**
-     * Whether or not the argument is required
-     *
-     * @return {@code true} if the argument is required, else {@code false}
-     */
-    boolean required() default true;
-
-    /**
      * Name of the argument parser
      *
      * @return Argument name
      */
     String parserName() default "";
+
+    /**
+     * Get the default value
+     *
+     * @return Default value
+     */
+    String defaultValue() default "";
 
 }

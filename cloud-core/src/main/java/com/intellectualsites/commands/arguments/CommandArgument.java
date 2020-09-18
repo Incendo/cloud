@@ -128,7 +128,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      */
     @Nonnull
     public static <C, T> CommandArgument.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
-                                                                                    @Nonnull final String name) {
+                                                              @Nonnull final String name) {
         return new Builder<>(clazz, name);
     }
 
