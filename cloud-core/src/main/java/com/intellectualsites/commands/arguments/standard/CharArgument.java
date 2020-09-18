@@ -132,6 +132,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         public boolean isContextFree() {
             return true;
         }
+
     }
 
 

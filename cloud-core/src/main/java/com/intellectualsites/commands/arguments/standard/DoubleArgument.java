@@ -206,6 +206,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         public boolean isContextFree() {
             return true;
         }
+
     }
 
 

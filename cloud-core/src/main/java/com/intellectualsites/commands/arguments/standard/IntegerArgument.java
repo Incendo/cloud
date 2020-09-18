@@ -237,26 +237,32 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         @Override
         public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
                                         @Nonnull final String input) {
+            return getSuggestions(this.min, this.max, input);
+        }
+
+        @Nonnull
+        static List<String> getSuggestions(final long min, final long max, @Nonnull final String input) {
             if (input.isEmpty()) {
                 return IntStream.range(0, MAX_SUGGESTIONS_INCREMENT).mapToObj(Integer::toString).collect(Collectors.toList());
             }
             try {
-                final int inputInt = Integer.parseInt(input);
-                if (inputInt > this.getMax()) {
+                final long inputNum = Long.parseLong(input);
+                if (inputNum > max) {
                     return Collections.emptyList();
                 } else {
                     final List<String> suggestions = new LinkedList<>();
                     suggestions.add(input); /* It's a valid number, so we suggest it */
                     for (int i = 0; i < MAX_SUGGESTIONS_INCREMENT
-                                && (inputInt * NUMBER_SHIFT_MULTIPLIER) + i <= this.getMax(); i++) {
-                        suggestions.add(Integer.toString((inputInt * NUMBER_SHIFT_MULTIPLIER) + i));
+                            && (inputNum * NUMBER_SHIFT_MULTIPLIER) + i <= max; i++) {
+                        suggestions.add(Long.toString((inputNum * NUMBER_SHIFT_MULTIPLIER) + i));
                     }
                     return suggestions;
                 }
             } catch (final Exception ignored) {
-                return Collections.emptyList(); /* Invalid input */
+                return Collections.emptyList();
             }
         }
+
     }
 
 

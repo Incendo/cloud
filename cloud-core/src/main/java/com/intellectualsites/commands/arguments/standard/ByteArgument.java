@@ -30,6 +30,7 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Queue;
 
 @SuppressWarnings("unused")
@@ -207,6 +208,14 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         public boolean isContextFree() {
             return true;
         }
+
+        @Nonnull
+        @Override
+        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
+                                        @Nonnull final String input) {
+            return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
+        }
+
     }
 
 
