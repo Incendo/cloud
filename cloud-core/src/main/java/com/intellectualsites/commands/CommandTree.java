@@ -39,6 +39,7 @@ import com.intellectualsites.commands.meta.CommandMeta;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -101,7 +102,10 @@ public final class CommandTree<C, M extends CommandMeta> {
     public Optional<Command<C, M>> parse(@Nonnull final CommandContext<C> commandContext,
                                          @Nonnull final Queue<String> args) throws
             NoSuchCommandException, NoPermissionException, InvalidSyntaxException {
-        final Optional<Command<C, M>> commandOptional = parseCommand(commandContext, args, this.internalTree);
+        final Optional<Command<C, M>> commandOptional = parseCommand(new ArrayList<>(),
+                                                                     commandContext,
+                                                                     args,
+                                                                     this.internalTree);
         commandOptional.flatMap(Command::getSenderType).ifPresent(requiredType -> {
             if (!requiredType.isAssignableFrom(commandContext.getSender().getClass())) {
                 throw new InvalidCommandSenderException(commandContext.getSender(), requiredType, Collections.emptyList());
@@ -110,7 +114,8 @@ public final class CommandTree<C, M extends CommandMeta> {
         return commandOptional;
     }
 
-    private Optional<Command<C, M>> parseCommand(@Nonnull final CommandContext<C> commandContext,
+    private Optional<Command<C, M>> parseCommand(@Nonnull final List<CommandArgument<C, ?>> parsedArguments,
+                                                 @Nonnull final CommandContext<C> commandContext,
                                                  @Nonnull final Queue<String> commandQueue,
                                                  @Nonnull final Node<CommandArgument<C, ?>> root) {
         String permission = this.isPermitted(commandContext.getSender(), root);
@@ -121,7 +126,10 @@ public final class CommandTree<C, M extends CommandMeta> {
                                                                                         .collect(Collectors.toList()));
         }
 
-        final Optional<Command<C, M>> parsedChild = this.attemptParseUnambiguousChild(commandContext, root, commandQueue);
+        final Optional<Command<C, M>> parsedChild = this.attemptParseUnambiguousChild(parsedArguments,
+                                                                                      commandContext,
+                                                                                      root,
+                                                                                      commandQueue);
         // noinspection all
         if (parsedChild != null) {
             return parsedChild;
@@ -136,9 +144,7 @@ public final class CommandTree<C, M extends CommandMeta> {
                 } else {
                     /* Too many arguments. We have a unique path, so we can send the entire context */
                     throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                        .apply(root.getValue()
-                                                                                   .getOwningCommand()
-                                                                                   .getArguments()),
+                                                                        .apply(parsedArguments, root),
                                                      commandContext.getSender(), this.getChain(root)
                                                                                      .stream()
                                                                                      .map(Node::getValue)
@@ -147,10 +153,7 @@ public final class CommandTree<C, M extends CommandMeta> {
             } else {
                 /* Too many arguments. We have a unique path, so we can send the entire context */
                 throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                    .apply(Objects.requireNonNull(
-                                                                            Objects.requireNonNull(root.getValue())
-                                                                                   .getOwningCommand())
-                                                                                  .getArguments()),
+                                                                    .apply(parsedArguments, root),
                                                  commandContext.getSender(), this.getChain(root)
                                                                                  .stream()
                                                                                  .map(Node::getValue)
@@ -164,21 +167,32 @@ public final class CommandTree<C, M extends CommandMeta> {
                     if (child.getValue() != null) {
                         final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                         if (result.getParsedValue().isPresent()) {
-                            return this.parseCommand(commandContext, commandQueue, child);
+                            parsedArguments.add(child.getValue());
+                            return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
                         } /*else if (result.getFailure().isPresent() && root.children.size() == 1) {
                         }*/
                     }
                 }
             }
             /* We could not find a match */
-            throw new NoSuchCommandException(commandContext.getSender(),
-                                             getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
-                                             stringOrEmpty(commandQueue.peek()));
+            if (root.equals(this.internalTree)) {
+                throw new NoSuchCommandException(commandContext.getSender(),
+                                                 getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
+                                                 stringOrEmpty(commandQueue.peek()));
+            }
+            /* We have already traversed the tree */
+            throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
+                                                                .apply(parsedArguments, root),
+                                             commandContext.getSender(), this.getChain(root)
+                                                                             .stream()
+                                                                             .map(Node::getValue)
+                                                                             .collect(Collectors.toList()));
         }
     }
 
     @Nullable
-    private Optional<Command<C, M>> attemptParseUnambiguousChild(@Nonnull final CommandContext<C> commandContext,
+    private Optional<Command<C, M>> attemptParseUnambiguousChild(@Nonnull final List<CommandArgument<C, ?>> parsedArguments,
+                                                                 @Nonnull final CommandContext<C> commandContext,
                                                                  @Nonnull final Node<CommandArgument<C, ?>> root,
                                                                  @Nonnull final Queue<String> commandQueue) {
         String permission;
@@ -204,18 +218,25 @@ public final class CommandTree<C, M extends CommandMeta> {
                         throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                             .apply(Objects.requireNonNull(
                                                                                     child.getValue().getOwningCommand())
-                                                                                          .getArguments()),
+                                                                                          .getArguments(), child),
                                                          commandContext.getSender(), this.getChain(root)
                                                                                          .stream()
                                                                                          .map(Node::getValue)
                                                                                          .collect(Collectors.toList()));
                     } else {
+                        /*
                         throw new NoSuchCommandException(commandContext.getSender(),
                                                          this.getChain(root)
                                                              .stream()
                                                              .map(Node::getValue)
                                                              .collect(Collectors.toList()),
-                                                         "");
+                                                         "");*/
+                        throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
+                                                                            .apply(parsedArguments, root),
+                                                         commandContext.getSender(), this.getChain(root)
+                                                                                         .stream()
+                                                                                         .map(Node::getValue)
+                                                                                         .collect(Collectors.toList()));
                     }
                 }
                 final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
@@ -227,9 +248,7 @@ public final class CommandTree<C, M extends CommandMeta> {
                         } else {
                             /* Too many arguments. We have a unique path, so we can send the entire context */
                             throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                                .apply(Objects.requireNonNull(child.getValue()
-                                                                                                             .getOwningCommand())
-                                                                                              .getArguments()),
+                                                                                .apply(parsedArguments, child),
                                                              commandContext.getSender(), this.getChain(root)
                                                                                              .stream()
                                                                                              .map(Node::getValue)
@@ -237,7 +256,8 @@ public final class CommandTree<C, M extends CommandMeta> {
                                                                                                             Collectors.toList()));
                         }
                     } else {
-                        return this.parseCommand(commandContext, commandQueue, child);
+                        parsedArguments.add(child.getValue());
+                        return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
                     }
                 } else if (result.getFailure().isPresent()) {
                     throw new ArgumentParseException(result.getFailure().get(), commandContext.getSender(),

@@ -66,14 +66,4 @@ public class InvalidSyntaxException extends CommandParseException {
         return String.format("Invalid command syntax. Correct syntax is: %s", this.correctSyntax);
     }
 
-    @Override
-    public final synchronized Throwable fillInStackTrace() {
-        return this;
-    }
-
-    @Override
-    public final synchronized Throwable initCause(final Throwable cause) {
-        return this;
-    }
-
 }

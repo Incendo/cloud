@@ -23,6 +23,8 @@
 //
 package com.intellectualsites.commands.arguments;
 
+import com.intellectualsites.commands.CommandTree;
+
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
@@ -41,7 +43,8 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
 
     @Nonnull
     @Override
-    public final String apply(@Nonnull final List<CommandArgument<C, ?>> commandArguments) {
+    public final String apply(@Nonnull final List<CommandArgument<C, ?>> commandArguments,
+                              @Nonnull final CommandTree.Node<CommandArgument<C, ?>> node) {
         final StringBuilder stringBuilder = new StringBuilder();
         final Iterator<CommandArgument<C, ?>> iterator = commandArguments.iterator();
         while (iterator.hasNext()) {
@@ -58,6 +61,27 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             if (iterator.hasNext()) {
                 stringBuilder.append(" ");
             }
+        }
+        CommandTree.Node<CommandArgument<C, ?>> tail = node;
+        while (tail != null && !tail.isLeaf()) {
+            if (tail.getChildren().size() > 1) {
+                stringBuilder.append(" ");
+                final Iterator<CommandTree.Node<CommandArgument<C, ?>>> childIterator = tail.getChildren().iterator();
+                while (childIterator.hasNext()) {
+                    final CommandTree.Node<CommandArgument<C, ?>> child = childIterator.next();
+                    stringBuilder.append(child.getValue().getName());
+                    if (childIterator.hasNext()) {
+                        stringBuilder.append("|");
+                    }
+                }
+                break;
+            }
+            final CommandArgument<C, ?> argument = tail.getChildren().get(0).getValue();
+            stringBuilder.append(" ")
+                         .append(argument.isRequired() ? '<' : '[')
+                         .append(argument.getName())
+                         .append(argument.isRequired() ? '>' : ']');
+            tail = tail.getChildren().get(0);
         }
         return stringBuilder.toString();
     }

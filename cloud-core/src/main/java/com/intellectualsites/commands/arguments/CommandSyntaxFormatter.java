@@ -23,9 +23,10 @@
 //
 package com.intellectualsites.commands.arguments;
 
+import com.intellectualsites.commands.CommandTree;
+
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Utility that formats chains of {@link CommandArgument command arguments} into syntax strings
@@ -33,10 +34,17 @@ import java.util.function.Function;
  * @param <C> Command sender type
  */
 @FunctionalInterface
-public interface CommandSyntaxFormatter<C> extends Function<List<CommandArgument<C, ?>>, String> {
+public interface CommandSyntaxFormatter<C> {
 
-    @Override
+    /**
+     * Format the command arguments into a syntax string
+     *
+     * @param commandArguments Command arguments
+     * @param node             Trailing node
+     * @return Syntax string
+     */
     @Nonnull
-    String apply(@Nonnull List<CommandArgument<C, ?>> commandArguments);
+    String apply(@Nonnull List<CommandArgument<C, ?>> commandArguments,
+                 @Nonnull CommandTree.Node<CommandArgument<C, ?>> node);
 
 }

@@ -114,6 +114,12 @@ class CommandTreeTest {
         manager.executeCommand(new TestCommandSender(), "default 5").join();
     }
 
+    @Test
+    void invalidCommand() {
+        Assertions.assertThrows(CompletionException.class, () -> manager
+                .executeCommand(new TestCommandSender(), "invalid test").join());
+    }
+
 
     public static final class SpecificCommandSender extends TestCommandSender {
     }

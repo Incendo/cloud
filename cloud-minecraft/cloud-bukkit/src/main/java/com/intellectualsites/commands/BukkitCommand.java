@@ -25,15 +25,27 @@ package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.StaticArgument;
+import com.intellectualsites.commands.exceptions.ArgumentParseException;
+import com.intellectualsites.commands.exceptions.InvalidCommandSenderException;
+import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
+import com.intellectualsites.commands.exceptions.NoPermissionException;
+import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Consumer;
 
 final class BukkitCommand<C> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
+
+    private static final String MESSAGE_NO_PERMS = ChatColor.RED
+            + "I'm sorry, but you do not have permission to perform this command. "
+            + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final CommandArgument<C, ?> command;
     private final BukkitCommandManager<C> bukkitCommandManager;
@@ -63,13 +75,24 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                                  builder.toString())
                                  .whenComplete(((commandResult, throwable) -> {
                                      if (throwable != null) {
-                                         commandSender.sendMessage(ChatColor.RED + throwable.getMessage());
-                                         commandSender.sendMessage(ChatColor.RED + throwable.getCause().getMessage());
-                                         throwable.printStackTrace();
-                                         throwable.getCause().printStackTrace();
-                                     } else {
-                                         // Do something...
-                                         commandSender.sendMessage("All good!");
+                                         if (throwable instanceof InvalidSyntaxException) {
+                                             commandSender.sendMessage(ChatColor.RED + "Invalid Command Syntax. "
+                                                                     + "Correct command syntax is: "
+                                                                     + ChatColor.GRAY + "/"
+                                                                     + ((InvalidSyntaxException) throwable).getCorrectSyntax());
+                                         } else if (throwable instanceof InvalidCommandSenderException) {
+                                             commandSender.sendMessage(ChatColor.RED + throwable.getMessage());
+                                         } else if (throwable instanceof NoPermissionException) {
+                                             commandSender.sendMessage(MESSAGE_NO_PERMS);
+                                         } else if (throwable instanceof NoSuchCommandException) {
+                                             commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND);
+                                         } else if (throwable instanceof ArgumentParseException) {
+                                             commandSender.sendMessage(ChatColor.RED + "Invalid Command Argument: "
+                                                                      + ChatColor.GRAY + throwable.getCause().getMessage());
+                                         } else {
+                                             commandSender.sendMessage(throwable.getMessage());
+                                             throwable.printStackTrace();
+                                         }
                                      }
                                  }));
         return true;
@@ -99,6 +122,27 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     @Override
     public String getPermission() {
         return this.cloudCommand.getCommandPermission();
+    }
+
+    @Nullable
+    private <E extends Throwable> E captureException(@Nonnull final Class<E> clazz, @Nullable final Throwable throwable) {
+        if (throwable == null) {
+            return null;
+        }
+        if (clazz.equals(throwable.getClass())) {
+            //noinspection unchecked
+            return (E) throwable;
+        }
+        return captureException(clazz, throwable.getCause());
+    }
+
+    private <E extends Throwable> boolean handleException(@Nullable final E throwable,
+                                                          @Nonnull final Consumer<E> consumer) {
+        if (throwable == null) {
+            return false;
+        }
+        consumer.accept(throwable);
+        return true;
     }
 
 }
