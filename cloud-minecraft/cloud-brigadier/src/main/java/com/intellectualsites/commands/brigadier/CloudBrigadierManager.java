@@ -235,7 +235,6 @@ public final class CloudBrigadierManager<C, S> {
         if (argumentTypeSupplier != null) {
             return new Pair<>(argumentTypeSupplier.get(), true);
         }
-        System.err.printf("Found not native mapping for '%s'\n", argument.getValueType().getCanonicalName());
         return new Pair<>(StringArgumentType.string(), false);
     }
 
