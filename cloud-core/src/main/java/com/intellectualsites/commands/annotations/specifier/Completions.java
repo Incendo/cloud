@@ -21,42 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.arguments.parser;
+package com.intellectualsites.commands.annotations.specifier;
 
-import com.google.common.reflect.TypeToken;
 
-import javax.annotation.Nonnull;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Common parser parameters used when resolving types in the {@link ParserRegistry}
+ * Command completions, separated by "," or ", "
  */
-public final class StandardParameters {
-
-    private StandardParameters() {
-    }
-
-    /**
-     * Minimum value accepted by a numerical parser
-     */
-    public static final ParserParameter<Number> RANGE_MIN = create("min", TypeToken.of(Number.class));
-
-    /**
-     * Maximum value accepted by a numerical parser
-     */
-    public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.of(Number.class));
-
-    /**
-     * Command description
-     */
-    public static final ParserParameter<String> DESCRIPTION = create("description", TypeToken.of(String.class));
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface Completions {
 
     /**
      * Command completions
+     *
+     * @return Command completions
      */
-    public static final ParserParameter<String[]> COMPLETIONS = create("completions", TypeToken.of(String[].class));
-
-    private static <T> ParserParameter<T> create(@Nonnull final String key, @Nonnull final TypeToken<T> expectedType) {
-        return new ParserParameter<>(key, expectedType);
-    }
+    String value() default "";
 
 }

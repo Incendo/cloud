@@ -23,7 +23,6 @@
 //
 package com.intellectualsites.commands.annotations;
 
-import com.google.common.collect.Maps;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.annotations.specifier.Range;
@@ -34,7 +33,6 @@ import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.CompletionException;
 
 class AnnotationParserTest {
@@ -45,18 +43,7 @@ class AnnotationParserTest {
     @BeforeAll
     static void setup() {
         manager = new TestCommandManager();
-        annotationParser = new AnnotationParser<>(manager);
-    }
-
-    @Test
-    void testSyntaxParsing() {
-        final String text = "literal <required> [optional]";
-        final Map<String, AnnotationParser.ArgumentMode> arguments = annotationParser.parseSyntax(text);
-        final Map<String, AnnotationParser.ArgumentMode> map = Maps.newLinkedHashMap();
-        map.put("literal", AnnotationParser.ArgumentMode.LITERAL);
-        map.put("required", AnnotationParser.ArgumentMode.REQUIRED);
-        map.put("optional", AnnotationParser.ArgumentMode.OPTIONAL);
-        Assertions.assertEquals(map, arguments);
+        annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
     }
 
     @Test
@@ -64,11 +51,12 @@ class AnnotationParserTest {
         final Collection<Command<TestCommandSender, SimpleCommandMeta>> commands = annotationParser.parse(this);
         Assertions.assertFalse(commands.isEmpty());
         manager.executeCommand(new TestCommandSender(), "test 10").join();
+        manager.executeCommand(new TestCommandSender(), "t 10").join();
         Assertions.assertThrows(CompletionException.class, () ->
                 manager.executeCommand(new TestCommandSender(), "test 101").join());
     }
 
-    @CommandMethod("test <int> [string]")
+    @CommandMethod("test|t <int> [string]")
     public void testCommand(@Nonnull final TestCommandSender sender,
                             @Argument("int") @Range(max = "100") final int argument,
                             @Nonnull @Argument(value = "string", defaultValue = "potato") final String string) {

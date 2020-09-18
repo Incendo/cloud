@@ -23,7 +23,14 @@
 //
 package com.intellectualsites.commands;
 
+import com.intellectualsites.commands.annotations.AnnotationParser;
+import com.intellectualsites.commands.annotations.Argument;
+import com.intellectualsites.commands.annotations.CommandMethod;
+import com.intellectualsites.commands.annotations.Description;
+import com.intellectualsites.commands.annotations.specifier.Completions;
+import com.intellectualsites.commands.annotations.specifier.Range;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
+import com.intellectualsites.commands.arguments.parser.StandardParameters;
 import com.intellectualsites.commands.arguments.standard.BooleanArgument;
 import com.intellectualsites.commands.arguments.standard.DoubleArgument;
 import com.intellectualsites.commands.arguments.standard.EnumArgument;
@@ -33,17 +40,21 @@ import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.parsers.WorldArgument;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class BukkitTest extends JavaPlugin {
@@ -54,13 +65,18 @@ public final class BukkitTest extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
-            final PaperCommandManager<BukkitCommandSender> mgr = new PaperCommandManager<>(
+            final PaperCommandManager<CommandSender> mgr = new PaperCommandManager<>(
                     this,
                    CommandExecutionCoordinator
                            .simpleCoordinator(),
-                   BukkitCommandSender::of,
-                   BukkitCommandSender::getInternalSender
+                    Function.identity(),
+                    Function.identity()
             );
+            final AnnotationParser<CommandSender, BukkitCommandMeta> annotationParser
+                    = new AnnotationParser<>(mgr, CommandSender.class, p ->
+                    BukkitCommandMetaBuilder.builder().withDescription(p.get(StandardParameters.DESCRIPTION,
+                                                                             "No description")).build());
+            annotationParser.parse(this);
             mgr.registerBrigadier();
             mgr.command(mgr.commandBuilder("gamemode",
                                            Collections.singleton("gajmöde"),
@@ -68,7 +84,7 @@ public final class BukkitTest extends JavaPlugin {
                                                                    .withDescription("Your ugli")
                                                                    .build())
                            .argument(EnumArgument.required(GameMode.class, "gamemode"))
-                           .argument(StringArgument.<BukkitCommandSender>newBuilder("player")
+                           .argument(StringArgument.<CommandSender>newBuilder("player")
                                               .withSuggestionsProvider((v1, v2) -> {
                                                   final List<String> suggestions =
                                                           new ArrayList<>(
@@ -80,18 +96,17 @@ public final class BukkitTest extends JavaPlugin {
                                                   suggestions.add("cat");
                                                   return suggestions;
                                               }).build())
-                           .handler(c -> c.getSender()
-                                          .asPlayer()
+                           .handler(c -> ((Player) c.getSender())
                                           .setGameMode(c.<GameMode>get("gamemode")
                                                                .orElse(GameMode.SURVIVAL)))
                            .build())
                .command(mgr.commandBuilder("kenny")
                            .literal("sux")
                            .argument(IntegerArgument
-                                              .<BukkitCommandSender>newBuilder("perc")
+                                              .<CommandSender>newBuilder("perc")
                                               .withMin(PERC_MIN).withMax(PERC_MAX).build())
                            .handler(context -> {
-                               context.getSender().asPlayer().sendMessage(String.format(
+                               ((Player) context.getSender()).sendMessage(String.format(
                                        "Kenny sux %d%%",
                                        context.<Integer>get("perc").orElse(PERC_MIN)
                                ));
@@ -122,13 +137,14 @@ public final class BukkitTest extends JavaPlugin {
                                           .sendMessage(String.format("UUID: %s\n", c.<UUID>get("uuid").orElse(null))))
                            .build())
                .command(mgr.commandBuilder("give")
+                           .withSenderType(Player.class)
                            .argument(EnumArgument.required(Material.class, "material"))
                            .argument(IntegerArgument.required("amount"))
                            .handler(c -> {
                                final Material material = c.getRequired("material");
                                final int amount = c.getRequired("amount");
                                final ItemStack itemStack = new ItemStack(material, amount);
-                               c.getSender().asPlayer().getInventory().addItem(itemStack);
+                               ((Player) c.getSender()).getInventory().addItem(itemStack);
                                c.getSender().sendMessage("You've been given stuff, bro.");
                            })
                            .build())
@@ -138,7 +154,7 @@ public final class BukkitTest extends JavaPlugin {
                            .argument(WorldArgument.required("world"))
                            .handler(c -> {
                                final World world = c.getRequired("world");
-                               c.getSender().asPlayer().teleport(world.getSpawnLocation());
+                               ((Player) c.getSender()).teleport(world.getSpawnLocation());
                                c.getSender().sendMessage("Teleported.");
                            })
                            .build())
@@ -153,6 +169,14 @@ public final class BukkitTest extends JavaPlugin {
         } catch (final Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Description("Test cloud command using @CommandMethod")
+    @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
+    private void annotatedCommand(@Nonnull final Player player,
+                                  @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
+                                  @Argument("number") @Range(max = "100") final int number) {
+        player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
     }
 
 }

@@ -28,6 +28,7 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -93,16 +94,28 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         return Collections.unmodifiableSet(((StaticArgumentParser<C>) this.getParser()).getAcceptedStrings());
     }
 
+    /**
+     * Get an immutable list of all aliases that are not the main literal
+     *
+     * @return Immutable view of the optional argument aliases
+     */
+    @Nonnull
+    public List<String> getAlternativeAliases() {
+        return Collections.unmodifiableList(new ArrayList<>(((StaticArgumentParser<C>) this.getParser()).acceptedStrings));
+    }
+
 
     private static final class StaticArgumentParser<C> implements ArgumentParser<C, String> {
 
         private final String name;
         private final Set<String> acceptedStrings = new HashSet<>();
+        private final Set<String> alternativeAliases = new HashSet<>();
 
         private StaticArgumentParser(@Nonnull final String name, @Nonnull final String... aliases) {
             this.name = name;
             this.acceptedStrings.add(this.name);
             this.acceptedStrings.addAll(Arrays.asList(aliases));
+            this.alternativeAliases.addAll(Arrays.asList(aliases));
         }
 
         @Nonnull

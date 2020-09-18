@@ -47,6 +47,21 @@ public final class ParserParameters {
     }
 
     /**
+     * Create a {@link ParserParameters} instance containing a single key-value par
+     *
+     * @param parameter Parameter
+     * @param value     Value
+     * @param <T>       Value type
+     * @return          Constructed instance
+     */
+    @Nonnull
+    public static <T> ParserParameters single(@Nonnull final ParserParameter<T> parameter, @Nonnull final T value) {
+        final ParserParameters parameters = new ParserParameters();
+        parameters.store(parameter, value);
+        return parameters;
+    }
+
+    /**
      * Check if this instance contains a parameter-object pair for a given parameter
      *
      * @param parameter Parameter

@@ -24,6 +24,7 @@
 package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.arguments.standard.EnumArgument;
+import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
@@ -50,6 +51,14 @@ public class CommandSuggestionsTest {
                                                         .build())
                                .argument(EnumArgument.required(TestEnum.class, "enum"))
                                .build());
+        manager.command(manager.commandBuilder("test")
+                                .literal("comb")
+                                .argument(StringArgument.<TestCommandSender>newBuilder("str")
+                                                 .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two"))
+                                                 .build())
+                                .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
+                                                 .withMin(1).withMax(95).asOptional().build())
+                                .build());
     }
 
     @Test
@@ -59,7 +68,7 @@ public class CommandSuggestionsTest {
         Assertions.assertTrue(suggestions.isEmpty());
         final String input2 = "test ";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("one", "two","var"), suggestions2);
+        Assertions.assertEquals(Arrays.asList("comb", "one", "two","var"), suggestions2);
     }
 
     @Test
@@ -83,6 +92,19 @@ public class CommandSuggestionsTest {
         final String input = "kenny";
         final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
         Assertions.assertTrue(suggestions.isEmpty());
+    }
+
+    @Test
+    void testComb() {
+        final String input = "test comb ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("one", "two"), suggestions);
+        final String input2 = "test comb one ";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions2);
+        final String input3 = "test comb one 9";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Arrays.asList("9", "90", "91", "92", "93", "94", "95"), suggestions3);
     }
 
 

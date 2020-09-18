@@ -285,6 +285,8 @@ public final class CommandTree<C, M extends CommandMeta> {
                     return child.getValue().getParser().suggestions(commandContext, commandQueue.peek());
                 } else if (child.isLeaf()) {
                     return Collections.emptyList();
+                } else if (commandQueue.peek().isEmpty()) {
+                    return child.getValue().getParser().suggestions(commandContext, commandQueue.remove());
                 }
                 final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                 if (result.getParsedValue().isPresent()) {

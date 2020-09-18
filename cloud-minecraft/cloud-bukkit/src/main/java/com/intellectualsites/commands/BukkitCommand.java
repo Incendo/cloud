@@ -24,6 +24,7 @@
 package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.StaticArgument;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
@@ -32,17 +33,20 @@ import org.bukkit.plugin.Plugin;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-final class BukkitCommand<C>
-        extends org.bukkit.command.Command implements PluginIdentifiableCommand {
+final class BukkitCommand<C> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
     private final CommandArgument<C, ?> command;
     private final BukkitCommandManager<C> bukkitCommandManager;
     private final com.intellectualsites.commands.Command<C, BukkitCommandMeta> cloudCommand;
 
+    @SuppressWarnings("unchecked")
     BukkitCommand(@Nonnull final com.intellectualsites.commands.Command<C, BukkitCommandMeta> cloudCommand,
                   @Nonnull final CommandArgument<C, ?> command,
                   @Nonnull final BukkitCommandManager<C> bukkitCommandManager) {
-        super(command.getName());
+        super(command.getName(),
+              cloudCommand.getCommandMeta().getOrDefault("description", ""),
+              "",
+              ((StaticArgument<C>) command).getAlternativeAliases());
         this.command = command;
         this.bukkitCommandManager = bukkitCommandManager;
         this.cloudCommand = cloudCommand;
@@ -90,6 +94,11 @@ final class BukkitCommand<C>
     @Override
     public Plugin getPlugin() {
         return this.bukkitCommandManager.getOwningPlugin();
+    }
+
+    @Override
+    public String getPermission() {
+        return this.cloudCommand.getCommandPermission();
     }
 
 }

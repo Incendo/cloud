@@ -25,6 +25,7 @@ package com.intellectualsites.commands.arguments.parser;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
+import com.intellectualsites.commands.annotations.specifier.Completions;
 import com.intellectualsites.commands.annotations.specifier.Range;
 import com.intellectualsites.commands.arguments.standard.BooleanArgument;
 import com.intellectualsites.commands.arguments.standard.ByteArgument;
@@ -38,8 +39,8 @@ import com.intellectualsites.commands.arguments.standard.StringArgument;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -75,6 +76,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     public StandardParserRegistry() {
         /* Register standard mappers */
         this.<Range, Number>registerAnnotationMapper(Range.class, new RangeMapper<>());
+        this.<Completions, String>registerAnnotationMapper(Completions.class, new CompletionsMapper());
 
         /* Register standard types */
         this.registerParserSupplier(TypeToken.of(Byte.class), options ->
@@ -95,7 +97,8 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         this.registerParserSupplier(TypeToken.of(Character.class), options -> new CharArgument.CharacterParser<C>());
         /* Make this one less awful */
         this.registerParserSupplier(TypeToken.of(String.class), options -> new StringArgument.StringParser<C>(
-                StringArgument.StringMode.SINGLE, (context, s) -> Collections.emptyList()));
+                StringArgument.StringMode.SINGLE, (context, s) ->
+                Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))));
         /* Add options to this */
         this.registerParserSupplier(TypeToken.of(Boolean.class), options -> new BooleanArgument.BooleanParser<>(false));
     }
@@ -225,6 +228,20 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 parserParameters.store(StandardParameters.RANGE_MAX, max);
             }
             return parserParameters;
+        }
+
+    }
+
+
+    private static final class CompletionsMapper implements BiFunction<Completions, TypeToken<?>, ParserParameters> {
+
+        @Override
+        public ParserParameters apply(final Completions completions, final TypeToken<?> token) {
+            if (token.getRawType().equals(String.class)) {
+                final String[] splitCompletions = completions.value().replace(" ", "").split(",");
+                return ParserParameters.single(StandardParameters.COMPLETIONS, splitCompletions);
+            }
+            return ParserParameters.empty();
         }
 
     }
