@@ -21,8 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+package com.intellectualsites.commands.bukkit;
 
-/**
- * cloud implementation for Bukkit 1.8-1.16
- */
-package com.intellectualsites.commands;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import javax.annotation.Nonnull;
+
+final class BukkitConsoleSender extends BukkitCommandSender {
+
+    BukkitConsoleSender() {
+        super(Bukkit.getConsoleSender());
+    }
+
+    @Override
+    public boolean isPlayer() {
+        return false;
+    }
+
+    @Nonnull
+    @Override
+    public Player asPlayer() {
+        throw new UnsupportedOperationException("Cannot convert console to player");
+    }
+
+}

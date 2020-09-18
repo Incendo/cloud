@@ -52,7 +52,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
- * Parser that parses class instances {@link Command commands}
+ * Parser that parses class instances {@link com.intellectualsites.commands.Command commands}
  *
  * @param <C> Command sender type
  * @param <M> Command meta type

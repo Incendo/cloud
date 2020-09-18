@@ -21,21 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;
+package com.intellectualsites.commands.bukkit;
 
-import com.intellectualsites.commands.meta.SimpleCommandMeta;
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 
-public class BukkitCommandMeta extends SimpleCommandMeta {
+final class BukkitPlayerSender extends BukkitCommandSender {
 
-    /**
-     * Bukkit command meta data
-     *
-     * @param simpleCommandMeta Simple command meta data instance that gets mirrored
-     */
-    public BukkitCommandMeta(@Nonnull final SimpleCommandMeta simpleCommandMeta) {
-        super(simpleCommandMeta.getAll());
+    BukkitPlayerSender(@Nonnull final Player player) {
+        super(player);
     }
 
+    @Override
+    public boolean isPlayer() {
+        return true;
+    }
+
+    @Nonnull
+    @Override
+    public Player asPlayer() {
+        return (Player) this.getInternalSender();
+    }
 }

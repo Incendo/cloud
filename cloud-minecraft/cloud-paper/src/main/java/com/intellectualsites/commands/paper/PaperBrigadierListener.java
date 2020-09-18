@@ -21,12 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;
+package com.intellectualsites.commands.paper;
 
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
-import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.bukkit.BukkitCommandMeta;
+import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
+import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;

@@ -21,26 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;
 
-import org.bukkit.entity.Player;
-
-import javax.annotation.Nonnull;
-
-final class BukkitPlayerSender extends BukkitCommandSender {
-
-    BukkitPlayerSender(@Nonnull final Player player) {
-        super(player);
-    }
-
-    @Override
-    public boolean isPlayer() {
-        return true;
-    }
-
-    @Nonnull
-    @Override
-    public Player asPlayer() {
-        return (Player) this.getInternalSender();
-    }
-}
+/**
+ * BungeeCord implementation of cloud
+ */
+package com.intellectualsites.commands.bungee;

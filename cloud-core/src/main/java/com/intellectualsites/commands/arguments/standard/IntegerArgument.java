@@ -26,8 +26,8 @@ package com.intellectualsites.commands.arguments.standard;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
-import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
+import com.intellectualsites.commands.context.CommandContext;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;

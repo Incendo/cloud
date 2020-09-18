@@ -21,31 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;
+package com.intellectualsites.commands.bungee;
 
-import com.google.common.reflect.TypeToken;
+import com.intellectualsites.commands.CommandManager;
+import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
-import com.intellectualsites.commands.parsers.MaterialArgument;
-import com.intellectualsites.commands.parsers.WorldArgument;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.Plugin;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.util.function.Function;
 
-/**
- * Command manager for the Bukkit platform, using {@link BukkitCommandSender} as the
- * command sender type
- *
- * @param <C> Command sender type
- */
-public class BukkitCommandManager<C>
-        extends CommandManager<C, BukkitCommandMeta> {
+public class BungeeCommandManager<C> extends CommandManager<C, SimpleCommandMeta> {
 
     private final Plugin owningPlugin;
-
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
 
@@ -58,43 +48,29 @@ public class BukkitCommandManager<C>
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
-                                @Nonnull final Function<CommandTree<C, BukkitCommandMeta>,
-                                        CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator,
+    public BungeeCommandManager(@Nonnull final Plugin owningPlugin,
+                                @Nonnull final Function<CommandTree<C, SimpleCommandMeta>,
+                                        CommandExecutionCoordinator<C, SimpleCommandMeta>> commandExecutionCoordinator,
                                 @Nonnull final Function<CommandSender, C> commandSenderMapper,
                                 @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper)
             throws Exception {
-        super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
-        ((BukkitPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        super(commandExecutionCoordinator, new BungeePluginRegistrationHandler<>());
+        ((BungeePluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
-
-        /* Register Bukkit parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.of(World.class), params -> new WorldArgument.WorldParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.of(Material.class),
-                                                        params -> new MaterialArgument.MaterialParser<>());
     }
 
-    /**
-     * Get the plugin that owns the manager
-     *
-     * @return Owning plugin
-     */
-    @Nonnull
-    public Plugin getOwningPlugin() {
-        return this.owningPlugin;
+    @Override
+    public final boolean hasPermission(@Nonnull final C sender,
+                                 @Nonnull final String permission) {
+        return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 
-    /**
-     * Create default command meta data
-     *
-     * @return Meta data
-     */
     @Nonnull
     @Override
-    public BukkitCommandMeta createDefaultCommandMeta() {
-        return BukkitCommandMetaBuilder.builder().withDescription("").build();
+    public final SimpleCommandMeta createDefaultCommandMeta() {
+        return SimpleCommandMeta.empty();
     }
 
     @Nonnull
@@ -102,9 +78,14 @@ public class BukkitCommandManager<C>
         return this.commandSenderMapper;
     }
 
-    @Override
-    public final boolean hasPermission(@Nonnull final C sender, @Nonnull final String permission) {
-        return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
+    /**
+     * Get the owning plugin
+     *
+     * @return Owning plugin
+     */
+    @Nonnull
+    public Plugin getOwningPlugin() {
+        return this.owningPlugin;
     }
 
 }

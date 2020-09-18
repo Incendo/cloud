@@ -25,6 +25,7 @@ package com.intellectualsites.commands.brigadier;
 
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
+import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.arguments.CommandArgument;
@@ -36,6 +37,7 @@ import com.intellectualsites.commands.arguments.standard.FloatArgument;
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.arguments.standard.ShortArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
+import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -47,7 +49,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -65,7 +66,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Manager used to map cloud {@link com.intellectualsites.commands.Command}
+ * Manager used to map cloud {@link Command}
  * <p>
  * The structure of this class is largely inspired by
  * <a href="https://github.com/aikar/commands/blob/master/brigadier/src/main/java/co.aikar.commands/ACFBrigadierManager.java">
@@ -79,7 +80,7 @@ public final class CloudBrigadierManager<C, S> {
     private final Map<Class<?>, Function<? extends CommandArgument<C, ?>,
             ? extends ArgumentType<?>>> mappers;
     private final Map<Class<?>, Supplier<ArgumentType<?>>> defaultArgumentTypeSuppliers;
-    private final Supplier<com.intellectualsites.commands.context.CommandContext<C>> dummyContextProvider;
+    private final Supplier<CommandContext<C>> dummyContextProvider;
     private final CommandManager<C, ?> commandManager;
 
     /**
@@ -89,7 +90,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param dummyContextProvider Provider of dummy context for completions
      */
     public CloudBrigadierManager(@Nonnull final CommandManager<C, ?> commandManager,
-                                 @Nonnull final Supplier<com.intellectualsites.commands.context.CommandContext<C>>
+                                 @Nonnull final Supplier<CommandContext<C>>
                                          dummyContextProvider) {
         this.mappers = Maps.newHashMap();
         this.defaultArgumentTypeSuppliers = Maps.newHashMap();
@@ -298,7 +299,7 @@ public final class CloudBrigadierManager<C, S> {
     private CompletableFuture<Suggestions> buildSuggestions(@Nonnull final CommandArgument<C, ?> argument,
                                                             @Nonnull final CommandContext<S> s,
                                                             @Nonnull final SuggestionsBuilder builder) {
-        final com.intellectualsites.commands.context.CommandContext<C> commandContext = this.dummyContextProvider.get();
+        final CommandContext<C> commandContext = this.dummyContextProvider.get();
         final LinkedList<String> inputQueue = new LinkedList<>(Collections.singletonList(builder.getInput()));
         final CommandPreprocessingContext<C> commandPreprocessingContext =
                 new CommandPreprocessingContext<>(commandContext, inputQueue);

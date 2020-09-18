@@ -21,8 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;
+package com.intellectualsites.commands.bukkit;
 
+import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import org.bukkit.Bukkit;

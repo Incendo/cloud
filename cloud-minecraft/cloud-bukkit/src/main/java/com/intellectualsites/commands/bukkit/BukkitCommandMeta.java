@@ -21,8 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+package com.intellectualsites.commands.bukkit;
 
-/**
- * Paper specific implementation that extends the Bukkit implementation
- */
-package com.intellectualsites.commands;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
+
+import javax.annotation.Nonnull;
+
+public class BukkitCommandMeta extends SimpleCommandMeta {
+
+    /**
+     * Bukkit command meta data
+     *
+     * @param simpleCommandMeta Simple command meta data instance that gets mirrored
+     */
+    public BukkitCommandMeta(@Nonnull final SimpleCommandMeta simpleCommandMeta) {
+        super(simpleCommandMeta.getAll());
+    }
+
+}

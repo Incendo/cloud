@@ -21,8 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands;
+package com.intellectualsites.commands.bukkit;
 
+import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.exceptions.ArgumentParseException;
@@ -36,9 +37,7 @@ import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Consumer;
 
 final class BukkitCommand<C> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
@@ -49,10 +48,10 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     private final CommandArgument<C, ?> command;
     private final BukkitCommandManager<C> bukkitCommandManager;
-    private final com.intellectualsites.commands.Command<C, BukkitCommandMeta> cloudCommand;
+    private final Command<C, BukkitCommandMeta> cloudCommand;
 
     @SuppressWarnings("unchecked")
-    BukkitCommand(@Nonnull final com.intellectualsites.commands.Command<C, BukkitCommandMeta> cloudCommand,
+    BukkitCommand(@Nonnull final Command<C, BukkitCommandMeta> cloudCommand,
                   @Nonnull final CommandArgument<C, ?> command,
                   @Nonnull final BukkitCommandManager<C> bukkitCommandManager) {
         super(command.getName(),
@@ -88,7 +87,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                              commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND);
                                          } else if (throwable instanceof ArgumentParseException) {
                                              commandSender.sendMessage(ChatColor.RED + "Invalid Command Argument: "
-                                                                      + ChatColor.GRAY + throwable.getCause().getMessage());
+                                                                     + ChatColor.GRAY + throwable.getCause().getMessage());
                                          } else {
                                              commandSender.sendMessage(throwable.getMessage());
                                              throwable.printStackTrace();
@@ -122,27 +121,6 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     @Override
     public String getPermission() {
         return this.cloudCommand.getCommandPermission();
-    }
-
-    @Nullable
-    private <E extends Throwable> E captureException(@Nonnull final Class<E> clazz, @Nullable final Throwable throwable) {
-        if (throwable == null) {
-            return null;
-        }
-        if (clazz.equals(throwable.getClass())) {
-            //noinspection unchecked
-            return (E) throwable;
-        }
-        return captureException(clazz, throwable.getCause());
-    }
-
-    private <E extends Throwable> boolean handleException(@Nullable final E throwable,
-                                                          @Nonnull final Consumer<E> consumer) {
-        if (throwable == null) {
-            return false;
-        }
-        consumer.accept(throwable);
-        return true;
     }
 
 }

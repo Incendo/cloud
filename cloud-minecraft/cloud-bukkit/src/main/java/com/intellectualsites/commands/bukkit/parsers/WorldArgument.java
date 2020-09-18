@@ -21,30 +21,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.parsers;
+package com.intellectualsites.commands.bukkit.parsers;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import javax.annotation.Nonnull;
-import java.util.EnumSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
- * cloud argument type that parses Bukkit {@link Material materials}
+ * cloud argument type that parses Bukkit {@link org.bukkit.World worlds}
  *
  * @param <C> Command sender type
  */
-public class MaterialArgument<C> extends CommandArgument<C, Material> {
+public class WorldArgument<C> extends CommandArgument<C, World> {
 
-    protected MaterialArgument(final boolean required,
-                               @Nonnull final String name,
-                               @Nonnull final String defaultValue) {
-        super(required, name, new MaterialParser<>(), defaultValue, Material.class);
+    protected WorldArgument(final boolean required,
+                            @Nonnull final String name,
+                            @Nonnull final String defaultValue) {
+        super(required, name, new WorldParser<>(), defaultValue, World.class);
     }
 
     /**
@@ -55,8 +56,8 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @return Created builder
      */
     @Nonnull
-    public static <C> MaterialArgument.Builder<C> newBuilder(@Nonnull final String name) {
-        return new MaterialArgument.Builder<>(name);
+    public static <C> CommandArgument.Builder<C, World> newBuilder(@Nonnull final String name) {
+        return new WorldArgument.Builder<>(name);
     }
 
     /**
@@ -67,8 +68,8 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @return Created argument
      */
     @Nonnull
-    public static <C> CommandArgument<C, Material> required(@Nonnull final String name) {
-        return MaterialArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> CommandArgument<C, World> required(@Nonnull final String name) {
+        return WorldArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
@@ -79,83 +80,93 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @return Created argument
      */
     @Nonnull
-    public static <C> CommandArgument<C, Material> optional(@Nonnull final String name) {
-        return MaterialArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> CommandArgument<C, World> optional(@Nonnull final String name) {
+        return WorldArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
      * Create a new optional argument with a default value
      *
-     * @param name     Argument name
-     * @param material Default value
-     * @param <C> Command sender type
+     * @param name         Argument name
+     * @param defaultValue Default value
+     * @param <C>          Command sender type
      * @return Created argument
      */
     @Nonnull
-    public static <C> CommandArgument<C, Material> optional(@Nonnull final String name,
-                                                            @Nonnull final Material material) {
-        return MaterialArgument.<C>newBuilder(name).asOptionalWithDefault(material.name().toLowerCase()).build();
+    public static <C> CommandArgument<C, World> optional(@Nonnull final String name,
+                                                                               @Nonnull final String defaultValue) {
+        return WorldArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Material> {
+
+    public static final class Builder<C> extends CommandArgument.Builder<C, World> {
 
         protected Builder(@Nonnull final String name) {
-            super(Material.class, name);
+            super(World.class, name);
         }
-
-    }
-
-
-    public static final class MaterialParser<C> implements ArgumentParser<C, Material> {
 
         @Nonnull
         @Override
-        public ArgumentParseResult<Material> parse(@Nonnull final CommandContext<C> commandContext,
-                                                   @Nonnull final Queue<String> inputQueue) {
+        public CommandArgument<C, World> build() {
+            return new WorldArgument<>(this.isRequired(), this.getName(), this.getDefaultValue());
+        }
+    }
+
+
+    public static final class WorldParser<C> implements ArgumentParser<C, World> {
+
+        @Nonnull
+        @Override
+        public ArgumentParseResult<World> parse(@Nonnull final CommandContext<C> commandContext,
+                                                @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
-            try {
-                final Material material = Material.valueOf(input.replace("minecraft:", "").toUpperCase());
-                inputQueue.remove();
-                return ArgumentParseResult.success(material);
-            } catch (final IllegalArgumentException exception) {
-                return ArgumentParseResult.failure(new MaterialParseException(input));
+            final World world = Bukkit.getWorld(input);
+            if (world == null) {
+                return ArgumentParseResult.failure(new WorldParseException(input));
             }
+
+            inputQueue.remove();
+            return ArgumentParseResult.success(world);
+        }
+
+        @Nonnull
+        @Override
+        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
+            return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
         }
 
     }
 
 
-    public static final class MaterialParseException extends IllegalArgumentException {
+    public static final class WorldParseException extends IllegalArgumentException {
 
         private final String input;
 
         /**
-         * Construct a new MaterialParseException
+         * Construct a new WorldParseException
          *
          * @param input Input
          */
-        public MaterialParseException(@Nonnull final String input) {
+        public WorldParseException(@Nonnull final String input) {
             this.input = input;
         }
 
         /**
-         * Get the input
+         * Get the input provided by the sender
          *
          * @return Input
          */
-        @Nonnull
         public String getInput() {
             return this.input;
         }
 
         @Override
         public String getMessage() {
-            return EnumSet.allOf(Material.class).stream().map(Material::name).map(String::toLowerCase)
-                          .collect(Collectors.joining(", "));
+            return String.format("'%s' is not a valid Minecraft world", this.input);
         }
     }
 

@@ -25,4 +25,4 @@
 /**
  * Bukkit specific command arguments
  */
-package com.intellectualsites.commands.parsers;
+package com.intellectualsites.commands.bukkit.parsers;
