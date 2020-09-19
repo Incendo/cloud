@@ -21,27 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments.standard;
+package cloud.commandframework.bukkit.parsers;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
-public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
-
-    private UUIDArgument(final boolean required,
-                         @Nonnull final String name,
-                         final String defaultValue,
-                         @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
-        super(required, name, new UUIDParser<>(suggestionsProvider), defaultValue, UUID.class, suggestionsProvider);
+public final class PlayerArgument<C> extends CommandArgument<C, Player> {
+    private PlayerArgument(final boolean required,
+                           @Nonnull final String name,
+                           @Nonnull final String defaultValue,
+                           @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new PlayerParser<>(), defaultValue, Player.class, suggestionsProvider);
     }
 
     /**
@@ -64,8 +65,8 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @return Created component
      */
     @Nonnull
-    public static <C> CommandArgument<C, UUID> required(@Nonnull final String name) {
-        return UUIDArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> CommandArgument<C, Player> required(@Nonnull final String name) {
+        return PlayerArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
@@ -76,95 +77,105 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @return Created component
      */
     @Nonnull
-    public static <C> CommandArgument<C, UUID> optional(@Nonnull final String name) {
-        return UUIDArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> CommandArgument<C, Player> optional(@Nonnull final String name) {
+        return PlayerArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
      * Create a new required command component with a default value
      *
      * @param name       Component name
-     * @param defaultUUID Default uuid
+     * @param defaultNum Default num
      * @param <C>        Command sender type
      * @return Created component
      */
     @Nonnull
-    public static <C> CommandArgument<C, UUID> optional(@Nonnull final String name,
-                                                        final UUID defaultUUID) {
-        return UUIDArgument.<C>newBuilder(name).asOptionalWithDefault(defaultUUID.toString()).build();
+    public static <C> CommandArgument<C, Player> optional(@Nonnull final String name,
+                                                          final String defaultNum) {
+        return PlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, UUID> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Player> {
 
         protected Builder(@Nonnull final String name) {
-            super(UUID.class, name);
+            super(Player.class, name);
         }
 
         /**
-         * Builder a new example component
+         * Builder a new boolean component
          *
          * @return Constructed component
          */
         @Nonnull
         @Override
-        public UUIDArgument<C> build() {
-            return new UUIDArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+        public PlayerArgument<C> build() {
+            return new PlayerArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }
 
 
-    private static final class UUIDParser<C> implements ArgumentParser<C, UUID> {
-
-        private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
-
-        public UUIDParser(@Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
-            this.suggestionsProvider = suggestionsProvider;
-        }
+    private static final class PlayerParser<C> implements ArgumentParser<C, Player> {
 
         @Nonnull
         @Override
-        public ArgumentParseResult<UUID> parse(
-                @Nonnull final CommandContext<C> commandContext,
-                @Nonnull final Queue<String> inputQueue) {
+        public ArgumentParseResult<Player> parse(@Nonnull final CommandContext<C> commandContext,
+                                                 @Nonnull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
+            inputQueue.remove();
 
-            try {
-                UUID uuid = UUID.fromString(input);
-                inputQueue.remove();
-                return ArgumentParseResult.success(uuid);
-            } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new UUIDParseException(input));
+            //noinspection deprecation
+            Player player = Bukkit.getPlayer(input);
+
+            if (player == null) {
+                return ArgumentParseResult.failure(new PlayerParseException(input));
             }
+
+            return ArgumentParseResult.success(player);
         }
 
         @Nonnull
         @Override
         public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
                                         @Nonnull final String input) {
-            return this.suggestionsProvider.apply(commandContext, input);
-        }
+            List<String> output = new ArrayList<>();
 
-        @Override
-        public boolean isContextFree() {
-            return true;
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                output.add(player.getName());
+            }
+
+            return output;
         }
     }
 
 
-    public static final class UUIDParseException extends IllegalArgumentException {
+    /**
+     * Player parse exception
+     */
+    public static final class PlayerParseException extends IllegalArgumentException {
+
+        private final String input;
 
         /**
-         * Construct a new example parse exception
+         * Construct a new boolean parse exception
          *
          * @param input String input
          */
-        public UUIDParseException(@Nonnull final String input) {
-            super(input);
+        public PlayerParseException(@Nonnull final String input) {
+            this.input = input;
+        }
+
+        /**
+         * Get the supplied input
+         *
+         * @return String value
+         */
+        public String getInput() {
+            return input;
         }
 
     }
