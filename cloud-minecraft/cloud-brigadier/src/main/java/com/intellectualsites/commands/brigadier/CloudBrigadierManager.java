@@ -240,6 +240,33 @@ public final class CloudBrigadierManager<C, S> {
     }
 
     /**
+     * Create a new literal command node
+     *
+     * @param cloudCommand      Cloud command instance
+     * @param permissionChecker Permission checker
+     * @param executor          Command executor
+     * @return Literal command node
+     */
+    public LiteralCommandNode<S> createLiteralCommandNode(@Nonnull final Command<C> cloudCommand,
+                                                          @Nonnull final BiPredicate<S, String> permissionChecker,
+                                                          @Nonnull final com.mojang.brigadier.Command<S> executor) {
+        final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
+                .getCommandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
+        final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(node.getValue(), context, builder);
+        final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
+                .<S>literal(cloudCommand.getArguments().get(0).getName())
+                .requires(sender -> permissionChecker.test(sender, node.getNodeMeta().getOrDefault("permission", "")));
+        if (node.isLeaf() && node.getValue() != null) {
+            literalArgumentBuilder.executes(executor);
+        }
+        final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
+        for (final CommandTree.Node<CommandArgument<C, ?>> child : node.getChildren()) {
+            constructedRoot.addChild(this.constructCommandNode(child, permissionChecker, executor, provider).build());
+        }
+        return constructedRoot;
+    }
+
+    /**
      * Create a literal command from Brigadier command info, and a cloud command instance
      *
      * @param cloudCommand       Cloud root command
@@ -297,7 +324,7 @@ public final class CloudBrigadierManager<C, S> {
 
     @Nonnull
     private CompletableFuture<Suggestions> buildSuggestions(@Nonnull final CommandArgument<C, ?> argument,
-                                                            @Nonnull final CommandContext<S> s,
+                                                            @Nonnull final com.mojang.brigadier.context.CommandContext<S> s,
                                                             @Nonnull final SuggestionsBuilder builder) {
         final CommandContext<C> commandContext = this.dummyContextProvider.get();
         final LinkedList<String> inputQueue = new LinkedList<>(Collections.singletonList(builder.getInput()));
@@ -313,10 +340,7 @@ public final class CloudBrigadierManager<C, S> {
             command = command.substring(1);
         }
         final List<String> suggestions = this.commandManager.suggest(commandContext.getSender(), command);
-        /*argument.getParser().suggestions(commandContext, builder.getInput());*/
-        for (final String suggestion : suggestions) {
-            System.out.printf("- %s\n", suggestion);
-        }
+
         /*
         System.out.println("Filtering out with: " + builder.getInput());
         final CommandSuggestionProcessor<C> processor = this.commandManager.getCommandSuggestionProcessor();

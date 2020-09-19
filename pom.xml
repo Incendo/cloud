@@ -11,13 +11,15 @@
         <module>cloud-jline</module>
         <module>cloud-core</module>
         <module>cloud-pipeline</module>
+        <module>cloud-annotations</module>
         <!-- REMOVE THIS -->
         <module>cloud-minecraft/cloud-bukkit-test</module>
+        <module>cloud-minecraft/cloud-velocity-test</module>
         <module>cloud-minecraft/cloud-bukkit</module>
         <module>cloud-minecraft/cloud-paper</module>
         <module>cloud-minecraft/cloud-brigadier</module>
-        <module>cloud-annotations</module>
         <module>cloud-minecraft/cloud-bungee</module>
+        <module>cloud-minecraft/cloud-velocity</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>

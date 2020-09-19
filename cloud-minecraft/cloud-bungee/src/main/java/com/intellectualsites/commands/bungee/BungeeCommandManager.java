@@ -40,7 +40,7 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
 
     /**
-     * Construct a new Bukkit command manager
+     * Construct a new Bungee command manager
      *
      * @param owningPlugin                 Plugin that is constructing the manager
      * @param commandExecutionCoordinator  Coordinator provider

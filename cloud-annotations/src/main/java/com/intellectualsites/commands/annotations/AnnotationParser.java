@@ -55,7 +55,6 @@ import java.util.regex.Pattern;
  * Parser that parses class instances {@link com.intellectualsites.commands.Command commands}
  *
  * @param <C> Command sender type
- * @param <M> Command meta type
  */
 public final class AnnotationParser<C> {
 

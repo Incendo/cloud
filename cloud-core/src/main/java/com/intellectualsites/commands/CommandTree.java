@@ -447,10 +447,8 @@ public final class CommandTree<C> {
             chain = chain.subList(1, chain.size());
             // Go through all nodes from the tail upwards until a collision occurs
             for (final Node<CommandArgument<C, ?>> commandArgumentNode : chain) {
-                if (commandArgumentNode.nodeMeta.containsKey("permission") && !commandArgumentNode.nodeMeta.get("permission")
-                                                                                                           .equalsIgnoreCase(
-                                                                                                                   node.nodeMeta
-                                                                                                                           .get("permission"))) {
+                if (commandArgumentNode.nodeMeta.containsKey("permission")
+                        && !commandArgumentNode.nodeMeta.get("permission").equalsIgnoreCase(node.nodeMeta.get("permission"))) {
                     commandArgumentNode.nodeMeta.put("permission", "");
                 } else {
                     commandArgumentNode.nodeMeta.put("permission", node.nodeMeta.get("permission"));

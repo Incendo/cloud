@@ -38,7 +38,7 @@ Once the core functionality is present, the framework will offer implementation 
   
 - Create a Discord implementation (JDA)  
 - Create a Java CLI implementation (JLine3)  
-  
+
 ## nomenclature  
 - **sender**: someone who is able to produce input  
 - **argument**: an argument is something that can be parsed from a string  
@@ -47,7 +47,17 @@ Once the core functionality is present, the framework will offer implementation 
 - **static argument**: a string literal  
 - **command**: a command is a chain of arguments and a handler that acts on the parsed arguments
 - **command tree**: structure that contains all commands and is used to parse input into arguments
-  
+
+## modules
+- **cloud-core**: Core module containing most of the cloud API, and shared implementations
+- **cloud-annotations**: Annotation processing code that allows you to use annotated methods rather than builders
+- **cloud-jline**: W.I.P JLine3 implementation of cloud
+- **cloud-minecraft/cloud-brigadier**: Brigadier mappings for cloud
+- **cloud-minecraft/cloud-bukkit**: Bukkit 1.8.8+ implementation of cloud
+- **cloud-minecraft/cloud-paper**: Module that extends cloud-bukkit to add special support for Paper 1.8.8+
+- **cloud-minecraft/cloud-bungee**: BungeeCord 1.8.8+ implementation of Cloud
+- **cloud-minecraft/cloud-velocity**: Velocity v1.1.0 implementation of cloud
+
 ## links  
   
 - Discord: https://discord.gg/KxkjDVg  

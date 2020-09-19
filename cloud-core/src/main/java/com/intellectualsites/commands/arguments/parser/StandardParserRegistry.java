@@ -148,9 +148,8 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         if (producer == null) {
             /* Give enums special treatment */
             if (actualType.isSubtypeOf(Enum.class)) {
-                @SuppressWarnings("all") final EnumArgument.EnumParser enumArgument = new EnumArgument.EnumParser((Class<Enum>)
-                                                                                                                          actualType
-                                                                                                                                  .getRawType());
+                @SuppressWarnings("all") final EnumArgument.EnumParser enumArgument
+                        = new EnumArgument.EnumParser((Class<Enum>) actualType.getRawType());
                 // noinspection all
                 return Optional.of(enumArgument);
             }

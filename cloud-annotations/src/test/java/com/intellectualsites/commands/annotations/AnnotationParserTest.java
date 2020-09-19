@@ -38,7 +38,7 @@ import java.util.concurrent.CompletionException;
 class AnnotationParserTest {
 
     private static CommandManager<TestCommandSender> manager;
-    private static AnnotationParser<TestCommandSender, SimpleCommandMeta> annotationParser;
+    private static AnnotationParser<TestCommandSender> annotationParser;
 
     @BeforeAll
     static void setup() {

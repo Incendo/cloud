@@ -76,9 +76,9 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                      if (throwable != null) {
                                          if (throwable instanceof InvalidSyntaxException) {
                                              commandSender.sendMessage(ChatColor.RED + "Invalid Command Syntax. "
-                                                                               + "Correct command syntax is: "
-                                                                               + ChatColor.GRAY + "/"
-                                                                               + ((InvalidSyntaxException) throwable).getCorrectSyntax());
+                                                                       + "Correct command syntax is: "
+                                                                       + ChatColor.GRAY + "/"
+                                                                       + ((InvalidSyntaxException) throwable).getCorrectSyntax());
                                          } else if (throwable instanceof InvalidCommandSenderException) {
                                              commandSender.sendMessage(ChatColor.RED + throwable.getMessage());
                                          } else if (throwable instanceof NoPermissionException) {

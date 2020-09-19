@@ -105,7 +105,7 @@ public final class BukkitTest extends JavaPlugin {
                                              .<CommandSender>newBuilder("perc")
                                              .withMin(PERC_MIN).withMax(PERC_MAX).build())
                            .handler(context -> {
-                               ((Player) context.getSender()).sendMessage(String.format(
+                               context.getSender().sendMessage(String.format(
                                        "Kenny sux %d%%",
                                        context.<Integer>get("perc").orElse(PERC_MIN)
                                ));
