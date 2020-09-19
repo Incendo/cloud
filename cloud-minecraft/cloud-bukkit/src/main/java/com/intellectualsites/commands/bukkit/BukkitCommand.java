@@ -47,19 +47,19 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final CommandArgument<C, ?> command;
-    private final BukkitCommandManager<C> bukkitCommandManager;
+    private final BukkitCommandManager<C> manager;
     private final Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
     BukkitCommand(@Nonnull final Command<C> cloudCommand,
                   @Nonnull final CommandArgument<C, ?> command,
-                  @Nonnull final BukkitCommandManager<C> bukkitCommandManager) {
+                  @Nonnull final BukkitCommandManager<C> manager) {
         super(command.getName(),
               cloudCommand.getCommandMeta().getOrDefault("description", ""),
               "",
               ((StaticArgument<C>) command).getAlternativeAliases());
         this.command = command;
-        this.bukkitCommandManager = bukkitCommandManager;
+        this.manager = manager;
         this.cloudCommand = cloudCommand;
     }
 
@@ -70,31 +70,52 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        this.bukkitCommandManager.executeCommand(this.bukkitCommandManager.getCommandSenderMapper().apply(commandSender),
-                                                 builder.toString())
-                                 .whenComplete(((commandResult, throwable) -> {
-                                     if (throwable != null) {
-                                         if (throwable instanceof InvalidSyntaxException) {
-                                             commandSender.sendMessage(ChatColor.RED + "Invalid Command Syntax. "
-                                                                       + "Correct command syntax is: "
-                                                                       + ChatColor.GRAY + "/"
-                                                                       + ((InvalidSyntaxException) throwable).getCorrectSyntax());
-                                         } else if (throwable instanceof InvalidCommandSenderException) {
-                                             commandSender.sendMessage(ChatColor.RED + throwable.getMessage());
-                                         } else if (throwable instanceof NoPermissionException) {
-                                             commandSender.sendMessage(MESSAGE_NO_PERMS);
-                                         } else if (throwable instanceof NoSuchCommandException) {
-                                             commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND);
-                                         } else if (throwable instanceof ArgumentParseException) {
-                                             commandSender.sendMessage(ChatColor.RED + "Invalid Command Argument: "
-                                                                               + ChatColor.GRAY + throwable.getCause()
-                                                                                                           .getMessage());
-                                         } else {
-                                             commandSender.sendMessage(throwable.getMessage());
-                                             throwable.printStackTrace();
-                                         }
-                                     }
-                                 }));
+        final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
+        this.manager.executeCommand(sender,
+                                    builder.toString())
+                    .whenComplete(((commandResult, throwable) -> {
+             if (throwable != null) {
+                 if (throwable instanceof InvalidSyntaxException) {
+                     this.manager.handleException(sender,
+                                                  InvalidSyntaxException.class,
+                                                  (InvalidSyntaxException) throwable, (c, e) ->
+                          commandSender.sendMessage(ChatColor.RED + "Invalid Command Syntax. "
+                                               + "Correct command syntax is: "
+                                               + ChatColor.GRAY + "/"
+                                               + ((InvalidSyntaxException) throwable).getCorrectSyntax())
+                     );
+                 } else if (throwable instanceof InvalidCommandSenderException) {
+                     this.manager.handleException(sender,
+                                                  InvalidCommandSenderException.class,
+                                                  (InvalidCommandSenderException) throwable, (c, e) ->
+                          commandSender.sendMessage(ChatColor.RED + throwable.getMessage())
+                     );
+                 } else if (throwable instanceof NoPermissionException) {
+                     this.manager.handleException(sender,
+                                                  NoPermissionException.class,
+                                                  (NoPermissionException) throwable, (c, e) ->
+                          commandSender.sendMessage(MESSAGE_NO_PERMS)
+                     );
+                 } else if (throwable instanceof NoSuchCommandException) {
+                     this.manager.handleException(sender,
+                                                  NoSuchCommandException.class,
+                                                  (NoSuchCommandException) throwable, (c, e) ->
+                          commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND)
+                     );
+                 } else if (throwable instanceof ArgumentParseException) {
+                     this.manager.handleException(sender,
+                                                  ArgumentParseException.class,
+                                                  (ArgumentParseException) throwable, (c, e) ->
+                          commandSender.sendMessage(ChatColor.RED + "Invalid Command Argument: "
+                                                            + ChatColor.GRAY + throwable.getCause()
+                                                                                        .getMessage())
+                     );
+                 } else {
+                     commandSender.sendMessage(throwable.getMessage());
+                     throwable.printStackTrace();
+                 }
+             }
+         }));
         return true;
     }
 
@@ -110,13 +131,13 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.bukkitCommandManager.suggest(this.bukkitCommandManager.getCommandSenderMapper().apply(sender),
-                                                 builder.toString());
+        return this.manager.suggest(this.manager.getCommandSenderMapper().apply(sender),
+                                    builder.toString());
     }
 
     @Override
     public Plugin getPlugin() {
-        return this.bukkitCommandManager.getOwningPlugin();
+        return this.manager.getOwningPlugin();
     }
 
     @Override

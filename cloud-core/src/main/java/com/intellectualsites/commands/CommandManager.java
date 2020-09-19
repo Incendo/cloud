@@ -23,6 +23,7 @@
 //
 package com.intellectualsites.commands;
 
+import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.CommandSyntaxFormatter;
@@ -45,12 +46,16 @@ import com.intellectualsites.services.ServicePipeline;
 import com.intellectualsites.services.State;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -64,6 +69,7 @@ public abstract class CommandManager<C> {
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
+    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = Maps.newHashMap();
 
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandRegistrationHandler commandRegistrationHandler;
@@ -334,6 +340,52 @@ public abstract class CommandManager<C> {
     @Nonnull
     public ParserRegistry<C> getParserRegistry() {
         return this.parserRegistry;
+    }
+
+    /**
+     * Get the exception handler for an exception type, if one has been registered
+     *
+     * @param clazz Exception class
+     * @param <E>   Exception type
+     * @return Exception handler, or {@code null}
+     */
+    @Nullable
+    public final <E extends Exception> BiConsumer<C, E> getExceptionHandler(@Nullable final Class<E> clazz) {
+        final BiConsumer<C, ? extends Exception> consumer = this.exceptionHandlers.get(clazz);
+        if (consumer == null) {
+            return null;
+        }
+        //noinspection unchecked
+        return (BiConsumer<C, E>) consumer;
+    }
+
+    /**
+     * Register an exception handler for an exception type
+     *
+     * @param clazz   Exception class
+     * @param handler Exception handler
+     * @param <E>     Exception type
+     */
+    public final <E extends Exception> void registerExceptionHandler(@Nonnull final Class<E> clazz,
+                                                                     @Nonnull final BiConsumer<C, E> handler) {
+        this.exceptionHandlers.put(clazz, handler);
+    }
+
+    /**
+     * Handler an exception using the registered exception handler for the exception type, or using the
+     * provided default handler if no exception handler has been registered for the exception type
+     *
+     * @param sender         Executing command sender
+     * @param clazz          Exception class
+     * @param exception      Exception
+     * @param defaultHandler Default exception handler
+     * @param <E>            Exception type
+     */
+    public final <E extends Exception> void handleException(@Nonnull final C sender,
+                                                            @Nonnull final Class<E> clazz,
+                                                            @Nonnull final E exception,
+                                                            @Nonnull final BiConsumer<C, E> defaultHandler) {
+        Optional.ofNullable(this.getExceptionHandler(clazz)).orElse(defaultHandler).accept(sender, exception);
     }
 
 }

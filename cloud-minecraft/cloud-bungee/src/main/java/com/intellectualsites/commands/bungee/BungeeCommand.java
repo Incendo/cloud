@@ -45,19 +45,19 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                     + "Please contact the server administrators if you believe that this is in error.";
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
-    private final BungeeCommandManager<C> bungeeCommandManager;
+    private final BungeeCommandManager<C> manager;
     private final CommandArgument<C, ?> command;
     private final com.intellectualsites.commands.Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
     BungeeCommand(@Nonnull final com.intellectualsites.commands.Command<C> cloudCommand,
                   @Nonnull final CommandArgument<C, ?> command,
-                  @Nonnull final BungeeCommandManager<C> bungeeCommandManager) {
+                  @Nonnull final BungeeCommandManager<C> manager) {
         super(command.getName(),
               cloudCommand.getCommandPermission(),
               ((StaticArgument<C>) command).getAlternativeAliases().toArray(new String[0]));
         this.command = command;
-        this.bungeeCommandManager = bungeeCommandManager;
+        this.manager = manager;
         this.cloudCommand = cloudCommand;
     }
 
@@ -68,43 +68,64 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
-        this.bungeeCommandManager.executeCommand(this.bungeeCommandManager.getCommandSenderMapper().apply(commandSender),
-                                                 builder.toString())
-                                 .whenComplete(((commandResult, throwable) -> {
-                                     if (throwable != null) {
-                                         if (throwable instanceof InvalidSyntaxException) {
-                                             commandSender.sendMessage(
-                                                     new ComponentBuilder("Invalid Command Syntax. Correct command syntax is: ")
-                                                             .color(ChatColor.RED)
-                                                             .append("/")
-                                                             .color(ChatColor.GRAY)
-                                                             .append(((InvalidSyntaxException) throwable).getCorrectSyntax())
-                                                             .color(ChatColor.GRAY)
-                                                             .create()
-                                             );
-                                         } else if (throwable instanceof InvalidCommandSenderException) {
-                                             commandSender.sendMessage(new ComponentBuilder(throwable.getMessage())
-                                                                               .color(ChatColor.RED)
-                                                                               .create());
-                                         } else if (throwable instanceof NoPermissionException) {
-                                             commandSender.sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
-                                                                               .color(ChatColor.WHITE)
-                                                                               .create());
-                                         } else if (throwable instanceof NoSuchCommandException) {
-                                             commandSender.sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
-                                                                               .color(ChatColor.WHITE)
-                                                                               .create());
-                                         } else if (throwable instanceof ArgumentParseException) {
-                                             commandSender.sendMessage(new ComponentBuilder("Invalid Command Argument: ")
-                                                                               .color(ChatColor.GRAY)
-                                                                               .append(throwable.getCause().getMessage())
-                                                                               .create());
-                                         } else {
-                                             commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
-                                             throwable.printStackTrace();
-                                         }
-                                     }
-                                 }));
+        final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
+        this.manager.executeCommand(sender,
+                                    builder.toString())
+            .whenComplete(((commandResult, throwable) -> {
+                             if (throwable != null) {
+                                 if (throwable instanceof InvalidSyntaxException) {
+                                     this.manager.handleException(sender,
+                                                                  InvalidSyntaxException.class,
+                                                                  (InvalidSyntaxException) throwable, (c, e) ->
+                                          commandSender.sendMessage(
+                                                  new ComponentBuilder("Invalid Command Syntax. Correct command syntax is: ")
+                                                          .color(ChatColor.RED)
+                                                          .append("/")
+                                                          .color(ChatColor.GRAY)
+                                                          .append(((InvalidSyntaxException) throwable).getCorrectSyntax())
+                                                          .color(ChatColor.GRAY)
+                                                          .create()
+                                          )
+                                     );
+                                 } else if (throwable instanceof InvalidCommandSenderException) {
+                                     this.manager.handleException(sender,
+                                                                  InvalidCommandSenderException.class,
+                                                                  (InvalidCommandSenderException) throwable, (c, e) ->
+                                          commandSender.sendMessage(new ComponentBuilder(throwable.getMessage())
+                                                                            .color(ChatColor.RED)
+                                                                            .create())
+                                     );
+                                 } else if (throwable instanceof NoPermissionException) {
+                                     this.manager.handleException(sender,
+                                                                  NoPermissionException.class,
+                                                                  (NoPermissionException) throwable, (c, e) ->
+                                          commandSender.sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
+                                                                            .color(ChatColor.WHITE)
+                                                                            .create())
+                                     );
+                                 } else if (throwable instanceof NoSuchCommandException) {
+                                     this.manager.handleException(sender,
+                                                                  NoSuchCommandException.class,
+                                                                  (NoSuchCommandException) throwable, (c, e) ->
+                                          commandSender.sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
+                                                                            .color(ChatColor.WHITE)
+                                                                            .create())
+                                     );
+                                 } else if (throwable instanceof ArgumentParseException) {
+                                     this.manager.handleException(sender,
+                                                                  ArgumentParseException.class,
+                                                                  (ArgumentParseException) throwable, (c, e) ->
+                                          commandSender.sendMessage(new ComponentBuilder("Invalid Command Argument: ")
+                                                                            .color(ChatColor.GRAY)
+                                                                            .append(throwable.getCause().getMessage())
+                                                                            .create())
+                                     );
+                                 } else {
+                                     commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
+                                     throwable.printStackTrace();
+                                 }
+                             }
+                         }));
     }
 
     @Override
@@ -114,8 +135,8 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.bungeeCommandManager.suggest(this.bungeeCommandManager.getCommandSenderMapper().apply(sender),
-                                                 builder.toString());
+        return this.manager.suggest(this.manager.getCommandSenderMapper().apply(sender),
+                                    builder.toString());
     }
 
 }

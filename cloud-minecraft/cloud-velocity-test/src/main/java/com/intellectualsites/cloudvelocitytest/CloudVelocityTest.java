@@ -24,7 +24,12 @@
 package com.intellectualsites.cloudvelocitytest;
 
 import com.google.inject.Inject;
+import com.intellectualsites.commands.annotations.AnnotationParser;
+import com.intellectualsites.commands.annotations.Argument;
+import com.intellectualsites.commands.annotations.CommandMethod;
+import com.intellectualsites.commands.annotations.specifier.Range;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import com.intellectualsites.commands.velocity.VelocityCommandManager;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
@@ -67,6 +72,22 @@ public class CloudVelocityTest {
                  .literal("cute")
                  .handler(c -> c.getSender().sendMessage(TextComponent.of("That's right ;)").color(NamedTextColor.GOLD)))
                  .build()
+        );
+        final AnnotationParser<CommandSource> annotationParser = new AnnotationParser<>(m, CommandSource.class,
+                                                                                        p -> SimpleCommandMeta.empty());
+        annotationParser.parse(this);
+    }
+
+    @CommandMethod("test <num> [str]")
+    private void testCommand(@Nonnull @Argument("str") final String string,
+                             @Nonnull final CommandSource source,
+                             @Argument("num") @Range(max = "33") final int num) {
+        source.sendMessage(TextComponent.builder()
+            .append("You wrote: ", NamedTextColor.GOLD)
+            .append(string, NamedTextColor.LIGHT_PURPLE)
+            .append(" and ", NamedTextColor.GOLD)
+            .append(Integer.toString(num), NamedTextColor.LIGHT_PURPLE)
+            .append("!", NamedTextColor.GOLD)
         );
     }
 

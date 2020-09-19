@@ -256,12 +256,11 @@ public final class CloudBrigadierManager<C, S> {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
                 .<S>literal(cloudCommand.getArguments().get(0).getName())
                 .requires(sender -> permissionChecker.test(sender, node.getNodeMeta().getOrDefault("permission", "")));
-        if (node.isLeaf() && node.getValue() != null) {
-            literalArgumentBuilder.executes(executor);
-        }
+        literalArgumentBuilder.executes(executor);
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandArgument<C, ?>> child : node.getChildren()) {
-            constructedRoot.addChild(this.constructCommandNode(child, permissionChecker, executor, provider).build());
+            constructedRoot.addChild(this.constructCommandNode(true, child,
+                                                               permissionChecker, executor, provider).build());
         }
         return constructedRoot;
     }
@@ -289,12 +288,14 @@ public final class CloudBrigadierManager<C, S> {
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandArgument<C, ?>> child : cloudCommand.getChildren()) {
-            constructedRoot.addChild(this.constructCommandNode(child, permissionChecker, executor, suggestionProvider).build());
+            constructedRoot.addChild(this.constructCommandNode(false, child, permissionChecker,
+                                                               executor, suggestionProvider).build());
         }
         return constructedRoot;
     }
 
-    private ArgumentBuilder<S, ?> constructCommandNode(@Nonnull final CommandTree.Node<CommandArgument<C, ?>> root,
+    private ArgumentBuilder<S, ?> constructCommandNode(final boolean forceExecutor,
+                                                       @Nonnull final CommandTree.Node<CommandArgument<C, ?>> root,
                                                        @Nonnull final BiPredicate<S, String> permissionChecker,
                                                        @Nonnull final com.mojang.brigadier.Command<S> executor,
                                                        @Nonnull final SuggestionProvider<S> suggestionProvider) {
@@ -313,11 +314,11 @@ public final class CloudBrigadierManager<C, S> {
                     .suggests(provider)
                     .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")));
         }
-        if (root.isLeaf() || !root.getValue().isRequired()) {
+        if (forceExecutor || root.isLeaf() || !root.getValue().isRequired()) {
             argumentBuilder.executes(executor);
         }
         for (final CommandTree.Node<CommandArgument<C, ?>> node : root.getChildren()) {
-            argumentBuilder.then(constructCommandNode(node, permissionChecker, executor, suggestionProvider));
+            argumentBuilder.then(constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
         }
         return argumentBuilder;
     }

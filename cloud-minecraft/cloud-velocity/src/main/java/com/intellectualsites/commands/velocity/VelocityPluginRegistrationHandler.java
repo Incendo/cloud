@@ -28,10 +28,17 @@ import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.ArgumentParseException;
+import com.intellectualsites.commands.exceptions.InvalidCommandSenderException;
+import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
+import com.intellectualsites.commands.exceptions.NoPermissionException;
+import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -40,12 +47,17 @@ import java.util.Map;
 
 final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationHandler {
 
+    private static final String MESSAGE_NO_PERMS =
+            "I'm sorry, but you do not have permission to perform this command. "
+                    + "Please contact the server administrators if you believe that this is in error.";
+    private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
+
     private final Map<CommandArgument<?, ?>, BrigadierCommand> registeredCommands = new HashMap<>();
     private CloudBrigadierManager<C, CommandSource> brigadierManager;
-    private VelocityCommandManager<C> velocityCommandManager;
+    private VelocityCommandManager<C> manager;
 
     void initialize(@Nonnull final VelocityCommandManager<C> velocityCommandManager) {
-        this.velocityCommandManager = velocityCommandManager;
+        this.manager = velocityCommandManager;
         this.brigadierManager = new CloudBrigadierManager<>(velocityCommandManager,
             () -> new CommandContext<>(
                     velocityCommandManager.getCommandSenderMapper()
@@ -63,22 +75,62 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         final List<String> aliases = ((StaticArgument<C>) argument).getAlternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
                 this.brigadierManager.createLiteralCommandNode((Command<C>) command,
-                                                               (c, p) -> this.velocityCommandManager.hasPermission(
-                                                                       this.velocityCommandManager.getCommandSenderMapper()
-                                                                                                  .apply(c), p),
-                                                               commandContext -> {
-                                                                   final CommandSource source = commandContext.getSource();
-                                                                   final String input = commandContext.getInput();
-                                                                   this.velocityCommandManager.executeCommand(
-                                                                           this.velocityCommandManager.getCommandSenderMapper()
-                                                                                                      .apply(source), input);
-                                                                   return com.mojang.brigadier.Command.SINGLE_SUCCESS;
-                                                               })
+               (c, p) -> this.manager.hasPermission(
+                       this.manager.getCommandSenderMapper()
+                                   .apply(c), p),
+               commandContext -> {
+                   final CommandSource source = commandContext.getSource();
+                   final String input = commandContext.getInput();
+                   final C sender = this.manager.getCommandSenderMapper().apply(source);
+                   this.manager.executeCommand(sender, input).whenComplete((result, throwable) -> {
+                       if (throwable != null) {
+                           if (throwable instanceof InvalidSyntaxException) {
+                               this.manager.handleException(sender,
+                                                            InvalidSyntaxException.class,
+                                                            (InvalidSyntaxException) throwable, (c, e) ->
+                                source.sendMessage(TextComponent.builder("Invalid Command Syntax. Correct command syntax is: ",
+                                                                         NamedTextColor.RED)
+                                                                .append(e.getCorrectSyntax(), NamedTextColor.GRAY).build())
+                               );
+                           } else if (throwable instanceof InvalidCommandSenderException) {
+                               this.manager.handleException(sender,
+                                                            InvalidCommandSenderException.class,
+                                                            (InvalidCommandSenderException) throwable, (c, e) ->
+                                   source.sendMessage(TextComponent.of(throwable.getMessage()).color(NamedTextColor.RED))
+                               );
+                           } else if (throwable instanceof NoPermissionException) {
+                               this.manager.handleException(sender,
+                                                            NoPermissionException.class,
+                                                            (NoPermissionException) throwable, (c, e) ->
+                                   source.sendMessage(TextComponent.of(MESSAGE_NO_PERMS))
+                               );
+                           } else if (throwable instanceof NoSuchCommandException) {
+                               this.manager.handleException(sender,
+                                                            NoSuchCommandException.class,
+                                                            (NoSuchCommandException) throwable, (c, e) ->
+                                   source.sendMessage(TextComponent.of(MESSAGE_UNKNOWN_COMMAND))
+                               );
+                           } else if (throwable instanceof ArgumentParseException) {
+                               this.manager.handleException(sender,
+                                                            ArgumentParseException.class,
+                                                            (ArgumentParseException) throwable, (c, e) ->
+                                   source.sendMessage(TextComponent.builder("Invalid Command Argument: ", NamedTextColor.RED)
+                                                                   .append(throwable.getCause().getMessage(), NamedTextColor.GRAY)
+                                                                   .build())
+                               );
+                           } else {
+                               source.sendMessage(TextComponent.of(throwable.getMessage()).color(NamedTextColor.RED));
+                               throwable.printStackTrace();
+                           }
+                       }
+                   });
+                   return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+               })
         );
-        final CommandMeta commandMeta = this.velocityCommandManager.getProxyServer().getCommandManager()
-                                                                   .metaBuilder(brigadierCommand)
-                                                                   .aliases(aliases.toArray(new String[0])).build();
-        this.velocityCommandManager.getProxyServer().getCommandManager().register(commandMeta, brigadierCommand);
+        final CommandMeta commandMeta = this.manager.getProxyServer().getCommandManager()
+                                                    .metaBuilder(brigadierCommand)
+                                                    .aliases(aliases.toArray(new String[0])).build();
+        this.manager.getProxyServer().getCommandManager().register(commandMeta, brigadierCommand);
         this.registeredCommands.put(argument, brigadierCommand);
         return true;
     }

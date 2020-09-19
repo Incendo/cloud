@@ -77,10 +77,22 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 break;
             }
             final CommandArgument<C, ?> argument = tail.getChildren().get(0).getValue();
+            final String prefix;
+            final String suffix;
+            if (argument instanceof StaticArgument) {
+                prefix = "";
+                suffix = "";
+            } else if (argument.isRequired()) {
+                prefix = "<";
+                suffix = ">";
+            } else {
+                prefix = "[";
+                suffix = "]";
+            }
             stringBuilder.append(" ")
-                         .append(argument.isRequired() ? '<' : '[')
+                         .append(prefix)
                          .append(argument.getName())
-                         .append(argument.isRequired() ? '>' : ']');
+                         .append(suffix);
             tail = tail.getChildren().get(0);
         }
         return stringBuilder.toString();
