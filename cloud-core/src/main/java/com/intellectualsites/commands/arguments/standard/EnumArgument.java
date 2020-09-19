@@ -192,6 +192,14 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             this.enumClass = enumClass;
         }
 
+        @Nonnull
+        @SuppressWarnings("all")
+        private static String join(@Nonnull final Class<? extends Enum> clazz) {
+            final EnumSet<?> enumSet = EnumSet.allOf(clazz);
+            return enumSet.stream()
+                          .map(e -> e.toString().toLowerCase())
+                          .collect(Collectors.joining(", "));
+        }
 
         /**
          * Get the input provided by the sender
@@ -215,15 +223,6 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         @Override
         public String getMessage() {
             return String.format("'%s' is not one of the following: %s", this.input, join(enumClass));
-        }
-
-        @Nonnull
-        @SuppressWarnings("all")
-        private static String join(@Nonnull final Class<? extends Enum> clazz) {
-            final EnumSet<?> enumSet = EnumSet.allOf(clazz);
-            return enumSet.stream()
-                          .map(e -> e.toString().toLowerCase())
-                          .collect(Collectors.joining(", "));
         }
 
     }

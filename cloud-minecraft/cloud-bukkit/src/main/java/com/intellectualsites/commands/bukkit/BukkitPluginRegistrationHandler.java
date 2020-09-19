@@ -37,7 +37,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler<BukkitCommandMeta> {
+final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
 
     private final Map<CommandArgument<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
 
@@ -62,7 +62,7 @@ final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHan
     }
 
     @Override
-    public boolean registerCommand(@Nonnull final Command<?, BukkitCommandMeta> command) {
+    public boolean registerCommand(@Nonnull final Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
         if (this.registeredCommands.containsKey(commandArgument)) {
@@ -75,7 +75,7 @@ final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHan
             label = commandArgument.getName();
         }
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
-                (Command<C, BukkitCommandMeta>) command,
+                (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
                 this.bukkitCommandManager);
         this.registeredCommands.put(commandArgument, bukkitCommand);

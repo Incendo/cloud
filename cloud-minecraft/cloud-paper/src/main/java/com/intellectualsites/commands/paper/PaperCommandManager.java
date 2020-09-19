@@ -23,9 +23,8 @@
 //
 package com.intellectualsites.commands.paper;
 
-import com.intellectualsites.commands.bukkit.BukkitCommandManager;
-import com.intellectualsites.commands.bukkit.BukkitCommandMeta;
 import com.intellectualsites.commands.CommandTree;
+import com.intellectualsites.commands.bukkit.BukkitCommandManager;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -46,15 +45,15 @@ public class PaperCommandManager<C>
     /**
      * Construct a new Paper command manager
      *
-     * @param owningPlugin                Plugin that is constructing the manager
-     * @param commandExecutionCoordinator Coordinator provider
-     * @param commandSenderMapper         Function that maps {@link CommandSender} to the command sender type
+     * @param owningPlugin                 Plugin that is constructing the manager
+     * @param commandExecutionCoordinator  Coordinator provider
+     * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
     public PaperCommandManager(@Nonnull final Plugin owningPlugin,
-                               @Nonnull final Function<CommandTree<C, BukkitCommandMeta>,
-                          CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator,
+                               @Nonnull final Function<CommandTree<C>,
+                                       CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                                @Nonnull final Function<CommandSender, C> commandSenderMapper,
                                @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper) throws
             Exception {
@@ -65,7 +64,7 @@ public class PaperCommandManager<C>
      * Attempt to register the Brigadier mapper, and return it.
      *
      * @return {@link PaperBrigadierListener} instance, if it could be created. If it cannot
-     *         be created {@code null} is returned
+     * be created {@code null} is returned
      */
     @Nullable
     public PaperBrigadierListener<C> registerBrigadier() {

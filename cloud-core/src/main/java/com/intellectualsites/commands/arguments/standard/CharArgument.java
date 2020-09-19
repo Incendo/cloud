@@ -85,7 +85,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      */
     @Nonnull
     public static <C> CommandArgument<C, Character> optional(@Nonnull final String name,
-                                                                                   final String defaultNum) {
+                                                             final String defaultNum) {
         return CharArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 

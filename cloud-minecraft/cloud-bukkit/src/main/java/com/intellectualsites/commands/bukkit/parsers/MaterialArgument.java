@@ -88,7 +88,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      *
      * @param name     Argument name
      * @param material Default value
-     * @param <C> Command sender type
+     * @param <C>      Command sender type
      * @return Created argument
      */
     @Nonnull

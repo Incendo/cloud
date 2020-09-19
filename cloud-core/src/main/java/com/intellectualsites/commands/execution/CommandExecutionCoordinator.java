@@ -25,7 +25,6 @@ package com.intellectualsites.commands.execution;
 
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.meta.CommandMeta;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
@@ -39,18 +38,17 @@ import java.util.function.Function;
  * not command may be executed in parallel, etc.
  *
  * @param <C> Command sender type
- * @param <M> Command meta type
  */
-public abstract class CommandExecutionCoordinator<C, M extends CommandMeta> {
+public abstract class CommandExecutionCoordinator<C> {
 
-    private final CommandTree<C, M> commandTree;
+    private final CommandTree<C> commandTree;
 
     /**
      * Construct a new command execution coordinator
      *
      * @param commandTree Command tree
      */
-    public CommandExecutionCoordinator(@Nonnull final CommandTree<C, M> commandTree) {
+    public CommandExecutionCoordinator(@Nonnull final CommandTree<C> commandTree) {
         this.commandTree = commandTree;
     }
 
@@ -58,11 +56,10 @@ public abstract class CommandExecutionCoordinator<C, M extends CommandMeta> {
      * Returns a simple command execution coordinator that executes all commands immediately, on the calling thread
      *
      * @param <C> Command sender type
-     * @param <M> Command meta type
      * @return New coordinator instance
      */
-    public static <C, M extends CommandMeta> Function<CommandTree<C, M>,
-            CommandExecutionCoordinator<C, M>> simpleCoordinator() {
+    public static <C> Function<CommandTree<C>,
+            CommandExecutionCoordinator<C>> simpleCoordinator() {
         return SimpleCoordinator::new;
     }
 
@@ -74,7 +71,7 @@ public abstract class CommandExecutionCoordinator<C, M extends CommandMeta> {
      * @return Future that completes with the result
      */
     public abstract CompletableFuture<CommandResult<C>> coordinateExecution(@Nonnull CommandContext<C> commandContext,
-                                                                         @Nonnull Queue<String> input);
+                                                                            @Nonnull Queue<String> input);
 
     /**
      * Get the command tree
@@ -82,7 +79,7 @@ public abstract class CommandExecutionCoordinator<C, M extends CommandMeta> {
      * @return Command tree
      */
     @Nonnull
-    protected CommandTree<C, M> getCommandTree() {
+    protected CommandTree<C> getCommandTree() {
         return this.commandTree;
     }
 
@@ -91,18 +88,17 @@ public abstract class CommandExecutionCoordinator<C, M extends CommandMeta> {
      * A simple command execution coordinator that executes all commands immediately, on the calling thread
      *
      * @param <C> Command sender type
-     * @param <M> Command meta type
      */
-    public static final class SimpleCoordinator<C, M extends CommandMeta> extends
-            CommandExecutionCoordinator<C, M> {
+    public static final class SimpleCoordinator<C> extends
+            CommandExecutionCoordinator<C> {
 
-        private SimpleCoordinator(@Nonnull final CommandTree<C, M> commandTree) {
+        private SimpleCoordinator(@Nonnull final CommandTree<C> commandTree) {
             super(commandTree);
         }
 
         @Override
         public CompletableFuture<CommandResult<C>> coordinateExecution(@Nonnull final CommandContext<C> commandContext,
-                                                                    @Nonnull final Queue<String> input) {
+                                                                       @Nonnull final Queue<String> input) {
             final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
             try {
                 this.getCommandTree().parse(commandContext, input).ifPresent(

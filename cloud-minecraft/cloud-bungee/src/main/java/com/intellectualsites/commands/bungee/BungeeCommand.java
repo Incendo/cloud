@@ -30,7 +30,6 @@ import com.intellectualsites.commands.exceptions.InvalidCommandSenderException;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
-import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -42,16 +41,16 @@ import javax.annotation.Nonnull;
 public final class BungeeCommand<C> extends Command implements TabExecutor {
 
     private static final String MESSAGE_NO_PERMS =
-              "I'm sorry, but you do not have permission to perform this command. "
-            + "Please contact the server administrators if you believe that this is in error.";
+            "I'm sorry, but you do not have permission to perform this command. "
+                    + "Please contact the server administrators if you believe that this is in error.";
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final BungeeCommandManager<C> bungeeCommandManager;
     private final CommandArgument<C, ?> command;
-    private final com.intellectualsites.commands.Command<C, SimpleCommandMeta> cloudCommand;
+    private final com.intellectualsites.commands.Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
-    BungeeCommand(@Nonnull final com.intellectualsites.commands.Command<C, SimpleCommandMeta> cloudCommand,
+    BungeeCommand(@Nonnull final com.intellectualsites.commands.Command<C> cloudCommand,
                   @Nonnull final CommandArgument<C, ?> command,
                   @Nonnull final BungeeCommandManager<C> bungeeCommandManager) {
         super(command.getName(),
@@ -71,41 +70,41 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         }
         this.bungeeCommandManager.executeCommand(this.bungeeCommandManager.getCommandSenderMapper().apply(commandSender),
                                                  builder.toString())
-         .whenComplete(((commandResult, throwable) -> {
-             if (throwable != null) {
-                 if (throwable instanceof InvalidSyntaxException) {
-                     commandSender.sendMessage(
-                             new ComponentBuilder("Invalid Command Syntax. Correct command syntax is: ")
-                                     .color(ChatColor.RED)
-                                     .append("/")
-                                     .color(ChatColor.GRAY)
-                                     .append(((InvalidSyntaxException) throwable).getCorrectSyntax())
-                                     .color(ChatColor.GRAY)
-                                     .create()
-                     );
-                 } else if (throwable instanceof InvalidCommandSenderException) {
-                     commandSender.sendMessage(new ComponentBuilder(throwable.getMessage())
-                                                       .color(ChatColor.RED)
-                                                       .create());
-                 } else if (throwable instanceof NoPermissionException) {
-                     commandSender.sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
-                                                       .color(ChatColor.WHITE)
-                                                       .create());
-                 } else if (throwable instanceof NoSuchCommandException) {
-                     commandSender.sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
-                                                       .color(ChatColor.WHITE)
-                                                       .create());
-                 } else if (throwable instanceof ArgumentParseException) {
-                     commandSender.sendMessage(new ComponentBuilder("Invalid Command Argument: ")
-                                                        .color(ChatColor.GRAY)
-                                                        .append(throwable.getCause().getMessage())
-                                                        .create());
-                 } else {
-                     commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
-                     throwable.printStackTrace();
-                 }
-             }
-         }));
+                                 .whenComplete(((commandResult, throwable) -> {
+                                     if (throwable != null) {
+                                         if (throwable instanceof InvalidSyntaxException) {
+                                             commandSender.sendMessage(
+                                                     new ComponentBuilder("Invalid Command Syntax. Correct command syntax is: ")
+                                                             .color(ChatColor.RED)
+                                                             .append("/")
+                                                             .color(ChatColor.GRAY)
+                                                             .append(((InvalidSyntaxException) throwable).getCorrectSyntax())
+                                                             .color(ChatColor.GRAY)
+                                                             .create()
+                                             );
+                                         } else if (throwable instanceof InvalidCommandSenderException) {
+                                             commandSender.sendMessage(new ComponentBuilder(throwable.getMessage())
+                                                                               .color(ChatColor.RED)
+                                                                               .create());
+                                         } else if (throwable instanceof NoPermissionException) {
+                                             commandSender.sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
+                                                                               .color(ChatColor.WHITE)
+                                                                               .create());
+                                         } else if (throwable instanceof NoSuchCommandException) {
+                                             commandSender.sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
+                                                                               .color(ChatColor.WHITE)
+                                                                               .create());
+                                         } else if (throwable instanceof ArgumentParseException) {
+                                             commandSender.sendMessage(new ComponentBuilder("Invalid Command Argument: ")
+                                                                               .color(ChatColor.GRAY)
+                                                                               .append(throwable.getCause().getMessage())
+                                                                               .create());
+                                         } else {
+                                             commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
+                                             throwable.printStackTrace();
+                                         }
+                                     }
+                                 }));
     }
 
     @Override

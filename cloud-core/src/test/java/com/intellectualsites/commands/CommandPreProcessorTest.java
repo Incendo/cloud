@@ -36,23 +36,23 @@ import javax.annotation.Nonnull;
 
 public class CommandPreProcessorTest {
 
-    private static CommandManager<TestCommandSender, SimpleCommandMeta> manager;
+    private static CommandManager<TestCommandSender> manager;
 
     @BeforeAll
     static void newTree() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                                       .argument(EnumArgument.required(SampleEnum.class, "enum"))
-                                       .handler(
-                                               commandContext -> System.out.printf("enum = %s | integer = %d\n",
-                                                                                   commandContext.<SampleEnum>get(
-                                                                                           "enum").orElse(
-                                                                                           SampleEnum.VALUE1),
-                                                                                   commandContext.<Integer>get(
-                                                                                           "int").orElseThrow(
-                                                                                           () -> new NullPointerException(
-                                                                                                   "int"))))
-                                       .build());
+                               .argument(EnumArgument.required(SampleEnum.class, "enum"))
+                               .handler(
+                                       commandContext -> System.out.printf("enum = %s | integer = %d\n",
+                                                                           commandContext.<SampleEnum>get(
+                                                                                   "enum").orElse(
+                                                                                   SampleEnum.VALUE1),
+                                                                           commandContext.<Integer>get(
+                                                                                   "int").orElseThrow(
+                                                                                   () -> new NullPointerException(
+                                                                                           "int"))))
+                               .build());
         manager.registerCommandPreProcessor(new SamplePreprocessor());
     }
 

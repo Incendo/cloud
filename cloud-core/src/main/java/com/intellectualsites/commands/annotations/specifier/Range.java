@@ -42,13 +42,13 @@ public @interface Range {
      *
      * @return String serialized number
      */
-     @Nonnull String min() default "";
+    @Nonnull String min() default "";
 
     /**
      * Maximum value accepted by the parser
      *
      * @return String serialized number
      */
-     @Nonnull String max() default "";
+    @Nonnull String max() default "";
 
 }

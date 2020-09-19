@@ -57,40 +57,26 @@ public class SimpleCommandMeta extends CommandMeta {
      *
      * @return Empty instance
      */
-    @Nonnull public static SimpleCommandMeta empty() {
+    @Nonnull
+    public static SimpleCommandMeta empty() {
         return SimpleCommandMeta.builder().build();
     }
 
-    /**
-     * Get the value associated with a key
-     *
-     * @param key Key
-     * @return Optional that may contain the associated value
-     */
+    @Override
     @Nonnull
-    public Optional<String> getValue(@Nonnull final String key) {
+    public final Optional<String> getValue(@Nonnull final String key) {
         return Optional.ofNullable(this.metaMap.get(key));
     }
 
-    /**
-     * Get the value if it exists, else return the default value
-     *
-     * @param key          Key
-     * @param defaultValue Default value
-     * @return Value, or default value
-     */
+    @Override
     @Nonnull
-    public String getOrDefault(@Nonnull final String key, @Nonnull final String defaultValue) {
+    public final String getOrDefault(@Nonnull final String key, @Nonnull final String defaultValue) {
         return this.getValue(key).orElse(defaultValue);
     }
 
-    /**
-     * Get a copy of the meta map
-     *
-     * @return Copy of meta map
-     */
+    @Override
     @Nonnull
-    public Map<String, String> getAll() {
+    public final Map<String, String> getAll() {
         return new HashMap<>(this.metaMap);
     }
 

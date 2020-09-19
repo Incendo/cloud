@@ -32,28 +32,25 @@ import javax.annotation.Nonnull;
  */
 public final class StandardParameters {
 
-    private StandardParameters() {
-    }
-
     /**
      * Minimum value accepted by a numerical parser
      */
     public static final ParserParameter<Number> RANGE_MIN = create("min", TypeToken.of(Number.class));
-
     /**
      * Maximum value accepted by a numerical parser
      */
     public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.of(Number.class));
-
     /**
      * Command description
      */
     public static final ParserParameter<String> DESCRIPTION = create("description", TypeToken.of(String.class));
-
     /**
      * Command completions
      */
     public static final ParserParameter<String[]> COMPLETIONS = create("completions", TypeToken.of(String[].class));
+
+    private StandardParameters() {
+    }
 
     private static <T> ParserParameter<T> create(@Nonnull final String key, @Nonnull final TypeToken<T> expectedType) {
         return new ParserParameter<>(key, expectedType);

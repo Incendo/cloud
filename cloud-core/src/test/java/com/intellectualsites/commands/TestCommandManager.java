@@ -29,7 +29,7 @@ import com.intellectualsites.commands.meta.SimpleCommandMeta;
 
 import javax.annotation.Nonnull;
 
-public class TestCommandManager extends CommandManager<TestCommandSender, SimpleCommandMeta> {
+public class TestCommandManager extends CommandManager<TestCommandSender> {
 
     protected TestCommandManager() {
         super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());

@@ -24,7 +24,6 @@
 package com.intellectualsites.commands.internal;
 
 import com.intellectualsites.commands.Command;
-import com.intellectualsites.commands.meta.CommandMeta;
 
 import javax.annotation.Nonnull;
 
@@ -32,11 +31,19 @@ import javax.annotation.Nonnull;
  * Utility that registers commands natively for whatever
  * platform the library is used in. This can do nothing, if
  * the target platform does not have its own concept of commands
- *
- * @param <M> Command meta type
  */
 @FunctionalInterface
-public interface CommandRegistrationHandler<M extends CommandMeta> {
+public interface CommandRegistrationHandler {
+
+    /**
+     * Create a new {@link CommandRegistrationHandler} that does nothing
+     *
+     * @return Constructed registration
+     */
+    @Nonnull
+    static CommandRegistrationHandler nullCommandRegistrationHandler() {
+        return new NullCommandRegistrationHandler();
+    }
 
     /**
      * Attempt to register the command
@@ -45,26 +52,15 @@ public interface CommandRegistrationHandler<M extends CommandMeta> {
      * @return {@code true} if the command was registered successfully,
      * else {@code false}
      */
-    boolean registerCommand(@Nonnull Command<?, M> command);
+    boolean registerCommand(@Nonnull Command<?> command);
 
-    /**
-     * Create a new {@link CommandRegistrationHandler} that does nothing
-     *
-     * @param <M> Command meta type
-     * @return Constructed registration
-     */
-    static <M extends CommandMeta> CommandRegistrationHandler<M> nullCommandRegistrationHandler() {
-        return new NullCommandRegistrationHandler<>();
-    }
-
-
-    final class NullCommandRegistrationHandler<M extends CommandMeta> implements CommandRegistrationHandler<M> {
+    final class NullCommandRegistrationHandler implements CommandRegistrationHandler {
 
         private NullCommandRegistrationHandler() {
         }
 
         @Override
-        public boolean registerCommand(@Nonnull final Command<?, M> command) {
+        public boolean registerCommand(@Nonnull final Command<?> command) {
             return true;
         }
 

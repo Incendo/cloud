@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
  * @param <C> Command sender type
  * @param <M> Command meta type
  */
-public final class AnnotationParser<C, M extends CommandMeta> {
+public final class AnnotationParser<C> {
 
     private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile("([A-Za-z0-9]+)(|([A-Za-z0-9]+))*")
                                                                              .asPredicate();
@@ -67,8 +67,8 @@ public final class AnnotationParser<C, M extends CommandMeta> {
                                                                               .asPredicate();
 
 
-    private final Function<ParserParameters, M> metaMapper;
-    private final CommandManager<C, M> manager;
+    private final Function<ParserParameters, CommandMeta> metaMapper;
+    private final CommandManager<C> manager;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
     private final Class<C> commandSenderClass;
 
@@ -82,9 +82,9 @@ public final class AnnotationParser<C, M extends CommandMeta> {
      *                           {@link com.intellectualsites.commands.arguments.parser.ParserParameter}. Mappers for the
      *                           parser parameters can be registered using {@link #registerAnnotationMapper(Class, Function)}
      */
-    public AnnotationParser(@Nonnull final CommandManager<C, M> manager,
+    public AnnotationParser(@Nonnull final CommandManager<C> manager,
                             @Nonnull final Class<C> commandSenderClass,
-                            @Nonnull final Function<ParserParameters, M> metaMapper) {
+                            @Nonnull final Function<ParserParameters, CommandMeta> metaMapper) {
         this.commandSenderClass = commandSenderClass;
         this.manager = manager;
         this.metaMapper = metaMapper;
@@ -105,7 +105,7 @@ public final class AnnotationParser<C, M extends CommandMeta> {
     }
 
     @Nonnull
-    private M createMeta(@Nonnull final Annotation[] annotations) {
+    private CommandMeta createMeta(@Nonnull final Annotation[] annotations) {
         final ParserParameters parameters = ParserParameters.empty();
         for (final Annotation annotation : annotations) {
             @SuppressWarnings("ALL") final Function function = this.annotationMappers.get(annotation.annotationType());
@@ -127,7 +127,7 @@ public final class AnnotationParser<C, M extends CommandMeta> {
      * @return Collection of parsed annotations
      */
     @Nonnull
-    public <T> Collection<Command<C, M>> parse(@Nonnull final T instance) {
+    public <T> Collection<Command<C>> parse(@Nonnull final T instance) {
         final Method[] methods = instance.getClass().getDeclaredMethods();
         final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
         for (final Method method : methods) {
@@ -144,28 +144,31 @@ public final class AnnotationParser<C, M extends CommandMeta> {
             }
             commandMethodPairs.add(new CommandMethodPair(method, commandMethod));
         }
-        final Collection<Command<C, M>> commands = this.construct(instance, commandMethodPairs);
-        for (final Command<C, M> command : commands) {
-            this.manager.command(command);
+        final Collection<Command<C>> commands = this.construct(instance, commandMethodPairs);
+        for (final Command<C> command : commands) {
+            @SuppressWarnings("ALL") final CommandManager commandManager = this.manager;
+            //noinspection all
+            commandManager.command(command);
         }
         return commands;
     }
 
     @Nonnull
     @SuppressWarnings("unchecked")
-    private Collection<Command<C, M>> construct(@Nonnull final Object instance,
-                                                @Nonnull final Collection<CommandMethodPair> methodPairs) {
-        final Collection<Command<C, M>> commands = new ArrayList<>();
+    private Collection<Command<C>> construct(@Nonnull final Object instance,
+                                             @Nonnull final Collection<CommandMethodPair> methodPairs) {
+        final Collection<Command<C>> commands = new ArrayList<>();
         for (final CommandMethodPair commandMethodPair : methodPairs) {
             final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
             final Method method = commandMethodPair.getMethod();
             final LinkedHashMap<String, SyntaxFragment> tokens = this.parseSyntax(commandMethod.value());
             /* Determine command name */
             final String commandToken = commandMethod.value().split(" ")[0].split("\\|")[0];
+            @SuppressWarnings("ALL") final CommandManager manager = this.manager;
             @SuppressWarnings("ALL")
-            Command.Builder builder = this.manager.commandBuilder(commandToken,
-                                                                  tokens.get(commandToken).getMinor(),
-                                                                  this.createMeta(method.getAnnotations()));
+            Command.Builder builder = manager.commandBuilder(commandToken,
+                                                             tokens.get(commandToken).getMinor(),
+                                                             this.createMeta(method.getAnnotations()));
             final Collection<ArgumentParameterPair> arguments = this.getArguments(method);
             final Map<String, CommandArgument<C, ?>> commandArguments = Maps.newHashMap();
             /* Go through all annotated parameters and build up the argument tree */
@@ -270,7 +273,7 @@ public final class AnnotationParser<C, M extends CommandMeta> {
         if (syntaxFragment == null || syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
             throw new IllegalArgumentException(String.format(
                     "Invalid command argument '%s' in method '%s': "
-                  + "Missing syntax mapping", argumentPair.getArgument().value(), method.getName()));
+                            + "Missing syntax mapping", argumentPair.getArgument().value(), method.getName()));
         }
         final Argument argument = argumentPair.getArgument();
         @SuppressWarnings("ALL") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(parameter.getType(),
@@ -329,6 +332,12 @@ public final class AnnotationParser<C, M extends CommandMeta> {
     }
 
 
+    enum ArgumentMode {
+        LITERAL,
+        OPTIONAL,
+        REQUIRED
+    }
+
     private static final class CommandMethodPair {
 
         private final Method method;
@@ -351,7 +360,6 @@ public final class AnnotationParser<C, M extends CommandMeta> {
 
     }
 
-
     private static final class ArgumentParameterPair {
 
         private final Parameter parameter;
@@ -373,14 +381,6 @@ public final class AnnotationParser<C, M extends CommandMeta> {
         }
 
     }
-
-
-    enum ArgumentMode {
-        LITERAL,
-        OPTIONAL,
-        REQUIRED
-    }
-
 
     private static final class SyntaxFragment {
 

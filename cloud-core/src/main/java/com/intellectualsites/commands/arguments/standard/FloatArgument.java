@@ -26,8 +26,8 @@ package com.intellectualsites.commands.arguments.standard;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
-import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
@@ -94,10 +94,27 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
      */
     @Nonnull
     public static <C> CommandArgument<C, Float> optional(@Nonnull final String name,
-                                                                               final float defaultNum) {
+                                                         final float defaultNum) {
         return FloatArgument.<C>newBuilder(name).asOptionalWithDefault(Float.toString(defaultNum)).build();
     }
 
+    /**
+     * Get the minimum accepted float that could have been parsed
+     *
+     * @return Minimum float
+     */
+    public float getMin() {
+        return this.min;
+    }
+
+    /**
+     * Get the maximum accepted float that could have been parsed
+     *
+     * @return Maximum float
+     */
+    public float getMax() {
+        return this.max;
+    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Float> {
 
@@ -144,26 +161,6 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         }
 
     }
-
-
-    /**
-     * Get the minimum accepted float that could have been parsed
-     *
-     * @return Minimum float
-     */
-    public float getMin() {
-        return this.min;
-    }
-
-    /**
-     * Get the maximum accepted float that could have been parsed
-     *
-     * @return Maximum float
-     */
-    public float getMax() {
-        return this.max;
-    }
-
 
     public static final class FloatParser<C> implements ArgumentParser<C, Float> {
 

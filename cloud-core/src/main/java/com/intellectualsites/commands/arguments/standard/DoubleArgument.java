@@ -26,8 +26,8 @@ package com.intellectualsites.commands.arguments.standard;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
-import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
@@ -94,10 +94,27 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      */
     @Nonnull
     public static <C> CommandArgument<C, Double> optional(@Nonnull final String name,
-                                                                                final double defaultNum) {
+                                                          final double defaultNum) {
         return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(Double.toString(defaultNum)).build();
     }
 
+    /**
+     * Get the minimum accepted double that could have been parsed
+     *
+     * @return Minimum double
+     */
+    public double getMin() {
+        return this.min;
+    }
+
+    /**
+     * Get the maximum accepted double that could have been parsed
+     *
+     * @return Maximum double
+     */
+    public double getMax() {
+        return this.max;
+    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Double> {
 
@@ -144,26 +161,6 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         }
 
     }
-
-
-    /**
-     * Get the minimum accepted double that could have been parsed
-     *
-     * @return Minimum double
-     */
-    public double getMin() {
-        return this.min;
-    }
-
-    /**
-     * Get the maximum accepted double that could have been parsed
-     *
-     * @return Maximum double
-     */
-    public double getMax() {
-        return this.max;
-    }
-
 
     public static final class DoubleParser<C> implements ArgumentParser<C, Double> {
 

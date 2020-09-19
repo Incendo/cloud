@@ -37,7 +37,7 @@ import java.util.concurrent.CompletionException;
 
 class AnnotationParserTest {
 
-    private static CommandManager<TestCommandSender, SimpleCommandMeta> manager;
+    private static CommandManager<TestCommandSender> manager;
     private static AnnotationParser<TestCommandSender, SimpleCommandMeta> annotationParser;
 
     @BeforeAll
@@ -48,7 +48,7 @@ class AnnotationParserTest {
 
     @Test
     void testMethodConstruction() {
-        final Collection<Command<TestCommandSender, SimpleCommandMeta>> commands = annotationParser.parse(this);
+        final Collection<Command<TestCommandSender>> commands = annotationParser.parse(this);
         Assertions.assertFalse(commands.isEmpty());
         manager.executeCommand(new TestCommandSender(), "test 10").join();
         manager.executeCommand(new TestCommandSender(), "t 10").join();

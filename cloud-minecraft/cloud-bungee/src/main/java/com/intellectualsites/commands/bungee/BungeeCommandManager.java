@@ -33,7 +33,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import javax.annotation.Nonnull;
 import java.util.function.Function;
 
-public class BungeeCommandManager<C> extends CommandManager<C, SimpleCommandMeta> {
+public class BungeeCommandManager<C> extends CommandManager<C> {
 
     private final Plugin owningPlugin;
     private final Function<CommandSender, C> commandSenderMapper;
@@ -49,8 +49,8 @@ public class BungeeCommandManager<C> extends CommandManager<C, SimpleCommandMeta
      * @throws Exception If the construction of the manager fails
      */
     public BungeeCommandManager(@Nonnull final Plugin owningPlugin,
-                                @Nonnull final Function<CommandTree<C, SimpleCommandMeta>,
-                                        CommandExecutionCoordinator<C, SimpleCommandMeta>> commandExecutionCoordinator,
+                                @Nonnull final Function<CommandTree<C>,
+                                        CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                                 @Nonnull final Function<CommandSender, C> commandSenderMapper,
                                 @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper)
             throws Exception {
@@ -63,7 +63,7 @@ public class BungeeCommandManager<C> extends CommandManager<C, SimpleCommandMeta
 
     @Override
     public final boolean hasPermission(@Nonnull final C sender,
-                                 @Nonnull final String permission) {
+                                       @Nonnull final String permission) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 

@@ -47,15 +47,15 @@ import java.util.function.Function;
 /**
  * Command manager for use with JLine
  */
-public class JLineCommandManager extends CommandManager<JLineCommandSender, SimpleCommandMeta> implements Completer {
+public class JLineCommandManager extends CommandManager<JLineCommandSender> implements Completer {
 
     /**
      * Construct a new JLine command manager
      *
      * @param executionCoordinatorFunction Function producing a new coordinator
      */
-    public JLineCommandManager(@Nonnull final Function<CommandTree<JLineCommandSender, SimpleCommandMeta>,
-            CommandExecutionCoordinator<JLineCommandSender, SimpleCommandMeta>> executionCoordinatorFunction) {
+    public JLineCommandManager(@Nonnull final Function<CommandTree<JLineCommandSender>,
+            CommandExecutionCoordinator<JLineCommandSender>> executionCoordinatorFunction) {
         super(executionCoordinatorFunction, CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
 
@@ -78,35 +78,35 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
         jLineCommandManager.command(
                 jLineCommandManager.commandBuilder("stop", SimpleCommandMeta.empty())
                                    .handler(commandContext ->
-                                                        shouldStop[0] = true)
+                                                    shouldStop[0] = true)
                                    .build())
                            .command(jLineCommandManager.commandBuilder("echo", SimpleCommandMeta.empty())
-                                                               .argument(String.class, "string", builder ->
-                                                                       builder.asRequired()
-                                                                              .withParser(((commandContext, inputQueue) -> {
-                                                                                  final StringBuilder stringBuilder =
-                                                                                          new StringBuilder();
-                                                                                  while (!inputQueue.isEmpty()) {
-                                                                                      stringBuilder.append(inputQueue.remove());
-                                                                                      if (!inputQueue.isEmpty()) {
-                                                                                          stringBuilder.append(" ");
-                                                                                      }
-                                                                                  }
-                                                                                  return ArgumentParseResult.success(
-                                                                                          stringBuilder.toString());
-                                                                              })).build())
-                                                               .handler(commandContext -> commandContext.get("string")
-                                                                                                            .ifPresent(
-                                                                                                             System.out::println))
-                                                               .build())
+                                                       .argument(String.class, "string", builder ->
+                                                               builder.asRequired()
+                                                                      .withParser(((commandContext, inputQueue) -> {
+                                                                          final StringBuilder stringBuilder =
+                                                                                  new StringBuilder();
+                                                                          while (!inputQueue.isEmpty()) {
+                                                                              stringBuilder.append(inputQueue.remove());
+                                                                              if (!inputQueue.isEmpty()) {
+                                                                                  stringBuilder.append(" ");
+                                                                              }
+                                                                          }
+                                                                          return ArgumentParseResult.success(
+                                                                                  stringBuilder.toString());
+                                                                      })).build())
+                                                       .handler(commandContext -> commandContext.get("string")
+                                                                                                .ifPresent(
+                                                                                                        System.out::println))
+                                                       .build())
                            .command(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                               .argument(StaticArgument.required("one"))
-                                                               .handler(commandContext -> System.out.println("Test (1)"))
-                                                               .build())
+                                                       .argument(StaticArgument.required("one"))
+                                                       .handler(commandContext -> System.out.println("Test (1)"))
+                                                       .build())
                            .command(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                               .argument(StaticArgument.required("two"))
-                                                               .handler(commandContext -> System.out.println("Test (2)"))
-                                                               .build());
+                                                       .argument(StaticArgument.required("two"))
+                                                       .handler(commandContext -> System.out.println("Test (2)"))
+                                                       .build());
         System.out.println("Ready...");
         while (!shouldStop[0]) {
             final String line = lineReader.readLine();
@@ -139,8 +139,8 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
 
     @Override
     public final void complete(@Nonnull final LineReader lineReader,
-                         @Nonnull final ParsedLine parsedLine,
-                         @Nonnull final List<Candidate> list) {
+                               @Nonnull final ParsedLine parsedLine,
+                               @Nonnull final List<Candidate> list) {
         final String line = parsedLine.line();
         if (line == null || line.isEmpty() || !line.startsWith("/")) {
             System.out.println("Cannot suggest: empty line");
@@ -157,7 +157,7 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender, Simp
 
     @Override
     public final boolean hasPermission(@Nonnull final JLineCommandSender sender, @Nonnull final String permission) {
-       return true;
+        return true;
     }
 
 }

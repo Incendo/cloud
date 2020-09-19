@@ -72,12 +72,12 @@ public class ParserRegistryTest {
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MIN));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MAX));
         final ArgumentParser<TestCommandSender, ?> parser = parserRegistry.createParser(parsedType,
-                                                                                    parserParameters)
-                                                                      .orElseThrow(
-                                                                               () -> new NullPointerException("No parser found"));
+                                                                                        parserParameters)
+                                                                          .orElseThrow(
+                                                                                  () -> new NullPointerException(
+                                                                                          "No parser found"));
         Assertions.assertTrue(parser instanceof IntegerArgument.IntegerParser);
-        @SuppressWarnings("unchecked")
-        final IntegerArgument.IntegerParser<TestCommandSender> integerParser =
+        @SuppressWarnings("unchecked") final IntegerArgument.IntegerParser<TestCommandSender> integerParser =
                 (IntegerArgument.IntegerParser<TestCommandSender>) parser;
         Assertions.assertEquals(RANGE_MIN, integerParser.getMin());
         Assertions.assertEquals(RANGE_MAX, integerParser.getMax());

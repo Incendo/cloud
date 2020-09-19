@@ -40,7 +40,7 @@ import java.util.concurrent.CompletionException;
 class CommandTreeTest {
 
     private static final int EXPECTED_INPUT_NUMBER = 15;
-    private static CommandManager<TestCommandSender, SimpleCommandMeta> manager;
+    private static CommandManager<TestCommandSender> manager;
 
     @BeforeAll
     static void newTree() {
@@ -53,25 +53,25 @@ class CommandTreeTest {
                                                SimpleCommandMeta.empty())
                                .literal("opt", "öpt")
                                .argument(IntegerArgument
-                                                                .optional("num", EXPECTED_INPUT_NUMBER))
+                                                 .optional("num", EXPECTED_INPUT_NUMBER))
                                .build())
                .command(manager.commandBuilder("req").withSenderType(SpecificCommandSender.class).build());
     }
 
     @Test
     void parse() {
-        final Optional<Command<TestCommandSender, SimpleCommandMeta>> command = manager.getCommandTree()
-                                                                                   .parse(new CommandContext<>(
-                                                                                                         new TestCommandSender()),
-                                                                                                 new LinkedList<>(
-                                                                                                         Arrays.asList("test",
-                                                                                                                       "one")));
+        final Optional<Command<TestCommandSender>> command = manager.getCommandTree()
+                                                                    .parse(new CommandContext<>(
+                                                                                   new TestCommandSender()),
+                                                                           new LinkedList<>(
+                                                                                   Arrays.asList("test",
+                                                                                                 "one")));
         Assertions.assertTrue(command.isPresent());
         Assertions.assertThrows(NoPermissionException.class, () -> manager.getCommandTree()
                                                                           .parse(new CommandContext<>(
-                                                                                                new TestCommandSender()),
-                                                                                        new LinkedList<>(
-                                                                                                Arrays.asList("test", "two"))));
+                                                                                         new TestCommandSender()),
+                                                                                 new LinkedList<>(
+                                                                                         Arrays.asList("test", "two"))));
         manager.getCommandTree()
                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt")))
                .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
@@ -106,9 +106,9 @@ class CommandTreeTest {
                 manager.commandBuilder("default")
                        .argument(manager.argumentBuilder(Integer.class, "int").build())
                        .handler(context -> {
-                            final int number = context.getRequired("int");
-                            System.out.printf("Supplied number is: %d\n", number);
-                        })
+                           final int number = context.getRequired("int");
+                           System.out.printf("Supplied number is: %d\n", number);
+                       })
                        .build()
         );
         manager.executeCommand(new TestCommandSender(), "default 5").join();

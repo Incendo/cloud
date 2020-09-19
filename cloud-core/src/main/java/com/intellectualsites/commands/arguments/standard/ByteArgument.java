@@ -26,8 +26,8 @@ package com.intellectualsites.commands.arguments.standard;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
-import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -90,11 +90,29 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    @Nonnull public static <C> CommandArgument<C, Byte> optional(@Nonnull final String name,
-                                                                                       final byte defaultNum) {
+    @Nonnull
+    public static <C> CommandArgument<C, Byte> optional(@Nonnull final String name,
+                                                        final byte defaultNum) {
         return ByteArgument.<C>newBuilder(name).asOptionalWithDefault(Byte.toString(defaultNum)).build();
     }
 
+    /**
+     * Get the minimum accepted byteeger that could have been parsed
+     *
+     * @return Minimum byteeger
+     */
+    public byte getMin() {
+        return this.min;
+    }
+
+    /**
+     * Get the maximum accepted byteeger that could have been parsed
+     *
+     * @return Maximum byteeger
+     */
+    public byte getMax() {
+        return this.max;
+    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Byte> {
 
@@ -141,26 +159,6 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         }
 
     }
-
-
-    /**
-     * Get the minimum accepted byteeger that could have been parsed
-     *
-     * @return Minimum byteeger
-     */
-    public byte getMin() {
-        return this.min;
-    }
-
-    /**
-     * Get the maximum accepted byteeger that could have been parsed
-     *
-     * @return Maximum byteeger
-     */
-    public byte getMax() {
-        return this.max;
-    }
-
 
     public static final class ByteParser<C> implements ArgumentParser<C, Byte> {
 

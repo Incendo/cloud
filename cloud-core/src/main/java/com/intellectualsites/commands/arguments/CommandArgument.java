@@ -76,7 +76,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      */
     private final Class<T> valueType;
 
-    private Command<C, ?> owningCommand;
+    private Command<C> owningCommand;
 
     /**
      * Construct a new command argument
@@ -105,10 +105,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
     /**
      * Construct a new command argument
      *
-     * @param required     Whether or not the argument is required
-     * @param name         The argument name
-     * @param parser       The argument parser
-     * @param valueType    Type produced by the parser
+     * @param required  Whether or not the argument is required
+     * @param name      The argument name
+     * @param parser    The argument parser
+     * @param valueType Type produced by the parser
      */
     public CommandArgument(final boolean required,
                            @Nonnull final String name,
@@ -174,7 +174,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @return Owning command
      */
     @Nullable
-    public Command<C, ?> getOwningCommand() {
+    public Command<C> getOwningCommand() {
         return this.owningCommand;
     }
 
@@ -183,7 +183,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      *
      * @param owningCommand Owning command
      */
-    public void setOwningCommand(@Nonnull final Command<C, ?> owningCommand) {
+    public void setOwningCommand(@Nonnull final Command<C> owningCommand) {
         if (this.owningCommand != null) {
             throw new IllegalStateException("Cannot replace owning command");
         }
@@ -265,7 +265,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         private final Class<T> valueType;
         private final String name;
 
-        private CommandManager<C, ?> manager;
+        private CommandManager<C> manager;
         private boolean required = true;
         private ArgumentParser<C, T> parser;
         private String defaultValue = "";
@@ -284,7 +284,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
          * @return Builder instance
          */
         @Nonnull
-        public Builder<C, T> manager(@Nonnull final CommandManager<C, ?> manager) {
+        public Builder<C, T> manager(@Nonnull final CommandManager<C> manager) {
             this.manager = manager;
             return this;
         }
@@ -357,7 +357,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         public CommandArgument<C, T> build() {
             if (this.parser == null && this.manager != null) {
                 this.parser = this.manager.getParserRegistry().createParser(TypeToken.of(valueType), ParserParameters.empty())
-                                    .orElse(null);
+                                          .orElse(null);
             }
             if (this.parser == null) {
                 this.parser = (c, i) -> ArgumentParseResult

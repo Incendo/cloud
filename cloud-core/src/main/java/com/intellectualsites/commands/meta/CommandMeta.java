@@ -24,6 +24,8 @@
 package com.intellectualsites.commands.meta;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Object that is associated with a {@link com.intellectualsites.commands.Command}.
@@ -31,7 +33,7 @@ import javax.annotation.Nonnull;
  * <p>
  * Appropriate use for command meta would be fixed state, such as command descriptions.
  */
-public class CommandMeta {
+public abstract class CommandMeta {
 
     /**
      * Create a new simple command meta builder
@@ -48,5 +50,32 @@ public class CommandMeta {
     public final String toString() {
         return "";
     }
+
+    /**
+     * Get the value associated with a key
+     *
+     * @param key Key
+     * @return Optional that may contain the associated value
+     */
+    @Nonnull
+    public abstract Optional<String> getValue(@Nonnull String key);
+
+    /**
+     * Get the value if it exists, else return the default value
+     *
+     * @param key          Key
+     * @param defaultValue Default value
+     * @return Value, or default value
+     */
+    @Nonnull
+    public abstract String getOrDefault(@Nonnull String key, @Nonnull String defaultValue);
+
+    /**
+     * Get a copy of the meta map
+     *
+     * @return Copy of meta map
+     */
+    @Nonnull
+    public abstract Map<String, String> getAll();
 
 }

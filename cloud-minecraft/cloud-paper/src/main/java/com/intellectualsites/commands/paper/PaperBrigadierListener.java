@@ -25,10 +25,9 @@ package com.intellectualsites.commands.paper;
 
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
-import com.intellectualsites.commands.bukkit.BukkitCommandMeta;
 import com.intellectualsites.commands.CommandTree;
-import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
 import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
 import com.intellectualsites.commands.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
@@ -52,8 +51,9 @@ class PaperBrigadierListener<C> implements Listener {
     PaperBrigadierListener(@Nonnull final PaperCommandManager<C> paperCommandManager) throws Exception {
         this.paperCommandManager = paperCommandManager;
         this.brigadierManager = new CloudBrigadierManager<>(this.paperCommandManager,
-                () -> new CommandContext<>(this.paperCommandManager.getCommandSenderMapper()
-                                                                   .apply(Bukkit.getConsoleSender())));
+                                                            () -> new CommandContext<>(
+                                                                    this.paperCommandManager.getCommandSenderMapper()
+                                                                                            .apply(Bukkit.getConsoleSender())));
         /* Register default mappings */
         final String version = Bukkit.getServer().getClass().getPackage().getName();
         this.nmsVersion = version.substring(version.lastIndexOf(".") + 1);
@@ -112,7 +112,7 @@ class PaperBrigadierListener<C> implements Listener {
 
     @EventHandler
     public void onCommandRegister(@Nonnull final CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
-        final CommandTree<C, BukkitCommandMeta> commandTree = this.paperCommandManager.getCommandTree();
+        final CommandTree<C> commandTree = this.paperCommandManager.getCommandTree();
         final CommandTree.Node<CommandArgument<C, ?>> node = commandTree.getNamedNode(event.getCommandLabel());
         if (node == null) {
             return;

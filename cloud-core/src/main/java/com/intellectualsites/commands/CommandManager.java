@@ -57,18 +57,17 @@ import java.util.function.Function;
  * The manager is responsible for command registration, parsing delegation, etc.
  *
  * @param <C> Command sender type
- * @param <M> Command meta type
  */
 @SuppressWarnings("unused")
-public abstract class CommandManager<C, M extends CommandMeta> {
+public abstract class CommandManager<C> {
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
 
-    private final CommandExecutionCoordinator<C, M> commandExecutionCoordinator;
-    private final CommandRegistrationHandler<M> commandRegistrationHandler;
-    private final CommandTree<C, M> commandTree;
+    private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
+    private final CommandRegistrationHandler commandRegistrationHandler;
+    private final CommandTree<C> commandTree;
 
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
@@ -80,8 +79,8 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      * @param commandRegistrationHandler  Command registration handler
      */
     public CommandManager(
-            @Nonnull final Function<CommandTree<C, M>, CommandExecutionCoordinator<C, M>> commandExecutionCoordinator,
-            @Nonnull final CommandRegistrationHandler<M> commandRegistrationHandler) {
+            @Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
         this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
@@ -159,7 +158,7 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      * @param command Command to register
      * @return The command manager instance
      */
-    public CommandManager<C, M> command(@Nonnull final Command<C, M> command) {
+    public CommandManager<C> command(@Nonnull final Command<C> command) {
         this.commandTree.insertCommand(command);
         return this;
     }
@@ -189,7 +188,7 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      * @return Command registration handler
      */
     @Nonnull
-    protected CommandRegistrationHandler<M> getCommandRegistrationHandler() {
+    protected CommandRegistrationHandler getCommandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
 
@@ -211,9 +210,9 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      * @return Builder instance
      */
     @Nonnull
-    public Command.Builder<C, M> commandBuilder(@Nonnull final String name,
-                                                @Nonnull final Collection<String> aliases,
-                                                @Nonnull final M meta) {
+    public Command.Builder<C> commandBuilder(@Nonnull final String name,
+                                             @Nonnull final Collection<String> aliases,
+                                             @Nonnull final CommandMeta meta) {
         return Command.newBuilder(name, meta, aliases.toArray(new String[0]));
     }
 
@@ -222,25 +221,28 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      *
      * @param name    Command name
      * @param meta    Command meta
+     * @param aliases Command aliases
      * @return Builder instance
      */
     @Nonnull
-    public Command.Builder<C, M> commandBuilder(@Nonnull final String name,
-                                                @Nonnull final M meta) {
-        return Command.newBuilder(name, meta);
+    public Command.Builder<C> commandBuilder(@Nonnull final String name,
+                                             @Nonnull final CommandMeta meta,
+                                             @Nonnull final String... aliases) {
+        return Command.newBuilder(name, meta, aliases);
     }
 
     /**
      * Create a new command builder using a default command meta instance.
      *
-     * @param name Command name
+     * @param name    Command name
+     * @param aliases Command aliases
      * @return Builder instance
      * @throws UnsupportedOperationException If the command manager does not support default command meta creation
      * @see #createDefaultCommandMeta() Default command meta creation
      */
     @Nonnull
-    public Command.Builder<C, M> commandBuilder(@Nonnull final String name) {
-        return Command.<C, M>newBuilder(name, this.createDefaultCommandMeta()).manager(this);
+    public Command.Builder<C> commandBuilder(@Nonnull final String name, @Nonnull final String... aliases) {
+        return Command.<C>newBuilder(name, this.createDefaultCommandMeta(), aliases).manager(this);
     }
 
     /**
@@ -263,7 +265,7 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      * @return Command tree
      */
     @Nonnull
-    public CommandTree<C, M> getCommandTree() {
+    public CommandTree<C> getCommandTree() {
         return this.commandTree;
     }
 
@@ -274,7 +276,7 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      * @throws UnsupportedOperationException If the command manager does not support this operation
      */
     @Nonnull
-    public abstract M createDefaultCommandMeta();
+    public abstract CommandMeta createDefaultCommandMeta();
 
     /**
      * Register a new command preprocessor. The order they are registered in is respected, and they
@@ -297,12 +299,12 @@ public abstract class CommandManager<C, M extends CommandMeta> {
      */
     public State preprocessContext(@Nonnull final CommandContext<C> context, @Nonnull final LinkedList<String> inputQueue) {
         this.servicePipeline.pump(new CommandPreprocessingContext<>(context, inputQueue))
-                                   .through(new TypeToken<CommandPreprocessor<C>>() {
-                                   })
-                                   .getResult();
+                            .through(new TypeToken<CommandPreprocessor<C>>() {
+                            })
+                            .getResult();
         return context.<String>get(AcceptingCommandPreprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
-                ? State.REJECTED
-                : State.ACCEPTED;
+               ? State.REJECTED
+               : State.ACCEPTED;
     }
 
     /**

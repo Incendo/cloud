@@ -24,6 +24,7 @@
 
 /**
  * cloud API main package
+ *
  * @see com.intellectualsites.commands.CommandManager Command manager class
  */
 package com.intellectualsites.commands;

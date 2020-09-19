@@ -26,14 +26,12 @@ package com.intellectualsites.commands.bungee;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
-import com.intellectualsites.commands.meta.SimpleCommandMeta;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
-final class BungeePluginRegistrationHandler<C> implements
-        CommandRegistrationHandler<SimpleCommandMeta> {
+final class BungeePluginRegistrationHandler<C> implements CommandRegistrationHandler {
 
     private final Map<CommandArgument<?, ?>, net.md_5.bungee.api.plugin.Command> registeredCommands = new HashMap<>();
 
@@ -47,19 +45,19 @@ final class BungeePluginRegistrationHandler<C> implements
     }
 
     @Override
-    public boolean registerCommand(@Nonnull final Command<?, SimpleCommandMeta> command) {
+    public boolean registerCommand(@Nonnull final Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
         if (this.registeredCommands.containsKey(commandArgument)) {
             return false;
         }
         @SuppressWarnings("unchecked") final BungeeCommand<C> bungeeCommand = new BungeeCommand<>(
-                (Command<C, SimpleCommandMeta>) command,
+                (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
                 this.bungeeCommandManager);
         this.registeredCommands.put(commandArgument, bungeeCommand);
         this.bungeeCommandManager.getOwningPlugin().getProxy().getPluginManager()
-                .registerCommand(this.bungeeCommandManager.getOwningPlugin(), bungeeCommand);
+                                 .registerCommand(this.bungeeCommandManager.getOwningPlugin(), bungeeCommand);
         return true;
     }
 

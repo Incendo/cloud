@@ -33,7 +33,7 @@ import com.intellectualsites.services.types.ConsumerService;
  * {@link ConsumerService#interrupt()}
  *
  * @param <C> Command sender type
- * {@inheritDoc}
+ *            {@inheritDoc}
  */
 public interface CommandPreprocessor<C> extends ConsumerService<CommandPreprocessingContext<C>> {
 }

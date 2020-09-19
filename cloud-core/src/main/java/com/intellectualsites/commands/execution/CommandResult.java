@@ -50,7 +50,8 @@ public class CommandResult<C> {
      *
      * @return Command context
      */
-    @Nonnull public CommandContext<C> getCommandContext() {
+    @Nonnull
+    public CommandContext<C> getCommandContext() {
         return this.commandContext;
     }
 

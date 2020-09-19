@@ -26,7 +26,6 @@ package com.intellectualsites.commands;
 import com.intellectualsites.commands.arguments.standard.EnumArgument;
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
-import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ import java.util.List;
 
 public class CommandSuggestionsTest {
 
-    private static CommandManager<TestCommandSender, SimpleCommandMeta> manager;
+    private static CommandManager<TestCommandSender> manager;
 
     @BeforeAll
     static void setupManager() {
@@ -47,18 +46,18 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("test")
                                .literal("var")
                                .argument(StringArgument.<TestCommandSender>newBuilder("str")
-                                                        .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two"))
-                                                        .build())
+                                                 .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two"))
+                                                 .build())
                                .argument(EnumArgument.required(TestEnum.class, "enum"))
                                .build());
         manager.command(manager.commandBuilder("test")
-                                .literal("comb")
-                                .argument(StringArgument.<TestCommandSender>newBuilder("str")
+                               .literal("comb")
+                               .argument(StringArgument.<TestCommandSender>newBuilder("str")
                                                  .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two"))
                                                  .build())
-                                .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
+                               .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
                                                  .withMin(1).withMax(95).asOptional().build())
-                                .build());
+                               .build());
     }
 
     @Test
@@ -68,7 +67,7 @@ public class CommandSuggestionsTest {
         Assertions.assertTrue(suggestions.isEmpty());
         final String input2 = "test ";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("comb", "one", "two","var"), suggestions2);
+        Assertions.assertEquals(Arrays.asList("comb", "one", "two", "var"), suggestions2);
     }
 
     @Test
@@ -109,7 +108,8 @@ public class CommandSuggestionsTest {
 
 
     public enum TestEnum {
-        FOO, BAR
+        FOO,
+        BAR
     }
 
 }

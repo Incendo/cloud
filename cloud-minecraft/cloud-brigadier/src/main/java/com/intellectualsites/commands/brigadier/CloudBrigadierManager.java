@@ -81,7 +81,7 @@ public final class CloudBrigadierManager<C, S> {
             ? extends ArgumentType<?>>> mappers;
     private final Map<Class<?>, Supplier<ArgumentType<?>>> defaultArgumentTypeSuppliers;
     private final Supplier<CommandContext<C>> dummyContextProvider;
-    private final CommandManager<C, ?> commandManager;
+    private final CommandManager<C> commandManager;
 
     /**
      * Create a new cloud brigadier manager
@@ -89,7 +89,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param commandManager       Command manager
      * @param dummyContextProvider Provider of dummy context for completions
      */
-    public CloudBrigadierManager(@Nonnull final CommandManager<C, ?> commandManager,
+    public CloudBrigadierManager(@Nonnull final CommandManager<C> commandManager,
                                  @Nonnull final Supplier<CommandContext<C>>
                                          dummyContextProvider) {
         this.mappers = Maps.newHashMap();
@@ -184,14 +184,14 @@ public final class CloudBrigadierManager<C, S> {
      * Register a cloud-Brigadier mapping
      *
      * @param argumentType cloud argument type
-     * @param mapper        mapper function
-     * @param <T>           cloud argument value type
-     * @param <K>           cloud argument type
-     * @param <O>           Brigadier argument type value
+     * @param mapper       mapper function
+     * @param <T>          cloud argument value type
+     * @param <K>          cloud argument type
+     * @param <O>          Brigadier argument type value
      */
     public <T, K extends CommandArgument<C, T>, O> void registerMapping(@Nonnull final TypeToken<K> argumentType,
                                                                         @Nonnull final Function<? extends K,
-                                                                                 ? extends ArgumentType<O>> mapper) {
+                                                                                ? extends ArgumentType<O>> mapper) {
         this.mappers.put(argumentType.getRawType(), mapper);
     }
 
@@ -211,8 +211,8 @@ public final class CloudBrigadierManager<C, S> {
      *
      * @param argumentType cloud argument type
      * @param argument     cloud argument
-     * @param <T>           cloud argument value type (generic)
-     * @param <K>           cloud argument type (generic)
+     * @param <T>          cloud argument value type (generic)
+     * @param <K>          cloud argument type (generic)
      * @return Brigadier argument type
      */
     @Nullable
@@ -268,9 +268,9 @@ public final class CloudBrigadierManager<C, S> {
     }
 
     private ArgumentBuilder<S, ?> constructCommandNode(@Nonnull final CommandTree.Node<CommandArgument<C, ?>> root,
-                                                @Nonnull final BiPredicate<S, String> permissionChecker,
-                                                @Nonnull final com.mojang.brigadier.Command<S> executor,
-                                                @Nonnull final SuggestionProvider<S> suggestionProvider) {
+                                                       @Nonnull final BiPredicate<S, String> permissionChecker,
+                                                       @Nonnull final com.mojang.brigadier.Command<S> executor,
+                                                       @Nonnull final SuggestionProvider<S> suggestionProvider) {
 
         ArgumentBuilder<S, ?> argumentBuilder;
         if (root.getValue() instanceof StaticArgument) {

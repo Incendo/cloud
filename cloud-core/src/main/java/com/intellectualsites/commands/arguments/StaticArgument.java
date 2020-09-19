@@ -57,7 +57,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      */
     @Nonnull
     public static <C> StaticArgument<C> required(@Nonnull final String name,
-                                                                       @Nonnull final String... aliases) {
+                                                 @Nonnull final String... aliases) {
         return new StaticArgument<>(true, name, aliases);
     }
 
@@ -71,7 +71,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      */
     @Nonnull
     public static <C> StaticArgument<C> optional(@Nonnull final String name,
-                                                                       @Nonnull final String... aliases) {
+                                                 @Nonnull final String... aliases) {
         return new StaticArgument<>(false, name, aliases);
     }
 

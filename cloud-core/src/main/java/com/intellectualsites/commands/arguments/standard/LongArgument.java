@@ -26,8 +26,8 @@ package com.intellectualsites.commands.arguments.standard;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
-import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -95,10 +95,27 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      */
     @Nonnull
     public static <C> CommandArgument<C, Long> optional(@Nonnull final String name,
-                                                                              final long defaultNum) {
+                                                        final long defaultNum) {
         return LongArgument.<C>newBuilder(name).asOptionalWithDefault(Long.toString(defaultNum)).build();
     }
 
+    /**
+     * Get the minimum accepted long that could have been parsed
+     *
+     * @return Minimum long
+     */
+    public long getMin() {
+        return this.min;
+    }
+
+    /**
+     * Get the maximum accepted long that could have been parsed
+     *
+     * @return Maximum long
+     */
+    public long getMax() {
+        return this.max;
+    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Long> {
 
@@ -145,26 +162,6 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         }
 
     }
-
-
-    /**
-     * Get the minimum accepted long that could have been parsed
-     *
-     * @return Minimum long
-     */
-    public long getMin() {
-        return this.min;
-    }
-
-    /**
-     * Get the maximum accepted long that could have been parsed
-     *
-     * @return Maximum long
-     */
-    public long getMax() {
-        return this.max;
-    }
-
 
     private static final class LongParser<C> implements ArgumentParser<C, Long> {
 

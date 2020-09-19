@@ -89,10 +89,18 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      */
     @Nonnull
     public static <C> CommandArgument<C, Boolean> optional(@Nonnull final String name,
-                                                                                 final String defaultNum) {
+                                                           final String defaultNum) {
         return BooleanArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
+    /**
+     * Get the liberal boolean
+     *
+     * @return Liberal boolean
+     */
+    public boolean isLiberal() {
+        return liberal;
+    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Boolean> {
 
@@ -126,16 +134,6 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         }
 
     }
-
-    /**
-     * Get the liberal boolean
-     *
-     * @return Liberal boolean
-     */
-    public boolean isLiberal() {
-        return liberal;
-    }
-
 
     public static final class BooleanParser<C> implements ArgumentParser<C, Boolean> {
 

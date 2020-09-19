@@ -26,8 +26,8 @@ package com.intellectualsites.commands.arguments.standard;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
 import com.intellectualsites.commands.arguments.parser.ArgumentParser;
-import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -102,10 +102,27 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
      */
     @Nonnull
     public static <C> CommandArgument<C, Integer> optional(@Nonnull final String name,
-                                                                                 final int defaultNum) {
+                                                           final int defaultNum) {
         return IntegerArgument.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
     }
 
+    /**
+     * Get the minimum accepted integer that could have been parsed
+     *
+     * @return Minimum integer
+     */
+    public int getMin() {
+        return this.min;
+    }
+
+    /**
+     * Get the maximum accepted integer that could have been parsed
+     *
+     * @return Maximum integer
+     */
+    public int getMax() {
+        return this.max;
+    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Integer> {
 
@@ -153,26 +170,6 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
     }
 
-
-    /**
-     * Get the minimum accepted integer that could have been parsed
-     *
-     * @return Minimum integer
-     */
-    public int getMin() {
-        return this.min;
-    }
-
-    /**
-     * Get the maximum accepted integer that could have been parsed
-     *
-     * @return Maximum integer
-     */
-    public int getMax() {
-        return this.max;
-    }
-
-
     public static final class IntegerParser<C> implements ArgumentParser<C, Integer> {
 
         private final int min;
@@ -187,6 +184,29 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         public IntegerParser(final int min, final int max) {
             this.min = min;
             this.max = max;
+        }
+
+        @Nonnull
+        static List<String> getSuggestions(final long min, final long max, @Nonnull final String input) {
+            if (input.isEmpty()) {
+                return IntStream.range(0, MAX_SUGGESTIONS_INCREMENT).mapToObj(Integer::toString).collect(Collectors.toList());
+            }
+            try {
+                final long inputNum = Long.parseLong(input);
+                if (inputNum > max) {
+                    return Collections.emptyList();
+                } else {
+                    final List<String> suggestions = new LinkedList<>();
+                    suggestions.add(input); /* It's a valid number, so we suggest it */
+                    for (int i = 0; i < MAX_SUGGESTIONS_INCREMENT
+                            && (inputNum * NUMBER_SHIFT_MULTIPLIER) + i <= max; i++) {
+                        suggestions.add(Long.toString((inputNum * NUMBER_SHIFT_MULTIPLIER) + i));
+                    }
+                    return suggestions;
+                }
+            } catch (final Exception ignored) {
+                return Collections.emptyList();
+            }
         }
 
         @Nonnull
@@ -238,29 +258,6 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
                                         @Nonnull final String input) {
             return getSuggestions(this.min, this.max, input);
-        }
-
-        @Nonnull
-        static List<String> getSuggestions(final long min, final long max, @Nonnull final String input) {
-            if (input.isEmpty()) {
-                return IntStream.range(0, MAX_SUGGESTIONS_INCREMENT).mapToObj(Integer::toString).collect(Collectors.toList());
-            }
-            try {
-                final long inputNum = Long.parseLong(input);
-                if (inputNum > max) {
-                    return Collections.emptyList();
-                } else {
-                    final List<String> suggestions = new LinkedList<>();
-                    suggestions.add(input); /* It's a valid number, so we suggest it */
-                    for (int i = 0; i < MAX_SUGGESTIONS_INCREMENT
-                            && (inputNum * NUMBER_SHIFT_MULTIPLIER) + i <= max; i++) {
-                        suggestions.add(Long.toString((inputNum * NUMBER_SHIFT_MULTIPLIER) + i));
-                    }
-                    return suggestions;
-                }
-            } catch (final Exception ignored) {
-                return Collections.emptyList();
-            }
         }
 
     }

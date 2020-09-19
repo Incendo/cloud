@@ -48,10 +48,10 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     private final CommandArgument<C, ?> command;
     private final BukkitCommandManager<C> bukkitCommandManager;
-    private final Command<C, BukkitCommandMeta> cloudCommand;
+    private final Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
-    BukkitCommand(@Nonnull final Command<C, BukkitCommandMeta> cloudCommand,
+    BukkitCommand(@Nonnull final Command<C> cloudCommand,
                   @Nonnull final CommandArgument<C, ?> command,
                   @Nonnull final BukkitCommandManager<C> bukkitCommandManager) {
         super(command.getName(),
@@ -76,9 +76,9 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                      if (throwable != null) {
                                          if (throwable instanceof InvalidSyntaxException) {
                                              commandSender.sendMessage(ChatColor.RED + "Invalid Command Syntax. "
-                                                                     + "Correct command syntax is: "
-                                                                     + ChatColor.GRAY + "/"
-                                                                     + ((InvalidSyntaxException) throwable).getCorrectSyntax());
+                                                                               + "Correct command syntax is: "
+                                                                               + ChatColor.GRAY + "/"
+                                                                               + ((InvalidSyntaxException) throwable).getCorrectSyntax());
                                          } else if (throwable instanceof InvalidCommandSenderException) {
                                              commandSender.sendMessage(ChatColor.RED + throwable.getMessage());
                                          } else if (throwable instanceof NoPermissionException) {
@@ -87,7 +87,8 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                              commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND);
                                          } else if (throwable instanceof ArgumentParseException) {
                                              commandSender.sendMessage(ChatColor.RED + "Invalid Command Argument: "
-                                                                     + ChatColor.GRAY + throwable.getCause().getMessage());
+                                                                               + ChatColor.GRAY + throwable.getCause()
+                                                                                                           .getMessage());
                                          } else {
                                              commandSender.sendMessage(throwable.getMessage());
                                              throwable.printStackTrace();

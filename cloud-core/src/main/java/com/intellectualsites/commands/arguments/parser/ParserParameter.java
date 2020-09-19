@@ -54,7 +54,8 @@ public class ParserParameter<T> {
      *
      * @return Parameter key
      */
-    @Nonnull public String getKey() {
+    @Nonnull
+    public String getKey() {
         return this.key;
     }
 
@@ -63,7 +64,8 @@ public class ParserParameter<T> {
      *
      * @return Expected type
      */
-    @Nonnull public TypeToken<T> getExpectedType() {
+    @Nonnull
+    public TypeToken<T> getExpectedType() {
         return this.expectedType;
     }
 

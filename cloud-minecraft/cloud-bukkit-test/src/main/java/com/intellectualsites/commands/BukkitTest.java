@@ -37,11 +37,11 @@ import com.intellectualsites.commands.arguments.standard.EnumArgument;
 import com.intellectualsites.commands.arguments.standard.FloatArgument;
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
-import com.intellectualsites.commands.bukkit.BukkitCommandMeta;
 import com.intellectualsites.commands.bukkit.BukkitCommandMetaBuilder;
-import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
-import com.intellectualsites.commands.paper.PaperCommandManager;
 import com.intellectualsites.commands.bukkit.parsers.WorldArgument;
+import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
+import com.intellectualsites.commands.paper.PaperCommandManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -54,7 +54,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -68,46 +67,43 @@ public final class BukkitTest extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
-            final PaperCommandManager<CommandSender> mgr = new PaperCommandManager<>(
+            final CommandManager<CommandSender> mgr = new PaperCommandManager<>(
                     this,
-                   CommandExecutionCoordinator
-                           .simpleCoordinator(),
+                    CommandExecutionCoordinator
+                            .simpleCoordinator(),
                     Function.identity(),
                     Function.identity()
             );
-            final AnnotationParser<CommandSender, BukkitCommandMeta> annotationParser
+            final AnnotationParser<CommandSender> annotationParser
                     = new AnnotationParser<>(mgr, CommandSender.class, p ->
                     BukkitCommandMetaBuilder.builder().withDescription(p.get(StandardParameters.DESCRIPTION,
                                                                              "No description")).build());
             annotationParser.parse(this);
-            mgr.registerBrigadier();
-            mgr.command(mgr.commandBuilder("gamemode",
-                                           Collections.singleton("gajmöde"),
-                                           BukkitCommandMetaBuilder.builder()
-                                                                   .withDescription("Your ugli")
-                                                                   .build())
+            //noinspection all
+            ((PaperCommandManager<CommandSender>) mgr).registerBrigadier();
+            mgr.command(mgr.commandBuilder("gamemode", this.metaWithDescription("Your ugli"), "gajmöde")
                            .argument(EnumArgument.required(GameMode.class, "gamemode"))
                            .argument(StringArgument.<CommandSender>newBuilder("player")
-                                              .withSuggestionsProvider((v1, v2) -> {
-                                                  final List<String> suggestions =
-                                                          new ArrayList<>(
-                                                                  Bukkit.getOnlinePlayers()
-                                                                        .stream()
-                                                                        .map(Player::getName)
-                                                                        .collect(Collectors.toList()));
-                                                  suggestions.add("dog");
-                                                  suggestions.add("cat");
-                                                  return suggestions;
-                                              }).build())
+                                             .withSuggestionsProvider((v1, v2) -> {
+                                                 final List<String> suggestions =
+                                                         new ArrayList<>(
+                                                                 Bukkit.getOnlinePlayers()
+                                                                       .stream()
+                                                                       .map(Player::getName)
+                                                                       .collect(Collectors.toList()));
+                                                 suggestions.add("dog");
+                                                 suggestions.add("cat");
+                                                 return suggestions;
+                                             }).build())
                            .handler(c -> ((Player) c.getSender())
-                                          .setGameMode(c.<GameMode>get("gamemode")
-                                                               .orElse(GameMode.SURVIVAL)))
+                                   .setGameMode(c.<GameMode>get("gamemode")
+                                                        .orElse(GameMode.SURVIVAL)))
                            .build())
                .command(mgr.commandBuilder("kenny")
                            .literal("sux")
                            .argument(IntegerArgument
-                                              .<CommandSender>newBuilder("perc")
-                                              .withMin(PERC_MIN).withMax(PERC_MAX).build())
+                                             .<CommandSender>newBuilder("perc")
+                                             .withMin(PERC_MIN).withMax(PERC_MAX).build())
                            .handler(context -> {
                                ((Player) context.getSender()).sendMessage(String.format(
                                        "Kenny sux %d%%",
@@ -180,6 +176,11 @@ public final class BukkitTest extends JavaPlugin {
                                   @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
                                   @Argument("number") @Range(max = "100") final int number) {
         player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
+    }
+
+    @Nonnull
+    private SimpleCommandMeta metaWithDescription(@Nonnull final String description) {
+        return BukkitCommandMetaBuilder.builder().withDescription(description).build();
     }
 
 }

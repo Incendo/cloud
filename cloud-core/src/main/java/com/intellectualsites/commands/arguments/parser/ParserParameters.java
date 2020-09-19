@@ -52,7 +52,7 @@ public final class ParserParameters {
      * @param parameter Parameter
      * @param value     Value
      * @param <T>       Value type
-     * @return          Constructed instance
+     * @return Constructed instance
      */
     @Nonnull
     public static <T> ParserParameters single(@Nonnull final ParserParameter<T> parameter, @Nonnull final T value) {

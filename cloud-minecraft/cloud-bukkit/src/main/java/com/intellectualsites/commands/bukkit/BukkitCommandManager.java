@@ -43,8 +43,7 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public class BukkitCommandManager<C>
-        extends CommandManager<C, BukkitCommandMeta> {
+public class BukkitCommandManager<C> extends CommandManager<C> {
 
     private final Plugin owningPlugin;
 
@@ -61,8 +60,8 @@ public class BukkitCommandManager<C>
      * @throws Exception If the construction of the manager fails
      */
     public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
-                                @Nonnull final Function<CommandTree<C, BukkitCommandMeta>,
-                                        CommandExecutionCoordinator<C, BukkitCommandMeta>> commandExecutionCoordinator,
+                                @Nonnull final Function<CommandTree<C>,
+                                        CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                                 @Nonnull final Function<CommandSender, C> commandSenderMapper,
                                 @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper)
             throws Exception {

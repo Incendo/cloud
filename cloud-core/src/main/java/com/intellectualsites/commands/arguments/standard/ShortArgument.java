@@ -95,10 +95,27 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
      */
     @Nonnull
     public static <C> CommandArgument<C, Short> optional(@Nonnull final String name,
-                                                                               final short defaultNum) {
+                                                         final short defaultNum) {
         return ShortArgument.<C>newBuilder(name).asOptionalWithDefault(Short.toString(defaultNum)).build();
     }
 
+    /**
+     * Get the minimum accepted short that could have been parsed
+     *
+     * @return Minimum short
+     */
+    public short getMin() {
+        return this.min;
+    }
+
+    /**
+     * Get the maximum accepted short that could have been parsed
+     *
+     * @return Maximum short
+     */
+    public short getMax() {
+        return this.max;
+    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Short> {
 
@@ -145,26 +162,6 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         }
 
     }
-
-
-    /**
-     * Get the minimum accepted short that could have been parsed
-     *
-     * @return Minimum short
-     */
-    public short getMin() {
-        return this.min;
-    }
-
-    /**
-     * Get the maximum accepted short that could have been parsed
-     *
-     * @return Maximum short
-     */
-    public short getMax() {
-        return this.max;
-    }
-
 
     public static final class ShortParser<C> implements ArgumentParser<C, Short> {
 
