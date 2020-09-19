@@ -72,7 +72,7 @@ public class CommandSuggestionsTest {
         Assertions.assertTrue(suggestions.isEmpty());
         final String input2 = "test ";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("comb", "one", "two", "var"), suggestions2);
+        Assertions.assertEquals(Arrays.asList("alt", "comb", "one", "two", "var"), suggestions2);
     }
 
     @Test
