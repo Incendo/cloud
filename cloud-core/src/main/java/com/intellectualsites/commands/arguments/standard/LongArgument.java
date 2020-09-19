@@ -30,8 +30,10 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class LongArgument<C> extends CommandArgument<C, Long> {
@@ -43,8 +45,9 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
                          @Nonnull final String name,
                          final long min,
                          final long max,
-                         final String defaultValue) {
-        super(required, name, new LongParser<>(min, max), defaultValue, Long.class);
+                         final String defaultValue,
+                         @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new LongParser<>(min, max), defaultValue, Long.class, suggestionsProvider);
         this.min = min;
         this.max = max;
     }
@@ -158,7 +161,8 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         @Nonnull
         @Override
         public LongArgument<C> build() {
-            return new LongArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+            return new LongArgument<>(this.isRequired(), this.getName(), this.min,
+                                      this.max, this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }

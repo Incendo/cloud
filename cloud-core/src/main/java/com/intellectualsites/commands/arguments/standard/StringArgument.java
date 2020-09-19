@@ -45,7 +45,8 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                            @Nonnull final StringMode stringMode,
                            @Nonnull final String defaultValue,
                            @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
-        super(required, name, new StringParser<>(stringMode, suggestionsProvider), defaultValue, String.class);
+        super(required, name, new StringParser<>(stringMode, suggestionsProvider),
+              defaultValue, String.class, suggestionsProvider);
         this.stringMode = stringMode;
     }
 

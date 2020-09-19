@@ -29,14 +29,18 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class CharArgument<C> extends CommandArgument<C, Character> {
 
     private CharArgument(final boolean required, @Nonnull final String name,
-                         @Nonnull final String defaultValue) {
-        super(required, name, new CharacterParser<>(), defaultValue, Character.class);
+                         @Nonnull final String defaultValue, @Nullable
+                         final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new CharacterParser<>(), defaultValue, Character.class, suggestionsProvider);
     }
 
     /**
@@ -104,7 +108,8 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         @Nonnull
         @Override
         public CharArgument<C> build() {
-            return new CharArgument<>(this.isRequired(), this.getName(), this.getDefaultValue());
+            return new CharArgument<>(this.isRequired(), this.getName(),
+                                      this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }

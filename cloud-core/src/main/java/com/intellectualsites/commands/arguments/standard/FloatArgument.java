@@ -30,7 +30,10 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class FloatArgument<C> extends CommandArgument<C, Float> {
@@ -42,8 +45,9 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
                           @Nonnull final String name,
                           final float min,
                           final float max,
-                          final String defaultValue) {
-        super(required, name, new FloatParser<>(min, max), defaultValue, Float.class);
+                          final String defaultValue,
+                          @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new FloatParser<>(min, max), defaultValue, Float.class, suggestionsProvider);
         this.min = min;
         this.max = max;
     }
@@ -157,7 +161,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         @Nonnull
         @Override
         public FloatArgument<C> build() {
-            return new FloatArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+            return new FloatArgument<>(this.isRequired(), this.getName(), this.min, this.max,
+                                       this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }

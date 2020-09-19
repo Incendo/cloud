@@ -30,8 +30,10 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class ByteArgument<C> extends CommandArgument<C, Byte> {
@@ -40,8 +42,9 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     private final byte max;
 
     private ByteArgument(final boolean required, @Nonnull final String name, final byte min,
-                         final byte max, final String defaultValue) {
-        super(required, name, new ByteParser<>(min, max), defaultValue, Byte.class);
+                         final byte max, final String defaultValue,
+                         @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new ByteParser<>(min, max), defaultValue, Byte.class, suggestionsProvider);
         this.min = min;
         this.max = max;
     }
@@ -155,7 +158,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         @Nonnull
         @Override
         public ByteArgument<C> build() {
-            return new ByteArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+            return new ByteArgument<>(this.isRequired(), this.getName(), this.min, this.max,
+                                      this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }

@@ -299,18 +299,18 @@ public final class CommandTree<C> {
                     return Collections.emptyList();
                     // return child.getValue().getParser().suggestions(commandContext, "");
                 } else if (child.isLeaf() && commandQueue.size() < 2) {
-                    return child.getValue().getParser().suggestions(commandContext, commandQueue.peek());
+                    return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
                 } else if (child.isLeaf()) {
                     return Collections.emptyList();
                 } else if (commandQueue.peek().isEmpty()) {
-                    return child.getValue().getParser().suggestions(commandContext, commandQueue.remove());
+                    return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());
                 }
                 final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                 if (result.getParsedValue().isPresent()) {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     return this.getSuggestions(commandContext, commandQueue, child);
                 } else if (result.getFailure().isPresent()) {
-                    return child.getValue().getParser().suggestions(commandContext, commandQueue.peek());
+                    return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
                 }
             }
         }
@@ -336,8 +336,8 @@ public final class CommandTree<C> {
                 if (argument.getValue() == null || this.isPermitted(commandContext.getSender(), argument) != null) {
                     continue;
                 }
-                suggestions.addAll(
-                        argument.getValue().getParser().suggestions(commandContext, stringOrEmpty(commandQueue.peek())));
+                suggestions.addAll(argument.getValue().getSuggestionsProvider()
+                                           .apply(commandContext, stringOrEmpty(commandQueue.peek())));
             }
             return suggestions;
         }

@@ -30,10 +30,12 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -50,8 +52,9 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
                             @Nonnull final String name,
                             final int min,
                             final int max,
-                            final String defaultValue) {
-        super(required, name, new IntegerParser<>(min, max), defaultValue, Integer.class);
+                            final String defaultValue,
+                            @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new IntegerParser<>(min, max), defaultValue, Integer.class, suggestionsProvider);
         this.min = min;
         this.max = max;
     }
@@ -165,7 +168,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         @Nonnull
         @Override
         public IntegerArgument<C> build() {
-            return new IntegerArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+            return new IntegerArgument<>(this.isRequired(), this.getName(), this.min, this.max,
+                                         this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }

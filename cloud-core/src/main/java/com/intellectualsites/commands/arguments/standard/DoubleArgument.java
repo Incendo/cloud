@@ -30,7 +30,10 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class DoubleArgument<C> extends CommandArgument<C, Double> {
@@ -42,8 +45,9 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
                            @Nonnull final String name,
                            final double min,
                            final double max,
-                           final String defaultValue) {
-        super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class);
+                           final String defaultValue,
+                           @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class, suggestionsProvider);
         this.min = min;
         this.max = max;
     }
@@ -157,7 +161,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         @Nonnull
         @Override
         public DoubleArgument<C> build() {
-            return new DoubleArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+            return new DoubleArgument<>(this.isRequired(), this.getName(), this.min, this.max,
+                                        this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }

@@ -30,8 +30,10 @@ import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.parsing.NumberParseException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class ShortArgument<C> extends CommandArgument<C, Short> {
@@ -43,8 +45,9 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
                           @Nonnull final String name,
                           final short min,
                           final short max,
-                          final String defaultValue) {
-        super(required, name, new ShortParser<>(min, max), defaultValue, Short.class);
+                          final String defaultValue,
+                          @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new ShortParser<>(min, max), defaultValue, Short.class, suggestionsProvider);
         this.min = min;
         this.max = max;
     }
@@ -158,7 +161,8 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         @Nonnull
         @Override
         public ShortArgument<C> build() {
-            return new ShortArgument<>(this.isRequired(), this.getName(), this.min, this.max, this.getDefaultValue());
+            return new ShortArgument<>(this.isRequired(), this.getName(), this.min, this.max,
+                                       this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }

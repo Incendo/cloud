@@ -29,9 +29,11 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -46,8 +48,9 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     protected EnumArgument(@Nonnull final Class<E> enumClass,
                            final boolean required,
                            @Nonnull final String name,
-                           @Nonnull final String defaultValue) {
-        super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass);
+                           @Nonnull final String defaultValue,
+                           @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass, suggestionsProvider);
     }
 
     /**
@@ -124,7 +127,8 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         @Nonnull
         @Override
         public CommandArgument<C, E> build() {
-            return new EnumArgument<>(this.enumClass, this.isRequired(), this.getName(), this.getDefaultValue());
+            return new EnumArgument<>(this.enumClass, this.isRequired(), this.getName(),
+                                      this.getDefaultValue(), this.getSuggestionsProvider());
         }
     }
 

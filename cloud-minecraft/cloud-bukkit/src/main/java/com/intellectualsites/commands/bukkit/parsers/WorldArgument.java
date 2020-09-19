@@ -31,8 +31,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -44,8 +46,9 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
 
     protected WorldArgument(final boolean required,
                             @Nonnull final String name,
-                            @Nonnull final String defaultValue) {
-        super(required, name, new WorldParser<>(), defaultValue, World.class);
+                            @Nonnull final String defaultValue,
+                            @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new WorldParser<>(), defaultValue, World.class, suggestionsProvider);
     }
 
     /**
@@ -108,7 +111,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         @Nonnull
         @Override
         public CommandArgument<C, World> build() {
-            return new WorldArgument<>(this.isRequired(), this.getName(), this.getDefaultValue());
+            return new WorldArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
         }
     }
 

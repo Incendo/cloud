@@ -58,6 +58,11 @@ public class CommandSuggestionsTest {
                                .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
                                                  .withMin(1).withMax(95).asOptional().build())
                                .build());
+        manager.command(manager.commandBuilder("test")
+                               .literal("alt")
+                               .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
+                                                 .withSuggestionsProvider((c, s) -> Arrays.asList("3", "33", "333")).build())
+                               .build());
     }
 
     @Test
@@ -104,6 +109,13 @@ public class CommandSuggestionsTest {
         final String input3 = "test comb one 9";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Arrays.asList("9", "90", "91", "92", "93", "94", "95"), suggestions3);
+    }
+
+    @Test
+    void testAltered() {
+        final String input = "test alt ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("3", "33", "333"), suggestions);
     }
 
 

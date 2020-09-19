@@ -30,8 +30,11 @@ import com.intellectualsites.commands.context.CommandContext;
 import org.bukkit.Material;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -43,8 +46,9 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
 
     protected MaterialArgument(final boolean required,
                                @Nonnull final String name,
-                               @Nonnull final String defaultValue) {
-        super(required, name, new MaterialParser<>(), defaultValue, Material.class);
+                               @Nonnull final String defaultValue,
+                               @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new MaterialParser<>(), defaultValue, Material.class, suggestionsProvider);
     }
 
     /**

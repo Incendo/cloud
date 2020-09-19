@@ -29,17 +29,20 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.context.CommandContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     private final boolean liberal;
 
     private BooleanArgument(final boolean required, @Nonnull final String name,
-                            final boolean liberal, @Nonnull final String defaultValue) {
-        super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class);
+                            final boolean liberal, @Nonnull final String defaultValue,
+                            @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class, suggestionsProvider);
         this.liberal = liberal;
     }
 
@@ -130,7 +133,8 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         @Nonnull
         @Override
         public BooleanArgument<C> build() {
-            return new BooleanArgument<>(this.isRequired(), this.getName(), this.liberal, this.getDefaultValue());
+            return new BooleanArgument<>(this.isRequired(), this.getName(), this.liberal,
+                                         this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }
