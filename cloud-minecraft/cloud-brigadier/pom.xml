@@ -58,5 +58,11 @@
             <version>1.0.17</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>29.0-jre</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
