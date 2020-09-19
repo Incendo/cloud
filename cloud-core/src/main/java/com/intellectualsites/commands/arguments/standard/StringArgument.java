@@ -268,6 +268,16 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         public boolean isContextFree() {
             return true;
         }
+
+        /**
+         * Get the string mode
+         *
+         * @return String mode
+         */
+        @Nonnull
+        public StringMode getStringMode() {
+            return this.stringMode;
+        }
     }
 
 

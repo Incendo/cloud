@@ -74,13 +74,16 @@ public final class BukkitTest extends JavaPlugin {
                     Function.identity(),
                     Function.identity()
             );
+
+            ((PaperCommandManager<CommandSender>) mgr).registerBrigadier();
+
             final AnnotationParser<CommandSender> annotationParser
                     = new AnnotationParser<>(mgr, CommandSender.class, p ->
                     BukkitCommandMetaBuilder.builder().withDescription(p.get(StandardParameters.DESCRIPTION,
                                                                              "No description")).build());
             annotationParser.parse(this);
             //noinspection all
-            ((PaperCommandManager<CommandSender>) mgr).registerBrigadier();
+
             mgr.command(mgr.commandBuilder("gamemode", this.metaWithDescription("Your ugli"), "gajmöde")
                            .argument(EnumArgument.required(GameMode.class, "gamemode"))
                            .argument(StringArgument.<CommandSender>newBuilder("player")
@@ -99,8 +102,8 @@ public final class BukkitTest extends JavaPlugin {
                                    .setGameMode(c.<GameMode>get("gamemode")
                                                         .orElse(GameMode.SURVIVAL)))
                            .build())
-               .command(mgr.commandBuilder("kenny")
-                           .literal("sux")
+               .command(mgr.commandBuilder("kenny", "k")
+                           .literal("sux", "s")
                            .argument(IntegerArgument
                                              .<CommandSender>newBuilder("perc")
                                              .withMin(PERC_MIN).withMax(PERC_MAX).build())
@@ -174,7 +177,7 @@ public final class BukkitTest extends JavaPlugin {
     @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
     private void annotatedCommand(@Nonnull final Player player,
                                   @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
-                                  @Argument("number") @Range(max = "100") final int number) {
+                                  @Argument("number") @Range(min = "10", max = "100") final int number) {
         player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
     }
 

@@ -531,8 +531,17 @@ public final class CommandTree<C> {
      */
     @Nullable
     public Node<CommandArgument<C, ?>> getNamedNode(@Nullable final String name) {
-        return this.getRootNodes().stream().filter(node -> node.getValue() != null
-                && node.getValue().getName().equalsIgnoreCase(name)).findAny().orElse(null);
+        for (final Node<CommandArgument<C, ?>> node : this.getRootNodes()) {
+            if (node.getValue() != null && node.getValue() instanceof StaticArgument) {
+                final StaticArgument<C> staticArgument = (StaticArgument<C>) node.getValue();
+                for (final String alias : staticArgument.getAliases()) {
+                    if (alias.equalsIgnoreCase(name))  {
+                        return node;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**

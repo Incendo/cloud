@@ -81,7 +81,7 @@ public class CloudVelocityTest {
     @CommandMethod("test <num> [str]")
     private void testCommand(@Nonnull @Argument("str") final String string,
                              @Nonnull final CommandSource source,
-                             @Argument("num") @Range(max = "33") final int num) {
+                             @Argument("num") @Range(min = "10", max = "33") final int num) {
         source.sendMessage(TextComponent.builder()
             .append("You wrote: ", NamedTextColor.GOLD)
             .append(string, NamedTextColor.LIGHT_PURPLE)

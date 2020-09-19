@@ -25,7 +25,6 @@ package com.intellectualsites.commands.bukkit;
 
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.arguments.CommandArgument;
-import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.exceptions.ArgumentParseException;
 import com.intellectualsites.commands.exceptions.InvalidCommandSenderException;
 import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
@@ -51,13 +50,15 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     private final Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
-    BukkitCommand(@Nonnull final Command<C> cloudCommand,
+    BukkitCommand(@Nonnull final String label,
+                  @Nonnull final List<String> aliases,
+                  @Nonnull final Command<C> cloudCommand,
                   @Nonnull final CommandArgument<C, ?> command,
                   @Nonnull final BukkitCommandManager<C> manager) {
-        super(command.getName(),
+        super(label,
               cloudCommand.getCommandMeta().getOrDefault("description", ""),
               "",
-              ((StaticArgument<C>) command).getAlternativeAliases());
+              aliases);
         this.command = command;
         this.manager = manager;
         this.cloudCommand = cloudCommand;
@@ -74,48 +75,52 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         this.manager.executeCommand(sender,
                                     builder.toString())
                     .whenComplete(((commandResult, throwable) -> {
-             if (throwable != null) {
-                 if (throwable instanceof InvalidSyntaxException) {
-                     this.manager.handleException(sender,
-                                                  InvalidSyntaxException.class,
-                                                  (InvalidSyntaxException) throwable, (c, e) ->
-                          commandSender.sendMessage(ChatColor.RED + "Invalid Command Syntax. "
-                                               + "Correct command syntax is: "
-                                               + ChatColor.GRAY + "/"
-                                               + ((InvalidSyntaxException) throwable).getCorrectSyntax())
-                     );
-                 } else if (throwable instanceof InvalidCommandSenderException) {
-                     this.manager.handleException(sender,
-                                                  InvalidCommandSenderException.class,
-                                                  (InvalidCommandSenderException) throwable, (c, e) ->
-                          commandSender.sendMessage(ChatColor.RED + throwable.getMessage())
-                     );
-                 } else if (throwable instanceof NoPermissionException) {
-                     this.manager.handleException(sender,
-                                                  NoPermissionException.class,
-                                                  (NoPermissionException) throwable, (c, e) ->
-                          commandSender.sendMessage(MESSAGE_NO_PERMS)
-                     );
-                 } else if (throwable instanceof NoSuchCommandException) {
-                     this.manager.handleException(sender,
-                                                  NoSuchCommandException.class,
-                                                  (NoSuchCommandException) throwable, (c, e) ->
-                          commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND)
-                     );
-                 } else if (throwable instanceof ArgumentParseException) {
-                     this.manager.handleException(sender,
-                                                  ArgumentParseException.class,
-                                                  (ArgumentParseException) throwable, (c, e) ->
-                          commandSender.sendMessage(ChatColor.RED + "Invalid Command Argument: "
-                                                            + ChatColor.GRAY + throwable.getCause()
-                                                                                        .getMessage())
-                     );
-                 } else {
-                     commandSender.sendMessage(throwable.getMessage());
-                     throwable.printStackTrace();
-                 }
-             }
-         }));
+                        if (throwable != null) {
+                            if (throwable instanceof InvalidSyntaxException) {
+                                this.manager.handleException(sender,
+                                                             InvalidSyntaxException.class,
+                                                             (InvalidSyntaxException) throwable, (c, e) ->
+                                                                     commandSender.sendMessage(
+                                                                             ChatColor.RED + "Invalid Command Syntax. "
+                                                                                     + "Correct command syntax is: "
+                                                                                     + ChatColor.GRAY + "/"
+                                                                                     + ((InvalidSyntaxException) throwable)
+                                                                                     .getCorrectSyntax())
+                                );
+                            } else if (throwable instanceof InvalidCommandSenderException) {
+                                this.manager.handleException(sender,
+                                                             InvalidCommandSenderException.class,
+                                                             (InvalidCommandSenderException) throwable, (c, e) ->
+                                                                     commandSender.sendMessage(
+                                                                             ChatColor.RED + throwable.getMessage())
+                                );
+                            } else if (throwable instanceof NoPermissionException) {
+                                this.manager.handleException(sender,
+                                                             NoPermissionException.class,
+                                                             (NoPermissionException) throwable, (c, e) ->
+                                                                     commandSender.sendMessage(MESSAGE_NO_PERMS)
+                                );
+                            } else if (throwable instanceof NoSuchCommandException) {
+                                this.manager.handleException(sender,
+                                                             NoSuchCommandException.class,
+                                                             (NoSuchCommandException) throwable, (c, e) ->
+                                                                     commandSender.sendMessage(MESSAGE_UNKNOWN_COMMAND)
+                                );
+                            } else if (throwable instanceof ArgumentParseException) {
+                                this.manager.handleException(sender,
+                                                             ArgumentParseException.class,
+                                                             (ArgumentParseException) throwable, (c, e) ->
+                                                                     commandSender.sendMessage(
+                                                                             ChatColor.RED + "Invalid Command Argument: "
+                                                                                     + ChatColor.GRAY + throwable.getCause()
+                                                                                                                 .getMessage())
+                                );
+                            } else {
+                                commandSender.sendMessage(throwable.getMessage());
+                                throwable.printStackTrace();
+                            }
+                        }
+                    }));
         return true;
     }
 

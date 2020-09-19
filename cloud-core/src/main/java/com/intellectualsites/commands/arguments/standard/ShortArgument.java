@@ -212,6 +212,24 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
             return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
         }
 
+        /**
+         * Get the max value
+         *
+         * @return Max value
+         */
+        public short getMax() {
+            return this.max;
+        }
+
+        /**
+         * Get the min value
+         *
+         * @return Min value
+         */
+        public short getMin() {
+            return this.min;
+        }
+
     }
 
 

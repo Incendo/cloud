@@ -72,6 +72,7 @@ public class PaperCommandManager<C>
             final PaperBrigadierListener<C> brigadierListener = new PaperBrigadierListener<>(this);
             Bukkit.getPluginManager().registerEvents(brigadierListener,
                                                      this.getOwningPlugin());
+            this.setSplitAliases(true);
             return brigadierListener;
         } catch (final Throwable e) {
             this.getOwningPlugin().getLogger().severe("Failed to register Brigadier listener");

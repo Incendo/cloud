@@ -214,6 +214,24 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
             return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
         }
 
+        /**
+         * Get the max value
+         *
+         * @return Max value
+         */
+        public byte getMax() {
+            return this.max;
+        }
+
+        /**
+         * Get the min value
+         *
+         * @return Min value
+         */
+        public byte getMin() {
+            return this.min;
+        }
+
     }
 
 

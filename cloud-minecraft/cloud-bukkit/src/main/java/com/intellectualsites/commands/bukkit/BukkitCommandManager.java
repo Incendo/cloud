@@ -50,6 +50,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
 
+    private boolean splitAliases = false;
+
     /**
      * Construct a new Bukkit command manager
      *
@@ -111,6 +113,14 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
     @Override
     public final boolean hasPermission(@Nonnull final C sender, @Nonnull final String permission) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
+    }
+
+    protected final void setSplitAliases(final boolean value) {
+        this.splitAliases = value;
+    }
+
+    protected final boolean getSplitAliases() {
+        return this.splitAliases;
     }
 
 }

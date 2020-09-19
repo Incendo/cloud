@@ -204,6 +204,24 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             return true;
         }
 
+        /**
+         * Get the max value
+         *
+         * @return Max value
+         */
+        public double getMax() {
+            return this.max;
+        }
+
+        /**
+         * Get the min value
+         *
+         * @return Min value
+         */
+        public double getMin() {
+            return this.min;
+        }
+
     }
 
 

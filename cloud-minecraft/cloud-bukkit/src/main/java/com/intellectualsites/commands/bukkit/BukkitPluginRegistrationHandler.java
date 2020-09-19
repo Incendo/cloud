@@ -25,6 +25,7 @@ package com.intellectualsites.commands.bukkit;
 
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -34,7 +35,9 @@ import org.bukkit.help.GenericCommandHelpTopic;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
@@ -74,14 +77,37 @@ final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHan
         } else {
             label = commandArgument.getName();
         }
+
+        @SuppressWarnings("unchecked") final List<String> aliases = ((StaticArgument<C>) commandArgument).getAlternativeAliases();
+
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
+                commandArgument.getName(),
+                (this.bukkitCommandManager.getSplitAliases() ? Collections.<String>emptyList() : aliases),
                 (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
                 this.bukkitCommandManager);
         this.registeredCommands.put(commandArgument, bukkitCommand);
         this.commandMap.register(commandArgument.getName(), this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
                                  bukkitCommand);
+
+        if (this.bukkitCommandManager.getSplitAliases()) {
+            for (final String alias : aliases) {
+                if (!this.bukkitCommands.containsKey(alias)) {
+                    @SuppressWarnings("unchecked") final BukkitCommand<C> aliasCommand = new BukkitCommand<>(
+                            alias,
+                            Collections.emptyList(),
+                            (Command<C>) command,
+                            (CommandArgument<C, ?>) commandArgument,
+                            this.bukkitCommandManager);
+                    this.commandMap.register(alias, this.bukkitCommandManager.getOwningPlugin()
+                                                                             .getName().toLowerCase(),
+                                             bukkitCommand);
+                }
+            }
+        }
+
         return true;
     }
+
 
 }

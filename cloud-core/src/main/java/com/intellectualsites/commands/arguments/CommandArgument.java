@@ -165,7 +165,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
     @Nonnull
     @Override
     public final String toString() {
-        return String.format("CommandArgument{name=%s}", this.name);
+        return String.format("%s{name=%s}", this.getClass().getSimpleName(), this.name);
     }
 
     /**

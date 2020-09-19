@@ -203,6 +203,25 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         public boolean isContextFree() {
             return true;
         }
+
+        /**
+         * Get the max value
+         *
+         * @return Max value
+         */
+        public float getMax() {
+            return this.max;
+        }
+
+        /**
+         * Get the min value
+         *
+         * @return Min value
+         */
+        public float getMin() {
+            return this.min;
+        }
+
     }
 
 

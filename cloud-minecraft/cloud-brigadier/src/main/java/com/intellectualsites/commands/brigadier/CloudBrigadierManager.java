@@ -30,6 +30,7 @@ import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.StaticArgument;
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.arguments.standard.BooleanArgument;
 import com.intellectualsites.commands.arguments.standard.ByteArgument;
 import com.intellectualsites.commands.arguments.standard.DoubleArgument;
@@ -77,7 +78,7 @@ import java.util.function.Supplier;
  */
 public final class CloudBrigadierManager<C, S> {
 
-    private final Map<Class<?>, Function<? extends CommandArgument<C, ?>,
+    private final Map<Class<?>, Function<? extends ArgumentParser<C, ?>,
             ? extends ArgumentType<?>>> mappers;
     private final Map<Class<?>, Supplier<ArgumentType<?>>> defaultArgumentTypeSuppliers;
     private final Supplier<CommandContext<C>> dummyContextProvider;
@@ -101,7 +102,7 @@ public final class CloudBrigadierManager<C, S> {
 
     private void registerInternalMappings() {
         /* Map byte, short and int to IntegerArgumentType */
-        this.registerMapping(new TypeToken<ByteArgument<C>>() {
+        this.registerMapping(new TypeToken<ByteArgument.ByteParser<C>>() {
         }, argument -> {
             final boolean hasMin = argument.getMin() != Byte.MIN_VALUE;
             final boolean hasMax = argument.getMax() != Byte.MAX_VALUE;
@@ -113,7 +114,7 @@ public final class CloudBrigadierManager<C, S> {
                 return IntegerArgumentType.integer();
             }
         });
-        this.registerMapping(new TypeToken<ShortArgument<C>>() {
+        this.registerMapping(new TypeToken<ShortArgument.ShortParser<C>>() {
         }, argument -> {
             final boolean hasMin = argument.getMin() != Short.MIN_VALUE;
             final boolean hasMax = argument.getMax() != Short.MAX_VALUE;
@@ -125,7 +126,7 @@ public final class CloudBrigadierManager<C, S> {
                 return IntegerArgumentType.integer();
             }
         });
-        this.registerMapping(new TypeToken<IntegerArgument<C>>() {
+        this.registerMapping(new TypeToken<IntegerArgument.IntegerParser<C>>() {
         }, argument -> {
             final boolean hasMin = argument.getMin() != Integer.MIN_VALUE;
             final boolean hasMax = argument.getMax() != Integer.MAX_VALUE;
@@ -138,7 +139,7 @@ public final class CloudBrigadierManager<C, S> {
             }
         });
         /* Map float to FloatArgumentType */
-        this.registerMapping(new TypeToken<FloatArgument<C>>() {
+        this.registerMapping(new TypeToken<FloatArgument.FloatParser<C>>() {
         }, argument -> {
             final boolean hasMin = argument.getMin() != Float.MIN_VALUE;
             final boolean hasMax = argument.getMax() != Float.MAX_VALUE;
@@ -151,7 +152,7 @@ public final class CloudBrigadierManager<C, S> {
             }
         });
         /* Map double to DoubleArgumentType */
-        this.registerMapping(new TypeToken<DoubleArgument<C>>() {
+        this.registerMapping(new TypeToken<DoubleArgument.DoubleParser<C>>() {
         }, argument -> {
             final boolean hasMin = argument.getMin() != Double.MIN_VALUE;
             final boolean hasMax = argument.getMax() != Double.MAX_VALUE;
@@ -164,10 +165,10 @@ public final class CloudBrigadierManager<C, S> {
             }
         });
         /* Map boolean to BoolArgumentType */
-        this.registerMapping(new TypeToken<BooleanArgument<C>>() {
+        this.registerMapping(new TypeToken<BooleanArgument.BooleanParser<C>>() {
         }, argument -> BoolArgumentType.bool());
         /* Map String properly to StringArgumentType */
-        this.registerMapping(new TypeToken<StringArgument<C>>() {
+        this.registerMapping(new TypeToken<StringArgument.StringParser<C>>() {
         }, argument -> {
             switch (argument.getStringMode()) {
                 case QUOTED:
@@ -189,7 +190,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param <K>          cloud argument type
      * @param <O>          Brigadier argument type value
      */
-    public <T, K extends CommandArgument<C, T>, O> void registerMapping(@Nonnull final TypeToken<K> argumentType,
+    public <T, K extends ArgumentParser<C, T>, O> void registerMapping(@Nonnull final TypeToken<K> argumentType,
                                                                         @Nonnull final Function<? extends K,
                                                                                 ? extends ArgumentType<O>> mapper) {
         this.mappers.put(argumentType.getRawType(), mapper);
@@ -206,33 +207,25 @@ public final class CloudBrigadierManager<C, S> {
         this.defaultArgumentTypeSuppliers.put(clazz, supplier);
     }
 
-    /**
-     * Get a Brigadier {@link ArgumentType} from a cloud {@link CommandArgument}
-     *
-     * @param argumentType cloud argument type
-     * @param argument     cloud argument
-     * @param <T>          cloud argument value type (generic)
-     * @param <K>          cloud argument type (generic)
-     * @return Brigadier argument type
-     */
     @Nullable
     @SuppressWarnings("all")
-    private <T, K extends CommandArgument<?, ?>> Pair<ArgumentType<?>, Boolean> getArgument(
+    private <T, K extends ArgumentParser<?, ?>> Pair<ArgumentType<?>, Boolean> getArgument(
+            @Nonnull final Class<?> valueType,
             @Nonnull final TypeToken<T> argumentType,
             @Nonnull final K argument) {
-        final CommandArgument<C, ?> commandArgument = (CommandArgument<C, ?>) argument;
+        final ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
         Function function = this.mappers.get(argumentType.getRawType());
         if (function == null) {
-            return this.createDefaultMapper(commandArgument);
+            return this.createDefaultMapper(valueType, commandArgument);
         }
-        return new Pair<>((ArgumentType<?>) function.apply(commandArgument), !argument.getValueType().equals(String.class));
+        return new Pair<>((ArgumentType<?>) function.apply(commandArgument), !(argument instanceof StringArgument.StringParser));
     }
 
     @Nonnull
-    private <T, K extends CommandArgument<C, T>> Pair<ArgumentType<?>, Boolean> createDefaultMapper(
-            @Nonnull final CommandArgument<C, T>
-                    argument) {
-        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers.get(argument.getValueType());
+    private <T, K extends ArgumentParser<C, T>> Pair<ArgumentType<?>, Boolean> createDefaultMapper(
+            @Nonnull final Class<?> clazz,
+            @Nonnull final ArgumentParser<C, T> argument) {
+        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers.get(clazz);
         if (argumentTypeSupplier != null) {
             return new Pair<>(argumentTypeSupplier.get(), true);
         }
@@ -306,8 +299,9 @@ public final class CloudBrigadierManager<C, S> {
                     .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")))
                     .executes(executor);
         } else {
-            final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(TypeToken.of(root.getValue().getClass()),
-                                                                         root.getValue());
+            final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(root.getValue().getValueType(),
+                                                                         TypeToken.of(root.getValue().getParser().getClass()),
+                                                                         root.getValue().getParser());
             final SuggestionProvider<S> provider = pair.getRight() ? null : suggestionProvider;
             argumentBuilder = RequiredArgumentBuilder
                     .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getLeft())
