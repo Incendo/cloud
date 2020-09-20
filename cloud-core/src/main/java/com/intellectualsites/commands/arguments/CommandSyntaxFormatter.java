@@ -26,6 +26,7 @@ package com.intellectualsites.commands.arguments;
 import com.intellectualsites.commands.CommandTree;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -45,6 +46,6 @@ public interface CommandSyntaxFormatter<C> {
      */
     @Nonnull
     String apply(@Nonnull List<CommandArgument<C, ?>> commandArguments,
-                 @Nonnull CommandTree.Node<CommandArgument<C, ?>> node);
+                 @Nullable CommandTree.Node<CommandArgument<C, ?>> node);
 
 }

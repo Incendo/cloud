@@ -23,6 +23,7 @@
 //
 package com.intellectualsites.commands;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.intellectualsites.commands.arguments.CommandArgument;
@@ -70,6 +71,7 @@ public abstract class CommandManager<C> {
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = Maps.newHashMap();
+    private final Collection<Command<C>> commands = Lists.newLinkedList();
 
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
@@ -166,6 +168,7 @@ public abstract class CommandManager<C> {
      */
     public CommandManager<C> command(@Nonnull final Command<C> command) {
         this.commandTree.insertCommand(command);
+        this.commands.add(command);
         return this;
     }
 
@@ -196,6 +199,10 @@ public abstract class CommandManager<C> {
     @Nonnull
     protected CommandRegistrationHandler getCommandRegistrationHandler() {
         return this.commandRegistrationHandler;
+    }
+
+    protected final void setCommandRegistrationHandler(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+        this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
     /**
@@ -389,8 +396,24 @@ public abstract class CommandManager<C> {
         Optional.ofNullable(this.getExceptionHandler(clazz)).orElse(defaultHandler).accept(sender, exception);
     }
 
-    protected final void setCommandRegistrationHandler(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
-        this.commandRegistrationHandler = commandRegistrationHandler;
+    /**
+     * Get all registered commands
+     *
+     * @return Unmodifiable view of all registered commands
+     */
+    @Nonnull
+    public final Collection<Command<C>> getCommands() {
+        return Collections.unmodifiableCollection(this.commands);
+    }
+
+    /**
+     * Get a command help handler instance
+     *
+     * @return Command help handler
+     */
+    @Nonnull
+    public final CommandHelpHandler<C> getCommandHelpHandler() {
+        return new CommandHelpHandler<>(this);
     }
 
 }

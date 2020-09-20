@@ -26,6 +26,7 @@ package com.intellectualsites.commands.arguments;
 import com.intellectualsites.commands.CommandTree;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
     @Nonnull
     @Override
     public final String apply(@Nonnull final List<CommandArgument<C, ?>> commandArguments,
-                              @Nonnull final CommandTree.Node<CommandArgument<C, ?>> node) {
+                              @Nullable final CommandTree.Node<CommandArgument<C, ?>> node) {
         final StringBuilder stringBuilder = new StringBuilder();
         final Iterator<CommandArgument<C, ?>> iterator = commandArguments.iterator();
         while (iterator.hasNext()) {
