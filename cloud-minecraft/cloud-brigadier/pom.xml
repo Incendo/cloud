@@ -36,7 +36,9 @@
         <version>1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
+
     <artifactId>cloud-brigadier</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
 
     <repositories>
         <repository>

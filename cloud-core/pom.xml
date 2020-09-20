@@ -35,6 +35,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <version>0.1.0-SNAPSHOT</version>
     <artifactId>cloud-core</artifactId>
 
     <dependencies>
