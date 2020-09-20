@@ -235,19 +235,21 @@ public final class CloudBrigadierManager<C, S> {
     /**
      * Create a new literal command node
      *
+     * @param label             Command label
      * @param cloudCommand      Cloud command instance
      * @param permissionChecker Permission checker
      * @param executor          Command executor
      * @return Literal command node
      */
-    public LiteralCommandNode<S> createLiteralCommandNode(@Nonnull final Command<C> cloudCommand,
+    public LiteralCommandNode<S> createLiteralCommandNode(@Nonnull final String label,
+                                                          @Nonnull final Command<C> cloudCommand,
                                                           @Nonnull final BiPredicate<S, String> permissionChecker,
                                                           @Nonnull final com.mojang.brigadier.Command<S> executor) {
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
                 .getCommandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
         final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(node.getValue(), context, builder);
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
-                .<S>literal(cloudCommand.getArguments().get(0).getName())
+                .<S>literal(label)
                 .requires(sender -> permissionChecker.test(sender, node.getNodeMeta().getOrDefault("permission", "")));
         literalArgumentBuilder.executes(executor);
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();

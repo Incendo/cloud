@@ -72,11 +72,11 @@ public abstract class CommandManager<C> {
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = Maps.newHashMap();
 
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
-    private final CommandRegistrationHandler commandRegistrationHandler;
     private final CommandTree<C> commandTree;
 
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
+    private CommandRegistrationHandler commandRegistrationHandler;
 
     /**
      * Create a new command manager instance
@@ -87,7 +87,7 @@ public abstract class CommandManager<C> {
     public CommandManager(
             @Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
-        this.commandTree = CommandTree.newTree(this, commandRegistrationHandler);
+        this.commandTree = CommandTree.newTree(this);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
         this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
@@ -386,6 +386,10 @@ public abstract class CommandManager<C> {
                                                             @Nonnull final E exception,
                                                             @Nonnull final BiConsumer<C, E> defaultHandler) {
         Optional.ofNullable(this.getExceptionHandler(clazz)).orElse(defaultHandler).accept(sender, exception);
+    }
+
+    protected final void setCommandRegistrationHandler(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+        this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
 }

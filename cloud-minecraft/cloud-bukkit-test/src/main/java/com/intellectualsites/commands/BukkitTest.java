@@ -37,7 +37,9 @@ import com.intellectualsites.commands.arguments.standard.EnumArgument;
 import com.intellectualsites.commands.arguments.standard.FloatArgument;
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
+import com.intellectualsites.commands.bukkit.BukkitCommandManager;
 import com.intellectualsites.commands.bukkit.BukkitCommandMetaBuilder;
+import com.intellectualsites.commands.bukkit.CloudBukkitCapabilities;
 import com.intellectualsites.commands.bukkit.parsers.WorldArgument;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
@@ -55,6 +57,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -64,10 +67,12 @@ public final class BukkitTest extends JavaPlugin {
     private static final int PERC_MIN = 0;
     private static final int PERC_MAX = 100;
 
+    private BukkitCommandManager<CommandSender> mgr;
+
     @Override
     public void onEnable() {
         try {
-            final CommandManager<CommandSender> mgr = new PaperCommandManager<>(
+            mgr = new PaperCommandManager<>(
                     this,
                     CommandExecutionCoordinator
                             .simpleCoordinator(),
@@ -75,7 +80,11 @@ public final class BukkitTest extends JavaPlugin {
                     Function.identity()
             );
 
-            ((PaperCommandManager<CommandSender>) mgr).registerBrigadier();
+            try {
+                ((PaperCommandManager<CommandSender>) mgr).registerBrigadier();
+            } catch (final Exception e) {
+                getLogger().warning("Failed to initialize Brigadier support: " + e.getMessage());
+            }
 
             final AnnotationParser<CommandSender> annotationParser
                     = new AnnotationParser<>(mgr, CommandSender.class, p ->
@@ -179,6 +188,17 @@ public final class BukkitTest extends JavaPlugin {
                                   @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
                                   @Argument("number") @Range(min = "10", max = "100") final int number) {
         player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
+    }
+
+    @CommandMethod("cloud help")
+    private void doHelp() {
+        final Set<CloudBukkitCapabilities> capabilities = this.mgr.queryCapabilities();
+        Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Capabilities");
+        for (final CloudBukkitCapabilities capability : capabilities) {
+            Bukkit.broadcastMessage(ChatColor.DARK_GRAY + "- " + ChatColor.AQUA + capability);
+        }
+        Bukkit.broadcastMessage(ChatColor.GRAY + "Using Registration Manager: "
+                                        + this.mgr.getCommandRegistrationHandler().getClass().getSimpleName());
     }
 
     @Nonnull

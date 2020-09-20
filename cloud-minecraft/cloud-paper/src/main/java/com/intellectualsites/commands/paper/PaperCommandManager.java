@@ -25,13 +25,13 @@ package com.intellectualsites.commands.paper;
 
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.bukkit.BukkitCommandManager;
+import com.intellectualsites.commands.bukkit.CloudBukkitCapabilities;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.function.Function;
 
 /**
@@ -39,8 +39,7 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public class PaperCommandManager<C>
-        extends BukkitCommandManager<C> {
+public class PaperCommandManager<C> extends BukkitCommandManager<C> {
 
     /**
      * Construct a new Paper command manager
@@ -58,27 +57,29 @@ public class PaperCommandManager<C>
                                @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper) throws
             Exception {
         super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
+
     }
 
     /**
-     * Attempt to register the Brigadier mapper, and return it.
+     * Register Brigadier mappings using the native paper events
      *
-     * @return {@link PaperBrigadierListener} instance, if it could be created. If it cannot
-     * be created {@code null} is returned
+     * @throws BrigadierFailureException Exception thrown if the mappings cannot be registered
      */
-    @Nullable
-    public PaperBrigadierListener<C> registerBrigadier() {
-        try {
-            final PaperBrigadierListener<C> brigadierListener = new PaperBrigadierListener<>(this);
-            Bukkit.getPluginManager().registerEvents(brigadierListener,
-                                                     this.getOwningPlugin());
-            this.setSplitAliases(true);
-            return brigadierListener;
-        } catch (final Throwable e) {
-            this.getOwningPlugin().getLogger().severe("Failed to register Brigadier listener");
-            e.printStackTrace();
+    @Override
+    public void registerBrigadier() throws BrigadierFailureException {
+        this.checkBrigadierCompatibility();
+        if (!this.queryCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
+            super.registerBrigadier();
+        } else {
+            try {
+                final PaperBrigadierListener<C> brigadierListener = new PaperBrigadierListener<>(this);
+                Bukkit.getPluginManager().registerEvents(brigadierListener,
+                                                         this.getOwningPlugin());
+                this.setSplitAliases(true);
+            } catch (final Throwable e) {
+                throw new BrigadierFailureException(BrigadierFailureReason.PAPER_BRIGADIER_INITIALIZATION_FAILURE, e);
+            }
         }
-        return null;
     }
 
 }

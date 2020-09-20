@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
+class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
 
     private final Map<CommandArgument<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
 
@@ -89,6 +89,7 @@ final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHan
         this.registeredCommands.put(commandArgument, bukkitCommand);
         this.commandMap.register(commandArgument.getName(), this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
                                  bukkitCommand);
+        this.registerExternal(commandArgument.getName(), command, bukkitCommand);
 
         if (this.bukkitCommandManager.getSplitAliases()) {
             for (final String alias : aliases) {
@@ -102,6 +103,7 @@ final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHan
                     this.commandMap.register(alias, this.bukkitCommandManager.getOwningPlugin()
                                                                              .getName().toLowerCase(),
                                              bukkitCommand);
+                    this.registerExternal(alias, command, aliasCommand);
                 }
             }
         }
@@ -109,5 +111,9 @@ final class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHan
         return true;
     }
 
+    protected void registerExternal(@Nonnull final String label,
+                                    @Nonnull final Command<?> command,
+                                    @Nonnull final BukkitCommand<C> bukkitCommand) {
+    }
 
 }

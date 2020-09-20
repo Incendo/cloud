@@ -74,7 +74,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         }
         final List<String> aliases = ((StaticArgument<C>) argument).getAlternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
-                this.brigadierManager.createLiteralCommandNode((Command<C>) command,
+                this.brigadierManager.createLiteralCommandNode(command.getArguments().get(0).getName(), (Command<C>) command,
                (c, p) -> this.manager.hasPermission(
                        this.manager.getCommandSenderMapper()
                                    .apply(c), p),

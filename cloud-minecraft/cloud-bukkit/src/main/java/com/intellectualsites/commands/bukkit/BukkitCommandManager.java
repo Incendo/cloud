@@ -29,13 +29,18 @@ import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.bukkit.parsers.MaterialArgument;
 import com.intellectualsites.commands.bukkit.parsers.WorldArgument;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Command manager for the Bukkit platform, using {@link BukkitCommandSender} as the
@@ -45,7 +50,13 @@ import java.util.function.Function;
  */
 public class BukkitCommandManager<C> extends CommandManager<C> {
 
+    private static final int VERSION_RADIX             = 10;
+    private static final int BRIGADIER_MINIMAL_VERSION = 13;
+    private static final int PAPER_BRIGADIER_VERSION   = 15;
+
     private final Plugin owningPlugin;
+    private final int minecraftVersion;
+    private final boolean paper;
 
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
@@ -77,6 +88,29 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.getParserRegistry().registerParserSupplier(TypeToken.of(World.class), params -> new WorldArgument.WorldParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.of(Material.class),
                                                         params -> new MaterialArgument.MaterialParser<>());
+
+        /* Try to determine the Minecraft version */
+        int version = -1;
+        try {
+            final Matcher matcher = Pattern.compile("\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?\\)")
+                                            .matcher(Bukkit.getVersion());
+            if (matcher.find()) {
+                version = Integer.parseInt(matcher.toMatchResult().group(2),
+                                           VERSION_RADIX);
+            }
+        } catch (final Exception e) {
+            this.owningPlugin.getLogger().severe("Failed to determine Minecraft version "
+                                                    + "for cloud Bukkit capability detection");
+        }
+        this.minecraftVersion = version;
+
+        boolean paper = false;
+        try {
+            Class.forName("com.destroystokyo.paper.PaperConfig");
+            paper = true;
+        } catch (final Exception ignored) {
+        }
+        this.paper = paper;
     }
 
     /**
@@ -121,6 +155,120 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
 
     protected final boolean getSplitAliases() {
         return this.splitAliases;
+    }
+
+    protected final void checkBrigadierCompatibility() throws BrigadierFailureException {
+        if (!this.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+            throw new BrigadierFailureException(BrigadierFailureReason.VERSION_TOO_LOW,
+                                                new IllegalArgumentException("Version: " + this.minecraftVersion));
+        }
+    }
+
+    /**
+     * Query for a specific capability
+     *
+     * @param capability Capability
+     * @return {@code true} if the manager has the given capability, else {@code false}
+     */
+    public final boolean queryCapability(@Nonnull final CloudBukkitCapabilities capability) {
+        return this.queryCapabilities().contains(capability);
+    }
+
+    /**
+     * Check for the platform capabilities
+     *
+     * @return A set containing all capabilities of the instance
+     */
+    public final Set<CloudBukkitCapabilities> queryCapabilities() {
+        if (this.paper) {
+            if (this.minecraftVersion >= BRIGADIER_MINIMAL_VERSION) {
+                if (this.minecraftVersion >= PAPER_BRIGADIER_VERSION) {
+                    return EnumSet.of(CloudBukkitCapabilities.NATIVE_BRIGADIER,
+                                      CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
+                                      CloudBukkitCapabilities.BRIGADIER);
+                } else {
+                    return EnumSet.of(CloudBukkitCapabilities.COMMODORE_BRIGADIER,
+                                      CloudBukkitCapabilities.BRIGADIER);
+                }
+            } else {
+                return EnumSet.of(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION);
+            }
+        } else {
+            if (this.minecraftVersion >= BRIGADIER_MINIMAL_VERSION) {
+                return EnumSet.of(CloudBukkitCapabilities.COMMODORE_BRIGADIER,
+                                  CloudBukkitCapabilities.BRIGADIER);
+            }
+        }
+        return EnumSet.noneOf(CloudBukkitCapabilities.class);
+    }
+
+    /**
+     * Attempt to register the Brigadier mapper, and return it.
+     *
+     * @throws BrigadierFailureException If Brigadier isn't
+     *         supported by the platform
+     */
+    public void registerBrigadier() throws BrigadierFailureException {
+        this.checkBrigadierCompatibility();
+        try {
+            final CloudCommodoreManager<C> cloudCommodoreManager = new CloudCommodoreManager<>(this);
+            cloudCommodoreManager.initialize(this);
+            this.setCommandRegistrationHandler(cloudCommodoreManager);
+        } catch (final Throwable e) {
+            throw new BrigadierFailureException(BrigadierFailureReason.COMMODORE_NOT_PRESENT, e);
+        }
+    }
+
+
+    /**
+     * Reasons to explain why Brigadier failed to initialize
+     */
+    public enum BrigadierFailureReason {
+        COMMODORE_NOT_PRESENT, VERSION_TOO_LOW, PAPER_BRIGADIER_INITIALIZATION_FAILURE
+    }
+
+
+    public static final class BrigadierFailureException extends IllegalStateException {
+
+        private final BrigadierFailureReason reason;
+
+        /**
+         * Initialize a new Brigadier failure exception
+         *
+         * @param reason Reason
+         */
+        public BrigadierFailureException(@Nonnull final BrigadierFailureReason reason) {
+            this.reason = reason;
+        }
+
+        /**
+         * Initialize a new Brigadier failure exception
+         *
+         * @param reason Reason
+         * @param cause  Cause
+         */
+        public BrigadierFailureException(@Nonnull final BrigadierFailureReason reason, @Nonnull final Throwable cause) {
+            super(cause);
+            this.reason = reason;
+        }
+
+        /**
+         * Get the reason for the exception
+         *
+         * @return Reason
+         */
+        @Nonnull
+        public BrigadierFailureReason getReason() {
+            return this.reason;
+        }
+
+        @Override
+        public String getMessage() {
+            return String.format("Could not initialize Brigadier mappings. Reason: %s (%s)",
+                                 this.reason.name().toLowerCase().replace("_", " "),
+                                 this.getCause() == null ? "" : this.getCause().getMessage());
+        }
+
     }
 
 }

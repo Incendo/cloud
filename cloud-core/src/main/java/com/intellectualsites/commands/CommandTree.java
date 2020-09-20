@@ -34,7 +34,6 @@ import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoCommandInLeafException;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
-import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -63,27 +62,21 @@ public final class CommandTree<C> {
 
     private final Node<CommandArgument<C, ?>> internalTree = new Node<>(null);
     private final CommandManager<C> commandManager;
-    private final CommandRegistrationHandler commandRegistrationHandler;
 
-    private CommandTree(@Nonnull final CommandManager<C> commandManager,
-                        @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+    private CommandTree(@Nonnull final CommandManager<C> commandManager) {
         this.commandManager = commandManager;
-        this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
     /**
      * Create a new command tree instance
      *
      * @param commandManager             Command manager
-     * @param commandRegistrationHandler Command registration handler
      * @param <C>                        Command sender type
      * @return New command tree
      */
     @Nonnull
-    public static <C> CommandTree<C> newTree(
-            @Nonnull final CommandManager<C> commandManager,
-            @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
-        return new CommandTree<>(commandManager, commandRegistrationHandler);
+    public static <C> CommandTree<C> newTree(@Nonnull final CommandManager<C> commandManager) {
+        return new CommandTree<>(commandManager);
     }
 
     /**
@@ -432,7 +425,7 @@ public final class CommandTree<C> {
                 throw new NoCommandInLeafException(leaf);
             } else {
                 final Command<C> owningCommand = leaf.getOwningCommand();
-                this.commandRegistrationHandler.registerCommand(owningCommand);
+                this.commandManager.getCommandRegistrationHandler().registerCommand(owningCommand);
             }
         });
 
