@@ -120,9 +120,6 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
 
     private static final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePlayer> {
 
-        private OfflinePlayerParser() {
-        }
-
         @Nonnull
         @Override
         public ArgumentParseResult<OfflinePlayer> parse(@Nonnull final CommandContext<C> commandContext,

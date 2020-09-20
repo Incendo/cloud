@@ -39,7 +39,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     private UUIDArgument(final boolean required,
                          @Nonnull final String name,
-                         final String defaultValue,
+                         @Nonnull final String defaultValue,
                          @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
         super(required, name, new UUIDParser<>(suggestionsProvider), defaultValue, UUID.class, suggestionsProvider);
     }
@@ -83,9 +83,9 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     /**
      * Create a new required command component with a default value
      *
-     * @param name       Component name
+     * @param name        Component name
      * @param defaultUUID Default uuid
-     * @param <C>        Command sender type
+     * @param <C>         Command sender type
      * @return Created component
      */
     @Nonnull
@@ -119,7 +119,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
         private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
 
-        public UUIDParser(@Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        UUIDParser(@Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
             this.suggestionsProvider = suggestionsProvider;
         }
 
