@@ -88,7 +88,7 @@ cloud is available from [IntellectualSites](https://intellectualsites.com)' mave
  <groupId>com.intellectualsites</groupId>  
  <artifactId>cloud-core</artifactId>
  <version>0.1.0-SNAPSHOT</version>
- </dependency>
+</dependency>
 ```  
   
 ### attributions, links &amp; acknowledgements  
