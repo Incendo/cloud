@@ -64,6 +64,9 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     @Override
     public final boolean hasPermission(@Nonnull final C sender,
                                        @Nonnull final String permission) {
+        if (permission.isEmpty()) {
+            return true;
+        }
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 

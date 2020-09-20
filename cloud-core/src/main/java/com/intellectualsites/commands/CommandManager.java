@@ -199,7 +199,8 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Check if the command sender has the required permission
+     * Check if the command sender has the required permission. If the permission node is
+     * empty, this should return {@code true}
      *
      * @param sender     Command sender
      * @param permission Permission node

@@ -79,14 +79,14 @@ public class CloudVelocityTest {
     }
 
     @CommandMethod("test <num> [str]")
-    private void testCommand(@Nonnull @Argument("str") final String string,
+    private void testCommand(@Nonnull @Argument(value = "str", defaultValue = "potato") final String string,
                              @Nonnull final CommandSource source,
                              @Argument("num") @Range(min = "10", max = "33") final int num) {
         source.sendMessage(TextComponent.builder()
             .append("You wrote: ", NamedTextColor.GOLD)
-            .append(string, NamedTextColor.LIGHT_PURPLE)
+            .append(string, NamedTextColor.RED)
             .append(" and ", NamedTextColor.GOLD)
-            .append(Integer.toString(num), NamedTextColor.LIGHT_PURPLE)
+            .append(Integer.toString(num), NamedTextColor.RED)
             .append("!", NamedTextColor.GOLD)
         );
     }

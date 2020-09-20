@@ -123,14 +123,6 @@ public final class BukkitTest extends JavaPlugin {
                                ));
                            })
                            .build())
-               .command(mgr.commandBuilder("test")
-                           .literal("one")
-                           .handler(c -> c.getSender().sendMessage("One!"))
-                           .build())
-               .command(mgr.commandBuilder("test")
-                           .literal("two")
-                           .handler(c -> c.getSender().sendMessage("Two!"))
-                           .build())
                .command(mgr.commandBuilder("uuidtest")
                            .argument(UUID.class, "uuid", builder -> builder
                                    .asRequired()
