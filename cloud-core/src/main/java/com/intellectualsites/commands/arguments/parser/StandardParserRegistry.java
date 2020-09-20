@@ -65,6 +65,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             .put(boolean.class, Boolean.class)
             .build();
 
+    private final Map<String, Function<ParserParameters, ArgumentParser<C, ?>>> namedParsers = new HashMap<>();
     private final Map<TypeToken<?>, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new HashMap<>();
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
             annotationMappers = new HashMap<>();
@@ -107,6 +108,12 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     public <T> void registerParserSupplier(@Nonnull final TypeToken<T> type,
                                            @Nonnull final Function<ParserParameters, ArgumentParser<C, ?>> supplier) {
         this.parserSuppliers.put(type, supplier);
+    }
+
+    @Override
+    public void registerNamedParserSupplier(@Nonnull final String name,
+                                            @Nonnull final Function<ParserParameters, ArgumentParser<C, ?>> supplier) {
+        this.namedParsers.put(name, supplier);
     }
 
     @Override
@@ -153,6 +160,19 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 // noinspection all
                 return Optional.of(enumArgument);
             }
+            return Optional.empty();
+        }
+        @SuppressWarnings("unchecked") final ArgumentParser<C, T> parser = (ArgumentParser<C, T>) producer.apply(
+                parserParameters);
+        return Optional.of(parser);
+    }
+
+    @Nonnull
+    @Override
+    public <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull final String name,
+                                                           @Nonnull final ParserParameters parserParameters) {
+        final Function<ParserParameters, ArgumentParser<C, ?>> producer = this.namedParsers.get(name);
+        if (producer == null) {
             return Optional.empty();
         }
         @SuppressWarnings("unchecked") final ArgumentParser<C, T> parser = (ArgumentParser<C, T>) producer.apply(

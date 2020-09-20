@@ -53,6 +53,16 @@ public interface ParserRegistry<C> {
                                     @Nonnull Function<ParserParameters, ArgumentParser<C, ?>> supplier);
 
     /**
+     * Register a named parser supplier
+     *
+     * @param name     Parser name
+     * @param supplier The function that generates the parser. The map supplied my contain parameters used
+     *                 to configure the parser, many of which are documented in {@link StandardParameters}
+     */
+    void registerNamedParserSupplier(@Nonnull String name,
+                                     @Nonnull Function<ParserParameters, ArgumentParser<C, ?>> supplier);
+
+    /**
      * Register a mapper that maps annotation instances to a map of parameter-object pairs
      *
      * @param annotation Annotation class
@@ -86,6 +96,19 @@ public interface ParserRegistry<C> {
      */
     @Nonnull
     <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull TypeToken<T> type,
+                                                    @Nonnull ParserParameters parserParameters);
+
+    /**
+     * Attempt to create a {@link ArgumentParser} for a specified type, using
+     * an instance of {@link ParserParameter} to configure the parser settings
+     *
+     * @param name             Parser
+     * @param parserParameters Parser parameters
+     * @param <T>              Generic type
+     * @return Parser, if one can be created
+     */
+    @Nonnull
+    <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull String name,
                                                     @Nonnull ParserParameters parserParameters);
 
 }

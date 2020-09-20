@@ -261,14 +261,28 @@ public final class AnnotationParser<C> {
         final TypeToken<?> token = TypeToken.of(parameter.getParameterizedType());
         final ParserParameters parameters = this.manager.getParserRegistry()
                                                         .parseAnnotations(token, annotations);
-        final ArgumentParser<C, ?> parser = this.manager.getParserRegistry()
-                                                        .createParser(token, parameters)
-                                                        .orElseThrow(() -> new IllegalArgumentException(
-                                                                String.format("Parameter '%s' in method '%s' "
-                                                                                      + "has parser '%s' but no parser exists "
-                                                                                      + "for that type",
-                                                                              parameter.getName(), method.getName(),
-                                                                              token.toString())));
+
+        final ArgumentParser<C, ?> parser;
+        if (argumentPair.getArgument().parserName().isEmpty()) {
+            parser = this.manager.getParserRegistry()
+                                 .createParser(token, parameters)
+                                 .orElseThrow(() -> new IllegalArgumentException(
+                                         String.format("Parameter '%s' in method '%s' "
+                                                               + "has parser '%s' but no parser exists "
+                                                               + "for that type",
+                                                       parameter.getName(), method.getName(),
+                                                       token.toString())));
+        } else {
+            parser = this.manager.getParserRegistry()
+                                 .createParser(argumentPair.getArgument().parserName(), parameters)
+                                 .orElseThrow(() -> new IllegalArgumentException(
+                                         String.format("Parameter '%s' in method '%s' "
+                                                               + "has parser '%s' but no parser exists "
+                                                               + "for that type",
+                                                       parameter.getName(), method.getName(),
+                                                       token.toString())));
+        }
+
         if (syntaxFragment == null || syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
             throw new IllegalArgumentException(String.format(
                     "Invalid command argument '%s' in method '%s': "

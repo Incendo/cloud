@@ -26,6 +26,7 @@ package com.intellectualsites.commands.annotations;
 import com.intellectualsites.commands.Command;
 import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.annotations.specifier.Range;
+import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.CompletionException;
 
 class AnnotationParserTest {
@@ -44,6 +46,8 @@ class AnnotationParserTest {
     static void setup() {
         manager = new TestCommandManager();
         annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
+        manager.getParserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
+                StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList("potato")));
     }
 
     @Test
@@ -59,7 +63,8 @@ class AnnotationParserTest {
     @CommandMethod("test|t <int> [string]")
     public void testCommand(@Nonnull final TestCommandSender sender,
                             @Argument("int") @Range(max = "100") final int argument,
-                            @Nonnull @Argument(value = "string", defaultValue = "potato") final String string) {
+                            @Nonnull @Argument(value = "string", defaultValue = "potato", parserName = "potato")
+                                final String string) {
         System.out.printf("Received int: %d and string '%s'\n", argument, string);
     }
 
