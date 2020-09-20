@@ -37,6 +37,7 @@ import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
 final class BukkitCommand<C> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
@@ -76,6 +77,10 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                     builder.toString())
                     .whenComplete(((commandResult, throwable) -> {
                         if (throwable != null) {
+                            if (throwable instanceof CompletionException) {
+                                throwable = throwable.getCause();
+                            }
+                            final Throwable finalThrowable = throwable;
                             if (throwable instanceof InvalidSyntaxException) {
                                 this.manager.handleException(sender,
                                                              InvalidSyntaxException.class,
@@ -84,7 +89,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                                                              ChatColor.RED + "Invalid Command Syntax. "
                                                                                      + "Correct command syntax is: "
                                                                                      + ChatColor.GRAY + "/"
-                                                                                     + ((InvalidSyntaxException) throwable)
+                                                                                     + ((InvalidSyntaxException) finalThrowable)
                                                                                      .getCorrectSyntax())
                                 );
                             } else if (throwable instanceof InvalidCommandSenderException) {
@@ -92,7 +97,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                                              InvalidCommandSenderException.class,
                                                              (InvalidCommandSenderException) throwable, (c, e) ->
                                                                      commandSender.sendMessage(
-                                                                             ChatColor.RED + throwable.getMessage())
+                                                                             ChatColor.RED + finalThrowable.getMessage())
                                 );
                             } else if (throwable instanceof NoPermissionException) {
                                 this.manager.handleException(sender,
@@ -112,7 +117,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                                              (ArgumentParseException) throwable, (c, e) ->
                                                                      commandSender.sendMessage(
                                                                              ChatColor.RED + "Invalid Command Argument: "
-                                                                                     + ChatColor.GRAY + throwable.getCause()
+                                                                                     + ChatColor.GRAY + finalThrowable.getCause()
                                                                                                                  .getMessage())
                                 );
                             } else {

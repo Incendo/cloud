@@ -35,10 +35,11 @@ public interface CommandContextFactory<C> {
     /**
      * Create a new command context
      *
+     * @param suggestions Whether or not the sender is requesting suggestions
      * @param sender Command sender
      * @return Command context
      */
     @Nonnull
-    CommandContext<C> create(@Nonnull C sender);
+    CommandContext<C> create(boolean suggestions, @Nonnull C sender);
 
 }

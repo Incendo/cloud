@@ -82,4 +82,12 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         }
     }
 
+    /**
+     * Register asynchronous completions. This requires all argument parsers to be thread safe, and it
+     * is up to the caller to guarantee that such is the case
+     */
+    public void registerAsynchronousCompletions() {
+        Bukkit.getServer().getPluginManager().registerEvents(new AsyncCommandSuggestionsListener<>(this), this.getOwningPlugin());
+    }
+
 }

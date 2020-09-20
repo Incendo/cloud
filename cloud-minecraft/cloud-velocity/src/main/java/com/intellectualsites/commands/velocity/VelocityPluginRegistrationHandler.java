@@ -44,6 +44,7 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionException;
 
 final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationHandler {
 
@@ -84,6 +85,10 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                    final C sender = this.manager.getCommandSenderMapper().apply(source);
                    this.manager.executeCommand(sender, input).whenComplete((result, throwable) -> {
                        if (throwable != null) {
+                           if (throwable instanceof CompletionException) {
+                               throwable = throwable.getCause();
+                           }
+                           final Throwable finalThrowable = throwable;
                            if (throwable instanceof InvalidSyntaxException) {
                                this.manager.handleException(sender,
                                                             InvalidSyntaxException.class,
@@ -96,7 +101,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                                this.manager.handleException(sender,
                                                             InvalidCommandSenderException.class,
                                                             (InvalidCommandSenderException) throwable, (c, e) ->
-                                   source.sendMessage(TextComponent.of(throwable.getMessage()).color(NamedTextColor.RED))
+                                   source.sendMessage(TextComponent.of(finalThrowable.getMessage()).color(NamedTextColor.RED))
                                );
                            } else if (throwable instanceof NoPermissionException) {
                                this.manager.handleException(sender,
@@ -114,8 +119,10 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                                this.manager.handleException(sender,
                                                             ArgumentParseException.class,
                                                             (ArgumentParseException) throwable, (c, e) ->
-                                   source.sendMessage(TextComponent.builder("Invalid Command Argument: ", NamedTextColor.RED)
-                                                                   .append(throwable.getCause().getMessage(), NamedTextColor.GRAY)
+                                   source.sendMessage(TextComponent.builder("Invalid Command Argument: ",
+                                                                            NamedTextColor.RED)
+                                                                   .append(finalThrowable.getCause().getMessage(),
+                                                                           NamedTextColor.GRAY)
                                                                    .build())
                                );
                            } else {

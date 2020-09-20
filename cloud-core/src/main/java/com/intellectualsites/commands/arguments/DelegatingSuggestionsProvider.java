@@ -21,23 +21,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.context;
+package com.intellectualsites.commands.arguments;
+
+import com.intellectualsites.commands.arguments.parser.ArgumentParser;
+import com.intellectualsites.commands.context.CommandContext;
 
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.function.BiFunction;
 
-public final class StandardCommandContextFactory<C> implements CommandContextFactory<C> {
+final class DelegatingSuggestionsProvider<C> implements BiFunction<CommandContext<C>, String, List<String>> {
 
-    /**
-     * Construct a new command context
-     *
-     * @param suggestions Whether or not the sender is requesting suggestions
-     * @param sender      Command sender
-     * @return Created context
-     */
-    @Nonnull
+    private final String argumentName;
+    private final ArgumentParser<C, ?> parser;
+
+    DelegatingSuggestionsProvider(@Nonnull final String argumentName, @Nonnull final ArgumentParser<C, ?> parser) {
+        this.argumentName = argumentName;
+        this.parser = parser;
+    }
+
     @Override
-    public CommandContext<C> create(final boolean suggestions, @Nonnull final C sender) {
-        return new CommandContext<>(suggestions, sender);
+    public List<String> apply(final CommandContext<C> context, final String s) {
+        return this.parser.suggestions(context, s);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DelegatingSuggestionsProvider{name='%s',parser='%s'}", this.argumentName,
+                             this.parser.getClass().getCanonicalName());
     }
 
 }

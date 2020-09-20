@@ -37,6 +37,7 @@ public final class CommandContext<C> {
 
     private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;
+    private final boolean suggestions;
 
     /**
      * Create a new command context instance
@@ -44,7 +45,18 @@ public final class CommandContext<C> {
      * @param commandSender Sender of the command
      */
     public CommandContext(@Nonnull final C commandSender) {
+        this(false, commandSender);
+    }
+
+    /**
+     * Create a new command context instance
+     *
+     * @param suggestions   Whether or not the context is created for command suggestions
+     * @param commandSender Sender of the command
+     */
+    public CommandContext(final boolean suggestions, @Nonnull final C commandSender) {
         this.commandSender = commandSender;
+        this.suggestions = suggestions;
     }
 
     /**
@@ -55,6 +67,15 @@ public final class CommandContext<C> {
     @Nonnull
     public C getSender() {
         return this.commandSender;
+    }
+
+    /**
+     * Check if this context was created for tab completion purposes
+     *
+     * @return {@code true} if this context is requesting suggestions, else {@code false}
+     */
+    public boolean isSuggestions() {
+        return this.suggestions;
     }
 
     /**

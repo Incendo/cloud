@@ -37,6 +37,7 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
 import javax.annotation.Nonnull;
+import java.util.concurrent.CompletionException;
 
 public final class BungeeCommand<C> extends Command implements TabExecutor {
 
@@ -73,6 +74,10 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                                     builder.toString())
             .whenComplete(((commandResult, throwable) -> {
                              if (throwable != null) {
+                                 if (throwable instanceof CompletionException) {
+                                     throwable = throwable.getCause();
+                                 }
+                                 final Throwable finalThrowable = throwable;
                                  if (throwable instanceof InvalidSyntaxException) {
                                      this.manager.handleException(sender,
                                                                   InvalidSyntaxException.class,
@@ -82,16 +87,17 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                                                           .color(ChatColor.RED)
                                                           .append("/")
                                                           .color(ChatColor.GRAY)
-                                                          .append(((InvalidSyntaxException) throwable).getCorrectSyntax())
+                                                          .append(((InvalidSyntaxException) finalThrowable).getCorrectSyntax())
                                                           .color(ChatColor.GRAY)
                                                           .create()
                                           )
                                      );
                                  } else if (throwable instanceof InvalidCommandSenderException) {
+                                     final Throwable finalThrowable1 = throwable;
                                      this.manager.handleException(sender,
                                                                   InvalidCommandSenderException.class,
                                                                   (InvalidCommandSenderException) throwable, (c, e) ->
-                                          commandSender.sendMessage(new ComponentBuilder(throwable.getMessage())
+                                          commandSender.sendMessage(new ComponentBuilder(finalThrowable1.getMessage())
                                                                             .color(ChatColor.RED)
                                                                             .create())
                                      );
@@ -117,7 +123,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                                                                   (ArgumentParseException) throwable, (c, e) ->
                                           commandSender.sendMessage(new ComponentBuilder("Invalid Command Argument: ")
                                                                             .color(ChatColor.GRAY)
-                                                                            .append(throwable.getCause().getMessage())
+                                                                            .append(finalThrowable.getCause().getMessage())
                                                                             .create())
                                      );
                                  } else {

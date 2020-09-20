@@ -73,6 +73,9 @@ public class CommandSuggestionsTest {
         final String input2 = "test ";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
         Assertions.assertEquals(Arrays.asList("alt", "comb", "one", "two", "var"), suggestions2);
+        final String input3 = "test a";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Collections.singletonList("alt"), suggestions3);
     }
 
     @Test
@@ -82,7 +85,7 @@ public class CommandSuggestionsTest {
         Assertions.assertTrue(suggestions.isEmpty());
         final String input2 = "test var one";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertTrue(suggestions2.isEmpty());
+        Assertions.assertEquals(Collections.emptyList(), suggestions2);
         final String input3 = "test var one f";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.singletonList("foo"), suggestions3);

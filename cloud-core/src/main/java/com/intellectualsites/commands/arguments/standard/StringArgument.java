@@ -215,13 +215,20 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             }
 
             if (this.stringMode == StringMode.SINGLE) {
+                if (commandContext.isSuggestions()) {
+                    final List<String> suggestions = this.suggestionsProvider.apply(commandContext, inputQueue.peek());
+                    if (!suggestions.isEmpty() && !suggestions.contains(input)) {
+                        return ArgumentParseResult.failure(new IllegalArgumentException(
+                                String.format("'%s' is not one of: %s", input, String.join(", ", suggestions))
+                        ));
+                    }
+                }
                 inputQueue.remove();
                 return ArgumentParseResult.success(input);
             }
 
             final StringJoiner sj = new StringJoiner(" ");
             final int size = inputQueue.size();
-
 
             boolean started = false;
             boolean finished = false;

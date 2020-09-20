@@ -122,7 +122,7 @@ public abstract class CommandManager<C> {
      */
     @Nonnull
     public CompletableFuture<CommandResult<C>> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
-        final CommandContext<C> context = this.commandContextFactory.create(commandSender);
+        final CommandContext<C> context = this.commandContextFactory.create(false, commandSender);
         final LinkedList<String> inputQueue = this.tokenize(input);
         try {
             if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
@@ -147,7 +147,7 @@ public abstract class CommandManager<C> {
      */
     @Nonnull
     public List<String> suggest(@Nonnull final C commandSender, @Nonnull final String input) {
-        final CommandContext<C> context = this.commandContextFactory.create(commandSender);
+        final CommandContext<C> context = this.commandContextFactory.create(true, commandSender);
         final LinkedList<String> inputQueue = this.tokenize(input);
         if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
             return this.commandSuggestionProcessor.apply(new CommandPreprocessingContext<>(context, inputQueue),

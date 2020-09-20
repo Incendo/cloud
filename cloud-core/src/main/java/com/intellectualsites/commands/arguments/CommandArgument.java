@@ -131,7 +131,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
 
     private static <C> BiFunction<CommandContext<C>, String, List<String>> buildDefaultSuggestionsProvider(
             @Nonnull final CommandArgument<C, ?> argument) {
-        return (context, s) -> argument.getParser().suggestions(context, s);
+        return new DelegatingSuggestionsProvider<>(argument.getName(), argument.getParser());
     }
 
     /**
@@ -404,8 +404,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
                 this.parser = (c, i) -> ArgumentParseResult
                         .failure(new UnsupportedOperationException("No parser was specified"));
             }
-            if (suggestionsProvider == null) {
-                suggestionsProvider = this.parser::suggestions;
+            if (this.suggestionsProvider == null) {
+                this.suggestionsProvider = new DelegatingSuggestionsProvider<>(this.name, this.parser);
             }
             return new CommandArgument<>(this.required, this.name, this.parser,
                                          this.defaultValue, this.valueType, this.suggestionsProvider);
