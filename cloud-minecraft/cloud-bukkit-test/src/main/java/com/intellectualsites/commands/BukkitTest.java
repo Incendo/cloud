@@ -41,6 +41,7 @@ import com.intellectualsites.commands.bukkit.BukkitCommandManager;
 import com.intellectualsites.commands.bukkit.BukkitCommandMetaBuilder;
 import com.intellectualsites.commands.bukkit.CloudBukkitCapabilities;
 import com.intellectualsites.commands.bukkit.parsers.WorldArgument;
+import com.intellectualsites.commands.execution.AsynchronousCommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import com.intellectualsites.commands.paper.PaperCommandManager;
@@ -72,10 +73,11 @@ public final class BukkitTest extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
+            final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
+                    AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
             mgr = new PaperCommandManager<>(
                     this,
-                    CommandExecutionCoordinator
-                            .simpleCoordinator(),
+                    executionCoordinatorFunction,
                     Function.identity(),
                     Function.identity()
             );
@@ -191,6 +193,7 @@ public final class BukkitTest extends JavaPlugin {
         }
         Bukkit.broadcastMessage(ChatColor.GRAY + "Using Registration Manager: "
                                         + this.mgr.getCommandRegistrationHandler().getClass().getSimpleName());
+        Bukkit.broadcastMessage(ChatColor.GRAY + "Calling Thread: " + Thread.currentThread().getName());
     }
 
     @Nonnull
