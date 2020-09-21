@@ -45,6 +45,7 @@ import com.intellectualsites.commands.execution.AsynchronousCommandExecutionCoor
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import com.intellectualsites.commands.paper.PaperCommandManager;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -81,6 +82,9 @@ public final class BukkitTest extends JavaPlugin {
                     Function.identity(),
                     Function.identity()
             );
+
+            final BukkitAudiences bukkitAudiences = BukkitAudiences.create(this);
+            final MinecraftHelp<CommandSender> minecraftHelp = new MinecraftHelp<>(bukkitAudiences::audience, mgr);
 
             try {
                 ((PaperCommandManager<CommandSender>) mgr).registerBrigadier();
@@ -176,7 +180,16 @@ public final class BukkitTest extends JavaPlugin {
                            .argument(BooleanArgument.required("bool"))
                            .argument(StringArgument.required("string"))
                            .handler(c -> c.getSender().sendMessage("Executed the command"))
-                           .build());
+                           .build())
+               .command(mgr.commandBuilder("annotationass").handler(c -> c.getSender()
+                                                                   .sendMessage(ChatColor.YELLOW + "Du e en ananas!")).build())
+               .command(mgr.commandBuilder("cloud")
+                           .literal("help")
+                           .argument(StringArgument.<CommandSender>newBuilder("query").greedy()
+                                                                                      .asOptionalWithDefault("")
+                                                                                      .build(), "Help query")
+                           .handler(c -> minecraftHelp.queryCommands(c.<String>get("query").orElse(""),
+                                                                     c.getSender())).build());
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -191,7 +204,7 @@ public final class BukkitTest extends JavaPlugin {
         player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
     }
 
-    @CommandMethod("cloud help")
+    @CommandMethod("cloud debug")
     private void doHelp() {
         final Set<CloudBukkitCapabilities> capabilities = this.mgr.queryCapabilities();
         Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Capabilities");

@@ -30,8 +30,11 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public final class CommandHelpHandler<C> {
 
@@ -142,31 +145,51 @@ public final class CommandHelpHandler<C> {
         final String rootFragment = queryFragments[0];
 
         /* Determine which command we are querying for */
-        Command<C> queryCommand = null;
-        String queryCommandName = "";
+        final List<Command<C>> availableCommands = new LinkedList<>();
+        final Set<String> availableCommandLabels = new HashSet<>();
 
-        outer:
         for (final VerboseHelpEntry<C> entry : verboseEntries) {
             final Command<C> command = entry.getCommand();
             @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) command.getArguments()
                                                                                                                .get(0);
             for (final String alias : staticArgument.getAliases()) {
-                if (alias.equalsIgnoreCase(rootFragment)) {
-                    /* We found our command */
-                    queryCommand = command;
-                    queryCommandName = staticArgument.getName();
-                    break outer;
+                if (alias.toLowerCase(Locale.ENGLISH).startsWith(rootFragment.toLowerCase(Locale.ENGLISH))) {
+                    availableCommands.add(command);
+                    availableCommandLabels.add(staticArgument.getName());
+                    break;
                 }
+            }
+
+            if (rootFragment.equalsIgnoreCase(staticArgument.getName())) {
+                availableCommandLabels.clear();
+                availableCommands.clear();
+                availableCommandLabels.add(staticArgument.getName());
+                availableCommands.add(command);
+                break;
             }
         }
 
         /* No command found, return all possible commands */
-        if (queryCommand == null) {
-            return new IndexHelpTopic<>(verboseEntries);
+        if (availableCommands.isEmpty()) {
+            return new IndexHelpTopic<>(Collections.emptyList());
+        } else if (availableCommandLabels.size() > 1) {
+            final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
+            for (final Command<C> command : availableCommands) {
+                final List<CommandArgument<C, ?>> arguments = command.getArguments();
+                final String description = command.getCommandMeta().getOrDefault("description", "");
+                syntaxHints.add(new VerboseHelpEntry<>(command,
+                                                       this.commandManager.getCommandSyntaxFormatter()
+                                                                          .apply(arguments, null),
+                                                       description));
+            }
+            syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::getSyntaxString));
+            return new IndexHelpTopic<>(syntaxHints);
         }
 
         /* Traverse command to find the most specific help topic */
-        final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.getCommandTree().getNamedNode(queryCommandName);
+        final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.getCommandTree()
+                                                                                .getNamedNode(availableCommandLabels.iterator()
+                                                                                                                    .next());
 
         final List<CommandArgument<C, ?>> traversedNodes = new LinkedList<>();
         CommandTree.Node<CommandArgument<C, ?>> head = node;
@@ -196,7 +219,9 @@ public final class CommandHelpHandler<C> {
                 /* Attempt to parse the longest possible description for the children */
                 final List<String> childSuggestions = new LinkedList<>();
                 for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
-                    childSuggestions.add(this.commandManager.getCommandSyntaxFormatter().apply(traversedNodes, child));
+                    final List<CommandArgument<C, ?>> traversedNodesSub = new LinkedList<>(traversedNodes);
+                    traversedNodesSub.add(child.getValue());
+                    childSuggestions.add(this.commandManager.getCommandSyntaxFormatter().apply(traversedNodesSub, child));
                 }
                 return new MultiHelpTopic<>(currentDescription, childSuggestions);
             }
@@ -250,7 +275,6 @@ public final class CommandHelpHandler<C> {
          *
          * @return {@code true} if the topic is entry, else {@code false}
          */
-        @Nonnull
         public boolean isEmpty() {
             return this.getEntries().isEmpty();
         }
@@ -295,7 +319,7 @@ public final class CommandHelpHandler<C> {
         }
 
     }
-    
+
 
     /**
      * Help topic with multiple semi-verbose command descriptions

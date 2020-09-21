@@ -34,31 +34,10 @@
         <version>1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>cloud-bukkit-test</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <artifactId>cloud-minecraft-extras</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
 
     <repositories>
         <repository>
@@ -69,34 +48,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.intellectualsites</groupId>
-            <artifactId>cloud-paper</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intellectualsites</groupId>
-            <artifactId>cloud-annotations</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>me.lucko</groupId>
-            <artifactId>commodore</artifactId>
-            <version>1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.intellectualsites</groupId>
-            <artifactId>cloud-minecraft-extras</artifactId>
+            <artifactId>cloud-core</artifactId>
             <version>0.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
-            <artifactId>adventure-platform-bukkit</artifactId>
+            <artifactId>adventure-text-minimessage</artifactId>
             <version>4.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
