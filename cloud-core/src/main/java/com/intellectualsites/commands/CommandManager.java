@@ -125,7 +125,7 @@ public abstract class CommandManager<C> {
     @Nonnull
     public CompletableFuture<CommandResult<C>> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
         final CommandContext<C> context = this.commandContextFactory.create(false, commandSender);
-        final LinkedList<String> inputQueue = this.tokenize(input);
+        final LinkedList<String> inputQueue = tokenize(input);
         try {
             if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
                 return this.commandExecutionCoordinator.coordinateExecution(context, inputQueue);
@@ -150,7 +150,7 @@ public abstract class CommandManager<C> {
     @Nonnull
     public List<String> suggest(@Nonnull final C commandSender, @Nonnull final String input) {
         final CommandContext<C> context = this.commandContextFactory.create(true, commandSender);
-        final LinkedList<String> inputQueue = this.tokenize(input);
+        final LinkedList<String> inputQueue = tokenize(input);
         if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
             return this.commandSuggestionProcessor.apply(new CommandPreprocessingContext<>(context, inputQueue),
                                                          this.commandTree.getSuggestions(
@@ -297,6 +297,7 @@ public abstract class CommandManager<C> {
      * are called in LIFO order
      *
      * @param processor Processor to register
+     * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
      */
     public void registerCommandPreProcessor(@Nonnull final CommandPreprocessor<C> processor) {
         this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPreprocessor<C>>() {
@@ -310,6 +311,7 @@ public abstract class CommandManager<C> {
      * @param context    Command context
      * @param inputQueue Command input as supplied by sender
      * @return {@link State#ACCEPTED} if the command should be parsed and executed, else {@link State#REJECTED}
+     * @see #registerExceptionHandler(Class, BiConsumer) Register a command preprocessor
      */
     public State preprocessContext(@Nonnull final CommandContext<C> context, @Nonnull final LinkedList<String> inputQueue) {
         this.servicePipeline.pump(new CommandPreprocessingContext<>(context, inputQueue))
@@ -325,6 +327,7 @@ public abstract class CommandManager<C> {
      * Get the command suggestions processor instance currently used in this command manager
      *
      * @return Command suggestions processor
+     * @see #setCommandSuggestionProcessor(CommandSuggestionProcessor) Setting the suggestion processor
      */
     @Nonnull
     public CommandSuggestionProcessor<C> getCommandSuggestionProcessor() {
@@ -332,7 +335,9 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Set the command suggestions processor for this command manager
+     * Set the command suggestions processor for this command manager. This will be called every
+     * time {@link #suggest(Object, String)} is called, to process the list of suggestions
+     * before it's returned to the caller
      *
      * @param commandSuggestionProcessor New command suggestions processor
      */
@@ -341,7 +346,15 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the parser registry instance
+     * Get the parser registry instance. The parser registry contains default
+     * mappings to {@link com.intellectualsites.commands.arguments.parser.ArgumentParser}
+     * and allows for the registration of custom mappings. The parser registry also
+     * contains mappings of annotations to {@link com.intellectualsites.commands.arguments.parser.ParserParameter}
+     * which allows for annotations to be used to customize parser settings.
+     * <p>
+     * When creating a new parser type, it is recommended to register it in the parser
+     * registry. In particular, default parser types (shipped with cloud implementations)
+     * should be registered in the constructor of the platform {@link CommandManager}
      *
      * @return Parser registry instance
      */
@@ -356,6 +369,7 @@ public abstract class CommandManager<C> {
      * @param clazz Exception class
      * @param <E>   Exception type
      * @return Exception handler, or {@code null}
+     * @see #registerCommandPreProcessor(CommandPreprocessor) Registering an exception handler
      */
     @Nullable
     public final <E extends Exception> BiConsumer<C, E> getExceptionHandler(@Nullable final Class<E> clazz) {
@@ -368,7 +382,9 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Register an exception handler for an exception type
+     * Register an exception handler for an exception type. This will then be used
+     * when {@link #handleException(Object, Class, Exception, BiConsumer)} is called
+     * for the particular exception type
      *
      * @param clazz   Exception class
      * @param handler Exception handler
@@ -380,13 +396,14 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Handler an exception using the registered exception handler for the exception type, or using the
+     * Handle an exception using the registered exception handler for the exception type, or using the
      * provided default handler if no exception handler has been registered for the exception type
      *
      * @param sender         Executing command sender
      * @param clazz          Exception class
-     * @param exception      Exception
-     * @param defaultHandler Default exception handler
+     * @param exception      Exception instance
+     * @param defaultHandler Default exception handler. Will be called if there is no exception
+     *                       handler stored for the exception type
      * @param <E>            Exception type
      */
     public final <E extends Exception> void handleException(@Nonnull final C sender,
@@ -397,7 +414,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get all registered commands
+     * Get a collection containing all registered commands.
      *
      * @return Unmodifiable view of all registered commands
      */
@@ -407,9 +424,11 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get a command help handler instance
+     * Get a command help handler instance. This can be used to assist in the production
+     * of command help menus, etc.
      *
-     * @return Command help handler
+     * @return Command help handler. A new instance will be created
+     * each time this method is called.
      */
     @Nonnull
     public final CommandHelpHandler<C> getCommandHelpHandler() {

@@ -120,7 +120,8 @@ public class Command<C> {
     }
 
     /**
-     * Create a new command builder
+     * Create a new command builder. Is recommended to use the builder methods
+     * in {@link CommandManager} rather than invoking this method directly.
      *
      * @param commandName Base command argument
      * @param commandMeta Command meta instance

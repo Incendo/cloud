@@ -52,7 +52,29 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
- * Tree containing all commands and command paths
+ * Tree containing all commands and command paths.
+ * <p>
+ * All {@link Command commands} consists of unique paths made out of {@link CommandArgument arguments}.
+ * These arguments may be {@link StaticArgument literals} or variables. Command may either be required
+ * or optional, with the requirement that no optional argument precedes a required argument.
+ * <p>
+ * The {@link Command commands} are stored in this tree and the nodes of tree consists of the command
+ * {@link CommandArgument arguments}. Each leaf node of the tree should containing a fully parsed
+ * {@link Command}. It is thus possible to walk the tree and determine whether or not the supplied
+ * input from a command sender constitutes a proper command.
+ * <p>
+ * When parsing input, the tree will be walked until one of four scenarios occur:
+ * <ol>
+ *     <li>The input queue is empty at a non-leaf node</li>
+ *     <li>The input queue is not empty following a leaf node</li>
+ *     <li>No child node is able to accept the input</li>
+ *     <li>The input queue is empty following a leaf node</li>
+ * </ol>
+ * <p>
+ * Scenarios one and two would result in a {@link InvalidSyntaxException} being thrown, whereas
+ * scenario three would result in a {@link NoSuchCommandException} if occurring at the root node
+ * or a {@link InvalidSyntaxException otherwise}. Only the fourth scenario would result in a complete
+ * command being parsed.
  *
  * @param <C> Command sender type
  */
@@ -70,8 +92,8 @@ public final class CommandTree<C> {
     /**
      * Create a new command tree instance
      *
-     * @param commandManager             Command manager
-     * @param <C>                        Command sender type
+     * @param commandManager Command manager
+     * @param <C>            Command sender type
      * @return New command tree
      */
     @Nonnull
@@ -528,7 +550,7 @@ public final class CommandTree<C> {
             if (node.getValue() != null && node.getValue() instanceof StaticArgument) {
                 final StaticArgument<C> staticArgument = (StaticArgument<C>) node.getValue();
                 for (final String alias : staticArgument.getAliases()) {
-                    if (alias.equalsIgnoreCase(name))  {
+                    if (alias.equalsIgnoreCase(name)) {
                         return node;
                     }
                 }
