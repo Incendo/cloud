@@ -73,7 +73,7 @@ import java.util.stream.Collectors;
  * <p>
  * Scenarios one and two would result in a {@link InvalidSyntaxException} being thrown, whereas
  * scenario three would result in a {@link NoSuchCommandException} if occurring at the root node
- * or a {@link InvalidSyntaxException otherwise}. Only the fourth scenario would result in a complete
+ * or a {@link InvalidSyntaxException} otherwise. Only the fourth scenario would result in a complete
  * command being parsed.
  *
  * @param <C> Command sender type

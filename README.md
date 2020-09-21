@@ -18,23 +18,23 @@ The code is based on a paper that can be found [here](https://github.com/Sauilit
   
 ## goals  
   
-- Allow for commands to be defined using builder patterns  
-- Allow for commands to be defined using annotated methods  
-- Allow for command pre-processing  
-- Allow for command suggestion outputs  
+- Allow for commands to be defined using builder patterns (Done)
+- Allow for commands to be defined using annotated methods (Done)
+- Allow for command pre-processing (Done)
+- Allow for command suggestion outputs (Done)
   
 Once the core functionality is present, the framework will offer implementation modules, supporting a wide variety of platforms.  
   
 ### implementations  
   
 - Minecraft:  
-  - Generic Brigadier module  
-  - Bukkit module  
-  - Paper module, with optional Brigadier support  
+  - Generic Brigadier module (Done)
+  - Bukkit module (Done)
+  - Paper module, with optional Brigadier support (Done) 
   - Sponge module  
   - Cloudburst  
-  - Bungee module  
-  - Velocity module  
+  - Bungee module (Done)
+  - Velocity module (Done)
   
 - Create a Discord implementation (JDA)  
 - Create a Java CLI implementation (JLine3)  
@@ -71,11 +71,12 @@ only needed the first time, as Maven will perform this operation when building.
   
 There is a bash script (`build.sh`) that performs the submodule updating &amp; builds the project.  
 Feel free to use this if you want to.  
+
+## use
+
+To use `cloud` you will first need to add it as a dependency to your project. Cloud is available from [IntellectualSites](https://intellectualsites.com)' maven repository.
   
-## maven  
-  
-cloud is available from [IntellectualSites](https://intellectualsites.com)' maven repository:  
-  
+**maven**:
 ```xml  
 <repository>  
  <id>intellectualsites-snapshots</id>  
@@ -86,17 +87,39 @@ cloud is available from [IntellectualSites](https://intellectualsites.com)' mave
 ```xml  
 <dependency>  
  <groupId>com.intellectualsites</groupId>  
- <artifactId>cloud-core</artifactId>
+ <artifactId>cloud-PLATFORM</artifactId>
  <version>0.1.0-SNAPSHOT</version>
 </dependency>
-```  
+<!-- 
+~    Optional: Allows you to use the annotated methods
+~    to declare commands 
+-->
+<dependency>  
+ <groupId>com.intellectualsites</groupId>  
+ <artifactId>cloud-annotations</artifactId>
+ <version>0.1.0-SNAPSHOT</version>
+</dependency>
+``` 
+
+**gradle**:
+```groovy
+repositories {
+    maven { url = 'https://mvn.intellectualsites.com/content/repositories/snapshots' }
+}
+```
+
+```groovy
+dependencies {
+    implementation 'com.intellectualsites:cloud-PLATFORM:0.1.0-SNAPSHOT'
+}
+```
+
+Replace `PLATFORM` with your platform of choice. We currently support: `bukkit`, `paper`, `bungee` and `velocity`. All modules use the same versions.
+More information about the Minecraft specific modules can be found [here](https://github.com/Sauilitired/cloud/tree/master/cloud-minecraft).
+
+## attributions, links &amp; acknowledgements  
   
-### attributions, links &amp; acknowledgements  
+This library is licensed under the <a href="https://opensource.org/licenses/MIT">MIT</a> license, and the code copyright  belongs to Alexander Söderberg. The implementation is based on a paper written by the copyright holder, and this paper exists under the <a href="https://creativecommons.org/licenses/by/4.0/legalcode">CC Attribution 4</a> license.  
   
-This library is licensed under the <a href="https://opensource.org/licenses/MIT">MIT</a> license, and the code copyright  
-belongs to Alexander Söderberg. The implementation is based on a paper written by the copyright holder, and this paper exists  
-under the <a href="https://creativecommons.org/licenses/by/4.0/legalcode">CC Attribution 4</a> license.  
-  
-The <a href="https://iconscout.com/icons/cloud" target="_blank">Cloud</a> icon was created by by   
-<a href="https://iconscout.com/contributors/oviyan">Thanga Vignesh P</a> on <a href="https://iconscout.com">Iconscout</a>  
-and Digital rights were purchased under a premium plan.
+The <a href="https://iconscout.com/icons/cloud" target="_blank">Cloud</a> icon was created by by <a href="https://iconscout.com/contributors/oviyan">
+Thanga Vignesh P</a> on <a href="https://iconscout.com">Iconscout</a> and Digital rights were purchased under a premium plan.
