@@ -170,12 +170,14 @@ public final class AnnotationParser<C> {
                                                              this.createMeta(method.getAnnotations()));
             final Collection<ArgumentParameterPair> arguments = this.getArguments(method);
             final Map<String, CommandArgument<C, ?>> commandArguments = Maps.newHashMap();
+            final Map<CommandArgument<C, ?>, String> argumentDescriptions = Maps.newHashMap();
             /* Go through all annotated parameters and build up the argument tree */
             for (final ArgumentParameterPair argumentPair : arguments) {
                 final CommandArgument<C, ?> argument = this.buildArgument(method,
                                                                           tokens.get(argumentPair.getArgument().value()),
                                                                           argumentPair);
                 commandArguments.put(argument.getName(), argument);
+                argumentDescriptions.put(argument, argumentPair.getArgument().description());
             }
             boolean commandNameFound = false;
             /* Build the command tree */
@@ -194,7 +196,10 @@ public final class AnnotationParser<C> {
                                 entry.getKey(), method.getName()
                         ));
                     }
-                    builder = builder.argument(argument);
+
+                    final String description = argumentDescriptions.getOrDefault(argument, "");
+
+                    builder = builder.argument(argument, description);
                 }
             }
             /* Try to find the command sender type */

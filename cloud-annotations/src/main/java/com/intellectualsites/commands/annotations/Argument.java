@@ -56,4 +56,11 @@ public @interface Argument {
      */
     String defaultValue() default "";
 
+    /**
+     * The argument description
+     *
+     * @return Argument description
+     */
+    String description() default "";
+
 }

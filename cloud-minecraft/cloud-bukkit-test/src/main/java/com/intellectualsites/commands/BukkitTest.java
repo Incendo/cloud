@@ -198,9 +198,10 @@ public final class BukkitTest extends JavaPlugin {
     @Description("Test cloud command using @CommandMethod")
     @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
     private void annotatedCommand(@Nonnull final Player player,
-                                  @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
-                                  @Argument(value = "number", defaultValue = "5") @Range(min = "10", max = "100")
-                                      final int number) {
+                                  @Argument(value = "input", description = "Some string") @Completions("one,two,duck")
+                                  @Nonnull final String input,
+                                  @Argument(value = "number", defaultValue = "5", description = "A number")
+                                  @Range(min = "10", max = "100") final int number) {
         player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
     }
 
