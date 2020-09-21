@@ -148,6 +148,8 @@ public final class CommandHelpHandler<C> {
         final List<Command<C>> availableCommands = new LinkedList<>();
         final Set<String> availableCommandLabels = new HashSet<>();
 
+        boolean exactMatch = false;
+
         for (final VerboseHelpEntry<C> entry : verboseEntries) {
             final Command<C> command = entry.getCommand();
             @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) command.getArguments()
@@ -156,6 +158,13 @@ public final class CommandHelpHandler<C> {
                 if (alias.toLowerCase(Locale.ENGLISH).startsWith(rootFragment.toLowerCase(Locale.ENGLISH))) {
                     availableCommands.add(command);
                     availableCommandLabels.add(staticArgument.getName());
+                    break;
+                }
+            }
+
+            for (final String alias : staticArgument.getAliases()) {
+                if (alias.equalsIgnoreCase(rootFragment)) {
+                    exactMatch = true;
                     break;
                 }
             }
@@ -172,7 +181,7 @@ public final class CommandHelpHandler<C> {
         /* No command found, return all possible commands */
         if (availableCommands.isEmpty()) {
             return new IndexHelpTopic<>(Collections.emptyList());
-        } else if (availableCommandLabels.size() > 1) {
+        } else if (!exactMatch || availableCommandLabels.size() > 1) {
             final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
             for (final Command<C> command : availableCommands) {
                 final List<CommandArgument<C, ?>> arguments = command.getArguments();
