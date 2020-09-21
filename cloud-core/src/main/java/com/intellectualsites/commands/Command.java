@@ -30,9 +30,11 @@ import com.intellectualsites.commands.meta.CommandMeta;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -45,7 +47,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class Command<C> {
 
-    @Nonnull private final List<CommandArgument<C, ?>> arguments;
+    @Nonnull private final Map<CommandArgument<C, ?>, String> arguments;
     @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
     @Nullable private final Class<? extends C> senderType;
     @Nonnull private final String commandPermission;
@@ -54,13 +56,13 @@ public class Command<C> {
     /**
      * Construct a new command
      *
-     * @param commandArguments        Command arguments
+     * @param commandArguments        Command argument and description pairs
      * @param commandExecutionHandler Execution handler
      * @param senderType              Required sender type. May be {@code null}
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final List<CommandArgument<C, ?>> commandArguments,
+    public Command(@Nonnull final Map<CommandArgument<C, ?>, String> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
                    @Nonnull final String commandPermission,
@@ -71,7 +73,7 @@ public class Command<C> {
         }
         // Enforce ordering of command arguments
         boolean foundOptional = false;
-        for (final CommandArgument<C, ?> argument : this.arguments) {
+        for (final CommandArgument<C, ?> argument : this.arguments.keySet()) {
             if (argument.getName().isEmpty()) {
                 throw new IllegalArgumentException("Argument names may not be empty");
             }
@@ -97,7 +99,7 @@ public class Command<C> {
      * @param senderType              Required sender type. May be {@code null}
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final List<CommandArgument<C, ?>> commandArguments,
+    public Command(@Nonnull final Map<CommandArgument<C, ?>, String> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
                    @Nonnull final CommandMeta commandMeta) {
@@ -112,7 +114,7 @@ public class Command<C> {
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final List<CommandArgument<C, ?>> commandArguments,
+    public Command(@Nonnull final Map<CommandArgument<C, ?>, String> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nonnull final String commandPermission,
                    @Nonnull final CommandMeta commandMeta) {
@@ -133,8 +135,9 @@ public class Command<C> {
     public static <C> Builder<C> newBuilder(@Nonnull final String commandName,
                                             @Nonnull final CommandMeta commandMeta,
                                             @Nonnull final String... aliases) {
-        return new Builder<>(null, commandMeta, null,
-                             Collections.singletonList(StaticArgument.required(commandName, aliases)),
+        final Map<CommandArgument<C, ?>, String> map = new LinkedHashMap<>();
+        map.put(StaticArgument.required(commandName, aliases), "");
+        return new Builder<>(null, commandMeta, null, map,
                              new CommandExecutionHandler.NullCommandExecutionHandler<>(), "");
     }
 
@@ -145,7 +148,7 @@ public class Command<C> {
      */
     @Nonnull
     public List<CommandArgument<C, ?>> getArguments() {
-        return Collections.unmodifiableList(this.arguments);
+        return new ArrayList<>(this.arguments.keySet());
     }
 
     /**
@@ -189,22 +192,14 @@ public class Command<C> {
     }
 
     /**
-     * Get the longest chain of similar arguments for
-     * two commands
+     * Get the description for an argument
      *
-     * @param other Command to compare to
-     * @return List containing the longest shared argument chain
+     * @param argument Argument
+     * @return Argument description
      */
-    public List<CommandArgument<C, ?>> getSharedArgumentChain(@Nonnull final Command<C> other) {
-        final List<CommandArgument<C, ?>> commandArguments = new LinkedList<>();
-        for (int i = 0; i < this.arguments.size() && i < other.arguments.size(); i++) {
-            if (this.arguments.get(i).equals(other.arguments.get(i))) {
-                commandArguments.add(this.arguments.get(i));
-            } else {
-                break;
-            }
-        }
-        return commandArguments;
+    @Nonnull
+    public String getArgumentDescription(@Nonnull final CommandArgument<C, ?> argument) {
+        return this.arguments.get(argument);
     }
 
 
@@ -217,7 +212,7 @@ public class Command<C> {
     public static final class Builder<C> {
 
         @Nonnull private final CommandMeta commandMeta;
-        @Nonnull private final List<CommandArgument<C, ?>> commandArguments;
+        @Nonnull private final Map<CommandArgument<C, ?>, String> commandArguments;
         @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
         @Nullable private final Class<? extends C> senderType;
         @Nonnull private final String commandPermission;
@@ -226,7 +221,7 @@ public class Command<C> {
         private Builder(@Nullable final CommandManager<C> commandManager,
                         @Nonnull final CommandMeta commandMeta,
                         @Nullable final Class<? extends C> senderType,
-                        @Nonnull final List<CommandArgument<C, ?>> commandArguments,
+                        @Nonnull final Map<CommandArgument<C, ?>, String> commandArguments,
                         @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                         @Nonnull final String commandPermission) {
             this.commandManager = commandManager;
@@ -264,7 +259,7 @@ public class Command<C> {
         }
 
         /**
-         * Add a new command argument to the command
+         * Add a new command argument with an empty description to the command
          *
          * @param argument Argument to add
          * @param <T>      Argument type
@@ -272,11 +267,25 @@ public class Command<C> {
          */
         @Nonnull
         public <T> Builder<C> argument(@Nonnull final CommandArgument<C, T> argument) {
-            final List<CommandArgument<C, ?>> commandArguments = new LinkedList<>(this.commandArguments);
-            commandArguments.add(argument);
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandArguments,
+            return this.argument(argument, "");
+        }
+
+        /**
+         * Add a new command argument to the command
+         *
+         * @param argument    Argument to add
+         * @param description Argument description
+         * @param <T>      Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         */
+        @Nonnull
+        public <T> Builder<C> argument(@Nonnull final CommandArgument<C, T> argument, @Nonnull final String description) {
+            final Map<CommandArgument<C, ?>, String> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
+            commandArgumentMap.put(argument, description);
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandArgumentMap,
                                  this.commandExecutionHandler, this.commandPermission);
         }
+
 
         /**
          * Add a new command argument by interacting with a constructed command argument builder
@@ -342,8 +351,11 @@ public class Command<C> {
          */
         @Nonnull
         public Command<C> build() {
-            return new Command<>(Collections.unmodifiableList(this.commandArguments),
-                                 this.commandExecutionHandler, this.senderType, this.commandPermission, this.commandMeta);
+            return new Command<>(Collections.unmodifiableMap(this.commandArguments),
+                                 this.commandExecutionHandler,
+                                 this.senderType,
+                                 this.commandPermission,
+                                 this.commandMeta);
         }
 
     }

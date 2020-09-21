@@ -23,12 +23,17 @@
 //
 package com.intellectualsites.commands;
 
+import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 class CommandHelpHandlerTest {
@@ -38,9 +43,11 @@ class CommandHelpHandlerTest {
     @BeforeAll
     static void setup() {
         manager = new TestCommandManager();
-        manager.command(manager.commandBuilder("test").literal("this").literal("thing").build());
-        manager.command(manager.commandBuilder("test").literal("int").
-                argument(IntegerArgument.required("int")).build());
+        final SimpleCommandMeta meta1 = SimpleCommandMeta.builder().with("description", "Command with only literals").build();
+        manager.command(manager.commandBuilder("test", meta1).literal("this").literal("thing").build());
+        final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with("description", "Command with variables").build();
+        manager.command(manager.commandBuilder("test", meta2).literal("int").
+                argument(IntegerArgument.required("int"), "A number").build());
     }
 
     @Test
@@ -57,6 +64,83 @@ class CommandHelpHandlerTest {
     void testLongestChains() {
         final List<String> longestChains = manager.getCommandHelpHandler().getLongestSharedChains();
         Assertions.assertEquals(Arrays.asList("test int|this"), longestChains);
+    }
+
+    @Test
+    void testHelpQuery() {
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query1 = manager.getCommandHelpHandler().queryHelp("");
+        Assertions.assertTrue(query1 instanceof CommandHelpHandler.IndexHelpTopic);
+        this.printTopic("", query1);
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query2 = manager.getCommandHelpHandler().queryHelp("test");
+        Assertions.assertTrue(query2 instanceof CommandHelpHandler.MultiHelpTopic);
+        this.printTopic("test", query2);
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.getCommandHelpHandler().queryHelp("test int");
+        Assertions.assertTrue(query3 instanceof CommandHelpHandler.VerboseHelpTopic);
+        this.printTopic("test int", query3);
+    }
+
+    private void printTopic(@Nonnull final String query,
+                            @Nonnull final CommandHelpHandler.HelpTopic<TestCommandSender> helpTopic) {
+        System.out.printf("Showing results for query: \"/%s\"\n", query);
+        if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
+            this.printIndexHelpTopic((CommandHelpHandler.IndexHelpTopic<TestCommandSender>) helpTopic);
+        } else if (helpTopic instanceof CommandHelpHandler.MultiHelpTopic) {
+            this.printMultiHelpTopic((CommandHelpHandler.MultiHelpTopic<TestCommandSender>) helpTopic);
+        } else if (helpTopic instanceof CommandHelpHandler.VerboseHelpTopic) {
+            this.printVerboseHelpTopic((CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) helpTopic);
+        } else {
+            throw new IllegalArgumentException("Unknown help topic type");
+        }
+        System.out.println();
+    }
+
+    private void printIndexHelpTopic(@Nonnull final CommandHelpHandler.IndexHelpTopic<TestCommandSender> helpTopic) {
+        System.out.println("└── Available Commands: ");
+        final Iterator<CommandHelpHandler.VerboseHelpEntry<TestCommandSender>> iterator = helpTopic.getEntries().iterator();
+        while (iterator.hasNext()) {
+            final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry = iterator.next();
+            final String prefix = iterator.hasNext() ? "├──" : "└──";
+            System.out.printf("    %s %s: %s\n", prefix, entry.getSyntaxString(), entry.getDescription());
+        }
+    }
+
+    private void printMultiHelpTopic(@Nonnull final CommandHelpHandler.MultiHelpTopic<TestCommandSender> helpTopic) {
+        System.out.printf("└── /%s\n", helpTopic.getLongestPath());
+        final int headerIndentation = helpTopic.getLongestPath().length();
+        final Iterator<String> iterator = helpTopic.getChildSuggestions().iterator();
+        while (iterator.hasNext()) {
+            final String suggestion = iterator.next();
+            final StringBuilder printBuilder = new StringBuilder();
+            for (int i = 0; i < headerIndentation; i++) {
+                printBuilder.append(' ');
+            }
+            if (iterator.hasNext()) {
+                printBuilder.append("├── ");
+            } else {
+                printBuilder.append("└── ");
+            }
+            printBuilder.append(suggestion);
+            System.out.println(printBuilder.toString());
+        }
+    }
+
+    private void printVerboseHelpTopic(@Nonnull final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> helpTopic) {
+        System.out.printf("└── Command: /%s\n", manager.getCommandSyntaxFormatter()
+                                                      .apply(helpTopic.getCommand().getArguments(), null));
+        System.out.printf("    ├── Description: %s\n", helpTopic.getDescription());
+        System.out.println("    └── Args: ");
+        final Iterator<CommandArgument<TestCommandSender, ?>> iterator = helpTopic.getCommand().getArguments().iterator();
+        while (iterator.hasNext()) {
+            final CommandArgument<TestCommandSender, ?> argument = iterator.next();
+
+            String description = helpTopic.getCommand().getArgumentDescription(argument);
+            if (!description.isEmpty()) {
+                description = ": " + description;
+            }
+
+            System.out.printf("        %s %s%s\n", iterator.hasNext() ? "├──" : "└──", manager.getCommandSyntaxFormatter().apply(
+                    Collections.singletonList(argument), null), description);
+        }
     }
 
 }
