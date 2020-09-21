@@ -100,7 +100,7 @@ class CommandHelpHandlerTest {
         while (iterator.hasNext()) {
             final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry = iterator.next();
             final String prefix = iterator.hasNext() ? "├──" : "└──";
-            System.out.printf("    %s %s: %s\n", prefix, entry.getSyntaxString(), entry.getDescription());
+            System.out.printf("    %s /%s: %s\n", prefix, entry.getSyntaxString(), entry.getDescription());
         }
     }
 

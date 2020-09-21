@@ -295,6 +295,7 @@ public final class CommandHelpHandler<C> {
         }
 
     }
+    
 
     /**
      * Help topic with multiple semi-verbose command descriptions
