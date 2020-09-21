@@ -23,6 +23,33 @@ The code is based on a paper that can be found [here](https://github.com/Sauilit
 - Allow for command pre-processing (Done)
 - Allow for command suggestion outputs (Done)
   
+The builders will look something like:
+```java
+mgr.command(mgr.commandBuilder("give")
+               .withSenderType(Player.class)
+               .argument(EnumArgument.required(Material.class, "material"))
+               .argument(IntegerArgument.required("amount"))
+               .handler(c -> {
+                   final Material material = c.getRequired("material");
+                   final int amount = c.getRequired("amount");
+                   final ItemStack itemStack = new ItemStack(material, amount);
+                   ((Player) c.getSender()).getInventory().addItem(itemStack);
+                   c.getSender().sendMessage("You've been given stuff, bro.");
+               })
+               .build())
+```
+and the annotated methods will look something like:
+```java
+@Description("Test cloud command using @CommandMethod")
+@CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
+private void annotatedCommand(@Nonnull final Player player,
+                              @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
+                              @Argument(value = "number", defaultValue = "5") @Range(min = "10", max = "100")
+                                  final int number) {
+    player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
+}
+```
+
 Once the core functionality is present, the framework will offer implementation modules, supporting a wide variety of platforms.  
   
 ### implementations  
@@ -91,7 +118,7 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
  <version>0.1.0-SNAPSHOT</version>
 </dependency>
 <!-- 
-~    Optional: Allows you to use the annotated methods
+~    Optional: Allows you to use annotated methods
 ~    to declare commands 
 -->
 <dependency>  
