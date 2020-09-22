@@ -43,8 +43,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Command manager for the Bukkit platform, using {@link BukkitCommandSender} as the
- * command sender type
+ * Command manager for the Bukkit platform
  *
  * @param <C> Command sender type
  */

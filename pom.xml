@@ -21,6 +21,7 @@
         <module>cloud-minecraft/cloud-bungee</module>
         <module>cloud-minecraft/cloud-velocity</module>
         <module>cloud-minecraft/cloud-minecraft-extras</module>
+        <module>cloud-minecraft/cloud-cloudburst</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>
