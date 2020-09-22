@@ -5,25 +5,14 @@
   
 # cloud command framework ![license](https://img.shields.io/github/license/Sauilitired/cloud.svg) ![build](https://github.com/Sauilitired/cloud/workflows/Java%20CI%20with%20Maven/badge.svg) [![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/cloud/badge)](https://www.codefactor.io/repository/github/sauilitired/cloud)
 
-This is going to be a general-purpose Java command dispatcher &amp; framework.  
-It will allow programmers to define command chains that users can use to execute pre-defined actions.  
-  
-The library was named cloud because using it makes you feel like you're floating around on a cloud in heaven. It's an experience of pure bliss and joy.  
-This is unlike the experience of using **a**ny **c**ommand **f**ramework that currently exists for the JVM, which can be compared to drowning in a pool of lava while watching your family get eaten by a pack of wolves.   
-  
-Its feature set is derived from **a**lready existing **c**ommand **f**rameworks, while being less restrictive, opinionated and confusing.  
-CLOUD is built to be completely deterministic and your commands will behave exactly as you've programmed them to. No fluff and no mess, just a smooth cloud-like experience.  
-  
-The code is based on a paper that can be found [here](https://github.com/Sauilitired/Sauilitired/blob/master/AS_2020_09_Commands.pdf).  
-  
-## goals  
-  
-- Allow for commands to be defined using builder patterns (Done)
-- Allow for commands to be defined using annotated methods (Done)
-- Allow for command pre-processing (Done)
-- Allow for command suggestion outputs (Done)
-  
-The builders will look something like:
+Cloud is a general-purpose Java command dispatcher &amp; framework. It allows programmers to define command chains that are then parsed and invoked from user-
+supplied string inputs, to execute pre-defined actions.
+
+Cloud commands consist out of deterministic command chains are the arguments are strongly typed. When you write a command, you know exactly
+what type of data you will get to work with and you won't need to spend hours debugging command contexts while crying profusely. The experience
+of using the framework is like floating on a fluffy cloud in heaven. Its feature set is derived from Already existing Command Frameworks, while being less restrictive, opinionated and confusing.  
+
+Cloud allows for commands to be defined using builder patterns, like this:
 ```java
 mgr.command(mgr.commandBuilder("give")
                .withSenderType(Player.class)
@@ -38,7 +27,8 @@ mgr.command(mgr.commandBuilder("give")
                })
                .build())
 ```
-and the annotated methods will look something like:
+
+or using annoted methods, like this:
 ```java
 @Description("Test cloud command using @CommandMethod")
 @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
@@ -46,25 +36,17 @@ private void annotatedCommand(@Nonnull final Player player,
                               @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
                               @Argument(value = "number", defaultValue = "5") @Range(min = "10", max = "100")
                                   final int number) {
-    player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
+    player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input 
+                          + ChatColor.GREEN + " (" + number + ")");
 }
 ```
+while allowing you to extend and modify the command experience. The framework supports custom (any) command sender types, argument types &amp; parsers,
+annotation mappers and preprocessors. Cloud also has an advanced command suggestion system, that allows for context aware command completion and suggestions.
 
-Once the core functionality is present, the framework will offer implementation modules, supporting a wide variety of platforms.  
-  
-### implementations  
-  
-- Minecraft:  
-  - Generic Brigadier module (Done)
-  - Bukkit module (Done)
-  - Paper module, with optional Brigadier support (Done) 
-  - Sponge module  
-  - Cloudburst  
-  - Bungee module (Done)
-  - Velocity module (Done)
-  
-- Create a Discord implementation (JDA)  
-- Create a Java CLI implementation (JLine3)  
+Cloud by default ships with implementations and mappings for the most common Minecraft server platforms, JDA for Discord bots and JLine3 for CLI applications. The core
+module allows you to use Cloud anywhere, simply by implementing the CommandManager for the platform of your choice.
+
+The code is based on a (W.I.P) paper that can be found [here](https://github.com/Sauilitired/Sauilitired/blob/master/AS_2020_09_Commands.pdf).  
 
 ## nomenclature  
 - **sender**: someone who is able to produce input  
