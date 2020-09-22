@@ -108,6 +108,18 @@ public class SimpleCommandMeta extends CommandMeta {
         }
 
         /**
+         * Copy all values from another command meta instance
+         *
+         * @param commandMeta Existing instance
+         * @return Builder instance
+         */
+        @Nonnull
+        public Builder with(@Nonnull final CommandMeta commandMeta) {
+            commandMeta.getAll().forEach(this::with);
+            return this;
+        }
+
+        /**
          * Store a new key-value pair in the meta map
          *
          * @param key   Key

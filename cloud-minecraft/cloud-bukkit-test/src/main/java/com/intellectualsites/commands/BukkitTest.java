@@ -26,6 +26,7 @@ package com.intellectualsites.commands;
 import com.intellectualsites.commands.annotations.AnnotationParser;
 import com.intellectualsites.commands.annotations.Argument;
 import com.intellectualsites.commands.annotations.CommandMethod;
+import com.intellectualsites.commands.annotations.Confirmation;
 import com.intellectualsites.commands.annotations.Description;
 import com.intellectualsites.commands.annotations.specifier.Completions;
 import com.intellectualsites.commands.annotations.specifier.Range;
@@ -43,6 +44,7 @@ import com.intellectualsites.commands.bukkit.CloudBukkitCapabilities;
 import com.intellectualsites.commands.bukkit.parsers.WorldArgument;
 import com.intellectualsites.commands.execution.AsynchronousCommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
+import com.intellectualsites.commands.extra.confirmation.CommandConfirmationManager;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import com.intellectualsites.commands.paper.PaperCommandManager;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -61,6 +63,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -99,6 +102,14 @@ public final class BukkitTest extends JavaPlugin {
             } catch (final Throwable e) {
                 getLogger().warning("Failed to register asynchronous command completions: " + e.getMessage());
             }
+
+            final CommandConfirmationManager<CommandSender> confirmationManager = new CommandConfirmationManager<>(
+                    30,
+                    TimeUnit.SECONDS,
+                    c -> c.getCommandContext().getSender().sendMessage(ChatColor.RED + "Oh no. Confirm using /cloud confirm!"),
+                    c -> c.sendMessage(ChatColor.RED + "You don't have any pending commands!")
+            );
+            confirmationManager.registerConfirmationProcessor(mgr);
 
             final AnnotationParser<CommandSender> annotationParser
                     = new AnnotationParser<>(mgr, CommandSender.class, p ->
@@ -186,6 +197,9 @@ public final class BukkitTest extends JavaPlugin {
                .command(mgr.commandBuilder("annotationass").handler(c -> c.getSender()
                                                                    .sendMessage(ChatColor.YELLOW + "Du e en ananas!")).build())
                .command(mgr.commandBuilder("cloud")
+                           .literal("confirm")
+                           .handler(confirmationManager.createConfirmationExecutionHandler()).build())
+               .command(mgr.commandBuilder("cloud")
                            .literal("help")
                            .argument(StringArgument.<CommandSender>newBuilder("query").greedy()
                                                                                       .asOptionalWithDefault("")
@@ -207,6 +221,7 @@ public final class BukkitTest extends JavaPlugin {
         player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
     }
 
+    @Confirmation
     @CommandMethod("cloud debug")
     private void doHelp() {
         final Set<CloudBukkitCapabilities> capabilities = this.mgr.queryCapabilities();

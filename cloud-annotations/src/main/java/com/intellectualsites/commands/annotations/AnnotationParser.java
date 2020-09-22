@@ -32,7 +32,9 @@ import com.intellectualsites.commands.arguments.parser.ArgumentParser;
 import com.intellectualsites.commands.arguments.parser.ParserParameters;
 import com.intellectualsites.commands.arguments.parser.StandardParameters;
 import com.intellectualsites.commands.execution.CommandExecutionHandler;
+import com.intellectualsites.commands.extra.confirmation.CommandConfirmationManager;
 import com.intellectualsites.commands.meta.CommandMeta;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -140,10 +142,15 @@ public final class AnnotationParser<C> {
             /* Determine command name */
             final String commandToken = commandMethod.value().split(" ")[0].split("\\|")[0];
             @SuppressWarnings("ALL") final CommandManager manager = this.manager;
+            final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
+                                                                           .with(this.metaFactory.apply(method.getAnnotations()));
+            if (method.isAnnotationPresent(Confirmation.class)) {
+                metaBuilder.with(CommandConfirmationManager.CONFIRMATION_REQUIRED_META, "true");
+            }
             @SuppressWarnings("ALL")
             Command.Builder builder = manager.commandBuilder(commandToken,
                                                              tokens.get(commandToken).getMinor(),
-                                                             this.metaFactory.apply(method.getAnnotations()));
+                                                             metaBuilder.build());
             final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
             final Map<String, CommandArgument<C, ?>> commandArguments = Maps.newHashMap();
             final Map<CommandArgument<C, ?>, String> argumentDescriptions = Maps.newHashMap();

@@ -45,6 +45,10 @@ public final class StandardParameters {
      */
     public static final ParserParameter<String> DESCRIPTION = create("description", TypeToken.of(String.class));
     /**
+     * Command confirmation
+     */
+    public static final ParserParameter<Boolean> CONFIRMATION = create("confirmation", TypeToken.of(Boolean.class));
+    /**
      * Command completions
      */
     public static final ParserParameter<String[]> COMPLETIONS = create("completions", TypeToken.of(String[].class));

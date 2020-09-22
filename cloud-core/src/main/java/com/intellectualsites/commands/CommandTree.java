@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
  * These arguments may be {@link StaticArgument literals} or variables. Command may either be required
  * or optional, with the requirement that no optional argument precedes a required argument.
  * <p>
- * The {@link Command commands} are stored in this tree and the nodes of tree consists of the command
+ * The {@link Command commands} are stored in this tree and the nodes of tree consists of the command
  * {@link CommandArgument arguments}. Each leaf node of the tree should containing a fully parsed
  * {@link Command}. It is thus possible to walk the tree and determine whether or not the supplied
  * input from a command sender constitutes a proper command.
@@ -548,7 +548,7 @@ public final class CommandTree<C> {
     public Node<CommandArgument<C, ?>> getNamedNode(@Nullable final String name) {
         for (final Node<CommandArgument<C, ?>> node : this.getRootNodes()) {
             if (node.getValue() != null && node.getValue() instanceof StaticArgument) {
-                final StaticArgument<C> staticArgument = (StaticArgument<C>) node.getValue();
+                @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) node.getValue();
                 for (final String alias : staticArgument.getAliases()) {
                     if (alias.equalsIgnoreCase(name)) {
                         return node;
