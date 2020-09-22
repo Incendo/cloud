@@ -55,7 +55,7 @@ class AnnotationParserTest {
         final Collection<Command<TestCommandSender>> commands = annotationParser.parse(this);
         Assertions.assertFalse(commands.isEmpty());
         manager.executeCommand(new TestCommandSender(), "test 10").join();
-        manager.executeCommand(new TestCommandSender(), "t 10").join();
+        manager.executeCommand(new TestCommandSender(), "t 10 o").join();
         Assertions.assertThrows(CompletionException.class, () ->
                 manager.executeCommand(new TestCommandSender(), "test 101").join());
     }

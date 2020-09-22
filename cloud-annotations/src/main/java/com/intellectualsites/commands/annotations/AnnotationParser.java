@@ -37,19 +37,14 @@ import com.intellectualsites.commands.meta.CommandMeta;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 /**
  * Parser that parses class instances {@link com.intellectualsites.commands.Command commands}
@@ -58,18 +53,13 @@ import java.util.regex.Pattern;
  */
 public final class AnnotationParser<C> {
 
-    private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile("([A-Za-z0-9]+)(|([A-Za-z0-9]+))*")
-                                                                             .asPredicate();
-    private static final Predicate<String> PATTERN_ARGUMENT_REQUIRED = Pattern.compile("<([A-Za-z0-9]+)>")
-                                                                              .asPredicate();
-    private static final Predicate<String> PATTERN_ARGUMENT_OPTIONAL = Pattern.compile("\\[([A-Za-z0-9]+)]")
-                                                                              .asPredicate();
+    private final SyntaxParser syntaxParser = new SyntaxParser();
+    private final ArgumentExtractor argumentExtractor = new ArgumentExtractor();
 
-
-    private final Function<ParserParameters, CommandMeta> metaMapper;
     private final CommandManager<C> manager;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
     private final Class<C> commandSenderClass;
+    private final MetaFactory metaFactory;
 
     /**
      * Construct a new annotation parser
@@ -86,7 +76,7 @@ public final class AnnotationParser<C> {
                             @Nonnull final Function<ParserParameters, CommandMeta> metaMapper) {
         this.commandSenderClass = commandSenderClass;
         this.manager = manager;
-        this.metaMapper = metaMapper;
+        this.metaFactory = new MetaFactory(this, metaMapper);
         this.annotationMappers = Maps.newHashMap();
         this.registerAnnotationMapper(Description.class, d -> ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
     }
@@ -101,20 +91,6 @@ public final class AnnotationParser<C> {
     public <A extends Annotation> void registerAnnotationMapper(@Nonnull final Class<A> annotation,
                                                                 @Nonnull final Function<A, ParserParameters> mapper) {
         this.annotationMappers.put(annotation, mapper);
-    }
-
-    @Nonnull
-    private CommandMeta createMeta(@Nonnull final Annotation[] annotations) {
-        final ParserParameters parameters = ParserParameters.empty();
-        for (final Annotation annotation : annotations) {
-            @SuppressWarnings("ALL") final Function function = this.annotationMappers.get(annotation.annotationType());
-            if (function == null) {
-                continue;
-            }
-            //noinspection unchecked
-            parameters.merge((ParserParameters) function.apply(annotation));
-        }
-        return this.metaMapper.apply(parameters);
     }
 
     /**
@@ -160,15 +136,15 @@ public final class AnnotationParser<C> {
         for (final CommandMethodPair commandMethodPair : methodPairs) {
             final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
             final Method method = commandMethodPair.getMethod();
-            final LinkedHashMap<String, SyntaxFragment> tokens = this.parseSyntax(commandMethod.value());
+            final LinkedHashMap<String, SyntaxFragment> tokens = this.syntaxParser.apply(commandMethod.value());
             /* Determine command name */
             final String commandToken = commandMethod.value().split(" ")[0].split("\\|")[0];
             @SuppressWarnings("ALL") final CommandManager manager = this.manager;
             @SuppressWarnings("ALL")
             Command.Builder builder = manager.commandBuilder(commandToken,
                                                              tokens.get(commandToken).getMinor(),
-                                                             this.createMeta(method.getAnnotations()));
-            final Collection<ArgumentParameterPair> arguments = this.getArguments(method);
+                                                             this.metaFactory.apply(method.getAnnotations()));
+            final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
             final Map<String, CommandArgument<C, ?>> commandArguments = Maps.newHashMap();
             final Map<CommandArgument<C, ?>, String> argumentDescriptions = Maps.newHashMap();
             /* Go through all annotated parameters and build up the argument tree */
@@ -198,7 +174,6 @@ public final class AnnotationParser<C> {
                     }
 
                     final String description = argumentDescriptions.getOrDefault(argument, "");
-
                     builder = builder.argument(argument, description);
                 }
             }
@@ -220,37 +195,14 @@ public final class AnnotationParser<C> {
             } else if (senderType != null) {
                 builder = builder.withSenderType(senderType);
             }
-            /* Construct the handler */
-            final CommandExecutionHandler<C> commandExecutionHandler = commandContext -> {
-                final List<Object> parameters = new ArrayList<>(method.getParameterCount());
-                for (final Parameter parameter : method.getParameters()) {
-                    if (parameter.isAnnotationPresent(Argument.class)) {
-                        final Argument argument = parameter.getAnnotation(Argument.class);
-                        final CommandArgument<C, ?> commandArgument = commandArguments.get(argument.value());
-                        if (commandArgument.isRequired()) {
-                            parameters.add(commandContext.getRequired(argument.value()));
-                        } else {
-                            final Object optional = commandContext.get(argument.value()).orElse(null);
-                            parameters.add(optional);
-                        }
-                    } else {
-                        if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
-                            parameters.add(commandContext.getSender());
-                        } else {
-                            throw new IllegalArgumentException(String.format(
-                                    "Unknown command parameter '%s' in method '%s'",
-                                    parameter.getName(), method.getName()
-                            ));
-                        }
-                    }
-                }
-                try {
-                    method.invoke(instance, parameters.toArray());
-                } catch (final IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            };
-            builder = builder.handler(commandExecutionHandler);
+            try {
+                /* Construct the handler */
+                final CommandExecutionHandler<C> commandExecutionHandler
+                        = new MethodCommandExecutionHandler<>(instance, commandArguments, method);
+                builder = builder.handler(commandExecutionHandler);
+            } catch (final Exception e) {
+                throw new RuntimeException("Failed to construct command execution handler", e);
+            }
             commands.add(builder.build());
         }
         return commands;
@@ -309,126 +261,8 @@ public final class AnnotationParser<C> {
     }
 
     @Nonnull
-    LinkedHashMap<String, SyntaxFragment> parseSyntax(@Nonnull final String syntax) {
-        final StringTokenizer stringTokenizer = new StringTokenizer(syntax, " ");
-        final LinkedHashMap<String, SyntaxFragment> map = new LinkedHashMap<>();
-        while (stringTokenizer.hasMoreTokens()) {
-            final String token = stringTokenizer.nextToken();
-            String major;
-            List<String> minor = new ArrayList<>();
-            ArgumentMode mode;
-            if (PATTERN_ARGUMENT_REQUIRED.test(token)) {
-                major = token.substring(1, token.length() - 1);
-                mode = ArgumentMode.REQUIRED;
-            } else if (PATTERN_ARGUMENT_OPTIONAL.test(token)) {
-                major = token.substring(1, token.length() - 1);
-                mode = ArgumentMode.OPTIONAL;
-            } else if (PATTERN_ARGUMENT_LITERAL.test(token)) {
-                final String[] literals = token.split("\\|");
-                /* Actually use the other literals as well */
-                major = literals[0];
-                minor.addAll(Arrays.asList(literals).subList(1, literals.length));
-                mode = ArgumentMode.LITERAL;
-            } else {
-                throw new IllegalArgumentException(String.format("Unrecognizable syntax token '%s'", syntax));
-            }
-            map.put(major, new SyntaxFragment(major, minor, mode));
-        }
-        return map;
-    }
-
-    @Nonnull
-    private Collection<ArgumentParameterPair> getArguments(@Nonnull final Method method) {
-        final Collection<ArgumentParameterPair> arguments = new ArrayList<>();
-        for (final Parameter parameter : method.getParameters()) {
-            if (!parameter.isAnnotationPresent(Argument.class)) {
-                continue;
-            }
-            arguments.add(new ArgumentParameterPair(parameter, parameter.getAnnotation(Argument.class)));
-        }
-        return arguments;
-    }
-
-
-    enum ArgumentMode {
-        LITERAL,
-        OPTIONAL,
-        REQUIRED
-    }
-
-    private static final class CommandMethodPair {
-
-        private final Method method;
-        private final CommandMethod commandMethod;
-
-        private CommandMethodPair(@Nonnull final Method method, @Nonnull final CommandMethod commandMethod) {
-            this.method = method;
-            this.commandMethod = commandMethod;
-        }
-
-        @Nonnull
-        private Method getMethod() {
-            return this.method;
-        }
-
-        @Nonnull
-        private CommandMethod getCommandMethod() {
-            return this.commandMethod;
-        }
-
-    }
-
-    private static final class ArgumentParameterPair {
-
-        private final Parameter parameter;
-        private final Argument argument;
-
-        private ArgumentParameterPair(@Nonnull final Parameter parameter, @Nonnull final Argument argument) {
-            this.parameter = parameter;
-            this.argument = argument;
-        }
-
-        @Nonnull
-        private Parameter getParameter() {
-            return this.parameter;
-        }
-
-        @Nonnull
-        private Argument getArgument() {
-            return this.argument;
-        }
-
-    }
-
-    private static final class SyntaxFragment {
-
-        private final String major;
-        private final List<String> minor;
-        private final ArgumentMode argumentMode;
-
-        private SyntaxFragment(@Nonnull final String major,
-                               @Nonnull final List<String> minor,
-                               @Nonnull final ArgumentMode argumentMode) {
-            this.major = major;
-            this.minor = minor;
-            this.argumentMode = argumentMode;
-        }
-
-        @Nonnull
-        private String getMajor() {
-            return this.major;
-        }
-
-        @Nonnull
-        private List<String> getMinor() {
-            return this.minor;
-        }
-
-        @Nonnull
-        private ArgumentMode getArgumentMode() {
-            return this.argumentMode;
-        }
-
+    Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> getAnnotationMappers() {
+        return this.annotationMappers;
     }
 
 }
