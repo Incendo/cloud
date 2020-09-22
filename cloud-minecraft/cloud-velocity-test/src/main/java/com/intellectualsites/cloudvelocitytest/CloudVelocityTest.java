@@ -46,7 +46,7 @@ import java.util.function.Function;
 @Plugin(
         id = "cloud-velocity-test",
         name = "Cloud Velocity Test",
-        version = "0.0.1.0-SNAPSHOT"
+        version = "0.0.2.0-SNAPSHOT"
 )
 public class CloudVelocityTest {
 

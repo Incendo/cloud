@@ -265,6 +265,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             boolean started = false;
             boolean finished = false;
 
+            char start = ' ';
             for (int i = 0; i < size; i++) {
                 String string = inputQueue.peek();
 
@@ -274,13 +275,16 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
                 if (this.stringMode == StringMode.QUOTED) {
                     if (!started) {
-                        if (string.startsWith("\"")) {
+                        if (string.startsWith("\"") || string.startsWith("'")) {
+                            start = string.charAt(0);
                             string = string.substring(1);
                             started = true;
                         } else {
-                            return ArgumentParseResult.failure(new StringParseException(string, StringMode.QUOTED));
+                            /* Just read a single string instead */
+                            inputQueue.remove();
+                            return ArgumentParseResult.success(string);
                         }
-                    } else if (string.endsWith("\"")) {
+                    } else if (string.endsWith(Character.toString(start))) {
                         sj.add(string.substring(0, string.length() - 1));
                         inputQueue.remove();
                         finished = true;

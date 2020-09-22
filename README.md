@@ -97,7 +97,7 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
 <dependency>  
  <groupId>com.intellectualsites</groupId>  
  <artifactId>cloud-PLATFORM</artifactId>
- <version>0.1.0-SNAPSHOT</version>
+ <version>0.2.0-SNAPSHOT</version>
 </dependency>
 <!-- 
 ~    Optional: Allows you to use annotated methods
@@ -106,7 +106,7 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
 <dependency>  
  <groupId>com.intellectualsites</groupId>  
  <artifactId>cloud-annotations</artifactId>
- <version>0.1.0-SNAPSHOT</version>
+ <version>0.2.0-SNAPSHOT</version>
 </dependency>
 ``` 
 
@@ -119,7 +119,7 @@ repositories {
 
 ```groovy
 dependencies {
-    implementation 'com.intellectualsites:cloud-PLATFORM:0.1.0-SNAPSHOT'
+    implementation 'com.intellectualsites:cloud-PLATFORM:0.2.0-SNAPSHOT'
 }
 ```
 

@@ -30,8 +30,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class StringArgumentTest {
 
     private static final String[] storage = new String[2];
@@ -80,8 +78,12 @@ class StringArgumentTest {
     @Test
     void testQuotes() {
         clear();
-        manager.executeCommand(new TestCommandSender(), "quoted \"quoted string\" unquoted").join();
-        Assertions.assertEquals("quoted string", storage[0]);
+        manager.executeCommand(new TestCommandSender(), "quoted 'quoted \" string' unquoted").join();
+        Assertions.assertEquals("quoted \" string", storage[0]);
+        Assertions.assertEquals("unquoted", storage[1]);
+        clear();
+        manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted");
+        Assertions.assertEquals("quoted", storage[0]);
         Assertions.assertEquals("unquoted", storage[1]);
     }
 

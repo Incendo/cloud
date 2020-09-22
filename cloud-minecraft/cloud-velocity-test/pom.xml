@@ -37,7 +37,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud-velocity-test</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
 
     <profiles>
         <profile>
@@ -209,12 +209,12 @@
         <dependency>
             <groupId>com.intellectualsites</groupId>
             <artifactId>cloud-velocity</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intellectualsites</groupId>
             <artifactId>cloud-annotations</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
