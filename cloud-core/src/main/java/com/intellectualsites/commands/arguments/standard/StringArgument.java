@@ -63,7 +63,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
     /**
-     * Create a new required command argument
+     * Create a new required single string command argument
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -71,11 +71,24 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      */
     @Nonnull
     public static <C> CommandArgument<C, String> required(@Nonnull final String name) {
-        return StringArgument.<C>newBuilder(name).asRequired().build();
+        return StringArgument.<C>newBuilder(name).single().asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new required command argument
+     *
+     * @param name       Argument name
+     * @param stringMode String mode
+     * @param <C>        Command sender type
+     * @return Created argument
+     */
+    @Nonnull
+    public static <C> CommandArgument<C, String> required(@Nonnull final String name, @Nonnull final StringMode stringMode) {
+        return StringArgument.<C>newBuilder(name).withMode(stringMode).asRequired().build();
+    }
+
+    /**
+     * Create a new optional single string command argument
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -83,7 +96,20 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      */
     @Nonnull
     public static <C> CommandArgument<C, String> optional(@Nonnull final String name) {
-        return StringArgument.<C>newBuilder(name).asOptional().build();
+        return StringArgument.<C>newBuilder(name).single().asOptional().build();
+    }
+
+    /**
+     * Create a new optional command argument
+     *
+     * @param name       Argument name
+     * @param stringMode String mode
+     * @param <C>        Command sender type
+     * @return Created argument
+     */
+    @Nonnull
+    public static <C> CommandArgument<C, String> optional(@Nonnull final String name, @Nonnull final StringMode stringMode) {
+        return StringArgument.<C>newBuilder(name).withMode(stringMode).asOptional().build();
     }
 
     /**
@@ -125,6 +151,12 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
         protected Builder(@Nonnull final String name) {
             super(String.class, name);
+        }
+
+        @Nonnull
+        private Builder<C> withMode(@Nonnull final StringMode stringMode) {
+            this.stringMode = stringMode;
+            return this;
         }
 
         /**
@@ -234,7 +266,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             boolean finished = false;
 
             for (int i = 0; i < size; i++) {
-                final String string = inputQueue.peek();
+                String string = inputQueue.peek();
 
                 if (string == null) {
                     break;
@@ -243,7 +275,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 if (this.stringMode == StringMode.QUOTED) {
                     if (!started) {
                         if (string.startsWith("\"")) {
-                            sj.add(string.substring(1));
+                            string = string.substring(1);
                             started = true;
                         } else {
                             return ArgumentParseResult.failure(new StringParseException(string, StringMode.QUOTED));
@@ -256,7 +288,8 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     }
                 }
 
-                sj.add(inputQueue.remove());
+                sj.add(string);
+                inputQueue.remove();
             }
 
             if (this.stringMode == StringMode.QUOTED && (!started || !finished)) {

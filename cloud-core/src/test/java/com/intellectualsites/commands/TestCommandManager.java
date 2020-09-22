@@ -31,7 +31,10 @@ import javax.annotation.Nonnull;
 
 public class TestCommandManager extends CommandManager<TestCommandSender> {
 
-    protected TestCommandManager() {
+    /**
+     * Construct a new test command manager
+     */
+    public TestCommandManager() {
         super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
 

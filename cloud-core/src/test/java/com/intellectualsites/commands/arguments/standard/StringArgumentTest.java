@@ -1,0 +1,95 @@
+//
+// MIT License
+//
+// Copyright (c) 2020 Alexander Söderberg
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+package com.intellectualsites.commands.arguments.standard;
+
+import com.intellectualsites.commands.CommandManager;
+import com.intellectualsites.commands.TestCommandManager;
+import com.intellectualsites.commands.TestCommandSender;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class StringArgumentTest {
+
+    private static final String[] storage = new String[2];
+    private static CommandManager<TestCommandSender> manager;
+
+    @BeforeAll
+    static void setup() {
+        manager = new TestCommandManager();
+        manager.command(manager.commandBuilder("quoted")
+                               .argument(StringArgument.required("message1", StringArgument.StringMode.QUOTED))
+                               .argument(StringArgument.required("message2"))
+                               .handler(c -> {
+                                    final String message1 = c.getRequired("message1");
+                                    final String message2 = c.getRequired("message2");
+                                    storage[0] = message1;
+                                    storage[1] = message2;
+                               })
+                               .build());
+        manager.command(manager.commandBuilder("single")
+                               .argument(StringArgument.required("message"))
+                               .handler(c -> {
+                                    final String message = c.getRequired("message");
+                                    storage[0] = message;
+                               })
+                               .build());
+        manager.command(manager.commandBuilder("greedy")
+                               .argument(StringArgument.required("message", StringArgument.StringMode.GREEDY))
+                               .handler(c -> {
+                                   final String message = c.getRequired("message");
+                                   storage[0] = message;
+                               })
+                               .build());
+    }
+
+    private static void clear() {
+        storage[0] = storage[1] = null;
+    }
+
+    @Test
+    void testSingle() {
+        clear();
+        manager.executeCommand(new TestCommandSender(), "single string");
+        Assertions.assertEquals("string", storage[0]);
+    }
+
+    @Test
+    void testQuotes() {
+        clear();
+        manager.executeCommand(new TestCommandSender(), "quoted \"quoted string\" unquoted").join();
+        Assertions.assertEquals("quoted string", storage[0]);
+        Assertions.assertEquals("unquoted", storage[1]);
+    }
+
+    @Test
+    void testGreedy() {
+        clear();
+        manager.executeCommand(new TestCommandSender(), "greedy greedy string content").join();
+        Assertions.assertEquals("greedy string content", storage[0]);
+    }
+
+}
