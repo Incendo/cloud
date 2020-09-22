@@ -84,7 +84,9 @@ public final class BukkitTest extends JavaPlugin {
             );
 
             final BukkitAudiences bukkitAudiences = BukkitAudiences.create(this);
-            final MinecraftHelp<CommandSender> minecraftHelp = new MinecraftHelp<>(bukkitAudiences::audience, mgr);
+            final MinecraftHelp<CommandSender> minecraftHelp = new MinecraftHelp<>("/cloud help",
+                                                                                   bukkitAudiences::audience,
+                                                                                   mgr);
 
             try {
                 ((PaperCommandManager<CommandSender>) mgr).registerBrigadier();

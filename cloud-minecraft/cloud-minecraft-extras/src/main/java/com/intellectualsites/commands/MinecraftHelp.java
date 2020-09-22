@@ -64,15 +64,19 @@ public final class MinecraftHelp<C> {
 
     private final AudienceProvider<C> audienceProvider;
     private final CommandManager<C> commandManager;
+    private final String commandPrefix;
 
     /**
      * Construct a new Minecraft help instance
      *
+     * @param commandPrefix    Command that was used to trigger the help menu. Used to help insertion generation
      * @param audienceProvider Provider that maps the command sender type to {@link Audience}
      * @param commandManager   Command manager instance
      */
-    public MinecraftHelp(@Nonnull final AudienceProvider<C> audienceProvider,
+    public MinecraftHelp(@Nonnull final String commandPrefix,
+                         @Nonnull final AudienceProvider<C> audienceProvider,
                          @Nonnull final CommandManager<C> commandManager) {
+        this.commandPrefix = commandPrefix;
         this.audienceProvider = audienceProvider;
         this.commandManager = commandManager;
         /* Default messages */
@@ -81,11 +85,13 @@ public final class MinecraftHelp<C> {
         this.messageMap.put(MESSAGE_QUERY_QUERY, "<gray>Showing search results for query: \"<green>/<query></green>\"</gray>");
         this.messageMap.put(MESSAGE_QUERY_AVAILABLE_COMMANDS, "<dark_gray>└─</dark_gray><gray> Available Commands:</gray>");
         this.messageMap.put(MESSAGE_QUERY_COMMAND_SYNTAX, "<dark_gray>   ├─</dark_gray> <green>"
-                + "<hover:show_text:\"<gray><description></gray>\">/<command></hover></green>");
+        + "<click:run_command:cmdprefix><hover:show_text:\"<gray><description></gray>\">/<command></hover></click></green>");
         this.messageMap.put(MESSAGE_QUERY_COMMAND_SYNTAX_LAST, "<dark_gray>   └─</dark_gray> <green>"
-                + "<hover:show_text:\"<gray><description></gray>\">/<command></hover></green>");
+        + "<click:run_command:cmdprefix><hover:show_text:\"<gray><description></gray>\">/<command></hover></click></green>");
         this.messageMap.put(MESSAGE_QUERY_LONGEST_PATH, "<dark_gray>└─</dark_gray> <green>/<command></green>");
-        this.messageMap.put(MESSAGE_QUERY_SUGGESTION, "<dark_gray><indentation><prefix></dark_gray> <green><suggestion></green>");
+        this.messageMap.put(MESSAGE_QUERY_SUGGESTION, "<dark_gray><indentation><prefix></dark_gray> <green><click:run_command:"
+                + "<cmdprefix>><hover:show_text:\"<gray>Click to show help for this command</gray>\">"
+                + "<suggestion></hover></click></green>");
         this.messageMap.put(MESSAGE_QUERY_VERBOSE_SYNTAX, "<dark_gray>└─</dark_gray> <gold>Command:"
                 + " </gold><green>/<command></green>");
         this.messageMap.put(MESSAGE_QUERY_VERBOSE_DESCRIPTION, "<dark_gray>   ├─</dark_gray>"
@@ -175,15 +181,24 @@ public final class MinecraftHelp<C> {
         final Iterator<CommandHelpHandler.VerboseHelpEntry<C>> iterator = helpTopic.getEntries().iterator();
         while (iterator.hasNext()) {
             final CommandHelpHandler.VerboseHelpEntry<C> entry = iterator.next();
-            if (iterator.hasNext()) {
-                audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_COMMAND_SYNTAX),
-                                                            Template.of("command", entry.getSyntaxString()),
-                                                            Template.of("description", entry.getDescription())));
-            } else {
-                audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_COMMAND_SYNTAX_LAST),
-                                                            Template.of("command", entry.getSyntaxString()),
-                                                            Template.of("description", entry.getDescription())));
-            }
+
+            final String description = entry.getDescription().isEmpty() ? "Click to show help for this command"
+                                                                        : entry.getDescription();
+
+            String message = this.messageMap.get(iterator.hasNext() ? MESSAGE_QUERY_COMMAND_SYNTAX
+                                                                    : MESSAGE_QUERY_COMMAND_SYNTAX_LAST);
+
+            final String suggestedCommand = entry.getSyntaxString()
+                                                 .replace("<", "")
+                                                 .replace(">", "")
+                                                 .replace("[", "")
+                                                 .replace("]", "");
+
+            message = message.replace("<command>", entry.getSyntaxString())
+                             .replace("<description>", description)
+                             .replace("cmdprefix", this.commandPrefix + ' ' + suggestedCommand);
+
+            audience.sendMessage(this.miniMessage.parse(message));
         }
     }
 
@@ -208,10 +223,16 @@ public final class MinecraftHelp<C> {
                 prefix = "└─";
             }
 
+            final String suggestedCommand = suggestion.replace("<", "")
+                                                      .replace(">", "")
+                                                      .replace("[", "")
+                                                      .replace("]", "");
+
             audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_SUGGESTION),
                                                         Template.of("indentation", indentation.toString()),
                                                         Template.of("prefix", prefix),
-                                                        Template.of("suggestion", suggestion)));
+                                                        Template.of("suggestion", suggestion),
+                                                        Template.of("cmdprefix", this.commandPrefix + ' ' + suggestedCommand)));
         }
     }
 
