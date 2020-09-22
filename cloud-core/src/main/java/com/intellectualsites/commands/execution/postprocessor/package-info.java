@@ -23,6 +23,6 @@
 //
 
 /**
- * Command preprocessing system
+ * Command postprocessing system
  */
-package com.intellectualsites.commands.execution.preprocessor;
+package com.intellectualsites.commands.execution.postprocessor;

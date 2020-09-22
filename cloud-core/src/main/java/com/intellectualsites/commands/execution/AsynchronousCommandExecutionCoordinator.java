@@ -24,8 +24,10 @@
 package com.intellectualsites.commands.execution;
 
 import com.intellectualsites.commands.Command;
+import com.intellectualsites.commands.CommandManager;
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.services.State;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,6 +35,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -43,6 +46,7 @@ import java.util.function.Supplier;
  */
 public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExecutionCoordinator<C> {
 
+    private final CommandManager<C> commandManager;
     private final Executor executor;
     private final boolean synchronizeParsing;
 
@@ -52,6 +56,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
         super(commandTree);
         this.executor = executor;
         this.synchronizeParsing = synchronizeParsing;
+        this.commandManager = commandTree.getCommandManager();
     }
 
     /**
@@ -69,17 +74,21 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     public CompletableFuture<CommandResult<C>> coordinateExecution(@Nonnull final CommandContext<C> commandContext,
                                                                    @Nonnull final Queue<String> input) {
 
+        final Consumer<Command<C>> commandConsumer = command -> {
+            if (this.commandManager.postprocessContext(commandContext, command) == State.ACCEPTED) {
+                command.getCommandExecutionHandler().execute(commandContext);
+            }
+        };
         final Supplier<CommandResult<C>> supplier;
         if (this.synchronizeParsing) {
             final Optional<Command<C>> commandOptional = this.getCommandTree().parse(commandContext, input);
             supplier = () -> {
-                commandOptional.ifPresent(command -> command.getCommandExecutionHandler().execute(commandContext));
+                commandOptional.ifPresent(commandConsumer);
                 return new CommandResult<>(commandContext);
             };
         } else {
             supplier = () -> {
-                this.getCommandTree().parse(commandContext, input).ifPresent(
-                        command -> command.getCommandExecutionHandler().execute(commandContext));
+                this.getCommandTree().parse(commandContext, input).ifPresent(commandConsumer);
                 return new CommandResult<>(commandContext);
             };
         }

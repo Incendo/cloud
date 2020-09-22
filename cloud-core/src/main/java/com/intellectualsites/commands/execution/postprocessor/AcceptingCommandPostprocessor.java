@@ -21,8 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+package com.intellectualsites.commands.execution.postprocessor;
+
+import javax.annotation.Nonnull;
 
 /**
- * Command preprocessing system
+ * {@link CommandPostprocessor} that does nothing besides indicating that the context
+ * has been properly processed
+ *
+ * @param <C> Command sender type
  */
-package com.intellectualsites.commands.execution.preprocessor;
+public final class AcceptingCommandPostprocessor<C> implements CommandPostprocessor<C> {
+
+    /**
+     * Key used to access the context meta that indicates that the context has been fully processed
+     */
+    public static final String PROCESSED_INDICATOR_KEY = "__COMMAND_POST_PROCESSED__";
+
+    @Override
+    public void accept(@Nonnull final CommandPostprocessingContext<C> context) {
+        context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
+    }
+
+}

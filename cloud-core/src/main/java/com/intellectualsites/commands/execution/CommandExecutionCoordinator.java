@@ -25,6 +25,7 @@ package com.intellectualsites.commands.execution;
 
 import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.services.State;
 
 import javax.annotation.Nonnull;
 import java.util.Queue;
@@ -101,8 +102,11 @@ public abstract class CommandExecutionCoordinator<C> {
                                                                        @Nonnull final Queue<String> input) {
             final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
             try {
-                this.getCommandTree().parse(commandContext, input).ifPresent(
-                        command -> command.getCommandExecutionHandler().execute(commandContext));
+                this.getCommandTree().parse(commandContext, input).ifPresent(command -> {
+                    if (this.getCommandTree().getCommandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
+                        command.getCommandExecutionHandler().execute(commandContext);
+                    }
+                });
                 completableFuture.complete(new CommandResult<>(commandContext));
             } catch (final Exception e) {
                 completableFuture.completeExceptionally(e);

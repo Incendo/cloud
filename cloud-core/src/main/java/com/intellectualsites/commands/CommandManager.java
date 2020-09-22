@@ -38,6 +38,9 @@ import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandResult;
 import com.intellectualsites.commands.execution.CommandSuggestionProcessor;
 import com.intellectualsites.commands.execution.FilteringCommandSuggestionProcessor;
+import com.intellectualsites.commands.execution.postprocessor.AcceptingCommandPostprocessor;
+import com.intellectualsites.commands.execution.postprocessor.CommandPostprocessingContext;
+import com.intellectualsites.commands.execution.postprocessor.CommandPostprocessor;
 import com.intellectualsites.commands.execution.preprocessor.AcceptingCommandPreprocessor;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessor;
@@ -94,6 +97,8 @@ public abstract class CommandManager<C> {
         this.commandRegistrationHandler = commandRegistrationHandler;
         this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
         }, new AcceptingCommandPreprocessor<>());
+        this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
+        }, new AcceptingCommandPostprocessor<>());
     }
 
     /**
@@ -306,12 +311,25 @@ public abstract class CommandManager<C> {
     }
 
     /**
+     * Register a new command postprocessor. The order they are registered in is respected, and they
+     * are called in LIFO order
+     *
+     * @param processor Processor to register
+     * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
+     */
+    public void registerCommandPostProcessor(@Nonnull final CommandPostprocessor<C> processor) {
+        this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPostprocessor<C>>() {
+                                                           }, processor,
+                                                           Collections.emptyList());
+    }
+
+    /**
      * Preprocess a command context instance
      *
      * @param context    Command context
      * @param inputQueue Command input as supplied by sender
      * @return {@link State#ACCEPTED} if the command should be parsed and executed, else {@link State#REJECTED}
-     * @see #registerExceptionHandler(Class, BiConsumer) Register a command preprocessor
+     * @see #registerCommandPreProcessor(CommandPreprocessor) Register a command preprocessor
      */
     public State preprocessContext(@Nonnull final CommandContext<C> context, @Nonnull final LinkedList<String> inputQueue) {
         this.servicePipeline.pump(new CommandPreprocessingContext<>(context, inputQueue))
@@ -319,6 +337,24 @@ public abstract class CommandManager<C> {
                             })
                             .getResult();
         return context.<String>get(AcceptingCommandPreprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
+               ? State.REJECTED
+               : State.ACCEPTED;
+    }
+
+    /**
+     * Postprocess a command context instance
+     *
+     * @param context    Command context
+     * @param command    Command instance
+     * @return {@link State#ACCEPTED} if the command should be parsed and executed, else {@link State#REJECTED}
+     * @see #registerCommandPostProcessor(CommandPostprocessor) Register a command postprocessor
+     */
+    public State postprocessContext(@Nonnull final CommandContext<C> context, @Nonnull final Command<C> command) {
+        this.servicePipeline.pump(new CommandPostprocessingContext<>(context, command))
+                            .through(new TypeToken<CommandPostprocessor<C>>() {
+                            })
+                            .getResult();
+        return context.<String>get(AcceptingCommandPostprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
                ? State.REJECTED
                : State.ACCEPTED;
     }

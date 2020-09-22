@@ -560,6 +560,16 @@ public final class CommandTree<C> {
     }
 
     /**
+     * Get the command manager
+     *
+     * @return Command manager
+     */
+    @Nonnull
+    public CommandManager<C> getCommandManager() {
+        return this.commandManager;
+    }
+
+    /**
      * Very simple tree structure
      *
      * @param <T> Node value type

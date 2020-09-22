@@ -21,8 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+package com.intellectualsites.commands.execution.postprocessor;
+
+import com.intellectualsites.services.types.ConsumerService;
 
 /**
- * Command preprocessing system
+ * Command postprocessor that acts on commands before execution
+ *
+ * @param <C> Command sender type
  */
-package com.intellectualsites.commands.execution.preprocessor;
+public interface CommandPostprocessor<C> extends ConsumerService<CommandPostprocessingContext<C>> {
+}
