@@ -223,6 +223,23 @@ public abstract class CommandManager<C> {
     /**
      * Create a new command builder
      *
+     * @param name        Command name
+     * @param aliases     Command aliases
+     * @param description Command description
+     * @param meta        Command meta
+     * @return Builder instance
+     */
+    @Nonnull
+    public Command.Builder<C> commandBuilder(@Nonnull final String name,
+                                             @Nonnull final Collection<String> aliases,
+                                             @Nonnull final Description description,
+                                             @Nonnull final CommandMeta meta) {
+        return Command.newBuilder(name, meta, description, aliases.toArray(new String[0]));
+    }
+
+    /**
+     * Create a new command builder
+     *
      * @param name    Command name
      * @param aliases Command aliases
      * @param meta    Command meta
@@ -232,7 +249,24 @@ public abstract class CommandManager<C> {
     public Command.Builder<C> commandBuilder(@Nonnull final String name,
                                              @Nonnull final Collection<String> aliases,
                                              @Nonnull final CommandMeta meta) {
-        return Command.newBuilder(name, meta, aliases.toArray(new String[0]));
+        return Command.newBuilder(name, meta, Description.empty(), aliases.toArray(new String[0]));
+    }
+
+    /**
+     * Create a new command builder
+     *
+     * @param name        Command name
+     * @param meta        Command meta
+     * @param description Command description
+     * @param aliases     Command aliases
+     * @return Builder instance
+     */
+    @Nonnull
+    public Command.Builder<C> commandBuilder(@Nonnull final String name,
+                                             @Nonnull final CommandMeta meta,
+                                             @Nonnull final Description description,
+                                             @Nonnull final String... aliases) {
+        return Command.newBuilder(name, meta, description, aliases);
     }
 
     /**
@@ -247,21 +281,39 @@ public abstract class CommandManager<C> {
     public Command.Builder<C> commandBuilder(@Nonnull final String name,
                                              @Nonnull final CommandMeta meta,
                                              @Nonnull final String... aliases) {
-        return Command.newBuilder(name, meta, aliases);
+        return Command.newBuilder(name, meta, Description.empty(), aliases);
     }
 
     /**
      * Create a new command builder using a default command meta instance.
      *
-     * @param name    Command name
-     * @param aliases Command aliases
+     * @param name        Command name
+     * @param description Command description
+     * @param aliases     Command aliases
      * @return Builder instance
      * @throws UnsupportedOperationException If the command manager does not support default command meta creation
      * @see #createDefaultCommandMeta() Default command meta creation
      */
     @Nonnull
-    public Command.Builder<C> commandBuilder(@Nonnull final String name, @Nonnull final String... aliases) {
-        return Command.<C>newBuilder(name, this.createDefaultCommandMeta(), aliases).manager(this);
+    public Command.Builder<C> commandBuilder(@Nonnull final String name,
+                                             @Nonnull final Description description,
+                                             @Nonnull final String... aliases) {
+        return Command.<C>newBuilder(name, this.createDefaultCommandMeta(), description, aliases).manager(this);
+    }
+
+    /**
+     * Create a new command builder using a default command meta instance.
+     *
+     * @param name        Command name
+     * @param aliases     Command aliases
+     * @return Builder instance
+     * @throws UnsupportedOperationException If the command manager does not support default command meta creation
+     * @see #createDefaultCommandMeta() Default command meta creation
+     */
+    @Nonnull
+    public Command.Builder<C> commandBuilder(@Nonnull final String name,
+                                             @Nonnull final String... aliases) {
+        return Command.<C>newBuilder(name, this.createDefaultCommandMeta(), Description.empty(), aliases).manager(this);
     }
 
     /**
@@ -344,8 +396,8 @@ public abstract class CommandManager<C> {
     /**
      * Postprocess a command context instance
      *
-     * @param context    Command context
-     * @param command    Command instance
+     * @param context Command context
+     * @param command Command instance
      * @return {@link State#ACCEPTED} if the command should be parsed and executed, else {@link State#REJECTED}
      * @see #registerCommandPostProcessor(CommandPostprocessor) Register a command postprocessor
      */

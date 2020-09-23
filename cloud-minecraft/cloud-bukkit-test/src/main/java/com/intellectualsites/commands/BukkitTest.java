@@ -27,7 +27,7 @@ import com.intellectualsites.commands.annotations.AnnotationParser;
 import com.intellectualsites.commands.annotations.Argument;
 import com.intellectualsites.commands.annotations.CommandMethod;
 import com.intellectualsites.commands.annotations.Confirmation;
-import com.intellectualsites.commands.annotations.Description;
+import com.intellectualsites.commands.annotations.CommandDescription;
 import com.intellectualsites.commands.annotations.specifier.Completions;
 import com.intellectualsites.commands.annotations.specifier.Range;
 import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
@@ -203,7 +203,7 @@ public final class BukkitTest extends JavaPlugin {
                            .literal("help")
                            .argument(StringArgument.<CommandSender>newBuilder("query").greedy()
                                                                                       .asOptionalWithDefault("")
-                                                                                      .build(), "Help query")
+                                                                                      .build(), Description.of("Help Query"))
                            .handler(c -> minecraftHelp.queryCommands(c.<String>get("query").orElse(""),
                                                                      c.getSender())).build());
         } catch (final Exception e) {
@@ -211,7 +211,7 @@ public final class BukkitTest extends JavaPlugin {
         }
     }
 
-    @Description("Test cloud command using @CommandMethod")
+    @CommandDescription("Test cloud command using @CommandMethod")
     @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
     private void annotatedCommand(@Nonnull final Player player,
                                   @Argument(value = "input", description = "Some string") @Completions("one,two,duck")

@@ -80,7 +80,8 @@ public final class AnnotationParser<C> {
         this.manager = manager;
         this.metaFactory = new MetaFactory(this, metaMapper);
         this.annotationMappers = Maps.newHashMap();
-        this.registerAnnotationMapper(Description.class, d -> ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
+        this.registerAnnotationMapper(CommandDescription.class, d ->
+                ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
     }
 
     /**
@@ -181,7 +182,7 @@ public final class AnnotationParser<C> {
                     }
 
                     final String description = argumentDescriptions.getOrDefault(argument, "");
-                    builder = builder.argument(argument, description);
+                    builder = builder.argument(argument, com.intellectualsites.commands.Description.of(description));
                 }
             }
             /* Try to find the command sender type */

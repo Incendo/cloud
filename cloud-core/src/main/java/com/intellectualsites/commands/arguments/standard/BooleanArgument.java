@@ -85,15 +85,15 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     /**
      * Create a new required command argument with a default value
      *
-     * @param name       Argument name
-     * @param defaultNum Default num
-     * @param <C>        Command sender type
+     * @param name           Argument name
+     * @param defaultBoolean Default num
+     * @param <C>            Command sender type
      * @return Created argument
      */
     @Nonnull
     public static <C> CommandArgument<C, Boolean> optional(@Nonnull final String name,
-                                                           final String defaultNum) {
-        return BooleanArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+                                                           final boolean defaultBoolean) {
+        return BooleanArgument.<C>newBuilder(name).asOptionalWithDefault(Boolean.toString(defaultBoolean)).build();
     }
 
     /**

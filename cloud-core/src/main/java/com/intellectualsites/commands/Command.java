@@ -27,6 +27,7 @@ import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.execution.CommandExecutionHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
+import com.intellectualsites.commands.meta.SimpleCommandMeta;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,10 +45,9 @@ import java.util.function.Consumer;
  *
  * @param <C> Command sender type
  */
-@SuppressWarnings("unused")
 public class Command<C> {
 
-    @Nonnull private final Map<CommandArgument<C, ?>, String> arguments;
+    @Nonnull private final Map<CommandArgument<C, ?>, Description> arguments;
     @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
     @Nullable private final Class<? extends C> senderType;
     @Nonnull private final String commandPermission;
@@ -62,7 +62,7 @@ public class Command<C> {
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final Map<CommandArgument<C, ?>, String> commandArguments,
+    public Command(@Nonnull final Map<CommandArgument<C, ?>, Description> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
                    @Nonnull final String commandPermission,
@@ -99,7 +99,7 @@ public class Command<C> {
      * @param senderType              Required sender type. May be {@code null}
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final Map<CommandArgument<C, ?>, String> commandArguments,
+    public Command(@Nonnull final Map<CommandArgument<C, ?>, Description> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
                    @Nonnull final CommandMeta commandMeta) {
@@ -114,11 +114,33 @@ public class Command<C> {
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
-    public Command(@Nonnull final Map<CommandArgument<C, ?>, String> commandArguments,
+    public Command(@Nonnull final Map<CommandArgument<C, ?>, Description> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nonnull final String commandPermission,
                    @Nonnull final CommandMeta commandMeta) {
-        this(commandArguments, commandExecutionHandler, null, "", commandMeta);
+        this(commandArguments, commandExecutionHandler, null, commandPermission, commandMeta);
+    }
+
+    /**
+     * Create a new command builder. Is recommended to use the builder methods
+     * in {@link CommandManager} rather than invoking this method directly.
+     *
+     * @param commandName Base command argument
+     * @param commandMeta Command meta instance
+     * @param description Command description
+     * @param aliases     Command aliases
+     * @param <C>         Command sender type
+     * @return Command builder
+     */
+    @Nonnull
+    public static <C> Builder<C> newBuilder(@Nonnull final String commandName,
+                                            @Nonnull final CommandMeta commandMeta,
+                                            @Nonnull final Description description,
+                                            @Nonnull final String... aliases) {
+        final Map<CommandArgument<C, ?>, Description> map = new LinkedHashMap<>();
+        map.put(StaticArgument.required(commandName, aliases), description);
+        return new Builder<>(null, commandMeta, null, map,
+                             new CommandExecutionHandler.NullCommandExecutionHandler<>(), "");
     }
 
     /**
@@ -135,8 +157,8 @@ public class Command<C> {
     public static <C> Builder<C> newBuilder(@Nonnull final String commandName,
                                             @Nonnull final CommandMeta commandMeta,
                                             @Nonnull final String... aliases) {
-        final Map<CommandArgument<C, ?>, String> map = new LinkedHashMap<>();
-        map.put(StaticArgument.required(commandName, aliases), "");
+        final Map<CommandArgument<C, ?>, Description> map = new LinkedHashMap<>();
+        map.put(StaticArgument.required(commandName, aliases), Description.empty());
         return new Builder<>(null, commandMeta, null, map,
                              new CommandExecutionHandler.NullCommandExecutionHandler<>(), "");
     }
@@ -199,7 +221,7 @@ public class Command<C> {
      */
     @Nonnull
     public String getArgumentDescription(@Nonnull final CommandArgument<C, ?> argument) {
-        return this.arguments.get(argument);
+        return this.arguments.get(argument).getDescription();
     }
 
 
@@ -212,7 +234,7 @@ public class Command<C> {
     public static final class Builder<C> {
 
         @Nonnull private final CommandMeta commandMeta;
-        @Nonnull private final Map<CommandArgument<C, ?>, String> commandArguments;
+        @Nonnull private final Map<CommandArgument<C, ?>, Description> commandArguments;
         @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
         @Nullable private final Class<? extends C> senderType;
         @Nonnull private final String commandPermission;
@@ -221,7 +243,7 @@ public class Command<C> {
         private Builder(@Nullable final CommandManager<C> commandManager,
                         @Nonnull final CommandMeta commandMeta,
                         @Nullable final Class<? extends C> senderType,
-                        @Nonnull final Map<CommandArgument<C, ?>, String> commandArguments,
+                        @Nonnull final Map<CommandArgument<C, ?>, Description> commandArguments,
                         @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                         @Nonnull final String commandPermission) {
             this.commandManager = commandManager;
@@ -230,6 +252,20 @@ public class Command<C> {
             this.commandExecutionHandler = Objects.requireNonNull(commandExecutionHandler, "Execution handler may not be null");
             this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
             this.commandMeta = Objects.requireNonNull(commandMeta, "Meta may not be null");
+        }
+
+        /**
+         * Add command meta to the internal command meta map
+         *
+         * @param key   Meta key
+         * @param value Meta value
+         * @return New builder instance using the inserted meta key-value pair
+         */
+        @Nonnull
+        public Builder<C> meta(@Nonnull final String key, @Nonnull final String value) {
+            final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).build();
+            return new Builder<>(this.commandManager, commandMeta, this.senderType, this.commandArguments,
+                                 this.commandExecutionHandler, this.commandPermission);
         }
 
         /**
@@ -259,6 +295,21 @@ public class Command<C> {
         }
 
         /**
+         * Inserts a required {@link StaticArgument} into the command chain
+         *
+         * @param main        Main argument name
+         * @param description Literal description
+         * @param aliases     Argument aliases
+         * @return New builder instance with the modified command chain
+         */
+        @Nonnull
+        public Builder<C> literal(@Nonnull final String main,
+                                  @Nonnull final Description description,
+                                  @Nonnull final String... aliases) {
+            return this.argument(StaticArgument.required(main, aliases), description);
+        }
+
+        /**
          * Add a new command argument with an empty description to the command
          *
          * @param argument Argument to add
@@ -267,7 +318,7 @@ public class Command<C> {
          */
         @Nonnull
         public <T> Builder<C> argument(@Nonnull final CommandArgument<C, T> argument) {
-            return this.argument(argument, "");
+            return this.argument(argument, Description.empty());
         }
 
         /**
@@ -275,12 +326,13 @@ public class Command<C> {
          *
          * @param argument    Argument to add
          * @param description Argument description
-         * @param <T>      Argument type
+         * @param <T>         Argument type
          * @return New builder instance with the command argument inserted into the argument list
          */
         @Nonnull
-        public <T> Builder<C> argument(@Nonnull final CommandArgument<C, T> argument, @Nonnull final String description) {
-            final Map<CommandArgument<C, ?>, String> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
+        public <T> Builder<C> argument(@Nonnull final CommandArgument<C, T> argument,
+                                       @Nonnull final Description description) {
+            final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
             commandArgumentMap.put(argument, description);
             return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandArgumentMap,
                                  this.commandExecutionHandler, this.commandPermission);

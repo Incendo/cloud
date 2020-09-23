@@ -66,6 +66,7 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 - **cloud-minecraft/cloud-paper**: Module that extends cloud-bukkit to add special support for Paper 1.8.8+
 - **cloud-minecraft/cloud-bungee**: BungeeCord 1.8.8+ implementation of Cloud
 - **cloud-minecraft/cloud-velocity**: Velocity v1.1.0 implementation of cloud
+- **cloud-minecraft/cloud-cloudburst**: Cloudburst v1.0.0+ implementation of cloud
 
 ## links  
   
@@ -91,8 +92,8 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
  <id>intellectualsites-snapshots</id>  
  <url>https://mvn.intellectualsites.com/content/repositories/snapshots</url>  
 </repository>  
-```  
-  
+```
+
 ```xml  
 <dependency>  
  <groupId>com.intellectualsites</groupId>  
@@ -109,6 +110,45 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
  <version>0.2.0-SNAPSHOT</version>
 </dependency>
 ``` 
+
+If you are shading in cloud, it is highly recommended that you relocate all of our classes to prevent issues
+with conflicting dependencies:
+
+```xml
+<build>
+    <plugins>
+         <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.intellectualsites.commands</pattern>
+                            <shadedPattern>YOUR.PACKAGE.HERE.cloud</shadedPattern> <!-- Replace this -->
+                        </relocation>
+                        <relocation>
+                            <pattern>com.intellectualsites.services</pattern>
+                            <shadedPattern>YOUR.PACKAGE.HERE.cloud.pipeline</shadedPattern> <!-- Replace this -->
+                        </relocation>
+                    </relocations>
+                </configuration>
+            </plugin>
+    </plugins>
+</build>
+```
 
 **gradle**:
 ```groovy

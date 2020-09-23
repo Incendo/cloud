@@ -47,7 +47,7 @@ class CommandHelpHandlerTest {
         manager.command(manager.commandBuilder("test", meta1).literal("this").literal("thing").build());
         final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with("description", "Command with variables").build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
-                argument(IntegerArgument.required("int"), "A number").build());
+                argument(IntegerArgument.required("int"), Description.of("A number")).build());
     }
 
     @Test

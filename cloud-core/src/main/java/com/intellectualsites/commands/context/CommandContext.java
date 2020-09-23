@@ -125,4 +125,17 @@ public final class CommandContext<C> {
         return (T) value;
     }
 
+    /**
+     * Get a value if it exists, else return the provided default value
+     *
+     * @param key           Argument key
+     * @param defaultValue  Default value
+     * @param <T>           Argument type
+     * @return Argument, or supplied default value
+     */
+    @Nonnull
+    public <T> T getOrDefault(@Nonnull final String key, @Nonnull final T defaultValue) {
+        return this.<T>get(key).orElse(defaultValue);
+    }
+
 }
