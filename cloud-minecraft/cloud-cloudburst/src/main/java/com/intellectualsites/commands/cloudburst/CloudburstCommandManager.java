@@ -29,7 +29,7 @@ import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
 import org.cloudburstmc.server.command.CommandSender;
-import org.cloudburstmc.server.plugin.PluginContainer;
+import org.cloudburstmc.server.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.util.function.Function;
@@ -44,7 +44,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
 
-    private final PluginContainer owningPlugin;
+    private final Plugin owningPlugin;
 
     /**
      * Construct a new Cloudburst command manager
@@ -53,13 +53,12 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
      * @param commandExecutionCoordinator  Coordinator provider
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
-     * @throws Exception If the construction of the manager fails
      */
-    public CloudburstCommandManager(@Nonnull final PluginContainer owningPlugin,
+    public CloudburstCommandManager(@Nonnull final Plugin owningPlugin,
                                 @Nonnull final Function<CommandTree<C>,
                                         CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                                 @Nonnull final Function<CommandSender, C> commandSenderMapper,
-                                @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper) throws Exception {
+                                @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper) {
         super(commandExecutionCoordinator, new CloudburstPluginRegistrationHandler<>());
         ((CloudburstPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.commandSenderMapper = commandSenderMapper;
@@ -90,7 +89,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
      * @return Owning plugin
      */
     @Nonnull
-    public final PluginContainer getOwningPlugin() {
+    public final Plugin getOwningPlugin() {
         return this.owningPlugin;
     }
 

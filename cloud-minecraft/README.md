@@ -8,6 +8,7 @@ This directory hosts Minecraft specific implementations of cloud. Their features
 | `cloud-paper` | Bukkit, Spigot, Paper | 1.8+ | Via Paper for MC 1.15+, Via commodore for MC 1.13+ |
 | `cloud-bungee` | BungeeCord | 1.8+ | No |
 | `cloud-velocity` | Velocity 1.1.0 | 1.7+ | Yes |
+| `cloud-cloudburst` | CloudBurst 1.0.0 | Bedrock 1.16.20+ | No |
 
 ## cloud-bukkit
 Bukkit mappings for cloud. If `commodore` is present on the classpath and the server is running at least version 1.13+, Brigadier mappings will be available.

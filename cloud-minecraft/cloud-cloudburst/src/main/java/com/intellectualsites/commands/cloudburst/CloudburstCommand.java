@@ -32,13 +32,13 @@ import com.intellectualsites.commands.exceptions.NoSuchCommandException;
 import org.cloudburstmc.server.command.CommandSender;
 import org.cloudburstmc.server.command.PluginCommand;
 import org.cloudburstmc.server.command.data.CommandData;
-import org.cloudburstmc.server.plugin.PluginContainer;
+import org.cloudburstmc.server.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 
-final class CloudburstCommand<C> extends PluginCommand<PluginContainer> {
+final class CloudburstCommand<C> extends PluginCommand<Plugin> {
 
     private static final String MESSAGE_NO_PERMS =
             "I'm sorry, but you do not have permission to perform this command. "
@@ -54,7 +54,7 @@ final class CloudburstCommand<C> extends PluginCommand<PluginContainer> {
                       @Nonnull final com.intellectualsites.commands.Command<C> cloudCommand,
                       @Nonnull final CommandArgument<C, ?> command,
                       @Nonnull final CloudburstCommandManager<C> manager) {
-        super(manager.getOwningPlugin(), null, CommandData.builder(label)
+        super(manager.getOwningPlugin(), CommandData.builder(label)
                                 .addAliases(aliases.toArray(new String[0]))
                                 .addPermission(cloudCommand.getCommandPermission())
                                 .setDescription(cloudCommand.getCommandMeta().getOrDefault("description", ""))

@@ -22,6 +22,7 @@
         <module>cloud-minecraft/cloud-velocity</module>
         <module>cloud-minecraft/cloud-minecraft-extras</module>
         <module>cloud-minecraft/cloud-cloudburst</module>
+        <module>cloud-minecraft/cloud-cloudburst-test</module>
     </modules>
     <packaging>pom</packaging>
     <inceptionYear>2020</inceptionYear>

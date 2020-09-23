@@ -28,7 +28,7 @@ import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import org.cloudburstmc.server.Server;
-import org.cloudburstmc.server.plugin.PluginContainer;
+import org.cloudburstmc.server.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
         if (this.registeredCommands.containsKey(commandArgument)) {
             return false;
         }
-        final PluginContainer plugin = this.cloudburstCommandManager.getOwningPlugin();
+        final Plugin plugin = this.cloudburstCommandManager.getOwningPlugin();
         final CloudburstCommand<C> cloudburstCommand = new CloudburstCommand<>(
                 commandArgument.getName(),
                 ((StaticArgument<C>) commandArgument).getAlternativeAliases(),
