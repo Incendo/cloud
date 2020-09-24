@@ -29,6 +29,7 @@ import com.intellectualsites.commands.CommandTree;
 import com.intellectualsites.commands.arguments.CommandArgument;
 import com.intellectualsites.commands.brigadier.CloudBrigadierManager;
 import com.intellectualsites.commands.context.CommandContext;
+import com.intellectualsites.commands.permission.CommandPermission;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -41,6 +42,7 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 import java.util.logging.Level;
 
 class PaperBrigadierListener<C> implements Listener {
@@ -124,12 +126,15 @@ class PaperBrigadierListener<C> implements Listener {
         if (node == null) {
             return;
         }
+        final BiPredicate<BukkitBrigadierCommandSource, CommandPermission> permissionChecker = (s, p) -> {
+            final C sender = paperCommandManager.getCommandSenderMapper().apply(s.getBukkitSender());
+            return paperCommandManager.hasPermission(sender, p);
+        };
         event.setLiteral(this.brigadierManager.createLiteralCommandNode(node,
                                                                         event.getLiteral(),
                                                                         event.getBrigadierCommand(),
                                                                         event.getBrigadierCommand(),
-                                                                        (s, p) -> p.toString().isEmpty()
-                                                                             || s.getBukkitSender().hasPermission(p.toString())));
+                                                                        permissionChecker));
     }
 
 }

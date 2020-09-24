@@ -222,6 +222,9 @@ public abstract class CommandManager<C> {
      * @return {@code true} if the sender has the permission, else {@code false}
      */
     public boolean hasPermission(@Nonnull final C sender, @Nonnull final CommandPermission permission) {
+        if (permission.toString().isEmpty()) {
+            return true;
+        }
         if (permission instanceof Permission) {
             return hasPermission(sender, permission.toString());
         }
@@ -233,7 +236,7 @@ public abstract class CommandManager<C> {
                 }
             }
         }
-        return !(permission instanceof OrPermission);
+        return false;
     }
 
     /**

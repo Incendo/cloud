@@ -36,6 +36,7 @@ import javax.annotation.Nonnull;
 @SuppressWarnings("ALL")
 class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
 
+    private final BukkitCommandManager<C> commandManager;
     private final CloudBrigadierManager brigadierManager;
     private final Commodore commodore;
 
@@ -45,6 +46,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             throw new BukkitCommandManager.BrigadierFailureException(BukkitCommandManager
                                                                              .BrigadierFailureReason.COMMODORE_NOT_PRESENT);
         }
+        this.commandManager = commandManager;
         this.commodore = CommodoreProvider.getCommodore(commandManager.getOwningPlugin());
         this.brigadierManager = new CloudBrigadierManager<>(commandManager, () ->
                 new CommandContext<>(commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender())));
@@ -58,6 +60,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
                 .createLiteralCommandNode(label, command, (o, p) -> true, cmd);
         this.commodore.register(bukkitCommand, literalCommandNode, p ->
-                p.hasPermission(command.getCommandPermission().toString()));
+                this.commandManager.hasPermission(commandManager.getCommandSenderMapper().apply(p),
+                                                  command.getCommandPermission()));
     }
 }
