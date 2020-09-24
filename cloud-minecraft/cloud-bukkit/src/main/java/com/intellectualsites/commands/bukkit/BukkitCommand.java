@@ -152,7 +152,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public String getPermission() {
-        return this.cloudCommand.getCommandPermission();
+        return this.cloudCommand.getCommandPermission().toString();
     }
 
 }

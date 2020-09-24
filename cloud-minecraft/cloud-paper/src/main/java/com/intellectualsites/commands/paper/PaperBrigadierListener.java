@@ -128,8 +128,8 @@ class PaperBrigadierListener<C> implements Listener {
                                                                         event.getLiteral(),
                                                                         event.getBrigadierCommand(),
                                                                         event.getBrigadierCommand(),
-                                                                        (s, p) -> p.isEmpty()
-                                                                                || s.getBukkitSender().hasPermission(p)));
+                                                                        (s, p) -> p.toString().isEmpty()
+                                                                             || s.getBukkitSender().hasPermission(p.toString())));
     }
 
 }

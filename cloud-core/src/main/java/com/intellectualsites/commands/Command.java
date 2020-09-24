@@ -28,6 +28,8 @@ import com.intellectualsites.commands.arguments.StaticArgument;
 import com.intellectualsites.commands.execution.CommandExecutionHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
+import com.intellectualsites.commands.permission.CommandPermission;
+import com.intellectualsites.commands.permission.Permission;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,7 +52,7 @@ public class Command<C> {
     @Nonnull private final Map<CommandArgument<C, ?>, Description> arguments;
     @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
     @Nullable private final Class<? extends C> senderType;
-    @Nonnull private final String commandPermission;
+    @Nonnull private final CommandPermission commandPermission;
     @Nonnull private final CommandMeta commandMeta;
 
     /**
@@ -65,7 +67,7 @@ public class Command<C> {
     public Command(@Nonnull final Map<CommandArgument<C, ?>, Description> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
-                   @Nonnull final String commandPermission,
+                   @Nonnull final CommandPermission commandPermission,
                    @Nonnull final CommandMeta commandMeta) {
         this.arguments = Objects.requireNonNull(commandArguments, "Command arguments may not be null");
         if (this.arguments.size() == 0) {
@@ -103,7 +105,7 @@ public class Command<C> {
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
                    @Nullable final Class<? extends C> senderType,
                    @Nonnull final CommandMeta commandMeta) {
-        this(commandArguments, commandExecutionHandler, senderType, "", commandMeta);
+        this(commandArguments, commandExecutionHandler, senderType, Permission.empty(), commandMeta);
     }
 
     /**
@@ -116,7 +118,7 @@ public class Command<C> {
      */
     public Command(@Nonnull final Map<CommandArgument<C, ?>, Description> commandArguments,
                    @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
-                   @Nonnull final String commandPermission,
+                   @Nonnull final CommandPermission commandPermission,
                    @Nonnull final CommandMeta commandMeta) {
         this(commandArguments, commandExecutionHandler, null, commandPermission, commandMeta);
     }
@@ -140,7 +142,7 @@ public class Command<C> {
         final Map<CommandArgument<C, ?>, Description> map = new LinkedHashMap<>();
         map.put(StaticArgument.required(commandName, aliases), description);
         return new Builder<>(null, commandMeta, null, map,
-                             new CommandExecutionHandler.NullCommandExecutionHandler<>(), "");
+                             new CommandExecutionHandler.NullCommandExecutionHandler<>(), Permission.empty());
     }
 
     /**
@@ -160,7 +162,7 @@ public class Command<C> {
         final Map<CommandArgument<C, ?>, Description> map = new LinkedHashMap<>();
         map.put(StaticArgument.required(commandName, aliases), Description.empty());
         return new Builder<>(null, commandMeta, null, map,
-                             new CommandExecutionHandler.NullCommandExecutionHandler<>(), "");
+                             new CommandExecutionHandler.NullCommandExecutionHandler<>(), Permission.empty());
     }
 
     /**
@@ -199,7 +201,7 @@ public class Command<C> {
      * @return Command permission
      */
     @Nonnull
-    public String getCommandPermission() {
+    public CommandPermission getCommandPermission() {
         return this.commandPermission;
     }
 
@@ -237,7 +239,7 @@ public class Command<C> {
         @Nonnull private final Map<CommandArgument<C, ?>, Description> commandArguments;
         @Nonnull private final CommandExecutionHandler<C> commandExecutionHandler;
         @Nullable private final Class<? extends C> senderType;
-        @Nonnull private final String commandPermission;
+        @Nonnull private final CommandPermission commandPermission;
         @Nullable private final CommandManager<C> commandManager;
 
         private Builder(@Nullable final CommandManager<C> commandManager,
@@ -245,7 +247,7 @@ public class Command<C> {
                         @Nullable final Class<? extends C> senderType,
                         @Nonnull final Map<CommandArgument<C, ?>, Description> commandArguments,
                         @Nonnull final CommandExecutionHandler<C> commandExecutionHandler,
-                        @Nonnull final String commandPermission) {
+                        @Nonnull final CommandPermission commandPermission) {
             this.commandManager = commandManager;
             this.senderType = senderType;
             this.commandArguments = Objects.requireNonNull(commandArguments, "Arguments may not be null");
@@ -391,9 +393,21 @@ public class Command<C> {
          * @return New builder instance using the command permission
          */
         @Nonnull
-        public Builder<C> withPermission(@Nonnull final String permission) {
+        public Builder<C> withPermission(@Nonnull final CommandPermission permission) {
             return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandArguments,
                                  this.commandExecutionHandler, permission);
+        }
+
+        /**
+         * Specify a command permission
+         *
+         * @param permission Command permission
+         * @return New builder instance using the command permission
+         */
+        @Nonnull
+        public Builder<C> withPermission(@Nonnull final String permission) {
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandArguments,
+                                 this.commandExecutionHandler, Permission.of(permission));
         }
 
         /**

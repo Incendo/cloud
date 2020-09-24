@@ -40,6 +40,8 @@ import com.intellectualsites.commands.arguments.standard.ShortArgument;
 import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessingContext;
+import com.intellectualsites.commands.permission.CommandPermission;
+import com.intellectualsites.commands.permission.Permission;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -243,14 +245,15 @@ public final class CloudBrigadierManager<C, S> {
      */
     public LiteralCommandNode<S> createLiteralCommandNode(@Nonnull final String label,
                                                           @Nonnull final Command<C> cloudCommand,
-                                                          @Nonnull final BiPredicate<S, String> permissionChecker,
+                                                          @Nonnull final BiPredicate<S, CommandPermission> permissionChecker,
                                                           @Nonnull final com.mojang.brigadier.Command<S> executor) {
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
                 .getCommandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
         final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(node.getValue(), context, builder);
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
                 .<S>literal(label)
-                .requires(sender -> permissionChecker.test(sender, node.getNodeMeta().getOrDefault("permission", "")));
+                .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.getNodeMeta()
+                                                                           .getOrDefault("permission", Permission.empty())));
         literalArgumentBuilder.executes(executor);
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandArgument<C, ?>> child : node.getChildren()) {
@@ -275,9 +278,10 @@ public final class CloudBrigadierManager<C, S> {
                                                           @Nonnull final LiteralCommandNode<S> root,
                                                           @Nonnull final SuggestionProvider<S> suggestionProvider,
                                                           @Nonnull final com.mojang.brigadier.Command<S> executor,
-                                                          @Nonnull final BiPredicate<S, String> permissionChecker) {
+                                                          @Nonnull final BiPredicate<S, CommandPermission> permissionChecker) {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
-                .requires(sender -> permissionChecker.test(sender, cloudCommand.getNodeMeta().getOrDefault("permission", "")));
+                .requires(sender -> permissionChecker.test(sender, (CommandPermission) cloudCommand.getNodeMeta()
+                                                                            .getOrDefault("permission", Permission.empty())));
         if (cloudCommand.isLeaf() && cloudCommand.getValue() != null) {
             literalArgumentBuilder.executes(executor);
         }
@@ -291,14 +295,15 @@ public final class CloudBrigadierManager<C, S> {
 
     private ArgumentBuilder<S, ?> constructCommandNode(final boolean forceExecutor,
                                                        @Nonnull final CommandTree.Node<CommandArgument<C, ?>> root,
-                                                       @Nonnull final BiPredicate<S, String> permissionChecker,
+                                                       @Nonnull final BiPredicate<S, CommandPermission> permissionChecker,
                                                        @Nonnull final com.mojang.brigadier.Command<S> executor,
                                                        @Nonnull final SuggestionProvider<S> suggestionProvider) {
 
         ArgumentBuilder<S, ?> argumentBuilder;
         if (root.getValue() instanceof StaticArgument) {
             argumentBuilder = LiteralArgumentBuilder.<S>literal(root.getValue().getName())
-                    .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")))
+                    .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.getNodeMeta()
+                                                                             .getOrDefault("permission", Permission.empty())))
                     .executes(executor);
         } else {
             final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(root.getValue().getValueType(),
@@ -308,7 +313,8 @@ public final class CloudBrigadierManager<C, S> {
             argumentBuilder = RequiredArgumentBuilder
                     .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getLeft())
                     .suggests(provider)
-                    .requires(sender -> permissionChecker.test(sender, root.getNodeMeta().getOrDefault("permission", "")));
+                    .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.getNodeMeta()
+                                                                            .getOrDefault("permission", Permission.empty())));
         }
         if (forceExecutor || root.isLeaf() || !root.getValue().isRequired()) {
             argumentBuilder.executes(executor);
