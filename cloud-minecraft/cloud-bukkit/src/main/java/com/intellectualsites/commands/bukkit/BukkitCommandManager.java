@@ -221,6 +221,15 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         }
     }
 
+    /**
+     * Get the backwards command sender plugin
+     *
+     * @return The backwards command sender mapper
+     */
+    @Nonnull
+    public final Function<C, CommandSender> getBackwardsCommandSenderMapper() {
+        return this.backwardsCommandSenderMapper;
+    }
 
     /**
      * Reasons to explain why Brigadier failed to initialize

@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
 class CommandPermissionTest {
 
     private final static CommandManager<TestCommandSender> manager = new PermissionOutputtingCommandManager();
+    private static boolean acceptOne = false;
 
     @BeforeAll
     static void setup() {
@@ -46,7 +47,9 @@ class CommandPermissionTest {
 
     @Test
     void testCompoundPermission() {
-        Assertions.assertTrue(manager.suggest(new TestCommandSender(), "").isEmpty());
+        Assertions.assertTrue(manager.suggest(new TestCommandSender(), "t").isEmpty());
+        acceptOne = true;
+        Assertions.assertFalse(manager.suggest(new TestCommandSender(), "t").isEmpty());
     }
 
     private static final class PermissionOutputtingCommandManager extends CommandManager<TestCommandSender> {
@@ -58,7 +61,7 @@ class CommandPermissionTest {
         @Override
         public boolean hasPermission(@Nonnull final TestCommandSender sender,
                                      @Nonnull final String permission) {
-            return false;
+            return acceptOne && permission.equalsIgnoreCase("test.permission.four");
         }
 
         @Nonnull
