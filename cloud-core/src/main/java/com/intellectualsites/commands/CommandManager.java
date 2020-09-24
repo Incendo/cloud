@@ -46,6 +46,9 @@ import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessin
 import com.intellectualsites.commands.execution.preprocessor.CommandPreprocessor;
 import com.intellectualsites.commands.internal.CommandRegistrationHandler;
 import com.intellectualsites.commands.meta.CommandMeta;
+import com.intellectualsites.commands.permission.CommandPermission;
+import com.intellectualsites.commands.permission.OrPermission;
+import com.intellectualsites.commands.permission.Permission;
 import com.intellectualsites.services.ServicePipeline;
 import com.intellectualsites.services.State;
 
@@ -208,6 +211,29 @@ public abstract class CommandManager<C> {
 
     protected final void setCommandRegistrationHandler(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
         this.commandRegistrationHandler = commandRegistrationHandler;
+    }
+
+    /**
+     * Check if the command sender has the required permission. If the permission node is
+     * empty, this should return {@code true}
+     *
+     * @param sender     Command sender
+     * @param permission Permission node
+     * @return {@code true} if the sender has the permission, else {@code false}
+     */
+    public boolean hasPermission(@Nonnull final C sender, @Nonnull final CommandPermission permission) {
+        if (permission instanceof Permission) {
+            return hasPermission(sender, permission.toString());
+        }
+        for (final CommandPermission innerPermission : permission.getPermissions()) {
+            final boolean hasPermission = this.hasPermission(sender, innerPermission);
+            if (permission instanceof OrPermission) {
+                if (hasPermission) {
+                    return true;
+                }
+            }
+        }
+        return !(permission instanceof OrPermission);
     }
 
     /**

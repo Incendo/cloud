@@ -55,7 +55,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                   @Nonnull final CommandArgument<C, ?> command,
                   @Nonnull final BungeeCommandManager<C> manager) {
         super(command.getName(),
-              cloudCommand.getCommandPermission(),
+              cloudCommand.getCommandPermission().toString(),
               ((StaticArgument<C>) command).getAlternativeAliases().toArray(new String[0]));
         this.command = command;
         this.manager = manager;

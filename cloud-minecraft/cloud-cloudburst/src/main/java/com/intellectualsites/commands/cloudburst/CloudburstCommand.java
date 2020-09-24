@@ -56,7 +56,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
                       @Nonnull final CloudburstCommandManager<C> manager) {
         super(manager.getOwningPlugin(), CommandData.builder(label)
                                 .addAliases(aliases.toArray(new String[0]))
-                                .addPermission(cloudCommand.getCommandPermission())
+                                .addPermission(cloudCommand.getCommandPermission().toString())
                                 .setDescription(cloudCommand.getCommandMeta().getOrDefault("description", ""))
                                 .build());
         this.command = command;

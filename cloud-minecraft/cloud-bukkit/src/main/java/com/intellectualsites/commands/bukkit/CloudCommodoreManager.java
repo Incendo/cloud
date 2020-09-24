@@ -57,6 +57,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         final com.mojang.brigadier.Command<?> cmd = o -> 1;
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
                 .createLiteralCommandNode(label, command, (o, p) -> true, cmd);
-        this.commodore.register(bukkitCommand, literalCommandNode, p -> p.hasPermission(command.getCommandPermission()));
+        this.commodore.register(bukkitCommand, literalCommandNode, p ->
+                p.hasPermission(command.getCommandPermission().toString()));
     }
 }

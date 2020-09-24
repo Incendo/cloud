@@ -24,6 +24,7 @@
 package com.intellectualsites.commands.exceptions;
 
 import com.intellectualsites.commands.arguments.CommandArgument;
+import com.intellectualsites.commands.permission.CommandPermission;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class NoPermissionException extends CommandParseException {
 
-    private final String missingPermission;
+    private final CommandPermission missingPermission;
 
     /**
      * Construct a new no permission exception
@@ -44,7 +45,7 @@ public class NoPermissionException extends CommandParseException {
      * @param commandSender     Command sender
      * @param currentChain      Chain leading up to the exception
      */
-    public NoPermissionException(@Nonnull final String missingPermission,
+    public NoPermissionException(@Nonnull final CommandPermission missingPermission,
                                  @Nonnull final Object commandSender,
                                  @Nonnull final List<CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
@@ -63,7 +64,7 @@ public class NoPermissionException extends CommandParseException {
      */
     @Nonnull
     public String getMissingPermission() {
-        return this.missingPermission;
+        return this.missingPermission.toString();
     }
 
     @Override

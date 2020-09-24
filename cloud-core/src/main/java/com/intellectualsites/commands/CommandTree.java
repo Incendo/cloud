@@ -34,10 +34,13 @@ import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.exceptions.NoCommandInLeafException;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.exceptions.NoSuchCommandException;
+import com.intellectualsites.commands.permission.CommandPermission;
+import com.intellectualsites.commands.permission.OrPermission;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -130,7 +133,7 @@ public final class CommandTree<C> {
                                               @Nonnull final CommandContext<C> commandContext,
                                               @Nonnull final Queue<String> commandQueue,
                                               @Nonnull final Node<CommandArgument<C, ?>> root) {
-        String permission = this.isPermitted(commandContext.getSender(), root);
+        CommandPermission permission = this.isPermitted(commandContext.getSender(), root);
         if (permission != null) {
             throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(root)
                                                                                         .stream()
@@ -213,7 +216,7 @@ public final class CommandTree<C> {
                                                               @Nonnull final CommandContext<C> commandContext,
                                                               @Nonnull final Node<CommandArgument<C, ?>> root,
                                                               @Nonnull final Queue<String> commandQueue) {
-        String permission;
+        CommandPermission permission;
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
             // The value has to be a variable
@@ -412,8 +415,8 @@ public final class CommandTree<C> {
     }
 
     @Nullable
-    private String isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandArgument<C, ?>> node) {
-        final String permission = node.nodeMeta.get("permission");
+    private CommandPermission isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandArgument<C, ?>> node) {
+        final CommandPermission permission = (CommandPermission) node.nodeMeta.get("permission");
         if (permission != null) {
             return this.commandManager.hasPermission(sender, permission) ? null : permission;
         }
@@ -422,22 +425,24 @@ public final class CommandTree<C> {
                                                      Objects.requireNonNull(
                                                              Objects.requireNonNull(node.value, "node.value").getOwningCommand(),
                                                              "owning command").getCommandPermission())
-                   ? null : Objects.requireNonNull(node.value.getOwningCommand(), "owning command").getCommandPermission();
+                   ? null : Objects.requireNonNull(node.value.getOwningCommand(), "owning command")
+                                   .getCommandPermission();
         }
         /*
           if any of the children would permit the execution, then the sender has a valid
            chain to execute, and so we allow them to execute the root
          */
-        final List<String> missingPermissions = new LinkedList<>();
+        final List<CommandPermission> missingPermissions = new LinkedList<>();
         for (final Node<CommandArgument<C, ?>> child : node.getChildren()) {
-            final String check = this.isPermitted(sender, child);
+            final CommandPermission check = this.isPermitted(sender, child);
             if (check == null) {
                 return null;
             } else {
                 missingPermissions.add(check);
             }
         }
-        return String.join(", ", missingPermissions);
+
+        return OrPermission.of(missingPermissions);
     }
 
     /**
@@ -466,20 +471,23 @@ public final class CommandTree<C> {
 
         // Register command permissions
         this.getLeavesRaw(this.internalTree).forEach(node -> {
+            // noinspection all
+            final CommandPermission commandPermission = node.getValue().getOwningCommand().getCommandPermission();
             /* All leaves must necessarily have an owning command */
             // noinspection all
-            node.nodeMeta.put("permission", node.getValue().getOwningCommand().getCommandPermission());
+            node.nodeMeta.put("permission", commandPermission);
             // Get chain and order it tail->head then skip the tail (leaf node)
             List<Node<CommandArgument<C, ?>>> chain = this.getChain(node);
             Collections.reverse(chain);
             chain = chain.subList(1, chain.size());
             // Go through all nodes from the tail upwards until a collision occurs
             for (final Node<CommandArgument<C, ?>> commandArgumentNode : chain) {
-                if (commandArgumentNode.nodeMeta.containsKey("permission")
-                        && !commandArgumentNode.nodeMeta.get("permission").equalsIgnoreCase(node.nodeMeta.get("permission"))) {
-                    commandArgumentNode.nodeMeta.put("permission", "");
+                final CommandPermission existingPermission = (CommandPermission) commandArgumentNode.nodeMeta.get("permission");
+                if (existingPermission != null) {
+                    commandArgumentNode.nodeMeta.put("permission",
+                                                     OrPermission.of(Arrays.asList(commandPermission, existingPermission)));
                 } else {
-                    commandArgumentNode.nodeMeta.put("permission", node.nodeMeta.get("permission"));
+                    commandArgumentNode.nodeMeta.put("permission", commandPermission);
                 }
             }
         });
@@ -589,7 +597,7 @@ public final class CommandTree<C> {
      */
     public static final class Node<T> {
 
-        private final Map<String, String> nodeMeta = new HashMap<>();
+        private final Map<String, Object> nodeMeta = new HashMap<>();
         private final List<Node<T>> children = new LinkedList<>();
         private final T value;
         private Node<T> parent;
@@ -640,7 +648,7 @@ public final class CommandTree<C> {
          * @return Node meta
          */
         @Nonnull
-        public Map<String, String> getNodeMeta() {
+        public Map<String, Object> getNodeMeta() {
             return this.nodeMeta;
         }
 
