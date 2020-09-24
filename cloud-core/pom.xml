@@ -40,6 +40,18 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.25.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.25.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.intellectualsites</groupId>
             <artifactId>cloud-pipeline</artifactId>
             <version>1.5.0-SNAPSHOT</version>

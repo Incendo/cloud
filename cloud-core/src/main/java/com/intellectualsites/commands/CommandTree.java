@@ -177,7 +177,13 @@ public final class CommandTree<C> {
                 while (childIterator.hasNext()) {
                     final Node<CommandArgument<C, ?>> child = childIterator.next();
                     if (child.getValue() != null) {
-                        final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                        final CommandArgument<C, ?> argument = child.getValue();
+                        final CommandContext.ArgumentTiming argumentTiming = commandContext.createTiming(argument);
+
+                        argumentTiming.setStart(System.nanoTime());
+                        final ArgumentParseResult<?> result = argument.getParser().parse(commandContext, commandQueue);
+                        argumentTiming.setEnd(System.nanoTime(), result.getFailure().isPresent());
+
                         if (result.getParsedValue().isPresent()) {
                             parsedArguments.add(child.getValue());
                             return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
@@ -251,7 +257,14 @@ public final class CommandTree<C> {
                                                                                          .collect(Collectors.toList()));
                     }
                 }
-                final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+
+                final CommandArgument<C, ?> argument = child.getValue();
+                final CommandContext.ArgumentTiming argumentTiming = commandContext.createTiming(argument);
+
+                argumentTiming.setStart(System.nanoTime());
+                final ArgumentParseResult<?> result = argument.getParser().parse(commandContext, commandQueue);
+                argumentTiming.setEnd(System.nanoTime(), result.getFailure().isPresent());
+
                 if (result.getParsedValue().isPresent()) {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     if (child.isLeaf()) {

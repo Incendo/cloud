@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * {@link CommandArgument} type that recognizes fixed strings. This type does not parse variables.
@@ -81,7 +82,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      * @param alias New alias
      */
     public void registerAlias(@Nonnull final String alias) {
-        ((StaticArgumentParser<C>) this.getParser()).acceptedStrings.add(alias);
+        ((StaticArgumentParser<C>) this.getParser()).insertAlias(alias);
     }
 
     /**
@@ -101,20 +102,21 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      */
     @Nonnull
     public List<String> getAlternativeAliases() {
-        return Collections.unmodifiableList(new ArrayList<>(((StaticArgumentParser<C>) this.getParser()).acceptedStrings));
+        return Collections.unmodifiableList(new ArrayList<>(((StaticArgumentParser<C>) this.getParser()).alternativeAliases));
     }
 
 
     private static final class StaticArgumentParser<C> implements ArgumentParser<C, String> {
 
-        private final String name;
-        private final Set<String> acceptedStrings = new HashSet<>();
+        private final Set<String> allAcceptedAliases = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         private final Set<String> alternativeAliases = new HashSet<>();
+
+        private final String name;
 
         private StaticArgumentParser(@Nonnull final String name, @Nonnull final String... aliases) {
             this.name = name;
-            this.acceptedStrings.add(this.name);
-            this.acceptedStrings.addAll(Arrays.asList(aliases));
+            this.allAcceptedAliases.add(this.name);
+            this.allAcceptedAliases.addAll(Arrays.asList(aliases));
             this.alternativeAliases.addAll(Arrays.asList(aliases));
         }
 
@@ -126,12 +128,9 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
             if (string == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input provided"));
             }
-            for (final String acceptedString : this.acceptedStrings) {
-                if (string.equalsIgnoreCase(acceptedString)) {
-                    // Remove the head of the queue
-                    inputQueue.remove();
-                    return ArgumentParseResult.success(this.name);
-                }
+            if (this.allAcceptedAliases.contains(string)) {
+                inputQueue.remove();
+                return ArgumentParseResult.success(this.name);
             }
             return ArgumentParseResult.failure(new IllegalArgumentException(string));
         }
@@ -149,8 +148,19 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
          */
         @Nonnull
         public Set<String> getAcceptedStrings() {
-            return this.acceptedStrings;
+            return this.allAcceptedAliases;
         }
+
+        /**
+         * Insert a new alias
+         *
+         * @param alias New alias
+         */
+        public void insertAlias(@Nonnull final String alias) {
+            this.allAcceptedAliases.add(alias);
+            this.alternativeAliases.add(alias);
+        }
+
     }
 
 }

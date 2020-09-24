@@ -23,8 +23,11 @@
 //
 package com.intellectualsites.commands.context;
 
+import com.google.common.collect.Maps;
+import com.intellectualsites.commands.arguments.CommandArgument;
+
 import javax.annotation.Nonnull;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,7 +38,8 @@ import java.util.Optional;
  */
 public final class CommandContext<C> {
 
-    private final Map<String, Object> internalStorage = new HashMap<>();
+    private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = Maps.newHashMap();
+    private final Map<String, Object> internalStorage = Maps.newHashMap();
     private final C commandSender;
     private final boolean suggestions;
 
@@ -128,14 +132,125 @@ public final class CommandContext<C> {
     /**
      * Get a value if it exists, else return the provided default value
      *
-     * @param key           Argument key
-     * @param defaultValue  Default value
-     * @param <T>           Argument type
+     * @param key          Argument key
+     * @param defaultValue Default value
+     * @param <T>          Argument type
      * @return Argument, or supplied default value
      */
     @Nonnull
     public <T> T getOrDefault(@Nonnull final String key, @Nonnull final T defaultValue) {
         return this.<T>get(key).orElse(defaultValue);
+    }
+
+    /**
+     * Create an argument timing for a specific argument
+     *
+     * @param argument Argument
+     * @return Created timing instance
+     */
+    @Nonnull
+    public ArgumentTiming createTiming(@Nonnull final CommandArgument<C, ?> argument) {
+        final ArgumentTiming argumentTiming = new ArgumentTiming();
+        this.argumentTimings.put(argument, argumentTiming);
+        return argumentTiming;
+    }
+
+    /**
+     * Get an immutable view of the argument timings map
+     *
+     * @return Argument timings
+     */
+    @Nonnull
+    public Map<CommandArgument<C, ?>, ArgumentTiming> getArgumentTimings() {
+        return Collections.unmodifiableMap(this.argumentTimings);
+    }
+
+
+    /**
+     * Used to track performance metrics related to command parsing. This is attached
+     * to the command context, as this depends on the command context that is being
+     * parsed.
+     * <p>
+     * The times are measured in nanoseconds.
+     */
+    public static final class ArgumentTiming {
+
+        private long start;
+        private long end;
+        private boolean success;
+
+        /**
+         * Created a new argument timing instance
+         *
+         * @param start   Start time (in nanoseconds)
+         * @param end     End time (in nanoseconds)
+         * @param success Whether or not the argument was parsed successfully
+         */
+        public ArgumentTiming(final long start, final long end, final boolean success) {
+            this.start = start;
+            this.end = end;
+            this.success = success;
+        }
+
+        /**
+         * Created a new argument timing instance without an end time
+         *
+         * @param start Start time (in nanoseconds)
+         */
+        public ArgumentTiming(final long start) {
+            this(start, -1, false);
+        }
+
+        /**
+         * Created a new argument timing instance
+         */
+        public ArgumentTiming() {
+            this(-1, -1, false);
+        }
+
+        /**
+         * Get the elapsed time
+         *
+         * @return Elapsed time (in nanoseconds)
+         */
+        public long getElapsedTime() {
+            if (this.end == -1) {
+                throw new IllegalStateException("No end time has been registered");
+            } else if (this.start == -1) {
+                throw new IllegalStateException("No start time has been registered");
+            }
+            return this.end - this.start;
+        }
+
+        /**
+         * Set the end time
+         *
+         * @param end End time (in nanoseconds)
+         * @param success Whether or not the argument was parsed successfully
+         */
+        public void setEnd(final long end, final boolean success) {
+            this.end = end;
+            this.success = success;
+        }
+
+        /**
+         * Set the start time
+         *
+         * @param start Start time (in nanoseconds)
+         */
+        public void setStart(final long start) {
+            this.start = start;
+        }
+
+        /**
+         * Check whether or not the value was parsed successfully
+         *
+         * @return {@code true} if the value was parsed successfully, {@code false} if not
+         */
+        public boolean wasSuccess() {
+            return this.success;
+        }
+
     }
 
 }
