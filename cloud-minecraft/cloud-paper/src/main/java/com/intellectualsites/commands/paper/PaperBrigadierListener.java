@@ -41,8 +41,11 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
+import java.util.logging.Level;
 
 class PaperBrigadierListener<C> implements Listener {
+
+    private static final int UUID_ARGUMENT_VERSION = 16;
 
     private final CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager;
     private final PaperCommandManager<C> paperCommandManager;
@@ -57,9 +60,13 @@ class PaperBrigadierListener<C> implements Listener {
         /* Register default mappings */
         final String version = Bukkit.getServer().getClass().getPackage().getName();
         this.nmsVersion = version.substring(version.lastIndexOf(".") + 1);
+        final int majorMinecraftVersion = Integer.parseInt(this.nmsVersion.split("_")[1]);
         try {
-            /* Map UUID */
-            this.mapSimpleNMS(UUID.class, this.getNMSArgument("UUID").getConstructor());
+            /* UUID nms argument is a 1.16+ feature */
+            if (majorMinecraftVersion >= UUID_ARGUMENT_VERSION) {
+                /* Map UUID */
+                this.mapSimpleNMS(UUID.class, this.getNMSArgument("UUID").getConstructor());
+            }
             /* Map Enchantment */
             this.mapSimpleNMS(Enchantment.class, this.getNMSArgument("Enchantment").getConstructor());
             /* Map EntityType */
@@ -69,7 +76,7 @@ class PaperBrigadierListener<C> implements Listener {
         } catch (final Exception e) {
             this.paperCommandManager.getOwningPlugin()
                                     .getLogger()
-                                    .warning("Failed to map Bukkit types to NMS argument types");
+                                    .log(Level.WARNING, "Failed to map Bukkit types to NMS argument types", e);
         }
     }
 
