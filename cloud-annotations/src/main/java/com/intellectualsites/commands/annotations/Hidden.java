@@ -23,32 +23,15 @@
 //
 package com.intellectualsites.commands.annotations;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Creates a command proxy for the command. This is similar to
- * {@link com.intellectualsites.commands.Command.Builder#proxies(com.intellectualsites.commands.Command)}.
+ * Indicates that the command should be hidden. Similar to {@link com.intellectualsites.commands.Command.Builder#hidden()}
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ProxiedBy {
-
-    /**
-     * Syntax of the proxying command
-     *
-     * @return Proxy syntax
-     */
-    @Nonnull String value();
-
-    /**
-     * Whether or not the proxying command should be {@link Hidden}
-     *
-     * @return {@code true} if the proxying command should be hidden, {@code false} if not
-     */
-    boolean hidden() default false;
-
+public @interface Hidden {
 }

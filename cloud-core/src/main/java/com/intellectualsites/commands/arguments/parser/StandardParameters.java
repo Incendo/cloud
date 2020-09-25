@@ -52,6 +52,10 @@ public final class StandardParameters {
      * Command completions
      */
     public static final ParserParameter<String[]> COMPLETIONS = create("completions", TypeToken.of(String[].class));
+    /**
+     * The command should be hidden from help menus, etc
+     */
+    public static final ParserParameter<Boolean> HIDDEN = create("hidden", TypeToken.of(Boolean.class));
 
     private StandardParameters() {
     }

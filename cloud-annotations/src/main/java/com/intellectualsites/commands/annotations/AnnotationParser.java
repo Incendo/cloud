@@ -148,6 +148,7 @@ public final class AnnotationParser<C> {
             if (method.isAnnotationPresent(Confirmation.class)) {
                 metaBuilder.with(CommandConfirmationManager.CONFIRMATION_REQUIRED_META, "true");
             }
+
             @SuppressWarnings("ALL")
             Command.Builder builder = manager.commandBuilder(commandToken,
                                                              tokens.get(commandToken).getMinor(),
@@ -211,15 +212,26 @@ public final class AnnotationParser<C> {
             } catch (final Exception e) {
                 throw new RuntimeException("Failed to construct command execution handler", e);
             }
+            /* Check if the command should be hidden */
+            if (method.isAnnotationPresent(Hidden.class)) {
+                builder = builder.hidden();
+            }
+            /* Construct and register the command */
             final Command<C> builtCommand = builder.build();
             commands.add(builtCommand);
             /* Check if we need to construct a proxy */
             if (method.isAnnotationPresent(ProxiedBy.class)) {
-                final String proxy = method.getAnnotation(ProxiedBy.class).value();
+                final ProxiedBy proxyAnnotation = method.getAnnotation(ProxiedBy.class);
+                final String proxy = proxyAnnotation.value();
                 if (proxy.contains(" ")) {
                     throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
                 }
-                manager.command(manager.commandBuilder(proxy, builtCommand.getCommandMeta()).proxies(builtCommand).build());
+                Command.Builder<C> proxyBuilder = manager.commandBuilder(proxy, builtCommand.getCommandMeta())
+                                                         .proxies(builtCommand);
+                if (proxyAnnotation.hidden()) {
+                    proxyBuilder = proxyBuilder.hidden();
+                }
+                manager.command(proxyBuilder.build());
             }
         }
         return commands;
