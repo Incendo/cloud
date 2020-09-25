@@ -24,6 +24,7 @@
 package com.intellectualsites.commands;
 
 import com.intellectualsites.commands.arguments.standard.IntegerArgument;
+import com.intellectualsites.commands.arguments.standard.StringArgument;
 import com.intellectualsites.commands.context.CommandContext;
 import com.intellectualsites.commands.exceptions.NoPermissionException;
 import com.intellectualsites.commands.meta.SimpleCommandMeta;
@@ -56,6 +57,15 @@ class CommandTreeTest {
                                                  .optional("num", EXPECTED_INPUT_NUMBER))
                                .build())
                .command(manager.commandBuilder("req").withSenderType(SpecificCommandSender.class).build());
+        final Command<TestCommandSender> toProxy = manager.commandBuilder("test")
+                                                          .literal("unproxied")
+                                                          .argument(StringArgument.required("string"))
+                                                          .argument(IntegerArgument.required("int"))
+                                                          .literal("anotherliteral")
+                                                          .handler(c -> {})
+                                                          .build();
+        manager.command(toProxy);
+        manager.command(manager.commandBuilder("proxy").proxies(toProxy).build());
     }
 
     @Test
@@ -118,6 +128,12 @@ class CommandTreeTest {
     void invalidCommand() {
         Assertions.assertThrows(CompletionException.class, () -> manager
                 .executeCommand(new TestCommandSender(), "invalid test").join());
+    }
+
+    @Test
+    void testProxy() {
+        manager.executeCommand(new TestCommandSender(),"test unproxied foo 10 anotherliteral").join();
+        manager.executeCommand(new TestCommandSender(), "proxy foo 10").join();
     }
 
 

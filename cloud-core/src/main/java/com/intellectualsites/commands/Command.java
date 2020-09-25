@@ -411,6 +411,33 @@ public class Command<C> {
         }
 
         /**
+         * Make the current command be a proxy of the supplied command. This means that
+         * all of the proxied commands variable command arguments will be inserted into this
+         * builder instance, in the order they are declared in the proxied command. Furthermore,
+         * the proxied commands command handler will be showed by the command that is currently
+         * being built. If the current command builder does not have a permission node set, this
+         * too will be copied.
+         *
+         * @param command Command to proxy
+         * @return New builder that proxies the given command
+         */
+        @Nonnull
+        public Builder<C> proxies(@Nonnull final Command<C> command) {
+            Builder<C> builder = this;
+            for (final CommandArgument<C, ?> argument : command.getArguments()) {
+                if (argument instanceof StaticArgument) {
+                    continue;
+                }
+                final CommandArgument<C, ?> builtArgument = argument.copy();
+                builder = builder.argument(builtArgument, Description.of(command.getArgumentDescription(argument)));
+            }
+            if (this.commandPermission.toString().isEmpty()) {
+                builder = builder.withPermission(command.getCommandPermission());
+            }
+            return builder.handler(command.commandExecutionHandler);
+        }
+
+        /**
          * Build a command using the builder instance
          *
          * @return Built command

@@ -211,7 +211,16 @@ public final class AnnotationParser<C> {
             } catch (final Exception e) {
                 throw new RuntimeException("Failed to construct command execution handler", e);
             }
-            commands.add(builder.build());
+            final Command<C> builtCommand = builder.build();
+            commands.add(builtCommand);
+            /* Check if we need to construct a proxy */
+            if (method.isAnnotationPresent(ProxiedBy.class)) {
+                final String proxy = method.getAnnotation(ProxiedBy.class).value();
+                if (proxy.contains(" ")) {
+                    throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
+                }
+                manager.command(manager.commandBuilder(proxy, builtCommand.getCommandMeta()).proxies(builtCommand).build());
+            }
         }
         return commands;
     }

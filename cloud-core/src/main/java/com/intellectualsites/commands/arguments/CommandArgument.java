@@ -282,6 +282,27 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
     }
 
     /**
+     * Create a copy of the command argument
+     *
+     * @return Copied argument
+     */
+    @Nonnull
+    public CommandArgument<C, T> copy() {
+        CommandArgument.Builder<C, T> builder = ofType(this.valueType, this.name);
+        builder = builder.withSuggestionsProvider(this.suggestionsProvider);
+        builder = builder.withParser(this.parser);
+        if (this.isRequired()) {
+            builder = builder.asRequired();
+        } else if (this.defaultValue.isEmpty()) {
+            builder = builder.asOptional();
+        } else {
+            builder = builder.asOptionalWithDefault(this.defaultValue);
+        }
+        return builder.build();
+    }
+
+
+    /**
      * Mutable builder for {@link CommandArgument} instances
      *
      * @param <C> Command sender type

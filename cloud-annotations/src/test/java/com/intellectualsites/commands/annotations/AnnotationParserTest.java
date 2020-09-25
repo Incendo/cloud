@@ -54,13 +54,15 @@ class AnnotationParserTest {
     void testMethodConstruction() {
         final Collection<Command<TestCommandSender>> commands = annotationParser.parse(this);
         Assertions.assertFalse(commands.isEmpty());
-        manager.executeCommand(new TestCommandSender(), "test 10").join();
-        manager.executeCommand(new TestCommandSender(), "t 10 o").join();
+        manager.executeCommand(new TestCommandSender(), "test literal 10").join();
+        manager.executeCommand(new TestCommandSender(), "t literal 10 o").join();
+        manager.executeCommand(new TestCommandSender(), "proxycommand 10").join();
         Assertions.assertThrows(CompletionException.class, () ->
                 manager.executeCommand(new TestCommandSender(), "test 101").join());
     }
 
-    @CommandMethod("test|t <int> [string]")
+    @ProxiedBy("proxycommand")
+    @CommandMethod("test|t literal <int> [string]")
     public void testCommand(@Nonnull final TestCommandSender sender,
                             @Argument("int") @Range(max = "100") final int argument,
                             @Nonnull @Argument(value = "string", defaultValue = "potato", parserName = "potato")
