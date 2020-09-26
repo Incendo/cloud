@@ -46,6 +46,8 @@ class CommandTreeTest {
     @BeforeAll
     static void newTree() {
         manager = new TestCommandManager();
+
+        /* Build general test commands */
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
                                .literal("one").build())
                .command(manager.commandBuilder("test", SimpleCommandMeta.empty())
@@ -57,6 +59,8 @@ class CommandTreeTest {
                                                  .optional("num", EXPECTED_INPUT_NUMBER))
                                .build())
                .command(manager.commandBuilder("req").withSenderType(SpecificCommandSender.class).build());
+
+        /* Build command to test command proxying */
         final Command<TestCommandSender> toProxy = manager.commandBuilder("test")
                                                           .literal("unproxied")
                                                           .argument(StringArgument.required("string"))
@@ -66,6 +70,17 @@ class CommandTreeTest {
                                                           .build();
         manager.command(toProxy);
         manager.command(manager.commandBuilder("proxy").proxies(toProxy).build());
+
+        /* Build command for testing intermediary and final executors */
+        manager.command(manager.commandBuilder("command")
+                               .withPermission("command.inner")
+                               .literal("inner")
+                               .handler(c -> System.out.println("Using inner command"))
+                               .build());
+        manager.command(manager.commandBuilder("command")
+                               .withPermission("command.outer")
+                               .handler(c -> System.out.println("Using outer command"))
+                               .build());
     }
 
     @Test
@@ -134,6 +149,12 @@ class CommandTreeTest {
     void testProxy() {
         manager.executeCommand(new TestCommandSender(),"test unproxied foo 10 anotherliteral").join();
         manager.executeCommand(new TestCommandSender(), "proxy foo 10").join();
+    }
+
+    @Test
+    void testIntermediary() {
+        manager.executeCommand(new TestCommandSender(), "command inner").join();
+        manager.executeCommand(new TestCommandSender(), "command").join();
     }
 
 

@@ -47,6 +47,7 @@ public class TestCommandManager extends CommandManager<TestCommandSender> {
     @Override
     public final boolean hasPermission(@Nonnull final TestCommandSender sender,
                                        @Nonnull final String permission) {
+        System.out.printf("Testing permission: %s\n", permission);
         return !permission.equalsIgnoreCase("no");
     }
 

@@ -226,6 +226,16 @@ public class Command<C> {
         return this.arguments.get(argument).getDescription();
     }
 
+    @Override
+    public final String toString() {
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (final CommandArgument<C, ?> argument : this.getArguments()) {
+            stringBuilder.append(argument.getName()).append(' ');
+        }
+        final String build = stringBuilder.toString();
+        return build.substring(0, build.length() - 1);
+    }
+
     /**
      * Check whether or not the command is hidden
      *
@@ -274,7 +284,7 @@ public class Command<C> {
          */
         @Nonnull
         public Builder<C> meta(@Nonnull final String key, @Nonnull final String value) {
-            final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).build();
+            final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
             return new Builder<>(this.commandManager, commandMeta, this.senderType, this.commandArguments,
                                  this.commandExecutionHandler, this.commandPermission);
         }
