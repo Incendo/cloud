@@ -41,9 +41,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletionException;
 
 final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationHandler {
@@ -53,7 +51,6 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                     + "Please contact the server administrators if you believe that this is in error.";
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
-    private final Map<CommandArgument<?, ?>, BrigadierCommand> registeredCommands = new HashMap<>();
     private CloudBrigadierManager<C, CommandSource> brigadierManager;
     private VelocityCommandManager<C> manager;
 
@@ -70,9 +67,6 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
     @Override
     public boolean registerCommand(@Nonnull final Command<?> command) {
         final CommandArgument<?, ?> argument = command.getArguments().get(0);
-        if (this.registeredCommands.containsKey(argument)) {
-            return false;
-        }
         final List<String> aliases = ((StaticArgument<C>) argument).getAlternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
                 this.brigadierManager.createLiteralCommandNode(command.getArguments().get(0).getName(), (Command<C>) command,
@@ -137,8 +131,8 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         final CommandMeta commandMeta = this.manager.getProxyServer().getCommandManager()
                                                     .metaBuilder(brigadierCommand)
                                                     .aliases(aliases.toArray(new String[0])).build();
+        aliases.forEach(this.manager.getProxyServer().getCommandManager()::unregister);
         this.manager.getProxyServer().getCommandManager().register(commandMeta, brigadierCommand);
-        this.registeredCommands.put(argument, brigadierCommand);
         return true;
     }
 

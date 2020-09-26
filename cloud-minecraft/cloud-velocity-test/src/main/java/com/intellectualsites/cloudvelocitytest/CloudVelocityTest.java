@@ -78,16 +78,21 @@ public class CloudVelocityTest {
         annotationParser.parse(this);
     }
 
+    @CommandMethod(value = "test", permission = "cloud.root")
+    private void testRoot(@Nonnull final CommandSource source) {
+        source.sendMessage(TextComponent.builder("Hello from the root!", NamedTextColor.GOLD));
+    }
+
     @CommandMethod("test <num> [str]")
     private void testCommand(@Nonnull @Argument(value = "str", defaultValue = "potato") final String string,
                              @Nonnull final CommandSource source,
                              @Argument("num") @Range(min = "10", max = "33") final int num) {
         source.sendMessage(TextComponent.builder()
-            .append("You wrote: ", NamedTextColor.GOLD)
-            .append(string, NamedTextColor.RED)
-            .append(" and ", NamedTextColor.GOLD)
-            .append(Integer.toString(num), NamedTextColor.RED)
-            .append("!", NamedTextColor.GOLD)
+                                        .append("You wrote: ", NamedTextColor.GOLD)
+                                        .append(string, NamedTextColor.RED)
+                                        .append(" and ", NamedTextColor.GOLD)
+                                        .append(Integer.toString(num), NamedTextColor.RED)
+                                        .append("!", NamedTextColor.GOLD)
         );
     }
 
