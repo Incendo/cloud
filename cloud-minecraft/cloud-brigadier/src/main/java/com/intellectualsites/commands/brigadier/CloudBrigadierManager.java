@@ -282,7 +282,7 @@ public final class CloudBrigadierManager<C, S> {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
                 .requires(sender -> permissionChecker.test(sender, (CommandPermission) cloudCommand.getNodeMeta()
                                                                             .getOrDefault("permission", Permission.empty())));
-        if (cloudCommand.isLeaf() && cloudCommand.getValue() != null) {
+        if (cloudCommand.getValue() != null && cloudCommand.getValue().getOwningCommand() != null) {
             literalArgumentBuilder.executes(executor);
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
