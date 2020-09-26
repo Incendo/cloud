@@ -190,8 +190,7 @@ public final class CommandTree<C> {
                         if (result.getParsedValue().isPresent()) {
                             parsedArguments.add(child.getValue());
                             return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
-                        } /*else if (result.getFailure().isPresent() && root.children.size() == 1) {
-                        }*/
+                        }
                     }
                 }
             }
@@ -201,7 +200,21 @@ public final class CommandTree<C> {
                                                  getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
                                                  stringOrEmpty(commandQueue.peek()));
             }
-            /* We have already traversed the tree */
+            /* If we couldn't match a child, check if there's a command attached and execute it */
+            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+                final Command<C> command = root.getValue().getOwningCommand();
+                if (!this.getCommandManager().hasPermission(commandContext.getSender(),
+                                                            command.getCommandPermission())) {
+                    throw new NoPermissionException(command.getCommandPermission(),
+                                                    commandContext.getSender(),
+                                                    this.getChain(root)
+                                                        .stream()
+                                                        .map(Node::getValue)
+                                                        .collect(Collectors.toList()));
+                }
+                return Optional.of(root.getValue().getOwningCommand());
+            }
+            /* We know that there's no command and we also cannot match any of the children */
             throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                 .apply(parsedArguments, root),
                                              commandContext.getSender(), this.getChain(root)
@@ -235,6 +248,20 @@ public final class CommandTree<C> {
                     } else if (!child.getValue().isRequired()) {
                         return Optional.ofNullable(this.cast(child.getValue().getOwningCommand()));
                     } else if (child.isLeaf()) {
+                        /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
+                        if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+                            final Command<C> command = root.getValue().getOwningCommand();
+                            if (!this.getCommandManager().hasPermission(commandContext.getSender(),
+                                                                        command.getCommandPermission())) {
+                                throw new NoPermissionException(command.getCommandPermission(),
+                                                                commandContext.getSender(),
+                                                                this.getChain(root)
+                                                                    .stream()
+                                                                    .map(Node::getValue)
+                                                                    .collect(Collectors.toList()));
+                            }
+                            return Optional.of(command);
+                        }
                         /* Not enough arguments */
                         throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                             .apply(Objects.requireNonNull(
@@ -245,13 +272,21 @@ public final class CommandTree<C> {
                                                                                          .map(Node::getValue)
                                                                                          .collect(Collectors.toList()));
                     } else {
-                        /*
-                        throw new NoSuchCommandException(commandContext.getSender(),
-                                                         this.getChain(root)
-                                                             .stream()
-                                                             .map(Node::getValue)
-                                                             .collect(Collectors.toList()),
-                                                         "");*/
+                        /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
+                        if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+                            final Command<C> command = root.getValue().getOwningCommand();
+                            if (!this.getCommandManager().hasPermission(commandContext.getSender(),
+                                                                        command.getCommandPermission())) {
+                                throw new NoPermissionException(command.getCommandPermission(),
+                                                                commandContext.getSender(),
+                                                                this.getChain(root)
+                                                                    .stream()
+                                                                    .map(Node::getValue)
+                                                                    .collect(Collectors.toList()));
+                            }
+                            return Optional.of(command);
+                        }
+                        /* Child does not have a command and so we cannot proceed */
                         throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
                                                                             .apply(parsedArguments, root),
                                                          commandContext.getSender(), this.getChain(root)
@@ -357,8 +392,7 @@ public final class CommandTree<C> {
                         final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                         if (result.getParsedValue().isPresent()) {
                             return this.getSuggestions(commandContext, commandQueue, child);
-                        } /* else if (result.getFailure().isPresent() && root.children.size() == 1) {
-                        }*/
+                        }
                     }
                 }
             }
@@ -407,6 +441,12 @@ public final class CommandTree<C> {
                 node = tempNode;
             }
             if (node.getValue() != null) {
+                if (node.getValue().getOwningCommand() != null) {
+                    throw new IllegalStateException(String.format(
+                            "Duplicate command chains detected. Node '%s' already has an owning command (%s)",
+                            node.toString(), node.getValue().getOwningCommand().toString()
+                    ));
+                }
                 node.getValue().setOwningCommand(command);
             }
             // Verify the command structure every time we add a new command
@@ -474,7 +514,6 @@ public final class CommandTree<C> {
             // noinspection all
             final CommandPermission commandPermission = node.getValue().getOwningCommand().getCommandPermission();
             /* All leaves must necessarily have an owning command */
-            // noinspection all
             node.nodeMeta.put("permission", commandPermission);
             // Get chain and order it tail->head then skip the tail (leaf node)
             List<Node<CommandArgument<C, ?>>> chain = this.getChain(node);
@@ -483,12 +522,25 @@ public final class CommandTree<C> {
             // Go through all nodes from the tail upwards until a collision occurs
             for (final Node<CommandArgument<C, ?>> commandArgumentNode : chain) {
                 final CommandPermission existingPermission = (CommandPermission) commandArgumentNode.nodeMeta.get("permission");
+
+                CommandPermission permission;
                 if (existingPermission != null) {
-                    commandArgumentNode.nodeMeta.put("permission",
-                                                     OrPermission.of(Arrays.asList(commandPermission, existingPermission)));
+                    permission = OrPermission.of(Arrays.asList(commandPermission, existingPermission));
                 } else {
-                    commandArgumentNode.nodeMeta.put("permission", commandPermission);
+                    permission = commandPermission;
                 }
+
+                /* Now also check if there's a command handler attached to an upper level node */
+                if (commandArgumentNode.getValue() != null && commandArgumentNode.getValue().getOwningCommand() != null) {
+                    final Command<C> command = commandArgumentNode.getValue().getOwningCommand();
+                    if (this.getCommandManager().getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
+                        permission = command.getCommandPermission();
+                    } else {
+                        permission = OrPermission.of(Arrays.asList(permission, command.getCommandPermission()));
+                    }
+                }
+
+                commandArgumentNode.nodeMeta.put("permission", permission);
             }
         });
     }

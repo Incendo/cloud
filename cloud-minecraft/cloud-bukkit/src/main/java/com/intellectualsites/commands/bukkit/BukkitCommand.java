@@ -155,4 +155,9 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         return this.cloudCommand.getCommandPermission().toString();
     }
 
+    @Override
+    public String getUsage() {
+        return this.manager.getCommandSyntaxFormatter().apply(this.cloudCommand.getArguments(), null);
+    }
+
 }

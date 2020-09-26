@@ -42,6 +42,7 @@ import com.intellectualsites.commands.bukkit.BukkitCommandManager;
 import com.intellectualsites.commands.bukkit.BukkitCommandMetaBuilder;
 import com.intellectualsites.commands.bukkit.CloudBukkitCapabilities;
 import com.intellectualsites.commands.bukkit.parsers.WorldArgument;
+import com.intellectualsites.commands.exceptions.InvalidSyntaxException;
 import com.intellectualsites.commands.execution.AsynchronousCommandExecutionCoordinator;
 import com.intellectualsites.commands.execution.CommandExecutionCoordinator;
 import com.intellectualsites.commands.extra.confirmation.CommandConfirmationManager;
@@ -92,7 +93,7 @@ public final class BukkitTest extends JavaPlugin {
                                                                                    mgr);
 
             try {
-                ((PaperCommandManager<CommandSender>) mgr).registerBrigadier();
+                mgr.registerBrigadier();
             } catch (final Exception e) {
                 getLogger().warning("Failed to initialize Brigadier support: " + e.getMessage());
             }
@@ -116,7 +117,6 @@ public final class BukkitTest extends JavaPlugin {
                     BukkitCommandMetaBuilder.builder().withDescription(p.get(StandardParameters.DESCRIPTION,
                                                                              "No description")).build());
             annotationParser.parse(this);
-            //noinspection all
 
             mgr.command(mgr.commandBuilder("gamemode", this.metaWithDescription("Your ugli"), "gajmöde")
                            .argument(EnumArgument.required(GameMode.class, "gamemode"))
@@ -148,6 +148,9 @@ public final class BukkitTest extends JavaPlugin {
                                ));
                            })
                            .build())
+               .command(mgr.commandBuilder("uuidtest")
+                            .handler(c -> c.getSender().sendMessage("Hey yo dum, provide a UUID idiot. Thx!"))
+                            .build())
                .command(mgr.commandBuilder("uuidtest")
                            .argument(UUID.class, "uuid", builder -> builder
                                    .asRequired()
@@ -201,11 +204,14 @@ public final class BukkitTest extends JavaPlugin {
                            .handler(confirmationManager.createConfirmationExecutionHandler()).build())
                .command(mgr.commandBuilder("cloud")
                            .literal("help")
+                           .withPermission("cloud.help")
                            .argument(StringArgument.<CommandSender>newBuilder("query").greedy()
                                                                                       .asOptionalWithDefault("")
                                                                                       .build(), Description.of("Help Query"))
                            .handler(c -> minecraftHelp.queryCommands(c.<String>get("query").orElse(""),
                                                                      c.getSender())).build());
+
+            mgr.registerExceptionHandler(InvalidSyntaxException.class, (c, e) -> e.printStackTrace());
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -222,7 +228,7 @@ public final class BukkitTest extends JavaPlugin {
     }
 
     @Confirmation
-    @CommandMethod("cloud debug")
+    @CommandMethod(value = "cloud", permission = "cloud.debug")
     private void doHelp() {
         final Set<CloudBukkitCapabilities> capabilities = this.mgr.queryCapabilities();
         Bukkit.broadcastMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "Capabilities");

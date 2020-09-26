@@ -56,6 +56,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -73,12 +74,13 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public abstract class CommandManager<C> {
 
+    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = Maps.newHashMap();
+    private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
+
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
-    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = Maps.newHashMap();
     private final Collection<Command<C>> commands = Lists.newLinkedList();
-
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
 
@@ -550,6 +552,44 @@ public abstract class CommandManager<C> {
     @Nonnull
     public final CommandHelpHandler<C> getCommandHelpHandler() {
         return new CommandHelpHandler<>(this);
+    }
+
+    /**
+     * Get a command manager setting
+     *
+     * @param setting Setting
+     * @return {@code true} if the setting is activated or {@code false} if it's not
+     */
+    public boolean getSetting(@Nonnull final ManagerSettings setting) {
+        return this.managerSettings.contains(setting);
+    }
+
+    /**
+     * Set the setting
+     *
+     * @param setting Setting to set
+     * @param value   Value
+     */
+    public void setSetting(@Nonnull final ManagerSettings setting,
+                           final boolean value) {
+        if (value) {
+            this.managerSettings.add(setting);
+        } else {
+            this.managerSettings.remove(setting);
+        }
+    }
+
+
+    /**
+     * Configurable command related settings
+     */
+    public enum ManagerSettings {
+        /**
+         * Do not create a compound permission and do not look greedily
+         * for child permission values, if a preceding command in the tree path
+         * has a command handler attached
+         */
+        ENFORCE_INTERMEDIARY_PERMISSIONS
     }
 
 }
