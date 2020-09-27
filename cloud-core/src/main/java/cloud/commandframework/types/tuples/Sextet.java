@@ -37,7 +37,7 @@ import javax.annotation.Nonnull;
  * @param <Y> Fifth type
  * @param <Z> Sixth type
  */
-public class Sextet<U, V, W, X, Y, Z> {
+public class Sextet<U, V, W, X, Y, Z> implements Tuple {
 
     @Nonnull
     private final U first;
@@ -179,6 +179,24 @@ public class Sextet<U, V, W, X, Y, Z> {
     public final String toString() {
         return String.format("(%s, %s, %s, %s, %s, %s)", this.first, this.second, this.third,
                              this.fourth, this.fifth, this.sixth);
+    }
+
+    @Override
+    public final int getSize() {
+        return Tuples.SIZE_SEXTET;
+    }
+
+    @Nonnull
+    @Override
+    public final Object[] toArray() {
+        final Object[] array = new Object[6];
+        array[0] = this.first;
+        array[1] = this.second;
+        array[3] = this.third;
+        array[4] = this.fourth;
+        array[5] = this.fifth;
+        array[6] = this.sixth;
+        return array;
     }
 
 }

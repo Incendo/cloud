@@ -63,6 +63,17 @@ public class CommandSuggestionsTest {
                                .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
                                                  .withSuggestionsProvider((c, s) -> Arrays.asList("3", "33", "333")).build())
                                .build());
+
+        manager.command(manager.commandBuilder("com")
+                               .argumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
+                                             Description.empty())
+                               .argument(IntegerArgument.required("int"))
+                               .build());
+
+        manager.command(manager.commandBuilder("com2")
+                               .argumentPair("com", Pair.of("x", "enum"),
+                                             Pair.of(Integer.class, TestEnum.class), Description.empty())
+                               .build());
     }
 
     @Test
@@ -121,6 +132,21 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Arrays.asList("3", "33", "333"), suggestions);
     }
 
+    @Test
+    void testCompound() {
+        final String input = "com ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final String input2 = "com 1 ";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions2);
+        final String input3 = "com 1 foo ";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions3);
+        final String input4 = "com2 1 ";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions4);
+    }
 
     public enum TestEnum {
         FOO,

@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
  * @param <U> First type
  * @param <V> Second type
  */
-public class Pair<U, V> {
+public class Pair<U, V> implements Tuple {
 
     @Nonnull
     private final U first;
@@ -102,6 +102,20 @@ public class Pair<U, V> {
     @Override
     public final String toString() {
         return String.format("(%s, %s)", this.first, this.second);
+    }
+
+    @Override
+    public final int getSize() {
+        return Tuples.SIZE_PAIR;
+    }
+
+    @Nonnull
+    @Override
+    public final Object[] toArray() {
+        final Object[] array = new Object[2];
+        array[0] = this.first;
+        array[1] = this.second;
+        return array;
     }
 
 }

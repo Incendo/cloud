@@ -81,6 +81,28 @@ class CommandTreeTest {
                                .withPermission("command.outer")
                                .handler(c -> System.out.println("Using outer command"))
                                .build());
+
+        /* Build command for testing compound types */
+        manager.command(manager.commandBuilder("pos")
+                               .argument(ArgumentPair.required(manager, "pos", Pair.of("x", "y"),
+                                                               Pair.of(Integer.class, Integer.class))
+                                                     .simple())
+                               .handler(c -> {
+                                   final Pair<Integer, Integer> pair = c.getRequired("pos");
+                                   System.out.printf("X: %d | Y: %d\n", pair.getFirst(), pair.getSecond());
+                               })
+                               .build());
+        manager.command(manager.commandBuilder("vec")
+                               .argument(ArgumentPair.required(manager, "vec", Pair.of("x", "y"),
+                                                               Pair.of(Double.class, Double.class))
+                                                     .withMapper(Vector2.class,
+                                                                 pair -> new Vector2(pair.getFirst(), pair.getSecond()))
+                               )
+                               .handler(c -> {
+                                   final Vector2 vector2 = c.getRequired("vec");
+                                   System.out.printf("X: %f | Y: %f\n", vector2.getX(), vector2.getY());
+                               })
+                               .build());
     }
 
     @Test
@@ -157,8 +179,35 @@ class CommandTreeTest {
         manager.executeCommand(new TestCommandSender(), "command").join();
     }
 
+    @Test
+    void testCompound() {
+        manager.executeCommand(new TestCommandSender(), "pos -3 2").join();
+        manager.executeCommand(new TestCommandSender(), "vec 1 1").join();
+    }
+
 
     public static final class SpecificCommandSender extends TestCommandSender {
+    }
+
+
+    public static final class Vector2 {
+
+        private final double x;
+        private final double y;
+
+        private Vector2(final double x, final double y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        private double getX() {
+            return this.x;
+        }
+
+        private double getY() {
+            return this.y;
+        }
+
     }
 
 }

@@ -53,7 +53,20 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             if (commandArgument instanceof StaticArgument) {
                 stringBuilder.append(commandArgument.getName());
             } else {
-                if (commandArgument.isRequired()) {
+                if (commandArgument instanceof CompoundArgument) {
+                    final char prefix = commandArgument.isRequired() ? '<' : '[';
+                    final char suffix = commandArgument.isRequired() ? '>' : ']';
+                    stringBuilder.append(prefix);
+                    // noinspection all
+                    final Object[] names = ((CompoundArgument<?, C, ?>) commandArgument).getNames().toArray();
+                    for (int i = 0; i < names.length; i++) {
+                        stringBuilder.append(prefix).append(names[i]).append(suffix);
+                        if ((i + 1) < names.length) {
+                            stringBuilder.append(' ');
+                        }
+                    }
+                    stringBuilder.append(suffix);
+                } else if (commandArgument.isRequired()) {
                     stringBuilder.append("<").append(commandArgument.getName()).append(">");
                 } else {
                     stringBuilder.append("[").append(commandArgument.getName()).append("]");
@@ -90,10 +103,24 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 prefix = "[";
                 suffix = "]";
             }
-            stringBuilder.append(" ")
-                         .append(prefix)
-                         .append(argument.getName())
-                         .append(suffix);
+
+            if (argument instanceof CompoundArgument) {
+                stringBuilder.append(" ").append(prefix);
+                // noinspection all
+                final Object[] names = ((CompoundArgument<?, C, ?>) argument).getNames().toArray();
+                for (int i = 0; i < names.length; i++) {
+                    stringBuilder.append(prefix).append(names[i]).append(suffix);
+                    if ((i + 1) < names.length) {
+                        stringBuilder.append(' ');
+                    }
+                }
+                stringBuilder.append(suffix);
+            } else {
+                stringBuilder.append(" ")
+                             .append(prefix)
+                             .append(argument.getName())
+                             .append(suffix);
+            }
             tail = tail.getChildren().get(0);
         }
         return stringBuilder.toString();

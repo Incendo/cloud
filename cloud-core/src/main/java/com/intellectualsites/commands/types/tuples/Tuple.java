@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg & Contributors
+// Copyright (c) 2020 Alexander Söderberg
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,34 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
-
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.context.CommandContext;
+package com.intellectualsites.commands.types.tuples;
 
 import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.function.BiFunction;
 
-final class DelegatingSuggestionsProvider<C> implements BiFunction<CommandContext<C>, String, List<String>> {
+/**
+ * Tuple type
+ */
+public interface Tuple {
 
-    private final String argumentName;
-    private final ArgumentParser<C, ?> parser;
+    /**
+     * Get the tuple size
+     *
+     * @return Tuple size
+     */
+    int getSize();
 
-    DelegatingSuggestionsProvider(@Nonnull final String argumentName, @Nonnull final ArgumentParser<C, ?> parser) {
-        this.argumentName = argumentName;
-        this.parser = parser;
-    }
-
-    @Override
-    public List<String> apply(final CommandContext<C> context, final String string) {
-        return this.parser.suggestions(context, string);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("DelegatingSuggestionsProvider{name='%s',parser='%s'}", this.argumentName,
-                             this.parser.getClass().getCanonicalName());
-    }
+    /**
+     * Turn the tuple into a type erased array
+     *
+     * @return Created array
+     */
+    @Nonnull
+    Object[] toArray();
 
 }

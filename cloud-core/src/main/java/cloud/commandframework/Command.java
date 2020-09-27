@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * A command consists out of a chain of {@link CommandArgument command arguments}.
@@ -359,7 +360,6 @@ public class Command<C> {
                                  this.commandExecutionHandler, this.commandPermission);
         }
 
-
         /**
          * Add a new command argument by interacting with a constructed command argument builder
          *
@@ -380,6 +380,138 @@ public class Command<C> {
             builderConsumer.accept(builder);
             return this.argument(builder.build());
         }
+
+        // Compound helper methods
+
+        /**
+         * Create a new argument pair that maps to {@link Pair}
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @return Builder instance with the argument inserted
+         */
+        @Nonnull
+        public <U, V> Builder<C> argumentPair(@Nonnull final String name,
+                                              @Nonnull final Pair<String, String> names,
+                                              @Nonnull final Pair<Class<U>, Class<V>> parserPair,
+                                              @Nonnull final Description description) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.argument(ArgumentPair.required(this.commandManager, name, names, parserPair).simple(), description);
+        }
+
+        /**
+         * Create a new argument pair that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param outputType  The output type
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param mapper      Mapper that maps from {@link Pair} to the custom type
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @param <O>         Output type
+         * @return Builder instance with the argument inserted
+         */
+        @Nonnull
+        public <U, V, O> Builder<C> argumentPair(@Nonnull final String name,
+                                                 @Nonnull final TypeToken<O> outputType,
+                                                 @Nonnull final Pair<String, String> names,
+                                                 @Nonnull final Pair<Class<U>, Class<V>> parserPair,
+                                                 @Nonnull final Function<Pair<U, V>, O> mapper,
+                                                 @Nonnull final Description description) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.argument(
+                    ArgumentPair.required(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
+                    description);
+        }
+
+        /**
+         * Create a new argument pair that maps to {@link com.intellectualsites.commands.types.tuples.Triplet}
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name          Name of the argument
+         * @param names         Triplet containing the names of the sub-arguments
+         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         *                      registered in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry}
+         *                      used by the {@link CommandManager} attached to this command
+         * @param description   Description of the argument
+         * @param <U>           First type
+         * @param <V>           Second type
+         * @param <W>           Third type
+         * @return Builder instance with the argument inserted
+         */
+        @Nonnull
+        public <U, V, W> Builder<C> argumentTriplet(@Nonnull final String name,
+                                                    @Nonnull final Triplet<String, String, String> names,
+                                                    @Nonnull final Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                                                    @Nonnull final Description description) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.argument(ArgumentTriplet.required(this.commandManager, name, names, parserTriplet).simple(), description);
+        }
+
+        /**
+         * Create a new argument triplet that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name          Name of the argument
+         * @param outputType    The output type
+         * @param names         Triplet containing the names of the sub-arguments
+         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         *                      registered in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry} used by
+         *                      the {@link CommandManager} attached to this command
+         * @param mapper        Mapper that maps from {@link Triplet} to the custom type
+         * @param description   Description of the argument
+         * @param <U>           First type
+         * @param <V>           Second type
+         * @param <W>           Third type
+         * @param <O>           Output type
+         * @return Builder instance with the argument inserted
+         */
+        @Nonnull
+        public <U, V, W, O> Builder<C> argumentTriplet(@Nonnull final String name,
+                                                       @Nonnull final TypeToken<O> outputType,
+                                                       @Nonnull final Triplet<String, String, String> names,
+                                                       @Nonnull final Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                                                       @Nonnull final Function<Triplet<U, V, W>, O> mapper,
+                                                       @Nonnull final Description description) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.argument(
+                    ArgumentTriplet.required(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
+                    description);
+        }
+
+        // End of compound helper methods
 
         /**
          * Specify the command execution handler
