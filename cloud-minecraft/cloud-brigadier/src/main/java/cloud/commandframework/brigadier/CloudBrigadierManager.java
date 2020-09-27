@@ -212,7 +212,7 @@ public final class CloudBrigadierManager<C, S> {
     @Nullable
     @SuppressWarnings("all")
     private <T, K extends ArgumentParser<?, ?>> Pair<ArgumentType<?>, Boolean> getArgument(
-            @Nonnull final Class<?> valueType,
+            @Nonnull final TypeToken<?> valueType,
             @Nonnull final TypeToken<T> argumentType,
             @Nonnull final K argument) {
         final ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
@@ -225,9 +225,9 @@ public final class CloudBrigadierManager<C, S> {
 
     @Nonnull
     private <T, K extends ArgumentParser<C, T>> Pair<ArgumentType<?>, Boolean> createDefaultMapper(
-            @Nonnull final Class<?> clazz,
+            @Nonnull final TypeToken<?> clazz,
             @Nonnull final ArgumentParser<C, T> argument) {
-        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers.get(clazz);
+        final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers.get(clazz.getRawType());
         if (argumentTypeSupplier != null) {
             return new Pair<>(argumentTypeSupplier.get(), true);
         }
@@ -298,12 +298,54 @@ public final class CloudBrigadierManager<C, S> {
                                                        @Nonnull final BiPredicate<S, CommandPermission> permissionChecker,
                                                        @Nonnull final com.mojang.brigadier.Command<S> executor,
                                                        @Nonnull final SuggestionProvider<S> suggestionProvider) {
+        if (root.getValue() instanceof CompoundArgument) {
+            @SuppressWarnings("unchecked")
+            final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) root.getValue();
+            final Object[] parsers = compoundArgument.getParserTuple().toArray();
+            final Object[] types = compoundArgument.getTypes().toArray();
+            final Object[] names = compoundArgument.getNames().toArray();
 
+            /* Build nodes backwards */
+            final ArgumentBuilder<S, ?>[] argumentBuilders = new ArgumentBuilder[parsers.length];
+
+            for (int i = parsers.length - 1; i >= 0; i--) {
+                @SuppressWarnings("unchecked")
+                final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) parsers[i];
+                final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(TypeToken.of((Class<?>) types[i]),
+                                                                             TypeToken.of(parser.getClass()),
+                                                                             parser);
+                final SuggestionProvider<S> provider = pair.getRight() ? null : suggestionProvider;
+                final ArgumentBuilder<S, ?> fragmentBuilder = RequiredArgumentBuilder
+                        .<S, Object>argument((String) names[i], (ArgumentType<Object>) pair.getLeft())
+                        .suggests(provider)
+                        .requires(sender -> permissionChecker.test(sender,
+                                               (CommandPermission) root.getNodeMeta()
+                                                                       .getOrDefault("permission", Permission.empty())));
+                argumentBuilders[i] = fragmentBuilder;
+
+                if (forceExecutor || (i == parsers.length - 1) && (root.isLeaf() || !root.getValue().isRequired())) {
+                    fragmentBuilder.executes(executor);
+                }
+
+                /* Link all previous builder to this one */
+                if ((i + 1) < parsers.length) {
+                    fragmentBuilder.then(argumentBuilders[i + 1]);
+                }
+            }
+
+            for (final CommandTree.Node<CommandArgument<C, ?>> node : root.getChildren()) {
+                argumentBuilders[parsers.length - 1]
+                        .then(constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
+            }
+
+            return argumentBuilders[0];
+        }
         ArgumentBuilder<S, ?> argumentBuilder;
         if (root.getValue() instanceof StaticArgument) {
             argumentBuilder = LiteralArgumentBuilder.<S>literal(root.getValue().getName())
                     .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.getNodeMeta()
-                                                                             .getOrDefault("permission", Permission.empty())))
+                                                                                               .getOrDefault("permission",
+                                                                                                             Permission.empty())))
                     .executes(executor);
         } else {
             final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(root.getValue().getValueType(),

@@ -30,6 +30,12 @@ import javax.annotation.Nonnull;
  */
 public final class Tuples {
 
+    static final int SIZE_PAIR    = 2;
+    static final int SIZE_TRIPLET = 3;
+    static final int SIZE_QUARTET = 4;
+    static final int SIZE_QUINTET = 5;
+    static final int SIZE_SEXTET  = 6;
+
     private Tuples() {
     }
 

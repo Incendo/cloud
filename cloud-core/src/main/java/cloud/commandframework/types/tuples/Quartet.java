@@ -35,7 +35,7 @@ import javax.annotation.Nonnull;
  * @param <W> Third type
  * @param <X> Fourth type
  */
-public class Quartet<U, V, W, X> {
+public class Quartet<U, V, W, X> implements Tuple {
 
     @Nonnull
     private final U first;
@@ -140,6 +140,22 @@ public class Quartet<U, V, W, X> {
     @Override
     public final String toString() {
         return String.format("(%s, %s, %s, %s)", this.first, this.second, this.third, this.fourth);
+    }
+
+    @Override
+    public final int getSize() {
+        return Tuples.SIZE_QUARTET;
+    }
+
+    @Nonnull
+    @Override
+    public final Object[] toArray() {
+        final Object[] array = new Object[4];
+        array[0] = this.first;
+        array[1] = this.second;
+        array[3] = this.third;
+        array[4] = this.fourth;
+        return array;
     }
 
 }

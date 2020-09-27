@@ -77,7 +77,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
     /**
      * The type that is produces by the argument's parser
      */
-    private final Class<T> valueType;
+    private final TypeToken<T> valueType;
     /**
      * Suggestion provider
      */
@@ -99,7 +99,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
                            @Nonnull final String name,
                            @Nonnull final ArgumentParser<C, T> parser,
                            @Nonnull final String defaultValue,
-                           @Nonnull final Class<T> valueType,
+                           @Nonnull final TypeToken<T> valueType,
                            @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
         this.required = required;
         this.name = Objects.requireNonNull(name, "Name may not be null");
@@ -112,6 +112,25 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         this.suggestionsProvider = suggestionsProvider == null
                                    ? buildDefaultSuggestionsProvider(this)
                                    : suggestionsProvider;
+    }
+
+    /**
+     * Construct a new command argument
+     *
+     * @param required            Whether or not the argument is required
+     * @param name                The argument name
+     * @param parser              The argument parser
+     * @param defaultValue        Default value used when no value is provided by the command sender
+     * @param valueType           Type produced by the parser
+     * @param suggestionsProvider Suggestions provider
+     */
+    public CommandArgument(final boolean required,
+                           @Nonnull final String name,
+                           @Nonnull final ArgumentParser<C, T> parser,
+                           @Nonnull final String defaultValue,
+                           @Nonnull final Class<T> valueType,
+                           @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        this(required, name, parser, defaultValue, TypeToken.of(valueType), suggestionsProvider);
     }
 
     /**
@@ -144,9 +163,24 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @return Argument builder
      */
     @Nonnull
-    public static <C, T> CommandArgument.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
+    public static <C, T> CommandArgument.Builder<C, T> ofType(@Nonnull final TypeToken<T> clazz,
                                                               @Nonnull final String name) {
         return new Builder<>(clazz, name);
+    }
+
+    /**
+     * Create a new command argument
+     *
+     * @param clazz Argument class
+     * @param name  Argument name
+     * @param <C>   Command sender type
+     * @param <T>   Argument Type. Used to make the compiler happy.
+     * @return Argument builder
+     */
+    @Nonnull
+    public static <C, T> CommandArgument.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
+                                                              @Nonnull final String name) {
+        return new Builder<>(TypeToken.of(clazz), name);
     }
 
     /**
@@ -277,7 +311,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @return Value type
      */
     @Nonnull
-    public Class<T> getValueType() {
+    public TypeToken<T> getValueType() {
         return this.valueType;
     }
 
@@ -310,7 +344,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      */
     public static class Builder<C, T> {
 
-        private final Class<T> valueType;
+        private final TypeToken<T> valueType;
         private final String name;
 
         private CommandManager<C> manager;
@@ -319,10 +353,15 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         private String defaultValue = "";
         private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
 
-        protected Builder(@Nonnull final Class<T> valueType,
+        protected Builder(@Nonnull final TypeToken<T> valueType,
                           @Nonnull final String name) {
             this.valueType = valueType;
             this.name = name;
+        }
+
+        protected Builder(@Nonnull final Class<T> valueType,
+                          @Nonnull final String name) {
+            this(TypeToken.of(valueType), name);
         }
 
         /**
@@ -418,7 +457,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         @Nonnull
         public CommandArgument<C, T> build() {
             if (this.parser == null && this.manager != null) {
-                this.parser = this.manager.getParserRegistry().createParser(TypeToken.of(valueType), ParserParameters.empty())
+                this.parser = this.manager.getParserRegistry().createParser(valueType, ParserParameters.empty())
                                           .orElse(null);
             }
             if (this.parser == null) {

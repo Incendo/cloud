@@ -34,7 +34,7 @@ import javax.annotation.Nonnull;
  * @param <V> Second type
  * @param <W> Third type
  */
-public class Triplet<U, V, W> {
+public class Triplet<U, V, W> implements Tuple {
 
     @Nonnull
     private final U first;
@@ -121,6 +121,21 @@ public class Triplet<U, V, W> {
     @Override
     public final String toString() {
         return String.format("(%s, %s, %s)", this.first, this.second, this.third);
+    }
+
+    @Override
+    public final int getSize() {
+        return Tuples.SIZE_TRIPLET;
+    }
+
+    @Nonnull
+    @Override
+    public final Object[] toArray() {
+        final Object[] array = new Object[3];
+        array[0] = this.first;
+        array[1] = this.second;
+        array[2] = this.third;
+        return array;
     }
 
 }

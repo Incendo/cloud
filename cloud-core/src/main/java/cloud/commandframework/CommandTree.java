@@ -360,6 +360,25 @@ public final class CommandTree<C> {
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
             // The value has to be a variable
             final Node<CommandArgument<C, ?>> child = children.get(0);
+
+            // START: Compound arguments
+            /* When we get in here, we need to treat compound arguments a little differently */
+            if (child.getValue() instanceof CompoundArgument) {
+                @SuppressWarnings("unchecked")
+                final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) child.getValue();
+                /* See how many arguments it requires */
+                final int requiredArguments = compoundArgument.getParserTuple().getSize();
+                /* Figure out whether we even need to care about this */
+                if (commandQueue.size() <= requiredArguments) {
+                    /* Attempt to pop as many arguments from the stack as possible */
+                    for (int i = 0; i < requiredArguments - 1 && commandQueue.size() > 1; i++) {
+                        commandQueue.remove();
+                        commandContext.store("__parsing_argument__", i + 2);
+                    }
+                }
+            }
+            // END: Compound arguments
+
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
                     return Collections.emptyList();
@@ -367,6 +386,10 @@ public final class CommandTree<C> {
                 } else if (child.isLeaf() && commandQueue.size() < 2) {
                     return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
                 } else if (child.isLeaf()) {
+                    if (child.getValue() instanceof CompoundArgument) {
+                        final String last = ((LinkedList<String>) commandQueue).getLast();
+                        return child.getValue().getSuggestionsProvider().apply(commandContext, last);
+                    }
                     return Collections.emptyList();
                 } else if (commandQueue.peek().isEmpty()) {
                     return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());

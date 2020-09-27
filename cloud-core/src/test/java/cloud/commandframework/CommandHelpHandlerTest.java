@@ -48,6 +48,12 @@ class CommandHelpHandlerTest {
         final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with("description", "Command with variables").build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
                 argument(IntegerArgument.required("int"), Description.of("A number")).build());
+
+        manager.command(manager.commandBuilder("vec")
+                               .meta("description", "Takes in a vector")
+                               .argumentPair("vec", Pair.of("x", "y"),
+                                             Pair.of(Double.class, Double.class), Description.of("Vector"))
+                               .build());
     }
 
     @Test
@@ -63,7 +69,7 @@ class CommandHelpHandlerTest {
     @Test
     void testLongestChains() {
         final List<String> longestChains = manager.getCommandHelpHandler().getLongestSharedChains();
-        Assertions.assertEquals(Arrays.asList("test int|this"), longestChains);
+        Assertions.assertEquals(Arrays.asList("test int|this", "vec <<x> <y>>"), longestChains);
     }
 
     @Test
@@ -77,6 +83,9 @@ class CommandHelpHandlerTest {
         final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.getCommandHelpHandler().queryHelp("test int");
         Assertions.assertTrue(query3 instanceof CommandHelpHandler.VerboseHelpTopic);
         this.printTopic("test int", query3);
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query4 = manager.getCommandHelpHandler().queryHelp("vec");
+        Assertions.assertTrue(query4 instanceof CommandHelpHandler.VerboseHelpTopic);
+        this.printTopic("vec", query4);
     }
 
     private void printTopic(@Nonnull final String query,

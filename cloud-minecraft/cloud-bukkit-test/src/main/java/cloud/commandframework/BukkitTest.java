@@ -58,6 +58,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -210,12 +211,34 @@ public final class BukkitTest extends JavaPlugin {
                                                                                       .build(), Description.of("Help Query"))
                            .handler(c -> minecraftHelp.queryCommands(c.<String>get("query").orElse(""),
                                                                      c.getSender())).build());
-
+            this.registerTeleportCommand(mgr);
             mgr.registerExceptionHandler(InvalidSyntaxException.class, (c, e) -> e.printStackTrace());
         } catch (final Exception e) {
             e.printStackTrace();
         }
     }
+
+private void registerTeleportCommand(@Nonnull final BukkitCommandManager<CommandSender> manager) {
+    manager.command(mgr.commandBuilder("teleport")
+                   .meta("description", "Takes in a location and teleports the player there")
+                   .withSenderType(Player.class)
+                   .argument(WorldArgument.required("world"), Description.of("World name"))
+                   .argumentTriplet("coords",
+                                    TypeToken.of(Vector.class),
+                                    Triplet.of("x", "y", "z"),
+                                    Triplet.of(Double.class, Double.class, Double.class),
+                                    triplet -> new Vector(triplet.getFirst(), triplet.getSecond(), triplet.getThird()),
+                                    Description.of("Coordinates"))
+                   .handler(context -> {
+                       context.getSender().sendMessage(ChatColor.GOLD + "Teleporting!");
+                       Bukkit.getScheduler().runTask(this, () -> {
+                           final World world = context.getRequired("world");
+                           final Vector vector = context.getRequired("coords");
+                           ((Player) context.getSender()).teleport(vector.toLocation(world));
+                       });
+                   })
+                   .build());
+}
 
     @CommandDescription("Test cloud command using @CommandMethod")
     @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
