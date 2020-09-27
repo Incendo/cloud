@@ -61,6 +61,7 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 - **cloud-core**: Core module containing most of the cloud API, and shared implementations
 - **cloud-annotations**: Annotation processing code that allows you to use annotated methods rather than builders
 - **cloud-jline**: W.I.P JLine3 implementation of cloud
+- **cloud-services**: Services for Cloud
 - **cloud-minecraft/cloud-brigadier**: Brigadier mappings for cloud
 - **cloud-minecraft/cloud-bukkit**: Bukkit 1.8.8+ implementation of cloud
 - **cloud-minecraft/cloud-paper**: Module that extends cloud-bukkit to add special support for Paper 1.8.8+
@@ -74,10 +75,8 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
   
 ## develop &amp; build  
   
-To clone the repository, use `git clone --recursive https://github.com/Sauilitired/cloud.git`.  
-To then build it, use `mvn clean package`. If you've already cloned the repository without  
-doing it recursively, use `git submodule update --remote` to update the submodule. This is  
-only needed the first time, as Maven will perform this operation when building.   
+To clone the repository, use `git clone https://github.com/Sauilitired/cloud.git`.
+To then build it, use `mvn clean package`.
   
 There is a bash script (`build.sh`) that performs the submodule updating &amp; builds the project.  
 Feel free to use this if you want to.  
@@ -96,7 +95,7 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
 
 ```xml  
 <dependency>  
- <groupId>com.intellectualsites</groupId>  
+ <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-PLATFORM</artifactId>
  <version>0.2.0-SNAPSHOT</version>
 </dependency>
@@ -105,7 +104,7 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
 ~    to declare commands 
 -->
 <dependency>  
- <groupId>com.intellectualsites</groupId>  
+ <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-annotations</artifactId>
  <version>0.2.0-SNAPSHOT</version>
 </dependency>
@@ -136,11 +135,11 @@ with conflicting dependencies:
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                     <relocations>
                         <relocation>
-                            <pattern>com.intellectualsites.commands</pattern>
+                            <pattern>cloud.commandframework</pattern>
                             <shadedPattern>YOUR.PACKAGE.HERE.cloud</shadedPattern> <!-- Replace this -->
                         </relocation>
                         <relocation>
-                            <pattern>com.intellectualsites.services</pattern>
+                            <pattern>cloud.commandframework.services</pattern>
                             <shadedPattern>YOUR.PACKAGE.HERE.cloud.pipeline</shadedPattern> <!-- Replace this -->
                         </relocation>
                     </relocations>
@@ -159,7 +158,7 @@ repositories {
 
 ```groovy
 dependencies {
-    implementation 'com.intellectualsites:cloud-PLATFORM:0.2.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-PLATFORM:0.2.0-SNAPSHOT'
 }
 ```
 

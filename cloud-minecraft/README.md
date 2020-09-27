@@ -16,7 +16,7 @@ Bukkit mappings for cloud. If `commodore` is present on the classpath and the se
 ### dependency
 ```xml
 <dependency>
-    <groupId>com.intellectualsites</groupId>
+    <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-bukkit</artifactId>
     <version>0.2.0-SNAPSHOT</version>
 </dependency>
@@ -63,7 +63,7 @@ An example plugin using the `cloud-paper` API can be found [here](https://github
 ### dependency
 ```xml
 <dependency>
-    <groupId>com.intellectualsites</groupId>
+    <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-paper</artifactId>
     <version>0.2.0-SNAPSHOT</version>
 </dependency>
@@ -78,7 +78,7 @@ BungeeCord mappings for cloud.
 ### dependency
 ```xml
 <dependency>
-    <groupId>com.intellectualsites</groupId>
+    <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-bungee</artifactId>
     <version>0.2.0-SNAPSHOT</version>
 </dependency>
@@ -101,7 +101,7 @@ An example plugin using the `cloud-velocity` API can be found [here](https://git
 ### dependency
 ```xml
 <dependency>
-    <groupId>com.intellectualsites</groupId>
+    <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-velocity</artifactId>
     <version>0.2.0-SNAPSHOT</version>
 </dependency>

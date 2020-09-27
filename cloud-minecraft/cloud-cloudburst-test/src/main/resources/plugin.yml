@@ -1,5 +1,5 @@
 name: CloudTest
-main: com.intellectualsites.commands.cloudburst.CloudCloudburstTest
+main: cloud.commandframework.cloudburst.CloudCloudburstTest
 version: 0.2.0-SNAPSHOT
 load: POSTWORLD
 api: ["2.0.0"]
