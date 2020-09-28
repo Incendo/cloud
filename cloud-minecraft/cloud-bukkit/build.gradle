@@ -1,0 +1,12 @@
+dependencies {
+    api (project(':cloud-core')) {
+        /* Exposed by Bukkit */
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    api (project(':cloud-brigadier')) {
+        /* Once again exposed by Bukkit */
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    implementation 'org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT'
+    implementation 'me.lucko:commodore:1.9'
+}

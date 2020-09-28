@@ -1,0 +1,4 @@
+dependencies {
+    implementation project(':cloud-core')
+    implementation 'com.google.guava:guava:29.0-jre'
+}
