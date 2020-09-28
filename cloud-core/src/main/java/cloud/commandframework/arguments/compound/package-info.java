@@ -21,28 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.types.tuples;
-
-import javax.annotation.Nonnull;
 
 /**
- * Tuple type
+ * Argument types that consists of 2 or more sub-types
  */
-public interface Tuple {
-
-    /**
-     * Get the tuple size
-     *
-     * @return Tuple size
-     */
-    int getSize();
-
-    /**
-     * Turn the tuple into a type erased array
-     *
-     * @return Created array
-     */
-    @Nonnull
-    Object[] toArray();
-
-}
+package cloud.commandframework.arguments.compound;

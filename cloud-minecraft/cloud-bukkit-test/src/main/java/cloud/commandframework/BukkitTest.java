@@ -23,13 +23,11 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
-import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
+import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.Confirmation;
-import cloud.commandframework.annotations.CommandDescription;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -45,9 +43,13 @@ import cloud.commandframework.bukkit.BukkitCommandMetaBuilder;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.paper.PaperCommandManager;
+import cloud.commandframework.types.tuples.Triplet;
+import com.google.common.reflect.TypeToken;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

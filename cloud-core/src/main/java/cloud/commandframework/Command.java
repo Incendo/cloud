@@ -25,11 +25,16 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.arguments.compound.ArgumentPair;
+import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.types.tuples.Pair;
+import cloud.commandframework.types.tuples.Triplet;
+import com.google.common.reflect.TypeToken;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -393,7 +398,7 @@ public class Command<C> {
          * @param name        Name of the argument
          * @param names       Pair containing the names of the sub-arguments
          * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param description Description of the argument
          * @param <U>         First type
@@ -422,7 +427,7 @@ public class Command<C> {
          * @param outputType  The output type
          * @param names       Pair containing the names of the sub-arguments
          * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry} used by the
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
          *                    {@link CommandManager} attached to this command
          * @param mapper      Mapper that maps from {@link Pair} to the custom type
          * @param description Description of the argument
@@ -447,7 +452,7 @@ public class Command<C> {
         }
 
         /**
-         * Create a new argument pair that maps to {@link com.intellectualsites.commands.types.tuples.Triplet}
+         * Create a new argument pair that maps to {@link cloud.commandframework.types.tuples.Triplet}
          * <p>
          * For this to work, there must be a {@link CommandManager}
          * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
@@ -456,7 +461,7 @@ public class Command<C> {
          * @param name          Name of the argument
          * @param names         Triplet containing the names of the sub-arguments
          * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry}
+         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
          *                      used by the {@link CommandManager} attached to this command
          * @param description   Description of the argument
          * @param <U>           First type
@@ -486,7 +491,7 @@ public class Command<C> {
          * @param outputType    The output type
          * @param names         Triplet containing the names of the sub-arguments
          * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
-         *                      registered in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry} used by
+         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
          *                      the {@link CommandManager} attached to this command
          * @param mapper        Mapper that maps from {@link Triplet} to the custom type
          * @param description   Description of the argument

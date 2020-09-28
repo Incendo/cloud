@@ -23,11 +23,13 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.types.tuples.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

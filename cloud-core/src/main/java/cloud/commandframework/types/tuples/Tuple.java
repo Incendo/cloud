@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+package cloud.commandframework.types.tuples;
+
+import javax.annotation.Nonnull;
 
 /**
- * Argument types that consists of 2 or more sub-types
+ * Tuple type
  */
-package com.intellectualsites.commands.arguments.compound;
+public interface Tuple {
+
+    /**
+     * Get the tuple size
+     *
+     * @return Tuple size
+     */
+    int getSize();
+
+    /**
+     * Turn the tuple into a type erased array
+     *
+     * @return Created array
+     */
+    @Nonnull
+    Object[] toArray();
+
+}
