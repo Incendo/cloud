@@ -32,6 +32,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -42,7 +43,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
     private OfflinePlayerArgument(final boolean required,
                                   @Nonnull final String name,
                                   @Nonnull final String defaultValue,
-                                  @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+                                  @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
         super(required, name, new OfflinePlayerParser<>(), defaultValue, OfflinePlayer.class, suggestionsProvider);
     }
 
