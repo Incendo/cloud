@@ -149,7 +149,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         private final String input;
 
         /**
-         * Construct a new boolean parse exception
+         * Construct a new Char parse exception
          *
          * @param input String input
          */
@@ -164,6 +164,11 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
          */
         public String getInput() {
             return input;
+        }
+
+        @Override
+        public String getMessage() {
+            return String.format("'%s' is not a valid character.", input);
         }
     }
 }

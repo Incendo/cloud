@@ -245,5 +245,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         public boolean isLiberal() {
             return liberal;
         }
+
+        @Override
+        public String getMessage() {
+            return String.format("Could not parse boolean from '%s'.", input);
+        }
     }
 }

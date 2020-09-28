@@ -157,14 +157,14 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
 
 
     /**
-     * Player parse exception
+     * OfflinePlayer parse exception
      */
     public static final class OfflinePlayerParseException extends IllegalArgumentException {
 
         private final String input;
 
         /**
-         * Construct a new boolean parse exception
+         * Construct a new OfflinePlayer parse exception
          *
          * @param input String input
          */
@@ -181,5 +181,9 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
             return input;
         }
 
+        @Override
+        public String getMessage() {
+            return String.format("No player found for input '%s'.", input);
+        }
     }
 }

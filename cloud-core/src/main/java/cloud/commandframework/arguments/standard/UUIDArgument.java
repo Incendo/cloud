@@ -146,14 +146,20 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     public static final class UUIDParseException extends IllegalArgumentException {
 
+        private final String input;
+
         /**
-         * Construct a new example parse exception
+         * Construct a new UUID parse exception
          *
          * @param input String input
          */
         public UUIDParseException(@Nonnull final String input) {
-            super(input);
+            this.input = input;
         }
 
+        @Override
+        public String getMessage() {
+            return String.format("Could not parse UUID from '%s'.", input);
+        }
     }
 }

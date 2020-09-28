@@ -162,7 +162,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         private final String input;
 
         /**
-         * Construct a new boolean parse exception
+         * Construct a new Player parse exception
          *
          * @param input String input
          */
@@ -179,5 +179,9 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
             return input;
         }
 
+        @Override
+        public String getMessage() {
+            return String.format("No player found for input '%s'.", input);
+        }
     }
 }
