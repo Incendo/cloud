@@ -24,8 +24,8 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,8 +44,8 @@ public class CommandParseException extends IllegalArgumentException {
      * @param commandSender Sender who executed the command
      * @param currentChain  Chain leading up to the exception
      */
-    protected CommandParseException(@Nonnull final Object commandSender,
-                                    @Nonnull final List<CommandArgument<?, ?>> currentChain) {
+    protected CommandParseException(@NonNull final Object commandSender,
+                                    @NonNull final List<CommandArgument<?, ?>> currentChain) {
         this.commandSender = commandSender;
         this.currentChain = currentChain;
     }
@@ -55,8 +55,7 @@ public class CommandParseException extends IllegalArgumentException {
      *
      * @return Command sender
      */
-    @Nonnull
-    public Object getCommandSender() {
+    public @NonNull Object getCommandSender() {
         return this.commandSender;
     }
 
@@ -65,8 +64,7 @@ public class CommandParseException extends IllegalArgumentException {
      *
      * @return Unmodifiable list of command arguments
      */
-    @Nonnull
-    public List<CommandArgument<?, ?>> getCurrentChain() {
+    public @NonNull List<@NonNull CommandArgument<?, ?>> getCurrentChain() {
         return Collections.unmodifiableList(this.currentChain);
     }
 

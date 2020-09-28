@@ -26,8 +26,8 @@ package cloud.commandframework.exceptions;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.permission.CommandPermission;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -46,9 +46,9 @@ public class NoPermissionException extends CommandParseException {
      * @param commandSender     Command sender
      * @param currentChain      Chain leading up to the exception
      */
-    public NoPermissionException(@Nonnull final CommandPermission missingPermission,
-                                 @Nonnull final Object commandSender,
-                                 @Nonnull final List<CommandArgument<?, ?>> currentChain) {
+    public NoPermissionException(@NonNull final CommandPermission missingPermission,
+                                 @NonNull final Object commandSender,
+                                 @NonNull final List<@NonNull CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.missingPermission = missingPermission;
     }
@@ -63,8 +63,7 @@ public class NoPermissionException extends CommandParseException {
      *
      * @return Get the missing permission node
      */
-    @Nonnull
-    public String getMissingPermission() {
+    public @NonNull String getMissingPermission() {
         return this.missingPermission.toString();
     }
 

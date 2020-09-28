@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Optional;
 
 /**
@@ -43,8 +44,7 @@ public abstract class ArgumentParseResult<T> {
      * @param <T>     Parser return type
      * @return Failed parse result
      */
-    @Nonnull
-    public static <T> ArgumentParseResult<T> failure(@Nonnull final Throwable failure) {
+    public static <T> @NonNull ArgumentParseResult<T> failure(@NonNull final Throwable failure) {
         return new ParseFailure<>(failure);
     }
 
@@ -55,8 +55,7 @@ public abstract class ArgumentParseResult<T> {
      * @param <T>   Parser return type
      * @return Succeeded parse result
      */
-    @Nonnull
-    public static <T> ArgumentParseResult<T> success(@Nonnull final T value) {
+    public static <T> @NonNull ArgumentParseResult<T> success(@NonNull final T value) {
         return new ParseSuccess<>(value);
     }
 
@@ -65,16 +64,14 @@ public abstract class ArgumentParseResult<T> {
      *
      * @return Optional containing the parsed value
      */
-    @Nonnull
-    public abstract Optional<T> getParsedValue();
+    public abstract @NonNull Optional<T> getParsedValue();
 
     /**
      * Get the failure reason, if it exists
      *
      * @return Optional containing the failure reason
      */
-    @Nonnull
-    public abstract Optional<Throwable> getFailure();
+    public abstract @NonNull Optional<Throwable> getFailure();
 
 
     private static final class ParseSuccess<T> extends ArgumentParseResult<T> {
@@ -84,19 +81,17 @@ public abstract class ArgumentParseResult<T> {
          */
         private final T value;
 
-        private ParseSuccess(@Nonnull final T value) {
+        private ParseSuccess(@NonNull final T value) {
             this.value = value;
         }
 
-        @Nonnull
         @Override
-        public Optional<T> getParsedValue() {
+        public @NonNull Optional<T> getParsedValue() {
             return Optional.of(this.value);
         }
 
-        @Nonnull
         @Override
-        public Optional<Throwable> getFailure() {
+        public @NonNull Optional<Throwable> getFailure() {
             return Optional.empty();
         }
 
@@ -110,19 +105,17 @@ public abstract class ArgumentParseResult<T> {
          */
         private final Throwable failure;
 
-        private ParseFailure(@Nonnull final Throwable failure) {
+        private ParseFailure(@NonNull final Throwable failure) {
             this.failure = failure;
         }
 
-        @Nonnull
         @Override
-        public Optional<T> getParsedValue() {
+        public @NonNull Optional<T> getParsedValue() {
             return Optional.empty();
         }
 
-        @Nonnull
         @Override
-        public Optional<Throwable> getFailure() {
+        public @NonNull Optional<Throwable> getFailure() {
             return Optional.of(this.failure);
         }
     }

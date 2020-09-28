@@ -25,8 +25,7 @@ package cloud.commandframework.exceptions;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Thrown when a {@link CommandArgument}
@@ -42,7 +41,7 @@ public final class NoCommandInLeafException extends IllegalStateException {
      *
      * @param commandArgument Command argument that caused the exception
      */
-    public NoCommandInLeafException(@Nonnull final CommandArgument<?, ?> commandArgument) {
+    public NoCommandInLeafException(@NonNull final CommandArgument<?, ?> commandArgument) {
         super(String.format("Leaf node '%s' does not have associated owning command", commandArgument.getName()));
         this.commandArgument = commandArgument;
     }
@@ -52,8 +51,7 @@ public final class NoCommandInLeafException extends IllegalStateException {
      *
      * @return Command argument
      */
-    @Nonnull
-    public CommandArgument<?, ?> getCommandArgument() {
+    public @NonNull CommandArgument<?, ?> getCommandArgument() {
         return this.commandArgument;
     }
 

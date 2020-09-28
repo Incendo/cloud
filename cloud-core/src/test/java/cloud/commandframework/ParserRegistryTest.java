@@ -24,17 +24,16 @@
 package cloud.commandframework;
 
 import cloud.commandframework.annotations.specifier.Range;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
+import cloud.commandframework.arguments.standard.IntegerArgument;
+import io.leangen.geantyref.TypeToken;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 
@@ -53,13 +52,11 @@ public class ParserRegistryTest {
                 return Range.class;
             }
 
-            @Nonnull
             @Override
             public String min() {
                 return Integer.toString(RANGE_MIN);
             }
 
-            @Nonnull
             @Override
             public String max() {
                 return Integer.toString(RANGE_MAX);

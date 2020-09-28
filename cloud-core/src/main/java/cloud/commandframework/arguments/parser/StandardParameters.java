@@ -24,8 +24,7 @@
 package cloud.commandframework.arguments.parser;
 
 import io.leangen.geantyref.TypeToken;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Common parser parameters used when resolving types in the {@link ParserRegistry}
@@ -60,7 +59,8 @@ public final class StandardParameters {
     private StandardParameters() {
     }
 
-    private static <T> ParserParameter<T> create(@Nonnull final String key, @Nonnull final TypeToken<T> expectedType) {
+    private static <T> @NonNull ParserParameter<T> create(@NonNull final String key,
+                                                          @NonNull final TypeToken<T> expectedType) {
         return new ParserParameter<>(key, expectedType);
     }
 

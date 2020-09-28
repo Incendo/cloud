@@ -24,8 +24,8 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,9 +36,9 @@ import java.util.List;
  */
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
 
-    @Nonnull
     @Override
-    public List<String> apply(@Nonnull final CommandPreprocessingContext<C> context, @Nonnull final List<String> strings) {
+    public @NonNull List<@NonNull String> apply(@NonNull final CommandPreprocessingContext<C> context,
+                                                @NonNull final List<@NonNull String> strings) {
         final String input;
         if (context.getInputQueue().isEmpty()) {
             input = "";

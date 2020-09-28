@@ -24,8 +24,8 @@
 package cloud.commandframework.execution.preprocessor;
 
 import cloud.commandframework.context.CommandContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -45,8 +45,8 @@ public final class CommandPreprocessingContext<C> {
      * @param commandContext Command context
      * @param inputQueue     Command input as supplied by sender
      */
-    public CommandPreprocessingContext(@Nonnull final CommandContext<C> commandContext,
-                                       @Nonnull final LinkedList<String> inputQueue) {
+    public CommandPreprocessingContext(@NonNull final CommandContext<C> commandContext,
+                                       @NonNull final LinkedList<@NonNull String> inputQueue) {
         this.commandContext = commandContext;
         this.inputQueue = inputQueue;
     }
@@ -56,8 +56,7 @@ public final class CommandPreprocessingContext<C> {
      *
      * @return Command context
      */
-    @Nonnull
-    public CommandContext<C> getCommandContext() {
+    public @NonNull CommandContext<C> getCommandContext() {
         return this.commandContext;
     }
 
@@ -67,8 +66,7 @@ public final class CommandPreprocessingContext<C> {
      *
      * @return Input queue
      */
-    @Nonnull
-    public LinkedList<String> getInputQueue() {
+    public @NonNull LinkedList<@NonNull String> getInputQueue() {
         return this.inputQueue;
     }
 

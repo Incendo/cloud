@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.execution.preprocessor;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link CommandPreprocessor} that does nothing besides indicating that the context
@@ -39,7 +39,7 @@ public final class AcceptingCommandPreprocessor<C> implements CommandPreprocesso
     public static final String PROCESSED_INDICATOR_KEY = "__COMMAND_PRE_PROCESSED__";
 
     @Override
-    public void accept(@Nonnull final CommandPreprocessingContext<C> context) {
+    public void accept(@NonNull final CommandPreprocessingContext<C> context) {
         context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
     }
 

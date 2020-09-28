@@ -24,6 +24,7 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -34,6 +35,6 @@ import java.util.function.BiFunction;
  * @param <C> Command sender type
  */
 public interface CommandSuggestionProcessor<C> extends
-        BiFunction<CommandPreprocessingContext<C>, List<String>, List<String>> {
+        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<String>, @NonNull List<String>> {
 
 }

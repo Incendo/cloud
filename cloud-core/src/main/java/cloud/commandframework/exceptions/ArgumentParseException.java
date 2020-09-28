@@ -24,8 +24,8 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 public class ArgumentParseException extends CommandParseException {
@@ -39,9 +39,9 @@ public class ArgumentParseException extends CommandParseException {
      * @param commandSender Command sender
      * @param currentChain  Chain leading up to the exception
      */
-    public ArgumentParseException(@Nonnull final Throwable throwable,
-                                  @Nonnull final Object commandSender,
-                                  @Nonnull final List<CommandArgument<?, ?>> currentChain) {
+    public ArgumentParseException(@NonNull final Throwable throwable,
+                                  @NonNull final Object commandSender,
+                                  @NonNull final List<@NonNull CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.cause = throwable;
     }
@@ -51,8 +51,7 @@ public class ArgumentParseException extends CommandParseException {
      *
      * @return Cause
      */
-    @Nonnull
-    public Throwable getCause() {
+    public @NonNull Throwable getCause() {
         return this.cause;
     }
 

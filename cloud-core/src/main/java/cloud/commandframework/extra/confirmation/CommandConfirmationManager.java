@@ -30,8 +30,8 @@ import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.types.tuples.Pair;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -73,9 +73,9 @@ public class CommandConfirmationManager<C> {
      * @param errorNotifier   Notifier that gets called when someone tries to confirm a command with nothing in the queue
      */
     public CommandConfirmationManager(final long timeout,
-                                      @Nonnull final TimeUnit timeoutTimeUnit,
-                                      @Nonnull final Consumer<CommandPostprocessingContext<C>> notifier,
-                                      @Nonnull final Consumer<C> errorNotifier) {
+                                      @NonNull final TimeUnit timeoutTimeUnit,
+                                      @NonNull final Consumer<@NonNull CommandPostprocessingContext<C>> notifier,
+                                      @NonNull final Consumer<@NonNull C> errorNotifier) {
         this.notifier = notifier;
         this.errorNotifier = errorNotifier;
         this.pendingCommands = new LinkedHashMap<C, Pair<CommandPostprocessingContext<C>, Long>>() {
@@ -87,11 +87,11 @@ public class CommandConfirmationManager<C> {
         this.timeoutMillis = timeoutTimeUnit.toMillis(timeout);
     }
 
-    private void notifyConsumer(@Nonnull final CommandPostprocessingContext<C> context) {
+    private void notifyConsumer(@NonNull final CommandPostprocessingContext<C> context) {
         this.notifier.accept(context);
     }
 
-    private void addPending(@Nonnull final CommandPostprocessingContext<C> context) {
+    private void addPending(@NonNull final CommandPostprocessingContext<C> context) {
         this.pendingCommands.put(context.getCommandContext().getSender(), Pair.of(context, System.currentTimeMillis()));
     }
 
@@ -101,8 +101,7 @@ public class CommandConfirmationManager<C> {
      * @param sender Sender
      * @return Optional containing the post processing context if one has been stored, else {@link Optional#empty()}
      */
-    @Nonnull
-    public Optional<CommandPostprocessingContext<C>> getPending(@Nonnull final C sender) {
+    public @NonNull Optional<CommandPostprocessingContext<C>> getPending(@NonNull final C sender) {
         final Pair<CommandPostprocessingContext<C>, Long> pair = this.pendingCommands.remove(sender);
         if (pair != null) {
             if (System.currentTimeMillis() < pair.getSecond() + this.timeoutMillis) {
@@ -118,8 +117,7 @@ public class CommandConfirmationManager<C> {
      * @param builder Command meta builder
      * @return Builder instance
      */
-    @Nonnull
-    public SimpleCommandMeta.Builder decorate(@Nonnull final SimpleCommandMeta.Builder builder) {
+    public SimpleCommandMeta.@NonNull Builder decorate(final SimpleCommandMeta.@NonNull Builder builder) {
         return builder.with(CONFIRMATION_REQUIRED_META, "true");
     }
 
@@ -128,7 +126,7 @@ public class CommandConfirmationManager<C> {
      *
      * @param manager Command manager
      */
-    public void registerConfirmationProcessor(@Nonnull final CommandManager<C> manager) {
+    public void registerConfirmationProcessor(@NonNull final CommandManager<C> manager) {
         manager.registerCommandPostProcessor(new CommandConfirmationPostProcessor());
     }
 
@@ -137,8 +135,7 @@ public class CommandConfirmationManager<C> {
      *
      * @return Handler for a confirmation command
      */
-    @Nonnull
-    public CommandExecutionHandler<C> createConfirmationExecutionHandler() {
+    public @NonNull CommandExecutionHandler<C> createConfirmationExecutionHandler() {
         return context -> {
             final Optional<CommandPostprocessingContext<C>> pending = this.getPending(context.getSender());
             if (pending.isPresent()) {
@@ -156,7 +153,7 @@ public class CommandConfirmationManager<C> {
     private final class CommandConfirmationPostProcessor implements CommandPostprocessor<C> {
 
         @Override
-        public void accept(@Nonnull final CommandPostprocessingContext<C> context) {
+        public void accept(@NonNull final CommandPostprocessingContext<C> context) {
             if (!context.getCommand()
                         .getCommandMeta()
                         .getOrDefault(CONFIRMATION_REQUIRED_META, "false")

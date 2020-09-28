@@ -24,8 +24,8 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -44,9 +44,9 @@ public final class NoSuchCommandException extends CommandParseException {
      * @param currentChain  Chain leading up to the exception
      * @param command       Entered command (following the command chain)
      */
-    public NoSuchCommandException(@Nonnull final Object commandSender,
-                                  @Nonnull final List<CommandArgument<?, ?>> currentChain,
-                                  @Nonnull final String command) {
+    public NoSuchCommandException(@NonNull final Object commandSender,
+                                  @NonNull final List<CommandArgument<?, ?>> currentChain,
+                                  @NonNull final String command) {
         super(commandSender, currentChain);
         this.suppliedCommand = command;
     }
@@ -69,8 +69,7 @@ public final class NoSuchCommandException extends CommandParseException {
      *
      * @return Supplied command
      */
-    @Nonnull
-    public String getSuppliedCommand() {
+    public @NonNull String getSuppliedCommand() {
         return this.suppliedCommand;
     }
 
