@@ -21,14 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.arguments.compound;
+package cloud.commandframework.arguments.compound;
 
+import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.types.tuples.Tuple;
 import com.google.common.reflect.TypeToken;
-import com.intellectualsites.commands.arguments.CommandArgument;
-import com.intellectualsites.commands.arguments.parser.ArgumentParseResult;
-import com.intellectualsites.commands.arguments.parser.ArgumentParser;
-import com.intellectualsites.commands.context.CommandContext;
-import com.intellectualsites.commands.types.tuples.Tuple;
 
 import javax.annotation.Nonnull;
 import java.util.List;

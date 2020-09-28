@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.compound.CompoundArgument;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

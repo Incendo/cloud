@@ -21,14 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package com.intellectualsites.commands.arguments.compound;
+package cloud.commandframework.arguments.compound;
 
 import com.google.common.reflect.TypeToken;
-import com.intellectualsites.commands.CommandManager;
-import com.intellectualsites.commands.arguments.parser.ArgumentParser;
-import com.intellectualsites.commands.arguments.parser.ParserParameters;
-import com.intellectualsites.commands.arguments.parser.ParserRegistry;
-import com.intellectualsites.commands.types.tuples.Pair;
+import cloud.commandframework.CommandManager;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserParameters;
+import cloud.commandframework.arguments.parser.ParserRegistry;
+import cloud.commandframework.types.tuples.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.function.Function;
@@ -71,7 +71,7 @@ public final class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>,
      * @param name    Argument name
      * @param names   Sub-argument names
      * @param types   Pair containing the types of the sub-arguments. There must be parsers for these types registered
-     *                in the {@link com.intellectualsites.commands.arguments.parser.ParserRegistry} used by the
+     *                in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
      *                {@link CommandManager}
      * @param <C>     Command sender type
      * @param <U>     First parsed type
@@ -86,12 +86,12 @@ public final class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>,
         final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(TypeToken.of(types.getFirst()),
                                                                              ParserParameters.empty()).orElseThrow(() ->
-                                                                                                                           new IllegalArgumentException(
-                                                                                                                                   "Could not create parser for primary type"));
+                                                                           new IllegalArgumentException(
+                                                                                   "Could not create parser for primary type"));
         final ArgumentParser<C, V> secondaryParser = parserRegistry.createParser(TypeToken.of(types.getSecond()),
                                                                                  ParserParameters.empty()).orElseThrow(() ->
-                                                                                                                               new IllegalArgumentException(
-                                                                                                                                       "Could not create parser for secondary type"));
+                                                                       new IllegalArgumentException(
+                                                                               "Could not create parser for secondary type"));
         return new ArgumentPairIntermediaryBuilder<>(true, name, names, Pair.of(firstParser, secondaryParser), types);
     }
 
