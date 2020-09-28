@@ -25,8 +25,7 @@ package cloud.commandframework.bukkit;
 
 import com.google.common.base.Objects;
 import org.bukkit.entity.Player;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Command sender that proxies {@link org.bukkit.command.CommandSender}
@@ -41,7 +40,7 @@ public abstract class BukkitCommandSender {
      *
      * @param internalSender Bukkit command sender
      */
-    public BukkitCommandSender(@Nonnull final org.bukkit.command.CommandSender internalSender) {
+    public BukkitCommandSender(final org.bukkit.command.@NonNull CommandSender internalSender) {
         this.internalSender = internalSender;
     }
 
@@ -51,8 +50,7 @@ public abstract class BukkitCommandSender {
      * @param player Player instance
      * @return Constructed command sender
      */
-    @Nonnull
-    public static BukkitCommandSender player(@Nonnull final Player player) {
+    public static @NonNull BukkitCommandSender player(@NonNull final Player player) {
         return new BukkitPlayerSender(player);
     }
 
@@ -61,8 +59,7 @@ public abstract class BukkitCommandSender {
      *
      * @return Constructed command sender
      */
-    @Nonnull
-    public static BukkitCommandSender console() {
+    public static @NonNull BukkitCommandSender console() {
         return new BukkitConsoleSender();
     }
 
@@ -72,8 +69,7 @@ public abstract class BukkitCommandSender {
      * @param sender Bukkit command sender
      * @return Constructed command sender
      */
-    @Nonnull
-    public static BukkitCommandSender of(@Nonnull final org.bukkit.command.CommandSender sender) {
+    public static @NonNull BukkitCommandSender of(final org.bukkit.command.@NonNull CommandSender sender) {
         if (sender instanceof Player) {
             return player((Player) sender);
         }
@@ -102,8 +98,7 @@ public abstract class BukkitCommandSender {
      *
      * @return Proxied command sneder
      */
-    @Nonnull
-    public org.bukkit.command.CommandSender getInternalSender() {
+    public org.bukkit.command.@NonNull CommandSender getInternalSender() {
         return this.internalSender;
     }
 
@@ -120,15 +115,14 @@ public abstract class BukkitCommandSender {
      *
      * @return Player object
      */
-    @Nonnull
-    public abstract Player asPlayer();
+    public abstract @NonNull Player asPlayer();
 
     /**
      * Send a message to the command sender
      *
      * @param message Message to send
      */
-    public void sendMessage(@Nonnull final String message) {
+    public void sendMessage(@NonNull final String message) {
         this.internalSender.sendMessage(message);
     }
 

@@ -23,14 +23,14 @@
 //
 package cloud.commandframework.arguments.standard;
 
-import cloud.commandframework.exceptions.parsing.NumberParseException;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NumberParseException;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -42,11 +42,12 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     private final long max;
 
     private LongArgument(final boolean required,
-                         @Nonnull final String name,
+                         @NonNull final String name,
                          final long min,
                          final long max,
                          final String defaultValue,
-                         @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+                         @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                 @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new LongParser<>(min, max), defaultValue, Long.class, suggestionsProvider);
         this.min = min;
         this.max = max;
@@ -59,8 +60,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    @Nonnull
-    public static <C> LongArgument.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> LongArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new Builder<>(name);
     }
 
@@ -71,8 +71,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Long> required(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Long> required(@NonNull final String name) {
         return LongArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -83,8 +82,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Long> optional(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Long> optional(@NonNull final String name) {
         return LongArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -96,9 +94,8 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Long> optional(@Nonnull final String name,
-                                                        final long defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Long> optional(@NonNull final String name,
+                                                                 final long defaultNum) {
         return LongArgument.<C>newBuilder(name).asOptionalWithDefault(Long.toString(defaultNum)).build();
     }
 
@@ -125,7 +122,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         private long min = Long.MIN_VALUE;
         private long max = Long.MAX_VALUE;
 
-        protected Builder(@Nonnull final String name) {
+        protected Builder(@NonNull final String name) {
             super(Long.class, name);
         }
 
@@ -135,8 +132,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @param min Minimum value
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withMin(final long min) {
+        public @NonNull Builder<C> withMin(final long min) {
             this.min = min;
             return this;
         }
@@ -147,8 +143,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @param max Maximum value
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withMax(final long max) {
+        public @NonNull Builder<C> withMax(final long max) {
             this.max = max;
             return this;
         }
@@ -158,9 +153,8 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          *
          * @return Constructed argument
          */
-        @Nonnull
         @Override
-        public LongArgument<C> build() {
+        public @NonNull LongArgument<C> build() {
             return new LongArgument<>(this.isRequired(), this.getName(), this.min,
                                       this.max, this.getDefaultValue(), this.getSuggestionsProvider());
         }
@@ -177,11 +171,10 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
             this.max = max;
         }
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<Long> parse(
-                @Nonnull final CommandContext<C> commandContext,
-                @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<Long> parse(
+                @NonNull final CommandContext<C> commandContext,
+                @NonNull final Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -203,10 +196,9 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
             return true;
         }
 
-        @Nonnull
         @Override
-        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
-                                        @Nonnull final String input) {
+        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final String input) {
             return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
         }
 
@@ -222,7 +214,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @param min   Minimum value
          * @param max   Maximum value
          */
-        public LongParseException(@Nonnull final String input, final long min, final long max) {
+        public LongParseException(@NonNull final String input, final long min, final long max) {
             super(input, min, max);
         }
 
@@ -237,8 +229,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         }
 
         @Override
-        @Nonnull
-        public String getNumberType() {
+        public @NonNull String getNumberType() {
             return "long";
         }
 

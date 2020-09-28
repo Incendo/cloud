@@ -34,8 +34,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 
@@ -51,11 +51,11 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     private final Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
-    BukkitCommand(@Nonnull final String label,
-                  @Nonnull final List<String> aliases,
-                  @Nonnull final Command<C> cloudCommand,
-                  @Nonnull final CommandArgument<C, ?> command,
-                  @Nonnull final BukkitCommandManager<C> manager) {
+    BukkitCommand(@NonNull final String label,
+                  @NonNull final List<@NonNull String> aliases,
+                  @NonNull final Command<C> cloudCommand,
+                  @NonNull final CommandArgument<C, ?> command,
+                  @NonNull final BukkitCommandManager<C> manager) {
         super(label,
               cloudCommand.getCommandMeta().getOrDefault("description", ""),
               "",

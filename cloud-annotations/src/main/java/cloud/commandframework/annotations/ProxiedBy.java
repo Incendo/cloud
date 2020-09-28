@@ -24,8 +24,8 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.Command;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -44,7 +44,7 @@ public @interface ProxiedBy {
      *
      * @return Proxy syntax
      */
-    @Nonnull String value();
+    @NonNull String value();
 
     /**
      * Whether or not the proxying command should be {@link Hidden}

@@ -153,12 +153,11 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
 
     @Override
     public final int getSize() {
-        return Tuples.SIZE_QUINTET;
+        return 5;
     }
 
-    @Nonnull
     @Override
-    public final Object[] toArray() {
+    public final @NonNull Object @NonNull [] toArray() {
         final Object[] array = new Object[5];
         array[0] = this.first;
         array[1] = this.second;

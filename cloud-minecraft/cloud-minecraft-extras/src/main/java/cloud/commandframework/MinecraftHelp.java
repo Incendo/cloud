@@ -28,8 +28,8 @@ import cloud.commandframework.arguments.StaticArgument;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.Template;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,9 +73,9 @@ public final class MinecraftHelp<C> {
      * @param audienceProvider Provider that maps the command sender type to {@link Audience}
      * @param commandManager   Command manager instance
      */
-    public MinecraftHelp(@Nonnull final String commandPrefix,
-                         @Nonnull final AudienceProvider<C> audienceProvider,
-                         @Nonnull final CommandManager<C> commandManager) {
+    public MinecraftHelp(@NonNull final String commandPrefix,
+                         @NonNull final AudienceProvider<C> audienceProvider,
+                         @NonNull final CommandManager<C> commandManager) {
         this.commandPrefix = commandPrefix;
         this.audienceProvider = audienceProvider;
         this.commandManager = commandManager;
@@ -109,8 +109,7 @@ public final class MinecraftHelp<C> {
      *
      * @return Command manager
      */
-    @Nonnull
-    public CommandManager<C> getCommandManager() {
+    public @NonNull CommandManager<C> getCommandManager() {
         return this.commandManager;
     }
 
@@ -119,8 +118,7 @@ public final class MinecraftHelp<C> {
      *
      * @return Audience provider
      */
-    @Nonnull
-    public AudienceProvider<C> getAudienceProvider() {
+    public @NonNull AudienceProvider<C> getAudienceProvider() {
         return this.audienceProvider;
     }
 
@@ -130,8 +128,7 @@ public final class MinecraftHelp<C> {
      * @param sender Sender to map
      * @return Mapped audience
      */
-    @Nonnull
-    public Audience getAudience(@Nonnull final C sender) {
+    public @NonNull Audience getAudience(@NonNull final C sender) {
         return this.audienceProvider.apply(sender);
     }
 
@@ -141,7 +138,8 @@ public final class MinecraftHelp<C> {
      * @param key     Message key
      * @param message Message
      */
-    public void setMessage(@Nonnull final String key, @Nonnull final String message) {
+    public void setMessage(@NonNull final String key,
+                           @NonNull final String message) {
         this.messageMap.put(key, message);
     }
 
@@ -151,17 +149,17 @@ public final class MinecraftHelp<C> {
      * @param query     Command query (without leading '/')
      * @param recipient Recipient
      */
-    public void queryCommands(@Nonnull final String query,
-                              @Nonnull final C recipient) {
+    public void queryCommands(@NonNull final String query,
+                              @NonNull final C recipient) {
         final Audience audience = this.getAudience(recipient);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_HEADER)));
         this.printTopic(recipient, query, this.commandManager.getCommandHelpHandler().queryHelp(query));
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_FOOTER)));
     }
 
-    private void printTopic(@Nonnull final C sender,
-                            @Nonnull final String query,
-                            @Nonnull final CommandHelpHandler.HelpTopic<C> helpTopic) {
+    private void printTopic(@NonNull final C sender,
+                            @NonNull final String query,
+                            final CommandHelpHandler.@NonNull HelpTopic<C> helpTopic) {
         this.getAudience(sender).sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_QUERY),
                                                                     Template.of("query", query)));
         if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
@@ -175,7 +173,8 @@ public final class MinecraftHelp<C> {
         }
     }
 
-    private void printIndexHelpTopic(@Nonnull final C sender, @Nonnull final CommandHelpHandler.IndexHelpTopic<C> helpTopic) {
+    private void printIndexHelpTopic(@NonNull final C sender,
+                                     final CommandHelpHandler.@NonNull IndexHelpTopic<C> helpTopic) {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_AVAILABLE_COMMANDS)));
         final Iterator<CommandHelpHandler.VerboseHelpEntry<C>> iterator = helpTopic.getEntries().iterator();
@@ -202,7 +201,8 @@ public final class MinecraftHelp<C> {
         }
     }
 
-    private void printMultiHelpTopic(@Nonnull final C sender, @Nonnull final CommandHelpHandler.MultiHelpTopic<C> helpTopic) {
+    private void printMultiHelpTopic(@NonNull final C sender,
+                                     final CommandHelpHandler.@NonNull MultiHelpTopic<C> helpTopic) {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_LONGEST_PATH),
                                                     Template.of("command", helpTopic.getLongestPath())));
@@ -236,7 +236,8 @@ public final class MinecraftHelp<C> {
         }
     }
 
-    private void printVerboseHelpTopic(@Nonnull final C sender, @Nonnull final CommandHelpHandler.VerboseHelpTopic<C> helpTopic) {
+    private void printVerboseHelpTopic(@NonNull final C sender,
+                                       final CommandHelpHandler.@NonNull VerboseHelpTopic<C> helpTopic) {
         final Audience audience = this.getAudience(sender);
         final String command = this.commandManager.getCommandSyntaxFormatter()
                                                   .apply(helpTopic.getCommand().getArguments(), null);

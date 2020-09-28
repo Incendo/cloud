@@ -27,9 +27,9 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
@@ -39,9 +39,10 @@ import java.util.function.BiFunction;
 public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     private UUIDArgument(final boolean required,
-                         @Nonnull final String name,
-                         @Nonnull final String defaultValue,
-                         @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+                         @NonNull final String name,
+                         @NonNull final String defaultValue,
+                         @Nullable final BiFunction<@NonNull CommandContext<C>,
+                                 @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new UUIDParser<>(), defaultValue, UUID.class, suggestionsProvider);
     }
 
@@ -52,8 +53,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    @Nonnull
-    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new Builder<>(name);
     }
 
@@ -64,8 +64,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, UUID> required(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, UUID> required(@NonNull final String name) {
         return UUIDArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -76,8 +75,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, UUID> optional(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, UUID> optional(@NonNull final String name) {
         return UUIDArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -89,16 +87,15 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>         Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, UUID> optional(@Nonnull final String name,
-                                                        final UUID defaultUUID) {
+    public static <C> @NonNull CommandArgument<C, UUID> optional(@NonNull final String name,
+                                                                 @NonNull final UUID defaultUUID) {
         return UUIDArgument.<C>newBuilder(name).asOptionalWithDefault(defaultUUID.toString()).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, UUID> {
 
-        protected Builder(@Nonnull final String name) {
+        protected Builder(@NonNull final String name) {
             super(UUID.class, name);
         }
 
@@ -107,9 +104,8 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
          *
          * @return Constructed component
          */
-        @Nonnull
         @Override
-        public UUIDArgument<C> build() {
+        public @NonNull UUIDArgument<C> build() {
             return new UUIDArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
@@ -118,11 +114,10 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     private static final class UUIDParser<C> implements ArgumentParser<C, UUID> {
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<UUID> parse(
-                @Nonnull final CommandContext<C> commandContext,
-                @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<UUID> parse(
+                @NonNull final CommandContext<C> commandContext,
+                @NonNull final Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -151,7 +146,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
          *
          * @param input String input
          */
-        public UUIDParseException(@Nonnull final String input) {
+        public UUIDParseException(@NonNull final String input) {
             super(input);
         }
 

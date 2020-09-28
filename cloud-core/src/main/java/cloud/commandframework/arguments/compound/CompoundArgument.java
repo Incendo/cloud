@@ -28,9 +28,9 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.types.tuples.Tuple;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.Function;
@@ -49,13 +49,13 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
     private final Tuple parserTuple;
 
     CompoundArgument(final boolean required,
-                     @Nonnull final String name,
-                     @Nonnull final Tuple names,
-                     @Nonnull final Tuple parserTuple,
-                     @Nonnull final Tuple types,
-                     @Nonnull final Function<T, O> mapper,
-                     @Nonnull final Function<Object[], T> tupleFactory,
-                     @Nonnull final TypeToken<O> valueType) {
+                     @NonNull final String name,
+                     @NonNull final Tuple names,
+                     @NonNull final Tuple parserTuple,
+                     @NonNull final Tuple types,
+                     @NonNull final Function<@NonNull T, @NonNull O> mapper,
+                     @NonNull final Function<@NonNull Object[], @NonNull T> tupleFactory,
+                     @NonNull final TypeToken<O> valueType) {
         super(required,
               name,
               new CompoundParser<>(parserTuple, mapper, tupleFactory),
@@ -72,8 +72,7 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
      *
      * @return Internal parsers
      */
-    @Nonnull
-    public Tuple getParserTuple() {
+    public @NonNull Tuple getParserTuple() {
         return this.parserTuple;
     }
 
@@ -82,8 +81,7 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
      *
      * @return Argument names
      */
-    @Nonnull
-    public Tuple getNames() {
+    public @NonNull Tuple getNames() {
         return this.names;
     }
 
@@ -92,8 +90,7 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
      *
      * @return Parser types
      */
-    @Nonnull
-    public Tuple getTypes() {
+    public @NonNull Tuple getTypes() {
         return this.types;
     }
 
@@ -104,22 +101,20 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
         private final Function<T, O> mapper;
         private final Function<Object[], T> tupleFactory;
 
-        private CompoundParser(@Nonnull final Tuple parserTuple,
-                               @Nonnull final Function<T, O> mapper,
-                               @Nonnull final Function<Object[], T> tupleFactory) {
+        private CompoundParser(@NonNull final Tuple parserTuple,
+                               @NonNull final Function<@NonNull T, @NonNull O> mapper,
+                               @NonNull final Function<@NonNull Object[], @NonNull T> tupleFactory) {
             this.parsers = parserTuple.toArray();
             this.mapper = mapper;
             this.tupleFactory = tupleFactory;
         }
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<O> parse(@Nonnull final CommandContext<C> commandContext,
-                                            @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<O> parse(@NonNull final CommandContext<C> commandContext,
+                                                     @NonNull final Queue<@NonNull String> inputQueue) {
             final Object[] output = new Object[this.parsers.length];
             for (int i = 0; i < this.parsers.length; i++) {
-                @SuppressWarnings("unchecked")
-                final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) this.parsers[i];
+                @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) this.parsers[i];
                 final ArgumentParseResult<?> result = parser.parse(commandContext, inputQueue);
                 if (result.getFailure().isPresent()) {
                     /* Return the failure */
@@ -129,8 +124,8 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
                 output[i] = result.getParsedValue().orElse(null);
             }
             /*
-            * We now know that we have complete output, as none of the parsers returned a failure.
-            * Now check if the mapper threw any exceptions
+             * We now know that we have complete output, as none of the parsers returned a failure.
+             * Now check if the mapper threw any exceptions
              */
             try {
                 return ArgumentParseResult.success(this.mapper.apply(this.tupleFactory.apply(output)));
@@ -139,10 +134,9 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
             }
         }
 
-        @Nonnull
         @Override
-        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
-                                        @Nonnull final String input) {
+        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final String input) {
             /*
             This method will be called n times, each time for each of the internal types.
             The problem is that we need to then know which of the parsers to forward the

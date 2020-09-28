@@ -25,24 +25,24 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.meta.CommandMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.function.Function;
 
-class MetaFactory implements Function<Annotation[], CommandMeta> {
+class MetaFactory implements Function<@NonNull Annotation @NonNull [], @NonNull CommandMeta> {
 
     private final AnnotationParser<?> annotationParser;
     private final Function<ParserParameters, CommandMeta> metaMapper;
 
-    MetaFactory(@Nonnull final AnnotationParser<?> annotationParser,
-                @Nonnull final Function<ParserParameters, CommandMeta> metaMapper) {
+    MetaFactory(@NonNull final AnnotationParser<?> annotationParser,
+                @NonNull final Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper) {
         this.annotationParser = annotationParser;
         this.metaMapper = metaMapper;
     }
 
     @Override
-    public CommandMeta apply(@Nonnull final Annotation[] annotations) {
+    public @NonNull CommandMeta apply(@NonNull final Annotation @NonNull [] annotations) {
         final ParserParameters parameters = ParserParameters.empty();
         for (final Annotation annotation : annotations) {
             @SuppressWarnings("ALL") final Function function = this.annotationParser.getAnnotationMappers()

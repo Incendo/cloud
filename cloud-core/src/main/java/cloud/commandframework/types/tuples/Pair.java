@@ -101,12 +101,11 @@ public class Pair<U, V> implements Tuple {
 
     @Override
     public final int getSize() {
-        return Tuples.SIZE_PAIR;
+        return 2;
     }
 
-    @Nonnull
     @Override
-    public final Object[] toArray() {
+    public final @NonNull Object @NonNull [] toArray() {
         final Object[] array = new Object[2];
         array[0] = this.first;
         array[1] = this.second;
