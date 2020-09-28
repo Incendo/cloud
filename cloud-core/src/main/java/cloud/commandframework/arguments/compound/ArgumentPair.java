@@ -23,14 +23,14 @@
 //
 package cloud.commandframework.arguments.compound;
 
-import com.google.common.reflect.TypeToken;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.types.tuples.Pair;
+import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 /**
@@ -55,12 +55,12 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      * @param valueType  The output type
      */
     protected ArgumentPair(final boolean required,
-                           @Nonnull final String name,
-                           @Nonnull final Pair<String, String> names,
-                           @Nonnull final Pair<Class<U>, Class<V>> types,
-                           @Nonnull final Pair<ArgumentParser<C, U>, ArgumentParser<C, V>> parserPair,
-                           @Nonnull final Function<Pair<U, V>, O> mapper,
-                           @Nonnull final TypeToken<O> valueType) {
+                           @NonNull final String name,
+                           @NonNull final Pair<@NonNull String, @NonNull String> names,
+                           @NonNull final Pair<@NonNull Class<U>, @NonNull Class<V>> types,
+                           @NonNull final Pair<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>> parserPair,
+                           @NonNull final Function<@NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper,
+                           @NonNull final TypeToken<O> valueType) {
         super(required, name, names, parserPair, types, mapper, o -> Pair.of((U) o[0], (V) o[1]), valueType);
     }
 
@@ -78,17 +78,18 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      * @param <V>     Second parsed type
      * @return Intermediary builder
      */
-    @Nonnull
-    public static <C, U, V> ArgumentPairIntermediaryBuilder<C, U, V> required(@Nonnull final CommandManager<C> manager,
-                                                                              @Nonnull final String name,
-                                                                              @Nonnull final Pair<String, String> names,
-                                                                              @Nonnull final Pair<Class<U>, Class<V>> types) {
+    public static <C, U, V> @NonNull ArgumentPairIntermediaryBuilder<C, U, V> required(@NonNull final CommandManager<C> manager,
+                                                                                       @NonNull final String name,
+                                                                                       @NonNull final Pair<@NonNull String,
+                                                                                                    @NonNull String> names,
+                                                                                       @NonNull final Pair<@NonNull Class<U>,
+                                                                                                    @NonNull Class<V>> types) {
         final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
-        final ArgumentParser<C, U> firstParser = parserRegistry.createParser(TypeToken.of(types.getFirst()),
+        final ArgumentParser<C, U> firstParser = parserRegistry.createParser(TypeToken.get(types.getFirst()),
                                                                              ParserParameters.empty()).orElseThrow(() ->
                                                                            new IllegalArgumentException(
                                                                                    "Could not create parser for primary type"));
-        final ArgumentParser<C, V> secondaryParser = parserRegistry.createParser(TypeToken.of(types.getSecond()),
+        final ArgumentParser<C, V> secondaryParser = parserRegistry.createParser(TypeToken.get(types.getSecond()),
                                                                                  ParserParameters.empty()).orElseThrow(() ->
                                                                        new IllegalArgumentException(
                                                                                "Could not create parser for secondary type"));
@@ -105,10 +106,11 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
         private final Pair<Class<U>, Class<V>> types;
 
         private ArgumentPairIntermediaryBuilder(final boolean required,
-                                                @Nonnull final String name,
-                                                @Nonnull final Pair<String, String> names,
-                                                @Nonnull final Pair<ArgumentParser<C, U>, ArgumentParser<C, V>> parserPair,
-                                                @Nonnull final Pair<Class<U>, Class<V>> types) {
+                                                @NonNull final String name,
+                                                @NonNull final Pair<@NonNull String, @NonNull String> names,
+                                                @NonNull final Pair<@NonNull ArgumentParser<@NonNull C, @NonNull U>,
+                                                        @NonNull ArgumentParser<@NonNull C, @NonNull V>> parserPair,
+                                                @NonNull final Pair<@NonNull Class<U>, @NonNull Class<V>> types) {
             this.required = required;
             this.name = name;
             this.names = names;
@@ -121,8 +123,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
          *
          * @return Argument pair
          */
-        @Nonnull
-        public ArgumentPair<C, U, V, Pair<U, V>> simple() {
+        public @NonNull ArgumentPair<@NonNull C, @NonNull U, @NonNull V, @NonNull Pair<@NonNull U, @NonNull V>> simple() {
             return new ArgumentPair<C, U, V, Pair<U, V>>(this.required,
                                                          this.name,
                                                          this.names,
@@ -141,9 +142,9 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
          * @param <O>    Output type
          * @return Created pair
          */
-        @Nonnull
-        public <O> ArgumentPair<C, U, V, O> withMapper(@Nonnull final TypeToken<O> clazz,
-                                                       @Nonnull final Function<Pair<U, V>, O> mapper) {
+        public <O> @NonNull ArgumentPair<C, U, V, O> withMapper(@NonNull final TypeToken<O> clazz,
+                                                                @NonNull final Function<@NonNull Pair<@NonNull U,
+                                                                        @NonNull V>, @NonNull O> mapper) {
             return new ArgumentPair<C, U, V, O>(this.required, this.name, this.names, this.types, this.parserPair, mapper, clazz);
         }
 
@@ -155,10 +156,10 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
          * @param <O>    Output type
          * @return Created pair
          */
-        @Nonnull
-        public <O> ArgumentPair<C, U, V, O> withMapper(@Nonnull final Class<O> clazz,
-                                                       @Nonnull final Function<Pair<U, V>, O> mapper) {
-            return this.withMapper(TypeToken.of(clazz), mapper);
+        public <O> @NonNull ArgumentPair<@NonNull C, @NonNull U, @NonNull V, @NonNull O> withMapper(
+                @NonNull final Class<O> clazz,
+                @NonNull final Function<@NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper) {
+            return this.withMapper(TypeToken.get(clazz), mapper);
         }
 
     }

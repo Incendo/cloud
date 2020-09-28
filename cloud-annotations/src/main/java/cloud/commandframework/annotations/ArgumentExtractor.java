@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -34,10 +35,10 @@ import java.util.function.Function;
  * Utility that extract {@link Argument arguments} from
  * {@link java.lang.reflect.Method method} {@link java.lang.reflect.Parameter parameters}
  */
-class ArgumentExtractor implements Function<Method, Collection<ArgumentParameterPair>> {
+class ArgumentExtractor implements Function<@NonNull Method, Collection<@NonNull ArgumentParameterPair>> {
 
     @Override
-    public Collection<ArgumentParameterPair> apply(@Nonnull final Method method) {
+    public @NonNull Collection<@NonNull ArgumentParameterPair> apply(@NonNull final Method method) {
         final Collection<ArgumentParameterPair> arguments = new ArrayList<>();
         for (final Parameter parameter : method.getParameters()) {
             if (!parameter.isAnnotationPresent(Argument.class)) {

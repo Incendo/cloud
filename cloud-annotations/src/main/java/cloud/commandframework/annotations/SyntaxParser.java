@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -36,7 +37,7 @@ import java.util.regex.Pattern;
 /**
  * Parses command syntax into syntax fragments
  */
-final class SyntaxParser implements Function<String, LinkedHashMap<String, SyntaxFragment>> {
+final class SyntaxParser implements Function<@NonNull String, @NonNull LinkedHashMap<@NonNull String, @NonNull SyntaxFragment>> {
 
     private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile("([A-Za-z0-9]+)(|([A-Za-z0-9]+))*")
                                                                              .asPredicate();
@@ -46,7 +47,7 @@ final class SyntaxParser implements Function<String, LinkedHashMap<String, Synta
                                                                               .asPredicate();
 
     @Override
-    public LinkedHashMap<String, SyntaxFragment> apply(@Nonnull final String syntax) {
+    public @NonNull LinkedHashMap<@NonNull String, @NonNull SyntaxFragment> apply(@NonNull final String syntax) {
         final StringTokenizer stringTokenizer = new StringTokenizer(syntax, " ");
         final LinkedHashMap<String, SyntaxFragment> map = new LinkedHashMap<>();
         while (stringTokenizer.hasMoreTokens()) {

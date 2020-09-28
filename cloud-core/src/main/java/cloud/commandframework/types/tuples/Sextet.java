@@ -171,12 +171,11 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
 
     @Override
     public final int getSize() {
-        return Tuples.SIZE_SEXTET;
+        return 6;
     }
 
-    @Nonnull
     @Override
-    public final Object[] toArray() {
+    public @NonNull final Object @NonNull [] toArray() {
         final Object[] array = new Object[6];
         array[0] = this.first;
         array[1] = this.second;

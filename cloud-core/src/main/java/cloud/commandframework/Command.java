@@ -34,7 +34,7 @@ import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -391,11 +391,10 @@ public class Command<C> {
          * @param <V>         Second type
          * @return Builder instance with the argument inserted
          */
-        @Nonnull
-        public <U, V> Builder<C> argumentPair(@Nonnull final String name,
-                                              @Nonnull final Pair<String, String> names,
-                                              @Nonnull final Pair<Class<U>, Class<V>> parserPair,
-                                              @Nonnull final Description description) {
+        public <U, V> @NonNull Builder<C> argumentPair(@NonNull final String name,
+                                                       @NonNull final Pair<@NonNull String, @NonNull String> names,
+                                                       @NonNull final Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                                                       @NonNull final Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
@@ -422,13 +421,13 @@ public class Command<C> {
          * @param <O>         Output type
          * @return Builder instance with the argument inserted
          */
-        @Nonnull
-        public <U, V, O> Builder<C> argumentPair(@Nonnull final String name,
-                                                 @Nonnull final TypeToken<O> outputType,
-                                                 @Nonnull final Pair<String, String> names,
-                                                 @Nonnull final Pair<Class<U>, Class<V>> parserPair,
-                                                 @Nonnull final Function<Pair<U, V>, O> mapper,
-                                                 @Nonnull final Description description) {
+        public <U, V, O> @NonNull Builder<C> argumentPair(@NonNull final String name,
+                                                          @NonNull final TypeToken<O> outputType,
+                                                          @NonNull final Pair<@NonNull String, @NonNull String> names,
+                                                          @NonNull final Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                                                          @NonNull final Function<Pair<@NonNull U, @NonNull V>,
+                                                                  @NonNull O> mapper,
+                                                          @NonNull final Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
@@ -455,11 +454,12 @@ public class Command<C> {
          * @param <W>           Third type
          * @return Builder instance with the argument inserted
          */
-        @Nonnull
-        public <U, V, W> Builder<C> argumentTriplet(@Nonnull final String name,
-                                                    @Nonnull final Triplet<String, String, String> names,
-                                                    @Nonnull final Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                                                    @Nonnull final Description description) {
+        public <U, V, W> @NonNull Builder<C> argumentTriplet(@NonNull final String name,
+                                                             @NonNull final Triplet<@NonNull String,
+                                                                     @NonNull String, @NonNull String> names,
+                                                             @NonNull final Triplet<@NonNull Class<U>,
+                                                                     @NonNull Class<V>, @NonNull Class<W>> parserTriplet,
+                                                             @NonNull final Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
@@ -487,13 +487,15 @@ public class Command<C> {
          * @param <O>           Output type
          * @return Builder instance with the argument inserted
          */
-        @Nonnull
-        public <U, V, W, O> Builder<C> argumentTriplet(@Nonnull final String name,
-                                                       @Nonnull final TypeToken<O> outputType,
-                                                       @Nonnull final Triplet<String, String, String> names,
-                                                       @Nonnull final Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                                                       @Nonnull final Function<Triplet<U, V, W>, O> mapper,
-                                                       @Nonnull final Description description) {
+        public <U, V, W, O> @NonNull Builder<C> argumentTriplet(@NonNull final String name,
+                                                                @NonNull final TypeToken<O> outputType,
+                                                                @NonNull final Triplet<@NonNull String,
+                                                                        @NonNull String, @NonNull String> names,
+                                                                @NonNull final Triplet<@NonNull Class<U>,
+                                                                        @NonNull Class<V>, @NonNull Class<W>> parserTriplet,
+                                                                @NonNull final Function<@NonNull Triplet<@NonNull U,
+                                                                        @NonNull V, @NonNull W>, @NonNull O> mapper,
+                                                                @NonNull final Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }

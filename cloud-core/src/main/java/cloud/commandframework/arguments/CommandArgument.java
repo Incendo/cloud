@@ -125,12 +125,13 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param suggestionsProvider Suggestions provider
      */
     public CommandArgument(final boolean required,
-                           @Nonnull final String name,
-                           @Nonnull final ArgumentParser<C, T> parser,
-                           @Nonnull final String defaultValue,
-                           @Nonnull final Class<T> valueType,
-                           @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
-        this(required, name, parser, defaultValue, TypeToken.of(valueType), suggestionsProvider);
+                           @NonNull final String name,
+                           @NonNull final ArgumentParser<C, T> parser,
+                           @NonNull final String defaultValue,
+                           @NonNull final Class<T> valueType,
+                           @Nullable final BiFunction<@NonNull CommandContext<C>,
+                                   @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
+        this(required, name, parser, defaultValue, TypeToken.get(valueType), suggestionsProvider);
     }
 
     /**
@@ -162,9 +163,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param <T>   Argument Type. Used to make the compiler happy.
      * @return Argument builder
      */
-    @Nonnull
-    public static <C, T> CommandArgument.Builder<C, T> ofType(@Nonnull final TypeToken<T> clazz,
-                                                              @Nonnull final String name) {
+    public static <C, T> CommandArgument.@NonNull Builder<C, T> ofType(@NonNull final TypeToken<T> clazz,
+                                                                       @NonNull final String name) {
         return new Builder<>(clazz, name);
     }
 
@@ -352,9 +352,9 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
             this.name = name;
         }
 
-        protected Builder(@Nonnull final Class<T> valueType,
-                          @Nonnull final String name) {
-            this(TypeToken.of(valueType), name);
+        protected Builder(@NonNull final Class<T> valueType,
+                          @NonNull final String name) {
+            this(TypeToken.get(valueType), name);
         }
 
         /**

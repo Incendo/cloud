@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.lang.reflect.Method;
 
 final class CommandMethodPair {
@@ -31,18 +32,17 @@ final class CommandMethodPair {
     private final Method method;
     private final CommandMethod commandMethod;
 
-    CommandMethodPair(@Nonnull final Method method, @Nonnull final CommandMethod commandMethod) {
+    CommandMethodPair(@NonNull final Method method,
+                      @NonNull final CommandMethod commandMethod) {
         this.method = method;
         this.commandMethod = commandMethod;
     }
 
-    @Nonnull
-    Method getMethod() {
+    @NonNull Method getMethod() {
         return this.method;
     }
 
-    @Nonnull
-    CommandMethod getCommandMethod() {
+    @NonNull CommandMethod getCommandMethod() {
         return this.commandMethod;
     }
 

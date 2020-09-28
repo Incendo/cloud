@@ -29,8 +29,8 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 public class BungeeCommandManager<C> extends CommandManager<C> {
@@ -48,11 +48,11 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    public BungeeCommandManager(@Nonnull final Plugin owningPlugin,
-                                @Nonnull final Function<CommandTree<C>,
-                                        CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                                @Nonnull final Function<CommandSender, C> commandSenderMapper,
-                                @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper)
+    public BungeeCommandManager(@NonNull final Plugin owningPlugin,
+                                @NonNull final Function<@NonNull CommandTree<C>,
+                                        @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+                                @NonNull final Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
+                                @NonNull final Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper)
             throws Exception {
         super(commandExecutionCoordinator, new BungeePluginRegistrationHandler<>());
         ((BungeePluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
@@ -62,22 +62,20 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     }
 
     @Override
-    public final boolean hasPermission(@Nonnull final C sender,
-                                       @Nonnull final String permission) {
+    public final boolean hasPermission(@NonNull final C sender,
+                                       @NonNull final String permission) {
         if (permission.isEmpty()) {
             return true;
         }
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 
-    @Nonnull
     @Override
-    public final SimpleCommandMeta createDefaultCommandMeta() {
+    public final @NonNull SimpleCommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
 
-    @Nonnull
-    final Function<CommandSender, C> getCommandSenderMapper() {
+    final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
     }
 
@@ -86,8 +84,7 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
      *
      * @return Owning plugin
      */
-    @Nonnull
-    public Plugin getOwningPlugin() {
+    public @NonNull Plugin getOwningPlugin() {
         return this.owningPlugin;
     }
 

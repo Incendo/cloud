@@ -118,12 +118,11 @@ public class Triplet<U, V, W> implements Tuple {
 
     @Override
     public final int getSize() {
-        return Tuples.SIZE_TRIPLET;
+        return 3;
     }
 
-    @Nonnull
     @Override
-    public final Object[] toArray() {
+    public final @NonNull Object @NonNull [] toArray() {
         final Object[] array = new Object[3];
         array[0] = this.first;
         array[1] = this.second;

@@ -24,12 +24,11 @@
 package cloud.commandframework.bukkit;
 
 import org.bukkit.entity.Player;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class BukkitPlayerSender extends BukkitCommandSender {
 
-    BukkitPlayerSender(@Nonnull final Player player) {
+    BukkitPlayerSender(@NonNull final Player player) {
         super(player);
     }
 
@@ -38,9 +37,8 @@ final class BukkitPlayerSender extends BukkitCommandSender {
         return true;
     }
 
-    @Nonnull
     @Override
-    public Player asPlayer() {
+    public @NonNull Player asPlayer() {
         return (Player) this.getInternalSender();
     }
 }
