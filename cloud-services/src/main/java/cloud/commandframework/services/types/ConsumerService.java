@@ -24,8 +24,8 @@
 package cloud.commandframework.services.types;
 
 import cloud.commandframework.services.State;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
 /**
@@ -49,9 +49,8 @@ public interface ConsumerService<Context>
     throw new PipeBurst();
   }
 
-  @Nonnull
   @Override
-  default State handle(@Nonnull final Context context) {
+  default @NonNull State handle(@NonNull final Context context) {
     try {
       this.accept(context);
     } catch (final PipeBurst burst) {
@@ -67,7 +66,7 @@ public interface ConsumerService<Context>
    * @param context Context to consume
    */
   @Override
-  void accept(@Nonnull Context context);
+  void accept(@NonNull Context context);
 
 
   class PipeBurst extends RuntimeException {

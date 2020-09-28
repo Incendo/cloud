@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.permission;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Collection;
 
 /**
@@ -36,8 +37,7 @@ public interface CommandPermission {
      *
      * @return Permission nodes
      */
-    @Nonnull
-    Collection<CommandPermission> getPermissions();
+    @NonNull Collection<@NonNull CommandPermission> getPermissions();
 
     /**
      * Get a string representation of the permission
@@ -45,7 +45,6 @@ public interface CommandPermission {
      * @return String representation of the permission node
      */
     @Override
-    @Nonnull
     String toString();
 
 }

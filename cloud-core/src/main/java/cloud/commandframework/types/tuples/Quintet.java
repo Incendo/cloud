@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Objects;
 
 /**
@@ -37,22 +38,17 @@ import java.util.Objects;
  */
 public class Quintet<U, V, W, X, Y> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
-    @Nonnull
     private final W third;
-    @Nonnull
     private final X fourth;
-    @Nonnull
     private final Y fifth;
 
-    protected Quintet(@Nonnull final U first,
-                      @Nonnull final V second,
-                      @Nonnull final W third,
-                      @Nonnull final X fourth,
-                      @Nonnull final Y fifth) {
+    protected Quintet(@NonNull final U first,
+                      @NonNull final V second,
+                      @NonNull final W third,
+                      @NonNull final X fourth,
+                      @NonNull final Y fifth) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -75,12 +71,12 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      * @param <Y>    Fifth type
      * @return Created quintet
      */
-    @Nonnull
-    public static <U, V, W, X, Y> Quintet<U, V, W, X, Y> of(@Nonnull final U first,
-                                                            @Nonnull final V second,
-                                                            @Nonnull final W third,
-                                                            @Nonnull final X fourth,
-                                                            @Nonnull final Y fifth) {
+    public static <U, V, W, X, Y> @NonNull Quintet<@NonNull U, @NonNull V, @NonNull W, @NonNull X, @NonNull Y> of(
+            @NonNull final U first,
+            @NonNull final V second,
+            @NonNull final W third,
+            @NonNull final X fourth,
+            @NonNull final Y fifth) {
         return new Quintet<>(first, second, third, fourth, fifth);
     }
 
@@ -89,8 +85,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -99,8 +94,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 
@@ -109,8 +103,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Third value
      */
-    @Nonnull
-    public final W getThird() {
+    public final @NonNull W getThird() {
         return this.third;
     }
 
@@ -119,8 +112,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Fourth value
      */
-    @Nonnull
-    public final X getFourth() {
+    public final @NonNull X getFourth() {
         return this.fourth;
     }
 
@@ -129,8 +121,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Fifth value
      */
-    @Nonnull
-    public final Y getFifth() {
+    public final @NonNull Y getFifth() {
         return this.fifth;
     }
 

@@ -23,15 +23,12 @@
 //
 package cloud.commandframework.services.mock;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
 public class SecondaryMockService implements MockService, Predicate<MockService.MockContext> {
 
-  @Nullable
   @Override
-  public MockResult handle(@Nonnull final MockContext mockContext) {
+  public MockResult handle(final MockContext mockContext) {
     return new MockResult(999);
   }
 

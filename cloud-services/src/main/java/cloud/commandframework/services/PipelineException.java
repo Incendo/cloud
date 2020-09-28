@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Wrapper for exceptions thrown during pipeline execution.
@@ -37,7 +37,7 @@ public final class PipelineException extends RuntimeException {
      *
      * @param cause Cause of the exception
      */
-    public PipelineException(@Nonnull final Exception cause) {
+    public PipelineException(@NonNull final Exception cause) {
         super(cause);
     }
 
@@ -47,7 +47,7 @@ public final class PipelineException extends RuntimeException {
      * @param message Message explaining the exception
      * @param cause   Cause of the exception
      */
-    public PipelineException(@Nonnull final String message, @Nonnull final Exception cause) {
+    public PipelineException(@NonNull final String message, @NonNull final Exception cause) {
         super(message, cause);
     }
 

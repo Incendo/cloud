@@ -23,12 +23,10 @@
 //
 package cloud.commandframework.services.mock;
 
-import javax.annotation.Nonnull;
-
 public class StateSettingConsumerService implements MockConsumerService {
 
   @Override
-  public void accept(@Nonnull final MockService.MockContext mockContext) {
+  public void accept(final MockService.MockContext mockContext) {
     mockContext.setState("");
   }
 

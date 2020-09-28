@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Objects;
 
 /**
@@ -38,25 +39,19 @@ import java.util.Objects;
  */
 public class Sextet<U, V, W, X, Y, Z> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
-    @Nonnull
     private final W third;
-    @Nonnull
     private final X fourth;
-    @Nonnull
     private final Y fifth;
-    @Nonnull
     private final Z sixth;
 
-    protected Sextet(@Nonnull final U first,
-                     @Nonnull final V second,
-                     @Nonnull final W third,
-                     @Nonnull final X fourth,
-                     @Nonnull final Y fifth,
-                     @Nonnull final Z sixth) {
+    protected Sextet(@NonNull final U first,
+                     @NonNull final V second,
+                     @NonNull final W third,
+                     @NonNull final X fourth,
+                     @NonNull final Y fifth,
+                     @NonNull final Z sixth) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -82,13 +77,13 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      * @param <Z>    Sixth type
      * @return Created sextet
      */
-    @Nonnull
-    public static <U, V, W, X, Y, Z> Sextet<U, V, W, X, Y, Z> of(@Nonnull final U first,
-                                                                 @Nonnull final V second,
-                                                                 @Nonnull final W third,
-                                                                 @Nonnull final X fourth,
-                                                                 @Nonnull final Y fifth,
-                                                                 @Nonnull final Z sixth) {
+    public static <U, V, W, X, Y, Z> @NonNull Sextet<@NonNull U, @NonNull V, @NonNull W, @NonNull X, @NonNull Y, @NonNull Z> of(
+                                                                          @NonNull final U first,
+                                                                          @NonNull final V second,
+                                                                          @NonNull final W third,
+                                                                          @NonNull final X fourth,
+                                                                          @NonNull final Y fifth,
+                                                                          @NonNull final Z sixth) {
         return new Sextet<>(first, second, third, fourth, fifth, sixth);
     }
 
@@ -97,8 +92,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -107,8 +101,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 
@@ -117,8 +110,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Third value
      */
-    @Nonnull
-    public final W getThird() {
+    public final @NonNull W getThird() {
         return this.third;
     }
 
@@ -127,8 +119,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Fourth value
      */
-    @Nonnull
-    public final X getFourth() {
+    public final @NonNull X getFourth() {
         return this.fourth;
     }
 
@@ -137,8 +128,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Fifth value
      */
-    @Nonnull
-    public final Y getFifth() {
+    public final @NonNull Y getFifth() {
         return this.fifth;
     }
 
@@ -147,8 +137,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Sixth value
      */
-    @Nonnull
-    public final Z getSixth() {
+    public final @NonNull Z getSixth() {
         return this.sixth;
     }
 

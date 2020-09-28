@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Objects;
 
 /**
@@ -34,13 +35,11 @@ import java.util.Objects;
  */
 public class Pair<U, V> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
 
-    protected Pair(@Nonnull final U first,
-                   @Nonnull final V second) {
+    protected Pair(@NonNull final U first,
+                   @NonNull final V second) {
         this.first = first;
         this.second = second;
     }
@@ -54,9 +53,8 @@ public class Pair<U, V> implements Tuple {
      * @param <V>    Second type
      * @return Created pair
      */
-    @Nonnull
-    public static <U, V> Pair<U, V> of(@Nonnull final U first,
-                                       @Nonnull final V second) {
+    public static <U, V> @NonNull Pair<@NonNull U, @NonNull V> of(@NonNull final U first,
+                                                                  @NonNull final V second) {
         return new Pair<>(first, second);
     }
 
@@ -65,8 +63,7 @@ public class Pair<U, V> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -75,8 +72,7 @@ public class Pair<U, V> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 

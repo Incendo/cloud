@@ -24,9 +24,9 @@
 package cloud.commandframework.services.types;
 
 import cloud.commandframework.services.ChunkedRequestContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -38,11 +38,10 @@ import java.util.Map;
  * @param <Chunked> Chunk request context
  */
 public interface PartialResultService<Context, Result, Chunked extends ChunkedRequestContext<Context, Result>>
-    extends Service<Chunked, Map<Context, Result>> {
+    extends Service<Chunked, @Nullable Map<@NonNull Context, @NonNull Result>> {
 
   @Override
-  @Nullable
-  default Map<Context, Result> handle(@Nonnull final Chunked context) {
+  default @Nullable Map<@NonNull Context, @NonNull Result> handle(@NonNull final Chunked context) {
     if (!context.isCompleted()) {
       this.handleRequests(context.getRemaining()).forEach(context::storeResult);
     }
@@ -59,7 +58,6 @@ public interface PartialResultService<Context, Result, Chunked extends ChunkedRe
    * @param requests Requests
    * @return Map of request-result pairs
    */
-  @Nonnull
-  Map<Context, Result> handleRequests(@Nonnull List<Context> requests);
+  @NonNull Map<@NonNull Context, @NonNull Result> handleRequests(@NonNull List<Context> requests);
 
 }

@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.services;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -44,8 +45,7 @@ public final class ServicePipelineBuilder {
      *
      * @return New service pipeline
      */
-    @Nonnull
-    public ServicePipeline build() {
+    public @NonNull ServicePipeline build() {
         return new ServicePipeline(this.executor);
     }
 
@@ -56,8 +56,7 @@ public final class ServicePipelineBuilder {
      * @param executor New executor
      * @return Builder instance
      */
-    @Nonnull
-    public ServicePipelineBuilder withExecutor(@Nonnull final Executor executor) {
+    public @NonNull ServicePipelineBuilder withExecutor(@NonNull final Executor executor) {
         this.executor = Objects.requireNonNull(executor, "Executor may not be null");
         return this;
     }

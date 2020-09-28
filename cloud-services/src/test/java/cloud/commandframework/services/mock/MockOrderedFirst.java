@@ -26,15 +26,11 @@ package cloud.commandframework.services.mock;
 import cloud.commandframework.services.ExecutionOrder;
 import cloud.commandframework.services.annotations.Order;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 @Order(ExecutionOrder.FIRST)
 public class MockOrderedFirst implements MockService {
 
-  @Nullable
   @Override
-  public MockResult handle(@Nonnull final MockContext mockContext) {
+  public MockResult handle(final MockContext mockContext) {
     return new MockResult(1);
   }
 
