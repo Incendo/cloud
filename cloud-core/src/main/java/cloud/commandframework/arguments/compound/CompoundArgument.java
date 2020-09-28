@@ -128,8 +128,15 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
                 /* Store the parsed value */
                 output[i] = result.getParsedValue().orElse(null);
             }
-            /* We now know that we have complete output, as none of the parsers returned a failure */
-            return ArgumentParseResult.success(this.mapper.apply(this.tupleFactory.apply(output)));
+            /*
+            * We now know that we have complete output, as none of the parsers returned a failure.
+            * Now check if the mapper threw any exceptions
+             */
+            try {
+                return ArgumentParseResult.success(this.mapper.apply(this.tupleFactory.apply(output)));
+            } catch (final Exception e) {
+                return ArgumentParseResult.failure(e);
+            }
         }
 
         @Nonnull
