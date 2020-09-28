@@ -31,6 +31,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -38,9 +39,10 @@ import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class PlayerArgument<C> extends CommandArgument<C, Player> {
-    private PlayerArgument(final boolean required, @Nonnull final String name,
-                            @Nonnull final String defaultValue,
-                           @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+    private PlayerArgument(final boolean required,
+                           @Nonnull final String name,
+                           @Nonnull final String defaultValue,
+                           @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
         super(required, name, new PlayerParser<>(), defaultValue, Player.class, suggestionsProvider);
     }
 

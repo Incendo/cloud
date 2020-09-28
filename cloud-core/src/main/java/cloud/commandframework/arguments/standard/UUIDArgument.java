@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
@@ -40,8 +41,8 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     private UUIDArgument(final boolean required,
                          @Nonnull final String name,
                          @Nonnull final String defaultValue,
-                         @Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
-        super(required, name, new UUIDParser<>(suggestionsProvider), defaultValue, UUID.class, suggestionsProvider);
+                         @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+        super(required, name, new UUIDParser<>(), defaultValue, UUID.class, suggestionsProvider);
     }
 
     /**
@@ -117,12 +118,6 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     private static final class UUIDParser<C> implements ArgumentParser<C, UUID> {
 
-        private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
-
-        UUIDParser(@Nonnull final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
-            this.suggestionsProvider = suggestionsProvider;
-        }
-
         @Nonnull
         @Override
         public ArgumentParseResult<UUID> parse(
@@ -140,13 +135,6 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
             } catch (IllegalArgumentException e) {
                 return ArgumentParseResult.failure(new UUIDParseException(input));
             }
-        }
-
-        @Nonnull
-        @Override
-        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
-                                        @Nonnull final String input) {
-            return this.suggestionsProvider.apply(commandContext, input);
         }
 
         @Override
