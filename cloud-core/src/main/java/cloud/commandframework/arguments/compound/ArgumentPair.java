@@ -41,7 +41,7 @@ import java.util.function.Function;
  * @param <V> Second argument type
  * @param <O> Output type
  */
-public final class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O> {
+public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O> {
 
     /**
      * Create a new argument pair.

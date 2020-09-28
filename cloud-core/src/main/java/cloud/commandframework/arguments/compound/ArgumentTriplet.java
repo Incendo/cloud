@@ -42,7 +42,7 @@ import java.util.function.Function;
  * @param <W> Third argument type
  * @param <O> Output type
  */
-public final class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, V, W>, C, O> {
+public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, V, W>, C, O> {
 
     /**
      * Create a new argument triplet.
