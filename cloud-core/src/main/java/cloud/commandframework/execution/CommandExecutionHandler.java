@@ -25,8 +25,7 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Handler that is invoked whenever a {@link Command} is executed
@@ -42,7 +41,7 @@ public interface CommandExecutionHandler<C> {
      *
      * @param commandContext Command context
      */
-    void execute(@Nonnull CommandContext<C> commandContext);
+    void execute(@NonNull CommandContext<C> commandContext);
 
 
     /**
@@ -53,7 +52,7 @@ public interface CommandExecutionHandler<C> {
     class NullCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
 
         @Override
-        public void execute(@Nonnull final CommandContext<C> commandContext) {
+        public void execute(@NonNull final CommandContext<C> commandContext) {
         }
 
     }

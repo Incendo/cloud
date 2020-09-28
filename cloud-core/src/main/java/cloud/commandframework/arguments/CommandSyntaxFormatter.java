@@ -24,9 +24,9 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandTree;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -44,8 +44,7 @@ public interface CommandSyntaxFormatter<C> {
      * @param node             Trailing node
      * @return Syntax string
      */
-    @Nonnull
-    String apply(@Nonnull List<CommandArgument<C, ?>> commandArguments,
-                 @Nullable CommandTree.Node<CommandArgument<C, ?>> node);
+    @NonNull String apply(@NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
+                          CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node);
 
 }

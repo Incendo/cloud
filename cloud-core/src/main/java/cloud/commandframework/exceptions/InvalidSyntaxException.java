@@ -24,8 +24,8 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -43,9 +43,9 @@ public class InvalidSyntaxException extends CommandParseException {
      * @param commandSender Sender that sent the command
      * @param currentChain  Chain leading up to issue
      */
-    public InvalidSyntaxException(@Nonnull final String correctSyntax,
-                                  @Nonnull final Object commandSender,
-                                  @Nonnull final List<CommandArgument<?, ?>> currentChain) {
+    public InvalidSyntaxException(@NonNull final String correctSyntax,
+                                  @NonNull final Object commandSender,
+                                  @NonNull final List<@NonNull CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.correctSyntax = correctSyntax;
     }
@@ -55,8 +55,7 @@ public class InvalidSyntaxException extends CommandParseException {
      *
      * @return Correct command syntax
      */
-    @Nonnull
-    public String getCorrectSyntax() {
+    public @NonNull String getCorrectSyntax() {
         return this.correctSyntax;
     }
 

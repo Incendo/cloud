@@ -24,8 +24,7 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.context.CommandContext;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * The result of a command execution
@@ -41,7 +40,7 @@ public class CommandResult<C> {
      *
      * @param context Command context
      */
-    public CommandResult(@Nonnull final CommandContext<C> context) {
+    public CommandResult(@NonNull final CommandContext<C> context) {
         this.commandContext = context;
     }
 
@@ -50,8 +49,7 @@ public class CommandResult<C> {
      *
      * @return Command context
      */
-    @Nonnull
-    public CommandContext<C> getCommandContext() {
+    public @NonNull CommandContext<C> getCommandContext() {
         return this.commandContext;
     }
 

@@ -25,8 +25,8 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +40,7 @@ public final class CommandHelpHandler<C> {
 
     private final CommandManager<C> commandManager;
 
-    CommandHelpHandler(@Nonnull final CommandManager<C> commandManager) {
+    CommandHelpHandler(@NonNull final CommandManager<C> commandManager) {
         this.commandManager = commandManager;
     }
 
@@ -49,8 +49,7 @@ public final class CommandHelpHandler<C> {
      *
      * @return Syntax hints for all registered commands, order in lexicographical order
      */
-    @Nonnull
-    public List<VerboseHelpEntry<C>> getAllCommands() {
+    public @NonNull List<@NonNull VerboseHelpEntry<C>> getAllCommands() {
         final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
         for (final Command<C> command : this.commandManager.getCommands()) {
             final List<CommandArgument<C, ?>> arguments = command.getArguments();
@@ -71,8 +70,7 @@ public final class CommandHelpHandler<C> {
      *
      * @return Longest shared command chains
      */
-    @Nonnull
-    public List<String> getLongestSharedChains() {
+    public @NonNull List<@NonNull String> getLongestSharedChains() {
         final List<String> chains = new ArrayList<>();
         this.commandManager.getCommandTree().getRootNodes().forEach(node ->
             chains.add(node.getValue()
@@ -91,9 +89,9 @@ public final class CommandHelpHandler<C> {
         private final String syntaxString;
         private final String description;
 
-        private VerboseHelpEntry(@Nonnull final Command<C> command,
-                                 @Nonnull final String syntaxString,
-                                 @Nonnull final String description) {
+        private VerboseHelpEntry(@NonNull final Command<C> command,
+                                 @NonNull final String syntaxString,
+                                 @NonNull final String description) {
             this.command = command;
             this.syntaxString = syntaxString;
             this.description = description;
@@ -104,8 +102,7 @@ public final class CommandHelpHandler<C> {
          *
          * @return Command
          */
-        @Nonnull
-        public Command<C> getCommand() {
+        public @NonNull Command<C> getCommand() {
             return this.command;
         }
 
@@ -114,8 +111,7 @@ public final class CommandHelpHandler<C> {
          *
          * @return Syntax string
          */
-        @Nonnull
-        public String getSyntaxString() {
+        public @NonNull String getSyntaxString() {
             return this.syntaxString;
         }
 
@@ -124,7 +120,7 @@ public final class CommandHelpHandler<C> {
          *
          * @return Command description
          */
-        public String getDescription() {
+        public @NonNull String getDescription() {
             return this.description;
         }
     }
@@ -135,7 +131,7 @@ public final class CommandHelpHandler<C> {
      * @param query Query string
      * @return Help topic, will return an empty {@link IndexHelpTopic} if no results were found
      */
-    public HelpTopic<C> queryHelp(@Nonnull final String query) {
+    public @NonNull HelpTopic<C> queryHelp(@NonNull final String query) {
         if (query.replace(" ", "").isEmpty()) {
             return new IndexHelpTopic<>(this.getAllCommands());
         }
@@ -265,7 +261,7 @@ public final class CommandHelpHandler<C> {
 
         private final List<VerboseHelpEntry<C>> entries;
 
-        private IndexHelpTopic(@Nonnull final List<VerboseHelpEntry<C>> entries) {
+        private IndexHelpTopic(@NonNull final List<@NonNull VerboseHelpEntry<C>> entries) {
             this.entries = entries;
         }
 
@@ -274,8 +270,7 @@ public final class CommandHelpHandler<C> {
          *
          * @return Entries
          */
-        @Nonnull
-        public List<VerboseHelpEntry<C>> getEntries() {
+        public @NonNull List<@NonNull VerboseHelpEntry<C>> getEntries() {
             return this.entries;
         }
 
@@ -301,7 +296,7 @@ public final class CommandHelpHandler<C> {
         private final Command<C> command;
         private final String description;
 
-        private VerboseHelpTopic(@Nonnull final Command<C> command) {
+        private VerboseHelpTopic(@NonNull final Command<C> command) {
             this.command = command;
             final String shortDescription = command.getCommandMeta().getOrDefault("description", "No description");
             this.description = command.getCommandMeta().getOrDefault("long-description", shortDescription);
@@ -312,8 +307,7 @@ public final class CommandHelpHandler<C> {
          *
          * @return Command
          */
-        @Nonnull
-        public Command<C> getCommand() {
+        public @NonNull Command<C> getCommand() {
             return this.command;
         }
 
@@ -322,8 +316,7 @@ public final class CommandHelpHandler<C> {
          *
          * @return Command description
          */
-        @Nonnull
-        public String getDescription() {
+        public @NonNull String getDescription() {
             return this.description;
         }
 
@@ -340,7 +333,8 @@ public final class CommandHelpHandler<C> {
         private final String longestPath;
         private final List<String> childSuggestions;
 
-        private MultiHelpTopic(@Nonnull final String longestPath, @Nonnull final List<String> childSuggestions) {
+        private MultiHelpTopic(@NonNull final String longestPath,
+                               @NonNull final List<@NonNull String> childSuggestions) {
             this.longestPath = longestPath;
             this.childSuggestions = childSuggestions;
         }
@@ -350,8 +344,7 @@ public final class CommandHelpHandler<C> {
          *
          * @return Longest path
          */
-        @Nonnull
-        public String getLongestPath() {
+        public @NonNull String getLongestPath() {
             return this.longestPath;
         }
 
@@ -360,8 +353,7 @@ public final class CommandHelpHandler<C> {
          *
          * @return Child suggestions
          */
-        @Nonnull
-        public List<String> getChildSuggestions() {
+        public @NonNull List<@NonNull String> getChildSuggestions() {
             return this.childSuggestions;
         }
 

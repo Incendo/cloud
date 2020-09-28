@@ -24,8 +24,8 @@
 package cloud.commandframework.arguments.parser;
 
 import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 
 /**
@@ -44,7 +44,8 @@ public class ParserParameter<T> {
      * @param key          Parameter key
      * @param expectedType Type that is expected to be mapped to this parameter
      */
-    public ParserParameter(@Nonnull final String key, @Nonnull final TypeToken<T> expectedType) {
+    public ParserParameter(@NonNull final String key,
+                           @NonNull final TypeToken<T> expectedType) {
         this.key = key;
         this.expectedType = expectedType;
     }
@@ -54,8 +55,7 @@ public class ParserParameter<T> {
      *
      * @return Parameter key
      */
-    @Nonnull
-    public String getKey() {
+    public @NonNull String getKey() {
         return this.key;
     }
 
@@ -64,8 +64,7 @@ public class ParserParameter<T> {
      *
      * @return Expected type
      */
-    @Nonnull
-    public TypeToken<T> getExpectedType() {
+    public @NonNull TypeToken<T> getExpectedType() {
         return this.expectedType;
     }
 

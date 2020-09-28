@@ -24,8 +24,8 @@
 package cloud.commandframework.meta;
 
 import cloud.commandframework.Command;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,14 +42,12 @@ public abstract class CommandMeta {
      *
      * @return Builder instance
      */
-    @Nonnull
-    public static SimpleCommandMeta.Builder simple() {
+    public static SimpleCommandMeta.@NonNull Builder simple() {
         return SimpleCommandMeta.builder();
     }
 
-    @Nonnull
     @Override
-    public final String toString() {
+    public final @NonNull String toString() {
         return "";
     }
 
@@ -59,8 +57,7 @@ public abstract class CommandMeta {
      * @param key Key
      * @return Optional that may contain the associated value
      */
-    @Nonnull
-    public abstract Optional<String> getValue(@Nonnull String key);
+    public abstract @NonNull Optional<String> getValue(@NonNull String key);
 
     /**
      * Get the value if it exists, else return the default value
@@ -69,15 +66,13 @@ public abstract class CommandMeta {
      * @param defaultValue Default value
      * @return Value, or default value
      */
-    @Nonnull
-    public abstract String getOrDefault(@Nonnull String key, @Nonnull String defaultValue);
+    public abstract @NonNull String getOrDefault(@NonNull String key, @NonNull String defaultValue);
 
     /**
      * Get a copy of the meta map
      *
      * @return Copy of meta map
      */
-    @Nonnull
-    public abstract Map<String, String> getAll();
+    public abstract @NonNull Map<@NonNull String, @NonNull String> getAll();
 
 }

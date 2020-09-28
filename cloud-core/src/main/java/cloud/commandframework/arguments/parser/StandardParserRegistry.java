@@ -36,8 +36,8 @@ import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,14 +56,14 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
     private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = new HashMap<Class<?>, Class<?>>() {
         {
-            put(char.class, Character .class);
-            put(int.class, Integer .class);
-            put(short.class, Short .class);
-            put(byte.class, Byte .class);
-            put(float.class, Float .class);
-            put(double.class, Double .class);
-            put(long.class, Long .class);
-            put(boolean.class, Boolean .class);
+            put(char.class, Character.class);
+            put(int.class, Integer.class);
+            put(short.class, Short.class);
+            put(byte.class, Byte.class);
+            put(float.class, Float.class);
+            put(double.class, Double.class);
+            put(long.class, Long.class);
+            put(boolean.class, Boolean.class);
         }
     };
 
@@ -107,28 +107,29 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
     @Override
-    public <T> void registerParserSupplier(@Nonnull final TypeToken<T> type,
-                                           @Nonnull final Function<ParserParameters, ArgumentParser<C, ?>> supplier) {
+    public <T> void registerParserSupplier(@NonNull final TypeToken<T> type,
+                                           @NonNull final Function<@NonNull ParserParameters,
+                                                   @NonNull ArgumentParser<C, ?>> supplier) {
         this.parserSuppliers.put(type, supplier);
     }
 
     @Override
-    public void registerNamedParserSupplier(@Nonnull final String name,
-                                            @Nonnull final Function<ParserParameters, ArgumentParser<C, ?>> supplier) {
+    public void registerNamedParserSupplier(@NonNull final String name,
+                                            @NonNull final Function<@NonNull ParserParameters,
+                                                    @NonNull ArgumentParser<C, ?>> supplier) {
         this.namedParsers.put(name, supplier);
     }
 
     @Override
-    public <A extends Annotation, T> void registerAnnotationMapper(@Nonnull final Class<A> annotation,
-                                                                   @Nonnull final BiFunction<A, TypeToken<?>,
-                                                                           ParserParameters> mapper) {
+    public <A extends Annotation, T> void registerAnnotationMapper(@NonNull final Class<A> annotation,
+                                                                   @NonNull final BiFunction<@NonNull A, @NonNull TypeToken<?>,
+                                                                           @NonNull ParserParameters> mapper) {
         this.annotationMappers.put(annotation, mapper);
     }
 
-    @Nonnull
     @Override
-    public ParserParameters parseAnnotations(@Nonnull final TypeToken<?> parsingType,
-                                             @Nonnull final Collection<? extends Annotation> annotations) {
+    public @NonNull ParserParameters parseAnnotations(@NonNull final TypeToken<?> parsingType,
+                                                      @NonNull final Collection<@NonNull ? extends Annotation> annotations) {
         final ParserParameters parserParameters = new ParserParameters();
         annotations.forEach(annotation -> {
             // noinspection all
@@ -143,10 +144,9 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         return parserParameters;
     }
 
-    @Nonnull
     @Override
-    public <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull final TypeToken<T> type,
-                                                           @Nonnull final ParserParameters parserParameters) {
+    public <T> @NonNull Optional<ArgumentParser<C, T>> createParser(@NonNull final TypeToken<T> type,
+                                                                    @NonNull final ParserParameters parserParameters) {
         final TypeToken<?> actualType;
         if (GenericTypeReflector.erase(type.getType()).isPrimitive()) {
             actualType = TypeToken.get(PRIMITIVE_MAPPINGS.get(GenericTypeReflector.erase(type.getType())));
@@ -169,10 +169,9 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         return Optional.of(parser);
     }
 
-    @Nonnull
     @Override
-    public <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull final String name,
-                                                           @Nonnull final ParserParameters parserParameters) {
+    public <T> @NonNull Optional<ArgumentParser<C, T>> createParser(@NonNull final String name,
+                                                                    @NonNull final ParserParameters parserParameters) {
         final Function<ParserParameters, ArgumentParser<C, ?>> producer = this.namedParsers.get(name);
         if (producer == null) {
             return Optional.empty();
@@ -183,15 +182,16 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
 
-    private static boolean isPrimitive(@Nonnull final TypeToken<?> type) {
+    private static boolean isPrimitive(@NonNull final TypeToken<?> type) {
         return GenericTypeReflector.erase(type.getType()).isPrimitive();
     }
 
 
-    private static final class RangeMapper<T> implements BiFunction<Range, TypeToken<?>, ParserParameters> {
+    private static final class RangeMapper<T> implements BiFunction<@NonNull Range, @NonNull TypeToken<?>,
+            @NonNull ParserParameters> {
 
         @Override
-        public ParserParameters apply(final Range range, final TypeToken<?> type) {
+        public @NonNull ParserParameters apply(@NonNull final Range range, @NonNull final TypeToken<?> type) {
             final Class<?> clazz;
             if (isPrimitive(type)) {
                 clazz = PRIMITIVE_MAPPINGS.get(GenericTypeReflector.erase(type.getType()));
@@ -259,10 +259,11 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
 
-    private static final class CompletionsMapper implements BiFunction<Completions, TypeToken<?>, ParserParameters> {
+    private static final class CompletionsMapper implements BiFunction<@NonNull Completions, @NonNull TypeToken<?>,
+            @NonNull ParserParameters> {
 
         @Override
-        public ParserParameters apply(final Completions completions, final TypeToken<?> token) {
+        public @NonNull ParserParameters apply(@NonNull final Completions completions, @NonNull final TypeToken<?> token) {
             if (GenericTypeReflector.erase(token.getType()).equals(String.class)) {
                 final String[] splitCompletions = completions.value().replace(" ", "").split(",");
                 return ParserParameters.single(StandardParameters.COMPLETIONS, splitCompletions);
