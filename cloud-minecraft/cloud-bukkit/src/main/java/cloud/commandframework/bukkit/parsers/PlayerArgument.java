@@ -117,7 +117,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     }
 
 
-    private static final class PlayerParser<C> implements ArgumentParser<C, Player> {
+    public static final class PlayerParser<C> implements ArgumentParser<C, Player> {
 
         @Nonnull
         @Override

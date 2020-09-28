@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.arguments.standard.UUIDArgument;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import cloud.commandframework.annotations.specifier.Completions;
@@ -44,6 +45,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -102,6 +104,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))));
         /* Add options to this */
         this.registerParserSupplier(TypeToken.of(Boolean.class), options -> new BooleanArgument.BooleanParser<>(false));
+        this.registerParserSupplier(TypeToken.of(UUID.class), options -> new UUIDArgument.UUIDParser<>());
     }
 
     @Override

@@ -116,7 +116,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     }
 
 
-    private static final class UUIDParser<C> implements ArgumentParser<C, UUID> {
+    public static final class UUIDParser<C> implements ArgumentParser<C, UUID> {
 
         @Nonnull
         @Override
