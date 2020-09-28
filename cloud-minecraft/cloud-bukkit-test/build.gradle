@@ -1,0 +1,43 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+
+def adventureVersion = '4.0.0-SNAPSHOT'
+
+shadowJar {
+    dependencies {
+        include(project(':cloud-paper'))
+        include(project(':cloud-annotations'))
+        include(project(':cloud-minecraft-extras'))
+        include(project(':cloud-core'))
+        include(project(':cloud-services'))
+        include(project(':cloud-brigadier'))
+        include(project(':cloud-bukkit'))
+        /* Commodore */
+        include(dependency('me.lucko:commodore:1.9'))
+        /* Adventure */
+        include(dependency("net.kyori:adventure-platform-bukkit:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-text-minimessage:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-text-serializer-bungeecord:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-text-serializer-legacy:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-text-serializer-gson:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-api:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-platform-api:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-platform-common:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-platform-viaversion:${adventureVersion}"))
+        include(dependency("net.kyori:adventure-nbt:${adventureVersion}"))
+        /* Examination */
+        include(dependency("net.kyori:examination-api:1.0.0"))
+        include(dependency("net.kyori:examination-string:1.0.0"))
+    }
+}
+
+dependencies {
+    /* Cloud */
+    implementation project(':cloud-paper')
+    implementation project(':cloud-annotations')
+    implementation project(':cloud-minecraft-extras')
+    /* Extras */
+    implementation 'me.lucko:commodore:1.9'
+    implementation 'net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT'
+    /* Bukkit */
+    compileOnly 'org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT'
+}

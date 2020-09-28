@@ -1,0 +1,8 @@
+dependencies {
+    api (project(':cloud-bukkit')) {
+        /* Exposed by Bukkit */
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    compileOnly 'com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT'
+    compileOnly 'com.destroystokyo.paper:paper-mojangapi:1.15.2-R0.1-SNAPSHOT'
+}

@@ -1,0 +1,19 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+
+def adventureVersion = '4.0.0-SNAPSHOT'
+
+shadowJar {
+    dependencies {
+        include(project(':cloud-velocity'))
+        include(project(':cloud-annotations'))
+        include(project(':cloud-core'))
+        include(project(':cloud-services'))
+        include(project(':cloud-brigadier'))
+    }
+}
+
+dependencies {
+    implementation project(':cloud-velocity')
+    implementation project(':cloud-annotations')
+    compileOnly 'com.velocitypowered:velocity-api:1.1.0-SNAPSHOT'
+}
