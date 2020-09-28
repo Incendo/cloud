@@ -27,8 +27,8 @@ import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.services.types.Service;
 import cloud.commandframework.services.types.SideEffectService;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -45,8 +45,9 @@ public final class ServiceSpigot<Context, Result> {
     private final ServicePipeline pipeline;
     private final ServiceRepository<Context, Result> repository;
 
-    ServiceSpigot(@Nonnull final ServicePipeline pipeline, @Nonnull final Context context,
-                  @Nonnull final TypeToken<? extends Service<Context, Result>> type) {
+    ServiceSpigot(@NonNull final ServicePipeline pipeline,
+                  @NonNull final Context context,
+                  @NonNull final TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type) {
         this.context = context;
         this.pipeline = pipeline;
         this.repository = pipeline.getRepository(type);
@@ -72,11 +73,11 @@ public final class ServiceSpigot<Context, Result> {
      * @see PipelineException PipelineException wraps exceptions thrown during filtering and result
      * retrieval
      */
-    @Nonnull
     @SuppressWarnings("unchecked")
-    public Result getResult()
+    public @NonNull Result getResult()
             throws IllegalStateException, PipelineException {
-        final LinkedList<? extends ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>>>
+        final LinkedList<? extends ServiceRepository<@NonNull Context, @NonNull Result>
+                .ServiceWrapper<? extends Service<@NonNull Context, @NonNull Result>>>
                 queue = this.repository.getQueue();
         queue.sort(null); // Sort using the built in comparator method
         ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>>
@@ -128,7 +129,7 @@ public final class ServiceSpigot<Context, Result> {
      *                               default implementation
      * @throws IllegalStateException If a {@link SideEffectService} returns {@code null}
      */
-    public void getResult(@Nonnull final BiConsumer<Result, Throwable> consumer) {
+    public void getResult(@NonNull final BiConsumer<Result, Throwable> consumer) {
         try {
             consumer.accept(getResult(), null);
         } catch (final PipelineException pipelineException) {
@@ -145,8 +146,7 @@ public final class ServiceSpigot<Context, Result> {
      *
      * @return Generated result
      */
-    @Nonnull
-    public CompletableFuture<Result> getResultAsynchronously() {
+    public @NonNull CompletableFuture<Result> getResultAsynchronously() {
         return CompletableFuture.supplyAsync(this::getResult, this.pipeline.getExecutor());
     }
 
@@ -155,8 +155,7 @@ public final class ServiceSpigot<Context, Result> {
      *
      * @return New pump, for the result of this request
      */
-    @Nonnull
-    public ServicePump<Result> forward() {
+    public @NonNull ServicePump<Result> forward() {
         return this.pipeline.pump(this.getResult());
     }
 
@@ -165,8 +164,7 @@ public final class ServiceSpigot<Context, Result> {
      *
      * @return New pump, for the result of this request
      */
-    @Nonnull
-    public CompletableFuture<ServicePump<Result>> forwardAsynchronously() {
+    public @NonNull CompletableFuture<ServicePump<Result>> forwardAsynchronously() {
         return this.getResultAsynchronously().thenApply(pipeline::pump);
     }
 

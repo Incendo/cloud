@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Objects;
 
 /**
@@ -36,19 +37,15 @@ import java.util.Objects;
  */
 public class Quartet<U, V, W, X> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
-    @Nonnull
     private final W third;
-    @Nonnull
     private final X fourth;
 
-    protected Quartet(@Nonnull final U first,
-                      @Nonnull final V second,
-                      @Nonnull final W third,
-                      @Nonnull final X fourth) {
+    protected Quartet(@NonNull final U first,
+                      @NonNull final V second,
+                      @NonNull final W third,
+                      @NonNull final X fourth) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -68,11 +65,10 @@ public class Quartet<U, V, W, X> implements Tuple {
      * @param <X>    Fourth type
      * @return Created quartet
      */
-    @Nonnull
-    public static <U, V, W, X> Quartet<U, V, W, X> of(@Nonnull final U first,
-                                                      @Nonnull final V second,
-                                                      @Nonnull final W third,
-                                                      @Nonnull final X fourth) {
+    public static <U, V, W, X> @NonNull Quartet<@NonNull U, @NonNull V, @NonNull W, @NonNull X> of(@NonNull final U first,
+                                                                                                   @NonNull final V second,
+                                                                                                   @NonNull final W third,
+                                                                                                   @NonNull final X fourth) {
         return new Quartet<>(first, second, third, fourth);
     }
 
@@ -81,8 +77,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -91,8 +86,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 
@@ -101,8 +95,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Third value
      */
-    @Nonnull
-    public final W getThird() {
+    public final @NonNull W getThird() {
         return this.third;
     }
 
@@ -111,8 +104,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Fourth value
      */
-    @Nonnull
-    public final X getFourth() {
+    public final @NonNull X getFourth() {
         return this.fourth;
     }
 

@@ -25,8 +25,8 @@ package cloud.commandframework.services;
 
 import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.types.Service;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ public final class ServicePipeline {
     private final Map<TypeToken<? extends Service<?, ?>>, ServiceRepository<?, ?>> repositories;
     private final Executor executor;
 
-    ServicePipeline(@Nonnull final Executor executor) {
+    ServicePipeline(@NonNull final Executor executor) {
         this.repositories = new HashMap<>();
         this.executor = executor;
     }
@@ -55,8 +55,7 @@ public final class ServicePipeline {
      *
      * @return Builder instance
      */
-    @Nonnull
-    public static ServicePipelineBuilder builder() {
+    public static @NonNull ServicePipelineBuilder builder() {
         return new ServicePipelineBuilder();
     }
 
@@ -71,9 +70,9 @@ public final class ServicePipeline {
      * @param <Result>              Service result type
      * @return ServicePipeline The service pipeline instance
      */
-    public <Context, Result> ServicePipeline registerServiceType(
-            @Nonnull final TypeToken<? extends Service<Context, Result>> type,
-            @Nonnull final Service<Context, Result> defaultImplementation) {
+    public <Context, Result> @NonNull ServicePipeline registerServiceType(
+            @NonNull final TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type,
+            @NonNull final Service<@NonNull Context, @NonNull Result> defaultImplementation) {
         synchronized (this.lock) {
             if (repositories.containsKey(type)) {
                 throw new IllegalArgumentException(String
@@ -105,8 +104,8 @@ public final class ServicePipeline {
      * @throws Exception Any exceptions thrown during the registration process
      */
     @SuppressWarnings("unchecked")
-    public <T> ServicePipeline registerMethods(
-            @Nonnull final T instance) throws Exception {
+    public <T> @NonNull ServicePipeline registerMethods(
+            @NonNull final T instance) throws Exception {
         synchronized (this.lock) {
             final Map<? extends Service<?, ?>, TypeToken<? extends Service<?, ?>>> services =
                     AnnotatedMethodServiceFactory.INSTANCE.lookupServices(instance);
@@ -139,9 +138,9 @@ public final class ServicePipeline {
      * @return ServicePipeline The service pipeline instance
      */
     public <Context, Result> ServicePipeline registerServiceImplementation(
-            @Nonnull final TypeToken<? extends Service<Context, Result>> type,
-            @Nonnull final Service<Context, Result> implementation,
-            @Nonnull final Collection<Predicate<Context>> filters) {
+            @NonNull final TypeToken<? extends Service<Context, Result>> type,
+            @NonNull final Service<Context, Result> implementation,
+            @NonNull final Collection<Predicate<Context>> filters) {
         synchronized (this.lock) {
             final ServiceRepository<Context, Result> repository = getRepository(type);
             repository.registerImplementation(implementation, filters);
@@ -163,9 +162,9 @@ public final class ServicePipeline {
      * @return ServicePipeline The service pipeline instance
      */
     public <Context, Result> ServicePipeline registerServiceImplementation(
-            @Nonnull final Class<? extends Service<Context, Result>> type,
-            @Nonnull final Service<Context, Result> implementation,
-            @Nonnull final Collection<Predicate<Context>> filters) {
+            @NonNull final Class<? extends Service<Context, Result>> type,
+            @NonNull final Service<Context, Result> implementation,
+            @NonNull final Collection<Predicate<Context>> filters) {
         return registerServiceImplementation(TypeToken.get(type), implementation, filters);
     }
 
@@ -177,15 +176,15 @@ public final class ServicePipeline {
      * @param <Context> Context type
      * @return Service pumper instance
      */
-    @Nonnull
-    public <Context> ServicePump<Context> pump(@Nonnull final Context context) {
+    @NonNull
+    public <Context> ServicePump<Context> pump(@NonNull final Context context) {
         return new ServicePump<>(this, context);
     }
 
     @SuppressWarnings("unchecked")
-    @Nonnull
+    @NonNull
     <Context, Result> ServiceRepository<Context, Result> getRepository(
-            @Nonnull final TypeToken<? extends Service<Context, Result>> type) {
+            @NonNull final TypeToken<? extends Service<Context, Result>> type) {
         final ServiceRepository<Context, Result> repository =
                 (ServiceRepository<Context, Result>) this.repositories.get(type);
         if (repository == null) {
@@ -200,7 +199,7 @@ public final class ServicePipeline {
      *
      * @return Returns an Immutable collection of the service types registered.
      */
-    @Nonnull
+    @NonNull
     public Collection<TypeToken<? extends Service<?, ?>>> getRecognizedTypes() {
         return Collections.unmodifiableCollection(this.repositories.keySet());
     }
@@ -215,10 +214,10 @@ public final class ServicePipeline {
      * @return Returns an collection of the {@link TypeToken}s of the implementations for a given
      * service. Iterator order matches the priority when pumping contexts through the pipeline
      */
-    @Nonnull
+    @NonNull
     @SuppressWarnings("unchecked")
     public <Context, Result, S extends Service<Context, Result>> Collection<TypeToken<? extends S>> getImplementations(
-            @Nonnull final TypeToken<S> type) {
+            @NonNull final TypeToken<S> type) {
         ServiceRepository<Context, Result> repository = getRepository(type);
         List<TypeToken<? extends S>> collection = new LinkedList<>();
         final LinkedList<? extends ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>>>
@@ -232,7 +231,7 @@ public final class ServicePipeline {
         return Collections.unmodifiableList(collection);
     }
 
-    @Nonnull
+    @NonNull
     Executor getExecutor() {
         return this.executor;
     }

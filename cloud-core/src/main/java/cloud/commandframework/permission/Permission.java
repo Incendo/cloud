@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.permission;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -40,7 +41,7 @@ public final class Permission implements CommandPermission {
 
     private final String permission;
 
-    private Permission(@Nonnull final String permission) {
+    private Permission(@NonNull final String permission) {
         this.permission = permission;
     }
 
@@ -49,8 +50,7 @@ public final class Permission implements CommandPermission {
      *
      * @return Command permission
      */
-    @Nonnull
-    public static Permission empty() {
+    public static @NonNull Permission empty() {
         return EMPTY;
     }
 
@@ -60,8 +60,7 @@ public final class Permission implements CommandPermission {
      * @param string Command permission
      * @return Created command permission
      */
-    @Nonnull
-    public static Permission of(@Nonnull final String string) {
+    public static @NonNull Permission of(@NonNull final String string) {
         return new Permission(string);
     }
 
@@ -70,14 +69,12 @@ public final class Permission implements CommandPermission {
      *
      * @return Command permission
      */
-    @Nonnull
     public String getPermission() {
         return this.permission;
     }
 
-    @Nonnull
     @Override
-    public Collection<CommandPermission> getPermissions() {
+    public @NonNull Collection<@NonNull CommandPermission> getPermissions() {
         return Collections.singleton(this);
     }
 
@@ -86,7 +83,6 @@ public final class Permission implements CommandPermission {
      *
      * @return Command permission
      */
-    @Nonnull
     @Override
     public String toString() {
         return this.permission;

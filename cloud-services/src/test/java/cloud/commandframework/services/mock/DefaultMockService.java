@@ -23,14 +23,10 @@
 //
 package cloud.commandframework.services.mock;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 public class DefaultMockService implements MockService {
 
-  @Nullable
   @Override
-  public MockResult handle(@Nonnull final MockContext mockContext)
+  public MockResult handle(final MockContext mockContext)
       throws Exception {
     if (mockContext.getString().equals("pls throw exception")) {
       throw new TotallyIntentionalException();

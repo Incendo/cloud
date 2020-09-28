@@ -25,13 +25,12 @@ package cloud.commandframework.services.mock;
 
 import cloud.commandframework.services.ChunkedRequestContext;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 
 public class MockChunkedRequest
     extends ChunkedRequestContext<MockChunkedRequest.Animal, MockChunkedRequest.Sound> {
 
-  public MockChunkedRequest(@Nonnull final Collection<Animal> requests) {
+  public MockChunkedRequest(final Collection<Animal> requests) {
     super(requests);
   }
 
@@ -39,11 +38,10 @@ public class MockChunkedRequest
 
     private final String name;
 
-    public Animal(@Nonnull final String name) {
+    public Animal(final String name) {
       this.name = name;
     }
 
-    @Nonnull
     public String getName() {
       return this.name;
     }
@@ -54,11 +52,10 @@ public class MockChunkedRequest
 
     private final String sound;
 
-    public Sound(@Nonnull final String sound) {
+    public Sound(final String sound) {
       this.sound = sound;
     }
 
-    @Nonnull
     public String getSound() {
       return this.sound;
     }

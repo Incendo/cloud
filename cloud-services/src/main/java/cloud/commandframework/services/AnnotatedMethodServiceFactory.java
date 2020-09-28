@@ -26,8 +26,8 @@ package cloud.commandframework.services;
 import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.annotations.ServiceImplementation;
 import cloud.commandframework.services.types.Service;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +35,8 @@ import java.util.Map;
 enum AnnotatedMethodServiceFactory {
     INSTANCE;
 
-    Map<? extends Service<?, ?>, TypeToken<? extends Service<?, ?>>> lookupServices(
-        @Nonnull final Object instance) throws Exception {
+    @NonNull Map<? extends Service<?, ?>, TypeToken<? extends Service<?, ?>>> lookupServices(
+        @NonNull final Object instance) throws Exception {
       final Map<Service<?, ?>, TypeToken<? extends Service<?, ?>>> map = new HashMap<>();
       final Class<?> clazz = instance.getClass();
       for (final Method method : clazz.getDeclaredMethods()) {

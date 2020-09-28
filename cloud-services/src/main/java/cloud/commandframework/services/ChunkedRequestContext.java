@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.services;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,18 +39,18 @@ import java.util.Map;
  * @param <Context> Context/Request type
  * @param <Result>  Result type
  */
-public abstract class ChunkedRequestContext<Context, Result> {
+public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
 
     private final Object lock = new Object();
-    private final List<Context> requests;
-    private final Map<Context, Result> results;
+    private final List<@NonNull Context> requests;
+    private final Map<@NonNull Context, @NonNull Result> results;
 
     /**
      * Initialize a new request
      *
      * @param requests Request contexts
      */
-    protected ChunkedRequestContext(@Nonnull final Collection<Context> requests) {
+    protected ChunkedRequestContext(@NonNull final Collection<Context> requests) {
         this.requests = new ArrayList<>(requests);
         this.results = new HashMap<>(requests.size());
     }
@@ -59,8 +60,7 @@ public abstract class ChunkedRequestContext<Context, Result> {
    *
    * @return Unmodifiable map of results
    */
-  @Nonnull
-  public final Map<Context, Result> getAvailableResults() {
+  public final @NonNull Map<@NonNull Context, @NonNull Result> getAvailableResults() {
     synchronized (this.lock) {
       return Collections.unmodifiableMap(this.results);
     }
@@ -71,8 +71,7 @@ public abstract class ChunkedRequestContext<Context, Result> {
    *
    * @return Unmodifiable list of remaining requests
    */
-  @Nonnull
-  public final List<Context> getRemaining() {
+  public final @NonNull List<@NonNull Context> getRemaining() {
     synchronized (this.lock) {
       return Collections.unmodifiableList(this.requests);
     }
@@ -84,7 +83,7 @@ public abstract class ChunkedRequestContext<Context, Result> {
      * @param context Context
      * @param result  Result
      */
-    public final void storeResult(@Nonnull final Context context, @Nonnull final Result result) {
+    public final void storeResult(@NonNull final Context context, @NonNull final Result result) {
         synchronized (this.lock) {
             this.results.put(context, result);
             this.requests.remove(context);

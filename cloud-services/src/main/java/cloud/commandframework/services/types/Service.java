@@ -25,9 +25,9 @@ package cloud.commandframework.services.types;
 
 import cloud.commandframework.services.ExecutionOrder;
 import cloud.commandframework.services.PipelineException;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.function.Function;
 
 /**
@@ -39,7 +39,7 @@ import java.util.function.Function;
  * @param <Result>  Response type, this is what is produced by the service ("provided")
  */
 @FunctionalInterface
-public interface Service<Context, Result> extends Function<Context, Result> {
+public interface Service<Context, Result> extends Function<@NonNull Context, @Nullable Result> {
 
   /**
    * Provide a response for the given context. If the service implementation cannot provide a
@@ -52,11 +52,10 @@ public interface Service<Context, Result> extends Function<Context, Result> {
    * @throws Exception Any exception that occurs during the handling can be thrown, and will be
    *                   wrapped by a {@link PipelineException}
    */
-  @Nullable
-  Result handle(@Nonnull Context context) throws Exception;
+  @Nullable Result handle(@NonNull Context context) throws Exception;
 
   @Override
-  default Result apply(@Nonnull Context context) {
+  default @Nullable Result apply(@NonNull Context context) {
     try {
       return this.handle(context);
     } catch (final Exception exception) {
@@ -70,8 +69,7 @@ public interface Service<Context, Result> extends Function<Context, Result> {
    *
    * @return Execution order
    */
-  @Nullable
-  default ExecutionOrder order() {
+  default @Nullable ExecutionOrder order() {
     return null;
   }
 

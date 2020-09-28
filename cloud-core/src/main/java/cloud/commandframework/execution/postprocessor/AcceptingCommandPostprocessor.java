@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.execution.postprocessor;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link CommandPostprocessor} that does nothing besides indicating that the context
@@ -39,7 +39,7 @@ public final class AcceptingCommandPostprocessor<C> implements CommandPostproces
     public static final String PROCESSED_INDICATOR_KEY = "__COMMAND_POST_PROCESSED__";
 
     @Override
-    public void accept(@Nonnull final CommandPostprocessingContext<C> context) {
+    public void accept(@NonNull final CommandPostprocessingContext<C> context) {
         context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
     }
 

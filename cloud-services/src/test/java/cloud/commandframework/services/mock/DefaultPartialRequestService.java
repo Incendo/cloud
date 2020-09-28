@@ -23,17 +23,14 @@
 //
 package cloud.commandframework.services.mock;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DefaultPartialRequestService implements MockPartialResultService {
 
-  @Nonnull
   @Override
-  public Map<MockChunkedRequest.Animal, MockChunkedRequest.Sound> handleRequests(
-      @Nonnull final List<MockChunkedRequest.Animal> requests) {
+  public Map<MockChunkedRequest.Animal, MockChunkedRequest.Sound> handleRequests(final List<MockChunkedRequest.Animal> requests) {
     final Map<MockChunkedRequest.Animal, MockChunkedRequest.Sound> map =
         new HashMap<>(requests.size());
     for (final MockChunkedRequest.Animal animal : requests) {

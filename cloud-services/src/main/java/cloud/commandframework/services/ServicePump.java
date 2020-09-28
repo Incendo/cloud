@@ -25,8 +25,7 @@ package cloud.commandframework.services;
 
 import cloud.commandframework.services.types.Service;
 import io.leangen.geantyref.TypeToken;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Class that forwards a context to a service type that consumes said context
@@ -38,7 +37,8 @@ public final class ServicePump<Context> {
     private final ServicePipeline servicePipeline;
     private final Context context;
 
-    ServicePump(final ServicePipeline servicePipeline, final Context context) {
+    ServicePump(@NonNull final ServicePipeline servicePipeline,
+                @NonNull final Context context) {
         this.servicePipeline = servicePipeline;
         this.context = context;
     }
@@ -50,9 +50,8 @@ public final class ServicePump<Context> {
      * @param <Result> Result type
      * @return Service spigot instance
      */
-    @Nonnull
-    public <Result> ServiceSpigot<Context, Result> through(
-            @Nonnull final TypeToken<? extends Service<Context, Result>> type) {
+    public <Result> @NonNull ServiceSpigot<@NonNull Context, @NonNull Result> through(
+            @NonNull final TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type) {
         return new ServiceSpigot<>(this.servicePipeline, this.context, type);
     }
 
@@ -63,9 +62,8 @@ public final class ServicePump<Context> {
      * @param <Result> Result type
      * @return Service spigot instance
      */
-    @Nonnull
-    public <Result> ServiceSpigot<Context, Result> through(
-            @Nonnull final Class<? extends Service<Context, Result>> clazz) {
+    public <Result> @NonNull ServiceSpigot<@NonNull Context, @NonNull Result> through(
+            @NonNull final Class<? extends Service<@NonNull Context, @NonNull Result>> clazz) {
         return this.through(TypeToken.get(clazz));
     }
 

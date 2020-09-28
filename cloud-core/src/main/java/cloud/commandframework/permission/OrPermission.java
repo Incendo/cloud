@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.permission;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,7 +38,7 @@ public final class OrPermission implements CommandPermission {
 
     private final Collection<CommandPermission> permissions;
 
-    private OrPermission(@Nonnull final Collection<CommandPermission> permissions) {
+    private OrPermission(@NonNull final Collection<CommandPermission> permissions) {
         this.permissions = permissions;
     }
 
@@ -47,8 +48,7 @@ public final class OrPermission implements CommandPermission {
      * @param permissions Permissions to join
      * @return Constructed permission
      */
-    @Nonnull
-    public static CommandPermission of(@Nonnull final Collection<CommandPermission> permissions) {
+    public static @NonNull CommandPermission of(@NonNull final Collection<CommandPermission> permissions) {
         final Set<CommandPermission> permissionSet = new HashSet<>();
         for (final CommandPermission permission : permissions) {
             permissionSet.addAll(permission.getPermissions());
@@ -56,9 +56,8 @@ public final class OrPermission implements CommandPermission {
         return new OrPermission(permissionSet);
     }
 
-    @Nonnull
     @Override
-    public Collection<CommandPermission> getPermissions() {
+    public @NonNull Collection<@NonNull CommandPermission> getPermissions() {
         return this.permissions;
     }
 

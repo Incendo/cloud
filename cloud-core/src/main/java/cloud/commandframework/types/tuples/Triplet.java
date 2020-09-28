@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Objects;
 
 /**
@@ -35,16 +36,13 @@ import java.util.Objects;
  */
 public class Triplet<U, V, W> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
-    @Nonnull
     private final W third;
 
-    protected Triplet(@Nonnull final U first,
-                      @Nonnull final V second,
-                      @Nonnull final W third) {
+    protected Triplet(@NonNull final U first,
+                      @NonNull final V second,
+                      @NonNull final W third) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -61,10 +59,9 @@ public class Triplet<U, V, W> implements Tuple {
      * @param <W>    Third type
      * @return Created triplet
      */
-    @Nonnull
-    public static <U, V, W> Triplet<U, V, W> of(@Nonnull final U first,
-                                                @Nonnull final V second,
-                                                @Nonnull final W third) {
+    public static <U, V, W> @NonNull Triplet<@NonNull U, @NonNull V, @NonNull W> of(@NonNull final U first,
+                                                                                    @NonNull final V second,
+                                                                                    @NonNull final W third) {
         return new Triplet<>(first, second, third);
     }
 
@@ -73,8 +70,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -83,8 +79,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 
@@ -93,8 +88,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return Third value
      */
-    @Nonnull
-    public final W getThird() {
+    public final @NonNull W getThird() {
         return this.third;
     }
 
