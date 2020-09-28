@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.types.Service;
 
 import javax.annotation.Nonnull;
@@ -166,7 +166,7 @@ public final class ServicePipeline {
             @Nonnull final Class<? extends Service<Context, Result>> type,
             @Nonnull final Service<Context, Result> implementation,
             @Nonnull final Collection<Predicate<Context>> filters) {
-        return registerServiceImplementation(TypeToken.of(type), implementation, filters);
+        return registerServiceImplementation(TypeToken.get(type), implementation, filters);
     }
 
     /**
@@ -227,7 +227,7 @@ public final class ServicePipeline {
         Collections.reverse(queue);
         for (ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>> wrapper : queue) {
             collection
-                    .add((TypeToken<? extends S>) TypeToken.of(wrapper.getImplementation().getClass()));
+                    .add((TypeToken<? extends S>) TypeToken.get(wrapper.getImplementation().getClass()));
         }
         return Collections.unmodifiableList(collection);
     }

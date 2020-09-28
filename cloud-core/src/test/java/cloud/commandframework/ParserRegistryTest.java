@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.standard.IntegerArgument;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.ParserRegistry;
@@ -67,7 +67,7 @@ public class ParserRegistryTest {
         };
 
 
-        final TypeToken<?> parsedType = TypeToken.of(int.class);
+        final TypeToken<?> parsedType = TypeToken.get(int.class);
         final ParserParameters parserParameters = parserRegistry.parseAnnotations(parsedType, Collections.singleton(range));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MIN));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MAX));
@@ -81,6 +81,14 @@ public class ParserRegistryTest {
                 (IntegerArgument.IntegerParser<TestCommandSender>) parser;
         Assertions.assertEquals(RANGE_MIN, integerParser.getMin());
         Assertions.assertEquals(RANGE_MAX, integerParser.getMax());
+
+        /* Test integer */
+        parserRegistry.createParser(TypeToken.get(int.class), ParserParameters.empty())
+                      .orElseThrow(() -> new IllegalArgumentException("No parser found for int.class"));
+
+        /* Test Enum */
+        parserRegistry.createParser(TypeToken.get(CommandManager.ManagerSettings.class), ParserParameters.empty())
+                      .orElseThrow(() -> new IllegalArgumentException("No parser found for enum"));
     }
 
 }

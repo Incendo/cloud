@@ -28,7 +28,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -84,8 +84,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
 
         /* Register Bukkit parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.of(World.class), params -> new WorldArgument.WorldParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.of(Material.class),
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), params -> new WorldArgument.WorldParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class),
                                                         params -> new MaterialArgument.MaterialParser<>());
 
         /* Try to determine the Minecraft version */

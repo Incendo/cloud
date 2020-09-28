@@ -23,16 +23,17 @@
 //
 package cloud.commandframework.extra.confirmation;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
+import cloud.commandframework.types.tuples.Pair;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -55,10 +56,13 @@ public class CommandConfirmationManager<C> {
      * Meta data stored for commands that require confirmation
      */
     public static final String CONFIRMATION_REQUIRED_META = "__REQUIRE_CONFIRMATION__";
+    private static final int MAXIMUM_PENDING_SIZE = 100;
 
     private final Consumer<CommandPostprocessingContext<C>> notifier;
     private final Consumer<C> errorNotifier;
-    private final Cache<C, CommandPostprocessingContext<C>> pendingCommands;
+    private final Map<C, Pair<CommandPostprocessingContext<C>, Long>> pendingCommands;
+
+    private final long timeoutMillis;
 
     /**
      * Create a new confirmation manager instance
@@ -74,7 +78,13 @@ public class CommandConfirmationManager<C> {
                                       @Nonnull final Consumer<C> errorNotifier) {
         this.notifier = notifier;
         this.errorNotifier = errorNotifier;
-        this.pendingCommands = CacheBuilder.newBuilder().expireAfterWrite(timeout, timeoutTimeUnit).concurrencyLevel(1).build();
+        this.pendingCommands = new LinkedHashMap<C, Pair<CommandPostprocessingContext<C>, Long>>() {
+            @Override
+            protected boolean removeEldestEntry(final Map.Entry<C, Pair<CommandPostprocessingContext<C>, Long>> eldest) {
+                return this.size() > MAXIMUM_PENDING_SIZE;
+            }
+        };
+        this.timeoutMillis = timeoutTimeUnit.toMillis(timeout);
     }
 
     private void notifyConsumer(@Nonnull final CommandPostprocessingContext<C> context) {
@@ -82,7 +92,7 @@ public class CommandConfirmationManager<C> {
     }
 
     private void addPending(@Nonnull final CommandPostprocessingContext<C> context) {
-        this.pendingCommands.put(context.getCommandContext().getSender(), context);
+        this.pendingCommands.put(context.getCommandContext().getSender(), Pair.of(context, System.currentTimeMillis()));
     }
 
     /**
@@ -93,7 +103,13 @@ public class CommandConfirmationManager<C> {
      */
     @Nonnull
     public Optional<CommandPostprocessingContext<C>> getPending(@Nonnull final C sender) {
-        return Optional.ofNullable(this.pendingCommands.getIfPresent(sender));
+        final Pair<CommandPostprocessingContext<C>, Long> pair = this.pendingCommands.remove(sender);
+        if (pair != null) {
+            if (System.currentTimeMillis() < pair.getSecond() + this.timeoutMillis) {
+                return Optional.of(pair.getFirst());
+            }
+        }
+        return Optional.empty();
     }
 
     /**

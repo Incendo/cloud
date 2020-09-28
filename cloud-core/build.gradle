@@ -1,6 +1,5 @@
 dependencies {
     api project(':cloud-services')
-    api 'com.google.guava:guava:29.0-jre'
     testImplementation 'org.openjdk.jmh:jmh-core:1.25.2'
     testImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.25.2'
 }

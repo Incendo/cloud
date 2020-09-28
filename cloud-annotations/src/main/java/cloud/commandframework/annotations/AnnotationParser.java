@@ -34,8 +34,7 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
-import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.arguments.parser.ParserParameters;
 
 import javax.annotation.Nonnull;
@@ -46,6 +45,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -81,7 +81,7 @@ public final class AnnotationParser<C> {
         this.commandSenderClass = commandSenderClass;
         this.manager = manager;
         this.metaFactory = new MetaFactory(this, metaMapper);
-        this.annotationMappers = Maps.newHashMap();
+        this.annotationMappers = new HashMap<>();
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
     }
@@ -156,8 +156,8 @@ public final class AnnotationParser<C> {
                                                              tokens.get(commandToken).getMinor(),
                                                              metaBuilder.build());
             final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
-            final Map<String, CommandArgument<C, ?>> commandArguments = Maps.newHashMap();
-            final Map<CommandArgument<C, ?>, String> argumentDescriptions = Maps.newHashMap();
+            final Map<String, CommandArgument<C, ?>> commandArguments = new HashMap<>();
+            final Map<CommandArgument<C, ?>, String> argumentDescriptions = new HashMap<>();
             /* Go through all annotated parameters and build up the argument tree */
             for (final ArgumentParameterPair argumentPair : arguments) {
                 final CommandArgument<C, ?> argument = this.buildArgument(method,
@@ -246,7 +246,7 @@ public final class AnnotationParser<C> {
                                                 @Nonnull final ArgumentParameterPair argumentPair) {
         final Parameter parameter = argumentPair.getParameter();
         final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
-        final TypeToken<?> token = TypeToken.of(parameter.getParameterizedType());
+        final TypeToken<?> token = TypeToken.get(parameter.getParameterizedType());
         final ParserParameters parameters = this.manager.getParserRegistry()
                                                         .parseAnnotations(token, annotations);
 

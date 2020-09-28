@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.annotations.Order;
 import cloud.commandframework.services.types.Service;
 
@@ -136,7 +136,7 @@ public final class ServiceRepository<Context, Response> {
         public String toString() {
             return String
                     .format("ServiceWrapper{type=%s,implementation=%s}", serviceType.toString(),
-                            TypeToken.of(implementation.getClass()).toString());
+                            TypeToken.get(implementation.getClass()).toString());
         }
 
         @Override

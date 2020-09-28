@@ -23,8 +23,6 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.standard.BooleanArgument;
@@ -36,6 +34,8 @@ import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeToken;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
@@ -54,16 +54,18 @@ import java.util.function.Function;
  */
 public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = ImmutableMap.<Class<?>, Class<?>>builder()
-            .put(char.class, Character.class)
-            .put(int.class, Integer.class)
-            .put(short.class, Short.class)
-            .put(byte.class, Byte.class)
-            .put(float.class, Float.class)
-            .put(double.class, Double.class)
-            .put(long.class, Long.class)
-            .put(boolean.class, Boolean.class)
-            .build();
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = new HashMap<Class<?>, Class<?>>() {
+        {
+            put(char.class, Character .class);
+            put(int.class, Integer .class);
+            put(short.class, Short .class);
+            put(byte.class, Byte .class);
+            put(float.class, Float .class);
+            put(double.class, Double .class);
+            put(long.class, Long .class);
+            put(boolean.class, Boolean .class);
+        }
+    };
 
     private final Map<String, Function<ParserParameters, ArgumentParser<C, ?>>> namedParsers = new HashMap<>();
     private final Map<TypeToken<?>, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new HashMap<>();
@@ -80,28 +82,28 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         this.<Completions, String>registerAnnotationMapper(Completions.class, new CompletionsMapper());
 
         /* Register standard types */
-        this.registerParserSupplier(TypeToken.of(Byte.class), options ->
+        this.registerParserSupplier(TypeToken.get(Byte.class), options ->
                 new ByteArgument.ByteParser<C>((byte) options.get(StandardParameters.RANGE_MIN, Byte.MIN_VALUE),
                                                (byte) options.get(StandardParameters.RANGE_MAX, Byte.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Short.class), options ->
+        this.registerParserSupplier(TypeToken.get(Short.class), options ->
                 new ShortArgument.ShortParser<C>((short) options.get(StandardParameters.RANGE_MIN, Short.MIN_VALUE),
                                                  (short) options.get(StandardParameters.RANGE_MAX, Short.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Integer.class), options ->
+        this.registerParserSupplier(TypeToken.get(Integer.class), options ->
                 new IntegerArgument.IntegerParser<C>((int) options.get(StandardParameters.RANGE_MIN, Integer.MIN_VALUE),
                                                      (int) options.get(StandardParameters.RANGE_MAX, Integer.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Float.class), options ->
+        this.registerParserSupplier(TypeToken.get(Float.class), options ->
                 new FloatArgument.FloatParser<C>((float) options.get(StandardParameters.RANGE_MIN, Float.MIN_VALUE),
                                                  (float) options.get(StandardParameters.RANGE_MAX, Float.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Double.class), options ->
+        this.registerParserSupplier(TypeToken.get(Double.class), options ->
                 new DoubleArgument.DoubleParser<C>((double) options.get(StandardParameters.RANGE_MIN, Double.MIN_VALUE),
                                                    (double) options.get(StandardParameters.RANGE_MAX, Double.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Character.class), options -> new CharArgument.CharacterParser<C>());
+        this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<C>());
         /* Make this one less awful */
-        this.registerParserSupplier(TypeToken.of(String.class), options -> new StringArgument.StringParser<C>(
+        this.registerParserSupplier(TypeToken.get(String.class), options -> new StringArgument.StringParser<C>(
                 StringArgument.StringMode.SINGLE, (context, s) ->
                 Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))));
         /* Add options to this */
-        this.registerParserSupplier(TypeToken.of(Boolean.class), options -> new BooleanArgument.BooleanParser<>(false));
+        this.registerParserSupplier(TypeToken.get(Boolean.class), options -> new BooleanArgument.BooleanParser<>(false));
     }
 
     @Override
@@ -146,17 +148,17 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     public <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull final TypeToken<T> type,
                                                            @Nonnull final ParserParameters parserParameters) {
         final TypeToken<?> actualType;
-        if (type.isPrimitive()) {
-            actualType = TypeToken.of(PRIMITIVE_MAPPINGS.get(type.getRawType()));
+        if (GenericTypeReflector.erase(type.getType()).isPrimitive()) {
+            actualType = TypeToken.get(PRIMITIVE_MAPPINGS.get(GenericTypeReflector.erase(type.getType())));
         } else {
             actualType = type;
         }
         final Function<ParserParameters, ArgumentParser<C, ?>> producer = this.parserSuppliers.get(actualType);
         if (producer == null) {
             /* Give enums special treatment */
-            if (actualType.isSubtypeOf(Enum.class)) {
+            if (GenericTypeReflector.isSuperType(Enum.class, actualType.getType())) {
                 @SuppressWarnings("all") final EnumArgument.EnumParser enumArgument
-                        = new EnumArgument.EnumParser((Class<Enum>) actualType.getRawType());
+                        = new EnumArgument.EnumParser((Class<Enum>) GenericTypeReflector.erase(actualType.getType()));
                 // noinspection all
                 return Optional.of(enumArgument);
             }
@@ -181,15 +183,20 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
 
+    private static boolean isPrimitive(@Nonnull final TypeToken<?> type) {
+        return GenericTypeReflector.erase(type.getType()).isPrimitive();
+    }
+
+
     private static final class RangeMapper<T> implements BiFunction<Range, TypeToken<?>, ParserParameters> {
 
         @Override
         public ParserParameters apply(final Range range, final TypeToken<?> type) {
             final Class<?> clazz;
-            if (type.isPrimitive()) {
-                clazz = PRIMITIVE_MAPPINGS.get(type.getRawType());
+            if (isPrimitive(type)) {
+                clazz = PRIMITIVE_MAPPINGS.get(GenericTypeReflector.erase(type.getType()));
             } else {
-                clazz = type.getRawType();
+                clazz = GenericTypeReflector.erase(type.getType());
             }
             if (!Number.class.isAssignableFrom(clazz)) {
                 return ParserParameters.empty();
@@ -256,7 +263,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
         @Override
         public ParserParameters apply(final Completions completions, final TypeToken<?> token) {
-            if (token.getRawType().equals(String.class)) {
+            if (GenericTypeReflector.erase(token.getType()).equals(String.class)) {
                 final String[] splitCompletions = completions.value().replace(" ", "").split(",");
                 return ParserParameters.single(StandardParameters.COMPLETIONS, splitCompletions);
             }

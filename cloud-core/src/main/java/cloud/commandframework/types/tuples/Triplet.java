@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import com.google.common.base.Objects;
-
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Immutable generic 3-tuple
@@ -108,14 +107,14 @@ public class Triplet<U, V, W> implements Tuple {
             return false;
         }
         final Triplet<?, ?, ?> triplet = (Triplet<?, ?, ?>) o;
-        return Objects.equal(getFirst(), triplet.getFirst())
-                && Objects.equal(getSecond(), triplet.getSecond())
-                && Objects.equal(getThird(), triplet.getThird());
+        return Objects.equals(getFirst(), triplet.getFirst())
+                && Objects.equals(getSecond(), triplet.getSecond())
+                && Objects.equals(getThird(), triplet.getThird());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(getFirst(), getSecond(), getThird());
+        return Objects.hash(getFirst(), getSecond(), getThird());
     }
 
     @Override

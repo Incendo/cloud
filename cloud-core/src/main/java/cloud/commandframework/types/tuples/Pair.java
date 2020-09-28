@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import com.google.common.base.Objects;
-
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Immutable generic 2-tuple
@@ -90,13 +89,13 @@ public class Pair<U, V> implements Tuple {
             return false;
         }
         final Pair<?, ?> pair = (Pair<?, ?>) o;
-        return Objects.equal(getFirst(), pair.getFirst())
-                && Objects.equal(getSecond(), pair.getSecond());
+        return Objects.equals(getFirst(), pair.getFirst())
+                && Objects.equals(getSecond(), pair.getSecond());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(getFirst(), getSecond());
+        return Objects.hash(getFirst(), getSecond());
     }
 
     @Override

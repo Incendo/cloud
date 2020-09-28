@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import com.google.common.base.Objects;
-
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Immutable generic 5-tuple
@@ -144,16 +143,16 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
             return false;
         }
         final Quintet<?, ?, ?, ?, ?> quintet = (Quintet<?, ?, ?, ?, ?>) o;
-        return Objects.equal(getFirst(), quintet.getFirst())
-                && Objects.equal(getSecond(), quintet.getSecond())
-                && Objects.equal(getThird(), quintet.getThird())
-                && Objects.equal(getFourth(), quintet.getFourth())
-                && Objects.equal(getFifth(), quintet.getFifth());
+        return Objects.equals(getFirst(), quintet.getFirst())
+                && Objects.equals(getSecond(), quintet.getSecond())
+                && Objects.equals(getThird(), quintet.getThird())
+                && Objects.equals(getFourth(), quintet.getFourth())
+                && Objects.equals(getFifth(), quintet.getFifth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(getFirst(), getSecond(), getThird(), getFourth(), getFifth());
+        return Objects.hash(getFirst(), getSecond(), getThird(), getFourth(), getFifth());
     }
 
     @Override

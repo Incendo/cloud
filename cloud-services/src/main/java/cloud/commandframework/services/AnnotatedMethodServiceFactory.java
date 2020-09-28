@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.annotations.ServiceImplementation;
 import cloud.commandframework.services.types.Service;
 
@@ -53,7 +53,7 @@ enum AnnotatedMethodServiceFactory {
 
             }
         map.put(new AnnotatedMethodService<>(instance, method),
-            TypeToken.of(serviceImplementation.value()));
+            TypeToken.get(serviceImplementation.value()));
         }
         return map;
     }

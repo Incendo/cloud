@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.services.types.Service;
 import cloud.commandframework.services.types.SideEffectService;

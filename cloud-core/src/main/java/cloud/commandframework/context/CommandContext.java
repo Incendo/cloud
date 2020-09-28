@@ -24,10 +24,10 @@
 package cloud.commandframework.context;
 
 import cloud.commandframework.arguments.CommandArgument;
-import com.google.common.collect.Maps;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,8 +38,8 @@ import java.util.Optional;
  */
 public final class CommandContext<C> {
 
-    private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = Maps.newHashMap();
-    private final Map<String, Object> internalStorage = Maps.newHashMap();
+    private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = new HashMap<>();
+    private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;
     private final boolean suggestions;
 
@@ -197,6 +197,7 @@ public final class CommandContext<C> {
          *
          * @param start Start time (in nanoseconds)
          */
+        @SuppressWarnings("unused")
         public ArgumentTiming(final long start) {
             this(start, -1, false);
         }

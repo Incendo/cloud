@@ -44,9 +44,7 @@ import cloud.commandframework.execution.preprocessor.AcceptingCommandPreprocesso
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
@@ -59,6 +57,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -76,13 +75,13 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public abstract class CommandManager<C> {
 
-    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = Maps.newHashMap();
+    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
     private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
-    private final Collection<Command<C>> commands = Lists.newLinkedList();
+    private final Collection<Command<C>> commands = new LinkedList<>();
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
 

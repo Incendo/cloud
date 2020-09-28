@@ -23,6 +23,8 @@
 //
 package cloud.commandframework.brigadier;
 
+import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
@@ -41,8 +43,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
-import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -61,6 +61,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -96,8 +97,8 @@ public final class CloudBrigadierManager<C, S> {
     public CloudBrigadierManager(@Nonnull final CommandManager<C> commandManager,
                                  @Nonnull final Supplier<CommandContext<C>>
                                          dummyContextProvider) {
-        this.mappers = Maps.newHashMap();
-        this.defaultArgumentTypeSuppliers = Maps.newHashMap();
+        this.mappers = new HashMap<>();
+        this.defaultArgumentTypeSuppliers = new HashMap<>();
         this.commandManager = commandManager;
         this.dummyContextProvider = dummyContextProvider;
         this.registerInternalMappings();
@@ -196,7 +197,7 @@ public final class CloudBrigadierManager<C, S> {
     public <T, K extends ArgumentParser<C, T>, O> void registerMapping(@Nonnull final TypeToken<K> argumentType,
                                                                         @Nonnull final Function<? extends K,
                                                                                 ? extends ArgumentType<O>> mapper) {
-        this.mappers.put(argumentType.getRawType(), mapper);
+        this.mappers.put(GenericTypeReflector.erase(argumentType.getType()), mapper);
     }
 
     /**
@@ -217,7 +218,7 @@ public final class CloudBrigadierManager<C, S> {
             @Nonnull final TypeToken<T> argumentType,
             @Nonnull final K argument) {
         final ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
-        Function function = this.mappers.get(argumentType.getRawType());
+        Function function = this.mappers.get(GenericTypeReflector.erase(argumentType.getType()));
         if (function == null) {
             return this.createDefaultMapper(valueType, commandArgument);
         }
@@ -350,7 +351,7 @@ public final class CloudBrigadierManager<C, S> {
                     .executes(executor);
         } else {
             final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(root.getValue().getValueType(),
-                                                                         TypeToken.of(root.getValue().getParser().getClass()),
+                                                                         TypeToken.get(root.getValue().getParser().getClass()),
                                                                          root.getValue().getParser());
             final SuggestionProvider<S> provider = pair.getRight() ? null : suggestionProvider;
             argumentBuilder = RequiredArgumentBuilder
