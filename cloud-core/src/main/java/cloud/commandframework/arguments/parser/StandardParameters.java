@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 
 import javax.annotation.Nonnull;
 
@@ -35,27 +35,27 @@ public final class StandardParameters {
     /**
      * Minimum value accepted by a numerical parser
      */
-    public static final ParserParameter<Number> RANGE_MIN = create("min", TypeToken.of(Number.class));
+    public static final ParserParameter<Number> RANGE_MIN = create("min", TypeToken.get(Number.class));
     /**
      * Maximum value accepted by a numerical parser
      */
-    public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.of(Number.class));
+    public static final ParserParameter<Number> RANGE_MAX = create("max", TypeToken.get(Number.class));
     /**
      * Command description
      */
-    public static final ParserParameter<String> DESCRIPTION = create("description", TypeToken.of(String.class));
+    public static final ParserParameter<String> DESCRIPTION = create("description", TypeToken.get(String.class));
     /**
      * Command confirmation
      */
-    public static final ParserParameter<Boolean> CONFIRMATION = create("confirmation", TypeToken.of(Boolean.class));
+    public static final ParserParameter<Boolean> CONFIRMATION = create("confirmation", TypeToken.get(Boolean.class));
     /**
      * Command completions
      */
-    public static final ParserParameter<String[]> COMPLETIONS = create("completions", TypeToken.of(String[].class));
+    public static final ParserParameter<String[]> COMPLETIONS = create("completions", TypeToken.get(String[].class));
     /**
      * The command should be hidden from help menus, etc
      */
-    public static final ParserParameter<Boolean> HIDDEN = create("hidden", TypeToken.of(Boolean.class));
+    public static final ParserParameter<Boolean> HIDDEN = create("hidden", TypeToken.get(Boolean.class));
 
     private StandardParameters() {
     }

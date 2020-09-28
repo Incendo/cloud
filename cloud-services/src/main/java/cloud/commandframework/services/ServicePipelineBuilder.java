@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.base.Preconditions;
-
 import javax.annotation.Nonnull;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -59,7 +58,7 @@ public final class ServicePipelineBuilder {
      */
     @Nonnull
     public ServicePipelineBuilder withExecutor(@Nonnull final Executor executor) {
-        this.executor = Preconditions.checkNotNull(executor, "Executor may not be null");
+        this.executor = Objects.requireNonNull(executor, "Executor may not be null");
         return this;
     }
 

@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.reflect.TypeToken;
 import cloud.commandframework.services.types.Service;
+import io.leangen.geantyref.TypeToken;
 
 import javax.annotation.Nonnull;
 
@@ -66,7 +66,7 @@ public final class ServicePump<Context> {
     @Nonnull
     public <Result> ServiceSpigot<Context, Result> through(
             @Nonnull final Class<? extends Service<Context, Result>> clazz) {
-        return this.through(TypeToken.of(clazz));
+        return this.through(TypeToken.get(clazz));
     }
 
 }

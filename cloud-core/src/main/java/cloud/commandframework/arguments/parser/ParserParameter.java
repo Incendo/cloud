@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;

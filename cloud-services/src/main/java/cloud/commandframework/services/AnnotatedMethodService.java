@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.base.Objects;
 import cloud.commandframework.services.annotations.Order;
 import cloud.commandframework.services.types.Service;
 
@@ -32,6 +31,7 @@ import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 class AnnotatedMethodService<Context, Result> implements Service<Context, Result> {
 
@@ -87,12 +87,12 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
       return false;
     }
     final AnnotatedMethodService<?, ?> that = (AnnotatedMethodService<?, ?>) o;
-    return Objects.equal(this.methodHandle, that.methodHandle);
+    return Objects.equals(this.methodHandle, that.methodHandle);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(this.methodHandle);
+    return Objects.hash(this.methodHandle);
   }
 
 }

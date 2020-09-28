@@ -23,10 +23,9 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import com.google.common.collect.Maps;
-
 import javax.annotation.Nonnull;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +33,7 @@ import java.util.Map;
  */
 public final class ParserParameters {
 
-    private final Map<ParserParameter<?>, Object> internalMap = Maps.newHashMap();
+    private final Map<ParserParameter<?>, Object> internalMap = new HashMap<>();
 
     /**
      * Get an empty {@link ParserParameters} instance

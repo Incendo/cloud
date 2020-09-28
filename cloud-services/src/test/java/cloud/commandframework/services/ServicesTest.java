@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.mock.*;
 import cloud.commandframework.services.types.Service;
 import org.junit.jupiter.api.Assertions;
@@ -38,12 +39,12 @@ public class ServicesTest {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build();
         Assertions.assertNotNull(servicePipeline);
         servicePipeline
-                .registerServiceType(TypeToken.of(MockService.class), new DefaultMockService());
+                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
         Assertions.assertThrows(IllegalArgumentException.class, () -> servicePipeline
-                .registerServiceType(TypeToken.of(MockService.class), new DefaultMockService()));
+                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService()));
         final SecondaryMockService secondaryMockService = new SecondaryMockService();
         servicePipeline
-                .registerServiceImplementation(TypeToken.of(MockService.class), secondaryMockService,
+                .registerServiceImplementation(TypeToken.get(MockService.class), secondaryMockService,
                         Collections.singleton(secondaryMockService));
         servicePipeline.registerServiceImplementation(MockService.class,
                 mockContext -> new MockService.MockResult(-91),
@@ -69,7 +70,7 @@ public class ServicesTest {
     @Test
     public void testSideEffectServices() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build();
-        servicePipeline.registerServiceType(TypeToken.of(MockSideEffectService.class),
+        servicePipeline.registerServiceType(TypeToken.get(MockSideEffectService.class),
                 new DefaultSideEffectService());
         final MockSideEffectService.MockPlayer mockPlayer =
                 new MockSideEffectService.MockPlayer(20);
@@ -88,8 +89,8 @@ public class ServicesTest {
     @Test
     public void testForwarding() throws Exception {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.of(MockService.class), new DefaultMockService())
-                .registerServiceType(TypeToken.of(MockResultConsumer.class), new MockResultConsumer());
+                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService())
+                .registerServiceType(TypeToken.get(MockResultConsumer.class), new MockResultConsumer());
         Assertions.assertEquals(State.ACCEPTED,
                 servicePipeline.pump(new MockService.MockContext("huh")).through(MockService.class)
                         .forward().through(MockResultConsumer.class).getResult());
@@ -103,7 +104,7 @@ public class ServicesTest {
     @Test
     public void testSorting() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.of(MockService.class), new DefaultMockService());
+                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
         servicePipeline.registerServiceImplementation(MockService.class, new MockOrderedFirst(),
                 Collections.emptyList());
         servicePipeline.registerServiceImplementation(MockService.class, new MockOrderedLast(),
@@ -117,21 +118,21 @@ public class ServicesTest {
     @Test
     public void testRecognisedTypes() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.of(MockService.class), new DefaultMockService());
+                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
         Assertions.assertEquals(1, servicePipeline.getRecognizedTypes().size());
     }
 
     @Test
     public void testImplementationGetters() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.of(MockService.class), new DefaultMockService());
+                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
         servicePipeline.registerServiceImplementation(MockService.class, new MockOrderedFirst(),
                 Collections.emptyList());
         servicePipeline.registerServiceImplementation(MockService.class, new MockOrderedLast(),
                 Collections.emptyList());
-        final TypeToken<? extends Service<?, ?>> first = TypeToken.of(MockOrderedFirst.class),
-                last = TypeToken.of(MockOrderedLast.class);
-        final TypeToken<MockService> mockServiceType = TypeToken.of(MockService.class);
+        final TypeToken<? extends Service<?, ?>> first = TypeToken.get(MockOrderedFirst.class),
+                last = TypeToken.get(MockOrderedLast.class);
+        final TypeToken<MockService> mockServiceType = TypeToken.get(MockService.class);
         for (TypeToken<?> typeToken : servicePipeline.getRecognizedTypes()) {
             Assertions.assertEquals(mockServiceType, typeToken);
         }
@@ -142,13 +143,13 @@ public class ServicesTest {
                 iterator = impls.iterator();
         Assertions.assertEquals(first, iterator.next());
         Assertions.assertEquals(last, iterator.next());
-        Assertions.assertEquals(DefaultMockService.class, iterator.next().getRawType());
+        Assertions.assertEquals(DefaultMockService.class, GenericTypeReflector.erase(iterator.next().getType()));
     }
 
     @Test
     public void testAnnotatedMethods() throws Exception {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.of(MockService.class), new DefaultMockService())
+                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService())
                 .registerMethods(new AnnotatedMethodTest());
         final String testString = UUID.randomUUID().toString();
         Assertions.assertEquals(testString.length(),
@@ -159,7 +160,7 @@ public class ServicesTest {
     @Test
     public void testConsumerServices() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.of(MockConsumerService.class),
+                .registerServiceType(TypeToken.get(MockConsumerService.class),
                         new StateSettingConsumerService())
                 .registerServiceImplementation(MockConsumerService.class,
                         new InterruptingMockConsumer(), Collections.emptyList());
@@ -171,7 +172,7 @@ public class ServicesTest {
     @Test
     public void testPartialResultServices() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.of(MockPartialResultService.class),
+                .registerServiceType(TypeToken.get(MockPartialResultService.class),
                         new DefaultPartialRequestService())
                 .registerServiceImplementation(MockPartialResultService.class,
                         new CompletingPartialResultService(), Collections.emptyList());
@@ -191,7 +192,7 @@ public class ServicesTest {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build();
         Assertions.assertNotNull(servicePipeline);
         servicePipeline
-                .registerServiceType(TypeToken.of(MockService.class), new DefaultMockService());
+                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
         final PipelineException pipelineException = Assertions.assertThrows(PipelineException.class,
                 () -> servicePipeline.pump(new MockService.MockContext("pls throw exception"))
                         .through(MockService.class).getResult());

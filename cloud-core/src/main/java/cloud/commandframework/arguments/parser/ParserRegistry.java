@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
@@ -34,7 +34,7 @@ import java.util.function.Function;
 
 /**
  * Registry of {@link ArgumentParser} that allows these arguments to be
- * referenced by a {@link Class} (or really, a {@link com.google.common.reflect.TypeToken})
+ * referenced by a {@link Class} (or really, a {@link TypeToken})
  * or a {@link String} key
  *
  * @param <C> Command sender type

@@ -1,5 +1,5 @@
 dependencies {
     implementation project(':cloud-core')
     /* Needs to be provided by the platform */
-    implementation 'com.mojang:brigadier:1.0.17'
+    compileOnly 'com.mojang:brigadier:1.0.17'
 }

@@ -24,7 +24,7 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -180,7 +180,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
     @Nonnull
     public static <C, T> CommandArgument.Builder<C, T> ofType(@Nonnull final Class<T> clazz,
                                                               @Nonnull final String name) {
-        return new Builder<>(TypeToken.of(clazz), name);
+        return new Builder<>(TypeToken.get(clazz), name);
     }
 
     /**

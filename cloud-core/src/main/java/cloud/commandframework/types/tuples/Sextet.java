@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import com.google.common.base.Objects;
-
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Immutable generic 6-tuple
@@ -162,17 +161,17 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
             return false;
         }
         final Sextet<?, ?, ?, ?, ?, ?> sextet = (Sextet<?, ?, ?, ?, ?, ?>) o;
-        return Objects.equal(getFirst(), sextet.getFirst())
-                && Objects.equal(getSecond(), sextet.getSecond())
-                && Objects.equal(getThird(), sextet.getThird())
-                && Objects.equal(getFourth(), sextet.getFourth())
-                && Objects.equal(getFifth(), sextet.getFifth())
-                && Objects.equal(getSixth(), sextet.getSixth());
+        return Objects.equals(getFirst(), sextet.getFirst())
+                && Objects.equals(getSecond(), sextet.getSecond())
+                && Objects.equals(getThird(), sextet.getThird())
+                && Objects.equals(getFourth(), sextet.getFourth())
+                && Objects.equals(getFifth(), sextet.getFifth())
+                && Objects.equals(getSixth(), sextet.getSixth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(getFirst(), getSecond(), getThird(), getFourth(), getFifth(), getSixth());
+        return Objects.hash(getFirst(), getSecond(), getThird(), getFourth(), getFifth(), getSixth());
     }
 
     @Override
