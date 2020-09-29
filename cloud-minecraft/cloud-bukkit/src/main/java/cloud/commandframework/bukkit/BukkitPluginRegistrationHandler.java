@@ -31,8 +31,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.help.GenericCommandHelpTopic;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -51,7 +51,7 @@ class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
     BukkitPluginRegistrationHandler() {
     }
 
-    void initialize(@Nonnull final BukkitCommandManager<C> bukkitCommandManager) throws Exception {
+    void initialize(@NonNull final BukkitCommandManager<C> bukkitCommandManager) throws Exception {
         final Method getCommandMap = Bukkit.getServer().getClass().getDeclaredMethod("getCommandMap");
         getCommandMap.setAccessible(true);
         this.commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());

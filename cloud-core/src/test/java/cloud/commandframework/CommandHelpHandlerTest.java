@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -89,8 +88,8 @@ class CommandHelpHandlerTest {
         this.printTopic("vec", query4);
     }
 
-    private void printTopic(@Nonnull final String query,
-                            @Nonnull final CommandHelpHandler.HelpTopic<TestCommandSender> helpTopic) {
+    private void printTopic(final String query,
+                           final CommandHelpHandler.HelpTopic<TestCommandSender> helpTopic) {
         System.out.printf("Showing results for query: \"/%s\"\n", query);
         if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
             this.printIndexHelpTopic((CommandHelpHandler.IndexHelpTopic<TestCommandSender>) helpTopic);
@@ -104,7 +103,7 @@ class CommandHelpHandlerTest {
         System.out.println();
     }
 
-    private void printIndexHelpTopic(@Nonnull final CommandHelpHandler.IndexHelpTopic<TestCommandSender> helpTopic) {
+    private void printIndexHelpTopic(final CommandHelpHandler.IndexHelpTopic<TestCommandSender> helpTopic) {
         System.out.println("└── Available Commands: ");
         final Iterator<CommandHelpHandler.VerboseHelpEntry<TestCommandSender>> iterator = helpTopic.getEntries().iterator();
         while (iterator.hasNext()) {
@@ -114,7 +113,7 @@ class CommandHelpHandlerTest {
         }
     }
 
-    private void printMultiHelpTopic(@Nonnull final CommandHelpHandler.MultiHelpTopic<TestCommandSender> helpTopic) {
+    private void printMultiHelpTopic(final CommandHelpHandler.MultiHelpTopic<TestCommandSender> helpTopic) {
         System.out.printf("└── /%s\n", helpTopic.getLongestPath());
         final int headerIndentation = helpTopic.getLongestPath().length();
         final Iterator<String> iterator = helpTopic.getChildSuggestions().iterator();
@@ -134,7 +133,7 @@ class CommandHelpHandlerTest {
         }
     }
 
-    private void printVerboseHelpTopic(@Nonnull final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> helpTopic) {
+    private void printVerboseHelpTopic(final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> helpTopic) {
         System.out.printf("└── Command: /%s\n", manager.getCommandSyntaxFormatter()
                                                       .apply(helpTopic.getCommand().getArguments(), null));
         System.out.printf("    ├── Description: %s\n", helpTopic.getDescription());
