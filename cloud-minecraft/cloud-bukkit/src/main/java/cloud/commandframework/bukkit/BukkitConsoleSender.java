@@ -25,8 +25,7 @@ package cloud.commandframework.bukkit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class BukkitConsoleSender extends BukkitCommandSender {
 
@@ -39,9 +38,8 @@ final class BukkitConsoleSender extends BukkitCommandSender {
         return false;
     }
 
-    @Nonnull
     @Override
-    public Player asPlayer() {
+    public @NonNull Player asPlayer() {
         throw new UnsupportedOperationException("Cannot convert console to player");
     }
 

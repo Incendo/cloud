@@ -24,8 +24,7 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.meta.SimpleCommandMeta;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class BukkitCommandMeta extends SimpleCommandMeta {
 
@@ -34,7 +33,7 @@ public class BukkitCommandMeta extends SimpleCommandMeta {
      *
      * @param simpleCommandMeta Simple command meta data instance that gets mirrored
      */
-    public BukkitCommandMeta(@Nonnull final SimpleCommandMeta simpleCommandMeta) {
+    public BukkitCommandMeta(@NonNull final SimpleCommandMeta simpleCommandMeta) {
         super(simpleCommandMeta.getAll());
     }
 

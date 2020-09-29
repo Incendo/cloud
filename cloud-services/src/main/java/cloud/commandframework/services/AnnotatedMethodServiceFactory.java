@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.services;
 
-import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.annotations.ServiceImplementation;
 import cloud.commandframework.services.types.Service;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Method;
@@ -53,7 +53,7 @@ enum AnnotatedMethodServiceFactory {
 
             }
         map.put(new AnnotatedMethodService<>(instance, method),
-            TypeToken.get(serviceImplementation.value()));
+                TypeToken.get(serviceImplementation.value()));
         }
         return map;
     }

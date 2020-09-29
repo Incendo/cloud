@@ -24,8 +24,7 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.meta.CommandMeta;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class BukkitCommandMetaBuilder {
 
@@ -37,8 +36,7 @@ public final class BukkitCommandMetaBuilder {
      *
      * @return Builder instance
      */
-    @Nonnull
-    public static BuilderStage1 builder() {
+    public static @NonNull BuilderStage1 builder() {
         return new BuilderStage1();
     }
 
@@ -54,8 +52,7 @@ public final class BukkitCommandMetaBuilder {
          * @param description Command description
          * @return Builder instance
          */
-        @Nonnull
-        public BuilderStage2 withDescription(@Nonnull final String description) {
+        public @NonNull BuilderStage2 withDescription(@NonNull final String description) {
             return new BuilderStage2(description);
         }
 
@@ -66,7 +63,7 @@ public final class BukkitCommandMetaBuilder {
 
         private final String description;
 
-        private BuilderStage2(@Nonnull final String description) {
+        private BuilderStage2(@NonNull final String description) {
             this.description = description;
         }
 
@@ -75,8 +72,7 @@ public final class BukkitCommandMetaBuilder {
          *
          * @return Meta instance
          */
-        @Nonnull
-        public BukkitCommandMeta build() {
+        public @NonNull BukkitCommandMeta build() {
             return new BukkitCommandMeta(CommandMeta.simple().with("description", this.description).build());
         }
 
