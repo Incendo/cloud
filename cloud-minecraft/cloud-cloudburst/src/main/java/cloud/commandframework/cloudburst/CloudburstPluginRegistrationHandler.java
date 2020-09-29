@@ -38,7 +38,7 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
 
     private final Map<CommandArgument<?, ?>, org.cloudburstmc.server.command.Command> registeredCommands = new HashMap<>();
 
-    private CloudburstCommandManager<C> cloudburstCommandManager;;
+    private CloudburstCommandManager<C> cloudburstCommandManager;
 
     CloudburstPluginRegistrationHandler() {
     }
