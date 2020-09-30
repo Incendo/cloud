@@ -23,14 +23,36 @@
 //
 package cloud.commandframework.services;
 
+import cloud.commandframework.services.mock.AnnotatedMethodTest;
+import cloud.commandframework.services.mock.CompletingPartialResultService;
+import cloud.commandframework.services.mock.DefaultMockService;
+import cloud.commandframework.services.mock.DefaultPartialRequestService;
+import cloud.commandframework.services.mock.DefaultSideEffectService;
+import cloud.commandframework.services.mock.InterruptingMockConsumer;
+import cloud.commandframework.services.mock.MockChunkedRequest;
+import cloud.commandframework.services.mock.MockConsumerService;
+import cloud.commandframework.services.mock.MockOrderedFirst;
+import cloud.commandframework.services.mock.MockOrderedLast;
+import cloud.commandframework.services.mock.MockPartialResultService;
+import cloud.commandframework.services.mock.MockResultConsumer;
+import cloud.commandframework.services.mock.MockService;
+import cloud.commandframework.services.mock.MockSideEffectService;
+import cloud.commandframework.services.mock.SecondaryMockService;
+import cloud.commandframework.services.mock.SecondaryMockSideEffectService;
+import cloud.commandframework.services.mock.StateSettingConsumerService;
+import cloud.commandframework.services.types.Service;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
-import cloud.commandframework.services.mock.*;
-import cloud.commandframework.services.types.Service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 public class ServicesTest {
 
@@ -133,8 +155,8 @@ public class ServicesTest {
         final TypeToken<? extends Service<?, ?>> first = TypeToken.get(MockOrderedFirst.class),
                 last = TypeToken.get(MockOrderedLast.class);
         final TypeToken<MockService> mockServiceType = TypeToken.get(MockService.class);
-        for (TypeToken<?> typeToken : servicePipeline.getRecognizedTypes()) {
-            Assertions.assertEquals(mockServiceType, typeToken);
+        for (Type typeToken : servicePipeline.getRecognizedTypes()) {
+            Assertions.assertEquals(mockServiceType.getType(), typeToken);
         }
         final Collection<? extends TypeToken<? extends Service<MockService.MockContext, MockService.MockResult>>>
                 impls = servicePipeline.getImplementations(mockServiceType);
