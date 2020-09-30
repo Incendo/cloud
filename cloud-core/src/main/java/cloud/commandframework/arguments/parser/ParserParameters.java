@@ -23,10 +23,10 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import com.google.common.collect.Maps;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,15 +34,14 @@ import java.util.Map;
  */
 public final class ParserParameters {
 
-    private final Map<ParserParameter<?>, Object> internalMap = Maps.newHashMap();
+    private final Map<ParserParameter<?>, Object> internalMap = new HashMap<>();
 
     /**
      * Get an empty {@link ParserParameters} instance
      *
      * @return Empty instance
      */
-    @Nonnull
-    public static ParserParameters empty() {
+    public static @NonNull ParserParameters empty() {
         return new ParserParameters();
     }
 
@@ -54,8 +53,8 @@ public final class ParserParameters {
      * @param <T>       Value type
      * @return Constructed instance
      */
-    @Nonnull
-    public static <T> ParserParameters single(@Nonnull final ParserParameter<T> parameter, @Nonnull final T value) {
+    public static <T> @NonNull ParserParameters single(@NonNull final ParserParameter<T> parameter,
+                                                       @NonNull final T value) {
         final ParserParameters parameters = new ParserParameters();
         parameters.store(parameter, value);
         return parameters;
@@ -68,7 +67,7 @@ public final class ParserParameters {
      * @param <T>       Parameter type
      * @return {@code true} if such a pair is stored, else {@code false}
      */
-    public <T> boolean has(@Nonnull final ParserParameter<T> parameter) {
+    public <T> boolean has(@NonNull final ParserParameter<T> parameter) {
         return this.internalMap.containsKey(parameter);
     }
 
@@ -79,7 +78,8 @@ public final class ParserParameters {
      * @param value     Object
      * @param <T>       Parameter type
      */
-    public <T> void store(@Nonnull final ParserParameter<T> parameter, @Nonnull final T value) {
+    public <T> void store(@NonNull final ParserParameter<T> parameter,
+                          @NonNull final T value) {
         this.internalMap.put(parameter, value);
     }
 
@@ -91,9 +91,9 @@ public final class ParserParameters {
      * @param <T>          Parameter type
      * @return Parameter value
      */
-    @Nonnull
     @SuppressWarnings("unchecked")
-    public <T> T get(@Nonnull final ParserParameter<T> parameter, @Nonnull final T defaultValue) {
+    public <T> @NonNull T get(@NonNull final ParserParameter<T> parameter,
+                              @NonNull final T defaultValue) {
         return (T) this.internalMap.getOrDefault(parameter, defaultValue);
     }
 
@@ -103,7 +103,7 @@ public final class ParserParameters {
      *
      * @param other Other instance
      */
-    public void merge(@Nonnull final ParserParameters other) {
+    public void merge(@NonNull final ParserParameters other) {
         this.internalMap.putAll(other.internalMap);
     }
 
@@ -112,8 +112,7 @@ public final class ParserParameters {
      *
      * @return Immutable map
      */
-    @Nonnull
-    public Map<ParserParameter<?>, Object> getAll() {
+    public @NonNull Map<@NonNull ParserParameter<?>, @NonNull Object> getAll() {
         return Collections.unmodifiableMap(this.internalMap);
     }
 

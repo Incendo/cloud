@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.exceptions.parsing;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class NumberParseException extends IllegalArgumentException {
 
@@ -38,7 +38,9 @@ public abstract class NumberParseException extends IllegalArgumentException {
      * @param min   Maximum value
      * @param max   Minimum value
      */
-    public NumberParseException(@Nonnull final String input, @Nonnull final Number min, @Nonnull final Number max) {
+    public NumberParseException(@NonNull final String input,
+                                @NonNull final Number min,
+                                @NonNull final Number max) {
         this.input = input;
         this.min = min;
         this.max = max;
@@ -63,8 +65,7 @@ public abstract class NumberParseException extends IllegalArgumentException {
      *
      * @return Number type
      */
-    @Nonnull
-    public abstract String getNumberType();
+    public abstract @NonNull String getNumberType();
 
     /**
      * If the parser had a maximum value
@@ -85,8 +86,7 @@ public abstract class NumberParseException extends IllegalArgumentException {
      *
      * @return Input
      */
-    @Nonnull
-    public String getInput() {
+    public @NonNull String getInput() {
         return this.input;
     }
 

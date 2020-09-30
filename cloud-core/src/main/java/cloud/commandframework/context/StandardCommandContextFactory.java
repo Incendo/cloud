@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.context;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class StandardCommandContextFactory<C> implements CommandContextFactory<C> {
 
@@ -34,9 +34,8 @@ public final class StandardCommandContextFactory<C> implements CommandContextFac
      * @param sender      Command sender
      * @return Created context
      */
-    @Nonnull
     @Override
-    public CommandContext<C> create(final boolean suggestions, @Nonnull final C sender) {
+    public CommandContext<C> create(final boolean suggestions, @NonNull final C sender) {
         return new CommandContext<>(suggestions, sender);
     }
 

@@ -23,14 +23,14 @@
 //
 package cloud.commandframework.cloudburst;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.Command;
+import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.Server;
 import org.cloudburstmc.server.plugin.Plugin;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,17 +38,17 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
 
     private final Map<CommandArgument<?, ?>, org.cloudburstmc.server.command.Command> registeredCommands = new HashMap<>();
 
-    private CloudburstCommandManager<C> cloudburstCommandManager;;
+    private CloudburstCommandManager<C> cloudburstCommandManager;
 
     CloudburstPluginRegistrationHandler() {
     }
 
-    void initialize(@Nonnull final CloudburstCommandManager<C> cloudburstCommandManager) {
+    void initialize(@NonNull final CloudburstCommandManager<C> cloudburstCommandManager) {
         this.cloudburstCommandManager = cloudburstCommandManager;
     }
 
     @Override
-    public final boolean registerCommand(@Nonnull final Command<?> command) {
+    public final boolean registerCommand(@NonNull final Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
         if (this.registeredCommands.containsKey(commandArgument)) {

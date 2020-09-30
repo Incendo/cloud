@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.meta;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class SimpleCommandMeta extends CommandMeta {
 
     private final Map<String, String> metaMap;
 
-    protected SimpleCommandMeta(@Nonnull final Map<String, String> metaMap) {
+    protected SimpleCommandMeta(@NonNull final Map<@NonNull String, @NonNull String> metaMap) {
         this.metaMap = Collections.unmodifiableMap(metaMap);
     }
 
@@ -47,8 +48,7 @@ public class SimpleCommandMeta extends CommandMeta {
      *
      * @return Builder instance
      */
-    @Nonnull
-    public static SimpleCommandMeta.Builder builder() {
+    public static SimpleCommandMeta.@NonNull Builder builder() {
         return new Builder();
     }
 
@@ -57,26 +57,22 @@ public class SimpleCommandMeta extends CommandMeta {
      *
      * @return Empty instance
      */
-    @Nonnull
-    public static SimpleCommandMeta empty() {
+    public static @NonNull SimpleCommandMeta empty() {
         return SimpleCommandMeta.builder().build();
     }
 
     @Override
-    @Nonnull
-    public final Optional<String> getValue(@Nonnull final String key) {
+    public final @NonNull Optional<String> getValue(@NonNull final String key) {
         return Optional.ofNullable(this.metaMap.get(key));
     }
 
     @Override
-    @Nonnull
-    public final String getOrDefault(@Nonnull final String key, @Nonnull final String defaultValue) {
+    public final @NonNull String getOrDefault(@NonNull final String key, @NonNull final String defaultValue) {
         return this.getValue(key).orElse(defaultValue);
     }
 
     @Override
-    @Nonnull
-    public final Map<String, String> getAll() {
+    public final @NonNull Map<@NonNull String, @NonNull String> getAll() {
         return new HashMap<>(this.metaMap);
     }
 
@@ -113,8 +109,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @param commandMeta Existing instance
          * @return Builder instance
          */
-        @Nonnull
-        public Builder with(@Nonnull final CommandMeta commandMeta) {
+        public @NonNull Builder with(@NonNull final CommandMeta commandMeta) {
             commandMeta.getAll().forEach(this::with);
             return this;
         }
@@ -126,8 +121,8 @@ public class SimpleCommandMeta extends CommandMeta {
          * @param value Value
          * @return Builder instance
          */
-        @Nonnull
-        public Builder with(@Nonnull final String key, @Nonnull final String value) {
+        public @NonNull Builder with(@NonNull final String key,
+                                     @NonNull final String value) {
             this.map.put(key, value);
             return this;
         }
@@ -137,8 +132,7 @@ public class SimpleCommandMeta extends CommandMeta {
          *
          * @return Meta instance
          */
-        @Nonnull
-        public SimpleCommandMeta build() {
+        public @NonNull SimpleCommandMeta build() {
             return new SimpleCommandMeta(this.map);
         }
 

@@ -24,8 +24,8 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -42,9 +42,9 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @param requiredSender The sender type that is required
      * @param currentChain   Chain leading up to the exception
      */
-    public InvalidCommandSenderException(@Nonnull final Object commandSender,
-                                         @Nonnull final Class<?> requiredSender,
-                                         @Nonnull final List<CommandArgument<?, ?>> currentChain) {
+    public InvalidCommandSenderException(@NonNull final Object commandSender,
+                                         @NonNull final Class<?> requiredSender,
+                                         @NonNull final List<@NonNull CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.requiredSender = requiredSender;
     }
@@ -54,8 +54,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
      *
      * @return Required sender type
      */
-    @Nonnull
-    public Class<?> getRequiredSender() {
+    public @NonNull Class<?> getRequiredSender() {
         return this.requiredSender;
     }
 

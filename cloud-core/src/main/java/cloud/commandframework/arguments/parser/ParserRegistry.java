@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Optional;
@@ -34,7 +34,7 @@ import java.util.function.Function;
 
 /**
  * Registry of {@link ArgumentParser} that allows these arguments to be
- * referenced by a {@link Class} (or really, a {@link com.google.common.reflect.TypeToken})
+ * referenced by a {@link Class} (or really, a {@link TypeToken})
  * or a {@link String} key
  *
  * @param <C> Command sender type
@@ -49,8 +49,8 @@ public interface ParserRegistry<C> {
      *                 to configure the parser, many of which are documented in {@link StandardParameters}
      * @param <T>      Generic type specifying what is produced by the parser
      */
-    <T> void registerParserSupplier(@Nonnull TypeToken<T> type,
-                                    @Nonnull Function<ParserParameters, ArgumentParser<C, ?>> supplier);
+    <T> void registerParserSupplier(@NonNull TypeToken<T> type,
+                                    @NonNull Function<@NonNull ParserParameters, @NonNull ArgumentParser<C, ?>> supplier);
 
     /**
      * Register a named parser supplier
@@ -59,8 +59,8 @@ public interface ParserRegistry<C> {
      * @param supplier The function that generates the parser. The map supplied my contain parameters used
      *                 to configure the parser, many of which are documented in {@link StandardParameters}
      */
-    void registerNamedParserSupplier(@Nonnull String name,
-                                     @Nonnull Function<ParserParameters, ArgumentParser<C, ?>> supplier);
+    void registerNamedParserSupplier(@NonNull String name,
+                                     @NonNull Function<@NonNull ParserParameters, @NonNull ArgumentParser<C, ?>> supplier);
 
     /**
      * Register a mapper that maps annotation instances to a map of parameter-object pairs
@@ -71,9 +71,9 @@ public interface ParserRegistry<C> {
      * @param <A>        Annotation type
      * @param <T>        Type of the object that the parser is retrieved for
      */
-    <A extends Annotation, T> void registerAnnotationMapper(@Nonnull Class<A> annotation,
-                                                            @Nonnull BiFunction<A, TypeToken<?>,
-                                                                    ParserParameters> mapper);
+    <A extends Annotation, T> void registerAnnotationMapper(@NonNull Class<A> annotation,
+                                                            @NonNull BiFunction<@NonNull A, @NonNull TypeToken<?>,
+                                                                    @NonNull ParserParameters> mapper);
 
     /**
      * Parse annotations into {@link ParserParameters}
@@ -82,8 +82,8 @@ public interface ParserRegistry<C> {
      * @param annotations The annotations to be parsed
      * @return Parsed parameters
      */
-    @Nonnull
-    ParserParameters parseAnnotations(@Nonnull TypeToken<?> parsingType, @Nonnull Collection<? extends Annotation> annotations);
+    @NonNull ParserParameters parseAnnotations(@NonNull TypeToken<?> parsingType,
+                                               @NonNull Collection<? extends Annotation> annotations);
 
     /**
      * Attempt to create a {@link ArgumentParser} for a specified type, using
@@ -94,9 +94,8 @@ public interface ParserRegistry<C> {
      * @param <T>              Generic type
      * @return Parser, if one can be created
      */
-    @Nonnull
-    <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull TypeToken<T> type,
-                                                    @Nonnull ParserParameters parserParameters);
+    <T> @NonNull Optional<ArgumentParser<C, T>> createParser(@NonNull TypeToken<T> type,
+                                                    @NonNull ParserParameters parserParameters);
 
     /**
      * Attempt to create a {@link ArgumentParser} for a specified type, using
@@ -107,8 +106,7 @@ public interface ParserRegistry<C> {
      * @param <T>              Generic type
      * @return Parser, if one can be created
      */
-    @Nonnull
-    <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull String name,
-                                                    @Nonnull ParserParameters parserParameters);
+    <T> @NonNull Optional<ArgumentParser<C, T>> createParser(@NonNull String name,
+                                                             @NonNull ParserParameters parserParameters);
 
 }

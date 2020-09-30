@@ -26,8 +26,8 @@ package cloud.commandframework.bungee;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,12 +40,12 @@ final class BungeePluginRegistrationHandler<C> implements CommandRegistrationHan
     BungeePluginRegistrationHandler() {
     }
 
-    void initialize(@Nonnull final BungeeCommandManager<C> bungeeCommandManager) {
+    void initialize(@NonNull final BungeeCommandManager<C> bungeeCommandManager) {
         this.bungeeCommandManager = bungeeCommandManager;
     }
 
     @Override
-    public boolean registerCommand(@Nonnull final Command<?> command) {
+    public boolean registerCommand(@NonNull final Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
         if (this.registeredCommands.containsKey(commandArgument)) {

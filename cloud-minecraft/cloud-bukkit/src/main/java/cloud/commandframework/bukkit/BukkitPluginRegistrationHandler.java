@@ -31,8 +31,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.help.GenericCommandHelpTopic;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -51,7 +51,7 @@ class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
     BukkitPluginRegistrationHandler() {
     }
 
-    void initialize(@Nonnull final BukkitCommandManager<C> bukkitCommandManager) throws Exception {
+    void initialize(@NonNull final BukkitCommandManager<C> bukkitCommandManager) throws Exception {
         final Method getCommandMap = Bukkit.getServer().getClass().getDeclaredMethod("getCommandMap");
         getCommandMap.setAccessible(true);
         this.commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());
@@ -65,7 +65,7 @@ class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
     }
 
     @Override
-    public boolean registerCommand(@Nonnull final Command<?> command) {
+    public boolean registerCommand(@NonNull final Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
         if (this.registeredCommands.containsKey(commandArgument)) {
@@ -111,9 +111,9 @@ class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
         return true;
     }
 
-    protected void registerExternal(@Nonnull final String label,
-                                    @Nonnull final Command<?> command,
-                                    @Nonnull final BukkitCommand<C> bukkitCommand) {
+    protected void registerExternal(@NonNull final String label,
+                                    @NonNull final Command<?> command,
+                                    @NonNull final BukkitCommand<C> bukkitCommand) {
     }
 
 }

@@ -26,8 +26,8 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
@@ -42,9 +42,10 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
     private final MethodHandle methodHandle;
     private final Map<String, CommandArgument<C, ?>> commandArguments;
 
-    MethodCommandExecutionHandler(@Nonnull final Object instance,
-                                  @Nonnull final Map<String, CommandArgument<C, ?>> commandArguments,
-                                  @Nonnull final Method method) throws Exception {
+    MethodCommandExecutionHandler(@NonNull final Object instance,
+                                  @NonNull final Map<@NonNull String,
+                                          @NonNull CommandArgument<@NonNull C, @NonNull ?>> commandArguments,
+                                  @NonNull  final Method method) throws Exception {
         this.commandArguments = commandArguments;
         method.setAccessible(true);
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
@@ -52,7 +53,7 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
     }
 
     @Override
-    public void execute(@Nonnull final CommandContext<C> commandContext) {
+    public void execute(@NonNull final CommandContext<C> commandContext) {
         final List<Object> arguments = new ArrayList<>(this.parameters.length);
 
         /* Bind parameters to context */

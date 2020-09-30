@@ -26,9 +26,9 @@ package cloud.commandframework.exceptions;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,8 +52,8 @@ public final class AmbiguousNodeException extends IllegalStateException {
      * @param children      All children of the parent
      */
     public AmbiguousNodeException(@Nullable final CommandArgument<?, ?> parentNode,
-                                  @Nonnull final CommandArgument<?, ?> ambiguousNode,
-                                  @Nonnull final List<CommandArgument<?, ?>> children) {
+                                  @NonNull final CommandArgument<?, ?> ambiguousNode,
+                                  @NonNull final List<@NonNull CommandArgument<?, ?>> children) {
         this.parentNode = parentNode;
         this.ambiguousNode = ambiguousNode;
         this.children = children;
@@ -64,8 +64,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      *
      * @return Parent node
      */
-    @Nullable
-    public CommandArgument<?, ?> getParentNode() {
+    public @Nullable CommandArgument<?, ?> getParentNode() {
         return this.parentNode;
     }
 
@@ -74,8 +73,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      *
      * @return Ambiguous node
      */
-    @Nonnull
-    public CommandArgument<?, ?> getAmbiguousNode() {
+    public @NonNull CommandArgument<?, ?> getAmbiguousNode() {
         return this.ambiguousNode;
     }
 
@@ -84,8 +82,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      *
      * @return Child nodes
      */
-    @Nonnull
-    public List<CommandArgument<?, ?>> getChildren() {
+    public @NonNull List<@NonNull CommandArgument<?, ?>> getChildren() {
         return this.children;
     }
 

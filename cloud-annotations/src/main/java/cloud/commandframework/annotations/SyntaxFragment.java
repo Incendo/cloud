@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.List;
 
 final class SyntaxFragment {
@@ -32,26 +33,23 @@ final class SyntaxFragment {
     private final List<String> minor;
     private final ArgumentMode argumentMode;
 
-    SyntaxFragment(@Nonnull final String major,
-                           @Nonnull final List<String> minor,
-                           @Nonnull final ArgumentMode argumentMode) {
+    SyntaxFragment(@NonNull final String major,
+                   @NonNull final List<@NonNull String> minor,
+                   @NonNull final ArgumentMode argumentMode) {
         this.major = major;
         this.minor = minor;
         this.argumentMode = argumentMode;
     }
 
-    @Nonnull
-    String getMajor() {
+    @NonNull String getMajor() {
         return this.major;
     }
 
-    @Nonnull
-    List<String> getMinor() {
+    @NonNull List<@NonNull String> getMinor() {
         return this.minor;
     }
 
-    @Nonnull
-    ArgumentMode getArgumentMode() {
+    @NonNull ArgumentMode getArgumentMode() {
         return this.argumentMode;
     }
 

@@ -30,7 +30,7 @@ import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -38,8 +38,8 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -75,11 +75,11 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    public BukkitCommandManager(@Nonnull final Plugin owningPlugin,
-                                @Nonnull final Function<CommandTree<C>,
-                                        CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                                @Nonnull final Function<CommandSender, C> commandSenderMapper,
-                                @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper)
+    public BukkitCommandManager(@NonNull final Plugin owningPlugin,
+                                @NonNull final Function<@NonNull CommandTree<C>,
+                                        @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+                                @NonNull final Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
+                                @NonNull final Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper)
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
         ((BukkitPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
@@ -88,8 +88,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
 
         /* Register Bukkit parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.of(World.class), params -> new WorldArgument.WorldParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.of(Material.class),
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), params -> new WorldArgument.WorldParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class),
                                                         params -> new MaterialArgument.MaterialParser<>());
         this.getParserRegistry()
             .registerParserSupplier(TypeToken.of(Player.class), params -> new PlayerArgument.PlayerParser<>());
@@ -126,8 +126,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      *
      * @return Owning plugin
      */
-    @Nonnull
-    public Plugin getOwningPlugin() {
+    public @NonNull Plugin getOwningPlugin() {
         return this.owningPlugin;
     }
 
@@ -136,9 +135,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      *
      * @return Meta data
      */
-    @Nonnull
     @Override
-    public BukkitCommandMeta createDefaultCommandMeta() {
+    public @NonNull BukkitCommandMeta createDefaultCommandMeta() {
         return BukkitCommandMetaBuilder.builder().withDescription("").build();
     }
 
@@ -147,13 +145,12 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      *
      * @return Command sender mapper
      */
-    @Nonnull
-    public final Function<CommandSender, C> getCommandSenderMapper() {
+    public final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
     }
 
     @Override
-    public final boolean hasPermission(@Nonnull final C sender, @Nonnull final String permission) {
+    public final boolean hasPermission(@NonNull final C sender, @NonNull final String permission) {
         if (permission.isEmpty()) {
             return true;
         }
@@ -181,7 +178,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      * @param capability Capability
      * @return {@code true} if the manager has the given capability, else {@code false}
      */
-    public final boolean queryCapability(@Nonnull final CloudBukkitCapabilities capability) {
+    public final boolean queryCapability(@NonNull final CloudBukkitCapabilities capability) {
         return this.queryCapabilities().contains(capability);
     }
 
@@ -190,7 +187,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      *
      * @return A set containing all capabilities of the instance
      */
-    public final Set<CloudBukkitCapabilities> queryCapabilities() {
+    public final @NonNull Set<@NonNull CloudBukkitCapabilities> queryCapabilities() {
         if (this.paper) {
             if (this.minecraftVersion >= BRIGADIER_MINIMAL_VERSION) {
                 if (this.minecraftVersion >= PAPER_BRIGADIER_VERSION) {
@@ -235,8 +232,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      *
      * @return The backwards command sender mapper
      */
-    @Nonnull
-    public final Function<C, CommandSender> getBackwardsCommandSenderMapper() {
+    public final @NonNull Function<@NonNull C, @NonNull CommandSender> getBackwardsCommandSenderMapper() {
         return this.backwardsCommandSenderMapper;
     }
 
@@ -257,7 +253,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
          *
          * @param reason Reason
          */
-        public BrigadierFailureException(@Nonnull final BrigadierFailureReason reason) {
+        public BrigadierFailureException(@NonNull final BrigadierFailureReason reason) {
             this.reason = reason;
         }
 
@@ -267,7 +263,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
          * @param reason Reason
          * @param cause  Cause
          */
-        public BrigadierFailureException(@Nonnull final BrigadierFailureReason reason, @Nonnull final Throwable cause) {
+        public BrigadierFailureException(@NonNull final BrigadierFailureReason reason, @NonNull final Throwable cause) {
             super(cause);
             this.reason = reason;
         }
@@ -277,8 +273,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
          *
          * @return Reason
          */
-        @Nonnull
-        public BrigadierFailureReason getReason() {
+        public @NonNull BrigadierFailureReason getReason() {
             return this.reason;
         }
 

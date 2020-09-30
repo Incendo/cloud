@@ -28,23 +28,20 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.SimpleCommandMeta;
 
-import javax.annotation.Nonnull;
-
 public class TestCommandManager extends CommandManager<TestCommandSender> {
 
     protected TestCommandManager() {
         super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
 
-    @Nonnull
     @Override
     public final SimpleCommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
 
     @Override
-    public final boolean hasPermission(@Nonnull final TestCommandSender sender,
-                                       @Nonnull final String permission) {
+    public final boolean hasPermission(final TestCommandSender sender,
+                                       final String permission) {
         return !permission.equalsIgnoreCase("no");
     }
 

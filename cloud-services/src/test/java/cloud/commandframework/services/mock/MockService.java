@@ -25,8 +25,6 @@ package cloud.commandframework.services.mock;
 
 import cloud.commandframework.services.types.Service;
 
-import javax.annotation.Nonnull;
-
 public interface MockService extends Service<MockService.MockContext, MockService.MockResult> {
 
     class MockContext {
@@ -34,21 +32,19 @@ public interface MockService extends Service<MockService.MockContext, MockServic
       private final String string;
       private String state = "";
 
-      public MockContext(@Nonnull final String string) {
+      public MockContext( final String string) {
         this.string = string;
       }
 
-      @Nonnull
       public String getString() {
         return this.string;
       }
 
-      @Nonnull
       public String getState() {
         return this.state;
       }
 
-      public void setState(@Nonnull final String state) {
+      public void setState( final String state) {
         this.state = state;
       }
 

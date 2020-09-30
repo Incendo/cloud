@@ -23,14 +23,14 @@
 //
 package cloud.commandframework.arguments.standard;
 
-import cloud.commandframework.exceptions.parsing.NumberParseException;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NumberParseException;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -41,9 +41,13 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     private final byte min;
     private final byte max;
 
-    private ByteArgument(final boolean required, @Nonnull final String name, final byte min,
-                         final byte max, final String defaultValue,
-                         @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+    private ByteArgument(final boolean required,
+                         @NonNull final String name,
+                         final byte min,
+                         final byte max,
+                         @NonNull final String defaultValue,
+                         @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                 @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new ByteParser<>(min, max), defaultValue, Byte.class, suggestionsProvider);
         this.min = min;
         this.max = max;
@@ -56,8 +60,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    @Nonnull
-    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new Builder<>(name);
     }
 
@@ -68,8 +71,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Byte> required(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Byte> required(@NonNull final String name) {
         return ByteArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -80,8 +82,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Byte> optional(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Byte> optional(@NonNull final String name) {
         return ByteArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -93,9 +94,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Byte> optional(@Nonnull final String name,
-                                                        final byte defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Byte> optional(@NonNull final String name,
+                                                                 final byte defaultNum) {
         return ByteArgument.<C>newBuilder(name).asOptionalWithDefault(Byte.toString(defaultNum)).build();
     }
 
@@ -122,7 +122,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         private byte min = Byte.MIN_VALUE;
         private byte max = Byte.MAX_VALUE;
 
-        protected Builder(@Nonnull final String name) {
+        protected Builder(@NonNull final String name) {
             super(Byte.class, name);
         }
 
@@ -132,8 +132,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @param min Minimum value
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withMin(final byte min) {
+        public @NonNull Builder<C> withMin(final byte min) {
             this.min = min;
             return this;
         }
@@ -144,8 +143,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @param max Maximum value
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withMax(final byte max) {
+        public @NonNull Builder<C> withMax(final byte max) {
             this.max = max;
             return this;
         }
@@ -155,9 +153,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          *
          * @return Constructed argument
          */
-        @Nonnull
         @Override
-        public ByteArgument<C> build() {
+        public @NonNull ByteArgument<C> build() {
             return new ByteArgument<>(this.isRequired(), this.getName(), this.min, this.max,
                                       this.getDefaultValue(), this.getSuggestionsProvider());
         }
@@ -180,11 +177,10 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
             this.max = max;
         }
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<Byte> parse(
-                @Nonnull final CommandContext<C> commandContext,
-                @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<Byte> parse(
+                @NonNull final CommandContext<C> commandContext,
+                @NonNull final Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -211,10 +207,9 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
             return true;
         }
 
-        @Nonnull
         @Override
-        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
-                                        @Nonnull final String input) {
+        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final String input) {
             return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
         }
 
@@ -251,7 +246,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @param min   Minimum value
          * @param max   Maximum value
          */
-        public ByteParseException(@Nonnull final String input, final byte min, final byte max) {
+        public ByteParseException(@NonNull final String input, final byte min, final byte max) {
             super(input, min, max);
         }
 
@@ -266,8 +261,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         }
 
         @Override
-        @Nonnull
-        public String getNumberType() {
+        public @NonNull String getNumberType() {
             return "byte";
         }
 

@@ -24,8 +24,7 @@
 package cloud.commandframework.services.types;
 
 import cloud.commandframework.services.State;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Service implementation that alters the state of the owning application in some way. A
@@ -49,7 +48,6 @@ public interface SideEffectService<Context> extends Service<Context, State> {
    *                   wrapped by a {@link cloud.commandframework.services.PipelineException}
    */
   @Override
-  @Nonnull
-  State handle(@Nonnull Context context) throws Exception;
+  @NonNull State handle(@NonNull Context context) throws Exception;
 
 }

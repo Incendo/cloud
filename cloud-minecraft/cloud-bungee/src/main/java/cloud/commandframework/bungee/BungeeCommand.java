@@ -35,8 +35,8 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.concurrent.CompletionException;
 
 public final class BungeeCommand<C> extends Command implements TabExecutor {
@@ -51,9 +51,9 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
     private final cloud.commandframework.Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
-    BungeeCommand(@Nonnull final cloud.commandframework.Command<C> cloudCommand,
-                  @Nonnull final CommandArgument<C, ?> command,
-                  @Nonnull final BungeeCommandManager<C> manager) {
+    BungeeCommand(final cloud.commandframework.@NonNull Command<C> cloudCommand,
+                  @NonNull final CommandArgument<C, ?> command,
+                  @NonNull final BungeeCommandManager<C> manager) {
         super(command.getName(),
               cloudCommand.getCommandPermission().toString(),
               ((StaticArgument<C>) command).getAlternativeAliases().toArray(new String[0]));

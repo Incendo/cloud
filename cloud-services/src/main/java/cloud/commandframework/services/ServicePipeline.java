@@ -23,10 +23,11 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.reflect.TypeToken;
 import cloud.commandframework.services.types.Service;
+import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,10 +43,10 @@ import java.util.function.Predicate;
 public final class ServicePipeline {
 
     private final Object lock = new Object();
-    private final Map<TypeToken<? extends Service<?, ?>>, ServiceRepository<?, ?>> repositories;
+    private final Map<Type, ServiceRepository<?, ?>> repositories;
     private final Executor executor;
 
-    ServicePipeline(@Nonnull final Executor executor) {
+    ServicePipeline(@NonNull final Executor executor) {
         this.repositories = new HashMap<>();
         this.executor = executor;
     }
@@ -55,8 +56,7 @@ public final class ServicePipeline {
      *
      * @return Builder instance
      */
-    @Nonnull
-    public static ServicePipelineBuilder builder() {
+    public static @NonNull ServicePipelineBuilder builder() {
         return new ServicePipelineBuilder();
     }
 
@@ -71,17 +71,17 @@ public final class ServicePipeline {
      * @param <Result>              Service result type
      * @return ServicePipeline The service pipeline instance
      */
-    public <Context, Result> ServicePipeline registerServiceType(
-            @Nonnull final TypeToken<? extends Service<Context, Result>> type,
-            @Nonnull final Service<Context, Result> defaultImplementation) {
+    public <Context, Result> @NonNull ServicePipeline registerServiceType(
+            @NonNull final TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type,
+            @NonNull final Service<@NonNull Context, @NonNull Result> defaultImplementation) {
         synchronized (this.lock) {
-            if (repositories.containsKey(type)) {
+            if (repositories.containsKey(type.getType())) {
                 throw new IllegalArgumentException(String
                         .format("Service of type '%s' has already been registered", type.toString()));
             }
             final ServiceRepository<Context, Result> repository = new ServiceRepository<>(type);
             repository.registerImplementation(defaultImplementation, Collections.emptyList());
-            this.repositories.put(type, repository);
+            this.repositories.put(type.getType(), repository);
             return this;
         }
     }
@@ -105,15 +105,15 @@ public final class ServicePipeline {
      * @throws Exception Any exceptions thrown during the registration process
      */
     @SuppressWarnings("unchecked")
-    public <T> ServicePipeline registerMethods(
-            @Nonnull final T instance) throws Exception {
+    public <T> @NonNull ServicePipeline registerMethods(
+            @NonNull final T instance) throws Exception {
         synchronized (this.lock) {
             final Map<? extends Service<?, ?>, TypeToken<? extends Service<?, ?>>> services =
                     AnnotatedMethodServiceFactory.INSTANCE.lookupServices(instance);
             for (final Map.Entry<? extends Service<?, ?>, TypeToken<? extends Service<?, ?>>> serviceEntry : services
                     .entrySet()) {
                 final TypeToken<? extends Service<?, ?>> type = serviceEntry.getValue();
-                final ServiceRepository<?, ?> repository = this.repositories.get(type);
+                final ServiceRepository<?, ?> repository = this.repositories.get(type.getType());
                 if (repository == null) {
                     throw new IllegalArgumentException(
                             String.format("No service registered for type '%s'", type.toString()));
@@ -139,9 +139,9 @@ public final class ServicePipeline {
      * @return ServicePipeline The service pipeline instance
      */
     public <Context, Result> ServicePipeline registerServiceImplementation(
-            @Nonnull final TypeToken<? extends Service<Context, Result>> type,
-            @Nonnull final Service<Context, Result> implementation,
-            @Nonnull final Collection<Predicate<Context>> filters) {
+            @NonNull final TypeToken<? extends Service<Context, Result>> type,
+            @NonNull final Service<Context, Result> implementation,
+            @NonNull final Collection<Predicate<Context>> filters) {
         synchronized (this.lock) {
             final ServiceRepository<Context, Result> repository = getRepository(type);
             repository.registerImplementation(implementation, filters);
@@ -163,10 +163,10 @@ public final class ServicePipeline {
      * @return ServicePipeline The service pipeline instance
      */
     public <Context, Result> ServicePipeline registerServiceImplementation(
-            @Nonnull final Class<? extends Service<Context, Result>> type,
-            @Nonnull final Service<Context, Result> implementation,
-            @Nonnull final Collection<Predicate<Context>> filters) {
-        return registerServiceImplementation(TypeToken.of(type), implementation, filters);
+            @NonNull final Class<? extends Service<Context, Result>> type,
+            @NonNull final Service<Context, Result> implementation,
+            @NonNull final Collection<Predicate<Context>> filters) {
+        return registerServiceImplementation(TypeToken.get(type), implementation, filters);
     }
 
     /**
@@ -177,17 +177,17 @@ public final class ServicePipeline {
      * @param <Context> Context type
      * @return Service pumper instance
      */
-    @Nonnull
-    public <Context> ServicePump<Context> pump(@Nonnull final Context context) {
+    @NonNull
+    public <Context> ServicePump<Context> pump(@NonNull final Context context) {
         return new ServicePump<>(this, context);
     }
 
     @SuppressWarnings("unchecked")
-    @Nonnull
+    @NonNull
     <Context, Result> ServiceRepository<Context, Result> getRepository(
-            @Nonnull final TypeToken<? extends Service<Context, Result>> type) {
+            @NonNull final TypeToken<? extends Service<Context, Result>> type) {
         final ServiceRepository<Context, Result> repository =
-                (ServiceRepository<Context, Result>) this.repositories.get(type);
+                (ServiceRepository<Context, Result>) this.repositories.get(type.getType());
         if (repository == null) {
             throw new IllegalArgumentException(
                     String.format("No service registered for type '%s'", type.toString()));
@@ -200,8 +200,8 @@ public final class ServicePipeline {
      *
      * @return Returns an Immutable collection of the service types registered.
      */
-    @Nonnull
-    public Collection<TypeToken<? extends Service<?, ?>>> getRecognizedTypes() {
+    @NonNull
+    public Collection<Type> getRecognizedTypes() {
         return Collections.unmodifiableCollection(this.repositories.keySet());
     }
 
@@ -215,10 +215,10 @@ public final class ServicePipeline {
      * @return Returns an collection of the {@link TypeToken}s of the implementations for a given
      * service. Iterator order matches the priority when pumping contexts through the pipeline
      */
-    @Nonnull
+    @NonNull
     @SuppressWarnings("unchecked")
     public <Context, Result, S extends Service<Context, Result>> Collection<TypeToken<? extends S>> getImplementations(
-            @Nonnull final TypeToken<S> type) {
+            @NonNull final TypeToken<S> type) {
         ServiceRepository<Context, Result> repository = getRepository(type);
         List<TypeToken<? extends S>> collection = new LinkedList<>();
         final LinkedList<? extends ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>>>
@@ -227,12 +227,12 @@ public final class ServicePipeline {
         Collections.reverse(queue);
         for (ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>> wrapper : queue) {
             collection
-                    .add((TypeToken<? extends S>) TypeToken.of(wrapper.getImplementation().getClass()));
+                    .add((TypeToken<? extends S>) TypeToken.get(wrapper.getImplementation().getClass()));
         }
         return Collections.unmodifiableList(collection);
     }
 
-    @Nonnull
+    @NonNull
     Executor getExecutor() {
         return this.executor;
     }

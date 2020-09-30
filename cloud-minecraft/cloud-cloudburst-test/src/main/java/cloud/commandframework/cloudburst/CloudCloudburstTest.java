@@ -29,11 +29,11 @@ import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
 import org.cloudburstmc.server.plugin.PluginBase;
 import org.cloudburstmc.server.utils.TextFormat;
 
-import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 /**
@@ -61,8 +61,8 @@ public final class CloudCloudburstTest extends PluginBase {
     }
 
     @CommandMethod("test <num> [str]")
-    private void testCommand(@Nonnull @Argument(value = "str", defaultValue = "potato") final String string,
-                             @Nonnull final CommandSender source,
+    private void testCommand(@NonNull @Argument(value = "str", defaultValue = "potato") final String string,
+                             @NonNull final CommandSender source,
                              @Argument("num") @Range(min = "10", max = "33") final int num) {
         source.sendMessage(TextFormat.RED + "You said: "
                            + TextFormat.GOLD + string

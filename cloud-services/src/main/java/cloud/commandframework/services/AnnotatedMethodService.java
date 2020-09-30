@@ -23,15 +23,15 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.base.Objects;
 import cloud.commandframework.services.annotations.Order;
 import cloud.commandframework.services.types.Service;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 class AnnotatedMethodService<Context, Result> implements Service<Context, Result> {
 
@@ -40,7 +40,8 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
     private final Method method;
     private final Object instance;
 
-    AnnotatedMethodService(@Nonnull final Object instance, @Nonnull final Method method)
+    AnnotatedMethodService(@NonNull final Object instance,
+                           @NonNull final Method method)
         throws Exception {
       ExecutionOrder executionOrder = ExecutionOrder.SOON;
       try {
@@ -57,10 +58,9 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
       this.method = method;
     }
 
-  @Nullable
   @Override
   @SuppressWarnings("unchecked")
-  public Result handle(@Nonnull final Context context) {
+  public @Nullable Result handle(@NonNull final Context context) {
     try {
       return (Result) this.methodHandle.invoke(this.instance, context);
     } catch (final Throwable throwable) {
@@ -72,9 +72,8 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
     return null;
   }
 
-  @Nonnull
   @Override
-  public ExecutionOrder order() {
+  public @NonNull ExecutionOrder order() {
     return this.executionOrder;
   }
 
@@ -87,12 +86,12 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
       return false;
     }
     final AnnotatedMethodService<?, ?> that = (AnnotatedMethodService<?, ?>) o;
-    return Objects.equal(this.methodHandle, that.methodHandle);
+    return Objects.equals(this.methodHandle, that.methodHandle);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(this.methodHandle);
+    return Objects.hash(this.methodHandle);
   }
 
 }

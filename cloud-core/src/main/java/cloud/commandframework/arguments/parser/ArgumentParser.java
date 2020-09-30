@@ -24,8 +24,8 @@
 package cloud.commandframework.arguments.parser;
 
 import cloud.commandframework.context.CommandContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
@@ -46,8 +46,8 @@ public interface ArgumentParser<C, T> {
      * @param inputQueue     The queue of arguments
      * @return Parsed command result
      */
-    @Nonnull
-    ArgumentParseResult<T> parse(@Nonnull CommandContext<C> commandContext, @Nonnull Queue<String> inputQueue);
+    @NonNull ArgumentParseResult<@NonNull T> parse(@NonNull CommandContext<@NonNull C> commandContext,
+                                                   @NonNull Queue<@NonNull String> inputQueue);
 
     /**
      * Get a list of suggested arguments that would be correctly parsed by this parser
@@ -56,8 +56,8 @@ public interface ArgumentParser<C, T> {
      * @param input          Input string
      * @return List of suggestions
      */
-    @Nonnull
-    default List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
+    default @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
+                                                       @NonNull final String input) {
         return Collections.emptyList();
     }
 

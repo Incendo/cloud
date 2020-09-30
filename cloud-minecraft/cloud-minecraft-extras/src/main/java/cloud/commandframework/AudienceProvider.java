@@ -24,8 +24,8 @@
 package cloud.commandframework;
 
 import net.kyori.adventure.audience.Audience;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 /**
@@ -34,7 +34,7 @@ import java.util.function.Function;
  * @param <C> Command sender type
  */
 @FunctionalInterface
-public interface AudienceProvider<C> extends Function<C, Audience> {
+public interface AudienceProvider<C> extends Function<@NonNull C, @NonNull Audience> {
 
     /**
      * Convert a command sender to an {@link Audience}
@@ -43,7 +43,6 @@ public interface AudienceProvider<C> extends Function<C, Audience> {
      * @return Mapped audience
      */
     @Override
-    @Nonnull
-    Audience apply(@Nonnull C sender);
+    @NonNull Audience apply(@NonNull C sender);
 
 }

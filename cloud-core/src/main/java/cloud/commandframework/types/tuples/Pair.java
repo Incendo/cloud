@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.types.tuples;
 
-import com.google.common.base.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Immutable generic 2-tuple
@@ -35,13 +35,11 @@ import javax.annotation.Nonnull;
  */
 public class Pair<U, V> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
 
-    protected Pair(@Nonnull final U first,
-                   @Nonnull final V second) {
+    protected Pair(@NonNull final U first,
+                   @NonNull final V second) {
         this.first = first;
         this.second = second;
     }
@@ -55,9 +53,8 @@ public class Pair<U, V> implements Tuple {
      * @param <V>    Second type
      * @return Created pair
      */
-    @Nonnull
-    public static <U, V> Pair<U, V> of(@Nonnull final U first,
-                                       @Nonnull final V second) {
+    public static <U, V> @NonNull Pair<@NonNull U, @NonNull V> of(@NonNull final U first,
+                                                                  @NonNull final V second) {
         return new Pair<>(first, second);
     }
 
@@ -66,8 +63,7 @@ public class Pair<U, V> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -76,8 +72,7 @@ public class Pair<U, V> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 
@@ -90,13 +85,13 @@ public class Pair<U, V> implements Tuple {
             return false;
         }
         final Pair<?, ?> pair = (Pair<?, ?>) o;
-        return Objects.equal(getFirst(), pair.getFirst())
-                && Objects.equal(getSecond(), pair.getSecond());
+        return Objects.equals(getFirst(), pair.getFirst())
+                && Objects.equals(getSecond(), pair.getSecond());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(getFirst(), getSecond());
+        return Objects.hash(getFirst(), getSecond());
     }
 
     @Override
@@ -106,12 +101,11 @@ public class Pair<U, V> implements Tuple {
 
     @Override
     public final int getSize() {
-        return Tuples.SIZE_PAIR;
+        return 2;
     }
 
-    @Nonnull
     @Override
-    public final Object[] toArray() {
+    public final @NonNull Object @NonNull [] toArray() {
         final Object[] array = new Object[2];
         array[0] = this.first;
         array[1] = this.second;

@@ -44,21 +44,20 @@ import cloud.commandframework.execution.preprocessor.AcceptingCommandPreprocesso
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.services.ServicePipeline;
 import cloud.commandframework.services.State;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -76,13 +75,13 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public abstract class CommandManager<C> {
 
-    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = Maps.newHashMap();
+    private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
     private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
 
     private final CommandContextFactory<C> commandContextFactory = new StandardCommandContextFactory<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
-    private final Collection<Command<C>> commands = Lists.newLinkedList();
+    private final Collection<Command<C>> commands = new LinkedList<>();
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
 
@@ -97,8 +96,8 @@ public abstract class CommandManager<C> {
      * @param commandRegistrationHandler  Command registration handler
      */
     public CommandManager(
-            @Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            @Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+            @NonNull final Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            @NonNull final CommandRegistrationHandler commandRegistrationHandler) {
         this.commandTree = CommandTree.newTree(this);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
@@ -114,8 +113,7 @@ public abstract class CommandManager<C> {
      * @param input Input string
      * @return List of tokens
      */
-    @Nonnull
-    public static LinkedList<String> tokenize(@Nonnull final String input) {
+    public static @NonNull LinkedList<@NonNull String> tokenize(@NonNull final String input) {
         final StringTokenizer stringTokenizer = new StringTokenizer(input, " ");
         final LinkedList<String> tokens = new LinkedList<>();
         while (stringTokenizer.hasMoreElements()) {
@@ -134,8 +132,8 @@ public abstract class CommandManager<C> {
      * @param input         Input provided by the sender
      * @return Command result
      */
-    @Nonnull
-    public CompletableFuture<CommandResult<C>> executeCommand(@Nonnull final C commandSender, @Nonnull final String input) {
+    public @NonNull CompletableFuture<CommandResult<C>> executeCommand(@NonNull final C commandSender,
+                                                                       @NonNull final String input) {
         final CommandContext<C> context = this.commandContextFactory.create(false, commandSender);
         final LinkedList<String> inputQueue = tokenize(input);
         try {
@@ -159,8 +157,8 @@ public abstract class CommandManager<C> {
      * @param input         Input provided by the sender
      * @return List of suggestions
      */
-    @Nonnull
-    public List<String> suggest(@Nonnull final C commandSender, @Nonnull final String input) {
+    public @NonNull List<@NonNull String> suggest(@NonNull final C commandSender,
+                                                  @NonNull final String input) {
         final CommandContext<C> context = this.commandContextFactory.create(true, commandSender);
         final LinkedList<String> inputQueue = tokenize(input);
         if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
@@ -178,7 +176,7 @@ public abstract class CommandManager<C> {
      * @param command Command to register
      * @return The command manager instance
      */
-    public CommandManager<C> command(@Nonnull final Command<C> command) {
+    public @NonNull CommandManager<C> command(@NonNull final Command<C> command) {
         this.commandTree.insertCommand(command);
         this.commands.add(command);
         return this;
@@ -189,8 +187,7 @@ public abstract class CommandManager<C> {
      *
      * @return Command syntax formatter
      */
-    @Nonnull
-    public CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
+    public @NonNull CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
         return this.commandSyntaxFormatter;
     }
 
@@ -199,7 +196,7 @@ public abstract class CommandManager<C> {
      *
      * @param commandSyntaxFormatter New formatter
      */
-    public void setCommandSyntaxFormatter(@Nonnull final CommandSyntaxFormatter<C> commandSyntaxFormatter) {
+    public void setCommandSyntaxFormatter(@NonNull final CommandSyntaxFormatter<C> commandSyntaxFormatter) {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
     }
 
@@ -208,12 +205,11 @@ public abstract class CommandManager<C> {
      *
      * @return Command registration handler
      */
-    @Nonnull
-    protected CommandRegistrationHandler getCommandRegistrationHandler() {
+    protected @NonNull CommandRegistrationHandler getCommandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
 
-    protected final void setCommandRegistrationHandler(@Nonnull final CommandRegistrationHandler commandRegistrationHandler) {
+    protected final void setCommandRegistrationHandler(@NonNull final CommandRegistrationHandler commandRegistrationHandler) {
         this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
@@ -225,7 +221,8 @@ public abstract class CommandManager<C> {
      * @param permission Permission node
      * @return {@code true} if the sender has the permission, else {@code false}
      */
-    public boolean hasPermission(@Nonnull final C sender, @Nonnull final CommandPermission permission) {
+    public boolean hasPermission(@NonNull final C sender,
+                                 @NonNull final CommandPermission permission) {
         if (permission.toString().isEmpty()) {
             return true;
         }
@@ -251,7 +248,7 @@ public abstract class CommandManager<C> {
      * @param permission Permission node
      * @return {@code true} if the sender has the permission, else {@code false}
      */
-    public abstract boolean hasPermission(@Nonnull C sender, @Nonnull String permission);
+    public abstract boolean hasPermission(@NonNull C sender, @NonNull String permission);
 
     /**
      * Create a new command builder
@@ -262,11 +259,10 @@ public abstract class CommandManager<C> {
      * @param meta        Command meta
      * @return Builder instance
      */
-    @Nonnull
-    public Command.Builder<C> commandBuilder(@Nonnull final String name,
-                                             @Nonnull final Collection<String> aliases,
-                                             @Nonnull final Description description,
-                                             @Nonnull final CommandMeta meta) {
+    public Command.@NonNull Builder<C> commandBuilder(@NonNull final String name,
+                                             @NonNull final Collection<String> aliases,
+                                             @NonNull final Description description,
+                                             @NonNull final CommandMeta meta) {
         return Command.newBuilder(name, meta, description, aliases.toArray(new String[0]));
     }
 
@@ -278,10 +274,9 @@ public abstract class CommandManager<C> {
      * @param meta    Command meta
      * @return Builder instance
      */
-    @Nonnull
-    public Command.Builder<C> commandBuilder(@Nonnull final String name,
-                                             @Nonnull final Collection<String> aliases,
-                                             @Nonnull final CommandMeta meta) {
+    public Command.@NonNull Builder<C> commandBuilder(@NonNull final String name,
+                                                      @NonNull final Collection<String> aliases,
+                                                      @NonNull final CommandMeta meta) {
         return Command.newBuilder(name, meta, Description.empty(), aliases.toArray(new String[0]));
     }
 
@@ -294,11 +289,10 @@ public abstract class CommandManager<C> {
      * @param aliases     Command aliases
      * @return Builder instance
      */
-    @Nonnull
-    public Command.Builder<C> commandBuilder(@Nonnull final String name,
-                                             @Nonnull final CommandMeta meta,
-                                             @Nonnull final Description description,
-                                             @Nonnull final String... aliases) {
+    public Command.@NonNull Builder<C> commandBuilder(@NonNull final String name,
+                                                      @NonNull final CommandMeta meta,
+                                                      @NonNull final Description description,
+                                                      @NonNull final String... aliases) {
         return Command.newBuilder(name, meta, description, aliases);
     }
 
@@ -310,10 +304,9 @@ public abstract class CommandManager<C> {
      * @param aliases Command aliases
      * @return Builder instance
      */
-    @Nonnull
-    public Command.Builder<C> commandBuilder(@Nonnull final String name,
-                                             @Nonnull final CommandMeta meta,
-                                             @Nonnull final String... aliases) {
+    public Command.@NonNull Builder<C> commandBuilder(@NonNull final String name,
+                                                      @NonNull final CommandMeta meta,
+                                                      @NonNull final String... aliases) {
         return Command.newBuilder(name, meta, Description.empty(), aliases);
     }
 
@@ -327,10 +320,9 @@ public abstract class CommandManager<C> {
      * @throws UnsupportedOperationException If the command manager does not support default command meta creation
      * @see #createDefaultCommandMeta() Default command meta creation
      */
-    @Nonnull
-    public Command.Builder<C> commandBuilder(@Nonnull final String name,
-                                             @Nonnull final Description description,
-                                             @Nonnull final String... aliases) {
+    public Command.@NonNull Builder<C> commandBuilder(@NonNull final String name,
+                                                      @NonNull final Description description,
+                                                      @NonNull final String... aliases) {
         return Command.<C>newBuilder(name, this.createDefaultCommandMeta(), description, aliases).manager(this);
     }
 
@@ -343,9 +335,8 @@ public abstract class CommandManager<C> {
      * @throws UnsupportedOperationException If the command manager does not support default command meta creation
      * @see #createDefaultCommandMeta() Default command meta creation
      */
-    @Nonnull
-    public Command.Builder<C> commandBuilder(@Nonnull final String name,
-                                             @Nonnull final String... aliases) {
+    public Command.@NonNull Builder<C> commandBuilder(@NonNull final String name,
+                                                      @NonNull final String... aliases) {
         return Command.<C>newBuilder(name, this.createDefaultCommandMeta(), Description.empty(), aliases).manager(this);
     }
 
@@ -357,8 +348,8 @@ public abstract class CommandManager<C> {
      * @param <T>  Generic argument name
      * @return Argument builder
      */
-    @Nonnull
-    public <T> CommandArgument.Builder<C, T> argumentBuilder(@Nonnull final Class<T> type, @Nonnull final String name) {
+    public <T> CommandArgument.@NonNull Builder<C, T> argumentBuilder(@NonNull final Class<T> type,
+                                                                      @NonNull final String name) {
         return CommandArgument.<C, T>ofType(type, name).manager(this);
     }
 
@@ -368,8 +359,7 @@ public abstract class CommandManager<C> {
      *
      * @return Command tree
      */
-    @Nonnull
-    public CommandTree<C> getCommandTree() {
+    public @NonNull CommandTree<C> getCommandTree() {
         return this.commandTree;
     }
 
@@ -379,8 +369,7 @@ public abstract class CommandManager<C> {
      * @return Default command meta
      * @throws UnsupportedOperationException If the command manager does not support this operation
      */
-    @Nonnull
-    public abstract CommandMeta createDefaultCommandMeta();
+    public abstract @NonNull CommandMeta createDefaultCommandMeta();
 
     /**
      * Register a new command preprocessor. The order they are registered in is respected, and they
@@ -389,7 +378,7 @@ public abstract class CommandManager<C> {
      * @param processor Processor to register
      * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
      */
-    public void registerCommandPreProcessor(@Nonnull final CommandPreprocessor<C> processor) {
+    public void registerCommandPreProcessor(@NonNull final CommandPreprocessor<C> processor) {
         this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPreprocessor<C>>() {
                                                            }, processor,
                                                            Collections.emptyList());
@@ -402,7 +391,7 @@ public abstract class CommandManager<C> {
      * @param processor Processor to register
      * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
      */
-    public void registerCommandPostProcessor(@Nonnull final CommandPostprocessor<C> processor) {
+    public void registerCommandPostProcessor(@NonNull final CommandPostprocessor<C> processor) {
         this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPostprocessor<C>>() {
                                                            }, processor,
                                                            Collections.emptyList());
@@ -416,7 +405,8 @@ public abstract class CommandManager<C> {
      * @return {@link State#ACCEPTED} if the command should be parsed and executed, else {@link State#REJECTED}
      * @see #registerCommandPreProcessor(CommandPreprocessor) Register a command preprocessor
      */
-    public State preprocessContext(@Nonnull final CommandContext<C> context, @Nonnull final LinkedList<String> inputQueue) {
+    public State preprocessContext(@NonNull final CommandContext<C> context,
+                                   @NonNull final LinkedList<@NonNull String> inputQueue) {
         this.servicePipeline.pump(new CommandPreprocessingContext<>(context, inputQueue))
                             .through(new TypeToken<CommandPreprocessor<C>>() {
                             })
@@ -434,7 +424,8 @@ public abstract class CommandManager<C> {
      * @return {@link State#ACCEPTED} if the command should be parsed and executed, else {@link State#REJECTED}
      * @see #registerCommandPostProcessor(CommandPostprocessor) Register a command postprocessor
      */
-    public State postprocessContext(@Nonnull final CommandContext<C> context, @Nonnull final Command<C> command) {
+    public State postprocessContext(@NonNull final CommandContext<C> context,
+                                    @NonNull final Command<C> command) {
         this.servicePipeline.pump(new CommandPostprocessingContext<>(context, command))
                             .through(new TypeToken<CommandPostprocessor<C>>() {
                             })
@@ -450,8 +441,7 @@ public abstract class CommandManager<C> {
      * @return Command suggestions processor
      * @see #setCommandSuggestionProcessor(CommandSuggestionProcessor) Setting the suggestion processor
      */
-    @Nonnull
-    public CommandSuggestionProcessor<C> getCommandSuggestionProcessor() {
+    public @NonNull CommandSuggestionProcessor<C> getCommandSuggestionProcessor() {
         return this.commandSuggestionProcessor;
     }
 
@@ -462,7 +452,7 @@ public abstract class CommandManager<C> {
      *
      * @param commandSuggestionProcessor New command suggestions processor
      */
-    public void setCommandSuggestionProcessor(@Nonnull final CommandSuggestionProcessor<C> commandSuggestionProcessor) {
+    public void setCommandSuggestionProcessor(@NonNull final CommandSuggestionProcessor<C> commandSuggestionProcessor) {
         this.commandSuggestionProcessor = commandSuggestionProcessor;
     }
 
@@ -479,7 +469,6 @@ public abstract class CommandManager<C> {
      *
      * @return Parser registry instance
      */
-    @Nonnull
     public ParserRegistry<C> getParserRegistry() {
         return this.parserRegistry;
     }
@@ -492,8 +481,8 @@ public abstract class CommandManager<C> {
      * @return Exception handler, or {@code null}
      * @see #registerCommandPreProcessor(CommandPreprocessor) Registering an exception handler
      */
-    @Nullable
-    public final <E extends Exception> BiConsumer<C, E> getExceptionHandler(@Nullable final Class<E> clazz) {
+    public final <E extends Exception> @Nullable BiConsumer<@NonNull C, @NonNull E>
+    getExceptionHandler(@NonNull final Class<E> clazz) {
         final BiConsumer<C, ? extends Exception> consumer = this.exceptionHandlers.get(clazz);
         if (consumer == null) {
             return null;
@@ -511,8 +500,8 @@ public abstract class CommandManager<C> {
      * @param handler Exception handler
      * @param <E>     Exception type
      */
-    public final <E extends Exception> void registerExceptionHandler(@Nonnull final Class<E> clazz,
-                                                                     @Nonnull final BiConsumer<C, E> handler) {
+    public final <E extends Exception> void registerExceptionHandler(@NonNull final Class<E> clazz,
+                                                                     @NonNull final BiConsumer<@NonNull C, @NonNull E> handler) {
         this.exceptionHandlers.put(clazz, handler);
     }
 
@@ -527,10 +516,10 @@ public abstract class CommandManager<C> {
      *                       handler stored for the exception type
      * @param <E>            Exception type
      */
-    public final <E extends Exception> void handleException(@Nonnull final C sender,
-                                                            @Nonnull final Class<E> clazz,
-                                                            @Nonnull final E exception,
-                                                            @Nonnull final BiConsumer<C, E> defaultHandler) {
+    public final <E extends Exception> void handleException(@NonNull final C sender,
+                                                            @NonNull final Class<E> clazz,
+                                                            @NonNull final E exception,
+                                                            @NonNull final BiConsumer<C, E> defaultHandler) {
         Optional.ofNullable(this.getExceptionHandler(clazz)).orElse(defaultHandler).accept(sender, exception);
     }
 
@@ -539,8 +528,7 @@ public abstract class CommandManager<C> {
      *
      * @return Unmodifiable view of all registered commands
      */
-    @Nonnull
-    public final Collection<Command<C>> getCommands() {
+    public final @NonNull Collection<@NonNull Command<C>> getCommands() {
         return Collections.unmodifiableCollection(this.commands);
     }
 
@@ -551,8 +539,7 @@ public abstract class CommandManager<C> {
      * @return Command help handler. A new instance will be created
      * each time this method is called.
      */
-    @Nonnull
-    public final CommandHelpHandler<C> getCommandHelpHandler() {
+    public final @NonNull CommandHelpHandler<C> getCommandHelpHandler() {
         return new CommandHelpHandler<>(this);
     }
 
@@ -562,7 +549,7 @@ public abstract class CommandManager<C> {
      * @param setting Setting
      * @return {@code true} if the setting is activated or {@code false} if it's not
      */
-    public boolean getSetting(@Nonnull final ManagerSettings setting) {
+    public boolean getSetting(@NonNull final ManagerSettings setting) {
         return this.managerSettings.contains(setting);
     }
 
@@ -572,7 +559,7 @@ public abstract class CommandManager<C> {
      * @param setting Setting to set
      * @param value   Value
      */
-    public void setSetting(@Nonnull final ManagerSettings setting,
+    public void setSetting(@NonNull final ManagerSettings setting,
                            final boolean value) {
         if (value) {
             this.managerSettings.add(setting);

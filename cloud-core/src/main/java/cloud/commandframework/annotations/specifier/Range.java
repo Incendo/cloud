@@ -24,8 +24,8 @@
 package cloud.commandframework.annotations.specifier;
 
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -44,13 +44,13 @@ public @interface Range {
      *
      * @return String serialized number
      */
-    @Nonnull String min() default "";
+    @NonNull String min() default "";
 
     /**
      * Maximum value accepted by the parser
      *
      * @return String serialized number
      */
-    @Nonnull String max() default "";
+    @NonNull String max() default "";
 
 }

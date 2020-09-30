@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.types.tuples;
 
-import com.google.common.base.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Immutable generic 5-tuple
@@ -38,22 +38,17 @@ import javax.annotation.Nonnull;
  */
 public class Quintet<U, V, W, X, Y> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
-    @Nonnull
     private final W third;
-    @Nonnull
     private final X fourth;
-    @Nonnull
     private final Y fifth;
 
-    protected Quintet(@Nonnull final U first,
-                      @Nonnull final V second,
-                      @Nonnull final W third,
-                      @Nonnull final X fourth,
-                      @Nonnull final Y fifth) {
+    protected Quintet(@NonNull final U first,
+                      @NonNull final V second,
+                      @NonNull final W third,
+                      @NonNull final X fourth,
+                      @NonNull final Y fifth) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -76,12 +71,12 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      * @param <Y>    Fifth type
      * @return Created quintet
      */
-    @Nonnull
-    public static <U, V, W, X, Y> Quintet<U, V, W, X, Y> of(@Nonnull final U first,
-                                                            @Nonnull final V second,
-                                                            @Nonnull final W third,
-                                                            @Nonnull final X fourth,
-                                                            @Nonnull final Y fifth) {
+    public static <U, V, W, X, Y> @NonNull Quintet<@NonNull U, @NonNull V, @NonNull W, @NonNull X, @NonNull Y> of(
+            @NonNull final U first,
+            @NonNull final V second,
+            @NonNull final W third,
+            @NonNull final X fourth,
+            @NonNull final Y fifth) {
         return new Quintet<>(first, second, third, fourth, fifth);
     }
 
@@ -90,8 +85,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -100,8 +94,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 
@@ -110,8 +103,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Third value
      */
-    @Nonnull
-    public final W getThird() {
+    public final @NonNull W getThird() {
         return this.third;
     }
 
@@ -120,8 +112,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Fourth value
      */
-    @Nonnull
-    public final X getFourth() {
+    public final @NonNull X getFourth() {
         return this.fourth;
     }
 
@@ -130,8 +121,7 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
      *
      * @return Fifth value
      */
-    @Nonnull
-    public final Y getFifth() {
+    public final @NonNull Y getFifth() {
         return this.fifth;
     }
 
@@ -144,16 +134,16 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
             return false;
         }
         final Quintet<?, ?, ?, ?, ?> quintet = (Quintet<?, ?, ?, ?, ?>) o;
-        return Objects.equal(getFirst(), quintet.getFirst())
-                && Objects.equal(getSecond(), quintet.getSecond())
-                && Objects.equal(getThird(), quintet.getThird())
-                && Objects.equal(getFourth(), quintet.getFourth())
-                && Objects.equal(getFifth(), quintet.getFifth());
+        return Objects.equals(getFirst(), quintet.getFirst())
+                && Objects.equals(getSecond(), quintet.getSecond())
+                && Objects.equals(getThird(), quintet.getThird())
+                && Objects.equals(getFourth(), quintet.getFourth())
+                && Objects.equals(getFifth(), quintet.getFifth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(getFirst(), getSecond(), getThird(), getFourth(), getFifth());
+        return Objects.hash(getFirst(), getSecond(), getThird(), getFourth(), getFifth());
     }
 
     @Override
@@ -163,12 +153,11 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
 
     @Override
     public final int getSize() {
-        return Tuples.SIZE_QUINTET;
+        return 5;
     }
 
-    @Nonnull
     @Override
-    public final Object[] toArray() {
+    public final @NonNull Object @NonNull [] toArray() {
         final Object[] array = new Object[5];
         array[0] = this.first;
         array[1] = this.second;

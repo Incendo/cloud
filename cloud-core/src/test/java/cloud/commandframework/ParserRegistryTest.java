@@ -24,17 +24,16 @@
 package cloud.commandframework;
 
 import cloud.commandframework.annotations.specifier.Range;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import com.google.common.reflect.TypeToken;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
+import cloud.commandframework.arguments.standard.IntegerArgument;
+import io.leangen.geantyref.TypeToken;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 
@@ -53,13 +52,11 @@ public class ParserRegistryTest {
                 return Range.class;
             }
 
-            @Nonnull
             @Override
             public String min() {
                 return Integer.toString(RANGE_MIN);
             }
 
-            @Nonnull
             @Override
             public String max() {
                 return Integer.toString(RANGE_MAX);
@@ -67,7 +64,7 @@ public class ParserRegistryTest {
         };
 
 
-        final TypeToken<?> parsedType = TypeToken.of(int.class);
+        final TypeToken<?> parsedType = TypeToken.get(int.class);
         final ParserParameters parserParameters = parserRegistry.parseAnnotations(parsedType, Collections.singleton(range));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MIN));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MAX));
@@ -81,6 +78,14 @@ public class ParserRegistryTest {
                 (IntegerArgument.IntegerParser<TestCommandSender>) parser;
         Assertions.assertEquals(RANGE_MIN, integerParser.getMin());
         Assertions.assertEquals(RANGE_MAX, integerParser.getMax());
+
+        /* Test integer */
+        parserRegistry.createParser(TypeToken.get(int.class), ParserParameters.empty())
+                      .orElseThrow(() -> new IllegalArgumentException("No parser found for int.class"));
+
+        /* Test Enum */
+        parserRegistry.createParser(TypeToken.get(CommandManager.ManagerSettings.class), ParserParameters.empty())
+                      .orElseThrow(() -> new IllegalArgumentException("No parser found for enum"));
     }
 
 }

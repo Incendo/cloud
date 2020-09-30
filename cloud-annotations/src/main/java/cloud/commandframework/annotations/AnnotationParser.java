@@ -34,18 +34,18 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
-import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.arguments.parser.ParserParameters;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -75,13 +75,13 @@ public final class AnnotationParser<C> {
      *                           {@link ParserParameter}. Mappers for the
      *                           parser parameters can be registered using {@link #registerAnnotationMapper(Class, Function)}
      */
-    public AnnotationParser(@Nonnull final CommandManager<C> manager,
-                            @Nonnull final Class<C> commandSenderClass,
-                            @Nonnull final Function<ParserParameters, CommandMeta> metaMapper) {
+    public AnnotationParser(@NonNull final CommandManager<C> manager,
+                            @NonNull final Class<C> commandSenderClass,
+                            @NonNull final Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper) {
         this.commandSenderClass = commandSenderClass;
         this.manager = manager;
         this.metaFactory = new MetaFactory(this, metaMapper);
-        this.annotationMappers = Maps.newHashMap();
+        this.annotationMappers = new HashMap<>();
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
     }
@@ -93,8 +93,9 @@ public final class AnnotationParser<C> {
      * @param mapper     Mapping function
      * @param <A>        Annotation type
      */
-    public <A extends Annotation> void registerAnnotationMapper(@Nonnull final Class<A> annotation,
-                                                                @Nonnull final Function<A, ParserParameters> mapper) {
+    public <A extends Annotation> void registerAnnotationMapper(@NonNull final Class<A> annotation,
+                                                                @NonNull final Function<@NonNull A,
+                                                                        @NonNull ParserParameters> mapper) {
         this.annotationMappers.put(annotation, mapper);
     }
 
@@ -106,8 +107,7 @@ public final class AnnotationParser<C> {
      * @param <T>      Type of the instance
      * @return Collection of parsed annotations
      */
-    @Nonnull
-    public <T> Collection<Command<C>> parse(@Nonnull final T instance) {
+    public <T> @NonNull Collection<@NonNull Command<C>> parse(@NonNull final T instance) {
         final Method[] methods = instance.getClass().getDeclaredMethods();
         final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
         for (final Method method : methods) {
@@ -133,10 +133,10 @@ public final class AnnotationParser<C> {
         return commands;
     }
 
-    @Nonnull
     @SuppressWarnings("unchecked")
-    private Collection<Command<C>> construct(@Nonnull final Object instance,
-                                             @Nonnull final Collection<CommandMethodPair> methodPairs) {
+    private @NonNull Collection<@NonNull Command<C>> construct(
+            @NonNull final Object instance,
+            @NonNull final Collection<@NonNull CommandMethodPair> methodPairs) {
         final Collection<Command<C>> commands = new ArrayList<>();
         for (final CommandMethodPair commandMethodPair : methodPairs) {
             final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
@@ -156,8 +156,8 @@ public final class AnnotationParser<C> {
                                                              tokens.get(commandToken).getMinor(),
                                                              metaBuilder.build());
             final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
-            final Map<String, CommandArgument<C, ?>> commandArguments = Maps.newHashMap();
-            final Map<CommandArgument<C, ?>, String> argumentDescriptions = Maps.newHashMap();
+            final Map<String, CommandArgument<C, ?>> commandArguments = new HashMap<>();
+            final Map<CommandArgument<C, ?>, String> argumentDescriptions = new HashMap<>();
             /* Go through all annotated parameters and build up the argument tree */
             for (final ArgumentParameterPair argumentPair : arguments) {
                 final CommandArgument<C, ?> argument = this.buildArgument(method,
@@ -239,14 +239,13 @@ public final class AnnotationParser<C> {
         return commands;
     }
 
-    @Nonnull
     @SuppressWarnings("unchecked")
-    private CommandArgument<C, ?> buildArgument(@Nonnull final Method method,
-                                                @Nullable final SyntaxFragment syntaxFragment,
-                                                @Nonnull final ArgumentParameterPair argumentPair) {
+    private @NonNull CommandArgument<C, ?> buildArgument(@NonNull final Method method,
+                                                         @Nullable final SyntaxFragment syntaxFragment,
+                                                         @NonNull final ArgumentParameterPair argumentPair) {
         final Parameter parameter = argumentPair.getParameter();
         final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
-        final TypeToken<?> token = TypeToken.of(parameter.getParameterizedType());
+        final TypeToken<?> token = TypeToken.get(parameter.getParameterizedType());
         final ParserParameters parameters = this.manager.getParserRegistry()
                                                         .parseAnnotations(token, annotations);
 
@@ -291,8 +290,8 @@ public final class AnnotationParser<C> {
         return argumentBuilder.manager(this.manager).withParser(parser).build();
     }
 
-    @Nonnull
-    Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> getAnnotationMappers() {
+    @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>,
+            @NonNull Function<@NonNull ? extends Annotation, @NonNull ParserParameters>> getAnnotationMappers() {
         return this.annotationMappers;
     }
 

@@ -24,16 +24,16 @@
 package cloud.commandframework.services;
 
 import cloud.commandframework.services.types.Service;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 enum ServiceFilterHandler {
     INSTANCE;
 
     <Context> boolean passes(
-            @Nonnull final ServiceRepository<Context, ?>.ServiceWrapper<? extends Service<Context, ?>> service,
-            @Nonnull final Context context) {
+            @NonNull final ServiceRepository<Context, ?>.ServiceWrapper<? extends Service<Context, ?>> service,
+            @NonNull final Context context) {
         if (!service.isDefaultImplementation()) {
             for (final Predicate<Context> predicate : service.getFilters()) {
                 try {

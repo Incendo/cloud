@@ -31,8 +31,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nonnull;
-
 public class CommandPostProcessorTest {
 
     private static CommandManager<TestCommandSender> manager;
@@ -56,7 +54,7 @@ public class CommandPostProcessorTest {
     static final class SamplePostprocessor implements CommandPostprocessor<TestCommandSender> {
 
         @Override
-        public void accept(@Nonnull final CommandPostprocessingContext<TestCommandSender> context) {
+        public void accept(final CommandPostprocessingContext<TestCommandSender> context) {
             ConsumerService.interrupt();
         }
 

@@ -24,10 +24,10 @@
 package cloud.commandframework.context;
 
 import cloud.commandframework.arguments.CommandArgument;
-import com.google.common.collect.Maps;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,8 +38,8 @@ import java.util.Optional;
  */
 public final class CommandContext<C> {
 
-    private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = Maps.newHashMap();
-    private final Map<String, Object> internalStorage = Maps.newHashMap();
+    private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = new HashMap<>();
+    private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;
     private final boolean suggestions;
 
@@ -48,7 +48,7 @@ public final class CommandContext<C> {
      *
      * @param commandSender Sender of the command
      */
-    public CommandContext(@Nonnull final C commandSender) {
+    public CommandContext(@NonNull final C commandSender) {
         this(false, commandSender);
     }
 
@@ -58,7 +58,8 @@ public final class CommandContext<C> {
      * @param suggestions   Whether or not the context is created for command suggestions
      * @param commandSender Sender of the command
      */
-    public CommandContext(final boolean suggestions, @Nonnull final C commandSender) {
+    public CommandContext(final boolean suggestions,
+                          @NonNull final C commandSender) {
         this.commandSender = commandSender;
         this.suggestions = suggestions;
     }
@@ -68,8 +69,7 @@ public final class CommandContext<C> {
      *
      * @return Command sender
      */
-    @Nonnull
-    public C getSender() {
+    public @NonNull C getSender() {
         return this.commandSender;
     }
 
@@ -89,7 +89,7 @@ public final class CommandContext<C> {
      * @param value Value
      * @param <T>   Value type
      */
-    public <T> void store(@Nonnull final String key, @Nonnull final T value) {
+    public <T> void store(@NonNull final String key, @NonNull final T value) {
         this.internalStorage.put(key, value);
     }
 
@@ -100,8 +100,7 @@ public final class CommandContext<C> {
      * @param <T> Value type
      * @return Value
      */
-    @Nonnull
-    public <T> Optional<T> get(@Nonnull final String key) {
+    public <T> @NonNull Optional<T> get(@NonNull final String key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
             @SuppressWarnings("ALL") final T castedValue = (T) value;
@@ -119,9 +118,8 @@ public final class CommandContext<C> {
      * @return Argument
      * @throws NullPointerException If no such argument is stored
      */
-    @Nonnull
     @SuppressWarnings("unchecked")
-    public <T> T getRequired(@Nonnull final String key) {
+    public <T> @NonNull T getRequired(@NonNull final String key) {
         final Object value = this.internalStorage.get(key);
         if (value == null) {
             throw new NullPointerException("No such object stored in the context: " + key);
@@ -137,8 +135,8 @@ public final class CommandContext<C> {
      * @param <T>          Argument type
      * @return Argument, or supplied default value
      */
-    @Nonnull
-    public <T> T getOrDefault(@Nonnull final String key, @Nonnull final T defaultValue) {
+    public <T> @NonNull T getOrDefault(@NonNull final String key,
+                                       @NonNull final T defaultValue) {
         return this.<T>get(key).orElse(defaultValue);
     }
 
@@ -148,8 +146,7 @@ public final class CommandContext<C> {
      * @param argument Argument
      * @return Created timing instance
      */
-    @Nonnull
-    public ArgumentTiming createTiming(@Nonnull final CommandArgument<C, ?> argument) {
+    public @NonNull ArgumentTiming createTiming(@NonNull final CommandArgument<C, ?> argument) {
         final ArgumentTiming argumentTiming = new ArgumentTiming();
         this.argumentTimings.put(argument, argumentTiming);
         return argumentTiming;
@@ -160,8 +157,7 @@ public final class CommandContext<C> {
      *
      * @return Argument timings
      */
-    @Nonnull
-    public Map<CommandArgument<C, ?>, ArgumentTiming> getArgumentTimings() {
+    public @NonNull Map<CommandArgument<@NonNull C, @NonNull ?>, ArgumentTiming> getArgumentTimings() {
         return Collections.unmodifiableMap(this.argumentTimings);
     }
 
@@ -197,6 +193,7 @@ public final class CommandContext<C> {
          *
          * @param start Start time (in nanoseconds)
          */
+        @SuppressWarnings("unused")
         public ArgumentTiming(final long start) {
             this(start, -1, false);
         }

@@ -23,7 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.lang.reflect.Parameter;
 
 final class ArgumentParameterPair {
@@ -31,18 +32,17 @@ final class ArgumentParameterPair {
     private final Parameter parameter;
     private final Argument argument;
 
-    ArgumentParameterPair(@Nonnull final Parameter parameter, @Nonnull final Argument argument) {
+    ArgumentParameterPair(@NonNull final Parameter parameter,
+                          @NonNull final Argument argument) {
         this.parameter = parameter;
         this.argument = argument;
     }
 
-    @Nonnull
-    Parameter getParameter() {
+    @NonNull Parameter getParameter() {
         return this.parameter;
     }
 
-    @Nonnull
-    Argument getArgument() {
+    @NonNull Argument getArgument() {
         return this.argument;
     }
 

@@ -25,12 +25,10 @@ package cloud.commandframework.services.mock;
 
 import cloud.commandframework.services.types.ConsumerService;
 
-import javax.annotation.Nonnull;
-
 public class InterruptingMockConsumer implements MockConsumerService {
 
   @Override
-  public void accept(@Nonnull final MockService.MockContext mockContext) {
+  public void accept(final MockService.MockContext mockContext) {
     ConsumerService.interrupt();
   }
 

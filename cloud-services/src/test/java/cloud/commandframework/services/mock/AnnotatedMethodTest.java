@@ -25,12 +25,10 @@ package cloud.commandframework.services.mock;
 
 import cloud.commandframework.services.annotations.ServiceImplementation;
 
-import javax.annotation.Nonnull;
-
 public class AnnotatedMethodTest {
 
     @ServiceImplementation(MockService.class)
-    public MockService.MockResult handle(@Nonnull final MockService.MockContext context) {
+    public MockService.MockResult handle(final MockService.MockContext context) {
         return new MockService.MockResult(context.getString().length());
     }
 

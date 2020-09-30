@@ -25,8 +25,8 @@ package cloud.commandframework.execution.postprocessor;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 
 /**
@@ -36,8 +36,8 @@ import java.util.Objects;
  */
 public final class CommandPostprocessingContext<C> {
 
-    private final CommandContext<C> commandContext;
-    private final Command<C> command;
+    private final CommandContext<@NonNull C> commandContext;
+    private final Command<@NonNull C> command;
 
     /**
      * Construct a new command postprocessing context
@@ -45,8 +45,8 @@ public final class CommandPostprocessingContext<C> {
      * @param commandContext Command context
      * @param command        Command instance
      */
-    public CommandPostprocessingContext(@Nonnull final CommandContext<C> commandContext,
-                                        @Nonnull final Command<C> command) {
+    public CommandPostprocessingContext(@NonNull final CommandContext<@NonNull C> commandContext,
+                                        @NonNull final Command<@NonNull C> command) {
         this.commandContext = commandContext;
         this.command = command;
     }
@@ -56,8 +56,7 @@ public final class CommandPostprocessingContext<C> {
      *
      * @return Command context
      */
-    @Nonnull
-    public CommandContext<C> getCommandContext() {
+    public @NonNull CommandContext<@NonNull C> getCommandContext() {
         return this.commandContext;
     }
 
@@ -66,8 +65,7 @@ public final class CommandPostprocessingContext<C> {
      *
      * @return Command instance
      */
-    @Nonnull
-    public Command<C> getCommand() {
+    public @NonNull Command<@NonNull C> getCommand() {
         return this.command;
     }
 

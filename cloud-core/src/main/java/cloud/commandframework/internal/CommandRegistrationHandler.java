@@ -24,8 +24,7 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.Command;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Utility that registers commands natively for whatever
@@ -40,8 +39,7 @@ public interface CommandRegistrationHandler {
      *
      * @return Constructed registration
      */
-    @Nonnull
-    static CommandRegistrationHandler nullCommandRegistrationHandler() {
+    static @NonNull CommandRegistrationHandler nullCommandRegistrationHandler() {
         return new NullCommandRegistrationHandler();
     }
 
@@ -52,7 +50,7 @@ public interface CommandRegistrationHandler {
      * @return {@code true} if the command was registered successfully,
      * else {@code false}
      */
-    boolean registerCommand(@Nonnull Command<?> command);
+    boolean registerCommand(@NonNull Command<?> command);
 
     final class NullCommandRegistrationHandler implements CommandRegistrationHandler {
 
@@ -60,7 +58,7 @@ public interface CommandRegistrationHandler {
         }
 
         @Override
-        public boolean registerCommand(@Nonnull final Command<?> command) {
+        public boolean registerCommand(@NonNull final Command<?> command) {
             return true;
         }
 

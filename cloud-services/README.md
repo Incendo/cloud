@@ -111,7 +111,7 @@ public class DefaultMockService implements MockService {
 Example Registration:
 
 ```java
-servicePipeline.registerServiceType(TypeToken.of(MockService.class), new DefaultMockService());
+servicePipeline.registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
 ```
 
 Example Usage:

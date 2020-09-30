@@ -28,10 +28,10 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
 import org.cloudburstmc.server.plugin.Plugin;
 
-import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 /**
@@ -54,11 +54,11 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      */
-    public CloudburstCommandManager(@Nonnull final Plugin owningPlugin,
-                                @Nonnull final Function<CommandTree<C>,
-                                        CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                                @Nonnull final Function<CommandSender, C> commandSenderMapper,
-                                @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper) {
+    public CloudburstCommandManager(@NonNull final Plugin owningPlugin,
+                                    @NonNull final Function<@NonNull CommandTree<C>,
+                                            @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+                                    @NonNull final Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
+                                    @NonNull final Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper) {
         super(commandExecutionCoordinator, new CloudburstPluginRegistrationHandler<>());
         ((CloudburstPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.commandSenderMapper = commandSenderMapper;
@@ -67,19 +67,17 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
     }
 
     @Override
-    public final boolean hasPermission(@Nonnull final C sender,
-                                       @Nonnull final String permission) {
+    public final boolean hasPermission(@NonNull final C sender,
+                                       @NonNull final String permission) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 
-    @Nonnull
     @Override
-    public final CommandMeta createDefaultCommandMeta() {
+    public final @NonNull CommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.builder().build();
     }
 
-    @Nonnull
-    final Function<CommandSender, C> getCommandSenderMapper() {
+    final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
     }
 
@@ -88,8 +86,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
      *
      * @return Owning plugin
      */
-    @Nonnull
-    public final Plugin getOwningPlugin() {
+    public final @NonNull Plugin getOwningPlugin() {
         return this.owningPlugin;
     }
 

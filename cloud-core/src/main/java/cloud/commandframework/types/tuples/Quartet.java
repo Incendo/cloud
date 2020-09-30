@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.types.tuples;
 
-import com.google.common.base.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Immutable generic 5-tuple
@@ -37,19 +37,15 @@ import javax.annotation.Nonnull;
  */
 public class Quartet<U, V, W, X> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
-    @Nonnull
     private final W third;
-    @Nonnull
     private final X fourth;
 
-    protected Quartet(@Nonnull final U first,
-                      @Nonnull final V second,
-                      @Nonnull final W third,
-                      @Nonnull final X fourth) {
+    protected Quartet(@NonNull final U first,
+                      @NonNull final V second,
+                      @NonNull final W third,
+                      @NonNull final X fourth) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -69,11 +65,10 @@ public class Quartet<U, V, W, X> implements Tuple {
      * @param <X>    Fourth type
      * @return Created quartet
      */
-    @Nonnull
-    public static <U, V, W, X> Quartet<U, V, W, X> of(@Nonnull final U first,
-                                                      @Nonnull final V second,
-                                                      @Nonnull final W third,
-                                                      @Nonnull final X fourth) {
+    public static <U, V, W, X> @NonNull Quartet<@NonNull U, @NonNull V, @NonNull W, @NonNull X> of(@NonNull final U first,
+                                                                                                   @NonNull final V second,
+                                                                                                   @NonNull final W third,
+                                                                                                   @NonNull final X fourth) {
         return new Quartet<>(first, second, third, fourth);
     }
 
@@ -82,8 +77,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -92,8 +86,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 
@@ -102,8 +95,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Third value
      */
-    @Nonnull
-    public final W getThird() {
+    public final @NonNull W getThird() {
         return this.third;
     }
 
@@ -112,8 +104,7 @@ public class Quartet<U, V, W, X> implements Tuple {
      *
      * @return Fourth value
      */
-    @Nonnull
-    public final X getFourth() {
+    public final @NonNull X getFourth() {
         return this.fourth;
     }
 
@@ -126,15 +117,15 @@ public class Quartet<U, V, W, X> implements Tuple {
             return false;
         }
         final Quartet<?, ?, ?, ?> quartet = (Quartet<?, ?, ?, ?>) o;
-        return Objects.equal(getFirst(), quartet.getFirst())
-                && Objects.equal(getSecond(), quartet.getSecond())
-                && Objects.equal(getThird(), quartet.getThird())
-                && Objects.equal(getFourth(), quartet.getFourth());
+        return Objects.equals(getFirst(), quartet.getFirst())
+                && Objects.equals(getSecond(), quartet.getSecond())
+                && Objects.equals(getThird(), quartet.getThird())
+                && Objects.equals(getFourth(), quartet.getFourth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(getFirst(), getSecond(), getThird(), getFourth());
+        return Objects.hash(getFirst(), getSecond(), getThird(), getFourth());
     }
 
     @Override
@@ -144,12 +135,11 @@ public class Quartet<U, V, W, X> implements Tuple {
 
     @Override
     public final int getSize() {
-        return Tuples.SIZE_QUARTET;
+        return 4;
     }
 
-    @Nonnull
     @Override
-    public final Object[] toArray() {
+    public final @NonNull Object @NonNull [] toArray() {
         final Object[] array = new Object[4];
         array[0] = this.first;
         array[1] = this.second;

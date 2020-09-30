@@ -24,13 +24,13 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.exceptions.parsing.NumberParseException;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NumberParseException;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -42,11 +42,12 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     private final double max;
 
     private DoubleArgument(final boolean required,
-                           @Nonnull final String name,
+                           @NonNull final String name,
                            final double min,
                            final double max,
                            final String defaultValue,
-                           @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+                           @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                   @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class, suggestionsProvider);
         this.min = min;
         this.max = max;
@@ -59,8 +60,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    @Nonnull
-    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new Builder<>(name);
     }
 
@@ -71,8 +71,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Double> required(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Double> required(@NonNull final String name) {
         return DoubleArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -83,8 +82,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Double> optional(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Double> optional(@NonNull final String name) {
         return DoubleArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -96,9 +94,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Double> optional(@Nonnull final String name,
-                                                          final double defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Double> optional(@NonNull final String name,
+                                                                   final double defaultNum) {
         return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(Double.toString(defaultNum)).build();
     }
 
@@ -125,7 +122,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         private double min = Double.MIN_VALUE;
         private double max = Double.MAX_VALUE;
 
-        protected Builder(@Nonnull final String name) {
+        protected Builder(@NonNull final String name) {
             super(Double.class, name);
         }
 
@@ -135,8 +132,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          * @param min Minimum value
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withMin(final int min) {
+        public @NonNull Builder<C> withMin(final int min) {
             this.min = min;
             return this;
         }
@@ -147,8 +143,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          * @param max Maximum value
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withMax(final int max) {
+        public @NonNull Builder<C> withMax(final int max) {
             this.max = max;
             return this;
         }
@@ -158,9 +153,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          *
          * @return Constructed argument
          */
-        @Nonnull
         @Override
-        public DoubleArgument<C> build() {
+        public @NonNull DoubleArgument<C> build() {
             return new DoubleArgument<>(this.isRequired(), this.getName(), this.min, this.max,
                                         this.getDefaultValue(), this.getSuggestionsProvider());
         }
@@ -183,11 +177,10 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             this.max = max;
         }
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<Double> parse(
-                @Nonnull final CommandContext<C> commandContext,
-                @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<Double> parse(
+                @NonNull final CommandContext<C> commandContext,
+                @NonNull final Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -239,7 +232,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          * @param min   Minimum value
          * @param max   Maximum value
          */
-        public DoubleParseException(@Nonnull final String input, final double min, final double max) {
+        public DoubleParseException(@NonNull final String input, final double min, final double max) {
             super(input, min, max);
         }
 
@@ -254,8 +247,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         }
 
         @Override
-        @Nonnull
-        public String getNumberType() {
+        public @NonNull String getNumberType() {
             return "double";
         }
 

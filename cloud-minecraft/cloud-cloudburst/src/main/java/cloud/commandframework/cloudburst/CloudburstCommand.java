@@ -24,18 +24,18 @@
 package cloud.commandframework.cloudburst;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.exceptions.InvalidSyntaxException;
-import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
 import org.cloudburstmc.server.command.PluginCommand;
 import org.cloudburstmc.server.command.data.CommandData;
 import org.cloudburstmc.server.plugin.Plugin;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 
@@ -50,11 +50,11 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
     private final CloudburstCommandManager<C> manager;
     private final Command<C> cloudCommand;
 
-    CloudburstCommand(@Nonnull final String label,
-                      @Nonnull final List<String> aliases,
-                      @Nonnull final Command<C> cloudCommand,
-                      @Nonnull final CommandArgument<C, ?> command,
-                      @Nonnull final CloudburstCommandManager<C> manager) {
+    CloudburstCommand(@NonNull final String label,
+                      @NonNull final List<@NonNull String> aliases,
+                      @NonNull final Command<C> cloudCommand,
+                      @NonNull final CommandArgument<C, ?> command,
+                      @NonNull final CloudburstCommandManager<C> manager) {
         super(manager.getOwningPlugin(), CommandData.builder(label)
                                 .addAliases(aliases.toArray(new String[0]))
                                 .addPermission(cloudCommand.getCommandPermission().toString())

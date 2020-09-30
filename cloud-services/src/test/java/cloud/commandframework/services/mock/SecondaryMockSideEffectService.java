@@ -25,13 +25,10 @@ package cloud.commandframework.services.mock;
 
 import cloud.commandframework.services.State;
 
-import javax.annotation.Nonnull;
-
 public class SecondaryMockSideEffectService implements MockSideEffectService {
 
-  @Nonnull
   @Override
-  public State handle(@Nonnull final MockPlayer mockPlayer) {
+  public State handle(final MockPlayer mockPlayer) {
     return null;
   }
 

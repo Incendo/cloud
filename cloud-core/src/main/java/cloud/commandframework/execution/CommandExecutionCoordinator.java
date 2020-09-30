@@ -26,8 +26,8 @@ package cloud.commandframework.execution;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.services.State;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -49,7 +49,7 @@ public abstract class CommandExecutionCoordinator<C> {
      *
      * @param commandTree Command tree
      */
-    public CommandExecutionCoordinator(@Nonnull final CommandTree<C> commandTree) {
+    public CommandExecutionCoordinator(@NonNull final CommandTree<C> commandTree) {
         this.commandTree = commandTree;
     }
 
@@ -59,8 +59,8 @@ public abstract class CommandExecutionCoordinator<C> {
      * @param <C> Command sender type
      * @return New coordinator instance
      */
-    public static <C> Function<CommandTree<C>,
-            CommandExecutionCoordinator<C>> simpleCoordinator() {
+    public static <C> @NonNull Function<@NonNull CommandTree<C>,
+            @NonNull CommandExecutionCoordinator<C>> simpleCoordinator() {
         return SimpleCoordinator::new;
     }
 
@@ -71,16 +71,15 @@ public abstract class CommandExecutionCoordinator<C> {
      * @param input          Command input
      * @return Future that completes with the result
      */
-    public abstract CompletableFuture<CommandResult<C>> coordinateExecution(@Nonnull CommandContext<C> commandContext,
-                                                                            @Nonnull Queue<String> input);
+    public abstract @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(@NonNull CommandContext<C> commandContext,
+                                                                                     @NonNull Queue<@NonNull String> input);
 
     /**
      * Get the command tree
      *
      * @return Command tree
      */
-    @Nonnull
-    protected CommandTree<C> getCommandTree() {
+    protected @NonNull CommandTree<C> getCommandTree() {
         return this.commandTree;
     }
 
@@ -93,13 +92,13 @@ public abstract class CommandExecutionCoordinator<C> {
     public static final class SimpleCoordinator<C> extends
             CommandExecutionCoordinator<C> {
 
-        private SimpleCoordinator(@Nonnull final CommandTree<C> commandTree) {
+        private SimpleCoordinator(@NonNull final CommandTree<C> commandTree) {
             super(commandTree);
         }
 
         @Override
-        public CompletableFuture<CommandResult<C>> coordinateExecution(@Nonnull final CommandContext<C> commandContext,
-                                                                       @Nonnull final Queue<String> input) {
+        public CompletableFuture<CommandResult<C>> coordinateExecution(@NonNull final CommandContext<C> commandContext,
+                                                                       @NonNull final Queue<@NonNull String> input) {
             final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
             try {
                 this.getCommandTree().parse(commandContext, input).ifPresent(command -> {

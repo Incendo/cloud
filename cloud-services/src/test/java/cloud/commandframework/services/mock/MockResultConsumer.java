@@ -26,13 +26,10 @@ package cloud.commandframework.services.mock;
 import cloud.commandframework.services.State;
 import cloud.commandframework.services.types.SideEffectService;
 
-import javax.annotation.Nonnull;
-
 public class MockResultConsumer implements SideEffectService<MockService.MockResult> {
 
-  @Nonnull
   @Override
-  public State handle(@Nonnull final MockService.MockResult mockResultConsumer) {
+  public State handle(final MockService.MockResult mockResultConsumer) {
     return State.ACCEPTED;
   }
 

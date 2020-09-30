@@ -26,8 +26,8 @@ package cloud.commandframework.arguments;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,7 +44,7 @@ import java.util.TreeSet;
  */
 public final class StaticArgument<C> extends CommandArgument<C, String> {
 
-    private StaticArgument(final boolean required, @Nonnull final String name, @Nonnull final String... aliases) {
+    private StaticArgument(final boolean required, @NonNull final String name, @NonNull final String... aliases) {
         super(required, name, new StaticArgumentParser<>(name, aliases), String.class);
     }
 
@@ -56,9 +56,8 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      * @param <C>     Command sender type
      * @return Constructed argument
      */
-    @Nonnull
-    public static <C> StaticArgument<C> required(@Nonnull final String name,
-                                                 @Nonnull final String... aliases) {
+    public static <C> @NonNull StaticArgument<C> required(@NonNull final String name,
+                                                          @NonNull final String... aliases) {
         return new StaticArgument<>(true, name, aliases);
     }
 
@@ -70,9 +69,8 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      * @param <C>     Command sender type
      * @return Constructed argument
      */
-    @Nonnull
-    public static <C> StaticArgument<C> optional(@Nonnull final String name,
-                                                 @Nonnull final String... aliases) {
+    public static <C> @NonNull StaticArgument<C> optional(@NonNull final String name,
+                                                          @NonNull final String... aliases) {
         return new StaticArgument<>(false, name, aliases);
     }
 
@@ -81,7 +79,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      *
      * @param alias New alias
      */
-    public void registerAlias(@Nonnull final String alias) {
+    public void registerAlias(@NonNull final String alias) {
         ((StaticArgumentParser<C>) this.getParser()).insertAlias(alias);
     }
 
@@ -90,8 +88,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      *
      * @return Immutable view of the argument aliases
      */
-    @Nonnull
-    public Set<String> getAliases() {
+    public @NonNull Set<@NonNull String> getAliases() {
         return Collections.unmodifiableSet(((StaticArgumentParser<C>) this.getParser()).getAcceptedStrings());
     }
 
@@ -100,8 +97,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      *
      * @return Immutable view of the optional argument aliases
      */
-    @Nonnull
-    public List<String> getAlternativeAliases() {
+    public @NonNull List<@NonNull String> getAlternativeAliases() {
         return Collections.unmodifiableList(new ArrayList<>(((StaticArgumentParser<C>) this.getParser()).alternativeAliases));
     }
 
@@ -113,17 +109,16 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
 
         private final String name;
 
-        private StaticArgumentParser(@Nonnull final String name, @Nonnull final String... aliases) {
+        private StaticArgumentParser(@NonNull final String name, @NonNull final String... aliases) {
             this.name = name;
             this.allAcceptedAliases.add(this.name);
             this.allAcceptedAliases.addAll(Arrays.asList(aliases));
             this.alternativeAliases.addAll(Arrays.asList(aliases));
         }
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<String> parse(@Nonnull final CommandContext<C> commandContext,
-                                                 @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<String> parse(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final Queue<@NonNull String> inputQueue) {
             final String string = inputQueue.peek();
             if (string == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input provided"));
@@ -135,9 +130,9 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
             return ArgumentParseResult.failure(new IllegalArgumentException(string));
         }
 
-        @Nonnull
         @Override
-        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext, @Nonnull final String input) {
+        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final String input) {
             return Collections.singletonList(this.name);
         }
 
@@ -146,8 +141,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
          *
          * @return Accepted strings
          */
-        @Nonnull
-        public Set<String> getAcceptedStrings() {
+        public @NonNull Set<@NonNull String> getAcceptedStrings() {
             return this.allAcceptedAliases;
         }
 
@@ -156,7 +150,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
          *
          * @param alias New alias
          */
-        public void insertAlias(@Nonnull final String alias) {
+        public void insertAlias(@NonNull final String alias) {
             this.allAcceptedAliases.add(alias);
             this.alternativeAliases.add(alias);
         }

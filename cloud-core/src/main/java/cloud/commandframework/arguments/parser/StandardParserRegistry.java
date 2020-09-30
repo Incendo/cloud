@@ -37,8 +37,10 @@ import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,16 +58,18 @@ import java.util.function.Function;
  */
 public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = ImmutableMap.<Class<?>, Class<?>>builder()
-            .put(char.class, Character.class)
-            .put(int.class, Integer.class)
-            .put(short.class, Short.class)
-            .put(byte.class, Byte.class)
-            .put(float.class, Float.class)
-            .put(double.class, Double.class)
-            .put(long.class, Long.class)
-            .put(boolean.class, Boolean.class)
-            .build();
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = new HashMap<Class<?>, Class<?>>() {
+        {
+            put(char.class, Character.class);
+            put(int.class, Integer.class);
+            put(short.class, Short.class);
+            put(byte.class, Byte.class);
+            put(float.class, Float.class);
+            put(double.class, Double.class);
+            put(long.class, Long.class);
+            put(boolean.class, Boolean.class);
+        }
+    };
 
     private final Map<String, Function<ParserParameters, ArgumentParser<C, ?>>> namedParsers = new HashMap<>();
     private final Map<TypeToken<?>, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new HashMap<>();
@@ -82,24 +86,24 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         this.<Completions, String>registerAnnotationMapper(Completions.class, new CompletionsMapper());
 
         /* Register standard types */
-        this.registerParserSupplier(TypeToken.of(Byte.class), options ->
+        this.registerParserSupplier(TypeToken.get(Byte.class), options ->
                 new ByteArgument.ByteParser<C>((byte) options.get(StandardParameters.RANGE_MIN, Byte.MIN_VALUE),
                                                (byte) options.get(StandardParameters.RANGE_MAX, Byte.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Short.class), options ->
+        this.registerParserSupplier(TypeToken.get(Short.class), options ->
                 new ShortArgument.ShortParser<C>((short) options.get(StandardParameters.RANGE_MIN, Short.MIN_VALUE),
                                                  (short) options.get(StandardParameters.RANGE_MAX, Short.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Integer.class), options ->
+        this.registerParserSupplier(TypeToken.get(Integer.class), options ->
                 new IntegerArgument.IntegerParser<C>((int) options.get(StandardParameters.RANGE_MIN, Integer.MIN_VALUE),
                                                      (int) options.get(StandardParameters.RANGE_MAX, Integer.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Float.class), options ->
+        this.registerParserSupplier(TypeToken.get(Float.class), options ->
                 new FloatArgument.FloatParser<C>((float) options.get(StandardParameters.RANGE_MIN, Float.MIN_VALUE),
                                                  (float) options.get(StandardParameters.RANGE_MAX, Float.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Double.class), options ->
+        this.registerParserSupplier(TypeToken.get(Double.class), options ->
                 new DoubleArgument.DoubleParser<C>((double) options.get(StandardParameters.RANGE_MIN, Double.MIN_VALUE),
                                                    (double) options.get(StandardParameters.RANGE_MAX, Double.MAX_VALUE)));
-        this.registerParserSupplier(TypeToken.of(Character.class), options -> new CharArgument.CharacterParser<C>());
+        this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<C>());
         /* Make this one less awful */
-        this.registerParserSupplier(TypeToken.of(String.class), options -> new StringArgument.StringParser<C>(
+        this.registerParserSupplier(TypeToken.get(String.class), options -> new StringArgument.StringParser<C>(
                 StringArgument.StringMode.SINGLE, (context, s) ->
                 Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))));
         /* Add options to this */
@@ -108,28 +112,29 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
     @Override
-    public <T> void registerParserSupplier(@Nonnull final TypeToken<T> type,
-                                           @Nonnull final Function<ParserParameters, ArgumentParser<C, ?>> supplier) {
+    public <T> void registerParserSupplier(@NonNull final TypeToken<T> type,
+                                           @NonNull final Function<@NonNull ParserParameters,
+                                                   @NonNull ArgumentParser<C, ?>> supplier) {
         this.parserSuppliers.put(type, supplier);
     }
 
     @Override
-    public void registerNamedParserSupplier(@Nonnull final String name,
-                                            @Nonnull final Function<ParserParameters, ArgumentParser<C, ?>> supplier) {
+    public void registerNamedParserSupplier(@NonNull final String name,
+                                            @NonNull final Function<@NonNull ParserParameters,
+                                                    @NonNull ArgumentParser<C, ?>> supplier) {
         this.namedParsers.put(name, supplier);
     }
 
     @Override
-    public <A extends Annotation, T> void registerAnnotationMapper(@Nonnull final Class<A> annotation,
-                                                                   @Nonnull final BiFunction<A, TypeToken<?>,
-                                                                           ParserParameters> mapper) {
+    public <A extends Annotation, T> void registerAnnotationMapper(@NonNull final Class<A> annotation,
+                                                                   @NonNull final BiFunction<@NonNull A, @NonNull TypeToken<?>,
+                                                                           @NonNull ParserParameters> mapper) {
         this.annotationMappers.put(annotation, mapper);
     }
 
-    @Nonnull
     @Override
-    public ParserParameters parseAnnotations(@Nonnull final TypeToken<?> parsingType,
-                                             @Nonnull final Collection<? extends Annotation> annotations) {
+    public @NonNull ParserParameters parseAnnotations(@NonNull final TypeToken<?> parsingType,
+                                                      @NonNull final Collection<@NonNull ? extends Annotation> annotations) {
         final ParserParameters parserParameters = new ParserParameters();
         annotations.forEach(annotation -> {
             // noinspection all
@@ -144,22 +149,21 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         return parserParameters;
     }
 
-    @Nonnull
     @Override
-    public <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull final TypeToken<T> type,
-                                                           @Nonnull final ParserParameters parserParameters) {
+    public <T> @NonNull Optional<ArgumentParser<C, T>> createParser(@NonNull final TypeToken<T> type,
+                                                                    @NonNull final ParserParameters parserParameters) {
         final TypeToken<?> actualType;
-        if (type.isPrimitive()) {
-            actualType = TypeToken.of(PRIMITIVE_MAPPINGS.get(type.getRawType()));
+        if (GenericTypeReflector.erase(type.getType()).isPrimitive()) {
+            actualType = TypeToken.get(PRIMITIVE_MAPPINGS.get(GenericTypeReflector.erase(type.getType())));
         } else {
             actualType = type;
         }
         final Function<ParserParameters, ArgumentParser<C, ?>> producer = this.parserSuppliers.get(actualType);
         if (producer == null) {
             /* Give enums special treatment */
-            if (actualType.isSubtypeOf(Enum.class)) {
+            if (GenericTypeReflector.isSuperType(Enum.class, actualType.getType())) {
                 @SuppressWarnings("all") final EnumArgument.EnumParser enumArgument
-                        = new EnumArgument.EnumParser((Class<Enum>) actualType.getRawType());
+                        = new EnumArgument.EnumParser((Class<Enum>) GenericTypeReflector.erase(actualType.getType()));
                 // noinspection all
                 return Optional.of(enumArgument);
             }
@@ -170,10 +174,9 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         return Optional.of(parser);
     }
 
-    @Nonnull
     @Override
-    public <T> Optional<ArgumentParser<C, T>> createParser(@Nonnull final String name,
-                                                           @Nonnull final ParserParameters parserParameters) {
+    public <T> @NonNull Optional<ArgumentParser<C, T>> createParser(@NonNull final String name,
+                                                                    @NonNull final ParserParameters parserParameters) {
         final Function<ParserParameters, ArgumentParser<C, ?>> producer = this.namedParsers.get(name);
         if (producer == null) {
             return Optional.empty();
@@ -184,15 +187,21 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
 
-    private static final class RangeMapper<T> implements BiFunction<Range, TypeToken<?>, ParserParameters> {
+    private static boolean isPrimitive(@NonNull final TypeToken<?> type) {
+        return GenericTypeReflector.erase(type.getType()).isPrimitive();
+    }
+
+
+    private static final class RangeMapper<T> implements BiFunction<@NonNull Range, @NonNull TypeToken<?>,
+            @NonNull ParserParameters> {
 
         @Override
-        public ParserParameters apply(final Range range, final TypeToken<?> type) {
+        public @NonNull ParserParameters apply(@NonNull final Range range, @NonNull final TypeToken<?> type) {
             final Class<?> clazz;
-            if (type.isPrimitive()) {
-                clazz = PRIMITIVE_MAPPINGS.get(type.getRawType());
+            if (isPrimitive(type)) {
+                clazz = PRIMITIVE_MAPPINGS.get(GenericTypeReflector.erase(type.getType()));
             } else {
-                clazz = type.getRawType();
+                clazz = GenericTypeReflector.erase(type.getType());
             }
             if (!Number.class.isAssignableFrom(clazz)) {
                 return ParserParameters.empty();
@@ -255,11 +264,12 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
 
-    private static final class CompletionsMapper implements BiFunction<Completions, TypeToken<?>, ParserParameters> {
+    private static final class CompletionsMapper implements BiFunction<@NonNull Completions, @NonNull TypeToken<?>,
+            @NonNull ParserParameters> {
 
         @Override
-        public ParserParameters apply(final Completions completions, final TypeToken<?> token) {
-            if (token.getRawType().equals(String.class)) {
+        public @NonNull ParserParameters apply(@NonNull final Completions completions, @NonNull final TypeToken<?> token) {
+            if (GenericTypeReflector.erase(token.getType()).equals(String.class)) {
                 final String[] splitCompletions = completions.value().replace(" ", "").split(",");
                 return ParserParameters.single(StandardParameters.COMPLETIONS, splitCompletions);
             }

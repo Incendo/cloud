@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.types.tuples;
 
-import com.google.common.base.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Immutable generic 6-tuple
@@ -39,25 +39,19 @@ import javax.annotation.Nonnull;
  */
 public class Sextet<U, V, W, X, Y, Z> implements Tuple {
 
-    @Nonnull
     private final U first;
-    @Nonnull
     private final V second;
-    @Nonnull
     private final W third;
-    @Nonnull
     private final X fourth;
-    @Nonnull
     private final Y fifth;
-    @Nonnull
     private final Z sixth;
 
-    protected Sextet(@Nonnull final U first,
-                     @Nonnull final V second,
-                     @Nonnull final W third,
-                     @Nonnull final X fourth,
-                     @Nonnull final Y fifth,
-                     @Nonnull final Z sixth) {
+    protected Sextet(@NonNull final U first,
+                     @NonNull final V second,
+                     @NonNull final W third,
+                     @NonNull final X fourth,
+                     @NonNull final Y fifth,
+                     @NonNull final Z sixth) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -83,13 +77,13 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      * @param <Z>    Sixth type
      * @return Created sextet
      */
-    @Nonnull
-    public static <U, V, W, X, Y, Z> Sextet<U, V, W, X, Y, Z> of(@Nonnull final U first,
-                                                                 @Nonnull final V second,
-                                                                 @Nonnull final W third,
-                                                                 @Nonnull final X fourth,
-                                                                 @Nonnull final Y fifth,
-                                                                 @Nonnull final Z sixth) {
+    public static <U, V, W, X, Y, Z> @NonNull Sextet<@NonNull U, @NonNull V, @NonNull W, @NonNull X, @NonNull Y, @NonNull Z> of(
+                                                                          @NonNull final U first,
+                                                                          @NonNull final V second,
+                                                                          @NonNull final W third,
+                                                                          @NonNull final X fourth,
+                                                                          @NonNull final Y fifth,
+                                                                          @NonNull final Z sixth) {
         return new Sextet<>(first, second, third, fourth, fifth, sixth);
     }
 
@@ -98,8 +92,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return First value
      */
-    @Nonnull
-    public final U getFirst() {
+    public final @NonNull U getFirst() {
         return this.first;
     }
 
@@ -108,8 +101,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Second value
      */
-    @Nonnull
-    public final V getSecond() {
+    public final @NonNull V getSecond() {
         return this.second;
     }
 
@@ -118,8 +110,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Third value
      */
-    @Nonnull
-    public final W getThird() {
+    public final @NonNull W getThird() {
         return this.third;
     }
 
@@ -128,8 +119,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Fourth value
      */
-    @Nonnull
-    public final X getFourth() {
+    public final @NonNull X getFourth() {
         return this.fourth;
     }
 
@@ -138,8 +128,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Fifth value
      */
-    @Nonnull
-    public final Y getFifth() {
+    public final @NonNull Y getFifth() {
         return this.fifth;
     }
 
@@ -148,8 +137,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      *
      * @return Sixth value
      */
-    @Nonnull
-    public final Z getSixth() {
+    public final @NonNull Z getSixth() {
         return this.sixth;
     }
 
@@ -162,17 +150,17 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
             return false;
         }
         final Sextet<?, ?, ?, ?, ?, ?> sextet = (Sextet<?, ?, ?, ?, ?, ?>) o;
-        return Objects.equal(getFirst(), sextet.getFirst())
-                && Objects.equal(getSecond(), sextet.getSecond())
-                && Objects.equal(getThird(), sextet.getThird())
-                && Objects.equal(getFourth(), sextet.getFourth())
-                && Objects.equal(getFifth(), sextet.getFifth())
-                && Objects.equal(getSixth(), sextet.getSixth());
+        return Objects.equals(getFirst(), sextet.getFirst())
+                && Objects.equals(getSecond(), sextet.getSecond())
+                && Objects.equals(getThird(), sextet.getThird())
+                && Objects.equals(getFourth(), sextet.getFourth())
+                && Objects.equals(getFifth(), sextet.getFifth())
+                && Objects.equals(getSixth(), sextet.getSixth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(getFirst(), getSecond(), getThird(), getFourth(), getFifth(), getSixth());
+        return Objects.hash(getFirst(), getSecond(), getThird(), getFourth(), getFifth(), getSixth());
     }
 
     @Override
@@ -183,12 +171,11 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
 
     @Override
     public final int getSize() {
-        return Tuples.SIZE_SEXTET;
+        return 6;
     }
 
-    @Nonnull
     @Override
-    public final Object[] toArray() {
+    public @NonNull final Object @NonNull [] toArray() {
         final Object[] array = new Object[6];
         array[0] = this.first;
         array[1] = this.second;

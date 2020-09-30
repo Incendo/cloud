@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.services;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.annotations.Order;
 import cloud.commandframework.services.types.Service;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,7 +54,7 @@ public final class ServiceRepository<Context, Response> {
      *
      * @param serviceType Service type
      */
-    ServiceRepository(@Nonnull final TypeToken<? extends Service<Context, Response>> serviceType) {
+    ServiceRepository(@NonNull final TypeToken<? extends Service<Context, Response>> serviceType) {
         this.serviceType = serviceType;
         this.implementations = new LinkedList<>();
     }
@@ -66,8 +66,8 @@ public final class ServiceRepository<Context, Response> {
      * @param filters Filters that will be used to determine whether or not the service gets used
      * @param <T>     Type of the implementation
      */
-    <T extends Service<Context, Response>> void registerImplementation(@Nonnull final T service,
-                                                                       @Nonnull final Collection<Predicate<Context>> filters) {
+    <T extends Service<Context, Response>> void registerImplementation(@NonNull final T service,
+                                                                       @NonNull final Collection<Predicate<Context>> filters) {
         synchronized (this.lock) {
             this.implementations.add(new ServiceWrapper<>(service, filters));
         }
@@ -78,7 +78,7 @@ public final class ServiceRepository<Context, Response> {
      *
      * @return Queue containing all implementations
      */
-    @Nonnull
+    @NonNull
     LinkedList<ServiceWrapper<? extends Service<Context, Response>>> getQueue() {
         synchronized (this.lock) {
             return new LinkedList<>(this.implementations);
@@ -101,8 +101,8 @@ public final class ServiceRepository<Context, Response> {
         private final int registrationOrder = ServiceRepository.this.registrationOrder++;
         private final ExecutionOrder executionOrder;
 
-        private ServiceWrapper(@Nonnull final T implementation,
-                               @Nonnull final Collection<Predicate<Context>> filters) {
+        private ServiceWrapper(@NonNull final T implementation,
+                               @NonNull final Collection<Predicate<Context>> filters) {
             this.defaultImplementation = implementations.isEmpty();
             this.implementation = implementation;
             this.filters = filters;
@@ -118,12 +118,12 @@ public final class ServiceRepository<Context, Response> {
             this.executionOrder = executionOrder;
         }
 
-        @Nonnull
+        @NonNull
         T getImplementation() {
             return this.implementation;
         }
 
-        @Nonnull
+        @NonNull
         Collection<Predicate<Context>> getFilters() {
             return Collections.unmodifiableCollection(this.filters);
         }
@@ -136,11 +136,11 @@ public final class ServiceRepository<Context, Response> {
         public String toString() {
             return String
                     .format("ServiceWrapper{type=%s,implementation=%s}", serviceType.toString(),
-                            TypeToken.of(implementation.getClass()).toString());
+                            TypeToken.get(implementation.getClass()).toString());
         }
 
         @Override
-        public int compareTo(@Nonnull final ServiceWrapper<T> other) {
+        public int compareTo(@NonNull final ServiceWrapper<T> other) {
             return Comparator.<ServiceWrapper<T>>comparingInt(
                     wrapper -> wrapper.isDefaultImplementation()
                                ? Integer.MIN_VALUE

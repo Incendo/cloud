@@ -28,9 +28,9 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.services.State;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
@@ -52,7 +52,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
 
     private AsynchronousCommandExecutionCoordinator(@Nullable final Executor executor,
                                                     final boolean synchronizeParsing,
-                                                    @Nonnull final CommandTree<C> commandTree) {
+                                                    @NonNull final CommandTree<C> commandTree) {
         super(commandTree);
         this.executor = executor;
         this.synchronizeParsing = synchronizeParsing;
@@ -65,14 +65,13 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
      * @param <C> Command sender type
      * @return Builder
      */
-    @Nonnull
-    public static <C> Builder<C> newBuilder() {
+    public static <C> @NonNull Builder<C> newBuilder() {
         return new Builder<>();
     }
 
     @Override
-    public CompletableFuture<CommandResult<C>> coordinateExecution(@Nonnull final CommandContext<C> commandContext,
-                                                                   @Nonnull final Queue<String> input) {
+    public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(@NonNull final CommandContext<C> commandContext,
+                                                                            @NonNull final Queue<@NonNull String> input) {
 
         final Consumer<Command<C>> commandConsumer = command -> {
             if (this.commandManager.postprocessContext(commandContext, command) == State.ACCEPTED) {
@@ -119,8 +118,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          *
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withSynchronousParsing() {
+        public @NonNull Builder<C> withSynchronousParsing() {
             this.synchronizeParsing = true;
             return this;
         }
@@ -130,8 +128,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          *
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withAsynchronousParsing() {
+        public @NonNull Builder<C> withAsynchronousParsing() {
             this.synchronizeParsing = false;
             return this;
         }
@@ -143,8 +140,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          * @param executor Executor to use
          * @return Builder instance
          */
-        @Nonnull
-        public Builder<C> withExecutor(@Nonnull final Executor executor) {
+        public @NonNull Builder<C> withExecutor(@NonNull final Executor executor) {
             this.executor = executor;
             return this;
         }
@@ -155,8 +151,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          *
          * @return Function that builds the coordinator
          */
-        @Nonnull
-        public Function<CommandTree<C>, CommandExecutionCoordinator<C>> build() {
+        public @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> build() {
             return tree -> new AsynchronousCommandExecutionCoordinator<>(this.executor, this.synchronizeParsing, tree);
         }
 

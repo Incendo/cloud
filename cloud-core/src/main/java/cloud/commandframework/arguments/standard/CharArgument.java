@@ -24,12 +24,12 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -37,9 +37,11 @@ import java.util.function.BiFunction;
 @SuppressWarnings("unused")
 public final class CharArgument<C> extends CommandArgument<C, Character> {
 
-    private CharArgument(final boolean required, @Nonnull final String name,
-                         @Nonnull final String defaultValue, @Nullable
-                         final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+    private CharArgument(final boolean required,
+                         @NonNull final String name,
+                         @NonNull final String defaultValue,
+                         @Nullable final BiFunction<@NonNull CommandContext<C>,
+                                 @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new CharacterParser<>(), defaultValue, Character.class, suggestionsProvider);
     }
 
@@ -50,8 +52,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    @Nonnull
-    public static <C> CharArgument.Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> CharArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new CharArgument.Builder<>(name);
     }
 
@@ -62,8 +63,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Character> required(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Character> required(@NonNull final String name) {
         return CharArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -74,8 +74,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Character> optional(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Character> optional(@NonNull final String name) {
         return CharArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -87,16 +86,15 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Character> optional(@Nonnull final String name,
-                                                             final String defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Character> optional(@NonNull final String name,
+                                                                      @NonNull final String defaultNum) {
         return CharArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Character> {
 
-        protected Builder(@Nonnull final String name) {
+        protected Builder(@NonNull final String name) {
             super(Character.class, name);
         }
 
@@ -105,9 +103,8 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
          *
          * @return Constructed argument
          */
-        @Nonnull
         @Override
-        public CharArgument<C> build() {
+        public @NonNull CharArgument<C> build() {
             return new CharArgument<>(this.isRequired(), this.getName(),
                                       this.getDefaultValue(), this.getSuggestionsProvider());
         }
@@ -117,10 +114,9 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
 
     public static final class CharacterParser<C> implements ArgumentParser<C, Character> {
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<Character> parse(@Nonnull final CommandContext<C> commandContext,
-                                                    @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<Character> parse(@NonNull final CommandContext<C> commandContext,
+                                                             @NonNull final Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -153,7 +149,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
          *
          * @param input String input
          */
-        public CharParseException(final String input) {
+        public CharParseException(@NonNull final String input) {
             this.input = input;
         }
 
@@ -162,7 +158,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
          *
          * @return Input value
          */
-        public String getInput() {
+        public @NonNull String getInput() {
             return input;
         }
 

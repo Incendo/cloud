@@ -32,6 +32,7 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -40,7 +41,6 @@ import org.jline.reader.ParsedLine;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
 
@@ -54,7 +54,7 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
      *
      * @param executionCoordinatorFunction Function producing a new coordinator
      */
-    public JLineCommandManager(@Nonnull final Function<CommandTree<JLineCommandSender>,
+    public JLineCommandManager(@NonNull final Function<CommandTree<JLineCommandSender>,
             CommandExecutionCoordinator<JLineCommandSender>> executionCoordinatorFunction) {
         super(executionCoordinatorFunction, CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
@@ -138,9 +138,9 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
     }
 
     @Override
-    public final void complete(@Nonnull final LineReader lineReader,
-                               @Nonnull final ParsedLine parsedLine,
-                               @Nonnull final List<Candidate> list) {
+    public final void complete(@NonNull final LineReader lineReader,
+                               @NonNull final ParsedLine parsedLine,
+                               @NonNull final List<@NonNull Candidate> list) {
         final String line = parsedLine.line();
         if (line == null || line.isEmpty() || !line.startsWith("/")) {
             System.out.println("Cannot suggest: empty line");
@@ -149,14 +149,14 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
         System.out.printf("Trying to complete '%s'\n", line);
     }
 
-    @Nonnull
     @Override
-    public final SimpleCommandMeta createDefaultCommandMeta() {
+    public final @NonNull SimpleCommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
 
     @Override
-    public final boolean hasPermission(@Nonnull final JLineCommandSender sender, @Nonnull final String permission) {
+    public final boolean hasPermission(@NonNull final JLineCommandSender sender,
+                                       @NonNull final String permission) {
         return true;
     }
 

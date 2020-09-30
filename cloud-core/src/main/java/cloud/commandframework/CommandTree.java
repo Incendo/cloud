@@ -37,9 +37,9 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -89,7 +89,7 @@ public final class CommandTree<C> {
     private final Node<CommandArgument<C, ?>> internalTree = new Node<>(null);
     private final CommandManager<C> commandManager;
 
-    private CommandTree(@Nonnull final CommandManager<C> commandManager) {
+    private CommandTree(@NonNull final CommandManager<C> commandManager) {
         this.commandManager = commandManager;
     }
 
@@ -100,8 +100,7 @@ public final class CommandTree<C> {
      * @param <C>            Command sender type
      * @return New command tree
      */
-    @Nonnull
-    public static <C> CommandTree<C> newTree(@Nonnull final CommandManager<C> commandManager) {
+    public static <C> @NonNull CommandTree<C> newTree(@NonNull final CommandManager<C> commandManager) {
         return new CommandTree<>(commandManager);
     }
 
@@ -115,8 +114,8 @@ public final class CommandTree<C> {
      * @throws NoPermissionException  If the sender lacks permission to execute the command
      * @throws InvalidSyntaxException If the command syntax is invalid
      */
-    public Optional<Command<C>> parse(@Nonnull final CommandContext<C> commandContext,
-                                      @Nonnull final Queue<String> args) throws
+    public @NonNull Optional<Command<C>> parse(@NonNull final CommandContext<C> commandContext,
+                                               @NonNull final Queue<@NonNull String> args) throws
             NoSuchCommandException, NoPermissionException, InvalidSyntaxException {
         final Optional<Command<C>> commandOptional = parseCommand(new ArrayList<>(),
                                                                   commandContext,
@@ -130,10 +129,10 @@ public final class CommandTree<C> {
         return commandOptional;
     }
 
-    private Optional<Command<C>> parseCommand(@Nonnull final List<CommandArgument<C, ?>> parsedArguments,
-                                              @Nonnull final CommandContext<C> commandContext,
-                                              @Nonnull final Queue<String> commandQueue,
-                                              @Nonnull final Node<CommandArgument<C, ?>> root) {
+    private Optional<Command<C>> parseCommand(@NonNull final List<@NonNull CommandArgument<C, ?>> parsedArguments,
+                                              @NonNull final CommandContext<C> commandContext,
+                                              @NonNull final Queue<@NonNull String> commandQueue,
+                                              @NonNull final Node<@Nullable CommandArgument<C, ?>> root) {
         CommandPermission permission = this.isPermitted(commandContext.getSender(), root);
         if (permission != null) {
             throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(root)
@@ -225,11 +224,11 @@ public final class CommandTree<C> {
         }
     }
 
-    @Nullable
-    private Optional<Command<C>> attemptParseUnambiguousChild(@Nonnull final List<CommandArgument<C, ?>> parsedArguments,
-                                                              @Nonnull final CommandContext<C> commandContext,
-                                                              @Nonnull final Node<CommandArgument<C, ?>> root,
-                                                              @Nonnull final Queue<String> commandQueue) {
+    private @Nullable Optional<Command<C>>
+    attemptParseUnambiguousChild(@NonNull final List<@NonNull CommandArgument<C, ?>> parsedArguments,
+                                 @NonNull final CommandContext<C> commandContext,
+                                 @NonNull final Node<@Nullable CommandArgument<C, ?>> root,
+                                 @NonNull final Queue<String> commandQueue) {
         CommandPermission permission;
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
@@ -343,15 +342,14 @@ public final class CommandTree<C> {
      * @param commandQueue Input queue
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
      */
-    @Nonnull
-    public List<String> getSuggestions(@Nonnull final CommandContext<C> context, @Nonnull final Queue<String> commandQueue) {
+    public @NonNull List<@NonNull String> getSuggestions(@NonNull final CommandContext<C> context,
+                                                         @NonNull final Queue<@NonNull String> commandQueue) {
         return getSuggestions(context, commandQueue, this.internalTree);
     }
 
-    @Nonnull
-    private List<String> getSuggestions(@Nonnull final CommandContext<C> commandContext,
-                                        @Nonnull final Queue<String> commandQueue,
-                                        @Nonnull final Node<CommandArgument<C, ?>> root) {
+    private @NonNull List<@NonNull String> getSuggestions(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final Queue<@NonNull String> commandQueue,
+                                                          @NonNull final Node<@Nullable CommandArgument<C, ?>> root) {
 
         /* If the sender isn't allowed to access the root node, no suggestions are needed */
         if (this.isPermitted(commandContext.getSender(), root) != null) {
@@ -432,8 +430,7 @@ public final class CommandTree<C> {
         }
     }
 
-    @Nonnull
-    private String stringOrEmpty(@Nullable final String string) {
+    private @NonNull String stringOrEmpty(@Nullable final String string) {
         if (string == null) {
             return "";
         }
@@ -446,7 +443,7 @@ public final class CommandTree<C> {
      * @param command Command to insert
      */
     @SuppressWarnings("unchecked")
-    public void insertCommand(@Nonnull final Command<C> command) {
+    public void insertCommand(@NonNull final Command<C> command) {
         synchronized (this.commandLock) {
             Node<CommandArgument<C, ?>> node = this.internalTree;
             for (final CommandArgument<C, ?> argument : command.getArguments()) {
@@ -478,8 +475,8 @@ public final class CommandTree<C> {
         }
     }
 
-    @Nullable
-    private CommandPermission isPermitted(@Nonnull final C sender, @Nonnull final Node<CommandArgument<C, ?>> node) {
+    private @Nullable CommandPermission isPermitted(@NonNull final C sender,
+                                                    @NonNull final Node<@Nullable CommandArgument<C, ?>> node) {
         final CommandPermission permission = (CommandPermission) node.nodeMeta.get("permission");
         if (permission != null) {
             return this.commandManager.hasPermission(sender, permission) ? null : permission;
@@ -569,7 +566,7 @@ public final class CommandTree<C> {
         });
     }
 
-    private void checkAmbiguity(@Nonnull final Node<CommandArgument<C, ?>> node) throws AmbiguousNodeException {
+    private void checkAmbiguity(@NonNull final Node<@Nullable CommandArgument<C, ?>> node) throws AmbiguousNodeException {
         if (node.isLeaf()) {
             return;
         }
@@ -584,7 +581,8 @@ public final class CommandTree<C> {
         node.children.forEach(this::checkAmbiguity);
     }
 
-    private List<Node<CommandArgument<C, ?>>> getLeavesRaw(@Nonnull final Node<CommandArgument<C, ?>> node) {
+    private @NonNull List<@NonNull Node<@Nullable CommandArgument<C, ?>>>
+    getLeavesRaw(@NonNull final Node<@Nullable CommandArgument<C, ?>> node) {
         final List<Node<CommandArgument<C, ?>>> leaves = new LinkedList<>();
         if (node.isLeaf()) {
             if (node.getValue() != null) {
@@ -596,7 +594,7 @@ public final class CommandTree<C> {
         return leaves;
     }
 
-    private List<CommandArgument<C, ?>> getLeaves(@Nonnull final Node<CommandArgument<C, ?>> node) {
+    private @NonNull List<@NonNull CommandArgument<C, ?>> getLeaves(@NonNull final Node<@NonNull CommandArgument<C, ?>> node) {
         final List<CommandArgument<C, ?>> leaves = new LinkedList<>();
         if (node.isLeaf()) {
             if (node.getValue() != null) {
@@ -608,7 +606,8 @@ public final class CommandTree<C> {
         return leaves;
     }
 
-    private List<Node<CommandArgument<C, ?>>> getChain(@Nullable final Node<CommandArgument<C, ?>> end) {
+    private @NonNull List<@NonNull Node<@Nullable CommandArgument<C, ?>>>
+    getChain(@Nullable final Node<@Nullable CommandArgument<C, ?>> end) {
         final List<Node<CommandArgument<C, ?>>> chain = new LinkedList<>();
         Node<CommandArgument<C, ?>> tail = end;
         while (tail != null) {
@@ -619,8 +618,7 @@ public final class CommandTree<C> {
         return chain;
     }
 
-    @Nullable
-    private Command<C> cast(@Nullable final Command<C> command) {
+    private @Nullable Command<C> cast(@Nullable final Command<C> command) {
         return command;
     }
 
@@ -630,8 +628,7 @@ public final class CommandTree<C> {
      *
      * @return Root nodes
      */
-    @Nonnull
-    public Collection<Node<CommandArgument<C, ?>>> getRootNodes() {
+    public @NonNull Collection<@NonNull Node<@Nullable CommandArgument<C, ?>>> getRootNodes() {
         return this.internalTree.getChildren();
     }
 
@@ -641,8 +638,7 @@ public final class CommandTree<C> {
      * @param name Root node name
      * @return Root node, or {@code null}
      */
-    @Nullable
-    public Node<CommandArgument<C, ?>> getNamedNode(@Nullable final String name) {
+    public @Nullable Node<@Nullable CommandArgument<C, ?>> getNamedNode(@Nullable final String name) {
         for (final Node<CommandArgument<C, ?>> node : this.getRootNodes()) {
             if (node.getValue() != null && node.getValue() instanceof StaticArgument) {
                 @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) node.getValue();
@@ -661,8 +657,7 @@ public final class CommandTree<C> {
      *
      * @return Command manager
      */
-    @Nonnull
-    public CommandManager<C> getCommandManager() {
+    public @NonNull CommandManager<C> getCommandManager() {
         return this.commandManager;
     }
 
@@ -687,20 +682,17 @@ public final class CommandTree<C> {
          *
          * @return Children
          */
-        @Nonnull
-        public List<Node<T>> getChildren() {
+        public @NonNull List<@NonNull Node<@Nullable T>> getChildren() {
             return Collections.unmodifiableList(this.children);
         }
 
-        @Nonnull
-        private Node<T> addChild(@Nonnull final T child) {
+        private @NonNull Node<@Nullable T> addChild(@NonNull final T child) {
             final Node<T> node = new Node<>(child);
             this.children.add(node);
             return node;
         }
 
-        @Nullable
-        private Node<T> getChild(@Nonnull final T type) {
+        private @Nullable Node<@Nullable T> getChild(@NonNull final T type) {
             for (final Node<T> child : this.children) {
                 if (type.equals(child.getValue())) {
                     return child;
@@ -723,8 +715,7 @@ public final class CommandTree<C> {
          *
          * @return Node meta
          */
-        @Nonnull
-        public Map<String, Object> getNodeMeta() {
+        public @NonNull Map<@NonNull String, @NonNull Object> getNodeMeta() {
             return this.nodeMeta;
         }
 
@@ -733,8 +724,7 @@ public final class CommandTree<C> {
          *
          * @return Node value
          */
-        @Nullable
-        public T getValue() {
+        public @Nullable T getValue() {
             return this.value;
         }
 
@@ -760,8 +750,7 @@ public final class CommandTree<C> {
          *
          * @return Parent node
          */
-        @Nullable
-        public Node<T> getParent() {
+        public @Nullable Node<@Nullable T> getParent() {
             return this.parent;
         }
 
@@ -770,7 +759,7 @@ public final class CommandTree<C> {
          *
          * @param parent new parent node
          */
-        public void setParent(@Nullable final Node<T> parent) {
+        public void setParent(@Nullable final Node<@Nullable T> parent) {
             this.parent = parent;
         }
 

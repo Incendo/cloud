@@ -24,8 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link CommandArgument} description
@@ -39,7 +38,7 @@ public final class Description {
 
     private final String description;
 
-    private Description(@Nonnull final String description) {
+    private Description(@NonNull final String description) {
         this.description = description;
     }
 
@@ -48,8 +47,7 @@ public final class Description {
      *
      * @return Command description
      */
-    @Nonnull
-    public static Description empty() {
+    public static @NonNull Description empty() {
         return EMPTY;
     }
 
@@ -59,8 +57,7 @@ public final class Description {
      * @param string Command description
      * @return Created command description
      */
-    @Nonnull
-    public static Description of(@Nonnull final String string) {
+    public static @NonNull Description of(@NonNull final String string) {
         return new Description(string);
     }
 
@@ -69,8 +66,7 @@ public final class Description {
      *
      * @return Command description
      */
-    @Nonnull
-    public String getDescription() {
+    public @NonNull String getDescription() {
        return this.description;
     }
 
@@ -79,9 +75,8 @@ public final class Description {
      *
      * @return Command description
      */
-    @Nonnull
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return this.description;
     }
 
