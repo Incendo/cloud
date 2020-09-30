@@ -92,9 +92,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class),
                                                         params -> new MaterialArgument.MaterialParser<>());
         this.getParserRegistry()
-            .registerParserSupplier(TypeToken.of(Player.class), params -> new PlayerArgument.PlayerParser<>());
+            .registerParserSupplier(TypeToken.get(Player.class), params -> new PlayerArgument.PlayerParser<>());
         this.getParserRegistry()
-            .registerParserSupplier(TypeToken.of(OfflinePlayer.class),
+            .registerParserSupplier(TypeToken.get(OfflinePlayer.class),
                                     params -> new OfflinePlayerArgument.OfflinePlayerParser<>());
 
         /* Try to determine the Minecraft version */

@@ -24,8 +24,6 @@
 package cloud.commandframework.arguments.parser;
 
 import cloud.commandframework.arguments.standard.UUIDArgument;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.standard.BooleanArgument;
@@ -107,8 +105,8 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 StringArgument.StringMode.SINGLE, (context, s) ->
                 Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))));
         /* Add options to this */
-        this.registerParserSupplier(TypeToken.of(Boolean.class), options -> new BooleanArgument.BooleanParser<>(false));
-        this.registerParserSupplier(TypeToken.of(UUID.class), options -> new UUIDArgument.UUIDParser<>());
+        this.registerParserSupplier(TypeToken.get(Boolean.class), options -> new BooleanArgument.BooleanParser<>(false));
+        this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDArgument.UUIDParser<>());
     }
 
     @Override
