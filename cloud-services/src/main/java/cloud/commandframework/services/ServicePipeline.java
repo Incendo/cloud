@@ -23,10 +23,11 @@
 //
 package cloud.commandframework.services;
 
-import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.types.Service;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ import java.util.function.Predicate;
 public final class ServicePipeline {
 
     private final Object lock = new Object();
-    private final Map<TypeToken<? extends Service<?, ?>>, ServiceRepository<?, ?>> repositories;
+    private final Map<Type, ServiceRepository<?, ?>> repositories;
     private final Executor executor;
 
     ServicePipeline(@NonNull final Executor executor) {
@@ -74,13 +75,13 @@ public final class ServicePipeline {
             @NonNull final TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type,
             @NonNull final Service<@NonNull Context, @NonNull Result> defaultImplementation) {
         synchronized (this.lock) {
-            if (repositories.containsKey(type)) {
+            if (repositories.containsKey(type.getType())) {
                 throw new IllegalArgumentException(String
                         .format("Service of type '%s' has already been registered", type.toString()));
             }
             final ServiceRepository<Context, Result> repository = new ServiceRepository<>(type);
             repository.registerImplementation(defaultImplementation, Collections.emptyList());
-            this.repositories.put(type, repository);
+            this.repositories.put(type.getType(), repository);
             return this;
         }
     }
@@ -112,7 +113,7 @@ public final class ServicePipeline {
             for (final Map.Entry<? extends Service<?, ?>, TypeToken<? extends Service<?, ?>>> serviceEntry : services
                     .entrySet()) {
                 final TypeToken<? extends Service<?, ?>> type = serviceEntry.getValue();
-                final ServiceRepository<?, ?> repository = this.repositories.get(type);
+                final ServiceRepository<?, ?> repository = this.repositories.get(type.getType());
                 if (repository == null) {
                     throw new IllegalArgumentException(
                             String.format("No service registered for type '%s'", type.toString()));
@@ -186,7 +187,7 @@ public final class ServicePipeline {
     <Context, Result> ServiceRepository<Context, Result> getRepository(
             @NonNull final TypeToken<? extends Service<Context, Result>> type) {
         final ServiceRepository<Context, Result> repository =
-                (ServiceRepository<Context, Result>) this.repositories.get(type);
+                (ServiceRepository<Context, Result>) this.repositories.get(type.getType());
         if (repository == null) {
             throw new IllegalArgumentException(
                     String.format("No service registered for type '%s'", type.toString()));
@@ -200,7 +201,7 @@ public final class ServicePipeline {
      * @return Returns an Immutable collection of the service types registered.
      */
     @NonNull
-    public Collection<TypeToken<? extends Service<?, ?>>> getRecognizedTypes() {
+    public Collection<Type> getRecognizedTypes() {
         return Collections.unmodifiableCollection(this.repositories.keySet());
     }
 
