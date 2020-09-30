@@ -92,7 +92,7 @@ public final class BukkitTest extends JavaPlugin {
 
             final BukkitAudiences bukkitAudiences = BukkitAudiences.create(this);
             final MinecraftHelp<CommandSender> minecraftHelp = new MinecraftHelp<>("/cloud help",
-                                                                                   bukkitAudiences::audience,
+                                                                           sender -> bukkitAudiences.player((Player) sender),
                                                                                    mgr);
 
             try {
