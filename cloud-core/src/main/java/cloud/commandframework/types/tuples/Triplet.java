@@ -70,7 +70,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return First value
      */
-    public final @NonNull U getFirst() {
+    public final U getFirst() {
         return this.first;
     }
 
@@ -79,7 +79,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return Second value
      */
-    public final @NonNull V getSecond() {
+    public final V getSecond() {
         return this.second;
     }
 
@@ -88,7 +88,7 @@ public class Triplet<U, V, W> implements Tuple {
      *
      * @return Third value
      */
-    public final @NonNull W getThird() {
+    public final W getThird() {
         return this.third;
     }
 

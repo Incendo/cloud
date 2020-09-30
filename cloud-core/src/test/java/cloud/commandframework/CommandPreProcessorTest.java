@@ -32,8 +32,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nonnull;
-
 public class CommandPreProcessorTest {
 
     private static CommandManager<TestCommandSender> manager;
@@ -72,7 +70,7 @@ public class CommandPreProcessorTest {
     static final class SamplePreprocessor implements CommandPreprocessor<TestCommandSender> {
 
         @Override
-        public void accept(@Nonnull final CommandPreprocessingContext<TestCommandSender> context) {
+        public void accept(final CommandPreprocessingContext<TestCommandSender> context) {
             try {
                 final int num = Integer.parseInt(context.getInputQueue().removeFirst());
                 context.getCommandContext().store("int", num);

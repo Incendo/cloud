@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -134,7 +134,7 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          * @return Argument triplet
          */
         public @NonNull ArgumentTriplet<@NonNull C, @NonNull U, @NonNull V,
-                @NonNull W, Triplet<@NonNull U, @NonNull V, @NonNull W>> simple() {
+                @NonNull W, Triplet<U, V, W>> simple() {
             return new ArgumentTriplet<>(this.required,
                                          this.name,
                                          this.names,

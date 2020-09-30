@@ -119,7 +119,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, String> optional(@NonNull final String name,
-                                                                   @NonNull String defaultString) {
+                                                                   @NonNull final String defaultString) {
         return StringArgument.<C>newBuilder(name).asOptionalWithDefault(defaultString).build();
     }
 

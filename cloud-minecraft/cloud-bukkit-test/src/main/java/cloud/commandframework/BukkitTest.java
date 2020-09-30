@@ -49,7 +49,7 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -61,8 +61,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -152,8 +152,8 @@ public final class BukkitTest extends JavaPlugin {
                            })
                            .build())
                .command(mgr.commandBuilder("uuidtest")
-                            .handler(c -> c.getSender().sendMessage("Hey yo dum, provide a UUID idiot. Thx!"))
-                            .build())
+                           .handler(c -> c.getSender().sendMessage("Hey yo dum, provide a UUID idiot. Thx!"))
+                           .build())
                .command(mgr.commandBuilder("uuidtest")
                            .argument(UUID.class, "uuid", builder -> builder
                                    .asRequired()
@@ -200,8 +200,10 @@ public final class BukkitTest extends JavaPlugin {
                            .argument(StringArgument.required("string"))
                            .handler(c -> c.getSender().sendMessage("Executed the command"))
                            .build())
-               .command(mgr.commandBuilder("annotationass").handler(c -> c.getSender()
-                                                                   .sendMessage(ChatColor.YELLOW + "Du e en ananas!")).build())
+               .command(mgr.commandBuilder("annotationass")
+                           .handler(c -> c.getSender()
+                                          .sendMessage(ChatColor.YELLOW + "Du e en ananas!"))
+                           .build())
                .command(mgr.commandBuilder("cloud")
                            .literal("confirm")
                            .handler(confirmationManager.createConfirmationExecutionHandler()).build())
@@ -220,33 +222,33 @@ public final class BukkitTest extends JavaPlugin {
         }
     }
 
-private void registerTeleportCommand(@Nonnull final BukkitCommandManager<CommandSender> manager) {
-    manager.command(mgr.commandBuilder("teleport")
-                   .meta("description", "Takes in a location and teleports the player there")
-                   .withSenderType(Player.class)
-                   .argument(WorldArgument.required("world"), Description.of("World name"))
-                   .argumentTriplet("coords",
-                                    TypeToken.of(Vector.class),
-                                    Triplet.of("x", "y", "z"),
-                                    Triplet.of(Double.class, Double.class, Double.class),
-                                    triplet -> new Vector(triplet.getFirst(), triplet.getSecond(), triplet.getThird()),
-                                    Description.of("Coordinates"))
-                   .handler(context -> {
-                       context.getSender().sendMessage(ChatColor.GOLD + "Teleporting!");
-                       Bukkit.getScheduler().runTask(this, () -> {
-                           final World world = context.getRequired("world");
-                           final Vector vector = context.getRequired("coords");
-                           ((Player) context.getSender()).teleport(vector.toLocation(world));
-                       });
-                   })
-                   .build());
-}
+    private void registerTeleportCommand(@NonNull final BukkitCommandManager<CommandSender> manager) {
+        manager.command(mgr.commandBuilder("teleport")
+                           .meta("description", "Takes in a location and teleports the player there")
+                           .withSenderType(Player.class)
+                           .argument(WorldArgument.required("world"), Description.of("World name"))
+                           .argumentTriplet("coords",
+                                            TypeToken.get(Vector.class),
+                                            Triplet.of("x", "y", "z"),
+                                            Triplet.of(Double.class, Double.class, Double.class),
+                                            triplet -> new Vector(triplet.getFirst(), triplet.getSecond(), triplet.getThird()),
+                                            Description.of("Coordinates"))
+                           .handler(context -> {
+                               context.getSender().sendMessage(ChatColor.GOLD + "Teleporting!");
+                               Bukkit.getScheduler().runTask(this, () -> {
+                                   final World world = context.getRequired("world");
+                                   final Vector vector = context.getRequired("coords");
+                                   ((Player) context.getSender()).teleport(vector.toLocation(world));
+                               });
+                           })
+                           .build());
+    }
 
     @CommandDescription("Test cloud command using @CommandMethod")
     @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
-    private void annotatedCommand(@Nonnull final Player player,
+    private void annotatedCommand(@NonNull final Player player,
                                   @Argument(value = "input", description = "Some string") @Completions("one,two,duck")
-                                  @Nonnull final String input,
+                                  @NonNull final String input,
                                   @Argument(value = "number", defaultValue = "5", description = "A number")
                                   @Range(min = "10", max = "100") final int number) {
         player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
@@ -265,8 +267,7 @@ private void registerTeleportCommand(@Nonnull final BukkitCommandManager<Command
         Bukkit.broadcastMessage(ChatColor.GRAY + "Calling Thread: " + Thread.currentThread().getName());
     }
 
-    @Nonnull
-    private SimpleCommandMeta metaWithDescription(@Nonnull final String description) {
+    private @NonNull SimpleCommandMeta metaWithDescription(@NonNull final String description) {
         return BukkitCommandMetaBuilder.builder().withDescription(description).build();
     }
 

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,20 +29,27 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument that parses into a {@link Player}
+ *
+ * @param <C> Command sender type
+ */
 @SuppressWarnings("unused")
 public final class PlayerArgument<C> extends CommandArgument<C, Player> {
+
     private PlayerArgument(final boolean required,
-                           @Nonnull final String name,
-                           @Nonnull final String defaultValue,
-                           @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+                           @NonNull final String name,
+                           @NonNull final String defaultValue,
+                           @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                   @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new PlayerParser<>(), defaultValue, Player.class, suggestionsProvider);
     }
 
@@ -53,8 +60,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    @Nonnull
-    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new Builder<>(name);
     }
 
@@ -65,8 +71,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Player> required(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Player> required(@NonNull final String name) {
         return PlayerArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -77,29 +82,27 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Player> optional(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, Player> optional(@NonNull final String name) {
         return PlayerArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
      * Create a new required command component with a default value
      *
-     * @param name       Component name
-     * @param defaultNum Default num
-     * @param <C>        Command sender type
+     * @param name          Component name
+     * @param defaultPlayer Default player
+     * @param <C>           Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, Player> optional(@Nonnull final String name,
-                                                          final String defaultNum) {
-        return PlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+    public static <C> @NonNull CommandArgument<C, Player> optional(@NonNull final String name,
+                                                                   @NonNull final String defaultPlayer) {
+        return PlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultPlayer).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Player> {
 
-        protected Builder(@Nonnull final String name) {
+        protected Builder(@NonNull final String name) {
             super(Player.class, name);
         }
 
@@ -108,9 +111,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
          *
          * @return Constructed component
          */
-        @Nonnull
         @Override
-        public PlayerArgument<C> build() {
+        public @NonNull PlayerArgument<C> build() {
             return new PlayerArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
@@ -119,10 +121,9 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
     private static final class PlayerParser<C> implements ArgumentParser<C, Player> {
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<Player> parse(@Nonnull final CommandContext<C> commandContext,
-                                                 @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<Player> parse(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -139,10 +140,9 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
             return ArgumentParseResult.success(player);
         }
 
-        @Nonnull
         @Override
-        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
-                                        @Nonnull final String input) {
+        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final String input) {
             List<String> output = new ArrayList<>();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -166,7 +166,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
          *
          * @param input String input
          */
-        public PlayerParseException(@Nonnull final String input) {
+        public PlayerParseException(@NonNull final String input) {
             this.input = input;
         }
 
@@ -175,7 +175,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
          *
          * @return String value
          */
-        public String getInput() {
+        public @NonNull String getInput() {
             return input;
         }
 

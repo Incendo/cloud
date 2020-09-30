@@ -423,10 +423,9 @@ public class Command<C> {
          */
         public <U, V, O> @NonNull Builder<C> argumentPair(@NonNull final String name,
                                                           @NonNull final TypeToken<O> outputType,
-                                                          @NonNull final Pair<@NonNull String, @NonNull String> names,
-                                                          @NonNull final Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                                                          @NonNull final Function<Pair<@NonNull U, @NonNull V>,
-                                                                  @NonNull O> mapper,
+                                                          @NonNull final Pair<String, String> names,
+                                                          @NonNull final Pair<Class<U>, Class<V>> parserPair,
+                                                          @NonNull final Function<Pair<U, V>, O> mapper,
                                                           @NonNull final Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -455,10 +454,8 @@ public class Command<C> {
          * @return Builder instance with the argument inserted
          */
         public <U, V, W> @NonNull Builder<C> argumentTriplet(@NonNull final String name,
-                                                             @NonNull final Triplet<@NonNull String,
-                                                                     @NonNull String, @NonNull String> names,
-                                                             @NonNull final Triplet<@NonNull Class<U>,
-                                                                     @NonNull Class<V>, @NonNull Class<W>> parserTriplet,
+                                                             @NonNull final Triplet<String, String, String> names,
+                                                             @NonNull final Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                                                              @NonNull final Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -489,12 +486,10 @@ public class Command<C> {
          */
         public <U, V, W, O> @NonNull Builder<C> argumentTriplet(@NonNull final String name,
                                                                 @NonNull final TypeToken<O> outputType,
-                                                                @NonNull final Triplet<@NonNull String,
-                                                                        @NonNull String, @NonNull String> names,
-                                                                @NonNull final Triplet<@NonNull Class<U>,
-                                                                        @NonNull Class<V>, @NonNull Class<W>> parserTriplet,
-                                                                @NonNull final Function<@NonNull Triplet<@NonNull U,
-                                                                        @NonNull V, @NonNull W>, @NonNull O> mapper,
+                                                                @NonNull final Triplet<String, String, String> names,
+                                                                @NonNull final Triplet<Class<U>, Class<V>,
+                                                                        Class<W>> parserTriplet,
+                                                                @NonNull final Function<Triplet<U, V, W>, O> mapper,
                                                                 @NonNull final Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
