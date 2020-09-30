@@ -26,13 +26,17 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
+import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
+import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -87,6 +91,11 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), params -> new WorldArgument.WorldParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class),
                                                         params -> new MaterialArgument.MaterialParser<>());
+        this.getParserRegistry()
+            .registerParserSupplier(TypeToken.of(Player.class), params -> new PlayerArgument.PlayerParser<>());
+        this.getParserRegistry()
+            .registerParserSupplier(TypeToken.of(OfflinePlayer.class),
+                                    params -> new OfflinePlayerArgument.OfflinePlayerParser<>());
 
         /* Try to determine the Minecraft version */
         int version = -1;
