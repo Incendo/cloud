@@ -265,7 +265,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
     }
 
     @Override
-    public final int compareTo(@NonNull CommandArgument<?, ?> o) {
+    public final int compareTo(@NonNull final CommandArgument<?, ?> o) {
         if (this instanceof StaticArgument) {
             if (o instanceof StaticArgument) {
                 return (this.getName().compareTo(o.getName()));
@@ -474,7 +474,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
             return this.defaultValue;
         }
 
-        protected final @NonNull BiFunction<@NonNull CommandContext<C>,@NonNull  String, @NonNull List<String>>
+        protected final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>
         getSuggestionsProvider() {
             return this.suggestionsProvider;
         }

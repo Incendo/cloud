@@ -30,8 +30,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nonnull;
-
 class CommandPermissionTest {
 
     private final static CommandManager<TestCommandSender> manager = new PermissionOutputtingCommandManager();
@@ -59,12 +57,11 @@ class CommandPermissionTest {
         }
 
         @Override
-        public boolean hasPermission(@Nonnull final TestCommandSender sender,
-                                     @Nonnull final String permission) {
+        public boolean hasPermission(final TestCommandSender sender,
+                                     final String permission) {
             return acceptOne && permission.equalsIgnoreCase("test.permission.four");
         }
 
-        @Nonnull
         @Override
         public CommandMeta createDefaultCommandMeta() {
             return SimpleCommandMeta.empty();

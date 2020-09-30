@@ -30,8 +30,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 import org.bukkit.Bukkit;
-
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("ALL")
 class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
@@ -40,7 +39,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     private final CloudBrigadierManager brigadierManager;
     private final Commodore commodore;
 
-    CloudCommodoreManager(@Nonnull final BukkitCommandManager<C> commandManager)
+    CloudCommodoreManager(@NonNull final BukkitCommandManager<C> commandManager)
             throws BukkitCommandManager.BrigadierFailureException {
         if (!CommodoreProvider.isSupported()) {
             throw new BukkitCommandManager.BrigadierFailureException(BukkitCommandManager
@@ -53,9 +52,9 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     }
 
     @Override
-    protected void registerExternal(@Nonnull final String label,
-                                    @Nonnull final Command<?> command,
-                                    @Nonnull final BukkitCommand<C> bukkitCommand) {
+    protected void registerExternal(@NonNull final String label,
+                                    @NonNull final Command<?> command,
+                                    @NonNull final BukkitCommand<C> bukkitCommand) {
         final com.mojang.brigadier.Command<?> cmd = o -> 1;
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
                 .createLiteralCommandNode(label, command, (o, p) -> true, cmd);

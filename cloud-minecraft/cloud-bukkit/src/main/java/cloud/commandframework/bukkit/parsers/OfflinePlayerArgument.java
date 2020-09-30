@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,20 +30,30 @@ import cloud.commandframework.context.CommandContext;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument type that parses into {@link OfflinePlayer}. This is not thread safe. This
+ * may also result in a blocking request to get the UUID for the offline player.
+ * <p>
+ * Avoid using this type if possible.
+ *
+ * @param <C> Command sender type
+ */
 @SuppressWarnings("unused")
 public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePlayer> {
+
     private OfflinePlayerArgument(final boolean required,
-                                  @Nonnull final String name,
-                                  @Nonnull final String defaultValue,
-                                  @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+                                  @NonNull final String name,
+                                  @NonNull final String defaultValue,
+                                  @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                          @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new OfflinePlayerParser<>(), defaultValue, OfflinePlayer.class, suggestionsProvider);
     }
 
@@ -54,8 +64,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      * @param <C>  Command sender type
      * @return Created builder
      */
-    @Nonnull
-    public static <C> Builder<C> newBuilder(@Nonnull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new Builder<>(name);
     }
 
@@ -66,8 +75,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      * @param <C>  Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, OfflinePlayer> required(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, OfflinePlayer> required(@NonNull final String name) {
         return OfflinePlayerArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -78,29 +86,27 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      * @param <C>  Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, OfflinePlayer> optional(@Nonnull final String name) {
+    public static <C> @NonNull CommandArgument<C, OfflinePlayer> optional(@NonNull final String name) {
         return OfflinePlayerArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
      * Create a new required command component with a default value
      *
-     * @param name       Component name
-     * @param defaultNum Default num
-     * @param <C>        Command sender type
+     * @param name          Component name
+     * @param defaultPlayer Default player
+     * @param <C>           Command sender type
      * @return Created component
      */
-    @Nonnull
-    public static <C> CommandArgument<C, OfflinePlayer> optional(@Nonnull final String name,
-                                                                 final String defaultNum) {
-        return OfflinePlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+    public static <C> @NonNull CommandArgument<C, OfflinePlayer> optional(@NonNull final String name,
+                                                                          @NonNull final String defaultPlayer) {
+        return OfflinePlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultPlayer).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, OfflinePlayer> {
 
-        protected Builder(@Nonnull final String name) {
+        protected Builder(@NonNull final String name) {
             super(OfflinePlayer.class, name);
         }
 
@@ -109,9 +115,8 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
          *
          * @return Constructed component
          */
-        @Nonnull
         @Override
-        public OfflinePlayerArgument<C> build() {
+        public @NonNull OfflinePlayerArgument<C> build() {
             return new OfflinePlayerArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
                                                this.getSuggestionsProvider());
         }
@@ -121,10 +126,9 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
 
     private static final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePlayer> {
 
-        @Nonnull
         @Override
-        public ArgumentParseResult<OfflinePlayer> parse(@Nonnull final CommandContext<C> commandContext,
-                                                        @Nonnull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<OfflinePlayer> parse(@NonNull final CommandContext<C> commandContext,
+                                                        @NonNull final Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -141,10 +145,9 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
             return ArgumentParseResult.success(player);
         }
 
-        @Nonnull
         @Override
-        public List<String> suggestions(@Nonnull final CommandContext<C> commandContext,
-                                        @Nonnull final String input) {
+        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
+                                                          @NonNull final String input) {
             List<String> output = new ArrayList<>();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -168,7 +171,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
          *
          * @param input String input
          */
-        public OfflinePlayerParseException(@Nonnull final String input) {
+        public OfflinePlayerParseException(@NonNull final String input) {
             this.input = input;
         }
 
@@ -177,7 +180,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
          *
          * @return String value
          */
-        public String getInput() {
+        public @NonNull String getInput() {
             return input;
         }
 
