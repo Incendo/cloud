@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
+import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
@@ -377,6 +378,15 @@ public final class CommandTree<C> {
                 }
             }
             // END: Compound arguments
+
+            // START: Flags
+            if (child.getValue() instanceof FlagArgument) {
+                /* Remove all but last */
+                while (commandQueue.size() > 1) {
+                    commandContext.store(FlagArgument.FLAG_META, commandQueue.remove());
+                }
+            }
+            // END: Flags
 
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {

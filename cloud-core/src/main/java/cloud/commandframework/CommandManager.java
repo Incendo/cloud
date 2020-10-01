@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserRegistry;
@@ -351,6 +352,16 @@ public abstract class CommandManager<C> {
     public <T> CommandArgument.@NonNull Builder<C, T> argumentBuilder(@NonNull final Class<T> type,
                                                                       @NonNull final String name) {
         return CommandArgument.<C, T>ofType(type, name).manager(this);
+    }
+
+    /**
+     * Create a new command flag builder
+     *
+     * @param name Flag name
+     * @return Flag builder
+     */
+    public CommandFlag.@NonNull Builder<Void> flagBuilder(@NonNull final String name) {
+        return CommandFlag.<C>newBuilder(name);
     }
 
     /**

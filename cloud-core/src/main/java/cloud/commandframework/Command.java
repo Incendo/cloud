@@ -27,6 +27,8 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
+import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
@@ -39,6 +41,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -146,8 +149,13 @@ public class Command<C> {
                                                      @NonNull final String... aliases) {
         final Map<@NonNull CommandArgument<C, ?>, @NonNull Description> map = new LinkedHashMap<>();
         map.put(StaticArgument.of(commandName, aliases), description);
-        return new Builder<>(null, commandMeta, null, map,
-                             new CommandExecutionHandler.NullCommandExecutionHandler<>(), Permission.empty());
+        return new Builder<>(null,
+                             commandMeta,
+                             null,
+                             map,
+                             new CommandExecutionHandler.NullCommandExecutionHandler<>(),
+                             Permission.empty(),
+                             Collections.emptyList());
     }
 
     /**
@@ -165,8 +173,13 @@ public class Command<C> {
                                                      @NonNull final String... aliases) {
         final Map<CommandArgument<C, ?>, Description> map = new LinkedHashMap<>();
         map.put(StaticArgument.of(commandName, aliases), Description.empty());
-        return new Builder<>(null, commandMeta, null, map,
-                             new CommandExecutionHandler.NullCommandExecutionHandler<>(), Permission.empty());
+        return new Builder<>(null,
+                             commandMeta,
+                             null,
+                             map,
+                             new CommandExecutionHandler.NullCommandExecutionHandler<>(),
+                             Permission.empty(),
+                             Collections.emptyList());
     }
 
     /**
@@ -258,19 +271,22 @@ public class Command<C> {
         private final Class<? extends C> senderType;
         private final CommandPermission commandPermission;
         private final CommandManager<C> commandManager;
+        private final Collection<CommandFlag<?>> flags;
 
         private Builder(@Nullable final CommandManager<C> commandManager,
                         @NonNull final CommandMeta commandMeta,
                         @Nullable final Class<? extends C> senderType,
                         @NonNull final Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
                         @NonNull final CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-                        @NonNull final CommandPermission commandPermission) {
+                        @NonNull final CommandPermission commandPermission,
+                        @NonNull final Collection<CommandFlag<?>> flags) {
             this.commandManager = commandManager;
             this.senderType = senderType;
             this.commandArguments = Objects.requireNonNull(commandArguments, "Arguments may not be null");
             this.commandExecutionHandler = Objects.requireNonNull(commandExecutionHandler, "Execution handler may not be null");
             this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
             this.commandMeta = Objects.requireNonNull(commandMeta, "Meta may not be null");
+            this.flags = Objects.requireNonNull(flags, "Flags may not be null");
         }
 
         /**
@@ -282,8 +298,13 @@ public class Command<C> {
          */
         public @NonNull Builder<C> meta(@NonNull final String key, @NonNull final String value) {
             final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
-            return new Builder<>(this.commandManager, commandMeta, this.senderType, this.commandArguments,
-                                 this.commandExecutionHandler, this.commandPermission);
+            return new Builder<>(this.commandManager,
+                                 commandMeta,
+                                 this.senderType,
+                                 this.commandArguments,
+                                 this.commandExecutionHandler,
+                                 this.commandPermission,
+                                 this.flags);
         }
 
         /**
@@ -295,8 +316,13 @@ public class Command<C> {
          * @return New builder instance using the provided command manager
          */
         public @NonNull Builder<C> manager(@Nullable final CommandManager<C> commandManager) {
-            return new Builder<>(commandManager, this.commandMeta, this.senderType, this.commandArguments,
-                                 this.commandExecutionHandler, this.commandPermission);
+            return new Builder<>(commandManager,
+                                 this.commandMeta,
+                                 this.senderType,
+                                 this.commandArguments,
+                                 this.commandExecutionHandler,
+                                 this.commandPermission,
+                                 this.flags);
         }
 
         /**
@@ -348,8 +374,13 @@ public class Command<C> {
                                                 @NonNull final Description description) {
             final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
             commandArgumentMap.put(argument, description);
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandArgumentMap,
-                                 this.commandExecutionHandler, this.commandPermission);
+            return new Builder<>(this.commandManager,
+                                 this.commandMeta,
+                                 this.senderType,
+                                 commandArgumentMap,
+                                 this.commandExecutionHandler,
+                                 this.commandPermission,
+                                 this.flags);
         }
 
         /**
@@ -508,8 +539,13 @@ public class Command<C> {
          * @return New builder instance using the command execution handler
          */
         public @NonNull Builder<C> handler(@NonNull final CommandExecutionHandler<C> commandExecutionHandler) {
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandArguments,
-                                 commandExecutionHandler, this.commandPermission);
+            return new Builder<>(this.commandManager,
+                                 this.commandMeta,
+                                 this.senderType,
+                                 this.commandArguments,
+                                 commandExecutionHandler,
+                                 this.commandPermission,
+                                 this.flags);
         }
 
         /**
@@ -519,8 +555,13 @@ public class Command<C> {
          * @return New builder instance using the command execution handler
          */
         public @NonNull Builder<C> withSenderType(@NonNull final Class<? extends C> senderType) {
-            return new Builder<>(this.commandManager, this.commandMeta, senderType, this.commandArguments,
-                                 this.commandExecutionHandler, this.commandPermission);
+            return new Builder<>(this.commandManager,
+                                 this.commandMeta,
+                                 senderType,
+                                 this.commandArguments,
+                                 this.commandExecutionHandler,
+                                 this.commandPermission,
+                                 this.flags);
         }
 
         /**
@@ -530,8 +571,13 @@ public class Command<C> {
          * @return New builder instance using the command permission
          */
         public @NonNull Builder<C> withPermission(@NonNull final CommandPermission permission) {
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandArguments,
-                                 this.commandExecutionHandler, permission);
+            return new Builder<>(this.commandManager,
+                                 this.commandMeta,
+                                 this.senderType,
+                                 this.commandArguments,
+                                 this.commandExecutionHandler,
+                                 permission,
+                                 this.flags);
         }
 
         /**
@@ -541,8 +587,13 @@ public class Command<C> {
          * @return New builder instance using the command permission
          */
         public @NonNull Builder<C> withPermission(@NonNull final String permission) {
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, this.commandArguments,
-                                 this.commandExecutionHandler, Permission.of(permission));
+            return new Builder<>(this.commandManager,
+                                 this.commandMeta,
+                                 this.senderType,
+                                 this.commandArguments,
+                                 this.commandExecutionHandler,
+                                 Permission.of(permission),
+                                 this.flags);
         }
 
         /**
@@ -582,12 +633,37 @@ public class Command<C> {
         }
 
         /**
+         * Register a new command flag
+         *
+         * @param flag Flag
+         * @param <T>  Flag value type
+         * @return New builder instance that uses the provided flag
+         */
+        public @NonNull <T> Builder<C> flag(@NonNull final CommandFlag<T> flag) {
+            final List<CommandFlag<?>> flags = new ArrayList<>(this.flags);
+            flags.add(flag);
+            return new Builder<>(this.commandManager,
+                                 this.commandMeta,
+                                 this.senderType,
+                                 this.commandArguments,
+                                 this.commandExecutionHandler,
+                                 this.commandPermission,
+                                 Collections.unmodifiableList(flags));
+        }
+
+        /**
          * Build a command using the builder instance
          *
          * @return Built command
          */
         public @NonNull Command<C> build() {
-            return new Command<>(Collections.unmodifiableMap(this.commandArguments),
+            final LinkedHashMap<CommandArgument<C, ?>, Description> commandArguments = new LinkedHashMap<>(this.commandArguments);
+            /* Construct flag node */
+            if (!flags.isEmpty()) {
+                final FlagArgument<C> flagArgument = new FlagArgument<>(this.flags);
+                commandArguments.put(flagArgument, Description.of("Command flags"));
+            }
+            return new Command<>(Collections.unmodifiableMap(commandArguments),
                                  this.commandExecutionHandler,
                                  this.senderType,
                                  this.commandPermission,

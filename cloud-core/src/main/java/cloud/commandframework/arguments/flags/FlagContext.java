@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Flag value mappings
  */
-public class FlagContext {
+public final class FlagContext {
 
     /**
      * Dummy object stored as a flag value when the flag has no associated parser
