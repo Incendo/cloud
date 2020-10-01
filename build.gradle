@@ -25,7 +25,6 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'checkstyle'
     apply plugin: 'com.github.hierynomus.license'
-    apply plugin: 'com.bmuschko.nexus'
 
     group = 'cloud.commandframework'
     version = '0.3.0-SNAPSHOT'
@@ -39,12 +38,6 @@ allprojects {
         mapping 'java', 'DOUBLESLASH_STYLE'
         includes(["**/*.java"])
     }
-
-    nexus {
-        sign = false
-        repositoryUrl = 'https://mvn.intellectualsites.com/content/repositories/releases/'
-        snapshotRepositoryUrl = 'https://mvn.intellectualsites.com/content/repositories/snapshots/'
-    }
 }
 
 subprojects {
@@ -57,14 +50,9 @@ subprojects {
         useJUnitPlatform()
     }
 
-    task publishingSourcesJar(type: Jar) {
-        from sourceSets.main.allJava
-        archiveClassifier.set('sources')
-    }
-
-    task publishingJavadocJar(type: Jar) {
-        from javadoc
-        archiveClassifier.set('javadoc')
+    java {
+        withSourcesJar()
+        withJavadocJar()
     }
 
     repositories {
@@ -114,7 +102,7 @@ subprojects {
 
     dependencies {
         compileOnly 'org.checkerframework:checker-qual:3.5.0'
-        api 'io.leangen.geantyref:geantyref:0.3.4'
+        api 'io.leangen.geantyref:geantyref:1.3.11'
         testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     }
 
@@ -129,8 +117,8 @@ subprojects {
             maven(MavenPublication) {
                 from components.java
 
-                artifact publishingJavadocJar
-                artifact publishingSourcesJar
+                artifact javadocJar
+                artifact sourcesJar
 
                 pom {
                     name = project.name
