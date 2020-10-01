@@ -14,6 +14,7 @@ plugins {
     id 'com.github.hierynomus.license' version '0.15.0'
     id 'java-library'
     id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'maven-publish'
 }
 
 checkstyle {
@@ -28,6 +29,7 @@ allprojects {
 
     group = 'cloud.commandframework'
     version = '0.3.0-SNAPSHOT'
+    description = 'Command framework and dispatcher for the JVM'
 
     /* Disable checkstyle on tests */
     project.gradle.startParameter.excludedTaskNames.add('checkstyleTest')
@@ -49,9 +51,20 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
 
     test {
         useJUnitPlatform()
+    }
+
+    task publishingSourcesJar(type: Jar) {
+        from sourceSets.main.allJava
+        archiveClassifier.set('sources')
+    }
+
+    task publishingJavadocJar(type: Jar) {
+        from javadoc
+        archiveClassifier.set('javadoc')
     }
 
     repositories {
@@ -101,6 +114,7 @@ subprojects {
 
     dependencies {
         compileOnly 'org.checkerframework:checker-qual:3.5.0'
+        api 'io.leangen.geantyref:geantyref:0.3.4'
         testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     }
 
@@ -109,23 +123,54 @@ subprojects {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
-}
 
-task aggregatedJavadocs(type: Javadoc, description: "Generate javadocs from all child projects as if it was a single project", group: "Documentation") {
-    destinationDir = file("./docs/javadoc")
-    title = "$project.name $version API"
-    options.author true
-    options.links "http://docs.spring.io/spring/docs/4.3.x/javadoc-api/", "http://docs.oracle.com/javase/8/docs/api/", "http://docs.spring.io/spring-ws/docs/2.3.0.RELEASE/api/", "http://docs.spring.io/spring-security/site/docs/4.0.4.RELEASE/apidocs/"
-    options.addStringOption("Xdoclint:none", "-quiet")
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
 
-    delete("./docs")
+                artifact publishingJavadocJar
+                artifact publishingSourcesJar
 
-    subprojects.each { proj ->
-        proj.tasks.withType(Javadoc).each { javadocTask ->
-            source += javadocTask.source
-            classpath += javadocTask.classpath
-            excludes += javadocTask.excludes
-            includes += javadocTask.includes
+                pom {
+                    name = project.name
+                    url = 'https://github.com/Sauilitired/cloud'
+                    description = project.description
+
+                    developers {
+                        developer {
+                            id = 'Sauilitired'
+                            name = 'Alexander Söderberg'
+                            url = 'https://alexander-soderberg.com'
+                            email = 'contact@alexander-soderberg.com'
+                        }
+                    }
+
+                    issueManagement {
+                        system = 'GitHub Issues'
+                        url = 'https://github.com/Sauilitired/cloud/issues'
+                    }
+
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+
+                    scm {
+                        connection = 'scm:git@github.com:Sauilitired/cloud.git'
+                        developerConnection = 'scm:git@github.com:Sauilitired/cloud.git'
+                        url = 'https://github.com/Sauilitired/cloud/'
+                    }
+                }
+            }
         }
     }
+
+    signing {
+        required { project.hasProperty('signing.keyId') && gradle.taskGraph.hasTask(':publish') && !project.version.endsWith('-SNAPSHOT') }
+        sign publishing.publications.maven
+    }
 }
+
