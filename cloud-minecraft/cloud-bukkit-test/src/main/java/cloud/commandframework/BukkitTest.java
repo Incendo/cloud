@@ -134,11 +134,10 @@ public final class BukkitTest extends JavaPlugin {
                                                  suggestions.add("dog");
                                                  suggestions.add("cat");
                                                  return suggestions;
-                                             }).build())
+                                             }))
                            .handler(c -> ((Player) c.getSender())
                                    .setGameMode(c.<GameMode>getOptional("gamemode")
-                                                        .orElse(GameMode.SURVIVAL)))
-                           .build())
+                                                        .orElse(GameMode.SURVIVAL))))
                .command(mgr.commandBuilder("kenny", "k")
                            .literal("sux", "s")
                            .argument(IntegerArgument
@@ -149,11 +148,9 @@ public final class BukkitTest extends JavaPlugin {
                                        "Kenny sux %d%%",
                                        context.<Integer>getOptional("perc").orElse(PERC_MIN)
                                ));
-                           })
-                           .build())
+                           }))
                .command(mgr.commandBuilder("uuidtest")
-                           .handler(c -> c.getSender().sendMessage("Hey yo dum, provide a UUID idiot. Thx!"))
-                           .build())
+                           .handler(c -> c.getSender().sendMessage("Hey yo dum, provide a UUID idiot. Thx!")))
                .command(mgr.commandBuilder("uuidtest")
                            .argument(UUID.class, "uuid", builder -> builder
                                    .asRequired()
@@ -166,10 +163,9 @@ public final class BukkitTest extends JavaPlugin {
                                        } catch (final Exception e) {
                                            return ArgumentParseResult.failure(e);
                                        }
-                                   }).build())
+                                   }))
                            .handler(c -> c.getSender()
-                                          .sendMessage(String.format("UUID: %s\n", c.<UUID>getOptional("uuid").orElse(null))))
-                           .build())
+                                          .sendMessage(String.format("UUID: %s\n", c.<UUID>getOptional("uuid").orElse(null)))))
                .command(mgr.commandBuilder("give")
                            .withSenderType(Player.class)
                            .argument(EnumArgument.of(Material.class, "material"))
@@ -180,30 +176,25 @@ public final class BukkitTest extends JavaPlugin {
                                final ItemStack itemStack = new ItemStack(material, amount);
                                ((Player) c.getSender()).getInventory().addItem(itemStack);
                                c.getSender().sendMessage("You've been given stuff, bro.");
-                           })
-                           .build())
+                           }))
                .command(mgr.commandBuilder("worldtp", BukkitCommandMetaBuilder.builder()
-                                                                              .withDescription("Teleport to a world")
-                                                                              .build())
+                                                                              .withDescription("Teleport to a world"))
                            .argument(WorldArgument.of("world"))
                            .handler(c -> {
                                final World world = c.get("world");
                                ((Player) c.getSender()).teleport(world.getSpawnLocation());
                                c.getSender().sendMessage("Teleported.");
-                           })
-                           .build())
+                           }))
                .command(mgr.commandBuilder("brigadier")
                            .argument(FloatArgument.of("float"))
                            .argument(DoubleArgument.of("double"))
                            .argument(IntegerArgument.of("int"))
                            .argument(BooleanArgument.of("bool"))
                            .argument(StringArgument.of("string"))
-                           .handler(c -> c.getSender().sendMessage("Executed the command"))
-                           .build())
+                           .handler(c -> c.getSender().sendMessage("Executed the command")))
                .command(mgr.commandBuilder("annotationass")
                            .handler(c -> c.getSender()
-                                          .sendMessage(ChatColor.YELLOW + "Du e en ananas!"))
-                           .build())
+                                          .sendMessage(ChatColor.YELLOW + "Du e en ananas!")))
                .command(mgr.commandBuilder("cloud")
                            .literal("confirm")
                            .handler(confirmationManager.createConfirmationExecutionHandler()).build())
@@ -240,8 +231,7 @@ public final class BukkitTest extends JavaPlugin {
                                    final Vector vector = context.get("coords");
                                    ((Player) context.getSender()).teleport(vector.toLocation(world));
                                });
-                           })
-                           .build());
+                           }));
     }
 
     @CommandDescription("Test cloud command using @CommandMethod")

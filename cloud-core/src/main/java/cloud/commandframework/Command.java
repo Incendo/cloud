@@ -38,13 +38,7 @@ import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -328,6 +322,18 @@ public class Command<C> {
         /**
          * Add a new command argument with an empty description to the command
          *
+         * @param builder Argument to add. {@link CommandArgument.Builder#build()} will be invoked
+         *                and the result will be registered in the command.
+         * @param <T>     Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         */
+        public <T> @NonNull Builder<C> argument(final CommandArgument.@NonNull Builder<C, T> builder) {
+            return this.argument(builder.build(), Description.empty());
+        }
+
+        /**
+         * Add a new command argument with an empty description to the command
+         *
          * @param argument Argument to add
          * @param <T>      Argument type
          * @return New builder instance with the command argument inserted into the argument list
@@ -348,6 +354,23 @@ public class Command<C> {
                                                 @NonNull final Description description) {
             final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
             commandArgumentMap.put(argument, description);
+            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandArgumentMap,
+                                 this.commandExecutionHandler, this.commandPermission);
+        }
+
+        /**
+         * Add a new command argument to the command
+         *
+         * @param builder     Argument to add. {@link CommandArgument.Builder#build()} will be invoked
+         *                    and the result will be registered in the command.
+         * @param description Argument description
+         * @param <T>         Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         */
+        public <T> @NonNull Builder<C> argument(final CommandArgument.@NonNull Builder<C, T> builder,
+                                                @NonNull final Description description) {
+            final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
+            commandArgumentMap.put(builder.build(), description);
             return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandArgumentMap,
                                  this.commandExecutionHandler, this.commandPermission);
         }

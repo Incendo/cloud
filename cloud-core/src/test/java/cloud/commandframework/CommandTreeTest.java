@@ -77,12 +77,10 @@ class CommandTreeTest {
         manager.command(manager.commandBuilder("command")
                                .withPermission("command.inner")
                                .literal("inner")
-                               .handler(c -> System.out.println("Using inner command"))
-                               .build());
+                               .handler(c -> System.out.println("Using inner command")));
         manager.command(manager.commandBuilder("command")
                                .withPermission("command.outer")
-                               .handler(c -> System.out.println("Using outer command"))
-                               .build());
+                               .handler(c -> System.out.println("Using outer command")));
 
         /* Build command for testing compound types */
         manager.command(manager.commandBuilder("pos")
@@ -92,8 +90,7 @@ class CommandTreeTest {
                                .handler(c -> {
                                    final Pair<Integer, Integer> pair = c.get("pos");
                                    System.out.printf("X: %d | Y: %d\n", pair.getFirst(), pair.getSecond());
-                               })
-                               .build());
+                               }));
         manager.command(manager.commandBuilder("vec")
                                .argument(ArgumentPair.of(manager, "vec", Pair.of("x", "y"),
                                                                Pair.of(Double.class, Double.class))
@@ -103,8 +100,7 @@ class CommandTreeTest {
                                .handler(c -> {
                                    final Vector2 vector2 = c.get("vec");
                                    System.out.printf("X: %f | Y: %f\n", vector2.getX(), vector2.getY());
-                               })
-                               .build());
+                               }));
     }
 
     @Test
@@ -153,12 +149,11 @@ class CommandTreeTest {
     void testDefaultParser() {
         manager.command(
                 manager.commandBuilder("default")
-                       .argument(manager.argumentBuilder(Integer.class, "int").build())
+                       .argument(manager.argumentBuilder(Integer.class, "int"))
                        .handler(context -> {
                            final int number = context.get("int");
                            System.out.printf("Supplied number is: %d\n", number);
                        })
-                       .build()
         );
         manager.executeCommand(new TestCommandSender(), "default 5").join();
     }
