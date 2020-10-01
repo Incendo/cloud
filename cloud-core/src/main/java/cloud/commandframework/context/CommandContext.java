@@ -24,6 +24,7 @@
 package cloud.commandframework.context;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.flags.FlagContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
@@ -39,6 +40,7 @@ import java.util.Optional;
 public final class CommandContext<C> {
 
     private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = new HashMap<>();
+    private final FlagContext flagContext = FlagContext.create();
     private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;
     private final boolean suggestions;
@@ -162,6 +164,15 @@ public final class CommandContext<C> {
      */
     public @NonNull Map<CommandArgument<@NonNull C, @NonNull ?>, ArgumentTiming> getArgumentTimings() {
         return Collections.unmodifiableMap(this.argumentTimings);
+    }
+
+    /**
+     * Get the associated {@link FlagContext} instance
+     *
+     * @return Flag context
+     */
+    public @NonNull FlagContext flags() {
+        return this.flagContext;
     }
 
 

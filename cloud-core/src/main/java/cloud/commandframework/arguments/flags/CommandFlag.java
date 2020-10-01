@@ -1,0 +1,175 @@
+//
+// MIT License
+//
+// Copyright (c) 2020 Alexander Söderberg & Contributors
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+package cloud.commandframework.arguments.flags;
+
+import cloud.commandframework.Description;
+import cloud.commandframework.arguments.CommandArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+/**
+ * A flag is an optional command argument that may have an associated parser,
+ * and is identified by its name. Essentially, it's a mixture of a command literal
+ * and an optional variable command argument.
+ *
+ * @param <T> Command argument type. {@link Void} is used when no argument is present.
+ */
+@SuppressWarnings("unused")
+public final class CommandFlag<T> {
+
+    private final @NonNull String name;
+    private final @NonNull String @NonNull [] aliases;
+    private final @NonNull Description description;
+
+    private final @Nullable CommandArgument<?, T> commandArgument;
+
+    private CommandFlag(@NonNull final String name,
+                        @NonNull final String @NonNull [] aliases,
+                        @NonNull final Description description,
+                        @Nullable final CommandArgument<?, T> commandArgument) {
+        this.name = name;
+        this.aliases = aliases;
+        this.description = description;
+        this.commandArgument = commandArgument;
+    }
+
+    /**
+     * Create a new flag builder
+     *
+     * @param name Flag name
+     * @return Flag builder
+     */
+    public static @NonNull Builder<Void> newBuilder(@NonNull final String name) {
+        return new Builder<>(name);
+    }
+
+    /**
+     * Get the flag name
+     *
+     * @return Flag name
+     */
+    public @NonNull String getName() {
+        return this.name;
+    }
+
+    /**
+     * Get all flag aliases. This does not include the flag name
+     *
+     * @return Flag aliases
+     */
+    public @NonNull Collection<@NonNull String> getAliases() {
+        return Arrays.asList(this.aliases);
+    }
+
+    /**
+     * Get the flag description
+     * <p>
+     * Flag description
+     */
+    public @NonNull Description getDescription() {
+        return this.description;
+    }
+
+    /**
+     * Get the command argument, if it exists
+     *
+     * @return Command argument, or {@code null}
+     */
+    public @Nullable CommandArgument<?, T> getCommandArgument() {
+        return this.commandArgument;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("--%s", this.name);
+    }
+
+
+    public static final class Builder<T> {
+
+        private final String name;
+        private final String[] aliases;
+        private final Description description;
+        private final CommandArgument<?, T> commandArgument;
+
+        private Builder(@NonNull final String name,
+                        @NonNull final String[] aliases,
+                        @NonNull final Description description,
+                        @Nullable final CommandArgument<?, T> commandArgument) {
+            this.name = name;
+            this.aliases = aliases;
+            this.description = description;
+            this.commandArgument = commandArgument;
+        }
+
+        private Builder(@NonNull final String name) {
+            this(name, new String[0], Description.empty(), null);
+        }
+
+        /**
+         * Create a new builder instance using the given flag aliases
+         *
+         * @param aliases Flag aliases
+         * @return New builder instance
+         */
+        public Builder<T> withAliases(@NonNull final String... aliases) {
+            return new Builder<>(this.name, aliases, this.description, this.commandArgument);
+        }
+
+        /**
+         * Create a new builder instance using the given flag description
+         *
+         * @param description Flag description
+         * @return New builder instance
+         */
+        public Builder<T> withDescription(@NonNull final Description description) {
+            return new Builder<>(this.name, this.aliases, description, this.commandArgument);
+        }
+
+        /**
+         * Create a new builder instance using the given command argument
+         *
+         * @param argument Command argument
+         * @param <N>      New argument type
+         * @return New builder instance
+         */
+        public <N> Builder<N> withArgument(@NonNull final CommandArgument<?, N> argument) {
+            return new Builder<>(this.name, this.aliases, this.description, argument);
+        }
+
+        /**
+         * Build a new command flag instance
+         *
+         * @return Constructed instance
+         */
+        public @NonNull CommandFlag<T> build() {
+            return new CommandFlag<>(this.name, this.aliases, this.description, this.commandArgument);
+        }
+
+    }
+
+}
