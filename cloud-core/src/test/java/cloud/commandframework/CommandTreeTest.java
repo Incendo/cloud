@@ -90,7 +90,7 @@ class CommandTreeTest {
                                                                Pair.of(Integer.class, Integer.class))
                                                      .simple())
                                .handler(c -> {
-                                   final Pair<Integer, Integer> pair = c.getRequired("pos");
+                                   final Pair<Integer, Integer> pair = c.get("pos");
                                    System.out.printf("X: %d | Y: %d\n", pair.getFirst(), pair.getSecond());
                                })
                                .build());
@@ -101,7 +101,7 @@ class CommandTreeTest {
                                                                  pair -> new Vector2(pair.getFirst(), pair.getSecond()))
                                )
                                .handler(c -> {
-                                   final Vector2 vector2 = c.getRequired("vec");
+                                   final Vector2 vector2 = c.get("vec");
                                    System.out.printf("X: %f | Y: %f\n", vector2.getX(), vector2.getY());
                                })
                                .build());
@@ -155,7 +155,7 @@ class CommandTreeTest {
                 manager.commandBuilder("default")
                        .argument(manager.argumentBuilder(Integer.class, "int").build())
                        .handler(context -> {
-                           final int number = context.getRequired("int");
+                           final int number = context.get("int");
                            System.out.printf("Supplied number is: %d\n", number);
                        })
                        .build()

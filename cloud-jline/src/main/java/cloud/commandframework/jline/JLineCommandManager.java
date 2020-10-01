@@ -95,7 +95,7 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
                                                                           return ArgumentParseResult.success(
                                                                                   stringBuilder.toString());
                                                                       })).build())
-                                                       .handler(commandContext -> commandContext.get("string")
+                                                       .handler(commandContext -> commandContext.getOptional("string")
                                                                                                 .ifPresent(
                                                                                                         System.out::println))
                                                        .build())

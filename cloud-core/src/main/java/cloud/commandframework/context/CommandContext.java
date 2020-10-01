@@ -83,7 +83,8 @@ public final class CommandContext<C> {
     }
 
     /**
-     * Store a value in the context map
+     * Store a value in the context map. This will overwrite any existing
+     * value stored with the same key
      *
      * @param key   Key
      * @param value Value
@@ -94,13 +95,14 @@ public final class CommandContext<C> {
     }
 
     /**
-     * Get a value from its key
+     * Get a value from its key. Will return {@link Optional#empty()}
+     * if no value is stored with the given key
      *
      * @param key Key
      * @param <T> Value type
      * @return Value
      */
-    public <T> @NonNull Optional<T> get(@NonNull final String key) {
+    public <T> @NonNull Optional<T> getOptional(@NonNull final String key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
             @SuppressWarnings("ALL") final T castedValue = (T) value;
@@ -111,7 +113,8 @@ public final class CommandContext<C> {
     }
 
     /**
-     * Get a required argument from the context
+     * Get a required argument from the context. This will thrown an exception
+     * if there's no value associated with the given key
      *
      * @param key Argument key
      * @param <T> Argument type
@@ -119,7 +122,7 @@ public final class CommandContext<C> {
      * @throws NullPointerException If no such argument is stored
      */
     @SuppressWarnings("unchecked")
-    public <T> @NonNull T getRequired(@NonNull final String key) {
+    public <T> @NonNull T get(@NonNull final String key) {
         final Object value = this.internalStorage.get(key);
         if (value == null) {
             throw new NullPointerException("No such object stored in the context: " + key);
@@ -137,7 +140,7 @@ public final class CommandContext<C> {
      */
     public <T> @NonNull T getOrDefault(@NonNull final String key,
                                        @NonNull final T defaultValue) {
-        return this.<T>get(key).orElse(defaultValue);
+        return this.<T>getOptional(key).orElse(defaultValue);
     }
 
     /**

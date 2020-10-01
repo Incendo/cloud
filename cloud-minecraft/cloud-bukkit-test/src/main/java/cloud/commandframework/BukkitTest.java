@@ -136,7 +136,7 @@ public final class BukkitTest extends JavaPlugin {
                                                  return suggestions;
                                              }).build())
                            .handler(c -> ((Player) c.getSender())
-                                   .setGameMode(c.<GameMode>get("gamemode")
+                                   .setGameMode(c.<GameMode>getOptional("gamemode")
                                                         .orElse(GameMode.SURVIVAL)))
                            .build())
                .command(mgr.commandBuilder("kenny", "k")
@@ -147,7 +147,7 @@ public final class BukkitTest extends JavaPlugin {
                            .handler(context -> {
                                context.getSender().sendMessage(String.format(
                                        "Kenny sux %d%%",
-                                       context.<Integer>get("perc").orElse(PERC_MIN)
+                                       context.<Integer>getOptional("perc").orElse(PERC_MIN)
                                ));
                            })
                            .build())
@@ -168,15 +168,15 @@ public final class BukkitTest extends JavaPlugin {
                                        }
                                    }).build())
                            .handler(c -> c.getSender()
-                                          .sendMessage(String.format("UUID: %s\n", c.<UUID>get("uuid").orElse(null))))
+                                          .sendMessage(String.format("UUID: %s\n", c.<UUID>getOptional("uuid").orElse(null))))
                            .build())
                .command(mgr.commandBuilder("give")
                            .withSenderType(Player.class)
                            .argument(EnumArgument.of(Material.class, "material"))
                            .argument(IntegerArgument.of("amount"))
                            .handler(c -> {
-                               final Material material = c.getRequired("material");
-                               final int amount = c.getRequired("amount");
+                               final Material material = c.get("material");
+                               final int amount = c.get("amount");
                                final ItemStack itemStack = new ItemStack(material, amount);
                                ((Player) c.getSender()).getInventory().addItem(itemStack);
                                c.getSender().sendMessage("You've been given stuff, bro.");
@@ -187,7 +187,7 @@ public final class BukkitTest extends JavaPlugin {
                                                                               .build())
                            .argument(WorldArgument.of("world"))
                            .handler(c -> {
-                               final World world = c.getRequired("world");
+                               final World world = c.get("world");
                                ((Player) c.getSender()).teleport(world.getSpawnLocation());
                                c.getSender().sendMessage("Teleported.");
                            })
@@ -213,7 +213,7 @@ public final class BukkitTest extends JavaPlugin {
                            .argument(StringArgument.<CommandSender>newBuilder("query").greedy()
                                                                                       .asOptionalWithDefault("")
                                                                                       .build(), Description.of("Help Query"))
-                           .handler(c -> minecraftHelp.queryCommands(c.<String>get("query").orElse(""),
+                           .handler(c -> minecraftHelp.queryCommands(c.<String>getOptional("query").orElse(""),
                                                                      c.getSender())).build());
             this.registerTeleportCommand(mgr);
             mgr.registerExceptionHandler(InvalidSyntaxException.class, (c, e) -> e.printStackTrace());
@@ -236,8 +236,8 @@ public final class BukkitTest extends JavaPlugin {
                            .handler(context -> {
                                context.getSender().sendMessage(ChatColor.GOLD + "Teleporting!");
                                Bukkit.getScheduler().runTask(this, () -> {
-                                   final World world = context.getRequired("world");
-                                   final Vector vector = context.getRequired("coords");
+                                   final World world = context.get("world");
+                                   final Vector vector = context.get("coords");
                                    ((Player) context.getSender()).teleport(vector.toLocation(world));
                                });
                            })

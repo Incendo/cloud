@@ -62,9 +62,9 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
                 final Argument argument = parameter.getAnnotation(Argument.class);
                 final CommandArgument<C, ?> commandArgument = this.commandArguments.get(argument.value());
                 if (commandArgument.isRequired()) {
-                    arguments.add(commandContext.getRequired(argument.value()));
+                    arguments.add(commandContext.get(argument.value()));
                 } else {
-                    final Object optional = commandContext.get(argument.value()).orElse(null);
+                    final Object optional = commandContext.getOptional(argument.value()).orElse(null);
                     arguments.add(optional);
                 }
             } else {

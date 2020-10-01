@@ -42,8 +42,8 @@ class StringArgumentTest {
                                .argument(StringArgument.of("message1", StringArgument.StringMode.QUOTED))
                                .argument(StringArgument.of("message2"))
                                .handler(c -> {
-                                    final String message1 = c.getRequired("message1");
-                                    final String message2 = c.getRequired("message2");
+                                    final String message1 = c.get("message1");
+                                    final String message2 = c.get("message2");
                                     storage[0] = message1;
                                     storage[1] = message2;
                                })
@@ -51,14 +51,14 @@ class StringArgumentTest {
         manager.command(manager.commandBuilder("single")
                                .argument(StringArgument.of("message"))
                                .handler(c -> {
-                                    final String message = c.getRequired("message");
+                                    final String message = c.get("message");
                                     storage[0] = message;
                                })
                                .build());
         manager.command(manager.commandBuilder("greedy")
                                .argument(StringArgument.of("message", StringArgument.StringMode.GREEDY))
                                .handler(c -> {
-                                   final String message = c.getRequired("message");
+                                   final String message = c.get("message");
                                    storage[0] = message;
                                })
                                .build());

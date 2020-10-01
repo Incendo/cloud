@@ -411,7 +411,7 @@ public abstract class CommandManager<C> {
                             .through(new TypeToken<CommandPreprocessor<C>>() {
                             })
                             .getResult();
-        return context.<String>get(AcceptingCommandPreprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
+        return context.<String>getOptional(AcceptingCommandPreprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
                ? State.REJECTED
                : State.ACCEPTED;
     }
@@ -430,7 +430,7 @@ public abstract class CommandManager<C> {
                             .through(new TypeToken<CommandPostprocessor<C>>() {
                             })
                             .getResult();
-        return context.<String>get(AcceptingCommandPostprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
+        return context.<String>getOptional(AcceptingCommandPostprocessor.PROCESSED_INDICATOR_KEY).orElse("").isEmpty()
                ? State.REJECTED
                : State.ACCEPTED;
     }
