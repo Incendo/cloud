@@ -183,6 +183,16 @@ public abstract class CommandManager<C> {
     }
 
     /**
+     * Register a new command
+     *
+     * @param command Command to register. {@link Command.Builder#build()}} will be invoked.
+     * @return The command manager instance
+     */
+    public @NonNull CommandManager<C> command(final Command.@NonNull Builder<C> command) {
+        return this.command(command.manager(this).build());
+    }
+
+    /**
      * Get the command syntax formatter
      *
      * @return Command syntax formatter

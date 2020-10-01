@@ -24,11 +24,10 @@ mgr.command(mgr.commandBuilder("give")
                    final ItemStack itemStack = new ItemStack(material, amount);
                    ((Player) c.getSender()).getInventory().addItem(itemStack);
                    c.getSender().sendMessage("You've been given stuff, bro.");
-               })
-               .build())
+               }));
 ```
 
-or using annoted methods, like this:
+or using annotated methods, like this:
 ```java
 @Description("Test cloud command using @CommandMethod")
 @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
