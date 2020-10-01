@@ -68,6 +68,15 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("com2")
                                .argumentPair("com", Pair.of("x", "enum"),
                                              Pair.of(Integer.class, TestEnum.class), Description.empty()));
+
+        manager.command(manager.commandBuilder("flags")
+                               .argument(IntegerArgument.of("num"))
+                               .flag(manager.flagBuilder("enum")
+                                            .withArgument(EnumArgument.of(TestEnum.class, "enum"))
+                                            .build())
+                               .flag(manager.flagBuilder("static")
+                                            .build())
+                               .build());
     }
 
     @Test
@@ -141,6 +150,20 @@ public class CommandSuggestionsTest {
         final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
         Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions4);
     }
+
+    @Test
+    void testFlags() {
+        final String input = "flags 10 ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("--enum", "--static"), suggestions);
+        final String input2 = "flags 10 --enum ";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions2);
+        final String input3 = "flags 10 --enum foo ";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Arrays.asList("--enum", "--static"), suggestions3);
+    }
+
 
     public enum TestEnum {
         FOO,

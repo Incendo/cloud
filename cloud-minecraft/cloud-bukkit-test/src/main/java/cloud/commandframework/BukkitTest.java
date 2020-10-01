@@ -59,6 +59,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -168,12 +169,21 @@ public final class BukkitTest extends JavaPlugin {
                                           .sendMessage(String.format("UUID: %s\n", c.<UUID>getOptional("uuid").orElse(null)))))
                .command(mgr.commandBuilder("give")
                            .withSenderType(Player.class)
+                           .flag(mgr.flagBuilder("color")
+                                    .withArgument(EnumArgument.of(ChatColor.class, "color"))
+                                    .build())
                            .argument(EnumArgument.of(Material.class, "material"))
                            .argument(IntegerArgument.of("amount"))
                            .handler(c -> {
                                final Material material = c.get("material");
                                final int amount = c.get("amount");
                                final ItemStack itemStack = new ItemStack(material, amount);
+
+                               final ChatColor color = c.flags().getValue("color", ChatColor.GOLD);
+                               final ItemMeta itemMeta = itemStack.getItemMeta();
+                               itemMeta.setDisplayName(color + String.format("%s's item", c.getSender().getName()));
+                               itemStack.setItemMeta(itemMeta);
+
                                ((Player) c.getSender()).getInventory().addItem(itemStack);
                                c.getSender().sendMessage("You've been given stuff, bro.");
                            }))

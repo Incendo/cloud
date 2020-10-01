@@ -30,6 +30,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * A flag is an optional command argument that may have an associated parser,
@@ -88,7 +89,7 @@ public final class CommandFlag<T> {
     /**
      * Get the flag description
      * <p>
-     * Flag description
+     * @return Flag description
      */
     public @NonNull Description getDescription() {
         return this.description;
@@ -106,6 +107,23 @@ public final class CommandFlag<T> {
     @Override
     public String toString() {
         return String.format("--%s", this.name);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final CommandFlag<?> that = (CommandFlag<?>) o;
+        return getName().equals(that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName());
     }
 
 

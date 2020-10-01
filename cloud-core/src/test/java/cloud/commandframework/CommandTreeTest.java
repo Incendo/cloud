@@ -101,6 +101,21 @@ class CommandTreeTest {
                                    final Vector2 vector2 = c.get("vec");
                                    System.out.printf("X: %f | Y: %f\n", vector2.getX(), vector2.getY());
                                }));
+
+        /* Build command for testing flags */
+        manager.command(manager.commandBuilder("flags")
+                               .flag(manager.flagBuilder("test")
+                                            .withAliases("t")
+                                            .build())
+                               .flag(manager.flagBuilder("test2")
+                                            .build())
+                               .flag(manager.flagBuilder("num")
+                                            .withArgument(IntegerArgument.of("num")).build())
+                               .handler(c -> {
+                                   System.out.println("Flag present? " + c.flags().isPresent("test"));
+                                   System.out.println("Numerical flag: " + c.flags().getValue("num", -10));
+                               })
+                       .build());
     }
 
     @Test
@@ -182,6 +197,20 @@ class CommandTreeTest {
         manager.executeCommand(new TestCommandSender(), "vec 1 1").join();
     }
 
+    @Test
+    void testFlags() {
+        manager.executeCommand(new TestCommandSender(), "flags").join();
+        manager.executeCommand(new TestCommandSender(), "flags --test").join();
+        manager.executeCommand(new TestCommandSender(), "flags -t").join();
+        Assertions.assertThrows(CompletionException.class, () ->
+                manager.executeCommand(new TestCommandSender(), "flags --test --nonexistant").join());
+        Assertions.assertThrows(CompletionException.class, () ->
+                manager.executeCommand(new TestCommandSender(), "flags --test --duplicate").join());
+        manager.executeCommand(new TestCommandSender(), "flags --test --test2").join();
+        Assertions.assertThrows(CompletionException.class, () ->
+                manager.executeCommand(new TestCommandSender(), "flags --test test2").join());
+        manager.executeCommand(new TestCommandSender(), "flags --num 500");
+    }
 
     public static final class SpecificCommandSender extends TestCommandSender {
     }

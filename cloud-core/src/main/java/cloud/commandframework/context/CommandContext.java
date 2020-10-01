@@ -26,6 +26,7 @@ package cloud.commandframework.context;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -115,6 +116,15 @@ public final class CommandContext<C> {
     }
 
     /**
+     * Remove a stored value from the context
+     *
+     * @param key Key to remove
+     */
+    public void remove(@NonNull final String key) {
+        this.internalStorage.remove(key);
+    }
+
+    /**
      * Get a required argument from the context. This will thrown an exception
      * if there's no value associated with the given key
      *
@@ -140,8 +150,8 @@ public final class CommandContext<C> {
      * @param <T>          Argument type
      * @return Argument, or supplied default value
      */
-    public <T> @NonNull T getOrDefault(@NonNull final String key,
-                                       @NonNull final T defaultValue) {
+    public <T> @Nullable T getOrDefault(@NonNull final String key,
+                                        @Nullable final T defaultValue) {
         return this.<T>getOptional(key).orElse(defaultValue);
     }
 
