@@ -70,7 +70,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Material> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Material> of(@NonNull final String name) {
         return MaterialArgument.<C>newBuilder(name).asRequired().build();
     }
 

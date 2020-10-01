@@ -82,10 +82,10 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
      * @return Intermediary builder
      */
     public static <C, U, V, W> @NonNull ArgumentTripletIntermediaryBuilder<@NonNull C, @NonNull U, @NonNull V, @NonNull W>
-    required(@NonNull final CommandManager<C> manager,
-             @NonNull final String name,
-             @NonNull final Triplet<@NonNull String, @NonNull String, @NonNull String> names,
-             @NonNull final Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types) {
+    of(@NonNull final CommandManager<C> manager,
+       @NonNull final String name,
+       @NonNull final Triplet<@NonNull String, @NonNull String, @NonNull String> names,
+       @NonNull final Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types) {
         final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(TypeToken.get(types.getFirst()),
                          ParserParameters.empty()).orElseThrow(() ->

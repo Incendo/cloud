@@ -71,7 +71,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Long> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Long> of(@NonNull final String name) {
         return LongArgument.<C>newBuilder(name).asRequired().build();
     }
 

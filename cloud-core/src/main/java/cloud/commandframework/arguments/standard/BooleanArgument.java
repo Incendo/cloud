@@ -67,7 +67,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Boolean> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Boolean> of(@NonNull final String name) {
         return BooleanArgument.<C>newBuilder(name).asRequired().build();
     }
 

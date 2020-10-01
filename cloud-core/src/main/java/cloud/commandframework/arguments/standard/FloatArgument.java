@@ -71,7 +71,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Float> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Float> of(@NonNull final String name) {
         return FloatArgument.<C>newBuilder(name).asRequired().build();
     }
 

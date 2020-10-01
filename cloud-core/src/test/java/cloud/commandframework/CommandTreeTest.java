@@ -65,8 +65,8 @@ class CommandTreeTest {
         /* Build command to test command proxying */
         final Command<TestCommandSender> toProxy = manager.commandBuilder("test")
                                                           .literal("unproxied")
-                                                          .argument(StringArgument.required("string"))
-                                                          .argument(IntegerArgument.required("int"))
+                                                          .argument(StringArgument.of("string"))
+                                                          .argument(IntegerArgument.of("int"))
                                                           .literal("anotherliteral")
                                                           .handler(c -> {})
                                                           .build();
@@ -86,7 +86,7 @@ class CommandTreeTest {
 
         /* Build command for testing compound types */
         manager.command(manager.commandBuilder("pos")
-                               .argument(ArgumentPair.required(manager, "pos", Pair.of("x", "y"),
+                               .argument(ArgumentPair.of(manager, "pos", Pair.of("x", "y"),
                                                                Pair.of(Integer.class, Integer.class))
                                                      .simple())
                                .handler(c -> {
@@ -95,7 +95,7 @@ class CommandTreeTest {
                                })
                                .build());
         manager.command(manager.commandBuilder("vec")
-                               .argument(ArgumentPair.required(manager, "vec", Pair.of("x", "y"),
+                               .argument(ArgumentPair.of(manager, "vec", Pair.of("x", "y"),
                                                                Pair.of(Double.class, Double.class))
                                                      .withMapper(Vector2.class,
                                                                  pair -> new Vector2(pair.getFirst(), pair.getSecond()))

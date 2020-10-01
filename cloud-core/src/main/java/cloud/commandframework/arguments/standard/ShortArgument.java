@@ -71,7 +71,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Short> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Short> of(@NonNull final String name) {
         return ShortArgument.<C>newBuilder(name).asRequired().build();
     }
 

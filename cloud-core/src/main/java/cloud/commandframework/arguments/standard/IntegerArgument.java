@@ -78,7 +78,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Integer> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Integer> of(@NonNull final String name) {
         return IntegerArgument.<C>newBuilder(name).asRequired().build();
     }
 

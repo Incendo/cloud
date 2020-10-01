@@ -122,7 +122,7 @@ public final class BukkitTest extends JavaPlugin {
             annotationParser.parse(this);
 
             mgr.command(mgr.commandBuilder("gamemode", this.metaWithDescription("Your ugli"), "gajmöde")
-                           .argument(EnumArgument.required(GameMode.class, "gamemode"))
+                           .argument(EnumArgument.of(GameMode.class, "gamemode"))
                            .argument(StringArgument.<CommandSender>newBuilder("player")
                                              .withSuggestionsProvider((v1, v2) -> {
                                                  final List<String> suggestions =
@@ -172,8 +172,8 @@ public final class BukkitTest extends JavaPlugin {
                            .build())
                .command(mgr.commandBuilder("give")
                            .withSenderType(Player.class)
-                           .argument(EnumArgument.required(Material.class, "material"))
-                           .argument(IntegerArgument.required("amount"))
+                           .argument(EnumArgument.of(Material.class, "material"))
+                           .argument(IntegerArgument.of("amount"))
                            .handler(c -> {
                                final Material material = c.getRequired("material");
                                final int amount = c.getRequired("amount");
@@ -185,7 +185,7 @@ public final class BukkitTest extends JavaPlugin {
                .command(mgr.commandBuilder("worldtp", BukkitCommandMetaBuilder.builder()
                                                                               .withDescription("Teleport to a world")
                                                                               .build())
-                           .argument(WorldArgument.required("world"))
+                           .argument(WorldArgument.of("world"))
                            .handler(c -> {
                                final World world = c.getRequired("world");
                                ((Player) c.getSender()).teleport(world.getSpawnLocation());
@@ -193,11 +193,11 @@ public final class BukkitTest extends JavaPlugin {
                            })
                            .build())
                .command(mgr.commandBuilder("brigadier")
-                           .argument(FloatArgument.required("float"))
-                           .argument(DoubleArgument.required("double"))
-                           .argument(IntegerArgument.required("int"))
-                           .argument(BooleanArgument.required("bool"))
-                           .argument(StringArgument.required("string"))
+                           .argument(FloatArgument.of("float"))
+                           .argument(DoubleArgument.of("double"))
+                           .argument(IntegerArgument.of("int"))
+                           .argument(BooleanArgument.of("bool"))
+                           .argument(StringArgument.of("string"))
                            .handler(c -> c.getSender().sendMessage("Executed the command"))
                            .build())
                .command(mgr.commandBuilder("annotationass")
@@ -226,7 +226,7 @@ public final class BukkitTest extends JavaPlugin {
         manager.command(mgr.commandBuilder("teleport")
                            .meta("description", "Takes in a location and teleports the player there")
                            .withSenderType(Player.class)
-                           .argument(WorldArgument.required("world"), Description.of("World name"))
+                           .argument(WorldArgument.of("world"), Description.of("World name"))
                            .argumentTriplet("coords",
                                             TypeToken.get(Vector.class),
                                             Triplet.of("x", "y", "z"),

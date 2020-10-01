@@ -78,11 +78,11 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      * @param <V>     Second parsed type
      * @return Intermediary builder
      */
-    public static <C, U, V> @NonNull ArgumentPairIntermediaryBuilder<C, U, V> required(@NonNull final CommandManager<C> manager,
-                                                                                       @NonNull final String name,
-                                                                                       @NonNull final Pair<@NonNull String,
+    public static <C, U, V> @NonNull ArgumentPairIntermediaryBuilder<C, U, V> of(@NonNull final CommandManager<C> manager,
+                                                                                 @NonNull final String name,
+                                                                                 @NonNull final Pair<@NonNull String,
                                                                                                     @NonNull String> names,
-                                                                                       @NonNull final Pair<@NonNull Class<U>,
+                                                                                 @NonNull final Pair<@NonNull Class<U>,
                                                                                                     @NonNull Class<V>> types) {
         final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(TypeToken.get(types.getFirst()),

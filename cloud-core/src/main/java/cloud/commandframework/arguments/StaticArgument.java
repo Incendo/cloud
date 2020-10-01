@@ -56,8 +56,8 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      * @param <C>     Command sender type
      * @return Constructed argument
      */
-    public static <C> @NonNull StaticArgument<C> required(@NonNull final String name,
-                                                          @NonNull final String... aliases) {
+    public static <C> @NonNull StaticArgument<C> of(@NonNull final String name,
+                                                    @NonNull final String... aliases) {
         return new StaticArgument<>(true, name, aliases);
     }
 

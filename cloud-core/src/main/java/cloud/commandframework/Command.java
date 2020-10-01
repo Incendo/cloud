@@ -145,7 +145,7 @@ public class Command<C> {
                                                      @NonNull final Description description,
                                                      @NonNull final String... aliases) {
         final Map<@NonNull CommandArgument<C, ?>, @NonNull Description> map = new LinkedHashMap<>();
-        map.put(StaticArgument.required(commandName, aliases), description);
+        map.put(StaticArgument.of(commandName, aliases), description);
         return new Builder<>(null, commandMeta, null, map,
                              new CommandExecutionHandler.NullCommandExecutionHandler<>(), Permission.empty());
     }
@@ -164,7 +164,7 @@ public class Command<C> {
                                                      @NonNull final CommandMeta commandMeta,
                                                      @NonNull final String... aliases) {
         final Map<CommandArgument<C, ?>, Description> map = new LinkedHashMap<>();
-        map.put(StaticArgument.required(commandName, aliases), Description.empty());
+        map.put(StaticArgument.of(commandName, aliases), Description.empty());
         return new Builder<>(null, commandMeta, null, map,
                              new CommandExecutionHandler.NullCommandExecutionHandler<>(), Permission.empty());
     }
@@ -308,7 +308,7 @@ public class Command<C> {
          */
         public @NonNull Builder<C> literal(@NonNull final String main,
                                            @NonNull final String... aliases) {
-            return this.argument(StaticArgument.required(main, aliases));
+            return this.argument(StaticArgument.of(main, aliases));
         }
 
         /**
@@ -322,7 +322,7 @@ public class Command<C> {
         public @NonNull Builder<C> literal(@NonNull final String main,
                                            @NonNull final Description description,
                                            @NonNull final String... aliases) {
-            return this.argument(StaticArgument.required(main, aliases), description);
+            return this.argument(StaticArgument.of(main, aliases), description);
         }
 
         /**
@@ -398,7 +398,7 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.argument(ArgumentPair.required(this.commandManager, name, names, parserPair).simple(), description);
+            return this.argument(ArgumentPair.of(this.commandManager, name, names, parserPair).simple(), description);
         }
 
         /**
@@ -431,7 +431,7 @@ public class Command<C> {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
             return this.argument(
-                    ArgumentPair.required(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
+                    ArgumentPair.of(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
                     description);
         }
 
@@ -460,7 +460,7 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.argument(ArgumentTriplet.required(this.commandManager, name, names, parserTriplet).simple(), description);
+            return this.argument(ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(), description);
         }
 
         /**
@@ -495,7 +495,7 @@ public class Command<C> {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
             return this.argument(
-                    ArgumentTriplet.required(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
+                    ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
                     description);
         }
 

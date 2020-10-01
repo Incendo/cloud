@@ -71,7 +71,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Double> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Double> of(@NonNull final String name) {
         return DoubleArgument.<C>newBuilder(name).asRequired().build();
     }
 

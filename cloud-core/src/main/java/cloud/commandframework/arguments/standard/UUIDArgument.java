@@ -64,7 +64,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, UUID> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, UUID> of(@NonNull final String name) {
         return UUIDArgument.<C>newBuilder(name).asRequired().build();
     }
 

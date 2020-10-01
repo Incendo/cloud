@@ -49,7 +49,7 @@ public class CommandSuggestionsTest {
                                .argument(StringArgument.<TestCommandSender>newBuilder("str")
                                                  .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two"))
                                                  .build())
-                               .argument(EnumArgument.required(TestEnum.class, "enum"))
+                               .argument(EnumArgument.of(TestEnum.class, "enum"))
                                .build());
         manager.command(manager.commandBuilder("test")
                                .literal("comb")
@@ -68,7 +68,7 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("com")
                                .argumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
                                              Description.empty())
-                               .argument(IntegerArgument.required("int"))
+                               .argument(IntegerArgument.of("int"))
                                .build());
 
         manager.command(manager.commandBuilder("com2")

@@ -71,7 +71,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Byte> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Byte> of(@NonNull final String name) {
         return ByteArgument.<C>newBuilder(name).asRequired().build();
     }
 

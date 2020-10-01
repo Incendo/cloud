@@ -69,7 +69,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, World> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, World> of(@NonNull final String name) {
         return WorldArgument.<C>newBuilder(name).asRequired().build();
     }
 

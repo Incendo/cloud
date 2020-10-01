@@ -75,7 +75,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, OfflinePlayer> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, OfflinePlayer> of(@NonNull final String name) {
         return OfflinePlayerArgument.<C>newBuilder(name).asRequired().build();
     }
 

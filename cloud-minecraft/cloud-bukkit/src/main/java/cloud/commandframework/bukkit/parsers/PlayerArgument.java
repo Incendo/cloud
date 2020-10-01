@@ -71,7 +71,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, Player> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Player> of(@NonNull final String name) {
         return PlayerArgument.<C>newBuilder(name).asRequired().build();
     }
 

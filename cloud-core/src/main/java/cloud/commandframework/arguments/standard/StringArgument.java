@@ -69,7 +69,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, String> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, String> of(@NonNull final String name) {
         return StringArgument.<C>newBuilder(name).single().asRequired().build();
     }
 
@@ -81,8 +81,8 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, String> required(@NonNull final String name,
-                                                                   @NonNull final StringMode stringMode) {
+    public static <C> @NonNull CommandArgument<C, String> of(@NonNull final String name,
+                                                             @NonNull final StringMode stringMode) {
         return StringArgument.<C>newBuilder(name).withMode(stringMode).asRequired().build();
     }
 

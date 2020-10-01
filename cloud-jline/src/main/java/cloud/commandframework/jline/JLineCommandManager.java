@@ -100,11 +100,11 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
                                                                                                         System.out::println))
                                                        .build())
                            .command(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                       .argument(StaticArgument.required("one"))
+                                                       .argument(StaticArgument.of("one"))
                                                        .handler(commandContext -> System.out.println("Test (1)"))
                                                        .build())
                            .command(jLineCommandManager.commandBuilder("test", SimpleCommandMeta.empty())
-                                                       .argument(StaticArgument.required("two"))
+                                                       .argument(StaticArgument.of("two"))
                                                        .handler(commandContext -> System.out.println("Test (2)"))
                                                        .build());
         System.out.println("Ready...");

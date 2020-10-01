@@ -63,7 +63,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Character> required(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Character> of(@NonNull final String name) {
         return CharArgument.<C>newBuilder(name).asRequired().build();
     }
 

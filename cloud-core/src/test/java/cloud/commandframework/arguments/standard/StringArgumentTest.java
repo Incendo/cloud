@@ -39,8 +39,8 @@ class StringArgumentTest {
     static void setup() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("quoted")
-                               .argument(StringArgument.required("message1", StringArgument.StringMode.QUOTED))
-                               .argument(StringArgument.required("message2"))
+                               .argument(StringArgument.of("message1", StringArgument.StringMode.QUOTED))
+                               .argument(StringArgument.of("message2"))
                                .handler(c -> {
                                     final String message1 = c.getRequired("message1");
                                     final String message2 = c.getRequired("message2");
@@ -49,14 +49,14 @@ class StringArgumentTest {
                                })
                                .build());
         manager.command(manager.commandBuilder("single")
-                               .argument(StringArgument.required("message"))
+                               .argument(StringArgument.of("message"))
                                .handler(c -> {
                                     final String message = c.getRequired("message");
                                     storage[0] = message;
                                })
                                .build());
         manager.command(manager.commandBuilder("greedy")
-                               .argument(StringArgument.required("message", StringArgument.StringMode.GREEDY))
+                               .argument(StringArgument.of("message", StringArgument.StringMode.GREEDY))
                                .handler(c -> {
                                    final String message = c.getRequired("message");
                                    storage[0] = message;

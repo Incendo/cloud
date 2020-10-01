@@ -40,7 +40,7 @@ public class CommandPreProcessorTest {
     static void newTree() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .argument(EnumArgument.required(SampleEnum.class, "enum"))
+                               .argument(EnumArgument.of(SampleEnum.class, "enum"))
                                .handler(
                                        commandContext -> System.out.printf("enum = %s | integer = %d\n",
                                                                            commandContext.<SampleEnum>get(

@@ -78,7 +78,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
      * @param <E>       Enum type
      * @return Created argument
      */
-    public static <C, E extends Enum<E>> @NonNull CommandArgument<C, E> required(
+    public static <C, E extends Enum<E>> @NonNull CommandArgument<C, E> of(
             @NonNull final Class<E> enumClass,
             @NonNull final String name) {
         return EnumArgument.<C, E>newBuilder(enumClass, name).asRequired().build();
