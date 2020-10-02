@@ -58,6 +58,8 @@ class AnnotationParserTest {
         manager.executeCommand(new TestCommandSender(), "proxycommand 10").join();
         Assertions.assertThrows(CompletionException.class, () ->
                 manager.executeCommand(new TestCommandSender(), "test 101").join());
+        manager.executeCommand(new TestCommandSender(), "flagcommand -p").join();
+        manager.executeCommand(new TestCommandSender(), "flagcommand --print --word peanut").join();
     }
 
     @ProxiedBy("proxycommand")
@@ -67,6 +69,15 @@ class AnnotationParserTest {
                             @Argument(value = "string", defaultValue = "potato", parserName = "potato")
                                 final String string) {
         System.out.printf("Received int: %d and string '%s'\n", argument, string);
+    }
+
+    @CommandMethod("flagcommand")
+    public void testFlags(final TestCommandSender sender,
+                          @Flag(value = "print", aliases = "p") boolean print,
+                          @Flag(value = "word", aliases = "w") String word) {
+        if (print) {
+            System.out.println(word);
+        }
     }
 
 }

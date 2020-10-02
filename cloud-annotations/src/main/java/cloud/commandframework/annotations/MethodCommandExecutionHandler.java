@@ -24,6 +24,7 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -55,6 +56,7 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
     @Override
     public void execute(@NonNull final CommandContext<C> commandContext) {
         final List<Object> arguments = new ArrayList<>(this.parameters.length);
+        final FlagContext flagContext = commandContext.flags();
 
         /* Bind parameters to context */
         for (final Parameter parameter : this.parameters) {
@@ -66,6 +68,13 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
                 } else {
                     final Object optional = commandContext.getOptional(argument.value()).orElse(null);
                     arguments.add(optional);
+                }
+            } else if (parameter.isAnnotationPresent(Flag.class)) {
+                final Flag flag = parameter.getAnnotation(Flag.class);
+                if (parameter.getType() == boolean.class) {
+                    arguments.add(flagContext.isPresent(flag.value()));
+                } else {
+                    arguments.add(flagContext.getValue(flag.value(), null));
                 }
             } else {
                 if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
