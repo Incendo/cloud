@@ -652,6 +652,17 @@ public class Command<C> {
         }
 
         /**
+         * Register a new command flag
+         *
+         * @param builder Flag builder. {@link CommandFlag.Builder#build()} will be invoked.
+         * @param <T>     Flag value type
+         * @return New builder instance that uses the provided flag
+         */
+        public @NonNull <T> Builder<C> flag(final CommandFlag.@NonNull Builder<T> builder) {
+            return this.flag(builder.build());
+        }
+
+        /**
          * Build a command using the builder instance
          *
          * @return Built command

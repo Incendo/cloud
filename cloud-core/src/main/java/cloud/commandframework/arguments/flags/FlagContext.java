@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.flags;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,7 +95,7 @@ public final class FlagContext {
      * @param <T>          Value type
      * @return Stored value, or the supplied default value
      */
-    public <T> T getValue(@NonNull final String name, @NonNull final T defaultValue) {
+    public <T> @Nullable T getValue(@NonNull final String name, @Nullable final T defaultValue) {
         final Object value = this.flagValues.get(name);
         if (value == null) {
             return defaultValue;

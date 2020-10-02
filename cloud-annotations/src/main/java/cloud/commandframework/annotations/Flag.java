@@ -23,30 +23,47 @@
 //
 package cloud.commandframework.annotations;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.function.Function;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Utility that extract {@link Argument arguments} from
- * {@link java.lang.reflect.Method method} {@link java.lang.reflect.Parameter parameters}
+ * Indicates that the parameter should be treated like a {@link cloud.commandframework.arguments.flags.CommandFlag}.
+ * If the parameter is a {@code boolean} then a presence flag will be created, else a value flag will be created
+ * and the parser will be resolved the same way as it would for a {@link Argument}
  */
-class ArgumentExtractor implements Function<@NonNull Method, @NonNull Collection<@NonNull ArgumentParameterPair>> {
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Flag {
 
-    @Override
-    public @NonNull Collection<@NonNull ArgumentParameterPair> apply(@NonNull final Method method) {
-        final Collection<ArgumentParameterPair> arguments = new ArrayList<>();
-        for (final Parameter parameter : method.getParameters()) {
-            if (!parameter.isAnnotationPresent(Argument.class)) {
-                continue;
-            }
-            arguments.add(new ArgumentParameterPair(parameter, parameter.getAnnotation(Argument.class)));
-        }
-        return arguments;
-    }
+    /**
+     * The flag name
+     *
+     * @return Flag name
+     */
+    String value();
+
+    /**
+     * Flag aliases
+     *
+     * @return Aliases
+     */
+    String[] aliases() default "";
+
+    /**
+     * Name of the parser. Leave empty to use
+     * the default parser for the parameter type
+     *
+     * @return Parser name
+     */
+    String parserName() default "";
+
+    /**
+     * The argument description
+     *
+     * @return Argument description
+     */
+    String description() default "";
 
 }

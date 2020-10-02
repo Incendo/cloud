@@ -89,6 +89,7 @@ public final class CommandFlag<T> {
     /**
      * Get the flag description
      * <p>
+     *
      * @return Flag description
      */
     public @NonNull Description getDescription() {
@@ -177,6 +178,17 @@ public final class CommandFlag<T> {
          */
         public <N> Builder<N> withArgument(@NonNull final CommandArgument<?, N> argument) {
             return new Builder<>(this.name, this.aliases, this.description, argument);
+        }
+
+        /**
+         * Create a new builder instance using the given command argument
+         *
+         * @param builder Command argument builder. {@link CommandArgument.Builder#build()} will be invoked.
+         * @param <N>     New argument type
+         * @return New builder instance
+         */
+        public <N> Builder<N> withArgument(final CommandArgument.@NonNull Builder<?, N> builder) {
+            return this.withArgument(builder.build());
         }
 
         /**

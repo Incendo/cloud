@@ -27,6 +27,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.StandardParameters;
@@ -64,6 +65,7 @@ public final class AnnotationParser<C> {
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
     private final Class<C> commandSenderClass;
     private final MetaFactory metaFactory;
+    private final FlagExtractor flagExtractor;
 
     /**
      * Construct a new annotation parser
@@ -82,6 +84,7 @@ public final class AnnotationParser<C> {
         this.manager = manager;
         this.metaFactory = new MetaFactory(this, metaMapper);
         this.annotationMappers = new HashMap<>();
+        this.flagExtractor = new FlagExtractor(manager);
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
     }
@@ -156,6 +159,7 @@ public final class AnnotationParser<C> {
                                                              tokens.get(commandToken).getMinor(),
                                                              metaBuilder.build());
             final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
+            final Collection<CommandFlag<?>> flags = this.flagExtractor.apply(method);
             final Map<String, CommandArgument<C, ?>> commandArguments = new HashMap<>();
             final Map<CommandArgument<C, ?>, String> argumentDescriptions = new HashMap<>();
             /* Go through all annotated parameters and build up the argument tree */
@@ -217,6 +221,10 @@ public final class AnnotationParser<C> {
             /* Check if the command should be hidden */
             if (method.isAnnotationPresent(Hidden.class)) {
                 builder = builder.hidden();
+            }
+            /* Apply flags */
+            for (final CommandFlag<?> flag : flags) {
+                builder = builder.flag(flag);
             }
             /* Construct and register the command */
             final Command<C> builtCommand = builder.build();
