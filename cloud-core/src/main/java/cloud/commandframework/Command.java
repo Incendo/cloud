@@ -408,8 +408,13 @@ public class Command<C> {
                                                 @NonNull final Description description) {
             final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
             commandArgumentMap.put(builder.build(), description);
-            return new Builder<>(this.commandManager, this.commandMeta, this.senderType, commandArgumentMap,
-                                 this.commandExecutionHandler, this.commandPermission);
+            return new Builder<>(this.commandManager,
+                                 this.commandMeta,
+                                 this.senderType,
+                                 commandArgumentMap,
+                                 this.commandExecutionHandler,
+                                 this.commandPermission,
+                                 this.flags);
         }
 
         /**
