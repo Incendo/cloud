@@ -25,10 +25,18 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
+import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
+import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
+import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
+import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
+import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument;
+import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
+import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
@@ -87,16 +95,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
 
-        /* Register Bukkit parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), params -> new WorldArgument.WorldParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class),
-                                                        params -> new MaterialArgument.MaterialParser<>());
-        this.getParserRegistry()
-            .registerParserSupplier(TypeToken.get(Player.class), params -> new PlayerArgument.PlayerParser<>());
-        this.getParserRegistry()
-            .registerParserSupplier(TypeToken.get(OfflinePlayer.class),
-                                    params -> new OfflinePlayerArgument.OfflinePlayerParser<>());
-
         /* Try to determine the Minecraft version */
         int version = -1;
         try {
@@ -119,6 +117,28 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         } catch (final Exception ignored) {
         }
         this.paper = paper;
+
+        /* Register Bukkit Preprocessor */
+        this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
+
+        /* Register Bukkit Parsers */
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), params -> new WorldArgument.WorldParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class),
+                                                        params -> new MaterialArgument.MaterialParser<>());
+        this.getParserRegistry()
+            .registerParserSupplier(TypeToken.get(Player.class), params -> new PlayerArgument.PlayerParser<>());
+        this.getParserRegistry()
+            .registerParserSupplier(TypeToken.get(OfflinePlayer.class),
+                                    params -> new OfflinePlayerArgument.OfflinePlayerParser<>());
+        /* Register Entity Selector Parsers */
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
+                new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(SinglePlayerSelector.class), parserParameters ->
+                new SinglePlayerSelectorArgument.SinglePlayerSelectorParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(MultipleEntitySelector.class), parserParameters ->
+                new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
+                new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
     }
 
     /**
