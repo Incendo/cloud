@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, MultiplePlayerSelector> {
+
     private MultiplePlayerSelectorArgument(final boolean required,
                                            @NonNull final String name,
                                            @NonNull final String defaultValue,
@@ -169,4 +170,5 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             return output;
         }
     }
+
 }

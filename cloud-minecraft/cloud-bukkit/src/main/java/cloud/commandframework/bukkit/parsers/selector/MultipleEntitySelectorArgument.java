@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
+
     private MultipleEntitySelectorArgument(final boolean required,
                                            @NonNull final String name,
                                            @NonNull final String defaultValue,
@@ -56,7 +57,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> MultipleEntitySelectorArgument.Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> MultipleEntitySelectorArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new MultipleEntitySelectorArgument.Builder<>(name);
     }
 
@@ -121,7 +122,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
         @Override
         public @NonNull ArgumentParseResult<MultipleEntitySelector> parse(@NonNull final CommandContext<C> commandContext,
                                                                           @NonNull final Queue<@NonNull String> inputQueue) {
-            if (!((Set<CloudBukkitCapabilities>) commandContext.get("CloudBukkitCapabilities")).contains(
+            if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
                 return ArgumentParseResult.failure(
                         new IllegalArgumentException("Entity selector argument type not supported below Minecraft 1.13."));
@@ -142,4 +143,5 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
             return ArgumentParseResult.success(new MultipleEntitySelector(entities));
         }
     }
+
 }

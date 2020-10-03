@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, SinglePlayerSelector> {
+
     private SinglePlayerSelectorArgument(final boolean required,
                                          @NonNull final String name,
                                          @NonNull final String defaultValue,
@@ -59,7 +60,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> SinglePlayerSelectorArgument.Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> SinglePlayerSelectorArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new SinglePlayerSelectorArgument.Builder<>(name);
     }
 
@@ -132,6 +133,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
 
             if (!((Set<CloudBukkitCapabilities>) commandContext.get("CloudBukkitCapabilities")).contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
+                @SuppressWarnings("deprecation")
                 Player player = Bukkit.getPlayer(input);
 
                 if (player == null) {
@@ -172,4 +174,5 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
             return output;
         }
     }
+    
 }

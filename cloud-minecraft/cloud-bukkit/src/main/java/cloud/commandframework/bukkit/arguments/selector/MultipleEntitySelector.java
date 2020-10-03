@@ -24,14 +24,17 @@
 package cloud.commandframework.bukkit.arguments.selector;
 
 import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
 public class MultipleEntitySelector extends EntitySelector {
+
     /**
      * @param entities The List of Bukkit {@link Entity}s to construct the {@link EntitySelector} from
      */
-    public MultipleEntitySelector(final List<Entity> entities) {
+    public MultipleEntitySelector(final @NonNull List<@NonNull Entity> entities) {
         super(entities);
     }
+
 }

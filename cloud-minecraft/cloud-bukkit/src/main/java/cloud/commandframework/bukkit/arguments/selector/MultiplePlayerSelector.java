@@ -26,17 +26,22 @@ package cloud.commandframework.bukkit.arguments.selector;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MultiplePlayerSelector extends MultipleEntitySelector {
+
     private final List<Player> players = new ArrayList<>();
 
     /**
+     * Construct a new selector
+     *
      * @param entities The List of Bukkit {@link Entity}s to construct the {@link EntitySelector} from
      */
-    public MultiplePlayerSelector(final List<Entity> entities) {
+    public MultiplePlayerSelector(final @NonNull List<@NonNull Entity> entities) {
         super(entities);
         entities.forEach(e -> {
             if (e.getType() != EntityType.PLAYER) {
@@ -48,9 +53,12 @@ public class MultiplePlayerSelector extends MultipleEntitySelector {
     }
 
     /**
-     * @return The list of Bukkit Players parsed from the selector
+     * Get the resulting players
+     *
+     * @return Immutable views of the list of Bukkit {@link Player players} parsed from the selector
      */
-    public final List<Player> getPlayers() {
-        return players;
+    public final @NonNull List<@NonNull Player> getPlayers() {
+        return Collections.unmodifiableList(this.players);
     }
+
 }

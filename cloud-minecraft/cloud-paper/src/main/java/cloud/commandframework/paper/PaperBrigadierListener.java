@@ -97,13 +97,14 @@ class PaperBrigadierListener<C> implements Listener {
      * @param playersOnly Whether the selector is for players only (true), or for all entities (false)
      * @return The NMS ArgumentType
      */
-    private Supplier<ArgumentType<?>> getEntitySelectorArgument(final boolean single, final boolean playersOnly) {
+    private Supplier<ArgumentType<?>> getEntitySelectorArgument(final boolean single,
+                                                                final boolean playersOnly) {
         return () -> {
             try {
-                Constructor<?> constructor = this.getNMSArgument("Entity").getDeclaredConstructors()[0];
+                final Constructor<?> constructor = this.getNMSArgument("Entity").getDeclaredConstructors()[0];
                 constructor.setAccessible(true);
                 return (ArgumentType<?>) constructor.newInstance(single, playersOnly);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 this.paperCommandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Selector Argument", e);
                 return null;
             }
