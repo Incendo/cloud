@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, SingleEntitySelector> {
+
     private SingleEntitySelectorArgument(final boolean required,
                                          @NonNull final String name,
                                          @NonNull final String defaultValue,
@@ -55,7 +56,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> SingleEntitySelectorArgument.Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> SingleEntitySelectorArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
         return new SingleEntitySelectorArgument.Builder<>(name);
     }
 
@@ -146,4 +147,5 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
             return ArgumentParseResult.success(new SingleEntitySelector(entities));
         }
     }
+
 }

@@ -117,9 +117,6 @@ subprojects {
             maven(MavenPublication) {
                 from components.java
 
-                artifact javadocJar
-                artifact sourcesJar
-
                 pom {
                     name = project.name
                     url = 'https://github.com/Sauilitired/cloud'

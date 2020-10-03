@@ -24,14 +24,18 @@
 package cloud.commandframework.bukkit.arguments.selector;
 
 import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
 public final class SingleEntitySelector extends MultipleEntitySelector {
+
     /**
-     * @param entities The List of Bukkit {@link Entity}s to construct the {@link EntitySelector} from
+     * Construct a new selector
+     *
+     * @param entities The List of Bukkit {@link Entity entities} to construct the {@link EntitySelector} from
      */
-    public SingleEntitySelector(final List<Entity> entities) {
+    public SingleEntitySelector(final @NonNull List<@NonNull Entity> entities) {
         super(entities);
         if (entities.size() > 1) {
             throw new IllegalArgumentException("More than 1 entity selected in single entity selector.");
@@ -39,9 +43,12 @@ public final class SingleEntitySelector extends MultipleEntitySelector {
     }
 
     /**
+     * Get the selected entity
+     *
      * @return Gets the single Bukkit Entity parsed by the selector
      */
-    public Entity getEntity() {
+    public @NonNull Entity getEntity() {
         return this.getEntities().get(0);
     }
+
 }

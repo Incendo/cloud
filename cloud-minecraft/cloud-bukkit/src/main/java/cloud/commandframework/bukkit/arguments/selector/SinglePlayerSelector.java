@@ -25,14 +25,18 @@ package cloud.commandframework.bukkit.arguments.selector;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
 public final class SinglePlayerSelector extends MultiplePlayerSelector {
+
     /**
-     * @param entities The List of Bukkit {@link Entity}s to construct the {@link EntitySelector} from
+     * Construct a new selector
+     *
+     * @param entities The List of Bukkit {@link Entity entities} to construct the {@link EntitySelector} from
      */
-    public SinglePlayerSelector(final List<Entity> entities) {
+    public SinglePlayerSelector(final @NonNull List<@NonNull Entity> entities) {
         super(entities);
         if (getPlayers().size() > 1) {
             throw new IllegalArgumentException("More than 1 player selected in single player selector.");
@@ -40,9 +44,12 @@ public final class SinglePlayerSelector extends MultiplePlayerSelector {
     }
 
     /**
+     * Get the selected player
+     *
      * @return Gets the single player parsed by the selector
      */
-    public Player getPlayer() {
+    public @NonNull Player getPlayer() {
         return this.getPlayers().get(0);
     }
+
 }

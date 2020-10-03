@@ -27,7 +27,14 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
+/**
+ * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
+ * with Bukkit specific objects
+ *
+ * @param <C>
+ */
+final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
+
     private final BukkitCommandManager<C> mgr;
 
     /**
@@ -35,7 +42,7 @@ public class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
      *
      * @param mgr The BukkitCommandManager
      */
-    public BukkitCommandPreprocessor(final BukkitCommandManager<C> mgr) {
+    BukkitCommandPreprocessor(final @NonNull BukkitCommandManager<C> mgr) {
         this.mgr = mgr;
     }
 
@@ -49,4 +56,5 @@ public class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
                 context.getCommandContext().getSender()));
         context.getCommandContext().store("CloudBukkitCapabilities", mgr.queryCapabilities());
     }
+
 }

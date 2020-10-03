@@ -24,26 +24,34 @@
 package cloud.commandframework.bukkit.arguments.selector;
 
 import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * A class to represent the result of parsing a Minecraft Entity/Target Selector argument
  */
 public abstract class EntitySelector {
+
     private final List<Entity> entities;
 
     /**
-     * @param entities The List of Bukkit {@link Entity}s to construct the {@link EntitySelector} from
+     * Construct a new entity selector
+     *
+     * @param entities The List of Bukkit {@link Entity entities} to construct the {@link EntitySelector} from
      */
-    public EntitySelector(final List<Entity> entities) {
+    public EntitySelector(final @NonNull List<@NonNull Entity> entities) {
         this.entities = entities;
     }
 
     /**
-     * @return The list of Entities resulting from parsing the entity selector
+     * Get the resulting entities
+     *
+     * @return Immutable view of the list list of entities resulting from parsing the entity selector
      */
-    public final List<Entity> getEntities() {
-        return entities;
+    public @NonNull List<@NonNull Entity> getEntities() {
+        return Collections.unmodifiableList(this.entities);
     }
+
 }
