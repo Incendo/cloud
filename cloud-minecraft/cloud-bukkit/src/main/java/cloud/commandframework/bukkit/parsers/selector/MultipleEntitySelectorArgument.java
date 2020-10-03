@@ -140,7 +140,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
                 return ArgumentParseResult.failure(new SelectorParseException(input));
             }
 
-            return ArgumentParseResult.success(new MultipleEntitySelector(entities));
+            return ArgumentParseResult.success(new MultipleEntitySelector(input, entities));
         }
     }
 

@@ -139,7 +139,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                 if (player == null) {
                     return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input));
                 }
-                return ArgumentParseResult.success(new SinglePlayerSelector(ImmutableList.of(player)));
+                return ArgumentParseResult.success(new SinglePlayerSelector(input, ImmutableList.of(player)));
             }
 
             List<Entity> entities;
@@ -159,7 +159,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                         new IllegalArgumentException("More than 1 player selected in single player selector"));
             }
 
-            return ArgumentParseResult.success(new SinglePlayerSelector(entities));
+            return ArgumentParseResult.success(new SinglePlayerSelector(input, entities));
         }
 
         @Override
