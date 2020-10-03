@@ -140,7 +140,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                 if (player == null) {
                     return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input));
                 }
-                return ArgumentParseResult.success(new MultiplePlayerSelector(ImmutableList.of(player)));
+                return ArgumentParseResult.success(new MultiplePlayerSelector(input, ImmutableList.of(player)));
             }
 
             List<Entity> entities;
@@ -156,7 +156,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                 }
             }
 
-            return ArgumentParseResult.success(new MultiplePlayerSelector(entities));
+            return ArgumentParseResult.success(new MultiplePlayerSelector(input, entities));
         }
 
         @Override

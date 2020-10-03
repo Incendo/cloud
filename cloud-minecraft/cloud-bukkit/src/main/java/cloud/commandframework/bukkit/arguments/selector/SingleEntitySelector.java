@@ -33,10 +33,12 @@ public final class SingleEntitySelector extends MultipleEntitySelector {
     /**
      * Construct a new selector
      *
+     * @param selector The input string used to create this selector
      * @param entities The List of Bukkit {@link Entity entities} to construct the {@link EntitySelector} from
      */
-    public SingleEntitySelector(final @NonNull List<@NonNull Entity> entities) {
-        super(entities);
+    public SingleEntitySelector(final @NonNull String selector,
+                                final @NonNull List<@NonNull Entity> entities) {
+        super(selector, entities);
         if (entities.size() > 1) {
             throw new IllegalArgumentException("More than 1 entity selected in single entity selector.");
         }

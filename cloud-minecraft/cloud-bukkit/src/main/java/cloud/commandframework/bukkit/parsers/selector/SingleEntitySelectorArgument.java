@@ -144,7 +144,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
                         new IllegalArgumentException("More than 1 entity selected in single entity selector."));
             }
 
-            return ArgumentParseResult.success(new SingleEntitySelector(entities));
+            return ArgumentParseResult.success(new SingleEntitySelector(input, entities));
         }
     }
 

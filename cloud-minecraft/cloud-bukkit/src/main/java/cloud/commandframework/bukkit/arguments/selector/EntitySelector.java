@@ -34,14 +34,18 @@ import java.util.List;
  */
 public abstract class EntitySelector {
 
+    private final String selector;
     private final List<Entity> entities;
 
     /**
      * Construct a new entity selector
      *
+     * @param selector The input string used to create this selector
      * @param entities The List of Bukkit {@link Entity entities} to construct the {@link EntitySelector} from
      */
-    public EntitySelector(final @NonNull List<@NonNull Entity> entities) {
+    public EntitySelector(final @NonNull String selector,
+                          final @NonNull List<@NonNull Entity> entities) {
+        this.selector = selector;
         this.entities = entities;
     }
 
@@ -54,4 +58,12 @@ public abstract class EntitySelector {
         return Collections.unmodifiableList(this.entities);
     }
 
+    /**
+     * Get the input String for this selector
+     *
+     * @return The input String for this selector
+     */
+    public @NonNull String getSelector() {
+        return this.selector;
+    }
 }
