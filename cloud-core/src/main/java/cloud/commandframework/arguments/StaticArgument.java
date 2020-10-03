@@ -62,19 +62,6 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
     }
 
     /**
-     * Create a new static argument instance for an optional command argument
-     *
-     * @param name    Argument name
-     * @param aliases Argument aliases
-     * @param <C>     Command sender type
-     * @return Constructed argument
-     */
-    public static <C> @NonNull StaticArgument<C> optional(final @NonNull String name,
-                                                          final @NonNull String... aliases) {
-        return new StaticArgument<>(false, name, aliases);
-    }
-
-    /**
      * Register a new alias
      *
      * @param alias New alias
