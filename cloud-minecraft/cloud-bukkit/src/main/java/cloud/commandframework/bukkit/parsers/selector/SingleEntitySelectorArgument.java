@@ -121,7 +121,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
         @Override
         public @NonNull ArgumentParseResult<SingleEntitySelector> parse(final @NonNull CommandContext<C> commandContext,
                                                                         final @NonNull Queue<@NonNull String> inputQueue) {
-            if (!((Set<CloudBukkitCapabilities>) commandContext.get("CloudBukkitCapabilities")).contains(
+            if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
                 return ArgumentParseResult.failure(
                         new IllegalArgumentException("Entity selector argument type not supported below Minecraft 1.13."));

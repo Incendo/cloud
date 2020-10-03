@@ -131,7 +131,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
             }
             inputQueue.remove();
 
-            if (!((Set<CloudBukkitCapabilities>) commandContext.get("CloudBukkitCapabilities")).contains(
+            if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
                 @SuppressWarnings("deprecation")
                 Player player = Bukkit.getPlayer(input);
