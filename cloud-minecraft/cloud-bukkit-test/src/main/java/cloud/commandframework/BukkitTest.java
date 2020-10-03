@@ -223,7 +223,7 @@ public final class BukkitTest extends JavaPlugin {
         }
     }
 
-    private void registerTeleportCommand(@NonNull final BukkitCommandManager<CommandSender> manager) {
+    private void registerTeleportCommand(final @NonNull BukkitCommandManager<CommandSender> manager) {
         manager.command(mgr.commandBuilder("teleport")
                            .meta("description", "Takes in a location and teleports the player there")
                            .withSenderType(Player.class)
@@ -246,9 +246,9 @@ public final class BukkitTest extends JavaPlugin {
 
     @CommandDescription("Test cloud command using @CommandMethod")
     @CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
-    private void annotatedCommand(@NonNull final Player player,
+    private void annotatedCommand(final @NonNull Player player,
                                   @Argument(value = "input", description = "Some string") @Completions("one,two,duck")
-                                  @NonNull final String input,
+                                  final @NonNull String input,
                                   @Argument(value = "number", defaultValue = "5", description = "A number")
                                   @Range(min = "10", max = "100") final int number) {
         player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input + ChatColor.GREEN + " (" + number + ")");
@@ -267,7 +267,7 @@ public final class BukkitTest extends JavaPlugin {
         Bukkit.broadcastMessage(ChatColor.GRAY + "Calling Thread: " + Thread.currentThread().getName());
     }
 
-    private @NonNull SimpleCommandMeta metaWithDescription(@NonNull final String description) {
+    private @NonNull SimpleCommandMeta metaWithDescription(final @NonNull String description) {
         return BukkitCommandMetaBuilder.builder().withDescription(description).build();
     }
 

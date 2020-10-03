@@ -41,7 +41,7 @@ public final class Permission implements CommandPermission {
 
     private final String permission;
 
-    private Permission(@NonNull final String permission) {
+    private Permission(final @NonNull String permission) {
         this.permission = permission;
     }
 
@@ -60,7 +60,7 @@ public final class Permission implements CommandPermission {
      * @param string Command permission
      * @return Created command permission
      */
-    public static @NonNull Permission of(@NonNull final String string) {
+    public static @NonNull Permission of(final @NonNull String string) {
         return new Permission(string);
     }
 

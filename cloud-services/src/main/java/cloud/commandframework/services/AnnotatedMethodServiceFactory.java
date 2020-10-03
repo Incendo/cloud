@@ -36,7 +36,7 @@ enum AnnotatedMethodServiceFactory {
     INSTANCE;
 
     @NonNull Map<? extends Service<?, ?>, TypeToken<? extends Service<?, ?>>> lookupServices(
-        @NonNull final Object instance) throws Exception {
+        final @NonNull Object instance) throws Exception {
       final Map<Service<?, ?>, TypeToken<? extends Service<?, ?>>> map = new HashMap<>();
       final Class<?> clazz = instance.getClass();
       for (final Method method : clazz.getDeclaredMethods()) {

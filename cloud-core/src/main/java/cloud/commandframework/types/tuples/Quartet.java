@@ -42,10 +42,10 @@ public class Quartet<U, V, W, X> implements Tuple {
     private final W third;
     private final X fourth;
 
-    protected Quartet(@NonNull final U first,
-                      @NonNull final V second,
-                      @NonNull final W third,
-                      @NonNull final X fourth) {
+    protected Quartet(final @NonNull U first,
+                      final @NonNull V second,
+                      final @NonNull W third,
+                      final @NonNull X fourth) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -65,10 +65,10 @@ public class Quartet<U, V, W, X> implements Tuple {
      * @param <X>    Fourth type
      * @return Created quartet
      */
-    public static <U, V, W, X> @NonNull Quartet<@NonNull U, @NonNull V, @NonNull W, @NonNull X> of(@NonNull final U first,
-                                                                                                   @NonNull final V second,
-                                                                                                   @NonNull final W third,
-                                                                                                   @NonNull final X fourth) {
+    public static <U, V, W, X> @NonNull Quartet<@NonNull U, @NonNull V, @NonNull W, @NonNull X> of(final @NonNull U first,
+                                                                                                   final @NonNull V second,
+                                                                                                   final @NonNull W third,
+                                                                                                   final @NonNull X fourth) {
         return new Quartet<>(first, second, third, fourth);
     }
 

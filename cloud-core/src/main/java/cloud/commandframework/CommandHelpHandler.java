@@ -40,7 +40,7 @@ public final class CommandHelpHandler<C> {
 
     private final CommandManager<C> commandManager;
 
-    CommandHelpHandler(@NonNull final CommandManager<C> commandManager) {
+    CommandHelpHandler(final @NonNull CommandManager<C> commandManager) {
         this.commandManager = commandManager;
     }
 
@@ -89,9 +89,9 @@ public final class CommandHelpHandler<C> {
         private final String syntaxString;
         private final String description;
 
-        private VerboseHelpEntry(@NonNull final Command<C> command,
-                                 @NonNull final String syntaxString,
-                                 @NonNull final String description) {
+        private VerboseHelpEntry(final @NonNull Command<C> command,
+                                 final @NonNull String syntaxString,
+                                 final @NonNull String description) {
             this.command = command;
             this.syntaxString = syntaxString;
             this.description = description;
@@ -131,7 +131,7 @@ public final class CommandHelpHandler<C> {
      * @param query Query string
      * @return Help topic, will return an empty {@link IndexHelpTopic} if no results were found
      */
-    public @NonNull HelpTopic<C> queryHelp(@NonNull final String query) {
+    public @NonNull HelpTopic<C> queryHelp(final @NonNull String query) {
         if (query.replace(" ", "").isEmpty()) {
             return new IndexHelpTopic<>(this.getAllCommands());
         }
@@ -261,7 +261,7 @@ public final class CommandHelpHandler<C> {
 
         private final List<VerboseHelpEntry<C>> entries;
 
-        private IndexHelpTopic(@NonNull final List<@NonNull VerboseHelpEntry<C>> entries) {
+        private IndexHelpTopic(final @NonNull List<@NonNull VerboseHelpEntry<C>> entries) {
             this.entries = entries;
         }
 
@@ -296,7 +296,7 @@ public final class CommandHelpHandler<C> {
         private final Command<C> command;
         private final String description;
 
-        private VerboseHelpTopic(@NonNull final Command<C> command) {
+        private VerboseHelpTopic(final @NonNull Command<C> command) {
             this.command = command;
             final String shortDescription = command.getCommandMeta().getOrDefault("description", "No description");
             this.description = command.getCommandMeta().getOrDefault("long-description", shortDescription);
@@ -333,8 +333,8 @@ public final class CommandHelpHandler<C> {
         private final String longestPath;
         private final List<String> childSuggestions;
 
-        private MultiHelpTopic(@NonNull final String longestPath,
-                               @NonNull final List<@NonNull String> childSuggestions) {
+        private MultiHelpTopic(final @NonNull String longestPath,
+                               final @NonNull List<@NonNull String> childSuggestions) {
             this.longestPath = longestPath;
             this.childSuggestions = childSuggestions;
         }

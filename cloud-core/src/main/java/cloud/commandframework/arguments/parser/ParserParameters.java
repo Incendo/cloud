@@ -53,8 +53,8 @@ public final class ParserParameters {
      * @param <T>       Value type
      * @return Constructed instance
      */
-    public static <T> @NonNull ParserParameters single(@NonNull final ParserParameter<T> parameter,
-                                                       @NonNull final T value) {
+    public static <T> @NonNull ParserParameters single(final @NonNull ParserParameter<T> parameter,
+                                                       final @NonNull T value) {
         final ParserParameters parameters = new ParserParameters();
         parameters.store(parameter, value);
         return parameters;
@@ -67,7 +67,7 @@ public final class ParserParameters {
      * @param <T>       Parameter type
      * @return {@code true} if such a pair is stored, else {@code false}
      */
-    public <T> boolean has(@NonNull final ParserParameter<T> parameter) {
+    public <T> boolean has(final @NonNull ParserParameter<T> parameter) {
         return this.internalMap.containsKey(parameter);
     }
 
@@ -78,8 +78,8 @@ public final class ParserParameters {
      * @param value     Object
      * @param <T>       Parameter type
      */
-    public <T> void store(@NonNull final ParserParameter<T> parameter,
-                          @NonNull final T value) {
+    public <T> void store(final @NonNull ParserParameter<T> parameter,
+                          final @NonNull T value) {
         this.internalMap.put(parameter, value);
     }
 
@@ -92,8 +92,8 @@ public final class ParserParameters {
      * @return Parameter value
      */
     @SuppressWarnings("unchecked")
-    public <T> @NonNull T get(@NonNull final ParserParameter<T> parameter,
-                              @NonNull final T defaultValue) {
+    public <T> @NonNull T get(final @NonNull ParserParameter<T> parameter,
+                              final @NonNull T defaultValue) {
         return (T) this.internalMap.getOrDefault(parameter, defaultValue);
     }
 
@@ -103,7 +103,7 @@ public final class ParserParameters {
      *
      * @param other Other instance
      */
-    public void merge(@NonNull final ParserParameters other) {
+    public void merge(final @NonNull ParserParameters other) {
         this.internalMap.putAll(other.internalMap);
     }
 

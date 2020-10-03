@@ -42,9 +42,9 @@ import java.util.function.BiFunction;
 public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
 
     private MultipleEntitySelectorArgument(final boolean required,
-                                           @NonNull final String name,
-                                           @NonNull final String defaultValue,
-                                           @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                           final @NonNull String name,
+                                           final @NonNull String defaultValue,
+                                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                                    @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new MultipleEntitySelectorParser<>(), defaultValue, MultipleEntitySelector.class,
               suggestionsProvider);
@@ -57,7 +57,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> MultipleEntitySelectorArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> MultipleEntitySelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new MultipleEntitySelectorArgument.Builder<>(name);
     }
 
@@ -68,7 +68,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultipleEntitySelector> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, MultipleEntitySelector> of(final @NonNull String name) {
         return MultipleEntitySelectorArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -79,7 +79,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultipleEntitySelector> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, MultipleEntitySelector> optional(final @NonNull String name) {
         return MultipleEntitySelectorArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -91,15 +91,15 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultipleEntitySelector> optional(@NonNull final String name,
-                                                                                   @NonNull final String defaultEntitySelector) {
+    public static <C> @NonNull CommandArgument<C, MultipleEntitySelector> optional(final @NonNull String name,
+                                                                                   final @NonNull String defaultEntitySelector) {
         return MultipleEntitySelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, MultipleEntitySelector> {
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(MultipleEntitySelector.class, name);
         }
 
@@ -120,8 +120,8 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
     public static final class MultipleEntitySelectorParser<C> implements ArgumentParser<C, MultipleEntitySelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<MultipleEntitySelector> parse(@NonNull final CommandContext<C> commandContext,
-                                                                          @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<MultipleEntitySelector> parse(final @NonNull CommandContext<C> commandContext,
+                                                                          final @NonNull Queue<@NonNull String> inputQueue) {
             if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
                 return ArgumentParseResult.failure(

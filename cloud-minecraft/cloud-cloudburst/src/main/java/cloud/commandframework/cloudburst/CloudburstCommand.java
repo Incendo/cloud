@@ -50,11 +50,11 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
     private final CloudburstCommandManager<C> manager;
     private final Command<C> cloudCommand;
 
-    CloudburstCommand(@NonNull final String label,
-                      @NonNull final List<@NonNull String> aliases,
-                      @NonNull final Command<C> cloudCommand,
-                      @NonNull final CommandArgument<C, ?> command,
-                      @NonNull final CloudburstCommandManager<C> manager) {
+    CloudburstCommand(final @NonNull String label,
+                      final @NonNull List<@NonNull String> aliases,
+                      final @NonNull Command<C> cloudCommand,
+                      final @NonNull CommandArgument<C, ?> command,
+                      final @NonNull CloudburstCommandManager<C> manager) {
         super(manager.getOwningPlugin(), CommandData.builder(label)
                                 .addAliases(aliases.toArray(new String[0]))
                                 .addPermission(cloudCommand.getCommandPermission().toString())

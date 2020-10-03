@@ -42,9 +42,9 @@ import java.util.function.BiFunction;
 public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, SingleEntitySelector> {
 
     private SingleEntitySelectorArgument(final boolean required,
-                                         @NonNull final String name,
-                                         @NonNull final String defaultValue,
-                                         @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                         final @NonNull String name,
+                                         final @NonNull String defaultValue,
+                                         final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                                  @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new SingleEntitySelectorParser<>(), defaultValue, SingleEntitySelector.class, suggestionsProvider);
     }
@@ -56,7 +56,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> SingleEntitySelectorArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> SingleEntitySelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new SingleEntitySelectorArgument.Builder<>(name);
     }
 
@@ -67,7 +67,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> of(final @NonNull String name) {
         return SingleEntitySelectorArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -78,7 +78,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> optional(final @NonNull String name) {
         return SingleEntitySelectorArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -90,15 +90,15 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> optional(@NonNull final String name,
-                                                                                 @NonNull final String defaultEntitySelector) {
+    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> optional(final @NonNull String name,
+                                                                                 final @NonNull String defaultEntitySelector) {
         return SingleEntitySelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, SingleEntitySelector> {
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(SingleEntitySelector.class, name);
         }
 
@@ -119,8 +119,8 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
     public static final class SingleEntitySelectorParser<C> implements ArgumentParser<C, SingleEntitySelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<SingleEntitySelector> parse(@NonNull final CommandContext<C> commandContext,
-                                                                        @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<SingleEntitySelector> parse(final @NonNull CommandContext<C> commandContext,
+                                                                        final @NonNull Queue<@NonNull String> inputQueue) {
             if (!((Set<CloudBukkitCapabilities>) commandContext.get("CloudBukkitCapabilities")).contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
                 return ArgumentParseResult.failure(

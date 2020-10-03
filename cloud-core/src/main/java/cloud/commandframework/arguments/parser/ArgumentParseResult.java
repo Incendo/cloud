@@ -44,7 +44,7 @@ public abstract class ArgumentParseResult<T> {
      * @param <T>     Parser return type
      * @return Failed parse result
      */
-    public static <T> @NonNull ArgumentParseResult<T> failure(@NonNull final Throwable failure) {
+    public static <T> @NonNull ArgumentParseResult<T> failure(final @NonNull Throwable failure) {
         return new ParseFailure<>(failure);
     }
 
@@ -55,7 +55,7 @@ public abstract class ArgumentParseResult<T> {
      * @param <T>   Parser return type
      * @return Succeeded parse result
      */
-    public static <T> @NonNull ArgumentParseResult<T> success(@NonNull final T value) {
+    public static <T> @NonNull ArgumentParseResult<T> success(final @NonNull T value) {
         return new ParseSuccess<>(value);
     }
 
@@ -81,7 +81,7 @@ public abstract class ArgumentParseResult<T> {
          */
         private final T value;
 
-        private ParseSuccess(@NonNull final T value) {
+        private ParseSuccess(final @NonNull T value) {
             this.value = value;
         }
 
@@ -105,7 +105,7 @@ public abstract class ArgumentParseResult<T> {
          */
         private final Throwable failure;
 
-        private ParseFailure(@NonNull final Throwable failure) {
+        private ParseFailure(final @NonNull Throwable failure) {
             this.failure = failure;
         }
 

@@ -38,7 +38,7 @@ public final class Description {
 
     private final String description;
 
-    private Description(@NonNull final String description) {
+    private Description(final @NonNull String description) {
         this.description = description;
     }
 
@@ -57,7 +57,7 @@ public final class Description {
      * @param string Command description
      * @return Created command description
      */
-    public static @NonNull Description of(@NonNull final String string) {
+    public static @NonNull Description of(final @NonNull String string) {
         return new Description(string);
     }
 

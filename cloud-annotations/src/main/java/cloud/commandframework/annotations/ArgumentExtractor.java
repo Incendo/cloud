@@ -38,7 +38,7 @@ import java.util.function.Function;
 class ArgumentExtractor implements Function<@NonNull Method, @NonNull Collection<@NonNull ArgumentParameterPair>> {
 
     @Override
-    public @NonNull Collection<@NonNull ArgumentParameterPair> apply(@NonNull final Method method) {
+    public @NonNull Collection<@NonNull ArgumentParameterPair> apply(final @NonNull Method method) {
         final Collection<ArgumentParameterPair> arguments = new ArrayList<>();
         for (final Parameter parameter : method.getParameters()) {
             if (!parameter.isAnnotationPresent(Argument.class)) {

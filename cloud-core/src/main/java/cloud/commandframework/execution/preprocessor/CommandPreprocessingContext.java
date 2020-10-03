@@ -45,8 +45,8 @@ public final class CommandPreprocessingContext<C> {
      * @param commandContext Command context
      * @param inputQueue     Command input as supplied by sender
      */
-    public CommandPreprocessingContext(@NonNull final CommandContext<C> commandContext,
-                                       @NonNull final LinkedList<@NonNull String> inputQueue) {
+    public CommandPreprocessingContext(final @NonNull CommandContext<C> commandContext,
+                                       final @NonNull LinkedList<@NonNull String> inputQueue) {
         this.commandContext = commandContext;
         this.inputQueue = inputQueue;
     }

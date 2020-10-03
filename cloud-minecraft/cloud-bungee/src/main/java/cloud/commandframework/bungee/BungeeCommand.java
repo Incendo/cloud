@@ -52,8 +52,8 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
 
     @SuppressWarnings("unchecked")
     BungeeCommand(final cloud.commandframework.@NonNull Command<C> cloudCommand,
-                  @NonNull final CommandArgument<C, ?> command,
-                  @NonNull final BungeeCommandManager<C> manager) {
+                  final @NonNull CommandArgument<C, ?> command,
+                  final @NonNull BungeeCommandManager<C> manager) {
         super(command.getName(),
               cloudCommand.getCommandPermission().toString(),
               ((StaticArgument<C>) command).getAlternativeAliases().toArray(new String[0]));

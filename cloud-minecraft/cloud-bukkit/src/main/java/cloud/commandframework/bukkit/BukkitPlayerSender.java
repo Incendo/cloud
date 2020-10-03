@@ -28,7 +28,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class BukkitPlayerSender extends BukkitCommandSender {
 
-    BukkitPlayerSender(@NonNull final Player player) {
+    BukkitPlayerSender(final @NonNull Player player) {
         super(player);
     }
 

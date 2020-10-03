@@ -46,12 +46,12 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
     private final Y fifth;
     private final Z sixth;
 
-    protected Sextet(@NonNull final U first,
-                     @NonNull final V second,
-                     @NonNull final W third,
-                     @NonNull final X fourth,
-                     @NonNull final Y fifth,
-                     @NonNull final Z sixth) {
+    protected Sextet(final @NonNull U first,
+                     final @NonNull V second,
+                     final @NonNull W third,
+                     final @NonNull X fourth,
+                     final @NonNull Y fifth,
+                     final @NonNull Z sixth) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -78,12 +78,12 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      * @return Created sextet
      */
     public static <U, V, W, X, Y, Z> @NonNull Sextet<@NonNull U, @NonNull V, @NonNull W, @NonNull X, @NonNull Y, @NonNull Z> of(
-                                                                          @NonNull final U first,
-                                                                          @NonNull final V second,
-                                                                          @NonNull final W third,
-                                                                          @NonNull final X fourth,
-                                                                          @NonNull final Y fifth,
-                                                                          @NonNull final Z sixth) {
+                                                                          final @NonNull U first,
+                                                                          final @NonNull V second,
+                                                                          final @NonNull W third,
+                                                                          final @NonNull X fourth,
+                                                                          final @NonNull Y fifth,
+                                                                          final @NonNull Z sixth) {
         return new Sextet<>(first, second, third, fourth, fifth, sixth);
     }
 
@@ -175,7 +175,7 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
     }
 
     @Override
-    public @NonNull final Object @NonNull [] toArray() {
+    public final @NonNull Object @NonNull [] toArray() {
         final Object[] array = new Object[6];
         array[0] = this.first;
         array[1] = this.second;

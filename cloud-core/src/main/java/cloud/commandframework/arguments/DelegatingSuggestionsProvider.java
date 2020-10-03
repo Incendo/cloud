@@ -36,13 +36,13 @@ final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull Comm
     private final String argumentName;
     private final ArgumentParser<C, ?> parser;
 
-    DelegatingSuggestionsProvider(@NonNull final String argumentName, @NonNull final ArgumentParser<C, ?> parser) {
+    DelegatingSuggestionsProvider(final @NonNull String argumentName, final @NonNull ArgumentParser<C, ?> parser) {
         this.argumentName = argumentName;
         this.parser = parser;
     }
 
     @Override
-    public @NonNull List<@NonNull String> apply(@NonNull final CommandContext<C> context, @NonNull final String s) {
+    public @NonNull List<@NonNull String> apply(final @NonNull CommandContext<C> context, final @NonNull String s) {
         return this.parser.suggestions(context, s);
     }
 

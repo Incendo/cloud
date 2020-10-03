@@ -43,8 +43,8 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
     private final MethodHandle methodHandle;
     private final Map<String, CommandArgument<C, ?>> commandArguments;
 
-    MethodCommandExecutionHandler(@NonNull final Object instance,
-                                  @NonNull final Map<@NonNull String,
+    MethodCommandExecutionHandler(final @NonNull Object instance,
+                                  final @NonNull Map<@NonNull String,
                                           @NonNull CommandArgument<@NonNull C, @NonNull ?>> commandArguments,
                                   @NonNull  final Method method) throws Exception {
         this.commandArguments = commandArguments;
@@ -54,7 +54,7 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
     }
 
     @Override
-    public void execute(@NonNull final CommandContext<C> commandContext) {
+    public void execute(final @NonNull CommandContext<C> commandContext) {
         final List<Object> arguments = new ArrayList<>(this.parameters.length);
         final FlagContext flagContext = commandContext.flags();
 

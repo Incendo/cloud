@@ -43,12 +43,12 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
     CloudburstPluginRegistrationHandler() {
     }
 
-    void initialize(@NonNull final CloudburstCommandManager<C> cloudburstCommandManager) {
+    void initialize(final @NonNull CloudburstCommandManager<C> cloudburstCommandManager) {
         this.cloudburstCommandManager = cloudburstCommandManager;
     }
 
     @Override
-    public final boolean registerCommand(@NonNull final Command<?> command) {
+    public final boolean registerCommand(final @NonNull Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
         if (this.registeredCommands.containsKey(commandArgument)) {

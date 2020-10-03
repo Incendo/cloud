@@ -59,8 +59,8 @@ public final class StandardParameters {
     private StandardParameters() {
     }
 
-    private static <T> @NonNull ParserParameter<T> create(@NonNull final String key,
-                                                          @NonNull final TypeToken<T> expectedType) {
+    private static <T> @NonNull ParserParameter<T> create(final @NonNull String key,
+                                                          final @NonNull TypeToken<T> expectedType) {
         return new ParserParameter<>(key, expectedType);
     }
 

@@ -44,7 +44,7 @@ import java.util.List;
 public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
 
     @Override
-    public final @NonNull String apply(@NonNull final List<@NonNull CommandArgument<C, ?>> commandArguments,
+    public final @NonNull String apply(final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
                                        final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node) {
         final StringBuilder stringBuilder = new StringBuilder();
         final Iterator<CommandArgument<C, ?>> iterator = commandArguments.iterator();

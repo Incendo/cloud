@@ -37,8 +37,8 @@ public final class ServicePump<Context> {
     private final ServicePipeline servicePipeline;
     private final Context context;
 
-    ServicePump(@NonNull final ServicePipeline servicePipeline,
-                @NonNull final Context context) {
+    ServicePump(final @NonNull ServicePipeline servicePipeline,
+                final @NonNull Context context) {
         this.servicePipeline = servicePipeline;
         this.context = context;
     }
@@ -51,7 +51,7 @@ public final class ServicePump<Context> {
      * @return Service spigot instance
      */
     public <Result> @NonNull ServiceSpigot<@NonNull Context, @NonNull Result> through(
-            @NonNull final TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type) {
+            final @NonNull TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type) {
         return new ServiceSpigot<>(this.servicePipeline, this.context, type);
     }
 
@@ -63,7 +63,7 @@ public final class ServicePump<Context> {
      * @return Service spigot instance
      */
     public <Result> @NonNull ServiceSpigot<@NonNull Context, @NonNull Result> through(
-            @NonNull final Class<? extends Service<@NonNull Context, @NonNull Result>> clazz) {
+            final @NonNull Class<? extends Service<@NonNull Context, @NonNull Result>> clazz) {
         return this.through(TypeToken.get(clazz));
     }
 

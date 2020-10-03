@@ -62,7 +62,7 @@ public final class CloudCloudburstTest extends PluginBase {
 
     @CommandMethod("test <num> [str]")
     private void testCommand(@NonNull @Argument(value = "str", defaultValue = "potato") final String string,
-                             @NonNull final CommandSender source,
+                             final @NonNull CommandSender source,
                              @Argument("num") @Range(min = "10", max = "33") final int num) {
         source.sendMessage(TextFormat.RED + "You said: "
                            + TextFormat.GOLD + string

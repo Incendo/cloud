@@ -40,8 +40,8 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
     private final Method method;
     private final Object instance;
 
-    AnnotatedMethodService(@NonNull final Object instance,
-                           @NonNull final Method method)
+    AnnotatedMethodService(final @NonNull Object instance,
+                           final @NonNull Method method)
         throws Exception {
       ExecutionOrder executionOrder = ExecutionOrder.SOON;
       try {
@@ -60,7 +60,7 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
 
   @Override
   @SuppressWarnings("unchecked")
-  public @Nullable Result handle(@NonNull final Context context) {
+  public @Nullable Result handle(final @NonNull Context context) {
     try {
       return (Result) this.methodHandle.invoke(this.instance, context);
     } catch (final Throwable throwable) {

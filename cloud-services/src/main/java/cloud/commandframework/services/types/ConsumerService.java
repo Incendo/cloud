@@ -50,7 +50,7 @@ public interface ConsumerService<Context>
   }
 
   @Override
-  default @NonNull State handle(@NonNull final Context context) {
+  default @NonNull State handle(final @NonNull Context context) {
     try {
       this.accept(context);
     } catch (final PipeBurst burst) {

@@ -46,9 +46,9 @@ import java.util.function.BiFunction;
 public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, MultiplePlayerSelector> {
 
     private MultiplePlayerSelectorArgument(final boolean required,
-                                           @NonNull final String name,
-                                           @NonNull final String defaultValue,
-                                           @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                           final @NonNull String name,
+                                           final @NonNull String defaultValue,
+                                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                                    @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new MultiplePlayerSelectorParser<>(), defaultValue, MultiplePlayerSelector.class,
               suggestionsProvider);
@@ -61,7 +61,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> MultiplePlayerSelectorArgument.Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> MultiplePlayerSelectorArgument.Builder<C> newBuilder(final @NonNull String name) {
         return new MultiplePlayerSelectorArgument.Builder<>(name);
     }
 
@@ -72,7 +72,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> of(final @NonNull String name) {
         return MultiplePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -83,7 +83,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> optional(final @NonNull String name) {
         return MultiplePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -95,15 +95,15 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> optional(@NonNull final String name,
-                                                                                   @NonNull final String defaultEntitySelector) {
+    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> optional(final @NonNull String name,
+                                                                                   final @NonNull String defaultEntitySelector) {
         return MultiplePlayerSelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, MultiplePlayerSelector> {
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(MultiplePlayerSelector.class, name);
         }
 
@@ -124,8 +124,8 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
     public static final class MultiplePlayerSelectorParser<C> implements ArgumentParser<C, MultiplePlayerSelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<MultiplePlayerSelector> parse(@NonNull final CommandContext<C> commandContext,
-                                                                          @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<MultiplePlayerSelector> parse(final @NonNull CommandContext<C> commandContext,
+                                                                          final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -159,8 +159,8 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final String input) {
+        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull String input) {
             List<String> output = new ArrayList<>();
 
             for (Player player : Bukkit.getOnlinePlayers()) {

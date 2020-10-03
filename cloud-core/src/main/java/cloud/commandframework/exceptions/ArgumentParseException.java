@@ -39,9 +39,9 @@ public class ArgumentParseException extends CommandParseException {
      * @param commandSender Command sender
      * @param currentChain  Chain leading up to the exception
      */
-    public ArgumentParseException(@NonNull final Throwable throwable,
-                                  @NonNull final Object commandSender,
-                                  @NonNull final List<@NonNull CommandArgument<?, ?>> currentChain) {
+    public ArgumentParseException(final @NonNull Throwable throwable,
+                                  final @NonNull Object commandSender,
+                                  final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.cause = throwable;
     }

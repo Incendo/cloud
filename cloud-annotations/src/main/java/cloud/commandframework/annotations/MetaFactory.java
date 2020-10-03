@@ -35,14 +35,14 @@ class MetaFactory implements Function<@NonNull Annotation @NonNull [], @NonNull 
     private final AnnotationParser<?> annotationParser;
     private final Function<ParserParameters, CommandMeta> metaMapper;
 
-    MetaFactory(@NonNull final AnnotationParser<?> annotationParser,
-                @NonNull final Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper) {
+    MetaFactory(final @NonNull AnnotationParser<?> annotationParser,
+                final @NonNull Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper) {
         this.annotationParser = annotationParser;
         this.metaMapper = metaMapper;
     }
 
     @Override
-    public @NonNull CommandMeta apply(@NonNull final Annotation @NonNull [] annotations) {
+    public @NonNull CommandMeta apply(final @NonNull Annotation @NonNull [] annotations) {
         final ParserParameters parameters = ParserParameters.empty();
         for (final Annotation annotation : annotations) {
             @SuppressWarnings("ALL") final Function function = this.annotationParser.getAnnotationMappers()

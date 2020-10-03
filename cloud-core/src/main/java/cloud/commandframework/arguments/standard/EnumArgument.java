@@ -45,11 +45,11 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
-    protected EnumArgument(@NonNull final Class<E> enumClass,
+    protected EnumArgument(final @NonNull Class<E> enumClass,
                            final boolean required,
-                           @NonNull final String name,
-                           @NonNull final String defaultValue,
-                           @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                           final @NonNull String name,
+                           final @NonNull String defaultValue,
+                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                    @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass, suggestionsProvider);
     }
@@ -65,7 +65,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
      */
     public static <C, E extends Enum<E>> EnumArgument.@NonNull Builder<C, E> newBuilder(
             @NonNull  final Class<E> enumClass,
-            @NonNull final String name) {
+            final @NonNull String name) {
         return new EnumArgument.Builder<>(name, enumClass);
     }
 
@@ -79,8 +79,8 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
      * @return Created argument
      */
     public static <C, E extends Enum<E>> @NonNull CommandArgument<C, E> of(
-            @NonNull final Class<E> enumClass,
-            @NonNull final String name) {
+            final @NonNull Class<E> enumClass,
+            final @NonNull String name) {
         return EnumArgument.<C, E>newBuilder(enumClass, name).asRequired().build();
     }
 
@@ -94,8 +94,8 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
      * @return Created argument
      */
     public static <C, E extends Enum<E>> @NonNull CommandArgument<C, E> optional(
-            @NonNull final Class<E> enumClass,
-            @NonNull final String name) {
+            final @NonNull Class<E> enumClass,
+            final @NonNull String name) {
         return EnumArgument.<C, E>newBuilder(enumClass, name).asOptional().build();
     }
 
@@ -110,9 +110,9 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
      * @return Created argument
      */
     public static <C, E extends Enum<E>> @NonNull CommandArgument<C, E> optional(
-            @NonNull final Class<E> enumClass,
-            @NonNull final String name,
-            @NonNull final E defaultValue) {
+            final @NonNull Class<E> enumClass,
+            final @NonNull String name,
+            final @NonNull E defaultValue) {
         return EnumArgument.<C, E>newBuilder(enumClass, name).asOptionalWithDefault(defaultValue.name().toLowerCase()).build();
     }
 
@@ -121,7 +121,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
         private final Class<E> enumClass;
 
-        protected Builder(@NonNull final String name, @NonNull final Class<E> enumClass) {
+        protected Builder(final @NonNull String name, final @NonNull Class<E> enumClass) {
             super(enumClass, name);
             this.enumClass = enumClass;
         }
@@ -144,14 +144,14 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
          *
          * @param enumClass Enum class
          */
-        public EnumParser(@NonNull final Class<E> enumClass) {
+        public EnumParser(final @NonNull Class<E> enumClass) {
             this.enumClass = enumClass;
             this.allowedValues = EnumSet.allOf(enumClass);
         }
 
         @Override
-        public @NonNull ArgumentParseResult<E> parse(@NonNull final CommandContext<C> commandContext,
-                                                     @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<E> parse(final @NonNull CommandContext<C> commandContext,
+                                                     final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -168,8 +168,8 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final String input) {
+        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull String input) {
             return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase()).collect(Collectors.toList());
         }
 
@@ -191,14 +191,14 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
          * @param input     Input
          * @param enumClass Enum class
          */
-        public EnumParseException(@NonNull final String input,
-                                  @NonNull final Class<? extends Enum<?>> enumClass) {
+        public EnumParseException(final @NonNull String input,
+                                  final @NonNull Class<? extends Enum<?>> enumClass) {
             this.input = input;
             this.enumClass = enumClass;
         }
 
         @SuppressWarnings("all")
-        private static @NonNull String join(@NonNull final Class<? extends Enum> clazz) {
+        private static @NonNull String join(final @NonNull Class<? extends Enum> clazz) {
             final EnumSet<?> enumSet = EnumSet.allOf(clazz);
             return enumSet.stream()
                           .map(e -> e.toString().toLowerCase())

@@ -37,7 +37,7 @@ public final class SelectorParseException extends IllegalArgumentException {
      *
      * @param input String input
      */
-    public SelectorParseException(@NonNull final String input) {
+    public SelectorParseException(final @NonNull String input) {
         this.input = input;
     }
 

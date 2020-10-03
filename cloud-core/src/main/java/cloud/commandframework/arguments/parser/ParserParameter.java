@@ -44,8 +44,8 @@ public class ParserParameter<T> {
      * @param key          Parameter key
      * @param expectedType Type that is expected to be mapped to this parameter
      */
-    public ParserParameter(@NonNull final String key,
-                           @NonNull final TypeToken<T> expectedType) {
+    public ParserParameter(final @NonNull String key,
+                           final @NonNull TypeToken<T> expectedType) {
         this.key = key;
         this.expectedType = expectedType;
     }

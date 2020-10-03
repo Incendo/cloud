@@ -42,11 +42,11 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     private final double max;
 
     private DoubleArgument(final boolean required,
-                           @NonNull final String name,
+                           final @NonNull String name,
                            final double min,
                            final double max,
                            final String defaultValue,
-                           @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                    @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class, suggestionsProvider);
         this.min = min;
@@ -60,7 +60,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -71,7 +71,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Double> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Double> of(final @NonNull String name) {
         return DoubleArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -82,7 +82,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Double> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Double> optional(final @NonNull String name) {
         return DoubleArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,7 +94,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Double> optional(@NonNull final String name,
+    public static <C> @NonNull CommandArgument<C, Double> optional(final @NonNull String name,
                                                                    final double defaultNum) {
         return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(Double.toString(defaultNum)).build();
     }
@@ -122,7 +122,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         private double min = Double.MIN_VALUE;
         private double max = Double.MAX_VALUE;
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(Double.class, name);
         }
 
@@ -179,8 +179,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
         @Override
         public @NonNull ArgumentParseResult<Double> parse(
-                @NonNull final CommandContext<C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue) {
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -232,7 +232,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          * @param min   Minimum value
          * @param max   Maximum value
          */
-        public DoubleParseException(@NonNull final String input, final double min, final double max) {
+        public DoubleParseException(final @NonNull String input, final double min, final double max) {
             super(input, min, max);
         }
 

@@ -42,11 +42,11 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     private final short max;
 
     private ShortArgument(final boolean required,
-                          @NonNull final String name,
+                          final @NonNull String name,
                           final short min,
                           final short max,
                           final String defaultValue,
-                          @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                          final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                   @NonNull List<String>> suggestionsProvider) {
         super(required, name, new ShortParser<>(min, max), defaultValue, Short.class, suggestionsProvider);
         this.min = min;
@@ -60,7 +60,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> ShortArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> ShortArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -71,7 +71,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Short> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Short> of(final @NonNull String name) {
         return ShortArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -82,7 +82,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Short> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Short> optional(final @NonNull String name) {
         return ShortArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,7 +94,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Short> optional(@NonNull final String name,
+    public static <C> @NonNull CommandArgument<C, Short> optional(final @NonNull String name,
                                                                   final short defaultNum) {
         return ShortArgument.<C>newBuilder(name).asOptionalWithDefault(Short.toString(defaultNum)).build();
     }
@@ -122,7 +122,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         private short min = Short.MIN_VALUE;
         private short max = Short.MAX_VALUE;
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(Short.class, name);
         }
 
@@ -179,8 +179,8 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
 
         @Override
         public @NonNull ArgumentParseResult<Short> parse(
-                @NonNull final CommandContext<C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue) {
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -203,8 +203,8 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final String input) {
+        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull String input) {
             return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
         }
 
@@ -238,7 +238,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @param min   Minimum value
          * @param max   Maximum value
          */
-        public ShortParseException(@NonNull final String input, final short min, final short max) {
+        public ShortParseException(final @NonNull String input, final short min, final short max) {
             super(input, min, max);
         }
 

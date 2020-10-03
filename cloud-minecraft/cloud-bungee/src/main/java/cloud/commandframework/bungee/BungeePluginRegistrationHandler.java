@@ -40,12 +40,12 @@ final class BungeePluginRegistrationHandler<C> implements CommandRegistrationHan
     BungeePluginRegistrationHandler() {
     }
 
-    void initialize(@NonNull final BungeeCommandManager<C> bungeeCommandManager) {
+    void initialize(final @NonNull BungeeCommandManager<C> bungeeCommandManager) {
         this.bungeeCommandManager = bungeeCommandManager;
     }
 
     @Override
-    public boolean registerCommand(@NonNull final Command<?> command) {
+    public boolean registerCommand(final @NonNull Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
         if (this.registeredCommands.containsKey(commandArgument)) {

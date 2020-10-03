@@ -39,7 +39,7 @@ public final class AcceptingCommandPreprocessor<C> implements CommandPreprocesso
     public static final String PROCESSED_INDICATOR_KEY = "__COMMAND_PRE_PROCESSED__";
 
     @Override
-    public void accept(@NonNull final CommandPreprocessingContext<C> context) {
+    public void accept(final @NonNull CommandPreprocessingContext<C> context) {
         context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
     }
 

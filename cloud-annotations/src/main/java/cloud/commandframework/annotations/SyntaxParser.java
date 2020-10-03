@@ -47,7 +47,7 @@ final class SyntaxParser implements Function<@NonNull String, @NonNull LinkedHas
                                                                               .asPredicate();
 
     @Override
-    public @NonNull LinkedHashMap<@NonNull String, @NonNull SyntaxFragment> apply(@NonNull final String syntax) {
+    public @NonNull LinkedHashMap<@NonNull String, @NonNull SyntaxFragment> apply(final @NonNull String syntax) {
         final StringTokenizer stringTokenizer = new StringTokenizer(syntax, " ");
         final LinkedHashMap<String, SyntaxFragment> map = new LinkedHashMap<>();
         while (stringTokenizer.hasMoreTokens()) {

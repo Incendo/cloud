@@ -49,7 +49,7 @@ public abstract class CommandExecutionCoordinator<C> {
      *
      * @param commandTree Command tree
      */
-    public CommandExecutionCoordinator(@NonNull final CommandTree<C> commandTree) {
+    public CommandExecutionCoordinator(final @NonNull CommandTree<C> commandTree) {
         this.commandTree = commandTree;
     }
 
@@ -92,13 +92,13 @@ public abstract class CommandExecutionCoordinator<C> {
     public static final class SimpleCoordinator<C> extends
             CommandExecutionCoordinator<C> {
 
-        private SimpleCoordinator(@NonNull final CommandTree<C> commandTree) {
+        private SimpleCoordinator(final @NonNull CommandTree<C> commandTree) {
             super(commandTree);
         }
 
         @Override
-        public CompletableFuture<CommandResult<C>> coordinateExecution(@NonNull final CommandContext<C> commandContext,
-                                                                       @NonNull final Queue<@NonNull String> input) {
+        public CompletableFuture<CommandResult<C>> coordinateExecution(final @NonNull CommandContext<C> commandContext,
+                                                                       final @NonNull Queue<@NonNull String> input) {
             final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
             try {
                 this.getCommandTree().parse(commandContext, input).ifPresent(command -> {

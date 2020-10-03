@@ -45,8 +45,8 @@ public final class CommandPostprocessingContext<C> {
      * @param commandContext Command context
      * @param command        Command instance
      */
-    public CommandPostprocessingContext(@NonNull final CommandContext<@NonNull C> commandContext,
-                                        @NonNull final Command<@NonNull C> command) {
+    public CommandPostprocessingContext(final @NonNull CommandContext<@NonNull C> commandContext,
+                                        final @NonNull Command<@NonNull C> command) {
         this.commandContext = commandContext;
         this.command = command;
     }

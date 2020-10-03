@@ -37,8 +37,8 @@ import java.util.List;
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
 
     @Override
-    public @NonNull List<@NonNull String> apply(@NonNull final CommandPreprocessingContext<C> context,
-                                                @NonNull final List<@NonNull String> strings) {
+    public @NonNull List<@NonNull String> apply(final @NonNull CommandPreprocessingContext<C> context,
+                                                final @NonNull List<@NonNull String> strings) {
         final String input;
         if (context.getInputQueue().isEmpty()) {
             input = "";

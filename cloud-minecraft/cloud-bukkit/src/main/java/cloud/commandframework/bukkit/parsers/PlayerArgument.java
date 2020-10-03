@@ -46,9 +46,9 @@ import java.util.function.BiFunction;
 public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
     private PlayerArgument(final boolean required,
-                           @NonNull final String name,
-                           @NonNull final String defaultValue,
-                           @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                           final @NonNull String name,
+                           final @NonNull String defaultValue,
+                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                    @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new PlayerParser<>(), defaultValue, Player.class, suggestionsProvider);
     }
@@ -60,7 +60,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -71,7 +71,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, Player> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Player> of(final @NonNull String name) {
         return PlayerArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -82,7 +82,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, Player> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Player> optional(final @NonNull String name) {
         return PlayerArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,15 +94,15 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>           Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, Player> optional(@NonNull final String name,
-                                                                   @NonNull final String defaultPlayer) {
+    public static <C> @NonNull CommandArgument<C, Player> optional(final @NonNull String name,
+                                                                   final @NonNull String defaultPlayer) {
         return PlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultPlayer).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Player> {
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(Player.class, name);
         }
 
@@ -122,8 +122,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     public static final class PlayerParser<C> implements ArgumentParser<C, Player> {
 
         @Override
-        public @NonNull ArgumentParseResult<Player> parse(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<Player> parse(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -141,8 +141,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final String input) {
+        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull String input) {
             List<String> output = new ArrayList<>();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -166,7 +166,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
          *
          * @param input String input
          */
-        public PlayerParseException(@NonNull final String input) {
+        public PlayerParseException(final @NonNull String input) {
             this.input = input;
         }
 

@@ -32,8 +32,8 @@ enum ServiceFilterHandler {
     INSTANCE;
 
     <Context> boolean passes(
-            @NonNull final ServiceRepository<Context, ?>.ServiceWrapper<? extends Service<Context, ?>> service,
-            @NonNull final Context context) {
+            final @NonNull ServiceRepository<Context, ?>.ServiceWrapper<? extends Service<Context, ?>> service,
+            final @NonNull Context context) {
         if (!service.isDefaultImplementation()) {
             for (final Predicate<Context> predicate : service.getFilters()) {
                 try {

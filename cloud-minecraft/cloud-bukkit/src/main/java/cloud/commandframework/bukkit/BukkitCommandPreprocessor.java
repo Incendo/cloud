@@ -51,7 +51,7 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
      * and a {@link java.util.Set} of {@link CloudBukkitCapabilities} with the key "CloudBukkitCapabilities"
      */
     @Override
-    public void accept(@NonNull final CommandPreprocessingContext<C> context) {
+    public void accept(final @NonNull CommandPreprocessingContext<C> context) {
         context.getCommandContext().store("BukkitCommandSender", mgr.getBackwardsCommandSenderMapper().apply(
                 context.getCommandContext().getSender()));
         context.getCommandContext().store("CloudBukkitCapabilities", mgr.queryCapabilities());

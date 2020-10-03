@@ -56,7 +56,7 @@ public final class ServicePipelineBuilder {
      * @param executor New executor
      * @return Builder instance
      */
-    public @NonNull ServicePipelineBuilder withExecutor(@NonNull final Executor executor) {
+    public @NonNull ServicePipelineBuilder withExecutor(final @NonNull Executor executor) {
         this.executor = Objects.requireNonNull(executor, "Executor may not be null");
         return this;
     }

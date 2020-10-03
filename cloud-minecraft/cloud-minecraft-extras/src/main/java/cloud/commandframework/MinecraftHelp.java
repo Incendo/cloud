@@ -73,9 +73,9 @@ public final class MinecraftHelp<C> {
      * @param audienceProvider Provider that maps the command sender type to {@link Audience}
      * @param commandManager   Command manager instance
      */
-    public MinecraftHelp(@NonNull final String commandPrefix,
-                         @NonNull final AudienceProvider<C> audienceProvider,
-                         @NonNull final CommandManager<C> commandManager) {
+    public MinecraftHelp(final @NonNull String commandPrefix,
+                         final @NonNull AudienceProvider<C> audienceProvider,
+                         final @NonNull CommandManager<C> commandManager) {
         this.commandPrefix = commandPrefix;
         this.audienceProvider = audienceProvider;
         this.commandManager = commandManager;
@@ -128,7 +128,7 @@ public final class MinecraftHelp<C> {
      * @param sender Sender to map
      * @return Mapped audience
      */
-    public @NonNull Audience getAudience(@NonNull final C sender) {
+    public @NonNull Audience getAudience(final @NonNull C sender) {
         return this.audienceProvider.apply(sender);
     }
 
@@ -138,8 +138,8 @@ public final class MinecraftHelp<C> {
      * @param key     Message key
      * @param message Message
      */
-    public void setMessage(@NonNull final String key,
-                           @NonNull final String message) {
+    public void setMessage(final @NonNull String key,
+                           final @NonNull String message) {
         this.messageMap.put(key, message);
     }
 
@@ -149,16 +149,16 @@ public final class MinecraftHelp<C> {
      * @param query     Command query (without leading '/')
      * @param recipient Recipient
      */
-    public void queryCommands(@NonNull final String query,
-                              @NonNull final C recipient) {
+    public void queryCommands(final @NonNull String query,
+                              final @NonNull C recipient) {
         final Audience audience = this.getAudience(recipient);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_HEADER)));
         this.printTopic(recipient, query, this.commandManager.getCommandHelpHandler().queryHelp(query));
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_FOOTER)));
     }
 
-    private void printTopic(@NonNull final C sender,
-                            @NonNull final String query,
+    private void printTopic(final @NonNull C sender,
+                            final @NonNull String query,
                             final CommandHelpHandler.@NonNull HelpTopic<C> helpTopic) {
         this.getAudience(sender).sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_QUERY),
                                                                     Template.of("query", query)));
@@ -173,7 +173,7 @@ public final class MinecraftHelp<C> {
         }
     }
 
-    private void printIndexHelpTopic(@NonNull final C sender,
+    private void printIndexHelpTopic(final @NonNull C sender,
                                      final CommandHelpHandler.@NonNull IndexHelpTopic<C> helpTopic) {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_AVAILABLE_COMMANDS)));
@@ -201,7 +201,7 @@ public final class MinecraftHelp<C> {
         }
     }
 
-    private void printMultiHelpTopic(@NonNull final C sender,
+    private void printMultiHelpTopic(final @NonNull C sender,
                                      final CommandHelpHandler.@NonNull MultiHelpTopic<C> helpTopic) {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_LONGEST_PATH),
@@ -236,7 +236,7 @@ public final class MinecraftHelp<C> {
         }
     }
 
-    private void printVerboseHelpTopic(@NonNull final C sender,
+    private void printVerboseHelpTopic(final @NonNull C sender,
                                        final CommandHelpHandler.@NonNull VerboseHelpTopic<C> helpTopic) {
         final Audience audience = this.getAudience(sender);
         final String command = this.commandManager.getCommandSyntaxFormatter()

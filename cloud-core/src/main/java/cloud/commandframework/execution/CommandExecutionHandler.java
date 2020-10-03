@@ -52,7 +52,7 @@ public interface CommandExecutionHandler<C> {
     class NullCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
 
         @Override
-        public void execute(@NonNull final CommandContext<C> commandContext) {
+        public void execute(final @NonNull CommandContext<C> commandContext) {
         }
 
     }

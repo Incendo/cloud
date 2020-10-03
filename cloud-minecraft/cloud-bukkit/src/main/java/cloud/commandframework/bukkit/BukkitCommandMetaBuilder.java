@@ -52,7 +52,7 @@ public final class BukkitCommandMetaBuilder {
          * @param description Command description
          * @return Builder instance
          */
-        public @NonNull BuilderStage2 withDescription(@NonNull final String description) {
+        public @NonNull BuilderStage2 withDescription(final @NonNull String description) {
             return new BuilderStage2(description);
         }
 
@@ -63,7 +63,7 @@ public final class BukkitCommandMetaBuilder {
 
         private final String description;
 
-        private BuilderStage2(@NonNull final String description) {
+        private BuilderStage2(final @NonNull String description) {
             this.description = description;
         }
 

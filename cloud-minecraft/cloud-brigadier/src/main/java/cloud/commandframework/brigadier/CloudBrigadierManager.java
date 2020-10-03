@@ -95,8 +95,8 @@ public final class CloudBrigadierManager<C, S> {
      * @param commandManager       Command manager
      * @param dummyContextProvider Provider of dummy context for completions
      */
-    public CloudBrigadierManager(@NonNull final CommandManager<C> commandManager,
-                                 @NonNull final Supplier<@NonNull CommandContext<C>>
+    public CloudBrigadierManager(final @NonNull CommandManager<C> commandManager,
+                                 final @NonNull Supplier<@NonNull CommandContext<C>>
                                          dummyContextProvider) {
         this.mappers = new HashMap<>();
         this.defaultArgumentTypeSuppliers = new HashMap<>();
@@ -199,9 +199,9 @@ public final class CloudBrigadierManager<C, S> {
      * @param <K>               cloud argument type
      * @param <O>               Brigadier argument type value
      */
-    public <T, K extends ArgumentParser<C, T>, O> void registerMapping(@NonNull final TypeToken<K> argumentType,
+    public <T, K extends ArgumentParser<C, T>, O> void registerMapping(final @NonNull TypeToken<K> argumentType,
                                                                        final boolean nativeSuggestions,
-                                                                       @NonNull final Function<@NonNull ? extends K,
+                                                                       final @NonNull Function<@NonNull ? extends K,
                                                                                @NonNull ? extends ArgumentType<O>> mapper) {
         this.mappers.put(GenericTypeReflector.erase(argumentType.getType()),
                          cloud.commandframework.types.tuples.Pair.of(mapper, nativeSuggestions));
@@ -213,16 +213,16 @@ public final class CloudBrigadierManager<C, S> {
      * @param clazz    Type to map
      * @param supplier Supplier that supplies the argument type
      */
-    public void registerDefaultArgumentTypeSupplier(@NonNull final Class<?> clazz,
-                                                    @NonNull final Supplier<@NonNull ArgumentType<?>> supplier) {
+    public void registerDefaultArgumentTypeSupplier(final @NonNull Class<?> clazz,
+                                                    final @NonNull Supplier<@NonNull ArgumentType<?>> supplier) {
         this.defaultArgumentTypeSuppliers.put(clazz, supplier);
     }
 
     @SuppressWarnings("all")
     private <T, K extends ArgumentParser<?, ?>> @Nullable Pair<@NonNull ArgumentType<?>, @NonNull Boolean> getArgument(
-            @NonNull final TypeToken<?> valueType,
-            @NonNull final TypeToken<T> argumentType,
-            @NonNull final K argument) {
+            final @NonNull TypeToken<?> valueType,
+            final @NonNull TypeToken<T> argumentType,
+            final @NonNull K argument) {
         final ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
         final cloud.commandframework.types.tuples.Pair pair
                 = this.mappers.get(GenericTypeReflector.erase(argumentType.getType()));
@@ -234,8 +234,8 @@ public final class CloudBrigadierManager<C, S> {
     }
 
     private <T, K extends ArgumentParser<C, T>> @NonNull Pair<@NonNull ArgumentType<?>, @NonNull Boolean> createDefaultMapper(
-            @NonNull final TypeToken<?> clazz,
-            @NonNull final ArgumentParser<C, T> argument) {
+            final @NonNull TypeToken<?> clazz,
+            final @NonNull ArgumentParser<C, T> argument) {
         final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers
                 .get(GenericTypeReflector.erase(clazz.getType()));
         if (argumentTypeSupplier != null) {
@@ -253,9 +253,9 @@ public final class CloudBrigadierManager<C, S> {
      * @param executor          Command executor
      * @return Literal command node
      */
-    public @NonNull LiteralCommandNode<S> createLiteralCommandNode(@NonNull final String label,
-                                                                   @NonNull final Command<C> cloudCommand,
-                                                                   @NonNull final BiPredicate<@NonNull S,
+    public @NonNull LiteralCommandNode<S> createLiteralCommandNode(final @NonNull String label,
+                                                                   final @NonNull Command<C> cloudCommand,
+                                                                   final @NonNull BiPredicate<@NonNull S,
                                                                            @NonNull CommandPermission> permissionChecker,
                                                                    final com.mojang.brigadier.@NonNull Command<S> executor) {
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
@@ -287,10 +287,10 @@ public final class CloudBrigadierManager<C, S> {
      */
     public @NonNull LiteralCommandNode<S> createLiteralCommandNode(
             final CommandTree.@NonNull Node<@NonNull CommandArgument<C, ?>> cloudCommand,
-            @NonNull final LiteralCommandNode<S> root,
-            @NonNull final SuggestionProvider<S> suggestionProvider,
+            final @NonNull LiteralCommandNode<S> root,
+            final @NonNull SuggestionProvider<S> suggestionProvider,
             final com.mojang.brigadier.@NonNull Command<S> executor,
-            @NonNull final BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker) {
+            final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker) {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
                 .requires(sender -> permissionChecker.test(sender,
                                                            (CommandPermission) cloudCommand.getNodeMeta()
@@ -310,7 +310,7 @@ public final class CloudBrigadierManager<C, S> {
     private @NonNull ArgumentBuilder<S, ?> constructCommandNode(
             final boolean forceExecutor,
             final CommandTree.@NonNull Node<CommandArgument<C, ?>> root,
-            @NonNull final BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker,
+            final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker,
             final com.mojang.brigadier.@NonNull Command<S> executor,
             final SuggestionProvider<S> suggestionProvider) {
         if (root.getValue() instanceof CompoundArgument) {
@@ -389,9 +389,9 @@ public final class CloudBrigadierManager<C, S> {
     }
 
     private @NonNull CompletableFuture<Suggestions> buildSuggestions(
-            @NonNull final CommandArgument<C, ?> argument,
+            final @NonNull CommandArgument<C, ?> argument,
             final com.mojang.brigadier.context.@NonNull CommandContext<S> s,
-            @NonNull final SuggestionsBuilder builder) {
+            final @NonNull SuggestionsBuilder builder) {
         final CommandContext<C> commandContext = this.dummyContextProvider.get();
         final LinkedList<String> inputQueue = new LinkedList<>(Collections.singletonList(builder.getInput()));
         final CommandPreprocessingContext<C> commandPreprocessingContext =
@@ -435,8 +435,8 @@ public final class CloudBrigadierManager<C, S> {
         private final L left;
         private final R right;
 
-        private Pair(@NonNull final L left,
-                     @NonNull final R right) {
+        private Pair(final @NonNull L left,
+                     final @NonNull R right) {
             this.left = left;
             this.right = right;
         }

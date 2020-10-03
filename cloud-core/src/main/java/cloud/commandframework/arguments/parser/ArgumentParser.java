@@ -56,8 +56,8 @@ public interface ArgumentParser<C, T> {
      * @param input          Input string
      * @return List of suggestions
      */
-    default @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
-                                                       @NonNull final String input) {
+    default @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
+                                                       final @NonNull String input) {
         return Collections.emptyList();
     }
 

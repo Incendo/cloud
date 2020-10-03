@@ -51,7 +51,7 @@ public final class CommandContext<C> {
      *
      * @param commandSender Sender of the command
      */
-    public CommandContext(@NonNull final C commandSender) {
+    public CommandContext(final @NonNull C commandSender) {
         this(false, commandSender);
     }
 
@@ -62,7 +62,7 @@ public final class CommandContext<C> {
      * @param commandSender Sender of the command
      */
     public CommandContext(final boolean suggestions,
-                          @NonNull final C commandSender) {
+                          final @NonNull C commandSender) {
         this.commandSender = commandSender;
         this.suggestions = suggestions;
     }
@@ -93,7 +93,7 @@ public final class CommandContext<C> {
      * @param value Value
      * @param <T>   Value type
      */
-    public <T> void store(@NonNull final String key, @NonNull final T value) {
+    public <T> void store(final @NonNull String key, final @NonNull T value) {
         this.internalStorage.put(key, value);
     }
 
@@ -105,7 +105,7 @@ public final class CommandContext<C> {
      * @param <T> Value type
      * @return Value
      */
-    public <T> @NonNull Optional<T> getOptional(@NonNull final String key) {
+    public <T> @NonNull Optional<T> getOptional(final @NonNull String key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
             @SuppressWarnings("ALL") final T castedValue = (T) value;
@@ -120,7 +120,7 @@ public final class CommandContext<C> {
      *
      * @param key Key to remove
      */
-    public void remove(@NonNull final String key) {
+    public void remove(final @NonNull String key) {
         this.internalStorage.remove(key);
     }
 
@@ -134,7 +134,7 @@ public final class CommandContext<C> {
      * @throws NullPointerException If no such argument is stored
      */
     @SuppressWarnings("unchecked")
-    public <T> @NonNull T get(@NonNull final String key) {
+    public <T> @NonNull T get(final @NonNull String key) {
         final Object value = this.internalStorage.get(key);
         if (value == null) {
             throw new NullPointerException("No such object stored in the context: " + key);
@@ -150,8 +150,8 @@ public final class CommandContext<C> {
      * @param <T>          Argument type
      * @return Argument, or supplied default value
      */
-    public <T> @Nullable T getOrDefault(@NonNull final String key,
-                                        @Nullable final T defaultValue) {
+    public <T> @Nullable T getOrDefault(final @NonNull String key,
+                                        final @Nullable T defaultValue) {
         return this.<T>getOptional(key).orElse(defaultValue);
     }
 
@@ -161,7 +161,7 @@ public final class CommandContext<C> {
      * @param argument Argument
      * @return Created timing instance
      */
-    public @NonNull ArgumentTiming createTiming(@NonNull final CommandArgument<C, ?> argument) {
+    public @NonNull ArgumentTiming createTiming(final @NonNull CommandArgument<C, ?> argument) {
         final ArgumentTiming argumentTiming = new ArgumentTiming();
         this.argumentTimings.put(argument, argumentTiming);
         return argumentTiming;

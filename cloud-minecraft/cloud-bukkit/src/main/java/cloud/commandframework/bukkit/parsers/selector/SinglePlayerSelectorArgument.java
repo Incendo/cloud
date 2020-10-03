@@ -46,9 +46,9 @@ import java.util.function.BiFunction;
 public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, SinglePlayerSelector> {
 
     private SinglePlayerSelectorArgument(final boolean required,
-                                         @NonNull final String name,
-                                         @NonNull final String defaultValue,
-                                         @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                                         final @NonNull String name,
+                                         final @NonNull String defaultValue,
+                                         final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                                  @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new SinglePlayerSelectorParser<>(), defaultValue, SinglePlayerSelector.class, suggestionsProvider);
     }
@@ -60,7 +60,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> SinglePlayerSelectorArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> SinglePlayerSelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new SinglePlayerSelectorArgument.Builder<>(name);
     }
 
@@ -71,7 +71,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> of(final @NonNull String name) {
         return SinglePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -82,7 +82,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> optional(final @NonNull String name) {
         return SinglePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,15 +94,15 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> optional(@NonNull final String name,
-                                                                                 @NonNull final String defaultEntitySelector) {
+    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> optional(final @NonNull String name,
+                                                                                 final @NonNull String defaultEntitySelector) {
         return SinglePlayerSelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, SinglePlayerSelector> {
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(SinglePlayerSelector.class, name);
         }
 
@@ -123,8 +123,8 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
     public static final class SinglePlayerSelectorParser<C> implements ArgumentParser<C, SinglePlayerSelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<SinglePlayerSelector> parse(@NonNull final CommandContext<C> commandContext,
-                                                                        @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<SinglePlayerSelector> parse(final @NonNull CommandContext<C> commandContext,
+                                                                        final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -163,8 +163,8 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final String input) {
+        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull String input) {
             List<String> output = new ArrayList<>();
 
             for (Player player : Bukkit.getOnlinePlayers()) {

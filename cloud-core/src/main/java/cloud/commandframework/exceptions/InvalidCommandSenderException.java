@@ -42,9 +42,9 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @param requiredSender The sender type that is required
      * @param currentChain   Chain leading up to the exception
      */
-    public InvalidCommandSenderException(@NonNull final Object commandSender,
-                                         @NonNull final Class<?> requiredSender,
-                                         @NonNull final List<@NonNull CommandArgument<?, ?>> currentChain) {
+    public InvalidCommandSenderException(final @NonNull Object commandSender,
+                                         final @NonNull Class<?> requiredSender,
+                                         final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.requiredSender = requiredSender;
     }

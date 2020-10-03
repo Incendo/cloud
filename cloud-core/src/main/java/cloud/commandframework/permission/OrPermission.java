@@ -38,7 +38,7 @@ public final class OrPermission implements CommandPermission {
 
     private final Collection<CommandPermission> permissions;
 
-    private OrPermission(@NonNull final Collection<CommandPermission> permissions) {
+    private OrPermission(final @NonNull Collection<CommandPermission> permissions) {
         this.permissions = permissions;
     }
 
@@ -48,7 +48,7 @@ public final class OrPermission implements CommandPermission {
      * @param permissions Permissions to join
      * @return Constructed permission
      */
-    public static @NonNull CommandPermission of(@NonNull final Collection<CommandPermission> permissions) {
+    public static @NonNull CommandPermission of(final @NonNull Collection<CommandPermission> permissions) {
         final Set<CommandPermission> permissionSet = new HashSet<>();
         for (final CommandPermission permission : permissions) {
             permissionSet.addAll(permission.getPermissions());

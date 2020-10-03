@@ -37,7 +37,7 @@ public final class PipelineException extends RuntimeException {
      *
      * @param cause Cause of the exception
      */
-    public PipelineException(@NonNull final Exception cause) {
+    public PipelineException(final @NonNull Exception cause) {
         super(cause);
     }
 
@@ -47,7 +47,7 @@ public final class PipelineException extends RuntimeException {
      * @param message Message explaining the exception
      * @param cause   Cause of the exception
      */
-    public PipelineException(@NonNull final String message, @NonNull final Exception cause) {
+    public PipelineException(final @NonNull String message, final @NonNull Exception cause) {
         super(message, cause);
     }
 

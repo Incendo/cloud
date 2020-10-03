@@ -54,7 +54,7 @@ public final class ServiceRepository<Context, Response> {
      *
      * @param serviceType Service type
      */
-    ServiceRepository(@NonNull final TypeToken<? extends Service<Context, Response>> serviceType) {
+    ServiceRepository(final @NonNull TypeToken<? extends Service<Context, Response>> serviceType) {
         this.serviceType = serviceType;
         this.implementations = new LinkedList<>();
     }
@@ -66,8 +66,8 @@ public final class ServiceRepository<Context, Response> {
      * @param filters Filters that will be used to determine whether or not the service gets used
      * @param <T>     Type of the implementation
      */
-    <T extends Service<Context, Response>> void registerImplementation(@NonNull final T service,
-                                                                       @NonNull final Collection<Predicate<Context>> filters) {
+    <T extends Service<Context, Response>> void registerImplementation(final @NonNull T service,
+                                                                       final @NonNull Collection<Predicate<Context>> filters) {
         synchronized (this.lock) {
             this.implementations.add(new ServiceWrapper<>(service, filters));
         }
@@ -101,8 +101,8 @@ public final class ServiceRepository<Context, Response> {
         private final int registrationOrder = ServiceRepository.this.registrationOrder++;
         private final ExecutionOrder executionOrder;
 
-        private ServiceWrapper(@NonNull final T implementation,
-                               @NonNull final Collection<Predicate<Context>> filters) {
+        private ServiceWrapper(final @NonNull T implementation,
+                               final @NonNull Collection<Predicate<Context>> filters) {
             this.defaultImplementation = implementations.isEmpty();
             this.implementation = implementation;
             this.filters = filters;
@@ -140,7 +140,7 @@ public final class ServiceRepository<Context, Response> {
         }
 
         @Override
-        public int compareTo(@NonNull final ServiceWrapper<T> other) {
+        public int compareTo(final @NonNull ServiceWrapper<T> other) {
             return Comparator.<ServiceWrapper<T>>comparingInt(
                     wrapper -> wrapper.isDefaultImplementation()
                                ? Integer.MIN_VALUE

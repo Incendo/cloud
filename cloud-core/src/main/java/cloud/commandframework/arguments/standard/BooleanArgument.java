@@ -40,10 +40,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     private final boolean liberal;
 
     private BooleanArgument(final boolean required,
-                            @NonNull final String name,
+                            final @NonNull String name,
                             final boolean liberal,
-                            @NonNull final String defaultValue,
-                            @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                            final @NonNull String defaultValue,
+                            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                     @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class, suggestionsProvider);
         this.liberal = liberal;
@@ -56,7 +56,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -67,7 +67,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Boolean> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Boolean> of(final @NonNull String name) {
         return BooleanArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -78,7 +78,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Boolean> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Boolean> optional(final @NonNull String name) {
         return BooleanArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -90,7 +90,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      * @param <C>            Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Boolean> optional(@NonNull final String name,
+    public static <C> @NonNull CommandArgument<C, Boolean> optional(final @NonNull String name,
                                                                     final boolean defaultBoolean) {
         return BooleanArgument.<C>newBuilder(name).asOptionalWithDefault(Boolean.toString(defaultBoolean)).build();
     }
@@ -108,7 +108,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
 
         private boolean liberal = false;
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(Boolean.class, name);
         }
 
@@ -154,8 +154,8 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         }
 
         @Override
-        public @NonNull ArgumentParseResult<Boolean> parse(@NonNull final CommandContext<C> commandContext,
-                                                           @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<Boolean> parse(final @NonNull CommandContext<C> commandContext,
+                                                           final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -188,8 +188,8 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final String input) {
+        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull String input) {
             if (!liberal) {
                 return Arrays.asList("TRUE", "FALSE");
             }
@@ -218,7 +218,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          * @param input   String input
          * @param liberal Liberal value
          */
-        public BooleanParseException(@NonNull final String input,
+        public BooleanParseException(final @NonNull String input,
                                      final boolean liberal) {
             this.input = input;
             this.liberal = liberal;

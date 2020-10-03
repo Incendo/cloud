@@ -83,11 +83,11 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    public BukkitCommandManager(@NonNull final Plugin owningPlugin,
-                                @NonNull final Function<@NonNull CommandTree<C>,
+    public BukkitCommandManager(final @NonNull Plugin owningPlugin,
+                                final @NonNull Function<@NonNull CommandTree<C>,
                                         @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                                @NonNull final Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
-                                @NonNull final Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper)
+                                final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
+                                final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper)
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
         ((BukkitPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
@@ -170,7 +170,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
     }
 
     @Override
-    public final boolean hasPermission(@NonNull final C sender, @NonNull final String permission) {
+    public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         if (permission.isEmpty()) {
             return true;
         }
@@ -198,7 +198,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      * @param capability Capability
      * @return {@code true} if the manager has the given capability, else {@code false}
      */
-    public final boolean queryCapability(@NonNull final CloudBukkitCapabilities capability) {
+    public final boolean queryCapability(final @NonNull CloudBukkitCapabilities capability) {
         return this.queryCapabilities().contains(capability);
     }
 
@@ -273,7 +273,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
          *
          * @param reason Reason
          */
-        public BrigadierFailureException(@NonNull final BrigadierFailureReason reason) {
+        public BrigadierFailureException(final @NonNull BrigadierFailureReason reason) {
             this.reason = reason;
         }
 
@@ -283,7 +283,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
          * @param reason Reason
          * @param cause  Cause
          */
-        public BrigadierFailureException(@NonNull final BrigadierFailureReason reason, @NonNull final Throwable cause) {
+        public BrigadierFailureException(final @NonNull BrigadierFailureReason reason, final @NonNull Throwable cause) {
             super(cause);
             this.reason = reason;
         }

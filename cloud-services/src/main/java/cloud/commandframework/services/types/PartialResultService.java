@@ -41,7 +41,7 @@ public interface PartialResultService<Context, Result, Chunked extends ChunkedRe
     extends Service<Chunked, @Nullable Map<@NonNull Context, @NonNull Result>> {
 
   @Override
-  default @Nullable Map<@NonNull Context, @NonNull Result> handle(@NonNull final Chunked context) {
+  default @Nullable Map<@NonNull Context, @NonNull Result> handle(final @NonNull Chunked context) {
     if (!context.isCompleted()) {
       this.handleRequests(context.getRemaining()).forEach(context::storeResult);
     }

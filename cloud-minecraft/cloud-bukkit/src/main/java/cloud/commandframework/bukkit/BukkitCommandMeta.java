@@ -33,7 +33,7 @@ public class BukkitCommandMeta extends SimpleCommandMeta {
      *
      * @param simpleCommandMeta Simple command meta data instance that gets mirrored
      */
-    public BukkitCommandMeta(@NonNull final SimpleCommandMeta simpleCommandMeta) {
+    public BukkitCommandMeta(final @NonNull SimpleCommandMeta simpleCommandMeta) {
         super(simpleCommandMeta.getAll());
     }
 

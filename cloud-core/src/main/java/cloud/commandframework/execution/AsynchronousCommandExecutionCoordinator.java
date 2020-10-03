@@ -50,9 +50,9 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     private final Executor executor;
     private final boolean synchronizeParsing;
 
-    private AsynchronousCommandExecutionCoordinator(@Nullable final Executor executor,
+    private AsynchronousCommandExecutionCoordinator(final @Nullable Executor executor,
                                                     final boolean synchronizeParsing,
-                                                    @NonNull final CommandTree<C> commandTree) {
+                                                    final @NonNull CommandTree<C> commandTree) {
         super(commandTree);
         this.executor = executor;
         this.synchronizeParsing = synchronizeParsing;
@@ -70,8 +70,8 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     }
 
     @Override
-    public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(@NonNull final CommandContext<C> commandContext,
-                                                                            @NonNull final Queue<@NonNull String> input) {
+    public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(final @NonNull CommandContext<C> commandContext,
+                                                                            final @NonNull Queue<@NonNull String> input) {
 
         final Consumer<Command<C>> commandConsumer = command -> {
             if (this.commandManager.postprocessContext(commandContext, command) == State.ACCEPTED) {
@@ -140,7 +140,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          * @param executor Executor to use
          * @return Builder instance
          */
-        public @NonNull Builder<C> withExecutor(@NonNull final Executor executor) {
+        public @NonNull Builder<C> withExecutor(final @NonNull Executor executor) {
             this.executor = executor;
             return this;
         }
