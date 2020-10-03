@@ -174,5 +174,5 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
             return output;
         }
     }
-    
+
 }
