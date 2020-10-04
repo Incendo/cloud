@@ -49,8 +49,8 @@ public class JavacordServerSender extends JavacordCommandSender {
      * Gets the server channel the command was executed in
      * @return The server channel
      */
-    public ServerChannel getServerChannel() {
-        return (ServerChannel) getTextChannel();
+    public @NonNull ServerChannel getServerChannel() {
+        return (ServerChannel) this.getTextChannel();
     }
 
     /**

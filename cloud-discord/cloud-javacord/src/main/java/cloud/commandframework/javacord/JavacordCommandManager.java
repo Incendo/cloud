@@ -94,7 +94,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
      * @return the command prefix
      */
     public @NonNull String getCommandPrefix(final @NonNull C sender) {
-        return commandPrefixMapper.apply(sender);
+        return this.commandPrefixMapper.apply(sender);
     }
 
     /**
@@ -102,7 +102,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
      *
      * @return Current DiscordApi instance
      */
-    public DiscordApi getDiscordApi() {
-        return discordApi;
+    public @NonNull DiscordApi getDiscordApi() {
+        return this.discordApi;
     }
 }

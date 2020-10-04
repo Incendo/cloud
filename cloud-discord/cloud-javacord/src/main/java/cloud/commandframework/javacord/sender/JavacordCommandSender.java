@@ -46,7 +46,7 @@ public class JavacordCommandSender {
      */
     @NonNull
     public MessageAuthor getAuthor() {
-        return event.getMessageAuthor();
+        return this.event.getMessageAuthor();
     }
 
     /**
@@ -56,7 +56,7 @@ public class JavacordCommandSender {
      */
     @NonNull
     public Message getMessage() {
-       return event.getMessage();
+       return this.event.getMessage();
     }
 
     /**
@@ -65,7 +65,7 @@ public class JavacordCommandSender {
      */
     @NonNull
     public TextChannel getTextChannel() {
-        return event.getChannel();
+        return this.event.getChannel();
     }
 
     /**
@@ -74,7 +74,7 @@ public class JavacordCommandSender {
      */
     @NonNull
     public MessageCreateEvent getEvent() {
-        return event;
+        return this.event;
     }
 
     /**
@@ -83,8 +83,8 @@ public class JavacordCommandSender {
      * @return The sent message
      */
     @NonNull
-    public CompletableFuture<Message> sendMessage(@Nullable String message) {
-        return event.getChannel().sendMessage(message);
+    public CompletableFuture<Message> sendMessage(final @Nullable String message) {
+        return this.event.getChannel().sendMessage(message);
     }
 
     /**
@@ -93,7 +93,7 @@ public class JavacordCommandSender {
      * @return The sent message
      */
     @NonNull
-    public CompletableFuture<Message> sendErrorMessage(@Nullable String message) {
+    public CompletableFuture<Message> sendErrorMessage(final @Nullable String message) {
         return sendMessage(":x: " + message);
     }
 
@@ -103,7 +103,7 @@ public class JavacordCommandSender {
      * @return The sent message
      */
     @NonNull
-    public CompletableFuture<Message> sendSuccessMessage(@Nullable String message) {
+    public CompletableFuture<Message> sendSuccessMessage(final @Nullable String message) {
         return sendMessage(":white_check_mark: " + message);
     }
 
