@@ -128,6 +128,13 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                                      );
                                  } else {
                                      commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
+                                     this.manager.getOwningPlugin().getLogger().warning(
+                                             String.format("(Cloud) Unknown exception type '%s' with cause '%s'",
+                                                           throwable.getClass().getCanonicalName(),
+                                                           throwable.getCause() == null ? "none"
+                                                                                        : throwable.getCause()
+                                                                                                   .getClass().getCanonicalName())
+                                     );
                                      throwable.printStackTrace();
                                  }
                              }

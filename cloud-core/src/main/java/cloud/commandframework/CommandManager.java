@@ -216,7 +216,7 @@ public abstract class CommandManager<C> {
      *
      * @return Command registration handler
      */
-    protected @NonNull CommandRegistrationHandler getCommandRegistrationHandler() {
+    public @NonNull CommandRegistrationHandler getCommandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
 

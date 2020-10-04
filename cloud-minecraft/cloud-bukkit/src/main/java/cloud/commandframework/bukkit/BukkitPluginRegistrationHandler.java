@@ -35,14 +35,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
-class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
+public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
 
     private final Map<CommandArgument<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
+    private final Set<String> recognizedAliases = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
     private Map<String, org.bukkit.command.Command> bukkitCommands;
     private BukkitCommandManager<C> bukkitCommandManager;
@@ -51,7 +55,7 @@ class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
     BukkitPluginRegistrationHandler() {
     }
 
-    void initialize(final @NonNull BukkitCommandManager<C> bukkitCommandManager) throws Exception {
+    final void initialize(final @NonNull BukkitCommandManager<C> bukkitCommandManager) throws Exception {
         final Method getCommandMap = Bukkit.getServer().getClass().getDeclaredMethod("getCommandMap");
         getCommandMap.setAccessible(true);
         this.commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());
@@ -65,31 +69,41 @@ class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
     }
 
     @Override
-    public boolean registerCommand(final @NonNull Command<?> command) {
+    public final boolean registerCommand(final @NonNull Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
         if (this.registeredCommands.containsKey(commandArgument)) {
             return false;
         }
+
         final String label;
+        final String prefixedLabel = String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(),
+                                                   commandArgument.getName()).toLowerCase();
         if (bukkitCommands.containsKey(commandArgument.getName())) {
-            label = String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(), commandArgument.getName());
+            label = prefixedLabel;
         } else {
             label = commandArgument.getName();
         }
 
-        @SuppressWarnings("unchecked") final List<String> aliases = ((StaticArgument<C>) commandArgument).getAlternativeAliases();
+        @SuppressWarnings("unchecked")
+        final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
+
+        if (!label.contains(":")) {
+            aliases.add(prefixedLabel);
+        }
 
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
-                commandArgument.getName(),
+                label,
                 (this.bukkitCommandManager.getSplitAliases() ? Collections.<String>emptyList() : aliases),
                 (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
                 this.bukkitCommandManager);
         this.registeredCommands.put(commandArgument, bukkitCommand);
-        this.commandMap.register(commandArgument.getName(), this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
+        this.commandMap.register(label,
+                                 this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
                                  bukkitCommand);
-        this.registerExternal(commandArgument.getName(), command, bukkitCommand);
+        this.registerExternal(label, command, bukkitCommand);
+        this.recognizedAliases.add(label);
 
         if (this.bukkitCommandManager.getSplitAliases()) {
             for (final String alias : aliases) {
@@ -104,11 +118,22 @@ class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
                                                                              .getName().toLowerCase(),
                                              bukkitCommand);
                     this.registerExternal(alias, command, aliasCommand);
+                    this.recognizedAliases.add(alias);
                 }
             }
         }
 
         return true;
+    }
+
+    /**
+     * Check if the given alias is recognizable by this registration handler
+     *
+     * @param alias Alias
+     * @return {@code true} if the alias is recognized, else {@code false}
+     */
+    public boolean isRecognized(@NonNull final String alias) {
+        return this.recognizedAliases.contains(alias);
     }
 
     protected void registerExternal(final @NonNull String label,

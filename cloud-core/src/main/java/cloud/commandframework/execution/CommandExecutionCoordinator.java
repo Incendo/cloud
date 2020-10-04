@@ -23,10 +23,13 @@
 //
 package cloud.commandframework.execution;
 
+import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.services.State;
+import cloud.commandframework.types.tuples.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
@@ -101,12 +104,17 @@ public abstract class CommandExecutionCoordinator<C> {
                                                                        final @NonNull Queue<@NonNull String> input) {
             final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
             try {
-                this.getCommandTree().parse(commandContext, input).ifPresent(command -> {
+                final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
+                        this.getCommandTree().parse(commandContext, input);
+                if (pair.getSecond() != null) {
+                    completableFuture.completeExceptionally(pair.getSecond());
+                } else {
+                    final Command<C> command = pair.getFirst();
                     if (this.getCommandTree().getCommandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
                         command.getCommandExecutionHandler().execute(commandContext);
                     }
-                });
-                completableFuture.complete(new CommandResult<>(commandContext));
+                    completableFuture.complete(new CommandResult<>(commandContext));
+                }
             } catch (final Exception e) {
                 completableFuture.completeExceptionally(e);
             }

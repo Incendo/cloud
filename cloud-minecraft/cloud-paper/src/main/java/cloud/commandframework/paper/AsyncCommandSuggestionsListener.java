@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.paper;
 
+import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
@@ -49,6 +50,12 @@ class AsyncCommandSuggestionsListener<C> implements Listener {
         }
         final String[] arguments = event.getBuffer().substring(1).split(" ");
         if (paperCommandManager.getCommandTree().getNamedNode(arguments[0]) == null) {
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
+                (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.getCommandRegistrationHandler();
+        if (!bukkitPluginRegistrationHandler.isRecognized(arguments[0])) {
             return;
         }
         final CommandSender sender = event.getSender();

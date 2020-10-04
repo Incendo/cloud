@@ -37,6 +37,7 @@ import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -49,6 +50,7 @@ import java.util.UUID;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 class PaperBrigadierListener<C> implements Listener {
 
@@ -168,8 +170,21 @@ class PaperBrigadierListener<C> implements Listener {
 
     @EventHandler
     public void onCommandRegister(@Nonnull final CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
+        if (!(event.getCommand() instanceof PluginIdentifiableCommand)) {
+            return;
+        } else if (!((PluginIdentifiableCommand) event.getCommand())
+                .getPlugin().equals(this.paperCommandManager.getOwningPlugin())) {
+            return;
+        }
+
         final CommandTree<C> commandTree = this.paperCommandManager.getCommandTree();
-        final CommandTree.Node<CommandArgument<C, ?>> node = commandTree.getNamedNode(event.getCommandLabel());
+
+        String label = event.getCommandLabel();
+        if (label.contains(":")) {
+            label = label.split(Pattern.quote(":"))[1];
+        }
+
+        final CommandTree.Node<CommandArgument<C, ?>> node = commandTree.getNamedNode(label);
         if (node == null) {
             return;
         }

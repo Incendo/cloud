@@ -38,6 +38,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
+import cloud.commandframework.types.tuples.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -52,7 +53,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
@@ -85,6 +85,8 @@ import java.util.stream.Collectors;
  */
 public final class CommandTree<C> {
 
+    private static final @Nullable Exception NULL_EXCEPTION = null;
+
     private final Object commandLock = new Object();
 
     private final Node<CommandArgument<C, ?>> internalTree = new Node<>(null);
@@ -111,43 +113,46 @@ public final class CommandTree<C> {
      * @param commandContext Command context instance
      * @param args           Input
      * @return Parsed command, if one could be found
-     * @throws NoSuchCommandException If there is no command matching the input
-     * @throws NoPermissionException  If the sender lacks permission to execute the command
-     * @throws InvalidSyntaxException If the command syntax is invalid
      */
-    public @NonNull Optional<Command<C>> parse(final @NonNull CommandContext<C> commandContext,
-                                               final @NonNull Queue<@NonNull String> args) throws
-            NoSuchCommandException, NoPermissionException, InvalidSyntaxException {
-        final Optional<Command<C>> commandOptional = parseCommand(new ArrayList<>(),
-                                                                  commandContext,
-                                                                  args,
-                                                                  this.internalTree);
-        commandOptional.flatMap(Command::getSenderType).ifPresent(requiredType -> {
-            if (!requiredType.isAssignableFrom(commandContext.getSender().getClass())) {
-                throw new InvalidCommandSenderException(commandContext.getSender(), requiredType, Collections.emptyList());
+    public @NonNull Pair<@Nullable Command<C>, @Nullable Exception> parse(final @NonNull CommandContext<C> commandContext,
+                                                                          final @NonNull Queue<@NonNull String> args) {
+        final Pair<@Nullable Command<C>, @Nullable Exception> pair = this.parseCommand(new ArrayList<>(),
+                                                                                       commandContext,
+                                                                                       args,
+                                                                                       this.internalTree);
+        if (pair.getFirst() != null) {
+            final Command<C> command = pair.getFirst();
+            if (command.getSenderType().isPresent() && !command.getSenderType().get()
+                                                               .isAssignableFrom(commandContext.getSender().getClass())) {
+                return Pair.of(null, new InvalidCommandSenderException(commandContext.getSender(),
+                                                                       command.getSenderType().get(),
+                                                                       Collections.emptyList()));
             }
-        });
-        return commandOptional;
-    }
-
-    private Optional<Command<C>> parseCommand(final @NonNull List<@NonNull CommandArgument<C, ?>> parsedArguments,
-                                              final @NonNull CommandContext<C> commandContext,
-                                              final @NonNull Queue<@NonNull String> commandQueue,
-                                              final @NonNull Node<@Nullable CommandArgument<C, ?>> root) {
-        CommandPermission permission = this.isPermitted(commandContext.getSender(), root);
-        if (permission != null) {
-            throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(root)
-                                                                                        .stream()
-                                                                                        .map(Node::getValue)
-                                                                                        .collect(Collectors.toList()));
         }
 
-        final Optional<Command<C>> parsedChild = this.attemptParseUnambiguousChild(parsedArguments,
-                                                                                   commandContext,
-                                                                                   root,
-                                                                                   commandQueue);
-        // noinspection all
-        if (parsedChild != null) {
+        return pair;
+    }
+
+    private @NonNull Pair<@Nullable Command<C>, @Nullable Exception>
+    parseCommand(final @NonNull List<@NonNull CommandArgument<C, ?>> parsedArguments,
+                 final @NonNull CommandContext<C> commandContext,
+                 final @NonNull Queue<@NonNull String> commandQueue,
+                 final @NonNull Node<@Nullable CommandArgument<C, ?>> root) {
+        CommandPermission permission = this.isPermitted(commandContext.getSender(), root);
+        if (permission != null) {
+            return Pair.of(null, new NoPermissionException(permission,
+                                                           commandContext.getSender(),
+                                                           this.getChain(root)
+                                                               .stream()
+                                                               .map(Node::getValue)
+                                                               .collect(Collectors.toList())));
+        }
+
+        final Pair<@Nullable Command<C>, @Nullable Exception> parsedChild = this.attemptParseUnambiguousChild(parsedArguments,
+                                                                                                              commandContext,
+                                                                                                              root,
+                                                                                                              commandQueue);
+        if (parsedChild.getFirst() != null || parsedChild.getSecond() != null) {
             return parsedChild;
         }
 
@@ -156,24 +161,26 @@ public final class CommandTree<C> {
             /* We are at the bottom. Check if there's a command attached, in which case we're done */
             if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
                 if (commandQueue.isEmpty()) {
-                    return Optional.ofNullable(this.cast(root.getValue().getOwningCommand()));
+                    return Pair.of(this.cast(root.getValue().getOwningCommand()), null);
                 } else {
                     /* Too many arguments. We have a unique path, so we can send the entire context */
-                    throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                        .apply(parsedArguments, root),
-                                                     commandContext.getSender(), this.getChain(root)
-                                                                                     .stream()
-                                                                                     .map(Node::getValue)
-                                                                                     .collect(Collectors.toList()));
+                    return Pair.of(null, new InvalidSyntaxException(
+                            this.commandManager.getCommandSyntaxFormatter()
+                                               .apply(parsedArguments, root),
+                            commandContext.getSender(), this.getChain(root)
+                                                            .stream()
+                                                            .map(Node::getValue)
+                                                            .collect(Collectors.toList())));
                 }
             } else {
                 /* Too many arguments. We have a unique path, so we can send the entire context */
-                throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                    .apply(parsedArguments, root),
-                                                 commandContext.getSender(), this.getChain(root)
-                                                                                 .stream()
-                                                                                 .map(Node::getValue)
-                                                                                 .collect(Collectors.toList()));
+                return Pair.of(null, new InvalidSyntaxException(
+                        this.commandManager.getCommandSyntaxFormatter()
+                                           .apply(parsedArguments, root),
+                        commandContext.getSender(), this.getChain(root)
+                                                        .stream()
+                                                        .map(Node::getValue)
+                                                        .collect(Collectors.toList())));
             }
         } else {
             final Iterator<Node<CommandArgument<C, ?>>> childIterator = root.getChildren().iterator();
@@ -197,39 +204,42 @@ public final class CommandTree<C> {
             }
             /* We could not find a match */
             if (root.equals(this.internalTree)) {
-                throw new NoSuchCommandException(commandContext.getSender(),
-                                                 getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
-                                                 stringOrEmpty(commandQueue.peek()));
+                return Pair.of(null, new NoSuchCommandException(
+                        commandContext.getSender(),
+                        getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
+                        stringOrEmpty(commandQueue.peek())));
             }
             /* If we couldn't match a child, check if there's a command attached and execute it */
-            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+            if (root.getValue() != null && root.getValue().getOwningCommand() != null && commandQueue.isEmpty()) {
                 final Command<C> command = root.getValue().getOwningCommand();
                 if (!this.getCommandManager().hasPermission(commandContext.getSender(),
                                                             command.getCommandPermission())) {
-                    throw new NoPermissionException(command.getCommandPermission(),
-                                                    commandContext.getSender(),
-                                                    this.getChain(root)
-                                                        .stream()
-                                                        .map(Node::getValue)
-                                                        .collect(Collectors.toList()));
+                    return Pair.of(null, new NoPermissionException(
+                            command.getCommandPermission(),
+                            commandContext.getSender(),
+                            this.getChain(root)
+                                .stream()
+                                .map(Node::getValue)
+                                .collect(Collectors.toList())));
                 }
-                return Optional.of(root.getValue().getOwningCommand());
+                return Pair.of(root.getValue().getOwningCommand(), null);
             }
             /* We know that there's no command and we also cannot match any of the children */
-            throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                .apply(parsedArguments, root),
-                                             commandContext.getSender(), this.getChain(root)
-                                                                             .stream()
-                                                                             .map(Node::getValue)
-                                                                             .collect(Collectors.toList()));
+            return Pair.of(null, new InvalidSyntaxException(
+                    this.commandManager.getCommandSyntaxFormatter()
+                                       .apply(parsedArguments, root),
+                    commandContext.getSender(), this.getChain(root)
+                                                    .stream()
+                                                    .map(Node::getValue)
+                                                    .collect(Collectors.toList())));
         }
     }
 
-    private @Nullable Optional<Command<C>>
-    attemptParseUnambiguousChild(final @NonNull List<@NonNull CommandArgument<C, ?>> parsedArguments,
-                                 final @NonNull CommandContext<C> commandContext,
-                                 final @NonNull Node<@Nullable CommandArgument<C, ?>> root,
-                                 final @NonNull Queue<String> commandQueue) {
+    private @NonNull Pair<@Nullable Command<C>, @Nullable Exception> attemptParseUnambiguousChild(
+            final @NonNull List<@NonNull CommandArgument<C, ?>> parsedArguments,
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull Node<@Nullable CommandArgument<C, ?>> root,
+            final @NonNull Queue<String> commandQueue) {
         CommandPermission permission;
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
@@ -237,63 +247,73 @@ public final class CommandTree<C> {
             final Node<CommandArgument<C, ?>> child = children.get(0);
             permission = this.isPermitted(commandContext.getSender(), child);
             if (permission != null) {
-                throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(child)
-                                                                                            .stream()
-                                                                                            .map(Node::getValue)
-                                                                                            .collect(Collectors.toList()));
+                return Pair.of(null, new NoPermissionException(
+                        permission,
+                        commandContext.getSender(),
+                        this.getChain(child)
+                            .stream()
+                            .map(Node::getValue)
+                            .collect(
+                                    Collectors.toList())));
             }
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
                     if (child.getValue().hasDefaultValue()) {
                         commandQueue.add(child.getValue().getDefaultValue());
                     } else if (!child.getValue().isRequired()) {
-                        return Optional.ofNullable(this.cast(child.getValue().getOwningCommand()));
+                        return Pair.of(this.cast(child.getValue().getOwningCommand()), null);
                     } else if (child.isLeaf()) {
                         /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
                         if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
                             final Command<C> command = root.getValue().getOwningCommand();
                             if (!this.getCommandManager().hasPermission(commandContext.getSender(),
                                                                         command.getCommandPermission())) {
-                                throw new NoPermissionException(command.getCommandPermission(),
-                                                                commandContext.getSender(),
-                                                                this.getChain(root)
-                                                                    .stream()
-                                                                    .map(Node::getValue)
-                                                                    .collect(Collectors.toList()));
+                                return Pair.of(null, new NoPermissionException(
+                                        command.getCommandPermission(),
+                                        commandContext.getSender(),
+                                        this.getChain(root)
+                                            .stream()
+                                            .map(Node::getValue)
+                                            .collect(Collectors.toList())));
                             }
-                            return Optional.of(command);
+                            return Pair.of(command, null);
                         }
                         /* Not enough arguments */
-                        throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                            .apply(Objects.requireNonNull(
-                                                                                    child.getValue().getOwningCommand())
-                                                                                          .getArguments(), child),
-                                                         commandContext.getSender(), this.getChain(root)
-                                                                                         .stream()
-                                                                                         .map(Node::getValue)
-                                                                                         .collect(Collectors.toList()));
+                        return Pair.of(null, new InvalidSyntaxException(
+                                this.commandManager.getCommandSyntaxFormatter()
+                                                   .apply(Objects.requireNonNull(
+                                                           child.getValue()
+                                                                .getOwningCommand())
+                                                                 .getArguments(), child),
+                                commandContext.getSender(), this.getChain(root)
+                                                                .stream()
+                                                                .map(Node::getValue)
+                                                                .collect(
+                                                                        Collectors.toList())));
                     } else {
                         /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
                         if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
                             final Command<C> command = root.getValue().getOwningCommand();
                             if (!this.getCommandManager().hasPermission(commandContext.getSender(),
                                                                         command.getCommandPermission())) {
-                                throw new NoPermissionException(command.getCommandPermission(),
-                                                                commandContext.getSender(),
-                                                                this.getChain(root)
-                                                                    .stream()
-                                                                    .map(Node::getValue)
-                                                                    .collect(Collectors.toList()));
+                                return Pair.of(null, new NoPermissionException(
+                                        command.getCommandPermission(),
+                                        commandContext.getSender(),
+                                        this.getChain(root)
+                                            .stream()
+                                            .map(Node::getValue)
+                                            .collect(Collectors.toList())));
                             }
-                            return Optional.of(command);
+                            return Pair.of(command, null);
                         }
                         /* Child does not have a command and so we cannot proceed */
-                        throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                            .apply(parsedArguments, root),
-                                                         commandContext.getSender(), this.getChain(root)
-                                                                                         .stream()
-                                                                                         .map(Node::getValue)
-                                                                                         .collect(Collectors.toList()));
+                        return Pair.of(null, new InvalidSyntaxException(
+                                this.commandManager.getCommandSyntaxFormatter()
+                                                   .apply(parsedArguments, root),
+                                commandContext.getSender(), this.getChain(root)
+                                                                .stream()
+                                                                .map(Node::getValue)
+                                                                .collect(Collectors.toList())));
                     }
                 }
 
@@ -308,32 +328,33 @@ public final class CommandTree<C> {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     if (child.isLeaf()) {
                         if (commandQueue.isEmpty()) {
-                            return Optional.ofNullable(this.cast(child.getValue().getOwningCommand()));
+                            return Pair.of(this.cast(child.getValue().getOwningCommand()), null);
                         } else {
                             /* Too many arguments. We have a unique path, so we can send the entire context */
-                            throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                                .apply(parsedArguments, child),
-                                                             commandContext.getSender(), this.getChain(root)
-                                                                                             .stream()
-                                                                                             .map(Node::getValue)
-                                                                                             .collect(
-                                                                                                     Collectors.toList()));
+                            return Pair.of(null, new InvalidSyntaxException(
+                                    this.commandManager.getCommandSyntaxFormatter()
+                                                       .apply(parsedArguments, child),
+                                    commandContext.getSender(), this.getChain(root)
+                                                                    .stream()
+                                                                    .map(Node::getValue)
+                                                                    .collect(
+                                                                            Collectors.toList())));
                         }
                     } else {
                         parsedArguments.add(child.getValue());
                         return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
                     }
                 } else if (result.getFailure().isPresent()) {
-                    throw new ArgumentParseException(result.getFailure().get(), commandContext.getSender(),
-                                                     this.getChain(child)
-                                                         .stream()
-                                                         .map(Node::getValue)
-                                                         .collect(Collectors.toList()));
+                    return Pair.of(null, new ArgumentParseException(
+                            result.getFailure().get(), commandContext.getSender(),
+                            this.getChain(child)
+                                .stream()
+                                .map(Node::getValue)
+                                .collect(Collectors.toList())));
                 }
             }
         }
-        // noinspection all
-        return null;
+        return Pair.of(null, null);
     }
 
     /**

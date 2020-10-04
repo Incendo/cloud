@@ -28,16 +28,16 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.services.State;
+import cloud.commandframework.types.tuples.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Execution coordinator parses and/or executes commands on a separate thread from the calling thread
@@ -54,7 +54,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
                                                     final boolean synchronizeParsing,
                                                     final @NonNull CommandTree<C> commandTree) {
         super(commandTree);
-        this.executor = executor;
+        this.executor = executor == null ? ForkJoinPool.commonPool() : executor;
         this.synchronizeParsing = synchronizeParsing;
         this.commandManager = commandTree.getCommandManager();
     }
@@ -78,24 +78,39 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
                 command.getCommandExecutionHandler().execute(commandContext);
             }
         };
-        final Supplier<CommandResult<C>> supplier;
+
         if (this.synchronizeParsing) {
-            final Optional<Command<C>> commandOptional = this.getCommandTree().parse(commandContext, input);
-            supplier = () -> {
-                commandOptional.ifPresent(commandConsumer);
+            final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
+                    this.getCommandTree().parse(commandContext, input);
+            if (pair.getSecond() != null) {
+                final CompletableFuture<CommandResult<C>> future = new CompletableFuture<>();
+                future.completeExceptionally(pair.getSecond());
+                return future;
+            }
+            return CompletableFuture.supplyAsync(() -> {
+                commandConsumer.accept(pair.getFirst());
                 return new CommandResult<>(commandContext);
-            };
-        } else {
-            supplier = () -> {
-                this.getCommandTree().parse(commandContext, input).ifPresent(commandConsumer);
-                return new CommandResult<>(commandContext);
-            };
+            }, this.executor);
         }
-        if (this.executor != null) {
-            return CompletableFuture.supplyAsync(supplier, this.executor);
-        } else {
-            return CompletableFuture.supplyAsync(supplier);
-        }
+
+        final CompletableFuture<CommandResult<C>> resultFuture = new CompletableFuture<>();
+
+        this.executor.execute(() -> {
+            try {
+                final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
+                        this.getCommandTree().parse(commandContext, input);
+                if (pair.getSecond() != null) {
+                    resultFuture.completeExceptionally(pair.getSecond());
+                } else {
+                    commandConsumer.accept(pair.getFirst());
+                    resultFuture.complete(new CommandResult<>(commandContext));
+                }
+            } catch (final Exception e) {
+                resultFuture.completeExceptionally(e);
+            }
+        });
+
+        return resultFuture;
     }
 
 
