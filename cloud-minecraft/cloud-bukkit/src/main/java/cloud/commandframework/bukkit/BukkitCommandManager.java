@@ -61,9 +61,10 @@ import java.util.regex.Pattern;
  */
 public class BukkitCommandManager<C> extends CommandManager<C> {
 
-    private static final int VERSION_RADIX             = 10;
-    private static final int BRIGADIER_MINIMAL_VERSION = 13;
-    private static final int PAPER_BRIGADIER_VERSION   = 15;
+    private static final int VERSION_RADIX = 10;
+    private static final int BRIGADIER_MINIMUM_VERSION = 13;
+    private static final int PAPER_BRIGADIER_VERSION = 15;
+    private static final int ASYNC_TAB_MINIMUM_VERSION = 12;
 
     private final Plugin owningPlugin;
     private final int minecraftVersion;
@@ -99,14 +100,14 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         int version = -1;
         try {
             final Matcher matcher = Pattern.compile("\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?\\)")
-                                            .matcher(Bukkit.getVersion());
+                                           .matcher(Bukkit.getVersion());
             if (matcher.find()) {
                 version = Integer.parseInt(matcher.toMatchResult().group(2),
                                            VERSION_RADIX);
             }
         } catch (final Exception e) {
             this.owningPlugin.getLogger().severe("Failed to determine Minecraft version "
-                                                    + "for cloud Bukkit capability detection");
+                                                         + "for cloud Bukkit capability detection");
         }
         this.minecraftVersion = version;
 
@@ -209,20 +210,21 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      */
     public final @NonNull Set<@NonNull CloudBukkitCapabilities> queryCapabilities() {
         if (this.paper) {
-            if (this.minecraftVersion >= BRIGADIER_MINIMAL_VERSION) {
+            if (this.minecraftVersion >= ASYNC_TAB_MINIMUM_VERSION) {
                 if (this.minecraftVersion >= PAPER_BRIGADIER_VERSION) {
                     return EnumSet.of(CloudBukkitCapabilities.NATIVE_BRIGADIER,
                                       CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
                                       CloudBukkitCapabilities.BRIGADIER);
-                } else {
+                } else if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
                     return EnumSet.of(CloudBukkitCapabilities.COMMODORE_BRIGADIER,
+                                      CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
                                       CloudBukkitCapabilities.BRIGADIER);
+                } else {
+                    return EnumSet.of(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION);
                 }
-            } else {
-                return EnumSet.of(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION);
             }
         } else {
-            if (this.minecraftVersion >= BRIGADIER_MINIMAL_VERSION) {
+            if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
                 return EnumSet.of(CloudBukkitCapabilities.COMMODORE_BRIGADIER,
                                   CloudBukkitCapabilities.BRIGADIER);
             }
@@ -234,7 +236,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      * Attempt to register the Brigadier mapper, and return it.
      *
      * @throws BrigadierFailureException If Brigadier isn't
-     *         supported by the platform
+     *                                   supported by the platform
      */
     public void registerBrigadier() throws BrigadierFailureException {
         this.checkBrigadierCompatibility();
@@ -260,7 +262,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      * Reasons to explain why Brigadier failed to initialize
      */
     public enum BrigadierFailureReason {
-        COMMODORE_NOT_PRESENT, VERSION_TOO_LOW, PAPER_BRIGADIER_INITIALIZATION_FAILURE
+        COMMODORE_NOT_PRESENT,
+        VERSION_TOO_LOW,
+        PAPER_BRIGADIER_INITIALIZATION_FAILURE
     }
 
 
