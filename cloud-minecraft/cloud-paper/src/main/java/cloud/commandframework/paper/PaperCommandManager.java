@@ -85,8 +85,11 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
     /**
      * Register asynchronous completions. This requires all argument parsers to be thread safe, and it
      * is up to the caller to guarantee that such is the case
+     *
+     * @throws ClassNotFoundException When Async completions are not supported by the server
      */
-    public void registerAsynchronousCompletions() {
+    public void registerAsynchronousCompletions() throws ClassNotFoundException {
+        Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
         Bukkit.getServer().getPluginManager().registerEvents(new AsyncCommandSuggestionsListener<>(this), this.getOwningPlugin());
     }
 
