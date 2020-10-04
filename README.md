@@ -16,11 +16,11 @@ Cloud allows for commands to be defined using builder patterns, like this:
 ```java
 mgr.command(mgr.commandBuilder("give")
                .withSenderType(Player.class)
-               .argument(EnumArgument.required(Material.class, "material"))
-               .argument(IntegerArgument.required("amount"))
+               .argument(EnumArgument.of(Material.class, "material"))
+               .argument(IntegerArgument.of("amount"))
                .handler(c -> {
-                   final Material material = c.getRequired("material");
-                   final int amount = c.getRequired("amount");
+                   final Material material = c.get("material");
+                   final int amount = c.get("amount");
                    final ItemStack itemStack = new ItemStack(material, amount);
                    ((Player) c.getSender()).getInventory().addItem(itemStack);
                    c.getSender().sendMessage("You've been given stuff, bro.");
@@ -29,8 +29,9 @@ mgr.command(mgr.commandBuilder("give")
 
 or using annotated methods, like this:
 ```java
-@Description("Test cloud command using @CommandMethod")
-@CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
+@CommandPermission("some.permission.node")
+@CommandDescription("Test cloud command using @CommandMethod")
+@CommandMethod("annotation|a <input> [number]")
 private void annotatedCommand(@Nonnull final Player player,
                               @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
                               @Argument(value = "number", defaultValue = "5") @Range(min = "10", max = "100")
