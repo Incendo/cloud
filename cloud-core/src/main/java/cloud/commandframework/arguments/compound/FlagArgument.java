@@ -59,6 +59,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
     private static final String FLAG_ARGUMENT_NAME = "flags";
 
     private final Collection<@NonNull CommandFlag<?>> flags;
+
     /**
      * Construct a new flag argument
      *
