@@ -93,7 +93,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
      * @param sender Sender used to get the prefix (probably won't used anyways)
      * @return the command prefix
      */
-    public String getCommandPrefix(C sender) {
+    public @NonNull String getCommandPrefix(final @NonNull C sender) {
         return commandPrefixMapper.apply(sender);
     }
 
