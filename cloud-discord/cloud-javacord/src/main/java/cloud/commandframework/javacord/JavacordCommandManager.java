@@ -72,7 +72,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
 
     @Override
     public boolean hasPermission(
-            @NonNull C sender, @NonNull String permission) {
+            final @NonNull C sender, final @NonNull String permission) {
         if (permission.isEmpty()) {
             return true;
         }
