@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg, Julian Staudt & Contributors
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,6 @@ import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
-import java.util.PrimitiveIterator;
 import java.util.concurrent.CompletionException;
 
 public class JavacordCommand<C> implements MessageCreateListener {
@@ -58,7 +57,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
     }
 
     @Override
-    public void onMessageCreate(final @NonNull MessageCreateEvent event) {
+    public final void onMessageCreate(final @NonNull MessageCreateEvent event) {
         MessageAuthor messageAuthor = event.getMessageAuthor();
 
         if (messageAuthor.isWebhook() || !messageAuthor.isRegularUser()) {
@@ -112,7 +111,10 @@ public class JavacordCommand<C> implements MessageCreateListener {
                                                InvalidSyntaxException.class,
                                                (InvalidSyntaxException) throwable,
                                                (c, e) -> commandSender.sendErrorMessage(
-                                                       "Invalid Command Syntax. Correct command syntax is: `" + e.getCorrectSyntax() + "`"));
+                                                       "Invalid Command Syntax. Correct command syntax is: `"
+                                                               + e.getCorrectSyntax()
+                                                               + "`")
+                       );
 
                        return;
                    }
@@ -139,7 +141,8 @@ public class JavacordCommand<C> implements MessageCreateListener {
                        manager.handleException(sender,
                                                ArgumentParseException.class,
                                                (ArgumentParseException) throwable,
-                                               (c, e) -> commandSender.sendErrorMessage("Invalid Command Argument: `" + e.getCause().getMessage() + "`"));
+                                               (c, e) -> commandSender.sendErrorMessage(
+                                                       "Invalid Command Argument: `" + e.getCause().getMessage() + "`"));
 
                        return;
                    }

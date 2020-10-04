@@ -23,6 +23,6 @@
 //
 
 /**
- * Bukkit specific command arguments
+ * Javacord specific command senders
  */
-package cloud.commandframework.bukkit.parsers;
+package cloud.commandframework.javacord.sender;

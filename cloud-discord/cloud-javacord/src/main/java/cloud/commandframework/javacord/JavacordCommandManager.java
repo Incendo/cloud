@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg, Julian Staudt & Contributors
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,12 +43,14 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
     private final Function<C, Boolean> commandPermissionMapper;
 
     /**
-     * Construct a new Bungee command manager
+     * Construct a new Javacord command manager
      *
      * @param discordApi                   Instance of {@link DiscordApi} used to register listeners
      * @param commandExecutionCoordinator  Coordinator provider
      * @param commandSenderMapper          Function that maps {@link Object} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link Object}
+     * @param commandPrefixMapper          Function that maps the command sender type to the command prefix
+     * @param commandPermissionMapper      Function used to check if a command sender has the permission to execute a command
      * @throws Exception If the construction of the manager fails
      */
     public JavacordCommandManager(@NonNull final DiscordApi discordApi,
@@ -71,7 +73,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
     }
 
     @Override
-    public boolean hasPermission(
+    public final boolean hasPermission(
             final @NonNull C sender, final @NonNull String permission) {
         if (permission.isEmpty()) {
             return true;
@@ -90,6 +92,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
 
     /**
      * Gets the current command prefix
+     *
      * @param sender Sender used to get the prefix (probably won't used anyways)
      * @return the command prefix
      */

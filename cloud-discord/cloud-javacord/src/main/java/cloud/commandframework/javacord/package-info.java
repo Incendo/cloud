@@ -23,6 +23,6 @@
 //
 
 /**
- * cloud implementation for Bukkit 1.8-1.16
+ * cloud implementation for Javacord
  */
-package cloud.commandframework.bukkit;
+package cloud.commandframework.javacord;

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg, Julian Staudt & Contributors
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,20 @@ import java.util.concurrent.CompletableFuture;
 
 public class JavacordCommandSender {
 
-    protected final MessageCreateEvent event;
+    private final MessageCreateEvent event;
 
-    public JavacordCommandSender(@NonNull MessageCreateEvent event) {
+    /**
+     * Commandsender used for all javacord commands executed.
+     *
+     * @param event The event which triggered the command
+     */
+    public JavacordCommandSender(@NonNull final MessageCreateEvent event) {
         this.event = event;
     }
 
     /**
      * Gets the author of the {@link Message message} which triggered the event
+     *
      * @return The author of the message
      */
     @NonNull
@@ -56,11 +62,12 @@ public class JavacordCommandSender {
      */
     @NonNull
     public Message getMessage() {
-       return this.event.getMessage();
+        return this.event.getMessage();
     }
 
     /**
      * Gets the textchannel the {@link Message message} was sent in
+     *
      * @return The textchannel of the event
      */
     @NonNull
@@ -70,6 +77,7 @@ public class JavacordCommandSender {
 
     /**
      * Gets the event which triggered the command
+     *
      * @return The event of the command
      */
     @NonNull
@@ -79,6 +87,7 @@ public class JavacordCommandSender {
 
     /**
      * Sends a message to the executor of the command
+     *
      * @param message message which should be sent
      * @return The sent message
      */
@@ -89,6 +98,7 @@ public class JavacordCommandSender {
 
     /**
      * Sends an error message to the executor of the command
+     *
      * @param message message which should be sent
      * @return The sent message
      */
@@ -99,6 +109,7 @@ public class JavacordCommandSender {
 
     /**
      * Sends a success message to the executor of the command
+     *
      * @param message message which should be sent
      * @return The sent message
      */

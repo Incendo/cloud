@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg, Julian Staudt & Contributors
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,31 +25,28 @@ package cloud.commandframework.javacord.sender;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.javacord.api.entity.channel.PrivateChannel;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 public class JavacordPrivateSender extends JavacordCommandSender {
 
     /**
      * Commandsender used for commands executed in a {@link PrivateChannel}
+     *
      * @param event The event which triggered the command
      */
     public JavacordPrivateSender(@NonNull final MessageCreateEvent event) {
         super(event);
     }
 
-    @Override
-    @NonNull
-    public TextChannel getTextChannel() {
-        return event.getPrivateChannel().orElseThrow(() -> new UnsupportedOperationException("PrivateChannel not present even though message was sent in a private channel"));
-    }
-
     /**
      * Gets the private channel the command was executed in
+     *
      * @return The private channel
      */
     @NonNull
     public PrivateChannel getPrivateChannel() {
-        return (PrivateChannel) getTextChannel();
+        return getEvent().getPrivateChannel()
+                         .orElseThrow(() -> new UnsupportedOperationException(
+                                 "PrivateTextChannel not present even though message was sent in a private channel"));
     }
 }

@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg, Julian Staudt & Contributors
+// Copyright (c) 2020 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@ package cloud.commandframework.javacord.sender;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -33,32 +32,34 @@ public class JavacordServerSender extends JavacordCommandSender {
 
     /**
      * Commandsender used for commands executed on a {@link Server}
+     *
      * @param event The event which triggered the command
      */
     public JavacordServerSender(@NonNull final MessageCreateEvent event) {
         super(event);
     }
 
-    @Override
-    @NonNull
-    public TextChannel getTextChannel() {
-        return event.getServerTextChannel().orElseThrow(() -> new UnsupportedOperationException("ServerTextChannel not present even though message was sent in a server channel"));
-    }
-
     /**
      * Gets the server channel the command was executed in
+     *
      * @return The server channel
      */
-    public @NonNull ServerChannel getServerChannel() {
-        return (ServerChannel) this.getTextChannel();
+    @NonNull
+    public ServerChannel getServerChannel() {
+        return getEvent().getServerTextChannel()
+                         .orElseThrow(() -> new UnsupportedOperationException(
+                                 "ServerTextChannel not present even though message was sent in a server channel"));
     }
 
     /**
      * Gets the server the command was executed in
+     *
      * @return The server
      */
     @NonNull
     public Server getServer() {
-        return event.getServer().orElseThrow(() -> new UnsupportedOperationException("Server not present even though message was sent on a server"));
+        return getEvent().getServer()
+                         .orElseThrow(() -> new UnsupportedOperationException(
+                                 "Server not present even though message was sent on a server"));
     }
 }
