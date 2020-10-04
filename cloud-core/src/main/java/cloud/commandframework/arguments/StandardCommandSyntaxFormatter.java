@@ -25,6 +25,8 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.compound.CompoundArgument;
+import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -66,10 +68,27 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                         }
                     }
                     stringBuilder.append(suffix);
-                } else if (commandArgument.isRequired()) {
-                    stringBuilder.append("<").append(commandArgument.getName()).append(">");
                 } else {
-                    stringBuilder.append("[").append(commandArgument.getName()).append("]");
+                    String name = commandArgument.getName();
+
+                    if (commandArgument instanceof FlagArgument) {
+                        final StringBuilder flagBuilder = new StringBuilder();
+                        @SuppressWarnings("unchecked")
+                        final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) commandArgument).getFlags().iterator();
+                        while (flagIterator.hasNext()) {
+                            flagBuilder.append("--").append(flagIterator.next().getName());
+                            if (flagIterator.hasNext()) {
+                                flagBuilder.append(" | ");
+                            }
+                        }
+                        name = flagBuilder.toString();
+                    }
+
+                    if (commandArgument.isRequired()) {
+                        stringBuilder.append("<").append(name).append(">");
+                    } else {
+                        stringBuilder.append("[").append(name).append("]");
+                    }
                 }
             }
             if (iterator.hasNext()) {
@@ -115,6 +134,20 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                     }
                 }
                 stringBuilder.append(suffix);
+            } else if (argument instanceof FlagArgument) {
+                final StringBuilder flagBuilder = new StringBuilder();
+                @SuppressWarnings("unchecked")
+                final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) argument).getFlags().iterator();
+                while (flagIterator.hasNext()) {
+                    flagBuilder.append("--").append(flagIterator.next().getName());
+                    if (flagIterator.hasNext()) {
+                        flagBuilder.append(" | ");
+                    }
+                }
+                stringBuilder.append(" ")
+                             .append(prefix)
+                             .append(flagBuilder)
+                             .append(suffix);
             } else {
                 stringBuilder.append(" ")
                              .append(prefix)
