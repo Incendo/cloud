@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
         jcenter()
     }
     dependencies {
@@ -14,11 +14,11 @@ plugins {
     id 'com.github.hierynomus.license' version '0.15.0'
     id 'java-library'
     id 'com.github.johnrengelman.shadow' version '6.0.0'
-    id 'maven-publish'
+    id 'de.marcphilipp.nexus-publish' version '0.3.0'
 }
 
 checkstyle {
-    configFile file("config/checkstyle/checkstyle.xml")
+    configFile file('config/checkstyle/checkstyle.xml')
 }
 
 allprojects {
@@ -27,7 +27,7 @@ allprojects {
     apply plugin: 'com.github.hierynomus.license'
 
     group = 'cloud.commandframework'
-    version = '0.3.0-SNAPSHOT'
+    version = '1.0.0-SNAPSHOT'
     description = 'Command framework and dispatcher for the JVM'
 
     /* Disable checkstyle on tests */
@@ -43,8 +43,8 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
-    apply plugin: 'maven-publish'
     apply plugin: 'signing'
+    apply plugin: 'de.marcphilipp.nexus-publish'
 
     test {
         useJUnitPlatform()
@@ -106,6 +106,12 @@ subprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     }
 
+    nexusPublishing {
+        repositories {
+            sonatype()
+        }
+    }
+
     sourceCompatibility = '1.8'
 
     tasks.withType(JavaCompile) {
@@ -114,7 +120,7 @@ subprojects {
 
     publishing {
         publications {
-            maven(MavenPublication) {
+            mavenJava(MavenPublication) {
                 from components.java
 
                 pom {
@@ -154,8 +160,12 @@ subprojects {
     }
 
     signing {
-        required { project.hasProperty('signing.keyId') && gradle.taskGraph.hasTask(':publish') && !project.version.endsWith('-SNAPSHOT') }
-        sign publishing.publications.maven
+        required { project.hasProperty('signing.keyId')
+                && (gradle.taskGraph.hasTask(':publish')
+                || gradle.taskGraph.hasTask(':publishToSonatype')
+                || gradle.taskGraph.hasTask(':publishToMavenLocal')) }
+        sign publishing.publications.mavenJava
     }
+
 }
 
