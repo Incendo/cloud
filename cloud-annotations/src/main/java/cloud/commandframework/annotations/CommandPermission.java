@@ -29,24 +29,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to declare a class method as a command method
+ * Equivalent to {@link cloud.commandframework.Command.Builder#withPermission(String)}
  */
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface CommandMethod {
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CommandPermission {
 
     /**
-     * Command syntax
+     * Get the command permission
      *
-     * @return Command syntax
+     * @return Command permission
      */
-    String value();
-
-    /**
-     * The required sender
-     *
-     * @return Required sender
-     */
-    Class<?> requiredSender() default Object.class;
+    String value() default "";
 
 }

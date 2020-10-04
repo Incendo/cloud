@@ -203,8 +203,11 @@ public final class AnnotationParser<C> {
                     break;
                 }
             }
-            /* Decorate command data */
-            builder = builder.withPermission(commandMethod.permission());
+
+            if (method.isAnnotationPresent(CommandPermission.class)) {
+                builder = builder.withPermission(method.getAnnotation(CommandPermission.class).value());
+            }
+
             if (commandMethod.requiredSender() != Object.class) {
                 builder = builder.withSenderType(commandMethod.requiredSender());
             } else if (senderType != null) {
