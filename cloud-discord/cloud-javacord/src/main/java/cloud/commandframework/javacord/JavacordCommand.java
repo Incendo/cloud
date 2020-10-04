@@ -58,7 +58,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
     }
 
     @Override
-    public void onMessageCreate(MessageCreateEvent event) {
+    public void onMessageCreate(final @NonNull MessageCreateEvent event) {
         MessageAuthor messageAuthor = event.getMessageAuthor();
 
         if (messageAuthor.isWebhook() || !messageAuthor.isRegularUser()) {
