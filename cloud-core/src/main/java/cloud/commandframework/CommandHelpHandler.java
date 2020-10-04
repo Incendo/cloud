@@ -203,9 +203,14 @@ public final class CommandHelpHandler<C> {
         outer: while (head != null) {
             ++index;
             traversedNodes.add(head.getValue());
-            if (head.isLeaf()) {
-                return new VerboseHelpTopic<>(head.getValue().getOwningCommand());
-            } else if (head.getChildren().size() == 1) {
+
+            if (head.getValue() != null && head.getValue().getOwningCommand() != null) {
+                if (head.isLeaf() || index == queryFragments.length) {
+                    return new VerboseHelpTopic<>(head.getValue().getOwningCommand());
+                }
+            }
+
+            if (head.getChildren().size() == 1) {
                 head = head.getChildren().get(0);
             } else {
                 if (index < queryFragments.length) {
