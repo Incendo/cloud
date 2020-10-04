@@ -1,14 +1,4 @@
-plugins {
-    id 'java'
-}
-
-group 'cloud.commandframework'
-version '0.3.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    api project(':cloud-core')
+    implementation 'org.javacord:javacord:3.1.1'
 }
