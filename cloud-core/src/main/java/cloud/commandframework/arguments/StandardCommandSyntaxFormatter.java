@@ -76,7 +76,11 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                         @SuppressWarnings("unchecked")
                         final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) commandArgument).getFlags().iterator();
                         while (flagIterator.hasNext()) {
-                            flagBuilder.append("--").append(flagIterator.next().getName());
+                            final CommandFlag<?> flag = flagIterator.next();
+                            flagBuilder.append("--").append(flag.getName());
+                            if (flag.getCommandArgument() != null) {
+                                flagBuilder.append(" [").append(flag.getCommandArgument().getName()).append("]");
+                            }
                             if (flagIterator.hasNext()) {
                                 flagBuilder.append(" | ");
                             }
@@ -139,7 +143,11 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 @SuppressWarnings("unchecked")
                 final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) argument).getFlags().iterator();
                 while (flagIterator.hasNext()) {
-                    flagBuilder.append("--").append(flagIterator.next().getName());
+                    final CommandFlag<?> flag = flagIterator.next();
+                    flagBuilder.append("--").append(flag.getName());
+                    if (flag.getCommandArgument() != null) {
+                        flagBuilder.append(" [").append(flag.getCommandArgument().getName()).append("]");
+                    }
                     if (flagIterator.hasNext()) {
                         flagBuilder.append(" | ");
                     }
