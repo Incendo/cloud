@@ -87,7 +87,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      * @return Prefix mapper
      */
     public final @NonNull Function<C, String> getPrefixMapper() {
-        return prefixMapper;
+        return this.prefixMapper;
     }
 
     /**
@@ -105,7 +105,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      * @return Bots discord id
      */
     public final long getBotId() {
-        return botId;
+        return this.botId;
     }
 
     @Override
@@ -114,12 +114,12 @@ public class JDACommandManager<C> extends CommandManager<C> {
             return true;
         }
 
-        if (permissionMapper != null) {
-            return permissionMapper.apply(sender, permission);
+        if (this.permissionMapper != null) {
+            return this.permissionMapper.apply(sender, permission);
         }
 
-        MessageReceivedEvent message = backwardsCommandSenderMapper.apply(sender);
-        Member member = message.getMember();
+        final MessageReceivedEvent message = this.backwardsCommandSenderMapper.apply(sender);
+        final Member member = message.getMember();
         if (member == null) {
             return false;
         }
