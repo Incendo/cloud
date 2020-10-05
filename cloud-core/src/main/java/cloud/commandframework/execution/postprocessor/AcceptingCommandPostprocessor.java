@@ -39,7 +39,7 @@ public final class AcceptingCommandPostprocessor<C> implements CommandPostproces
     public static final String PROCESSED_INDICATOR_KEY = "__COMMAND_POST_PROCESSED__";
 
     @Override
-    public void accept(@NonNull final CommandPostprocessingContext<C> context) {
+    public void accept(final @NonNull CommandPostprocessingContext<C> context) {
         context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
     }
 

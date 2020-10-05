@@ -50,7 +50,7 @@ public abstract class BukkitCommandSender {
      * @param player Player instance
      * @return Constructed command sender
      */
-    public static @NonNull BukkitCommandSender player(@NonNull final Player player) {
+    public static @NonNull BukkitCommandSender player(final @NonNull Player player) {
         return new BukkitPlayerSender(player);
     }
 
@@ -122,7 +122,7 @@ public abstract class BukkitCommandSender {
      *
      * @param message Message to send
      */
-    public void sendMessage(@NonNull final String message) {
+    public void sendMessage(final @NonNull String message) {
         this.internalSender.sendMessage(message);
     }
 

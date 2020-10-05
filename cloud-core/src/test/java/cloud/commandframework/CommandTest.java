@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class CommandTest {
     @Test
     void ensureOrdering() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                Command.newBuilder("test", SimpleCommandMeta.empty()).argument(StaticArgument.optional("something"))
+                Command.newBuilder("test", SimpleCommandMeta.empty()).argument(StringArgument.optional("something"))
                        .argument(StaticArgument.of("somethingelse")).build());
     }
 

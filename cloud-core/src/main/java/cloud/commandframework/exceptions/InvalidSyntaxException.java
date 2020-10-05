@@ -43,9 +43,9 @@ public class InvalidSyntaxException extends CommandParseException {
      * @param commandSender Sender that sent the command
      * @param currentChain  Chain leading up to issue
      */
-    public InvalidSyntaxException(@NonNull final String correctSyntax,
-                                  @NonNull final Object commandSender,
-                                  @NonNull final List<@NonNull CommandArgument<?, ?>> currentChain) {
+    public InvalidSyntaxException(final @NonNull String correctSyntax,
+                                  final @NonNull Object commandSender,
+                                  final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain) {
         super(commandSender, currentChain);
         this.correctSyntax = correctSyntax;
     }

@@ -55,12 +55,12 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      * @param valueType  The output type
      */
     protected ArgumentPair(final boolean required,
-                           @NonNull final String name,
-                           @NonNull final Pair<@NonNull String, @NonNull String> names,
-                           @NonNull final Pair<@NonNull Class<U>, @NonNull Class<V>> types,
-                           @NonNull final Pair<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>> parserPair,
-                           @NonNull final Function<@NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper,
-                           @NonNull final TypeToken<O> valueType) {
+                           final @NonNull String name,
+                           final @NonNull Pair<@NonNull String, @NonNull String> names,
+                           final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> types,
+                           final @NonNull Pair<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>> parserPair,
+                           final @NonNull Function<@NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper,
+                           final @NonNull TypeToken<O> valueType) {
         super(required, name, names, parserPair, types, mapper, o -> Pair.of((U) o[0], (V) o[1]), valueType);
     }
 
@@ -78,11 +78,11 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      * @param <V>     Second parsed type
      * @return Intermediary builder
      */
-    public static <C, U, V> @NonNull ArgumentPairIntermediaryBuilder<C, U, V> of(@NonNull final CommandManager<C> manager,
-                                                                                 @NonNull final String name,
-                                                                                 @NonNull final Pair<@NonNull String,
+    public static <C, U, V> @NonNull ArgumentPairIntermediaryBuilder<C, U, V> of(final @NonNull CommandManager<C> manager,
+                                                                                 final @NonNull String name,
+                                                                                 final @NonNull Pair<@NonNull String,
                                                                                                     @NonNull String> names,
-                                                                                 @NonNull final Pair<@NonNull Class<U>,
+                                                                                 final @NonNull Pair<@NonNull Class<U>,
                                                                                                     @NonNull Class<V>> types) {
         final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(TypeToken.get(types.getFirst()),
@@ -106,11 +106,11 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
         private final Pair<Class<U>, Class<V>> types;
 
         private ArgumentPairIntermediaryBuilder(final boolean required,
-                                                @NonNull final String name,
-                                                @NonNull final Pair<@NonNull String, @NonNull String> names,
-                                                @NonNull final Pair<@NonNull ArgumentParser<@NonNull C, @NonNull U>,
+                                                final @NonNull String name,
+                                                final @NonNull Pair<@NonNull String, @NonNull String> names,
+                                                final @NonNull Pair<@NonNull ArgumentParser<@NonNull C, @NonNull U>,
                                                         @NonNull ArgumentParser<@NonNull C, @NonNull V>> parserPair,
-                                                @NonNull final Pair<@NonNull Class<U>, @NonNull Class<V>> types) {
+                                                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> types) {
             this.required = required;
             this.name = name;
             this.names = names;
@@ -142,8 +142,8 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
          * @param <O>    Output type
          * @return Created pair
          */
-        public <O> @NonNull ArgumentPair<C, U, V, O> withMapper(@NonNull final TypeToken<O> clazz,
-                                                                @NonNull final Function<@NonNull Pair<@NonNull U,
+        public <O> @NonNull ArgumentPair<C, U, V, O> withMapper(final @NonNull TypeToken<O> clazz,
+                                                                final @NonNull Function<@NonNull Pair<@NonNull U,
                                                                         @NonNull V>, @NonNull O> mapper) {
             return new ArgumentPair<C, U, V, O>(this.required, this.name, this.names, this.types, this.parserPair, mapper, clazz);
         }
@@ -157,8 +157,8 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
          * @return Created pair
          */
         public <O> @NonNull ArgumentPair<@NonNull C, @NonNull U, @NonNull V, @NonNull O> withMapper(
-                @NonNull final Class<O> clazz,
-                @NonNull final Function<@NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper) {
+                final @NonNull Class<O> clazz,
+                final @NonNull Function<@NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper) {
             return this.withMapper(TypeToken.get(clazz), mapper);
         }
 

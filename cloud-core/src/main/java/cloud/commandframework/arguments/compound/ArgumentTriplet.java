@@ -56,13 +56,13 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
      * @param valueType     The output type
      */
     protected ArgumentTriplet(final boolean required,
-                              @NonNull final String name,
-                              @NonNull final Triplet<@NonNull String, @NonNull String, @NonNull String> names,
-                              @NonNull final Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types,
-                              @NonNull final Triplet<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>,
+                              final @NonNull String name,
+                              final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
+                              final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types,
+                              final @NonNull Triplet<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>,
                                       @NonNull ArgumentParser<C, W>> parserTriplet,
-                              @NonNull final Function<@NonNull Triplet<U, @NonNull V, @NonNull W>, @NonNull O> mapper,
-                              @NonNull final TypeToken<O> valueType) {
+                              final @NonNull Function<@NonNull Triplet<U, @NonNull V, @NonNull W>, @NonNull O> mapper,
+                              final @NonNull TypeToken<O> valueType) {
         super(required, name, names, parserTriplet, types, mapper, o -> Triplet.of((U) o[0], (V) o[1], (W) o[2]), valueType);
     }
 
@@ -82,10 +82,10 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
      * @return Intermediary builder
      */
     public static <C, U, V, W> @NonNull ArgumentTripletIntermediaryBuilder<@NonNull C, @NonNull U, @NonNull V, @NonNull W>
-    of(@NonNull final CommandManager<C> manager,
-       @NonNull final String name,
-       @NonNull final Triplet<@NonNull String, @NonNull String, @NonNull String> names,
-       @NonNull final Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types) {
+    of(final @NonNull CommandManager<C> manager,
+       final @NonNull String name,
+       final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
+       final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types) {
         final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(TypeToken.get(types.getFirst()),
                          ParserParameters.empty()).orElseThrow(() ->
@@ -113,13 +113,13 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
         private final Triplet<Class<U>, Class<V>, Class<W>> types;
 
         private ArgumentTripletIntermediaryBuilder(final boolean required,
-                                                   @NonNull final String name,
-                                                   @NonNull final Triplet<@NonNull String, @NonNull String,
+                                                   final @NonNull String name,
+                                                   final @NonNull Triplet<@NonNull String, @NonNull String,
                                                            @NonNull String> names,
-                                                   @NonNull final Triplet<@NonNull ArgumentParser<C, U>,
+                                                   final @NonNull Triplet<@NonNull ArgumentParser<C, U>,
                                                            @NonNull ArgumentParser<C, V>,
                                                            @NonNull ArgumentParser<C, W>> parserTriplet,
-                                                   @NonNull final Triplet<@NonNull Class<U>,
+                                                   final @NonNull Triplet<@NonNull Class<U>,
                                                            @NonNull Class<V>, @NonNull Class<W>> types) {
             this.required = required;
             this.name = name;
@@ -154,8 +154,8 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          * @return Created triplet
          */
         public <O> @NonNull ArgumentTriplet<@NonNull C, @NonNull U, @NonNull V,
-                @NonNull W, @NonNull O> withMapper(@NonNull final TypeToken<O> clazz,
-                                                   @NonNull final Function<@NonNull Triplet<@NonNull U,
+                @NonNull W, @NonNull O> withMapper(final @NonNull TypeToken<O> clazz,
+                                                   final @NonNull Function<@NonNull Triplet<@NonNull U,
                                                            @NonNull V, @NonNull W>, @NonNull O> mapper) {
             return new ArgumentTriplet<>(this.required, this.name, this.names, this.types, this.parserTriplet, mapper, clazz);
         }
@@ -168,8 +168,8 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          * @param <O>    Output type
          * @return Created triplet
          */
-        public <O> @NonNull ArgumentTriplet<C, U, V, W, O> withMapper(@NonNull final Class<O> clazz,
-                                                                      @NonNull final Function<@NonNull Triplet<@NonNull U,
+        public <O> @NonNull ArgumentTriplet<C, U, V, W, O> withMapper(final @NonNull Class<O> clazz,
+                                                                      final @NonNull Function<@NonNull Triplet<@NonNull U,
                                                                               @NonNull V, @NonNull W>, @NonNull O> mapper) {
             return new ArgumentTriplet<>(this.required, this.name, this.names, this.types,
                                          this.parserTriplet, mapper, TypeToken.get(clazz));

@@ -23,16 +23,21 @@
 //
 package cloud.commandframework.paper;
 
-import cloud.commandframework.brigadier.CloudBrigadierManager;
-import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
-import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
+import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
+import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
+import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.permission.CommandPermission;
+import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
+import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -43,7 +48,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 class PaperBrigadierListener<C> implements Listener {
 
@@ -53,7 +60,7 @@ class PaperBrigadierListener<C> implements Listener {
     private final PaperCommandManager<C> paperCommandManager;
     private final String nmsVersion;
 
-    PaperBrigadierListener(@Nonnull final PaperCommandManager<C> paperCommandManager) throws Exception {
+    PaperBrigadierListener(@Nonnull final PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
         this.brigadierManager = new CloudBrigadierManager<>(this.paperCommandManager,
                                                             () -> new CommandContext<>(
@@ -75,11 +82,35 @@ class PaperBrigadierListener<C> implements Listener {
             this.mapSimpleNMS(EntityType.class, this.getNMSArgument("EntitySummon").getConstructor());
             /* Map Material */
             this.mapSimpleNMS(Material.class, this.getNMSArgument("ItemStack").getConstructor());
+            /* Map Entity Selectors */
+            this.mapComplexNMS(SingleEntitySelector.class, this.getEntitySelectorArgument(true, false));
+            this.mapComplexNMS(SinglePlayerSelector.class, this.getEntitySelectorArgument(true, true));
+            this.mapComplexNMS(MultipleEntitySelector.class, this.getEntitySelectorArgument(false, false));
+            this.mapComplexNMS(MultiplePlayerSelector.class, this.getEntitySelectorArgument(false, true));
         } catch (final Exception e) {
             this.paperCommandManager.getOwningPlugin()
                                     .getLogger()
                                     .log(Level.WARNING, "Failed to map Bukkit types to NMS argument types", e);
         }
+    }
+
+    /**
+     * @param single      Whether the selector is for a single entity only (true), or for multiple entities (false)
+     * @param playersOnly Whether the selector is for players only (true), or for all entities (false)
+     * @return The NMS ArgumentType
+     */
+    private Supplier<ArgumentType<?>> getEntitySelectorArgument(final boolean single,
+                                                                final boolean playersOnly) {
+        return () -> {
+            try {
+                final Constructor<?> constructor = this.getNMSArgument("Entity").getDeclaredConstructors()[0];
+                constructor.setAccessible(true);
+                return (ArgumentType<?>) constructor.newInstance(single, playersOnly);
+            } catch (final Exception e) {
+                this.paperCommandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Selector Argument", e);
+                return null;
+            }
+        };
     }
 
     /**
@@ -119,10 +150,42 @@ class PaperBrigadierListener<C> implements Listener {
         }
     }
 
+    /**
+     * Attempt to register a mapping between a type and a NMS argument type
+     *
+     * @param type                 Type to map
+     * @param argumentTypeSupplier Supplier of the NMS argument type
+     */
+    public void mapComplexNMS(@Nonnull final Class<?> type,
+                              @Nonnull final Supplier<ArgumentType<?>> argumentTypeSupplier) {
+        try {
+            this.brigadierManager.registerDefaultArgumentTypeSupplier(type, argumentTypeSupplier);
+        } catch (final Exception e) {
+            this.paperCommandManager.getOwningPlugin()
+                                    .getLogger()
+                                    .warning(String.format("Failed to map '%s' to a Mojang serializable argument type",
+                                                           type.getCanonicalName()));
+        }
+    }
+
     @EventHandler
+    @SuppressWarnings("deprecation")
     public void onCommandRegister(@Nonnull final CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
+        if (!(event.getCommand() instanceof PluginIdentifiableCommand)) {
+            return;
+        } else if (!((PluginIdentifiableCommand) event.getCommand())
+                .getPlugin().equals(this.paperCommandManager.getOwningPlugin())) {
+            return;
+        }
+
         final CommandTree<C> commandTree = this.paperCommandManager.getCommandTree();
-        final CommandTree.Node<CommandArgument<C, ?>> node = commandTree.getNamedNode(event.getCommandLabel());
+
+        String label = event.getCommandLabel();
+        if (label.contains(":")) {
+            label = label.split(Pattern.quote(":"))[1];
+        }
+
+        final CommandTree.Node<CommandArgument<C, ?>> node = commandTree.getNamedNode(label);
         if (node == null) {
             return;
         }

@@ -32,7 +32,7 @@ public final class DynamicTuple implements Tuple {
 
     private final Object[] internalArray;
 
-    private DynamicTuple(@NonNull final Object @NonNull [] internalArray) {
+    private DynamicTuple(final @NonNull Object @NonNull [] internalArray) {
         this.internalArray = internalArray;
     }
 
@@ -42,7 +42,7 @@ public final class DynamicTuple implements Tuple {
      * @param elements Elements that should be contained in the tuple
      * @return Created tuple, preserving the order of the given elements
      */
-    public static @NonNull DynamicTuple of(@NonNull final Object... elements) {
+    public static @NonNull DynamicTuple of(final @NonNull Object... elements) {
         return new DynamicTuple(elements);
     }
 

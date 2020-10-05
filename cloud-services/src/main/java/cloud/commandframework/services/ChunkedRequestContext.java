@@ -50,7 +50,7 @@ public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
      *
      * @param requests Request contexts
      */
-    protected ChunkedRequestContext(@NonNull final Collection<Context> requests) {
+    protected ChunkedRequestContext(final @NonNull Collection<Context> requests) {
         this.requests = new ArrayList<>(requests);
         this.results = new HashMap<>(requests.size());
     }
@@ -83,7 +83,7 @@ public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
      * @param context Context
      * @param result  Result
      */
-    public final void storeResult(@NonNull final Context context, @NonNull final Result result) {
+    public final void storeResult(final @NonNull Context context, final @NonNull Result result) {
         synchronized (this.lock) {
             this.results.put(context, result);
             this.requests.remove(context);

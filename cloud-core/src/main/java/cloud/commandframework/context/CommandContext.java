@@ -51,7 +51,7 @@ public final class CommandContext<C> {
      *
      * @param commandSender Sender of the command
      */
-    public CommandContext(@NonNull final C commandSender) {
+    public CommandContext(final @NonNull C commandSender) {
         this(false, commandSender);
     }
 
@@ -62,7 +62,7 @@ public final class CommandContext<C> {
      * @param commandSender Sender of the command
      */
     public CommandContext(final boolean suggestions,
-                          @NonNull final C commandSender) {
+                          final @NonNull C commandSender) {
         this.commandSender = commandSender;
         this.suggestions = suggestions;
     }
@@ -93,7 +93,7 @@ public final class CommandContext<C> {
      * @param value Value
      * @param <T>   Value type
      */
-    public <T> void store(@NonNull final String key, @NonNull final T value) {
+    public <T> void store(final @NonNull String key, final @NonNull T value) {
         this.internalStorage.put(key, value);
     }
 
@@ -105,8 +105,26 @@ public final class CommandContext<C> {
      * @param <T> Value type
      * @return Value
      */
-    public <T> @NonNull Optional<T> getOptional(@NonNull final String key) {
+    public <T> @NonNull Optional<T> getOptional(final @NonNull String key) {
         final Object value = this.internalStorage.get(key);
+        if (value != null) {
+            @SuppressWarnings("ALL") final T castedValue = (T) value;
+            return Optional.of(castedValue);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Get a value from its key. Will return {@link Optional#empty()}
+     * if no value is stored with the given key
+     *
+     * @param argument Argument
+     * @param <T>      Value type
+     * @return Value
+     */
+    public <T> @NonNull Optional<T> getOptional(final @NonNull CommandArgument<C, T> argument) {
+        final Object value = this.internalStorage.get(argument.getName());
         if (value != null) {
             @SuppressWarnings("ALL") final T castedValue = (T) value;
             return Optional.of(castedValue);
@@ -120,7 +138,7 @@ public final class CommandContext<C> {
      *
      * @param key Key to remove
      */
-    public void remove(@NonNull final String key) {
+    public void remove(final @NonNull String key) {
         this.internalStorage.remove(key);
     }
 
@@ -134,12 +152,38 @@ public final class CommandContext<C> {
      * @throws NullPointerException If no such argument is stored
      */
     @SuppressWarnings("unchecked")
-    public <T> @NonNull T get(@NonNull final String key) {
+    public <T> @NonNull T get(final @NonNull String key) {
         final Object value = this.internalStorage.get(key);
         if (value == null) {
             throw new NullPointerException("No such object stored in the context: " + key);
         }
         return (T) value;
+    }
+
+    /**
+     * Get a required argument from the context. This will thrown an exception
+     * if there's no value associated with the given argument
+     *
+     * @param argument The argument
+     * @param <T>      Argument type
+     * @return Stored value
+     * @throws NullPointerException If no such value is stored
+     */
+    public <T> @NonNull T get(final @NonNull CommandArgument<C, T> argument) {
+        return this.get(argument.getName());
+    }
+
+    /**
+     * Get a value if it exists, else return the provided default value
+     *
+     * @param argument     Argument
+     * @param defaultValue Default value
+     * @param <T>          Argument type
+     * @return Stored value, or supplied default value
+     */
+    public <T> @Nullable T getOrDefault(final @NonNull CommandArgument<C, T> argument,
+                                        final @Nullable T defaultValue) {
+        return this.<T>getOptional(argument.getName()).orElse(defaultValue);
     }
 
     /**
@@ -150,8 +194,8 @@ public final class CommandContext<C> {
      * @param <T>          Argument type
      * @return Argument, or supplied default value
      */
-    public <T> @Nullable T getOrDefault(@NonNull final String key,
-                                        @Nullable final T defaultValue) {
+    public <T> @Nullable T getOrDefault(final @NonNull String key,
+                                        final @Nullable T defaultValue) {
         return this.<T>getOptional(key).orElse(defaultValue);
     }
 
@@ -161,7 +205,7 @@ public final class CommandContext<C> {
      * @param argument Argument
      * @return Created timing instance
      */
-    public @NonNull ArgumentTiming createTiming(@NonNull final CommandArgument<C, ?> argument) {
+    public @NonNull ArgumentTiming createTiming(final @NonNull CommandArgument<C, ?> argument) {
         final ArgumentTiming argumentTiming = new ArgumentTiming();
         this.argumentTimings.put(argument, argumentTiming);
         return argumentTiming;
@@ -246,7 +290,7 @@ public final class CommandContext<C> {
         /**
          * Set the end time
          *
-         * @param end End time (in nanoseconds)
+         * @param end     End time (in nanoseconds)
          * @param success Whether or not the argument was parsed successfully
          */
         public void setEnd(final long end, final boolean success) {

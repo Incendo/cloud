@@ -39,9 +39,9 @@ import java.util.function.BiFunction;
 public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     private UUIDArgument(final boolean required,
-                         @NonNull final String name,
-                         @NonNull final String defaultValue,
-                         @Nullable final BiFunction<@NonNull CommandContext<C>,
+                         final @NonNull String name,
+                         final @NonNull String defaultValue,
+                         final @Nullable BiFunction<@NonNull CommandContext<C>,
                                  @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new UUIDParser<>(), defaultValue, UUID.class, suggestionsProvider);
     }
@@ -53,7 +53,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -64,7 +64,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, UUID> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, UUID> of(final @NonNull String name) {
         return UUIDArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -75,7 +75,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, UUID> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, UUID> optional(final @NonNull String name) {
         return UUIDArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -87,15 +87,15 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>         Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, UUID> optional(@NonNull final String name,
-                                                                 @NonNull final UUID defaultUUID) {
+    public static <C> @NonNull CommandArgument<C, UUID> optional(final @NonNull String name,
+                                                                 final @NonNull UUID defaultUUID) {
         return UUIDArgument.<C>newBuilder(name).asOptionalWithDefault(defaultUUID.toString()).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, UUID> {
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(UUID.class, name);
         }
 
@@ -116,8 +116,8 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
         @Override
         public @NonNull ArgumentParseResult<UUID> parse(
-                @NonNull final CommandContext<C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue) {
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -148,7 +148,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
          *
          * @param input String input
          */
-        public UUIDParseException(@NonNull final String input) {
+        public UUIDParseException(final @NonNull String input) {
             this.input = input;
         }
 

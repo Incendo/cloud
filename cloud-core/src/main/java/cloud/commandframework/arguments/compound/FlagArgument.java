@@ -45,7 +45,7 @@ import java.util.function.BiFunction;
  *
  * @param <C> Command sender type
  */
-public class FlagArgument<C> extends CommandArgument<C, Object> {
+public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
     /**
      * Dummy object that indicates that flags were parsed successfully
@@ -58,6 +58,8 @@ public class FlagArgument<C> extends CommandArgument<C, Object> {
 
     private static final String FLAG_ARGUMENT_NAME = "flags";
 
+    private final Collection<@NonNull CommandFlag<?>> flags;
+
     /**
      * Construct a new flag argument
      *
@@ -68,19 +70,30 @@ public class FlagArgument<C> extends CommandArgument<C, Object> {
               FLAG_ARGUMENT_NAME,
               new FlagArgumentParser<>(flags.toArray(new CommandFlag<?>[0])),
               Object.class);
+        this.flags = flags;
     }
+
+    /**
+     * Get the flags registered in the argument
+     *
+     * @return Unmodifiable view of flags
+     */
+    public @NonNull Collection<@NonNull CommandFlag<?>> getFlags() {
+        return Collections.unmodifiableCollection(this.flags);
+    }
+
 
     public static final class FlagArgumentParser<C> implements ArgumentParser<C, Object> {
 
         private final CommandFlag<?>[] flags;
 
-        private FlagArgumentParser(@NonNull final CommandFlag<?>[] flags) {
+        private FlagArgumentParser(final @NonNull CommandFlag<?>[] flags) {
             this.flags = flags;
         }
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull Object> parse(@NonNull final CommandContext<@NonNull C> commandContext,
-                                                                   @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<@NonNull Object> parse(final @NonNull CommandContext<@NonNull C> commandContext,
+                                                                   final @NonNull Queue<@NonNull String> inputQueue) {
             /*
             This argument must necessarily be the last so we can just consume all remaining input. This argument type
             is similar to a greedy string in that sense. But, we need to keep all flag logic contained to the parser
@@ -88,7 +101,7 @@ public class FlagArgument<C> extends CommandArgument<C, Object> {
             final Set<CommandFlag<?>> parsedFlags = new HashSet<>();
             CommandFlag<?> currentFlag = null;
 
-            for (@NonNull final String string : inputQueue) {
+            for (final @NonNull String string : inputQueue) {
                 if (string.startsWith("-")) {
                     if (currentFlag != null && currentFlag.getCommandArgument() != null) {
                         return ArgumentParseResult.failure(

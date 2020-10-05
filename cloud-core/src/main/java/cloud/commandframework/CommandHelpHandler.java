@@ -34,13 +34,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 public final class CommandHelpHandler<C> {
 
     private final CommandManager<C> commandManager;
 
-    CommandHelpHandler(@NonNull final CommandManager<C> commandManager) {
+    CommandHelpHandler(final @NonNull CommandManager<C> commandManager) {
         this.commandManager = commandManager;
     }
 
@@ -73,8 +74,8 @@ public final class CommandHelpHandler<C> {
     public @NonNull List<@NonNull String> getLongestSharedChains() {
         final List<String> chains = new ArrayList<>();
         this.commandManager.getCommandTree().getRootNodes().forEach(node ->
-            chains.add(node.getValue()
-                           .getName() + this.commandManager.getCommandSyntaxFormatter()
+            chains.add(Objects.requireNonNull(node.getValue())
+                              .getName() + this.commandManager.getCommandSyntaxFormatter()
                                                            .apply(Collections
                                                                           .emptyList(),
                                                                   node)));
@@ -89,9 +90,9 @@ public final class CommandHelpHandler<C> {
         private final String syntaxString;
         private final String description;
 
-        private VerboseHelpEntry(@NonNull final Command<C> command,
-                                 @NonNull final String syntaxString,
-                                 @NonNull final String description) {
+        private VerboseHelpEntry(final @NonNull Command<C> command,
+                                 final @NonNull String syntaxString,
+                                 final @NonNull String description) {
             this.command = command;
             this.syntaxString = syntaxString;
             this.description = description;
@@ -131,7 +132,7 @@ public final class CommandHelpHandler<C> {
      * @param query Query string
      * @return Help topic, will return an empty {@link IndexHelpTopic} if no results were found
      */
-    public @NonNull HelpTopic<C> queryHelp(@NonNull final String query) {
+    public @NonNull HelpTopic<C> queryHelp(final @NonNull String query) {
         if (query.replace(" ", "").isEmpty()) {
             return new IndexHelpTopic<>(this.getAllCommands());
         }
@@ -203,15 +204,24 @@ public final class CommandHelpHandler<C> {
         outer: while (head != null) {
             ++index;
             traversedNodes.add(head.getValue());
-            if (head.isLeaf()) {
-                return new VerboseHelpTopic<>(head.getValue().getOwningCommand());
-            } else if (head.getChildren().size() == 1) {
+
+            if (head.getValue() != null && head.getValue().getOwningCommand() != null) {
+                if (head.isLeaf() || index == queryFragments.length) {
+                    return new VerboseHelpTopic<>(head.getValue().getOwningCommand());
+                }
+            }
+
+            if (head.getChildren().size() == 1) {
                 head = head.getChildren().get(0);
             } else {
                 if (index < queryFragments.length) {
                     /* We might still be able to match an argument */
                     for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
+                        @SuppressWarnings("unchecked")
                         final StaticArgument<C> childArgument = (StaticArgument<C>) child.getValue();
+                        if (childArgument == null) {
+                            continue;
+                        }
                         for (final String childAlias : childArgument.getAliases()) {
                             if (childAlias.equalsIgnoreCase(queryFragments[index])) {
                                 head = child;
@@ -248,6 +258,7 @@ public final class CommandHelpHandler<C> {
      *
      * @param <C> Command sender type
      */
+    @SuppressWarnings("unused")
     public interface HelpTopic<C> {
     }
 
@@ -261,7 +272,7 @@ public final class CommandHelpHandler<C> {
 
         private final List<VerboseHelpEntry<C>> entries;
 
-        private IndexHelpTopic(@NonNull final List<@NonNull VerboseHelpEntry<C>> entries) {
+        private IndexHelpTopic(final @NonNull List<@NonNull VerboseHelpEntry<C>> entries) {
             this.entries = entries;
         }
 
@@ -296,7 +307,7 @@ public final class CommandHelpHandler<C> {
         private final Command<C> command;
         private final String description;
 
-        private VerboseHelpTopic(@NonNull final Command<C> command) {
+        private VerboseHelpTopic(final @NonNull Command<C> command) {
             this.command = command;
             final String shortDescription = command.getCommandMeta().getOrDefault("description", "No description");
             this.description = command.getCommandMeta().getOrDefault("long-description", shortDescription);
@@ -333,8 +344,8 @@ public final class CommandHelpHandler<C> {
         private final String longestPath;
         private final List<String> childSuggestions;
 
-        private MultiHelpTopic(@NonNull final String longestPath,
-                               @NonNull final List<@NonNull String> childSuggestions) {
+        private MultiHelpTopic(final @NonNull String longestPath,
+                               final @NonNull List<@NonNull String> childSuggestions) {
             this.longestPath = longestPath;
             this.childSuggestions = childSuggestions;
         }

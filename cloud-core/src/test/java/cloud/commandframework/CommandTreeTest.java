@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
@@ -37,7 +38,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.concurrent.CompletionException;
 
 class CommandTreeTest {
@@ -68,7 +68,8 @@ class CommandTreeTest {
                                                           .argument(StringArgument.of("string"))
                                                           .argument(IntegerArgument.of("int"))
                                                           .literal("anotherliteral")
-                                                          .handler(c -> {})
+                                                          .handler(c -> {
+                                                          })
                                                           .build();
         manager.command(toProxy);
         manager.command(manager.commandBuilder("proxy").proxies(toProxy).build());
@@ -85,7 +86,7 @@ class CommandTreeTest {
         /* Build command for testing compound types */
         manager.command(manager.commandBuilder("pos")
                                .argument(ArgumentPair.of(manager, "pos", Pair.of("x", "y"),
-                                                               Pair.of(Integer.class, Integer.class))
+                                                         Pair.of(Integer.class, Integer.class))
                                                      .simple())
                                .handler(c -> {
                                    final Pair<Integer, Integer> pair = c.get("pos");
@@ -93,7 +94,7 @@ class CommandTreeTest {
                                }));
         manager.command(manager.commandBuilder("vec")
                                .argument(ArgumentPair.of(manager, "vec", Pair.of("x", "y"),
-                                                               Pair.of(Double.class, Double.class))
+                                                         Pair.of(Double.class, Double.class))
                                                      .withMapper(Vector2.class,
                                                                  pair -> new Vector2(pair.getFirst(), pair.getSecond()))
                                )
@@ -115,36 +116,37 @@ class CommandTreeTest {
                                    System.out.println("Flag present? " + c.flags().isPresent("test"));
                                    System.out.println("Numerical flag: " + c.flags().getValue("num", -10));
                                })
-                       .build());
+                               .build());
     }
 
     @Test
     void parse() {
-        final Optional<Command<TestCommandSender>> command = manager.getCommandTree()
+        final Pair<Command<TestCommandSender>, Exception> command = manager.getCommandTree()
+                                                                           .parse(new CommandContext<>(
+                                                                                          new TestCommandSender()),
+                                                                                  new LinkedList<>(
+                                                                                          Arrays.asList("test",
+                                                                                                        "one")));
+        Assertions.assertNotNull(command.getFirst());
+        Assertions.assertEquals(NoPermissionException.class, manager.getCommandTree()
                                                                     .parse(new CommandContext<>(
                                                                                    new TestCommandSender()),
                                                                            new LinkedList<>(
-                                                                                   Arrays.asList("test",
-                                                                                                 "one")));
-        Assertions.assertTrue(command.isPresent());
-        Assertions.assertThrows(NoPermissionException.class, () -> manager.getCommandTree()
-                                                                          .parse(new CommandContext<>(
-                                                                                         new TestCommandSender()),
-                                                                                 new LinkedList<>(
-                                                                                         Arrays.asList("test", "two"))));
+                                                                                   Arrays.asList("test", "two")))
+                                                                    .getSecond().getClass());
         manager.getCommandTree()
                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt")))
-               .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
+               .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
         manager.getCommandTree()
                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt", "12")))
-               .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
+               .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
     }
 
     @Test
     void testAlias() {
         manager.getCommandTree()
                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("other", "öpt", "12")))
-               .ifPresent(c -> c.getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender())));
+               .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
     }
 
     @Test
@@ -181,7 +183,7 @@ class CommandTreeTest {
 
     @Test
     void testProxy() {
-        manager.executeCommand(new TestCommandSender(),"test unproxied foo 10 anotherliteral").join();
+        manager.executeCommand(new TestCommandSender(), "test unproxied foo 10 anotherliteral").join();
         manager.executeCommand(new TestCommandSender(), "proxy foo 10").join();
     }
 
@@ -211,6 +213,15 @@ class CommandTreeTest {
                 manager.executeCommand(new TestCommandSender(), "flags --test test2").join());
         manager.executeCommand(new TestCommandSender(), "flags --num 500");
     }
+
+    @Test
+    void testDuplicateArgument() {
+        final CommandArgument<TestCommandSender, String> argument = StringArgument.of("test");
+        manager.command(manager.commandBuilder("one").argument(argument));
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                manager.command(manager.commandBuilder("two").argument(argument)));
+    }
+
 
     public static final class SpecificCommandSender extends TestCommandSender {
     }

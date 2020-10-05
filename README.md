@@ -16,11 +16,11 @@ Cloud allows for commands to be defined using builder patterns, like this:
 ```java
 mgr.command(mgr.commandBuilder("give")
                .withSenderType(Player.class)
-               .argument(EnumArgument.required(Material.class, "material"))
-               .argument(IntegerArgument.required("amount"))
+               .argument(EnumArgument.of(Material.class, "material"))
+               .argument(IntegerArgument.of("amount"))
                .handler(c -> {
-                   final Material material = c.getRequired("material");
-                   final int amount = c.getRequired("amount");
+                   final Material material = c.get("material");
+                   final int amount = c.get("amount");
                    final ItemStack itemStack = new ItemStack(material, amount);
                    ((Player) c.getSender()).getInventory().addItem(itemStack);
                    c.getSender().sendMessage("You've been given stuff, bro.");
@@ -29,8 +29,9 @@ mgr.command(mgr.commandBuilder("give")
 
 or using annotated methods, like this:
 ```java
-@Description("Test cloud command using @CommandMethod")
-@CommandMethod(value = "annotation|a <input> [number]", permission = "some.permission.node")
+@CommandPermission("some.permission.node")
+@CommandDescription("Test cloud command using @CommandMethod")
+@CommandMethod("annotation|a <input> [number]")
 private void annotatedCommand(@Nonnull final Player player,
                               @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
                               @Argument(value = "number", defaultValue = "5") @Range(min = "10", max = "100")
@@ -69,7 +70,8 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 - **cloud-minecraft/cloud-cloudburst**: Cloudburst v1.0.0+ implementation of cloud
 
 ## links  
-  
+
+- JavaDoc: https://javadoc.commandframework.cloud/
 - Discord: https://discord.gg/KxkjDVg  
   
 ## develop &amp; build  
@@ -82,13 +84,16 @@ Feel free to use this if you want to.
 
 ## use
 
-To use `cloud` you will first need to add it as a dependency to your project. Cloud is available from [IntellectualSites](https://intellectualsites.com)' maven repository.
-  
+To use `cloud` you will first need to add it as a dependency to your project.
+
+Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot repository](https://oss.sonatype.org/content/repositories/snapshots).
+Release builds of Cloud are available throgh the Maven central repository.
+
 **maven**:
 ```xml  
 <repository>  
- <id>intellectualsites-snapshots</id>  
- <url>https://mvn.intellectualsites.com/content/repositories/snapshots</url>  
+ <id>sonatype-snapshots</id>
+ <url>https://oss.sonatype.org/content/repositories/snapshots</url>
 </repository>  
 ```
 
@@ -96,7 +101,7 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-PLATFORM</artifactId>
- <version>0.2.0-SNAPSHOT</version>
+ <version>1.0.0-SNAPSHOT</version>
 </dependency>
 <!-- 
 ~    Optional: Allows you to use annotated methods
@@ -105,7 +110,7 @@ To use `cloud` you will first need to add it as a dependency to your project. Cl
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-annotations</artifactId>
- <version>0.2.0-SNAPSHOT</version>
+ <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ``` 
 
@@ -151,13 +156,13 @@ with conflicting dependencies:
 **gradle**:
 ```groovy
 repositories {
-    maven { url = 'https://mvn.intellectualsites.com/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 ```
 
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-PLATFORM:0.2.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-PLATFORM:1.0.0-SNAPSHOT'
 }
 ```
 

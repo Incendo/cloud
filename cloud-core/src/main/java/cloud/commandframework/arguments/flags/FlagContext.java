@@ -59,7 +59,7 @@ public final class FlagContext {
      *
      * @param flag Flag instance
      */
-    public void addPresenceFlag(@NonNull final CommandFlag<?> flag) {
+    public void addPresenceFlag(final @NonNull CommandFlag<?> flag) {
         this.flagValues.put(flag.getName(), FLAG_PRESENCE_VALUE);
     }
 
@@ -70,7 +70,8 @@ public final class FlagContext {
      * @param value Flag value
      * @param <T>   Value type
      */
-    public <T> void addValueFlag(@NonNull final CommandFlag<T> flag, @NonNull final T value) {
+    public <T> void addValueFlag(final @NonNull CommandFlag<T> flag,
+                                 final @NonNull T value) {
         this.flagValues.put(flag.getName(), value);
     }
 
@@ -82,7 +83,7 @@ public final class FlagContext {
      * @return {@code true} if the flag is presence and the flag is a presence flag,
      * else {@code false}
      */
-    public boolean isPresent(@NonNull final String flag) {
+    public boolean isPresent(final @NonNull String flag) {
         final Object value = this.flagValues.get(flag);
         return FLAG_PRESENCE_VALUE.equals(value);
     }
@@ -95,7 +96,8 @@ public final class FlagContext {
      * @param <T>          Value type
      * @return Stored value, or the supplied default value
      */
-    public <T> @Nullable T getValue(@NonNull final String name, @Nullable final T defaultValue) {
+    public <T> @Nullable T getValue(final @NonNull String name,
+                                    final @Nullable T defaultValue) {
         final Object value = this.flagValues.get(name);
         if (value == null) {
             return defaultValue;

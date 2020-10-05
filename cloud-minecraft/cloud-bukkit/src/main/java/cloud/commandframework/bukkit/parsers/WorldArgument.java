@@ -45,9 +45,9 @@ import java.util.stream.Collectors;
 public class WorldArgument<C> extends CommandArgument<C, World> {
 
     protected WorldArgument(final boolean required,
-                            @NonNull final String name,
-                            @NonNull final String defaultValue,
-                            @Nullable final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+                            final @NonNull String name,
+                            final @NonNull String defaultValue,
+                            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
         super(required, name, new WorldParser<>(), defaultValue, World.class, suggestionsProvider);
     }
 
@@ -58,7 +58,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> CommandArgument.@NonNull Builder<C, World> newBuilder(@NonNull final String name) {
+    public static <C> CommandArgument.@NonNull Builder<C, World> newBuilder(final @NonNull String name) {
         return new WorldArgument.Builder<>(name);
     }
 
@@ -69,7 +69,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, World> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, World> of(final @NonNull String name) {
         return WorldArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -80,7 +80,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, World> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, World> optional(final @NonNull String name) {
         return WorldArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -92,15 +92,15 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>          Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, World> optional(@NonNull final String name,
-                                                                  @NonNull final String defaultValue) {
+    public static <C> @NonNull CommandArgument<C, World> optional(final @NonNull String name,
+                                                                  final @NonNull String defaultValue) {
         return WorldArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, World> {
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(World.class, name);
         }
 
@@ -114,8 +114,8 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
     public static final class WorldParser<C> implements ArgumentParser<C, World> {
 
         @Override
-        public @NonNull ArgumentParseResult<World> parse(@NonNull final CommandContext<C> commandContext,
-                                                         @NonNull final Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<World> parse(final @NonNull CommandContext<C> commandContext,
+                                                         final @NonNull Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -131,7 +131,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         }
 
         @Override
-        public @NonNull List<String> suggestions(@NonNull final CommandContext<C> commandContext, @NonNull final String input) {
+        public @NonNull List<String> suggestions(final @NonNull CommandContext<C> commandContext, final @NonNull String input) {
             return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
         }
 
@@ -147,7 +147,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
          *
          * @param input Input
          */
-        public WorldParseException(@NonNull final String input) {
+        public WorldParseException(final @NonNull String input) {
             this.input = input;
         }
 

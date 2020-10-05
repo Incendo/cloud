@@ -73,9 +73,9 @@ public class CommandConfirmationManager<C> {
      * @param errorNotifier   Notifier that gets called when someone tries to confirm a command with nothing in the queue
      */
     public CommandConfirmationManager(final long timeout,
-                                      @NonNull final TimeUnit timeoutTimeUnit,
-                                      @NonNull final Consumer<@NonNull CommandPostprocessingContext<C>> notifier,
-                                      @NonNull final Consumer<@NonNull C> errorNotifier) {
+                                      final @NonNull TimeUnit timeoutTimeUnit,
+                                      final @NonNull Consumer<@NonNull CommandPostprocessingContext<C>> notifier,
+                                      final @NonNull Consumer<@NonNull C> errorNotifier) {
         this.notifier = notifier;
         this.errorNotifier = errorNotifier;
         this.pendingCommands = new LinkedHashMap<C, Pair<CommandPostprocessingContext<C>, Long>>() {
@@ -87,11 +87,11 @@ public class CommandConfirmationManager<C> {
         this.timeoutMillis = timeoutTimeUnit.toMillis(timeout);
     }
 
-    private void notifyConsumer(@NonNull final CommandPostprocessingContext<C> context) {
+    private void notifyConsumer(final @NonNull CommandPostprocessingContext<C> context) {
         this.notifier.accept(context);
     }
 
-    private void addPending(@NonNull final CommandPostprocessingContext<C> context) {
+    private void addPending(final @NonNull CommandPostprocessingContext<C> context) {
         this.pendingCommands.put(context.getCommandContext().getSender(), Pair.of(context, System.currentTimeMillis()));
     }
 
@@ -101,7 +101,7 @@ public class CommandConfirmationManager<C> {
      * @param sender Sender
      * @return Optional containing the post processing context if one has been stored, else {@link Optional#empty()}
      */
-    public @NonNull Optional<CommandPostprocessingContext<C>> getPending(@NonNull final C sender) {
+    public @NonNull Optional<CommandPostprocessingContext<C>> getPending(final @NonNull C sender) {
         final Pair<CommandPostprocessingContext<C>, Long> pair = this.pendingCommands.remove(sender);
         if (pair != null) {
             if (System.currentTimeMillis() < pair.getSecond() + this.timeoutMillis) {
@@ -126,7 +126,7 @@ public class CommandConfirmationManager<C> {
      *
      * @param manager Command manager
      */
-    public void registerConfirmationProcessor(@NonNull final CommandManager<C> manager) {
+    public void registerConfirmationProcessor(final @NonNull CommandManager<C> manager) {
         manager.registerCommandPostProcessor(new CommandConfirmationPostProcessor());
     }
 
@@ -153,7 +153,7 @@ public class CommandConfirmationManager<C> {
     private final class CommandConfirmationPostProcessor implements CommandPostprocessor<C> {
 
         @Override
-        public void accept(@NonNull final CommandPostprocessingContext<C> context) {
+        public void accept(final @NonNull CommandPostprocessingContext<C> context) {
             if (!context.getCommand()
                         .getCommandMeta()
                         .getOrDefault(CONFIRMATION_REQUIRED_META, "false")

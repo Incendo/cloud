@@ -33,9 +33,9 @@ final class SyntaxFragment {
     private final List<String> minor;
     private final ArgumentMode argumentMode;
 
-    SyntaxFragment(@NonNull final String major,
-                   @NonNull final List<@NonNull String> minor,
-                   @NonNull final ArgumentMode argumentMode) {
+    SyntaxFragment(final @NonNull String major,
+                   final @NonNull List<@NonNull String> minor,
+                   final @NonNull ArgumentMode argumentMode) {
         this.major = major;
         this.minor = minor;
         this.argumentMode = argumentMode;

@@ -45,9 +45,9 @@ import java.util.stream.Collectors;
 public class MaterialArgument<C> extends CommandArgument<C, Material> {
 
     protected MaterialArgument(final boolean required,
-                               @NonNull final String name,
-                               @NonNull final String defaultValue,
-                               @Nullable final BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                               final @NonNull String name,
+                               final @NonNull String defaultValue,
+                               final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                                        @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new MaterialParser<>(), defaultValue, Material.class, suggestionsProvider);
     }
@@ -59,7 +59,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> MaterialArgument.@NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> MaterialArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new MaterialArgument.Builder<>(name);
     }
 
@@ -70,7 +70,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Material> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Material> of(final @NonNull String name) {
         return MaterialArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -81,7 +81,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Material> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Material> optional(final @NonNull String name) {
         return MaterialArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -93,14 +93,14 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>      Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Material> optional(@NonNull final String name,
-                                                                     @NonNull final Material material) {
+    public static <C> @NonNull CommandArgument<C, Material> optional(final @NonNull String name,
+                                                                     final @NonNull Material material) {
         return MaterialArgument.<C>newBuilder(name).asOptionalWithDefault(material.name().toLowerCase()).build();
     }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Material> {
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(Material.class, name);
         }
 
@@ -110,8 +110,8 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
     public static final class MaterialParser<C> implements ArgumentParser<C, Material> {
 
         @Override
-        public @NonNull ArgumentParseResult<Material> parse(@NonNull final CommandContext<C> commandContext,
-                                                            @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<Material> parse(final @NonNull CommandContext<C> commandContext,
+                                                            final @NonNull Queue<@NonNull String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -138,7 +138,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
          *
          * @param input Input
          */
-        public MaterialParseException(@NonNull final String input) {
+        public MaterialParseException(final @NonNull String input) {
             this.input = input;
         }
 

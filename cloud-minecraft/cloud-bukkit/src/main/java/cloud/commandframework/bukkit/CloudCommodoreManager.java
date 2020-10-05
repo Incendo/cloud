@@ -39,7 +39,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     private final CloudBrigadierManager brigadierManager;
     private final Commodore commodore;
 
-    CloudCommodoreManager(@NonNull final BukkitCommandManager<C> commandManager)
+    CloudCommodoreManager(final @NonNull BukkitCommandManager<C> commandManager)
             throws BukkitCommandManager.BrigadierFailureException {
         if (!CommodoreProvider.isSupported()) {
             throw new BukkitCommandManager.BrigadierFailureException(BukkitCommandManager
@@ -52,9 +52,9 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     }
 
     @Override
-    protected void registerExternal(@NonNull final String label,
-                                    @NonNull final Command<?> command,
-                                    @NonNull final BukkitCommand<C> bukkitCommand) {
+    protected void registerExternal(final @NonNull String label,
+                                    final @NonNull Command<?> command,
+                                    final @NonNull BukkitCommand<C> bukkitCommand) {
         final com.mojang.brigadier.Command<?> cmd = o -> 1;
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
                 .createLiteralCommandNode(label, command, (o, p) -> true, cmd);

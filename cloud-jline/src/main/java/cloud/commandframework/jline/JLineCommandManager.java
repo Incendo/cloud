@@ -54,7 +54,7 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
      *
      * @param executionCoordinatorFunction Function producing a new coordinator
      */
-    public JLineCommandManager(@NonNull final Function<CommandTree<JLineCommandSender>,
+    public JLineCommandManager(final @NonNull Function<CommandTree<JLineCommandSender>,
             CommandExecutionCoordinator<JLineCommandSender>> executionCoordinatorFunction) {
         super(executionCoordinatorFunction, CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
@@ -138,9 +138,9 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
     }
 
     @Override
-    public final void complete(@NonNull final LineReader lineReader,
-                               @NonNull final ParsedLine parsedLine,
-                               @NonNull final List<@NonNull Candidate> list) {
+    public final void complete(final @NonNull LineReader lineReader,
+                               final @NonNull ParsedLine parsedLine,
+                               final @NonNull List<@NonNull Candidate> list) {
         final String line = parsedLine.line();
         if (line == null || line.isEmpty() || !line.startsWith("/")) {
             System.out.println("Cannot suggest: empty line");
@@ -155,8 +155,8 @@ public class JLineCommandManager extends CommandManager<JLineCommandSender> impl
     }
 
     @Override
-    public final boolean hasPermission(@NonNull final JLineCommandSender sender,
-                                       @NonNull final String permission) {
+    public final boolean hasPermission(final @NonNull JLineCommandSender sender,
+                                       final @NonNull String permission) {
         return true;
     }
 

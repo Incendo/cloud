@@ -48,10 +48,10 @@ public final class CommandFlag<T> {
 
     private final @Nullable CommandArgument<?, T> commandArgument;
 
-    private CommandFlag(@NonNull final String name,
-                        @NonNull final String @NonNull [] aliases,
-                        @NonNull final Description description,
-                        @Nullable final CommandArgument<?, T> commandArgument) {
+    private CommandFlag(final @NonNull String name,
+                        final @NonNull String @NonNull [] aliases,
+                        final @NonNull Description description,
+                        final @Nullable CommandArgument<?, T> commandArgument) {
         this.name = name;
         this.aliases = aliases;
         this.description = description;
@@ -64,7 +64,7 @@ public final class CommandFlag<T> {
      * @param name Flag name
      * @return Flag builder
      */
-    public static @NonNull Builder<Void> newBuilder(@NonNull final String name) {
+    public static @NonNull Builder<Void> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -135,17 +135,17 @@ public final class CommandFlag<T> {
         private final Description description;
         private final CommandArgument<?, T> commandArgument;
 
-        private Builder(@NonNull final String name,
-                        @NonNull final String[] aliases,
-                        @NonNull final Description description,
-                        @Nullable final CommandArgument<?, T> commandArgument) {
+        private Builder(final @NonNull String name,
+                        final @NonNull String[] aliases,
+                        final @NonNull Description description,
+                        final @Nullable CommandArgument<?, T> commandArgument) {
             this.name = name;
             this.aliases = aliases;
             this.description = description;
             this.commandArgument = commandArgument;
         }
 
-        private Builder(@NonNull final String name) {
+        private Builder(final @NonNull String name) {
             this(name, new String[0], Description.empty(), null);
         }
 
@@ -155,7 +155,7 @@ public final class CommandFlag<T> {
          * @param aliases Flag aliases
          * @return New builder instance
          */
-        public Builder<T> withAliases(@NonNull final String... aliases) {
+        public Builder<T> withAliases(final @NonNull String... aliases) {
             return new Builder<>(this.name, aliases, this.description, this.commandArgument);
         }
 
@@ -165,7 +165,7 @@ public final class CommandFlag<T> {
          * @param description Flag description
          * @return New builder instance
          */
-        public Builder<T> withDescription(@NonNull final Description description) {
+        public Builder<T> withDescription(final @NonNull Description description) {
             return new Builder<>(this.name, this.aliases, description, this.commandArgument);
         }
 
@@ -176,7 +176,7 @@ public final class CommandFlag<T> {
          * @param <N>      New argument type
          * @return New builder instance
          */
-        public <N> Builder<N> withArgument(@NonNull final CommandArgument<?, N> argument) {
+        public <N> Builder<N> withArgument(final @NonNull CommandArgument<?, N> argument) {
             return new Builder<>(this.name, this.aliases, this.description, argument);
         }
 

@@ -44,7 +44,7 @@ import java.util.TreeSet;
  */
 public final class StaticArgument<C> extends CommandArgument<C, String> {
 
-    private StaticArgument(final boolean required, @NonNull final String name, @NonNull final String... aliases) {
+    private StaticArgument(final boolean required, final @NonNull String name, final @NonNull String... aliases) {
         super(required, name, new StaticArgumentParser<>(name, aliases), String.class);
     }
 
@@ -56,22 +56,9 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      * @param <C>     Command sender type
      * @return Constructed argument
      */
-    public static <C> @NonNull StaticArgument<C> of(@NonNull final String name,
-                                                    @NonNull final String... aliases) {
+    public static <C> @NonNull StaticArgument<C> of(final @NonNull String name,
+                                                    final @NonNull String... aliases) {
         return new StaticArgument<>(true, name, aliases);
-    }
-
-    /**
-     * Create a new static argument instance for an optional command argument
-     *
-     * @param name    Argument name
-     * @param aliases Argument aliases
-     * @param <C>     Command sender type
-     * @return Constructed argument
-     */
-    public static <C> @NonNull StaticArgument<C> optional(@NonNull final String name,
-                                                          @NonNull final String... aliases) {
-        return new StaticArgument<>(false, name, aliases);
     }
 
     /**
@@ -79,7 +66,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      *
      * @param alias New alias
      */
-    public void registerAlias(@NonNull final String alias) {
+    public void registerAlias(final @NonNull String alias) {
         ((StaticArgumentParser<C>) this.getParser()).insertAlias(alias);
     }
 
@@ -109,7 +96,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
 
         private final String name;
 
-        private StaticArgumentParser(@NonNull final String name, @NonNull final String... aliases) {
+        private StaticArgumentParser(final @NonNull String name, final @NonNull String... aliases) {
             this.name = name;
             this.allAcceptedAliases.add(this.name);
             this.allAcceptedAliases.addAll(Arrays.asList(aliases));
@@ -117,8 +104,8 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         }
 
         @Override
-        public @NonNull ArgumentParseResult<String> parse(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<String> parse(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull Queue<@NonNull String> inputQueue) {
             final String string = inputQueue.peek();
             if (string == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input provided"));
@@ -131,8 +118,8 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final String input) {
+        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull String input) {
             return Collections.singletonList(this.name);
         }
 
@@ -150,7 +137,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
          *
          * @param alias New alias
          */
-        public void insertAlias(@NonNull final String alias) {
+        public void insertAlias(final @NonNull String alias) {
             this.allAcceptedAliases.add(alias);
             this.alternativeAliases.add(alias);
         }

@@ -43,12 +43,12 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
 
     private final CommandManager<?> commandManager;
 
-    FlagExtractor(@NonNull final CommandManager<?> commandManager) {
+    FlagExtractor(final @NonNull CommandManager<?> commandManager) {
         this.commandManager = commandManager;
     }
 
     @Override
-    public @NonNull Collection<@NonNull CommandFlag<?>> apply(@NonNull final Method method) {
+    public @NonNull Collection<@NonNull CommandFlag<?>> apply(final @NonNull Method method) {
         final Collection<CommandFlag<?>> flags = new LinkedList<>();
         for (final Parameter parameter : method.getParameters()) {
             if (!parameter.isAnnotationPresent(Flag.class)) {

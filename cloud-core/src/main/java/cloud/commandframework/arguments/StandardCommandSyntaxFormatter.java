@@ -25,6 +25,8 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.compound.CompoundArgument;
+import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,7 +46,7 @@ import java.util.List;
 public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
 
     @Override
-    public final @NonNull String apply(@NonNull final List<@NonNull CommandArgument<C, ?>> commandArguments,
+    public final @NonNull String apply(final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
                                        final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node) {
         final StringBuilder stringBuilder = new StringBuilder();
         final Iterator<CommandArgument<C, ?>> iterator = commandArguments.iterator();
@@ -66,10 +68,31 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                         }
                     }
                     stringBuilder.append(suffix);
-                } else if (commandArgument.isRequired()) {
-                    stringBuilder.append("<").append(commandArgument.getName()).append(">");
                 } else {
-                    stringBuilder.append("[").append(commandArgument.getName()).append("]");
+                    String name = commandArgument.getName();
+
+                    if (commandArgument instanceof FlagArgument) {
+                        final StringBuilder flagBuilder = new StringBuilder();
+                        @SuppressWarnings("unchecked")
+                        final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) commandArgument).getFlags().iterator();
+                        while (flagIterator.hasNext()) {
+                            final CommandFlag<?> flag = flagIterator.next();
+                            flagBuilder.append("--").append(flag.getName());
+                            if (flag.getCommandArgument() != null) {
+                                flagBuilder.append(" [").append(flag.getCommandArgument().getName()).append("]");
+                            }
+                            if (flagIterator.hasNext()) {
+                                flagBuilder.append(" | ");
+                            }
+                        }
+                        name = flagBuilder.toString();
+                    }
+
+                    if (commandArgument.isRequired()) {
+                        stringBuilder.append("<").append(name).append(">");
+                    } else {
+                        stringBuilder.append("[").append(name).append("]");
+                    }
                 }
             }
             if (iterator.hasNext()) {
@@ -115,6 +138,24 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                     }
                 }
                 stringBuilder.append(suffix);
+            } else if (argument instanceof FlagArgument) {
+                final StringBuilder flagBuilder = new StringBuilder();
+                @SuppressWarnings("unchecked")
+                final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) argument).getFlags().iterator();
+                while (flagIterator.hasNext()) {
+                    final CommandFlag<?> flag = flagIterator.next();
+                    flagBuilder.append("--").append(flag.getName());
+                    if (flag.getCommandArgument() != null) {
+                        flagBuilder.append(" [").append(flag.getCommandArgument().getName()).append("]");
+                    }
+                    if (flagIterator.hasNext()) {
+                        flagBuilder.append(" | ");
+                    }
+                }
+                stringBuilder.append(" ")
+                             .append(prefix)
+                             .append(flagBuilder)
+                             .append(suffix);
             } else {
                 stringBuilder.append(" ")
                              .append(prefix)

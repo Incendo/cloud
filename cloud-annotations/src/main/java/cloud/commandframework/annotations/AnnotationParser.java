@@ -77,9 +77,9 @@ public final class AnnotationParser<C> {
      *                           {@link ParserParameter}. Mappers for the
      *                           parser parameters can be registered using {@link #registerAnnotationMapper(Class, Function)}
      */
-    public AnnotationParser(@NonNull final CommandManager<C> manager,
-                            @NonNull final Class<C> commandSenderClass,
-                            @NonNull final Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper) {
+    public AnnotationParser(final @NonNull CommandManager<C> manager,
+                            final @NonNull Class<C> commandSenderClass,
+                            final @NonNull Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper) {
         this.commandSenderClass = commandSenderClass;
         this.manager = manager;
         this.metaFactory = new MetaFactory(this, metaMapper);
@@ -96,8 +96,8 @@ public final class AnnotationParser<C> {
      * @param mapper     Mapping function
      * @param <A>        Annotation type
      */
-    public <A extends Annotation> void registerAnnotationMapper(@NonNull final Class<A> annotation,
-                                                                @NonNull final Function<@NonNull A,
+    public <A extends Annotation> void registerAnnotationMapper(final @NonNull Class<A> annotation,
+                                                                final @NonNull Function<@NonNull A,
                                                                         @NonNull ParserParameters> mapper) {
         this.annotationMappers.put(annotation, mapper);
     }
@@ -110,7 +110,7 @@ public final class AnnotationParser<C> {
      * @param <T>      Type of the instance
      * @return Collection of parsed annotations
      */
-    public <T> @NonNull Collection<@NonNull Command<C>> parse(@NonNull final T instance) {
+    public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {
         final Method[] methods = instance.getClass().getDeclaredMethods();
         final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
         for (final Method method : methods) {
@@ -138,8 +138,8 @@ public final class AnnotationParser<C> {
 
     @SuppressWarnings("unchecked")
     private @NonNull Collection<@NonNull Command<C>> construct(
-            @NonNull final Object instance,
-            @NonNull final Collection<@NonNull CommandMethodPair> methodPairs) {
+            final @NonNull Object instance,
+            final @NonNull Collection<@NonNull CommandMethodPair> methodPairs) {
         final Collection<Command<C>> commands = new ArrayList<>();
         for (final CommandMethodPair commandMethodPair : methodPairs) {
             final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
@@ -203,8 +203,11 @@ public final class AnnotationParser<C> {
                     break;
                 }
             }
-            /* Decorate command data */
-            builder = builder.withPermission(commandMethod.permission());
+
+            if (method.isAnnotationPresent(CommandPermission.class)) {
+                builder = builder.withPermission(method.getAnnotation(CommandPermission.class).value());
+            }
+
             if (commandMethod.requiredSender() != Object.class) {
                 builder = builder.withSenderType(commandMethod.requiredSender());
             } else if (senderType != null) {
@@ -248,9 +251,9 @@ public final class AnnotationParser<C> {
     }
 
     @SuppressWarnings("unchecked")
-    private @NonNull CommandArgument<C, ?> buildArgument(@NonNull final Method method,
-                                                         @Nullable final SyntaxFragment syntaxFragment,
-                                                         @NonNull final ArgumentParameterPair argumentPair) {
+    private @NonNull CommandArgument<C, ?> buildArgument(final @NonNull Method method,
+                                                         final @Nullable SyntaxFragment syntaxFragment,
+                                                         final @NonNull ArgumentParameterPair argumentPair) {
         final Parameter parameter = argumentPair.getParameter();
         final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
         final TypeToken<?> token = TypeToken.get(parameter.getParameterizedType());

@@ -38,6 +38,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
+import cloud.commandframework.types.tuples.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -52,7 +53,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
@@ -90,7 +90,7 @@ public final class CommandTree<C> {
     private final Node<CommandArgument<C, ?>> internalTree = new Node<>(null);
     private final CommandManager<C> commandManager;
 
-    private CommandTree(@NonNull final CommandManager<C> commandManager) {
+    private CommandTree(final @NonNull CommandManager<C> commandManager) {
         this.commandManager = commandManager;
     }
 
@@ -101,7 +101,7 @@ public final class CommandTree<C> {
      * @param <C>            Command sender type
      * @return New command tree
      */
-    public static <C> @NonNull CommandTree<C> newTree(@NonNull final CommandManager<C> commandManager) {
+    public static <C> @NonNull CommandTree<C> newTree(final @NonNull CommandManager<C> commandManager) {
         return new CommandTree<>(commandManager);
     }
 
@@ -111,43 +111,47 @@ public final class CommandTree<C> {
      * @param commandContext Command context instance
      * @param args           Input
      * @return Parsed command, if one could be found
-     * @throws NoSuchCommandException If there is no command matching the input
-     * @throws NoPermissionException  If the sender lacks permission to execute the command
-     * @throws InvalidSyntaxException If the command syntax is invalid
      */
-    public @NonNull Optional<Command<C>> parse(@NonNull final CommandContext<C> commandContext,
-                                               @NonNull final Queue<@NonNull String> args) throws
-            NoSuchCommandException, NoPermissionException, InvalidSyntaxException {
-        final Optional<Command<C>> commandOptional = parseCommand(new ArrayList<>(),
-                                                                  commandContext,
-                                                                  args,
-                                                                  this.internalTree);
-        commandOptional.flatMap(Command::getSenderType).ifPresent(requiredType -> {
-            if (!requiredType.isAssignableFrom(commandContext.getSender().getClass())) {
-                throw new InvalidCommandSenderException(commandContext.getSender(), requiredType, Collections.emptyList());
+    public @NonNull Pair<@Nullable Command<C>, @Nullable Exception> parse(final @NonNull CommandContext<C> commandContext,
+                                                                          final @NonNull Queue<@NonNull String> args) {
+        final Pair<@Nullable Command<C>, @Nullable Exception> pair = this.parseCommand(new ArrayList<>(),
+                                                                                       commandContext,
+                                                                                       args,
+                                                                                       this.internalTree);
+        if (pair.getFirst() != null) {
+            final Command<C> command = pair.getFirst();
+            if (command.getSenderType().isPresent() && !command.getSenderType().get()
+                                                               .isAssignableFrom(commandContext.getSender().getClass())) {
+                return Pair.of(null, new InvalidCommandSenderException(commandContext.getSender(),
+                                                                       command.getSenderType().get(),
+                                                                       Collections.emptyList()));
             }
-        });
-        return commandOptional;
-    }
-
-    private Optional<Command<C>> parseCommand(@NonNull final List<@NonNull CommandArgument<C, ?>> parsedArguments,
-                                              @NonNull final CommandContext<C> commandContext,
-                                              @NonNull final Queue<@NonNull String> commandQueue,
-                                              @NonNull final Node<@Nullable CommandArgument<C, ?>> root) {
-        CommandPermission permission = this.isPermitted(commandContext.getSender(), root);
-        if (permission != null) {
-            throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(root)
-                                                                                        .stream()
-                                                                                        .map(Node::getValue)
-                                                                                        .collect(Collectors.toList()));
         }
 
-        final Optional<Command<C>> parsedChild = this.attemptParseUnambiguousChild(parsedArguments,
-                                                                                   commandContext,
-                                                                                   root,
-                                                                                   commandQueue);
-        // noinspection all
-        if (parsedChild != null) {
+        return pair;
+    }
+
+    private @NonNull Pair<@Nullable Command<C>, @Nullable Exception>
+    parseCommand(final @NonNull List<@NonNull CommandArgument<C, ?>> parsedArguments,
+                 final @NonNull CommandContext<C> commandContext,
+                 final @NonNull Queue<@NonNull String> commandQueue,
+                 final @NonNull Node<@Nullable CommandArgument<C, ?>> root) {
+        CommandPermission permission = this.isPermitted(commandContext.getSender(), root);
+        if (permission != null) {
+            return Pair.of(null, new NoPermissionException(permission,
+                                                           commandContext.getSender(),
+                                                           this.getChain(root)
+                                                               .stream()
+                                                               .filter(node -> node.getValue() != null)
+                                                               .map(Node::getValue)
+                                                               .collect(Collectors.toList())));
+        }
+
+        final Pair<@Nullable Command<C>, @Nullable Exception> parsedChild = this.attemptParseUnambiguousChild(parsedArguments,
+                                                                                                              commandContext,
+                                                                                                              root,
+                                                                                                              commandQueue);
+        if (parsedChild.getFirst() != null || parsedChild.getSecond() != null) {
             return parsedChild;
         }
 
@@ -156,24 +160,28 @@ public final class CommandTree<C> {
             /* We are at the bottom. Check if there's a command attached, in which case we're done */
             if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
                 if (commandQueue.isEmpty()) {
-                    return Optional.ofNullable(this.cast(root.getValue().getOwningCommand()));
+                    return Pair.of(this.cast(root.getValue().getOwningCommand()), null);
                 } else {
                     /* Too many arguments. We have a unique path, so we can send the entire context */
-                    throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                        .apply(parsedArguments, root),
-                                                     commandContext.getSender(), this.getChain(root)
-                                                                                     .stream()
-                                                                                     .map(Node::getValue)
-                                                                                     .collect(Collectors.toList()));
+                    return Pair.of(null, new InvalidSyntaxException(
+                            this.commandManager.getCommandSyntaxFormatter()
+                                               .apply(parsedArguments, root),
+                            commandContext.getSender(), this.getChain(root)
+                                                            .stream()
+                                                            .filter(node -> node.getValue() != null)
+                                                            .map(Node::getValue)
+                                                            .collect(Collectors.toList())));
                 }
             } else {
                 /* Too many arguments. We have a unique path, so we can send the entire context */
-                throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                    .apply(parsedArguments, root),
-                                                 commandContext.getSender(), this.getChain(root)
-                                                                                 .stream()
-                                                                                 .map(Node::getValue)
-                                                                                 .collect(Collectors.toList()));
+                return Pair.of(null, new InvalidSyntaxException(
+                        this.commandManager.getCommandSyntaxFormatter()
+                                           .apply(parsedArguments, root),
+                        commandContext.getSender(), this.getChain(root)
+                                                        .stream()
+                                                        .filter(node -> node.getValue() != null)
+                                                        .map(Node::getValue)
+                                                        .collect(Collectors.toList())));
             }
         } else {
             final Iterator<Node<CommandArgument<C, ?>>> childIterator = root.getChildren().iterator();
@@ -197,39 +205,44 @@ public final class CommandTree<C> {
             }
             /* We could not find a match */
             if (root.equals(this.internalTree)) {
-                throw new NoSuchCommandException(commandContext.getSender(),
-                                                 getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
-                                                 stringOrEmpty(commandQueue.peek()));
+                return Pair.of(null, new NoSuchCommandException(
+                        commandContext.getSender(),
+                        getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
+                        stringOrEmpty(commandQueue.peek())));
             }
             /* If we couldn't match a child, check if there's a command attached and execute it */
-            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+            if (root.getValue() != null && root.getValue().getOwningCommand() != null && commandQueue.isEmpty()) {
                 final Command<C> command = root.getValue().getOwningCommand();
                 if (!this.getCommandManager().hasPermission(commandContext.getSender(),
                                                             command.getCommandPermission())) {
-                    throw new NoPermissionException(command.getCommandPermission(),
-                                                    commandContext.getSender(),
-                                                    this.getChain(root)
-                                                        .stream()
-                                                        .map(Node::getValue)
-                                                        .collect(Collectors.toList()));
+                    return Pair.of(null, new NoPermissionException(
+                            command.getCommandPermission(),
+                            commandContext.getSender(),
+                            this.getChain(root)
+                                .stream()
+                                .filter(node -> node.getValue() != null)
+                                .map(Node::getValue)
+                                .collect(Collectors.toList())));
                 }
-                return Optional.of(root.getValue().getOwningCommand());
+                return Pair.of(root.getValue().getOwningCommand(), null);
             }
             /* We know that there's no command and we also cannot match any of the children */
-            throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                .apply(parsedArguments, root),
-                                             commandContext.getSender(), this.getChain(root)
-                                                                             .stream()
-                                                                             .map(Node::getValue)
-                                                                             .collect(Collectors.toList()));
+            return Pair.of(null, new InvalidSyntaxException(
+                    this.commandManager.getCommandSyntaxFormatter()
+                                       .apply(parsedArguments, root),
+                    commandContext.getSender(), this.getChain(root)
+                                                    .stream()
+                                                    .filter(node -> node.getValue() != null)
+                                                    .map(Node::getValue)
+                                                    .collect(Collectors.toList())));
         }
     }
 
-    private @Nullable Optional<Command<C>>
-    attemptParseUnambiguousChild(@NonNull final List<@NonNull CommandArgument<C, ?>> parsedArguments,
-                                 @NonNull final CommandContext<C> commandContext,
-                                 @NonNull final Node<@Nullable CommandArgument<C, ?>> root,
-                                 @NonNull final Queue<String> commandQueue) {
+    private @NonNull Pair<@Nullable Command<C>, @Nullable Exception> attemptParseUnambiguousChild(
+            final @NonNull List<@NonNull CommandArgument<C, ?>> parsedArguments,
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull Node<@Nullable CommandArgument<C, ?>> root,
+            final @NonNull Queue<String> commandQueue) {
         CommandPermission permission;
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
@@ -237,63 +250,78 @@ public final class CommandTree<C> {
             final Node<CommandArgument<C, ?>> child = children.get(0);
             permission = this.isPermitted(commandContext.getSender(), child);
             if (permission != null) {
-                throw new NoPermissionException(permission, commandContext.getSender(), this.getChain(child)
-                                                                                            .stream()
-                                                                                            .map(Node::getValue)
-                                                                                            .collect(Collectors.toList()));
+                return Pair.of(null, new NoPermissionException(
+                        permission,
+                        commandContext.getSender(),
+                        this.getChain(child)
+                            .stream()
+                            .filter(node -> node.getValue() != null)
+                            .map(Node::getValue)
+                            .collect(
+                                    Collectors.toList())));
             }
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
                     if (child.getValue().hasDefaultValue()) {
                         commandQueue.add(child.getValue().getDefaultValue());
                     } else if (!child.getValue().isRequired()) {
-                        return Optional.ofNullable(this.cast(child.getValue().getOwningCommand()));
+                        return Pair.of(this.cast(child.getValue().getOwningCommand()), null);
                     } else if (child.isLeaf()) {
                         /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
                         if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
                             final Command<C> command = root.getValue().getOwningCommand();
                             if (!this.getCommandManager().hasPermission(commandContext.getSender(),
                                                                         command.getCommandPermission())) {
-                                throw new NoPermissionException(command.getCommandPermission(),
-                                                                commandContext.getSender(),
-                                                                this.getChain(root)
-                                                                    .stream()
-                                                                    .map(Node::getValue)
-                                                                    .collect(Collectors.toList()));
+                                return Pair.of(null, new NoPermissionException(
+                                        command.getCommandPermission(),
+                                        commandContext.getSender(),
+                                        this.getChain(root)
+                                            .stream()
+                                            .filter(node -> node.getValue() != null)
+                                            .map(Node::getValue)
+                                            .collect(Collectors.toList())));
                             }
-                            return Optional.of(command);
+                            return Pair.of(command, null);
                         }
                         /* Not enough arguments */
-                        throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                            .apply(Objects.requireNonNull(
-                                                                                    child.getValue().getOwningCommand())
-                                                                                          .getArguments(), child),
-                                                         commandContext.getSender(), this.getChain(root)
-                                                                                         .stream()
-                                                                                         .map(Node::getValue)
-                                                                                         .collect(Collectors.toList()));
+                        return Pair.of(null, new InvalidSyntaxException(
+                                this.commandManager.getCommandSyntaxFormatter()
+                                                   .apply(Objects.requireNonNull(
+                                                           child.getValue()
+                                                                .getOwningCommand())
+                                                                 .getArguments(), child),
+                                commandContext.getSender(), this.getChain(root)
+                                                                .stream()
+                                                                .filter(node -> node.getValue() != null)
+                                                                .map(Node::getValue)
+                                                                .collect(
+                                                                        Collectors.toList())));
                     } else {
                         /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
                         if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
                             final Command<C> command = root.getValue().getOwningCommand();
                             if (!this.getCommandManager().hasPermission(commandContext.getSender(),
                                                                         command.getCommandPermission())) {
-                                throw new NoPermissionException(command.getCommandPermission(),
-                                                                commandContext.getSender(),
-                                                                this.getChain(root)
-                                                                    .stream()
-                                                                    .map(Node::getValue)
-                                                                    .collect(Collectors.toList()));
+                                return Pair.of(null, new NoPermissionException(
+                                        command.getCommandPermission(),
+                                        commandContext.getSender(),
+                                        this.getChain(root)
+                                            .stream()
+                                            .filter(node -> node.getValue() != null)
+                                            .map(Node::getValue)
+                                            .collect(Collectors.toList())));
                             }
-                            return Optional.of(command);
+                            return Pair.of(command, null);
                         }
                         /* Child does not have a command and so we cannot proceed */
-                        throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                            .apply(parsedArguments, root),
-                                                         commandContext.getSender(), this.getChain(root)
-                                                                                         .stream()
-                                                                                         .map(Node::getValue)
-                                                                                         .collect(Collectors.toList()));
+                        return Pair.of(null, new InvalidSyntaxException(
+                                this.commandManager.getCommandSyntaxFormatter()
+                                                   .apply(parsedArguments, root),
+                                commandContext.getSender(), this.getChain(root)
+                                                                .stream()
+                                                                .filter(node -> node.getValue() != null)
+                                                                .map(Node::getValue)
+                                                                .collect(Collectors.toList())));
                     }
                 }
 
@@ -308,32 +336,35 @@ public final class CommandTree<C> {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     if (child.isLeaf()) {
                         if (commandQueue.isEmpty()) {
-                            return Optional.ofNullable(this.cast(child.getValue().getOwningCommand()));
+                            return Pair.of(this.cast(child.getValue().getOwningCommand()), null);
                         } else {
                             /* Too many arguments. We have a unique path, so we can send the entire context */
-                            throw new InvalidSyntaxException(this.commandManager.getCommandSyntaxFormatter()
-                                                                                .apply(parsedArguments, child),
-                                                             commandContext.getSender(), this.getChain(root)
-                                                                                             .stream()
-                                                                                             .map(Node::getValue)
-                                                                                             .collect(
-                                                                                                     Collectors.toList()));
+                            return Pair.of(null, new InvalidSyntaxException(
+                                    this.commandManager.getCommandSyntaxFormatter()
+                                                       .apply(parsedArguments, child),
+                                    commandContext.getSender(), this.getChain(root)
+                                                                    .stream()
+                                                                    .filter(node -> node.getValue() != null)
+                                                                    .map(Node::getValue)
+                                                                    .collect(
+                                                                            Collectors.toList())));
                         }
                     } else {
                         parsedArguments.add(child.getValue());
                         return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
                     }
                 } else if (result.getFailure().isPresent()) {
-                    throw new ArgumentParseException(result.getFailure().get(), commandContext.getSender(),
-                                                     this.getChain(child)
-                                                         .stream()
-                                                         .map(Node::getValue)
-                                                         .collect(Collectors.toList()));
+                    return Pair.of(null, new ArgumentParseException(
+                            result.getFailure().get(), commandContext.getSender(),
+                            this.getChain(child)
+                                .stream()
+                                .filter(node -> node.getValue() != null)
+                                .map(Node::getValue)
+                                .collect(Collectors.toList())));
                 }
             }
         }
-        // noinspection all
-        return null;
+        return Pair.of(null, null);
     }
 
     /**
@@ -343,14 +374,14 @@ public final class CommandTree<C> {
      * @param commandQueue Input queue
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
      */
-    public @NonNull List<@NonNull String> getSuggestions(@NonNull final CommandContext<C> context,
-                                                         @NonNull final Queue<@NonNull String> commandQueue) {
+    public @NonNull List<@NonNull String> getSuggestions(final @NonNull CommandContext<C> context,
+                                                         final @NonNull Queue<@NonNull String> commandQueue) {
         return getSuggestions(context, commandQueue, this.internalTree);
     }
 
-    private @NonNull List<@NonNull String> getSuggestions(@NonNull final CommandContext<C> commandContext,
-                                                          @NonNull final Queue<@NonNull String> commandQueue,
-                                                          @NonNull final Node<@Nullable CommandArgument<C, ?>> root) {
+    private @NonNull List<@NonNull String> getSuggestions(final @NonNull CommandContext<C> commandContext,
+                                                          final @NonNull Queue<@NonNull String> commandQueue,
+                                                          final @NonNull Node<@Nullable CommandArgument<C, ?>> root) {
 
         /* If the sender isn't allowed to access the root node, no suggestions are needed */
         if (this.isPermitted(commandContext.getSender(), root) != null) {
@@ -408,7 +439,8 @@ public final class CommandTree<C> {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     return this.getSuggestions(commandContext, commandQueue, child);
                 } else if (result.getFailure().isPresent()) {
-                    return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
+                    final String value = commandQueue.peek() == null ? "" : commandQueue.peek();
+                    return child.getValue().getSuggestionsProvider().apply(commandContext, value);
                 }
             }
         }
@@ -440,7 +472,7 @@ public final class CommandTree<C> {
         }
     }
 
-    private @NonNull String stringOrEmpty(@Nullable final String string) {
+    private @NonNull String stringOrEmpty(final @Nullable String string) {
         if (string == null) {
             return "";
         }
@@ -453,7 +485,7 @@ public final class CommandTree<C> {
      * @param command Command to insert
      */
     @SuppressWarnings("unchecked")
-    public void insertCommand(@NonNull final Command<C> command) {
+    public void insertCommand(final @NonNull Command<C> command) {
         synchronized (this.commandLock) {
             Node<CommandArgument<C, ?>> node = this.internalTree;
             for (final CommandArgument<C, ?> argument : command.getArguments()) {
@@ -485,8 +517,8 @@ public final class CommandTree<C> {
         }
     }
 
-    private @Nullable CommandPermission isPermitted(@NonNull final C sender,
-                                                    @NonNull final Node<@Nullable CommandArgument<C, ?>> node) {
+    private @Nullable CommandPermission isPermitted(final @NonNull C sender,
+                                                    final @NonNull Node<@Nullable CommandArgument<C, ?>> node) {
         final CommandPermission permission = (CommandPermission) node.nodeMeta.get("permission");
         if (permission != null) {
             return this.commandManager.hasPermission(sender, permission) ? null : permission;
@@ -576,7 +608,7 @@ public final class CommandTree<C> {
         });
     }
 
-    private void checkAmbiguity(@NonNull final Node<@Nullable CommandArgument<C, ?>> node) throws AmbiguousNodeException {
+    private void checkAmbiguity(final @NonNull Node<@Nullable CommandArgument<C, ?>> node) throws AmbiguousNodeException {
         if (node.isLeaf()) {
             return;
         }
@@ -585,14 +617,17 @@ public final class CommandTree<C> {
             if (child.getValue() != null && !child.getValue().isRequired() && size > 1) {
                 throw new AmbiguousNodeException(node.getValue(),
                                                  child.getValue(),
-                                                 node.getChildren().stream().map(Node::getValue).collect(Collectors.toList()));
+                                                 node.getChildren()
+                                                     .stream()
+                                                     .filter(n -> n.getValue() != null)
+                                                     .map(Node::getValue).collect(Collectors.toList()));
             }
         }
         node.children.forEach(this::checkAmbiguity);
     }
 
     private @NonNull List<@NonNull Node<@Nullable CommandArgument<C, ?>>>
-    getLeavesRaw(@NonNull final Node<@Nullable CommandArgument<C, ?>> node) {
+    getLeavesRaw(final @NonNull Node<@Nullable CommandArgument<C, ?>> node) {
         final List<Node<CommandArgument<C, ?>>> leaves = new LinkedList<>();
         if (node.isLeaf()) {
             if (node.getValue() != null) {
@@ -604,7 +639,7 @@ public final class CommandTree<C> {
         return leaves;
     }
 
-    private @NonNull List<@NonNull CommandArgument<C, ?>> getLeaves(@NonNull final Node<@NonNull CommandArgument<C, ?>> node) {
+    private @NonNull List<@NonNull CommandArgument<C, ?>> getLeaves(final @NonNull Node<@NonNull CommandArgument<C, ?>> node) {
         final List<CommandArgument<C, ?>> leaves = new LinkedList<>();
         if (node.isLeaf()) {
             if (node.getValue() != null) {
@@ -617,7 +652,7 @@ public final class CommandTree<C> {
     }
 
     private @NonNull List<@NonNull Node<@Nullable CommandArgument<C, ?>>>
-    getChain(@Nullable final Node<@Nullable CommandArgument<C, ?>> end) {
+    getChain(final @Nullable Node<@Nullable CommandArgument<C, ?>> end) {
         final List<Node<CommandArgument<C, ?>>> chain = new LinkedList<>();
         Node<CommandArgument<C, ?>> tail = end;
         while (tail != null) {
@@ -628,7 +663,7 @@ public final class CommandTree<C> {
         return chain;
     }
 
-    private @Nullable Command<C> cast(@Nullable final Command<C> command) {
+    private @Nullable Command<C> cast(final @Nullable Command<C> command) {
         return command;
     }
 
@@ -648,7 +683,7 @@ public final class CommandTree<C> {
      * @param name Root node name
      * @return Root node, or {@code null}
      */
-    public @Nullable Node<@Nullable CommandArgument<C, ?>> getNamedNode(@Nullable final String name) {
+    public @Nullable Node<@Nullable CommandArgument<C, ?>> getNamedNode(final @Nullable String name) {
         for (final Node<CommandArgument<C, ?>> node : this.getRootNodes()) {
             if (node.getValue() != null && node.getValue() instanceof StaticArgument) {
                 @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) node.getValue();
@@ -683,7 +718,7 @@ public final class CommandTree<C> {
         private final T value;
         private Node<T> parent;
 
-        private Node(@Nullable final T value) {
+        private Node(final @Nullable T value) {
             this.value = value;
         }
 
@@ -696,13 +731,13 @@ public final class CommandTree<C> {
             return Collections.unmodifiableList(this.children);
         }
 
-        private @NonNull Node<@Nullable T> addChild(@NonNull final T child) {
+        private @NonNull Node<@Nullable T> addChild(final @NonNull T child) {
             final Node<T> node = new Node<>(child);
             this.children.add(node);
             return node;
         }
 
-        private @Nullable Node<@Nullable T> getChild(@NonNull final T type) {
+        private @Nullable Node<@Nullable T> getChild(final @NonNull T type) {
             for (final Node<T> child : this.children) {
                 if (type.equals(child.getValue())) {
                     return child;
@@ -769,7 +804,7 @@ public final class CommandTree<C> {
          *
          * @param parent new parent node
          */
-        public void setParent(@Nullable final Node<@Nullable T> parent) {
+        public void setParent(final @Nullable Node<@Nullable T> parent) {
             this.parent = parent;
         }
 

@@ -35,7 +35,7 @@ public final class StandardCommandContextFactory<C> implements CommandContextFac
      * @return Created context
      */
     @Override
-    public CommandContext<C> create(final boolean suggestions, @NonNull final C sender) {
+    public CommandContext<C> create(final boolean suggestions, final @NonNull C sender) {
         return new CommandContext<>(suggestions, sender);
     }
 

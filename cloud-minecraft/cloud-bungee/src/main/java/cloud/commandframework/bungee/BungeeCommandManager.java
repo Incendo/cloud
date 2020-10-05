@@ -48,11 +48,11 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    public BungeeCommandManager(@NonNull final Plugin owningPlugin,
-                                @NonNull final Function<@NonNull CommandTree<C>,
+    public BungeeCommandManager(final @NonNull Plugin owningPlugin,
+                                final @NonNull Function<@NonNull CommandTree<C>,
                                         @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                                @NonNull final Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
-                                @NonNull final Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper)
+                                final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
+                                final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper)
             throws Exception {
         super(commandExecutionCoordinator, new BungeePluginRegistrationHandler<>());
         ((BungeePluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
@@ -62,8 +62,8 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     }
 
     @Override
-    public final boolean hasPermission(@NonNull final C sender,
-                                       @NonNull final String permission) {
+    public final boolean hasPermission(final @NonNull C sender,
+                                       final @NonNull String permission) {
         if (permission.isEmpty()) {
             return true;
         }

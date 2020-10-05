@@ -43,13 +43,6 @@ public @interface CommandMethod {
     String value();
 
     /**
-     * The command permission node
-     *
-     * @return Command permission node
-     */
-    String permission() default "";
-
-    /**
      * The required sender
      *
      * @return Required sender

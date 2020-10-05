@@ -51,11 +51,11 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     private final Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
-    BukkitCommand(@NonNull final String label,
-                  @NonNull final List<@NonNull String> aliases,
-                  @NonNull final Command<C> cloudCommand,
-                  @NonNull final CommandArgument<C, ?> command,
-                  @NonNull final BukkitCommandManager<C> manager) {
+    BukkitCommand(final @NonNull String label,
+                  final @NonNull List<@NonNull String> aliases,
+                  final @NonNull Command<C> cloudCommand,
+                  final @NonNull CommandArgument<C, ?> command,
+                  final @NonNull BukkitCommandManager<C> manager) {
         super(label,
               cloudCommand.getCommandMeta().getOrDefault("description", ""),
               "",

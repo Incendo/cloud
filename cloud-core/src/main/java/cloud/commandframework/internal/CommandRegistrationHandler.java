@@ -58,7 +58,7 @@ public interface CommandRegistrationHandler {
         }
 
         @Override
-        public boolean registerCommand(@NonNull final Command<?> command) {
+        public boolean registerCommand(final @NonNull Command<?> command) {
             return true;
         }
 

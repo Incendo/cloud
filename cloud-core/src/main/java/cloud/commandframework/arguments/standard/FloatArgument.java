@@ -42,11 +42,11 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     private final float max;
 
     private FloatArgument(final boolean required,
-                          @NonNull final String name,
+                          final @NonNull String name,
                           final float min,
                           final float max,
-                          @NonNull final String defaultValue,
-                          @Nullable final BiFunction<@NonNull CommandContext<C>,
+                          final @NonNull String defaultValue,
+                          final @Nullable BiFunction<@NonNull CommandContext<C>,
                                   @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
         super(required, name, new FloatParser<>(min, max), defaultValue, Float.class, suggestionsProvider);
         this.min = min;
@@ -60,7 +60,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> @NonNull Builder<C> newBuilder(@NonNull final String name) {
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -71,7 +71,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Float> of(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Float> of(final @NonNull String name) {
         return FloatArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -82,7 +82,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Float> optional(@NonNull final String name) {
+    public static <C> @NonNull CommandArgument<C, Float> optional(final @NonNull String name) {
         return FloatArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -94,7 +94,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Float> optional(@NonNull final String name,
+    public static <C> @NonNull CommandArgument<C, Float> optional(final @NonNull String name,
                                                                   final float defaultNum) {
         return FloatArgument.<C>newBuilder(name).asOptionalWithDefault(Float.toString(defaultNum)).build();
     }
@@ -122,7 +122,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         private float min = Float.MIN_VALUE;
         private float max = Float.MAX_VALUE;
 
-        protected Builder(@NonNull final String name) {
+        protected Builder(final @NonNull String name) {
             super(Float.class, name);
         }
 
@@ -179,8 +179,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
         @Override
         public @NonNull ArgumentParseResult<Float> parse(
-                @NonNull final CommandContext<C> commandContext,
-                @NonNull final Queue<String> inputQueue) {
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<String> inputQueue) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -232,7 +232,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          * @param min   Minimum value
          * @param max   Maximum value
          */
-        public FloatParseException(@NonNull final String input, final float min, final float max) {
+        public FloatParseException(final @NonNull String input, final float min, final float max) {
             super(input, min, max);
         }
 

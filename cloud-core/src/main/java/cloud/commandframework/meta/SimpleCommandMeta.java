@@ -39,7 +39,7 @@ public class SimpleCommandMeta extends CommandMeta {
 
     private final Map<String, String> metaMap;
 
-    protected SimpleCommandMeta(@NonNull final Map<@NonNull String, @NonNull String> metaMap) {
+    protected SimpleCommandMeta(final @NonNull Map<@NonNull String, @NonNull String> metaMap) {
         this.metaMap = Collections.unmodifiableMap(metaMap);
     }
 
@@ -62,12 +62,12 @@ public class SimpleCommandMeta extends CommandMeta {
     }
 
     @Override
-    public final @NonNull Optional<String> getValue(@NonNull final String key) {
+    public final @NonNull Optional<String> getValue(final @NonNull String key) {
         return Optional.ofNullable(this.metaMap.get(key));
     }
 
     @Override
-    public final @NonNull String getOrDefault(@NonNull final String key, @NonNull final String defaultValue) {
+    public final @NonNull String getOrDefault(final @NonNull String key, final @NonNull String defaultValue) {
         return this.getValue(key).orElse(defaultValue);
     }
 
@@ -109,7 +109,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @param commandMeta Existing instance
          * @return Builder instance
          */
-        public @NonNull Builder with(@NonNull final CommandMeta commandMeta) {
+        public @NonNull Builder with(final @NonNull CommandMeta commandMeta) {
             commandMeta.getAll().forEach(this::with);
             return this;
         }
@@ -121,8 +121,8 @@ public class SimpleCommandMeta extends CommandMeta {
          * @param value Value
          * @return Builder instance
          */
-        public @NonNull Builder with(@NonNull final String key,
-                                     @NonNull final String value) {
+        public @NonNull Builder with(final @NonNull String key,
+                                     final @NonNull String value) {
             this.map.put(key, value);
             return this;
         }

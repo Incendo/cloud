@@ -52,8 +52,8 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
 
     @SuppressWarnings("unchecked")
     BungeeCommand(final cloud.commandframework.@NonNull Command<C> cloudCommand,
-                  @NonNull final CommandArgument<C, ?> command,
-                  @NonNull final BungeeCommandManager<C> manager) {
+                  final @NonNull CommandArgument<C, ?> command,
+                  final @NonNull BungeeCommandManager<C> manager) {
         super(command.getName(),
               cloudCommand.getCommandPermission().toString(),
               ((StaticArgument<C>) command).getAlternativeAliases().toArray(new String[0]));
@@ -128,6 +128,13 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                                      );
                                  } else {
                                      commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
+                                     this.manager.getOwningPlugin().getLogger().warning(
+                                             String.format("(Cloud) Unknown exception type '%s' with cause '%s'",
+                                                           throwable.getClass().getCanonicalName(),
+                                                           throwable.getCause() == null ? "none"
+                                                                                        : throwable.getCause()
+                                                                                                   .getClass().getCanonicalName())
+                                     );
                                      throwable.printStackTrace();
                                  }
                              }

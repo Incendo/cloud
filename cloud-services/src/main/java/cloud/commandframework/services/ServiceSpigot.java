@@ -45,9 +45,9 @@ public final class ServiceSpigot<Context, Result> {
     private final ServicePipeline pipeline;
     private final ServiceRepository<Context, Result> repository;
 
-    ServiceSpigot(@NonNull final ServicePipeline pipeline,
-                  @NonNull final Context context,
-                  @NonNull final TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type) {
+    ServiceSpigot(final @NonNull ServicePipeline pipeline,
+                  final @NonNull Context context,
+                  final @NonNull TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type) {
         this.context = context;
         this.pipeline = pipeline;
         this.repository = pipeline.getRepository(type);
@@ -129,7 +129,7 @@ public final class ServiceSpigot<Context, Result> {
      *                               default implementation
      * @throws IllegalStateException If a {@link SideEffectService} returns {@code null}
      */
-    public void getResult(@NonNull final BiConsumer<Result, Throwable> consumer) {
+    public void getResult(final @NonNull BiConsumer<Result, Throwable> consumer) {
         try {
             consumer.accept(getResult(), null);
         } catch (final PipelineException pipelineException) {

@@ -40,7 +40,7 @@ public class CommandResult<C> {
      *
      * @param context Command context
      */
-    public CommandResult(@NonNull final CommandContext<C> context) {
+    public CommandResult(final @NonNull CommandContext<C> context) {
         this.commandContext = context;
     }
 
