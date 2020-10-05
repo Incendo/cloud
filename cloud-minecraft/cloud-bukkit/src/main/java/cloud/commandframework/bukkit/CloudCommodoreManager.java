@@ -26,11 +26,16 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.permission.CommandPermission;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Collections;
 
 @SuppressWarnings("ALL")
 class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
@@ -57,9 +62,20 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
                                     final @NonNull BukkitCommand<C> bukkitCommand) {
         final com.mojang.brigadier.Command<?> cmd = o -> 1;
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
-                .createLiteralCommandNode(label, command, (o, p) -> true, cmd);
-        this.commodore.register(bukkitCommand, literalCommandNode, p ->
-                this.commandManager.hasPermission(commandManager.getCommandSenderMapper().apply(p),
-                                                  command.getCommandPermission()));
+                .<Object>createLiteralCommandNode(label, command, (o, p) -> {
+                    final CommandSender sender = this.commodore.getBukkitSender(o);
+                    return this.commandManager.hasPermission(this.commandManager.getCommandSenderMapper().apply(sender),
+                                                             (CommandPermission) p);
+                }, false, cmd);
+        final CommandNode existingNode = this.commodore.getDispatcher().findNode(Collections.singletonList(label));
+        if (existingNode != null) {
+            for (final CommandNode child : literalCommandNode.getChildren()) {
+                if (existingNode.getChild(child.getName()) == null) {
+                    existingNode.addChild(child);
+                }
+            }
+        } else {
+            this.commodore.register(literalCommandNode);
+        }
     }
 }

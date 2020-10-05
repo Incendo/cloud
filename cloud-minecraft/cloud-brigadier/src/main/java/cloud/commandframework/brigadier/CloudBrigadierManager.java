@@ -256,6 +256,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param label             Command label
      * @param cloudCommand      Cloud command instance
      * @param permissionChecker Permission checker
+     * @param forceRegister     Whether or not to force register an executor at every node
      * @param executor          Command executor
      * @return Literal command node
      */
@@ -263,6 +264,7 @@ public final class CloudBrigadierManager<C, S> {
                                                                    final @NonNull Command<C> cloudCommand,
                                                                    final @NonNull BiPredicate<@NonNull S,
                                                                            @NonNull CommandPermission> permissionChecker,
+                                                                   final boolean forceRegister,
                                                                    final com.mojang.brigadier.@NonNull Command<S> executor) {
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
                 .getCommandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
@@ -272,10 +274,13 @@ public final class CloudBrigadierManager<C, S> {
                 .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.getNodeMeta()
                                                                                            .getOrDefault("permission",
                                                                                                          Permission.empty())));
+        if (forceRegister || (node.getValue() != null && node.getValue().getOwningCommand() != null)) {
+            literalArgumentBuilder.executes(executor);
+        }
         literalArgumentBuilder.executes(executor);
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandArgument<C, ?>> child : node.getChildren()) {
-            constructedRoot.addChild(this.constructCommandNode(true, child,
+            constructedRoot.addChild(this.constructCommandNode(forceRegister, child,
                                                                permissionChecker, executor, provider).build());
         }
         return constructedRoot;
