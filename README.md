@@ -68,6 +68,8 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 - **cloud-minecraft/cloud-bungee**: BungeeCord 1.8.8+ implementation of Cloud
 - **cloud-minecraft/cloud-velocity**: Velocity v1.1.0 implementation of cloud
 - **cloud-minecraft/cloud-cloudburst**: Cloudburst v1.0.0+ implementation of cloud
+- **cloud-discord/cloud-jda**: JDA v4.2.0_207+ implementation of cloud
+- **cloud-discord/cloud-javacord**: Javacord v3.1.1+ implementation of cloud
 
 ## links  
 
@@ -166,7 +168,7 @@ dependencies {
 }
 ```
 
-Replace `PLATFORM` with your platform of choice. We currently support: `bukkit`, `paper`, `bungee` and `velocity`. All modules use the same versions.
+Replace `PLATFORM` with your platform of choice. We currently support: `bukkit`, `paper`, `bungee` and `velocity`for minecraft and `jda` and `javacord` for discord. All modules use the same versions.
 More information about the Minecraft specific modules can be found [here](https://github.com/Sauilitired/cloud/tree/master/cloud-minecraft).
 
 ## attributions, links &amp; acknowledgements  
