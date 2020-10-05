@@ -82,6 +82,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * Suggestion provider
      */
     private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
+    /**
+     * Whether or not the argument has been used before
+     */
+    private boolean argumentRegistered = false;
 
     private Command<C> owningCommand;
 
@@ -326,6 +330,22 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
             builder = builder.asOptionalWithDefault(this.defaultValue);
         }
         return builder.build();
+    }
+
+    /**
+     * Check whether or not the argument has been used in a command
+     *
+     * @return {@code true} if the argument has been used in a command, else {@code false}
+     */
+    public boolean isArgumentRegistered() {
+        return this.argumentRegistered;
+    }
+
+    /**
+     * Indicate that the argument has been associated with a command
+     */
+    public void setArgumentRegistered() {
+        this.argumentRegistered = true;
     }
 
 

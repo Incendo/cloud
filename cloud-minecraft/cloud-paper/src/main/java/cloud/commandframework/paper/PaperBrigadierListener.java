@@ -169,6 +169,7 @@ class PaperBrigadierListener<C> implements Listener {
     }
 
     @EventHandler
+    @SuppressWarnings("deprecation")
     public void onCommandRegister(@Nonnull final CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
         if (!(event.getCommand() instanceof PluginIdentifiableCommand)) {
             return;

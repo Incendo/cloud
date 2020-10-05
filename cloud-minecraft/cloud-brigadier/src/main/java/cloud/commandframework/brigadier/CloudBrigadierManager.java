@@ -85,7 +85,7 @@ public final class CloudBrigadierManager<C, S> {
 
     private final Map<Class<?>, cloud.commandframework.types.tuples.Pair<Function<? extends ArgumentParser<C, ?>,
             ? extends ArgumentType<?>>, Boolean>> mappers;
-    private final Map<Class<?>, Supplier<ArgumentType<?>>> defaultArgumentTypeSuppliers;
+    private final Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers;
     private final Supplier<CommandContext<C>> dummyContextProvider;
     private final CommandManager<C> commandManager;
 
@@ -214,7 +214,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param supplier Supplier that supplies the argument type
      */
     public void registerDefaultArgumentTypeSupplier(final @NonNull Class<?> clazz,
-                                                    final @NonNull Supplier<@NonNull ArgumentType<?>> supplier) {
+                                                    final @NonNull Supplier<@Nullable ArgumentType<?>> supplier) {
         this.defaultArgumentTypeSuppliers.put(clazz, supplier);
     }
 
@@ -238,7 +238,13 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull ArgumentParser<C, T> argument) {
         final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers
                 .get(GenericTypeReflector.erase(clazz.getType()));
+        @Nullable final ArgumentType<?> defaultType;
         if (argumentTypeSupplier != null) {
+            defaultType = argumentTypeSupplier.get();
+        } else {
+            defaultType = null;
+        }
+        if (defaultType != null) {
             return new Pair<>(argumentTypeSupplier.get(), true);
         }
         return new Pair<>(StringArgumentType.string(), false);

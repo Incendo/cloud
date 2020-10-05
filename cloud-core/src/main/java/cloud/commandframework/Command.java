@@ -384,6 +384,11 @@ public class Command<C> {
          */
         public <T> @NonNull Builder<C> argument(final @NonNull CommandArgument<C, T> argument,
                                                 final @NonNull Description description) {
+            if (argument.isArgumentRegistered()) {
+                throw new IllegalArgumentException("The provided argument has already been associated with a command."
+                                                 + " Use CommandArgument#copy to create a copy of the argument.");
+            }
+            argument.setArgumentRegistered();
             final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
             commandArgumentMap.put(argument, description);
             return new Builder<>(this.commandManager,

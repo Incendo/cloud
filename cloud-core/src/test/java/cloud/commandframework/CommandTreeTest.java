@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
@@ -212,6 +213,15 @@ class CommandTreeTest {
                 manager.executeCommand(new TestCommandSender(), "flags --test test2").join());
         manager.executeCommand(new TestCommandSender(), "flags --num 500");
     }
+
+    @Test
+    void testDuplicateArgument() {
+        final CommandArgument<TestCommandSender, String> argument = StringArgument.of("test");
+        manager.command(manager.commandBuilder("one").argument(argument));
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                manager.command(manager.commandBuilder("two").argument(argument)));
+    }
+
 
     public static final class SpecificCommandSender extends TestCommandSender {
     }
