@@ -34,7 +34,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -46,6 +48,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
     private final long botId;
 
     private final Function<@NonNull C, @NonNull String> prefixMapper;
+    private final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
     private final Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper;
     private final Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper;
 
@@ -55,6 +58,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      *
      * @param jda                          JDA instance to register against
      * @param prefixMapper                 Function that maps the sender to a command prefix string
+     * @param permissionMapper             Function used to check if a command sender has the permission to execute a command
      * @param commandExecutionCoordinator  Coordination provider
      * @param commandSenderMapper          Function that maps {@link MessageReceivedEvent} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link MessageReceivedEvent}
@@ -62,12 +66,14 @@ public class JDACommandManager<C> extends CommandManager<C> {
      */
     public JDACommandManager(final @NonNull JDA jda,
                              final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
+                             final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
                              final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                              final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper,
                              final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper)
             throws InterruptedException {
         super(commandExecutionCoordinator, CommandRegistrationHandler.nullCommandRegistrationHandler());
         this.prefixMapper = prefixMapper;
+        this.permissionMapper = permissionMapper;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
         jda.addEventListener(new JDACommandListener<>(this));
@@ -106,6 +112,10 @@ public class JDACommandManager<C> extends CommandManager<C> {
     public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         if (permission.isEmpty()) {
             return true;
+        }
+
+        if (permissionMapper != null) {
+            return permissionMapper.apply(sender, permission);
         }
 
         MessageReceivedEvent message = backwardsCommandSenderMapper.apply(sender);
