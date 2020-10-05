@@ -116,6 +116,24 @@ public final class CommandContext<C> {
     }
 
     /**
+     * Get a value from its key. Will return {@link Optional#empty()}
+     * if no value is stored with the given key
+     *
+     * @param argument Argument
+     * @param <T>      Value type
+     * @return Value
+     */
+    public <T> @NonNull Optional<T> getOptional(final @NonNull CommandArgument<C, T> argument) {
+        final Object value = this.internalStorage.get(argument.getName());
+        if (value != null) {
+            @SuppressWarnings("ALL") final T castedValue = (T) value;
+            return Optional.of(castedValue);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Remove a stored value from the context
      *
      * @param key Key to remove
@@ -140,6 +158,32 @@ public final class CommandContext<C> {
             throw new NullPointerException("No such object stored in the context: " + key);
         }
         return (T) value;
+    }
+
+    /**
+     * Get a required argument from the context. This will thrown an exception
+     * if there's no value associated with the given argument
+     *
+     * @param argument The argument
+     * @param <T>      Argument type
+     * @return Stored value
+     * @throws NullPointerException If no such value is stored
+     */
+    public <T> @NonNull T get(final @NonNull CommandArgument<C, T> argument) {
+        return this.get(argument.getName());
+    }
+
+    /**
+     * Get a value if it exists, else return the provided default value
+     *
+     * @param argument     Argument
+     * @param defaultValue Default value
+     * @param <T>          Argument type
+     * @return Stored value, or supplied default value
+     */
+    public <T> @Nullable T getOrDefault(final @NonNull CommandArgument<C, T> argument,
+                                        final @Nullable T defaultValue) {
+        return this.<T>getOptional(argument.getName()).orElse(defaultValue);
     }
 
     /**
@@ -246,7 +290,7 @@ public final class CommandContext<C> {
         /**
          * Set the end time
          *
-         * @param end End time (in nanoseconds)
+         * @param end     End time (in nanoseconds)
          * @param success Whether or not the argument was parsed successfully
          */
         public void setEnd(final long end, final boolean success) {
