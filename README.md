@@ -70,7 +70,8 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 - **cloud-minecraft/cloud-cloudburst**: Cloudburst v1.0.0+ implementation of cloud
 
 ## links  
-  
+
+- JavaDoc: https://javadoc.commandframework.cloud/
 - Discord: https://discord.gg/KxkjDVg  
   
 ## develop &amp; build  
@@ -155,13 +156,13 @@ with conflicting dependencies:
 **gradle**:
 ```groovy
 repositories {
-    maven { url = 'https://mvn.intellectualsites.com/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 ```
 
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-PLATFORM:0.2.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-PLATFORM:1.0.0-SNAPSHOT'
 }
 ```
 
