@@ -27,20 +27,26 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.javacord.sender.JavacordCommandSender;
+import cloud.commandframework.javacord.sender.JavacordServerSender;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.permission.PermissionType;
+import org.javacord.api.entity.user.User;
 
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class JavacordCommandManager<C> extends CommandManager<C> {
 
     private final DiscordApi discordApi;
-    private final Function<JavacordCommandSender, C> commandSenderMapper;
-    private final Function<C, JavacordCommandSender> backwardsCommandSenderMapper;
+    private final Function<@NonNull JavacordCommandSender, @NonNull C> commandSenderMapper;
+    private final Function<@NonNull C, @NonNull JavacordCommandSender> backwardsCommandSenderMapper;
 
-    private final Function<C, String> commandPrefixMapper;
-    private final Function<C, Boolean> commandPermissionMapper;
+    private final Function<@NonNull C, @NonNull String> commandPrefixMapper;
+    private final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> commandPermissionMapper;
 
     /**
      * Construct a new Javacord command manager
@@ -57,10 +63,11 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
                                   final @NonNull Function<@NonNull CommandTree<C>,
                                           @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
                                   final @NonNull Function<@NonNull JavacordCommandSender, @NonNull C> commandSenderMapper,
-                                  @NonNull
-                                  final Function<@NonNull C, @NonNull JavacordCommandSender> backwardsCommandSenderMapper,
+                                  final @NonNull Function<@NonNull C,
+                                          @NonNull JavacordCommandSender> backwardsCommandSenderMapper,
                                   final @NonNull Function<@NonNull C, @NonNull String> commandPrefixMapper,
-                                  final @NonNull Function<@NonNull C, @NonNull Boolean> commandPermissionMapper)
+                                  final @Nullable BiFunction<@NonNull C,
+                                          @NonNull String, @NonNull Boolean> commandPermissionMapper)
             throws Exception {
         super(commandExecutionCoordinator, new JavacordRegistrationHandler<>());
         ((JavacordRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
@@ -78,7 +85,23 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
         if (permission.isEmpty()) {
             return true;
         }
-        return this.commandPermissionMapper.apply(sender);
+
+        if (this.commandPermissionMapper != null) {
+            return this.commandPermissionMapper.apply(sender, permission);
+        }
+
+        final JavacordCommandSender commandSender = this.backwardsCommandSenderMapper.apply(sender);
+        if (!(commandSender instanceof JavacordServerSender)) {
+            return false;
+        }
+
+        final Optional<User> authorOptional = commandSender.getAuthor().asUser();
+        if (!authorOptional.isPresent()) {
+            return false;
+        }
+
+        final JavacordServerSender serverSender = (JavacordServerSender) commandSender;
+        return serverSender.getServer().hasPermission(authorOptional.get(), PermissionType.valueOf(permission));
     }
 
     @Override

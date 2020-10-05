@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -133,12 +134,27 @@ public final class CommandHelpHandler<C> {
      * @return Help topic, will return an empty {@link IndexHelpTopic} if no results were found
      */
     public @NonNull HelpTopic<C> queryHelp(final @NonNull String query) {
+        return this.queryHelp(null, query);
+    }
+
+    /**
+     * Query for help
+     *
+     * @param recipient The recipient of this help query to check permissions against (if Non-Null)
+     * @param query     Query string
+     * @return Help topic, will return an empty {@link IndexHelpTopic} if no results were found
+     */
+    public @NonNull HelpTopic<C> queryHelp(final @Nullable C recipient,
+                                           final @NonNull String query) {
+        final List<VerboseHelpEntry<C>> commands = this.getAllCommands();
+        commands.removeIf(command -> recipient != null && !this.commandManager.hasPermission(recipient,
+                                                                                             command.getCommand()
+                                                                                                    .getCommandPermission()));
         if (query.replace(" ", "").isEmpty()) {
-            return new IndexHelpTopic<>(this.getAllCommands());
+            return new IndexHelpTopic<>(commands);
         }
 
         final String[] queryFragments = query.split(" ");
-        final List<VerboseHelpEntry<C>> verboseEntries = this.getAllCommands();
         final String rootFragment = queryFragments[0];
 
         /* Determine which command we are querying for */
@@ -147,7 +163,7 @@ public final class CommandHelpHandler<C> {
 
         boolean exactMatch = false;
 
-        for (final VerboseHelpEntry<C> entry : verboseEntries) {
+        for (final VerboseHelpEntry<C> entry : commands) {
             final Command<C> command = entry.getCommand();
             @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) command.getArguments()
                                                                                                                .get(0);
@@ -189,6 +205,8 @@ public final class CommandHelpHandler<C> {
                                                        description));
             }
             syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::getSyntaxString));
+            syntaxHints.removeIf(command -> recipient != null
+                    && !this.commandManager.hasPermission(recipient, command.getCommand().getCommandPermission()));
             return new IndexHelpTopic<>(syntaxHints);
         }
 
@@ -207,7 +225,11 @@ public final class CommandHelpHandler<C> {
 
             if (head.getValue() != null && head.getValue().getOwningCommand() != null) {
                 if (head.isLeaf() || index == queryFragments.length) {
-                    return new VerboseHelpTopic<>(head.getValue().getOwningCommand());
+                    if (recipient == null || this.commandManager.hasPermission(recipient, head.getValue()
+                                                                                              .getOwningCommand()
+                                                                                              .getCommandPermission())) {
+                        return new VerboseHelpTopic<>(head.getValue().getOwningCommand());
+                    }
                 }
             }
 
@@ -235,8 +257,14 @@ public final class CommandHelpHandler<C> {
                 final List<String> childSuggestions = new LinkedList<>();
                 for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
                     final List<CommandArgument<C, ?>> traversedNodesSub = new LinkedList<>(traversedNodes);
-                    traversedNodesSub.add(child.getValue());
-                    childSuggestions.add(this.commandManager.getCommandSyntaxFormatter().apply(traversedNodesSub, child));
+                    if (recipient == null
+                            || child.getValue() == null
+                            || child.getValue().getOwningCommand() == null
+                            || this.commandManager.hasPermission(recipient,
+                                                                 child.getValue().getOwningCommand().getCommandPermission())) {
+                        traversedNodesSub.add(child.getValue());
+                        childSuggestions.add(this.commandManager.getCommandSyntaxFormatter().apply(traversedNodesSub, child));
+                    }
                 }
                 return new MultiHelpTopic<>(currentDescription, childSuggestions);
             }
@@ -258,7 +286,6 @@ public final class CommandHelpHandler<C> {
      *
      * @param <C> Command sender type
      */
-    @SuppressWarnings("unused")
     public interface HelpTopic<C> {
     }
 

@@ -153,7 +153,7 @@ public final class MinecraftHelp<C> {
                               final @NonNull C recipient) {
         final Audience audience = this.getAudience(recipient);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_HEADER)));
-        this.printTopic(recipient, query, this.commandManager.getCommandHelpHandler().queryHelp(query));
+        this.printTopic(recipient, query, this.commandManager.getCommandHelpHandler().queryHelp(recipient, query));
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_FOOTER)));
     }
 
