@@ -35,7 +35,7 @@ public class JavacordServerSender extends JavacordCommandSender {
      *
      * @param event The event which triggered the command
      */
-    public JavacordServerSender(@NonNull final MessageCreateEvent event) {
+    public JavacordServerSender(final @NonNull MessageCreateEvent event) {
         super(event);
     }
 

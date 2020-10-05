@@ -132,7 +132,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
      * @param alias Alias
      * @return {@code true} if the alias is recognized, else {@code false}
      */
-    public boolean isRecognized(@NonNull final String alias) {
+    public boolean isRecognized(final @NonNull String alias) {
         return this.recognizedAliases.contains(alias);
     }
 

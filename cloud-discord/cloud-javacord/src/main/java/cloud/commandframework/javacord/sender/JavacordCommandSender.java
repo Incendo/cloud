@@ -41,7 +41,7 @@ public class JavacordCommandSender {
      *
      * @param event The event which triggered the command
      */
-    public JavacordCommandSender(@NonNull final MessageCreateEvent event) {
+    public JavacordCommandSender(final @NonNull MessageCreateEvent event) {
         this.event = event;
     }
 

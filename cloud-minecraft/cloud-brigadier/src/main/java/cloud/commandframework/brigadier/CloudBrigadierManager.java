@@ -238,7 +238,7 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull ArgumentParser<C, T> argument) {
         final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers
                 .get(GenericTypeReflector.erase(clazz.getType()));
-        @Nullable final ArgumentType<?> defaultType;
+        final @Nullable ArgumentType<?> defaultType;
         if (argumentTypeSupplier != null) {
             defaultType = argumentTypeSupplier.get();
         } else {

@@ -49,8 +49,8 @@ public class JavacordCommand<C> implements MessageCreateListener {
     private final cloud.commandframework.Command<C> cloudCommand;
 
     JavacordCommand(final cloud.commandframework.@NonNull Command<C> cloudCommand,
-                    @NonNull final CommandArgument<C, ?> command,
-                    @NonNull final JavacordCommandManager<C> manager) {
+                    final @NonNull CommandArgument<C, ?> command,
+                    final @NonNull JavacordCommandManager<C> manager) {
         this.command = command;
         this.manager = manager;
         this.cloudCommand = cloudCommand;

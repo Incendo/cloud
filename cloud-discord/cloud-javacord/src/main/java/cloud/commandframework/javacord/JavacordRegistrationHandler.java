@@ -39,12 +39,12 @@ final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler
   JavacordRegistrationHandler() {
   }
 
-  void initialize(@NonNull final JavacordCommandManager<C> javacordCommandManager) {
+  void initialize(final @NonNull JavacordCommandManager<C> javacordCommandManager) {
     this.javacordCommandManager = javacordCommandManager;
   }
 
   @Override
-  public boolean registerCommand(@NonNull final Command<?> command) {
+  public boolean registerCommand(final @NonNull Command<?> command) {
     /* We only care about the root command argument */
     final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
     if (this.registeredCommands.containsKey(commandArgument)) {
