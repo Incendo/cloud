@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 public final class CommandHelpHandler<C> {
@@ -73,8 +74,8 @@ public final class CommandHelpHandler<C> {
     public @NonNull List<@NonNull String> getLongestSharedChains() {
         final List<String> chains = new ArrayList<>();
         this.commandManager.getCommandTree().getRootNodes().forEach(node ->
-            chains.add(node.getValue()
-                           .getName() + this.commandManager.getCommandSyntaxFormatter()
+            chains.add(Objects.requireNonNull(node.getValue())
+                              .getName() + this.commandManager.getCommandSyntaxFormatter()
                                                            .apply(Collections
                                                                           .emptyList(),
                                                                   node)));
@@ -216,7 +217,11 @@ public final class CommandHelpHandler<C> {
                 if (index < queryFragments.length) {
                     /* We might still be able to match an argument */
                     for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
+                        @SuppressWarnings("unchecked")
                         final StaticArgument<C> childArgument = (StaticArgument<C>) child.getValue();
+                        if (childArgument == null) {
+                            continue;
+                        }
                         for (final String childAlias : childArgument.getAliases()) {
                             if (childAlias.equalsIgnoreCase(queryFragments[index])) {
                                 head = child;
@@ -253,6 +258,7 @@ public final class CommandHelpHandler<C> {
      *
      * @param <C> Command sender type
      */
+    @SuppressWarnings("unused")
     public interface HelpTopic<C> {
     }
 

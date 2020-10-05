@@ -60,7 +60,7 @@ class PaperBrigadierListener<C> implements Listener {
     private final PaperCommandManager<C> paperCommandManager;
     private final String nmsVersion;
 
-    PaperBrigadierListener(@Nonnull final PaperCommandManager<C> paperCommandManager) throws Exception {
+    PaperBrigadierListener(@Nonnull final PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
         this.brigadierManager = new CloudBrigadierManager<>(this.paperCommandManager,
                                                             () -> new CommandContext<>(

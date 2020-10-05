@@ -73,7 +73,6 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-@SuppressWarnings("unused")
 public abstract class CommandManager<C> {
 
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
@@ -371,7 +370,7 @@ public abstract class CommandManager<C> {
      * @return Flag builder
      */
     public CommandFlag.@NonNull Builder<Void> flagBuilder(final @NonNull String name) {
-        return CommandFlag.<C>newBuilder(name);
+        return CommandFlag.newBuilder(name);
     }
 
     /**
@@ -580,6 +579,7 @@ public abstract class CommandManager<C> {
      * @param setting Setting to set
      * @param value   Value
      */
+    @SuppressWarnings("unused")
     public void setSetting(final @NonNull ManagerSettings setting,
                            final boolean value) {
         if (value) {

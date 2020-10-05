@@ -85,8 +85,6 @@ import java.util.stream.Collectors;
  */
 public final class CommandTree<C> {
 
-    private static final @Nullable Exception NULL_EXCEPTION = null;
-
     private final Object commandLock = new Object();
 
     private final Node<CommandArgument<C, ?>> internalTree = new Node<>(null);
@@ -144,6 +142,7 @@ public final class CommandTree<C> {
                                                            commandContext.getSender(),
                                                            this.getChain(root)
                                                                .stream()
+                                                               .filter(node -> node.getValue() != null)
                                                                .map(Node::getValue)
                                                                .collect(Collectors.toList())));
         }
@@ -169,6 +168,7 @@ public final class CommandTree<C> {
                                                .apply(parsedArguments, root),
                             commandContext.getSender(), this.getChain(root)
                                                             .stream()
+                                                            .filter(node -> node.getValue() != null)
                                                             .map(Node::getValue)
                                                             .collect(Collectors.toList())));
                 }
@@ -179,6 +179,7 @@ public final class CommandTree<C> {
                                            .apply(parsedArguments, root),
                         commandContext.getSender(), this.getChain(root)
                                                         .stream()
+                                                        .filter(node -> node.getValue() != null)
                                                         .map(Node::getValue)
                                                         .collect(Collectors.toList())));
             }
@@ -219,6 +220,7 @@ public final class CommandTree<C> {
                             commandContext.getSender(),
                             this.getChain(root)
                                 .stream()
+                                .filter(node -> node.getValue() != null)
                                 .map(Node::getValue)
                                 .collect(Collectors.toList())));
                 }
@@ -230,6 +232,7 @@ public final class CommandTree<C> {
                                        .apply(parsedArguments, root),
                     commandContext.getSender(), this.getChain(root)
                                                     .stream()
+                                                    .filter(node -> node.getValue() != null)
                                                     .map(Node::getValue)
                                                     .collect(Collectors.toList())));
         }
@@ -252,6 +255,7 @@ public final class CommandTree<C> {
                         commandContext.getSender(),
                         this.getChain(child)
                             .stream()
+                            .filter(node -> node.getValue() != null)
                             .map(Node::getValue)
                             .collect(
                                     Collectors.toList())));
@@ -273,6 +277,7 @@ public final class CommandTree<C> {
                                         commandContext.getSender(),
                                         this.getChain(root)
                                             .stream()
+                                            .filter(node -> node.getValue() != null)
                                             .map(Node::getValue)
                                             .collect(Collectors.toList())));
                             }
@@ -287,6 +292,7 @@ public final class CommandTree<C> {
                                                                  .getArguments(), child),
                                 commandContext.getSender(), this.getChain(root)
                                                                 .stream()
+                                                                .filter(node -> node.getValue() != null)
                                                                 .map(Node::getValue)
                                                                 .collect(
                                                                         Collectors.toList())));
@@ -301,6 +307,7 @@ public final class CommandTree<C> {
                                         commandContext.getSender(),
                                         this.getChain(root)
                                             .stream()
+                                            .filter(node -> node.getValue() != null)
                                             .map(Node::getValue)
                                             .collect(Collectors.toList())));
                             }
@@ -312,6 +319,7 @@ public final class CommandTree<C> {
                                                    .apply(parsedArguments, root),
                                 commandContext.getSender(), this.getChain(root)
                                                                 .stream()
+                                                                .filter(node -> node.getValue() != null)
                                                                 .map(Node::getValue)
                                                                 .collect(Collectors.toList())));
                     }
@@ -336,6 +344,7 @@ public final class CommandTree<C> {
                                                        .apply(parsedArguments, child),
                                     commandContext.getSender(), this.getChain(root)
                                                                     .stream()
+                                                                    .filter(node -> node.getValue() != null)
                                                                     .map(Node::getValue)
                                                                     .collect(
                                                                             Collectors.toList())));
@@ -349,6 +358,7 @@ public final class CommandTree<C> {
                             result.getFailure().get(), commandContext.getSender(),
                             this.getChain(child)
                                 .stream()
+                                .filter(node -> node.getValue() != null)
                                 .map(Node::getValue)
                                 .collect(Collectors.toList())));
                 }
@@ -429,7 +439,8 @@ public final class CommandTree<C> {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     return this.getSuggestions(commandContext, commandQueue, child);
                 } else if (result.getFailure().isPresent()) {
-                    return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
+                    final String value = commandQueue.peek() == null ? "" : commandQueue.peek();
+                    return child.getValue().getSuggestionsProvider().apply(commandContext, value);
                 }
             }
         }
@@ -606,7 +617,10 @@ public final class CommandTree<C> {
             if (child.getValue() != null && !child.getValue().isRequired() && size > 1) {
                 throw new AmbiguousNodeException(node.getValue(),
                                                  child.getValue(),
-                                                 node.getChildren().stream().map(Node::getValue).collect(Collectors.toList()));
+                                                 node.getChildren()
+                                                     .stream()
+                                                     .filter(n -> n.getValue() != null)
+                                                     .map(Node::getValue).collect(Collectors.toList()));
             }
         }
         node.children.forEach(this::checkAmbiguity);
