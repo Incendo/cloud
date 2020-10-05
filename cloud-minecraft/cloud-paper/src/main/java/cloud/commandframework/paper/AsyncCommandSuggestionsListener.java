@@ -28,8 +28,8 @@ import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,17 +39,17 @@ class AsyncCommandSuggestionsListener<C> implements Listener {
 
     private final PaperCommandManager<C> paperCommandManager;
 
-    AsyncCommandSuggestionsListener(@Nonnull final PaperCommandManager<C> paperCommandManager) {
+    AsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
     }
 
     @EventHandler
-    void onTabCompletion(@Nonnull final AsyncTabCompleteEvent event) throws Exception {
+    void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) throws Exception {
         if (event.getBuffer().isEmpty() || !event.getBuffer().startsWith("/")) {
             return;
         }
         final String[] arguments = event.getBuffer().substring(1).split(" ");
-        if (paperCommandManager.getCommandTree().getNamedNode(arguments[0]) == null) {
+        if (this.paperCommandManager.getCommandTree().getNamedNode(arguments[0]) == null) {
             return;
         }
         @SuppressWarnings("unchecked")

@@ -58,14 +58,14 @@ public class JDACommandListener<C> extends ListenerAdapter {
 
     @Override
     public final void onMessageReceived(final @NonNull MessageReceivedEvent event) {
-        Message message = event.getMessage();
-        C sender = commandManager.getCommandSenderMapper().apply(event);
+        final Message message = event.getMessage();
+        final C sender = this.commandManager.getCommandSenderMapper().apply(event);
 
-        if (commandManager.getBotId() == event.getAuthor().getIdLong()) {
+        if (this.commandManager.getBotId() == event.getAuthor().getIdLong()) {
             return;
         }
 
-        String prefix = commandManager.getPrefixMapper().apply(sender);
+        final String prefix = this.commandManager.getPrefixMapper().apply(sender);
         String content = message.getContentRaw();
 
         if (!content.startsWith(prefix)) {
@@ -81,40 +81,40 @@ public class JDACommandListener<C> extends ListenerAdapter {
                           }
 
                           if (throwable instanceof InvalidSyntaxException) {
-                              commandManager.handleException(sender,
-                                                             InvalidSyntaxException.class,
-                                                             (InvalidSyntaxException) throwable, (c, e) -> {
-                                          sendMessage(event,
-                                                      MESSAGE_INVALID_SYNTAX + prefix + ((InvalidSyntaxException) throwable)
-                                                              .getCorrectSyntax());
+                              this.commandManager.handleException(sender,
+                                                                  InvalidSyntaxException.class,
+                                                                  (InvalidSyntaxException) throwable, (c, e) -> {
+                                          this.sendMessage(event,
+                                                           MESSAGE_INVALID_SYNTAX + prefix + ((InvalidSyntaxException) throwable)
+                                                                   .getCorrectSyntax());
                                       });
                           } else if (throwable instanceof InvalidCommandSenderException) {
-                              commandManager.handleException(sender,
-                                                             InvalidCommandSenderException.class,
-                                                             (InvalidCommandSenderException) throwable, (c, e) ->
-                                                                     sendMessage(event, throwable.getMessage())
+                              this.commandManager.handleException(sender,
+                                                                  InvalidCommandSenderException.class,
+                                                                  (InvalidCommandSenderException) throwable, (c, e) ->
+                                                                          this.sendMessage(event, throwable.getMessage())
                               );
                           } else if (throwable instanceof NoPermissionException) {
-                              commandManager.handleException(sender,
-                                                             NoPermissionException.class,
-                                                             (NoPermissionException) throwable, (c, e) ->
-                                                                     sendMessage(event, MESSAGE_NO_PERMS)
+                              this.commandManager.handleException(sender,
+                                                                  NoPermissionException.class,
+                                                                  (NoPermissionException) throwable, (c, e) ->
+                                                                          this.sendMessage(event, MESSAGE_NO_PERMS)
                               );
                           } else if (throwable instanceof NoSuchCommandException) {
-                              commandManager.handleException(sender,
-                                                             NoSuchCommandException.class,
-                                                             (NoSuchCommandException) throwable, (c, e) ->
-                                                                     sendMessage(event, MESSAGE_UNKNOWN_COMMAND)
+                              this.commandManager.handleException(sender,
+                                                                  NoSuchCommandException.class,
+                                                                  (NoSuchCommandException) throwable, (c, e) ->
+                                                                          this.sendMessage(event, MESSAGE_UNKNOWN_COMMAND)
                               );
                           } else if (throwable instanceof ArgumentParseException) {
-                              commandManager.handleException(sender, ArgumentParseException.class,
-                                                             (ArgumentParseException) throwable, (c, e) -> {
-                                          sendMessage(event,
-                                                      "Invalid Command Argument: " + throwable.getCause()
-                                                                                              .getMessage());
+                              this.commandManager.handleException(sender, ArgumentParseException.class,
+                                                                  (ArgumentParseException) throwable, (c, e) -> {
+                                          this.sendMessage(event,
+                                                           "Invalid Command Argument: " + throwable.getCause()
+                                                                                                   .getMessage());
                                       });
                           } else {
-                              sendMessage(event, throwable.getMessage());
+                              this.sendMessage(event, throwable.getMessage());
                           }
                       });
     }

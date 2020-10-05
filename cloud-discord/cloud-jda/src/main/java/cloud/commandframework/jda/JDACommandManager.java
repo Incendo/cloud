@@ -50,7 +50,6 @@ public class JDACommandManager<C> extends CommandManager<C> {
     private final Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper;
 
     /**
-     * final
      * Construct a new JDA Command Manager
      *
      * @param jda                          JDA instance to register against
@@ -80,8 +79,8 @@ public class JDACommandManager<C> extends CommandManager<C> {
      *
      * @return Prefix mapper
      */
-    public final @NonNull Function<C, String> getPrefixMapper() {
-        return prefixMapper;
+    public final @NonNull Function<@NonNull C, @NonNull String> getPrefixMapper() {
+        return this.prefixMapper;
     }
 
     /**
@@ -99,7 +98,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      * @return Bots discord id
      */
     public final long getBotId() {
-        return botId;
+        return this.botId;
     }
 
     @Override
@@ -108,8 +107,8 @@ public class JDACommandManager<C> extends CommandManager<C> {
             return true;
         }
 
-        MessageReceivedEvent message = backwardsCommandSenderMapper.apply(sender);
-        Member member = message.getMember();
+        final MessageReceivedEvent message = this.backwardsCommandSenderMapper.apply(sender);
+        final Member member = message.getMember();
         if (member == null) {
             return false;
         }
