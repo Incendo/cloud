@@ -33,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -53,7 +54,7 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
                      final @NonNull Tuple names,
                      final @NonNull Tuple parserTuple,
                      final @NonNull Tuple types,
-                     final @NonNull Function<@NonNull T, @NonNull O> mapper,
+                     final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
                      final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
                      final @NonNull TypeToken<O> valueType) {
         super(required,
@@ -98,11 +99,11 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
     private static final class CompoundParser<T extends Tuple, C, O> implements ArgumentParser<C, O> {
 
         private final Object[] parsers;
-        private final Function<T, O> mapper;
+        private final BiFunction<C, T, O> mapper;
         private final Function<Object[], T> tupleFactory;
 
         private CompoundParser(final @NonNull Tuple parserTuple,
-                               final @NonNull Function<@NonNull T, @NonNull O> mapper,
+                               final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
                                final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory) {
             this.parsers = parserTuple.toArray();
             this.mapper = mapper;
@@ -128,7 +129,8 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
              * Now check if the mapper threw any exceptions
              */
             try {
-                return ArgumentParseResult.success(this.mapper.apply(this.tupleFactory.apply(output)));
+                return ArgumentParseResult.success(this.mapper.apply(commandContext.getSender(),
+                                                                     this.tupleFactory.apply(output)));
             } catch (final Exception e) {
                 return ArgumentParseResult.failure(e);
             }

@@ -31,7 +31,7 @@ import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * A compound argument consisting of two inner arguments
@@ -59,7 +59,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
                            final @NonNull Pair<@NonNull String, @NonNull String> names,
                            final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> types,
                            final @NonNull Pair<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>> parserPair,
-                           final @NonNull Function<@NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper,
+                           final @NonNull BiFunction<@NonNull C, @NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper,
                            final @NonNull TypeToken<O> valueType) {
         super(required, name, names, parserPair, types, mapper, o -> Pair.of((U) o[0], (V) o[1]), valueType);
     }
@@ -129,7 +129,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
                                                          this.names,
                                                          this.types,
                                                          this.parserPair,
-                                                         Function.identity(),
+                                                         (sender, pair) -> pair,
                                                          new TypeToken<Pair<U, V>>() {
                                                          });
         }
@@ -143,7 +143,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
          * @return Created pair
          */
         public <O> @NonNull ArgumentPair<C, U, V, O> withMapper(final @NonNull TypeToken<O> clazz,
-                                                                final @NonNull Function<@NonNull Pair<@NonNull U,
+                                                                final @NonNull BiFunction<@NonNull C, @NonNull Pair<@NonNull U,
                                                                         @NonNull V>, @NonNull O> mapper) {
             return new ArgumentPair<C, U, V, O>(this.required, this.name, this.names, this.types, this.parserPair, mapper, clazz);
         }
@@ -158,7 +158,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
          */
         public <O> @NonNull ArgumentPair<@NonNull C, @NonNull U, @NonNull V, @NonNull O> withMapper(
                 final @NonNull Class<O> clazz,
-                final @NonNull Function<@NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper) {
+                final @NonNull BiFunction<@NonNull C, @NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper) {
             return this.withMapper(TypeToken.get(clazz), mapper);
         }
 
