@@ -44,6 +44,7 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
+import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
@@ -53,6 +54,7 @@ import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -86,13 +88,13 @@ public final class ExamplePlugin extends JavaPlugin {
         // This is a function that will provide a command execution coordinator that parses and executes commands
         // asynchronously
         //
-        // final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-        //         AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
-        //
-        // However, in this example it is fine for us to run everything synchronously
-        //
         final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-                CommandExecutionCoordinator.simpleCoordinator();
+                 AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
+        //
+        // However, in many cases it is fine for to run everything synchronously:
+        //
+        // final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
+        //        CommandExecutionCoordinator.simpleCoordinator();
         //
         // This function maps the command sender type of our choice to the bukkit command sender.
         // However, in this example we use the Bukkit command sender, and so we just need to map it
@@ -207,29 +209,45 @@ public final class ExamplePlugin extends JavaPlugin {
                                             Triplet.of(Integer.class, Integer.class, Integer.class),
                                             triplet -> new Vector(triplet.getFirst(), triplet.getSecond(), triplet.getThird()),
                                             Description.of("Coordinates"))
-                                    .handler(context -> {
-                                        final Player player = (Player) context.getSender();
-                                        final World world = context.get(worldArgument);
-                                        final Vector coords = context.get("coords");
-                                        final Location location = coords.toLocation(world);
-                                        player.teleport(location);
-                                    }))
+                                    .handler(context -> manager.taskRecipe().begin(context)
+                                             .synchronous(commandContext -> {
+                                                 final Player player = (Player) commandContext.getSender();
+                                                 final World world = commandContext.get(worldArgument);
+                                                 final Vector coords = commandContext.get("coords");
+                                                 final Location location = coords.toLocation(world);
+                                                 player.teleport(location);
+                                             }).execute()))
                     .command(builder.literal("teleport")
                                     .literal("entity")
                                     .withSenderType(Player.class)
                                     .argument(SingleEntitySelectorArgument.of("entity"),
                                               Description.of("Entity to teleport"))
                                     .literal("here")
-                                    .handler(commandContext -> {
-                                        final Player player = (Player) commandContext.getSender();
-                                        final SingleEntitySelector singleEntitySelector = commandContext.get("entity");
-                                        if (singleEntitySelector.hasAny()) {
-                                            singleEntitySelector.getEntity().teleport(player);
-                                            player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
-                                        } else {
-                                            player.sendMessage(ChatColor.RED + "No entity matched your query.");
-                                        }
-                                    }));
+                                    .handler(
+                                            context -> manager.taskRecipe().begin(context)
+                                            .synchronous(commandContext -> {
+                                                final Player player = (Player) commandContext.getSender();
+                                                final SingleEntitySelector singleEntitySelector = commandContext.get("entity");
+                                                if (singleEntitySelector.hasAny()) {
+                                                    singleEntitySelector.getEntity().teleport(player);
+                                                    player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
+                                                } else {
+                                                    player.sendMessage(ChatColor.RED + "No entity matched your query.");
+                                                }
+                                            }).execute()
+                                    ));
+        manager.command(builder.literal("tasktest")
+                                .handler(context -> manager.taskRecipe()
+                                                           .begin(context)
+                                                           .asynchronous(c -> {
+                                                               c.getSender().sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
+                                                               return c;
+                                                           })
+                                                           .synchronous(c -> {
+                                                               c.getSender().sendMessage("SYNC: " + Bukkit.isPrimaryThread());
+                                                           })
+                                                           .execute(() -> context.getSender().sendMessage("DONE!"))
+                                ));
     }
 
     @CommandMethod("example help [query]")

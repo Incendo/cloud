@@ -288,7 +288,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             @NonNull ParserParameters> {
 
         @Override
-        public @NonNull ParserParameters apply(@NonNull final Greedy greedy, @NonNull final TypeToken<?> typeToken) {
+        public @NonNull ParserParameters apply(final @NonNull Greedy greedy, final @NonNull TypeToken<?> typeToken) {
             return ParserParameters.single(StandardParameters.GREEDY, true);
         }
 

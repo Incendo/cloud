@@ -13,6 +13,7 @@ include(':cloud-cloudburst')
 include(':cloud-javacord')
 include(':cloud-jda')
 include(':example-bukkit')
+include(':cloud-tasks')
 project(':cloud-bukkit').projectDir = file('cloud-minecraft/cloud-bukkit')
 project(':cloud-paper').projectDir = file('cloud-minecraft/cloud-paper')
 project(':cloud-brigadier').projectDir = file('cloud-minecraft/cloud-brigadier')
@@ -23,4 +24,3 @@ project(':cloud-cloudburst').projectDir = file('cloud-minecraft/cloud-cloudburst
 project(':cloud-javacord').projectDir = file('cloud-discord/cloud-javacord')
 project(':cloud-jda').projectDir = file('cloud-discord/cloud-jda')
 project(':example-bukkit').projectDir = file('examples/example-bukkit')
-

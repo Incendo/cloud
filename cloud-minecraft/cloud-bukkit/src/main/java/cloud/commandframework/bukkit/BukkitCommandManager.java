@@ -38,6 +38,8 @@ import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgu
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.tasks.TaskFactory;
+import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -73,6 +75,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
 
+    private final BukkitSynchronizer bukkitSynchronizer;
+    private final TaskFactory taskFactory;
+
     private boolean splitAliases = false;
 
     /**
@@ -95,6 +100,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+
+        this.bukkitSynchronizer = new BukkitSynchronizer(owningPlugin);
+        this.taskFactory = new TaskFactory(this.bukkitSynchronizer);
 
         /* Try to determine the Minecraft version */
         int version = -1;
@@ -140,6 +148,15 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
                 new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
                 new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
+    }
+
+    /**
+     * Create a new task recipe. This can be used to create chains of synchronous/asynchronous method calls
+     *
+     * @return Task recipe
+     */
+    public @NonNull TaskRecipe taskRecipe() {
+        return this.taskFactory.recipe();
     }
 
     /**
