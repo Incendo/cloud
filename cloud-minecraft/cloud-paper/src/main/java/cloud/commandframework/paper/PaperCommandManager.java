@@ -30,8 +30,8 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 /**
@@ -50,11 +50,11 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    public PaperCommandManager(@Nonnull final Plugin owningPlugin,
-                               @Nonnull final Function<CommandTree<C>,
+    public PaperCommandManager(final @NonNull Plugin owningPlugin,
+                               final @NonNull Function<CommandTree<C>,
                                        CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                               @Nonnull final Function<CommandSender, C> commandSenderMapper,
-                               @Nonnull final Function<C, CommandSender> backwardsCommandSenderMapper) throws
+                               final @NonNull Function<CommandSender, C> commandSenderMapper,
+                               final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper) throws
             Exception {
         super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
 

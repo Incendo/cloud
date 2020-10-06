@@ -42,6 +42,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -83,8 +84,7 @@ import java.util.function.Supplier;
  */
 public final class CloudBrigadierManager<C, S> {
 
-    private final Map<Class<?>, cloud.commandframework.types.tuples.Pair<Function<? extends ArgumentParser<C, ?>,
-            ? extends ArgumentType<?>>, Boolean>> mappers;
+    private final Map<Class<?>, Pair<Function<? extends ArgumentParser<C, ?>, ? extends ArgumentType<?>>, Boolean>> mappers;
     private final Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers;
     private final Supplier<CommandContext<C>> dummyContextProvider;
     private final CommandManager<C> commandManager;
@@ -203,8 +203,7 @@ public final class CloudBrigadierManager<C, S> {
                                                                        final boolean nativeSuggestions,
                                                                        final @NonNull Function<@NonNull ? extends K,
                                                                                @NonNull ? extends ArgumentType<O>> mapper) {
-        this.mappers.put(GenericTypeReflector.erase(argumentType.getType()),
-                         cloud.commandframework.types.tuples.Pair.of(mapper, nativeSuggestions));
+        this.mappers.put(GenericTypeReflector.erase(argumentType.getType()), Pair.of(mapper, nativeSuggestions));
     }
 
     /**
@@ -224,12 +223,11 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull TypeToken<T> argumentType,
             final @NonNull K argument) {
         final ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
-        final cloud.commandframework.types.tuples.Pair pair
-                = this.mappers.get(GenericTypeReflector.erase(argumentType.getType()));
+        final Pair pair = this.mappers.get(GenericTypeReflector.erase(argumentType.getType()));
         if (pair == null || pair.getFirst() == null) {
             return this.createDefaultMapper(valueType, commandArgument);
         }
-        return new Pair<>((ArgumentType<?>) ((Function) pair.getFirst()).apply(commandArgument),
+        return Pair.of((ArgumentType<?>) ((Function) pair.getFirst()).apply(commandArgument),
                           (boolean) pair.getSecond());
     }
 
@@ -245,9 +243,9 @@ public final class CloudBrigadierManager<C, S> {
             defaultType = null;
         }
         if (defaultType != null) {
-            return new Pair<>(argumentTypeSupplier.get(), true);
+            return Pair.of(argumentTypeSupplier.get(), true);
         }
-        return new Pair<>(StringArgumentType.string(), false);
+        return Pair.of(StringArgumentType.string(), false);
     }
 
     /**
@@ -339,10 +337,10 @@ public final class CloudBrigadierManager<C, S> {
                 final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(TypeToken.get((Class<?>) types[i]),
                                                                              TypeToken.get(parser.getClass()),
                                                                              parser);
-                final SuggestionProvider<S> provider = pair.getRight() ? null : suggestionProvider;
+                final SuggestionProvider<S> provider = pair.getSecond() ? null : suggestionProvider;
 
                 final ArgumentBuilder<S, ?> fragmentBuilder = RequiredArgumentBuilder
-                        .<S, Object>argument((String) names[i], (ArgumentType<Object>) pair.getLeft())
+                        .<S, Object>argument((String) names[i], (ArgumentType<Object>) pair.getFirst())
                         .suggests(provider)
                         .requires(sender -> permissionChecker.test(sender,
                                                                    (CommandPermission) root.getNodeMeta()
@@ -378,12 +376,12 @@ public final class CloudBrigadierManager<C, S> {
             final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(root.getValue().getValueType(),
                                                                          TypeToken.get(root.getValue().getParser().getClass()),
                                                                          root.getValue().getParser());
-            final SuggestionProvider<S> provider = pair.getRight()
+            final SuggestionProvider<S> provider = pair.getSecond()
                                                    ? null
                                                    : (context, builder) -> this.buildSuggestions(root.getValue(),
                                                                                                  context, builder);
             argumentBuilder = RequiredArgumentBuilder
-                    .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getLeft())
+                    .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getFirst())
                     .suggests(provider)
                     .requires(sender -> permissionChecker.test(sender,
                                                                (CommandPermission) root.getNodeMeta()
@@ -438,28 +436,6 @@ public final class CloudBrigadierManager<C, S> {
             builder.suggest(suggestion, new LiteralMessage(tooltip));
         }
         return builder.buildFuture();
-    }
-
-
-    private static final class Pair<L, R> {
-
-        private final L left;
-        private final R right;
-
-        private Pair(final @NonNull L left,
-                     final @NonNull R right) {
-            this.left = left;
-            this.right = right;
-        }
-
-        private @NonNull L getLeft() {
-            return this.left;
-        }
-
-        private @NonNull R getRight() {
-            return this.right;
-        }
-
     }
 
 }

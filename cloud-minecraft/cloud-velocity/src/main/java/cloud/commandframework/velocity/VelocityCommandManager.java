@@ -30,8 +30,8 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 /**
@@ -54,10 +54,10 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSource}
      */
     public VelocityCommandManager(
-            @Nonnull final ProxyServer proxyServer,
-            @Nonnull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            @Nonnull final Function<CommandSource, C> commandSenderMapper,
-            @Nonnull final Function<C, CommandSource> backwardsCommandSenderMapper) {
+            final @NonNull ProxyServer proxyServer,
+            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
+            final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper) {
         super(commandExecutionCoordinator, new VelocityPluginRegistrationHandler<>());
         ((VelocityPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.proxyServer = proxyServer;
@@ -66,23 +66,20 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
     }
 
     @Override
-    public final boolean hasPermission(@Nonnull final C sender, @Nonnull final String permission) {
+    public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 
-    @Nonnull
     @Override
-    public final CommandMeta createDefaultCommandMeta() {
+    public final @NonNull CommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
 
-    @Nonnull
-    final ProxyServer getProxyServer() {
+    final @NonNull ProxyServer getProxyServer() {
         return this.proxyServer;
     }
 
-    @Nonnull
-    final Function<CommandSource, C> getCommandSenderMapper() {
+    final @NonNull Function<@NonNull CommandSource, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
     }
 

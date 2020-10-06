@@ -66,7 +66,9 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     @Override
-    public boolean execute(final CommandSender commandSender, final String s, final String[] strings) {
+    public boolean execute(final @NonNull CommandSender commandSender,
+                           final @NonNull String s,
+                           final @NonNull String @NonNull [] strings) {
         /* Join input */
         final StringBuilder builder = new StringBuilder(this.command.getName());
         for (final String string : strings) {
@@ -135,8 +137,10 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     @Override
-    public List<String> tabComplete(final CommandSender sender, final String alias, final String[] args) throws
-            IllegalArgumentException {
+    public List<String> tabComplete(final @NonNull CommandSender sender,
+                                    final @NonNull String alias,
+                                    final @NonNull String @NonNull [] args)
+            throws IllegalArgumentException {
         final StringBuilder builder = new StringBuilder(this.command.getName());
         for (final String string : args) {
             builder.append(" ").append(string);

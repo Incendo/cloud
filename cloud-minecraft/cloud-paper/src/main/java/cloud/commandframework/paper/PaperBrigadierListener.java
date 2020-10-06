@@ -42,8 +42,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
@@ -60,7 +60,7 @@ class PaperBrigadierListener<C> implements Listener {
     private final PaperCommandManager<C> paperCommandManager;
     private final String nmsVersion;
 
-    PaperBrigadierListener(@Nonnull final PaperCommandManager<C> paperCommandManager) {
+    PaperBrigadierListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
         this.brigadierManager = new CloudBrigadierManager<>(this.paperCommandManager,
                                                             () -> new CommandContext<>(
@@ -120,8 +120,7 @@ class PaperBrigadierListener<C> implements Listener {
      * @return Argument class
      * @throws Exception If the type cannot be retrieved
      */
-    @Nonnull
-    private Class<?> getNMSArgument(@Nonnull final String argument) throws Exception {
+    private @NonNull Class<?> getNMSArgument(final @NonNull String argument) throws Exception {
         return Class.forName(String.format("net.minecraft.server.%s.Argument%s", this.nmsVersion, argument));
     }
 
@@ -131,8 +130,8 @@ class PaperBrigadierListener<C> implements Listener {
      * @param type        Type to map
      * @param constructor Constructor that construct the NMS argument type
      */
-    public void mapSimpleNMS(@Nonnull final Class<?> type,
-                             @Nonnull final Constructor<?> constructor) {
+    public void mapSimpleNMS(final @NonNull Class<?> type,
+                             final @NonNull Constructor<?> constructor) {
         try {
             this.brigadierManager.registerDefaultArgumentTypeSupplier(type, () -> {
                 try {
@@ -156,8 +155,8 @@ class PaperBrigadierListener<C> implements Listener {
      * @param type                 Type to map
      * @param argumentTypeSupplier Supplier of the NMS argument type
      */
-    public void mapComplexNMS(@Nonnull final Class<?> type,
-                              @Nonnull final Supplier<ArgumentType<?>> argumentTypeSupplier) {
+    public void mapComplexNMS(final @NonNull Class<?> type,
+                              final @NonNull Supplier<ArgumentType<?>> argumentTypeSupplier) {
         try {
             this.brigadierManager.registerDefaultArgumentTypeSupplier(type, argumentTypeSupplier);
         } catch (final Exception e) {
@@ -170,7 +169,7 @@ class PaperBrigadierListener<C> implements Listener {
 
     @EventHandler
     @SuppressWarnings("deprecation")
-    public void onCommandRegister(@Nonnull final CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
+    public void onCommandRegister(final @NonNull CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
         if (!(event.getCommand() instanceof PluginIdentifiableCommand)) {
             return;
         } else if (!((PluginIdentifiableCommand) event.getCommand())
@@ -190,8 +189,8 @@ class PaperBrigadierListener<C> implements Listener {
             return;
         }
         final BiPredicate<BukkitBrigadierCommandSource, CommandPermission> permissionChecker = (s, p) -> {
-            final C sender = paperCommandManager.getCommandSenderMapper().apply(s.getBukkitSender());
-            return paperCommandManager.hasPermission(sender, p);
+            final C sender = this.paperCommandManager.getCommandSenderMapper().apply(s.getBukkitSender());
+            return this.paperCommandManager.hasPermission(sender, p);
         };
         event.setLiteral(this.brigadierManager.createLiteralCommandNode(node,
                                                                         event.getLiteral(),

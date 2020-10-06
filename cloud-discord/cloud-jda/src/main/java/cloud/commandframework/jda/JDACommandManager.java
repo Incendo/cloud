@@ -53,7 +53,6 @@ public class JDACommandManager<C> extends CommandManager<C> {
     private final Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper;
 
     /**
-     * final
      * Construct a new JDA Command Manager
      *
      * @param jda                          JDA instance to register against
@@ -86,7 +85,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      *
      * @return Prefix mapper
      */
-    public final @NonNull Function<C, String> getPrefixMapper() {
+    public final @NonNull Function<@NonNull C, @NonNull String> getPrefixMapper() {
         return this.prefixMapper;
     }
 

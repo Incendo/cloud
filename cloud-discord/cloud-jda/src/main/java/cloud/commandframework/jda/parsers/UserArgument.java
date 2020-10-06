@@ -87,13 +87,6 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         return UserArgument.<C>newBuilder(name, jda).asOptional().build();
     }
 
-
-    public enum ParserMode {
-        MENTION,
-        ID,
-        NAME
-    }
-
     /**
      * Get the modes enabled on the parser
      *
@@ -102,6 +95,14 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     public @NotNull List<ParserMode> getModes() {
         return modes;
     }
+
+
+    public enum ParserMode {
+        MENTION,
+        ID,
+        NAME
+    }
+
 
     public static final class Builder<C> extends CommandArgument.Builder<C, User> {
         private final JDA jda;
@@ -158,7 +159,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
             if (modes.contains(ParserMode.MENTION)) {
                 if (input.endsWith(">")) {
-                    String id;
+                    final String id;
                     if (input.startsWith("<@!")) {
                         id = input.substring(3, input.length() - 1);
                     } else {
@@ -166,10 +167,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     }
 
                     try {
-                        final ArgumentParseResult<User> result = userFromId(input, id);
+                        final ArgumentParseResult<User> result = this.userFromId(input, id);
                         inputQueue.remove();
                         return result;
-                    } catch (UserNotFoundParseException | NumberFormatException e) {
+                    } catch (final UserNotFoundParseException | NumberFormatException e) {
                         exception = e;
                     }
                 }
@@ -177,16 +178,16 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
             if (modes.contains(ParserMode.ID)) {
                 try {
-                    final ArgumentParseResult<User> result = userFromId(input, input);
+                    final ArgumentParseResult<User> result = this.userFromId(input, input);
                     inputQueue.remove();
                     return result;
-                } catch (UserNotFoundParseException | NumberFormatException e) {
+                } catch (final UserNotFoundParseException | NumberFormatException e) {
                     exception = e;
                 }
             }
 
             if (modes.contains(ParserMode.NAME)) {
-                List<User> users = jda.getUsersByName(input, true);
+                final List<User> users = jda.getUsersByName(input, true);
 
                 if (users.size() == 0) {
                     exception = new UserNotFoundParseException(input);
@@ -209,7 +210,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
         private @NonNull ArgumentParseResult<User> userFromId(final @NonNull String input, final @NonNull String id)
                 throws UserNotFoundParseException, NumberFormatException {
-            User user = jda.getUserById(id);
+            final User user = jda.getUserById(id);
 
             if (user == null) {
                 throw new UserNotFoundParseException(input);

@@ -39,8 +39,8 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 
@@ -54,7 +54,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
     private CloudBrigadierManager<C, CommandSource> brigadierManager;
     private VelocityCommandManager<C> manager;
 
-    void initialize(@Nonnull final VelocityCommandManager<C> velocityCommandManager) {
+    void initialize(final @NonNull VelocityCommandManager<C> velocityCommandManager) {
         this.manager = velocityCommandManager;
         this.brigadierManager = new CloudBrigadierManager<>(velocityCommandManager,
             () -> new CommandContext<>(
@@ -65,7 +65,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
     }
 
     @Override
-    public boolean registerCommand(@Nonnull final Command<?> command) {
+    public boolean registerCommand(final @NonNull Command<?> command) {
         final CommandArgument<?, ?> argument = command.getArguments().get(0);
         final List<String> aliases = ((StaticArgument<C>) argument).getAlternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
