@@ -96,7 +96,7 @@ class CommandTreeTest {
                                .argument(ArgumentPair.of(manager, "vec", Pair.of("x", "y"),
                                                          Pair.of(Double.class, Double.class))
                                                      .withMapper(Vector2.class,
-                                                                 pair -> new Vector2(pair.getFirst(), pair.getSecond()))
+                                                                 (sender, pair) -> new Vector2(pair.getFirst(), pair.getSecond()))
                                )
                                .handler(c -> {
                                    final Vector2 vector2 = c.get("vec");

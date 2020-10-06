@@ -48,8 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * A command consists out of a chain of {@link CommandArgument command arguments}.
@@ -495,7 +495,7 @@ public class Command<C> {
                                                           final @NonNull TypeToken<O> outputType,
                                                           final @NonNull Pair<String, String> names,
                                                           final @NonNull Pair<Class<U>, Class<V>> parserPair,
-                                                          final @NonNull Function<Pair<U, V>, O> mapper,
+                                                          final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
                                                           final @NonNull Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -559,7 +559,7 @@ public class Command<C> {
                                                                 final @NonNull Triplet<String, String, String> names,
                                                                 final @NonNull Triplet<Class<U>, Class<V>,
                                                                         Class<W>> parserTriplet,
-                                                                final @NonNull Function<Triplet<U, V, W>, O> mapper,
+                                                                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
                                                                 final @NonNull Description description) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");

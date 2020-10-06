@@ -31,7 +31,7 @@ import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * A compound argument consisting of three inner arguments
@@ -61,7 +61,8 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
                               final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types,
                               final @NonNull Triplet<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>,
                                       @NonNull ArgumentParser<C, W>> parserTriplet,
-                              final @NonNull Function<@NonNull Triplet<U, @NonNull V, @NonNull W>, @NonNull O> mapper,
+                              final @NonNull BiFunction<@NonNull C,
+                                      @NonNull Triplet<U, @NonNull V, @NonNull W>, @NonNull O> mapper,
                               final @NonNull TypeToken<O> valueType) {
         super(required, name, names, parserTriplet, types, mapper, o -> Triplet.of((U) o[0], (V) o[1], (W) o[2]), valueType);
     }
@@ -140,7 +141,7 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
                                          this.names,
                                          this.types,
                                          this.parserTriplet,
-                                         Function.identity(),
+                                         (sender, triplet) -> triplet,
                                          new TypeToken<Triplet<U, V, W>>() {
                                          });
         }
@@ -155,7 +156,7 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          */
         public <O> @NonNull ArgumentTriplet<@NonNull C, @NonNull U, @NonNull V,
                 @NonNull W, @NonNull O> withMapper(final @NonNull TypeToken<O> clazz,
-                                                   final @NonNull Function<@NonNull Triplet<@NonNull U,
+                                                   final @NonNull BiFunction<@NonNull C, @NonNull Triplet<@NonNull U,
                                                            @NonNull V, @NonNull W>, @NonNull O> mapper) {
             return new ArgumentTriplet<>(this.required, this.name, this.names, this.types, this.parserTriplet, mapper, clazz);
         }
@@ -169,8 +170,9 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          * @return Created triplet
          */
         public <O> @NonNull ArgumentTriplet<C, U, V, W, O> withMapper(final @NonNull Class<O> clazz,
-                                                                      final @NonNull Function<@NonNull Triplet<@NonNull U,
-                                                                              @NonNull V, @NonNull W>, @NonNull O> mapper) {
+                                                                      final @NonNull BiFunction<@NonNull C,
+                                                                              @NonNull Triplet<@NonNull U, @NonNull V,
+                                                                                      @NonNull W>, @NonNull O> mapper) {
             return new ArgumentTriplet<>(this.required, this.name, this.names, this.types,
                                          this.parserTriplet, mapper, TypeToken.get(clazz));
         }
