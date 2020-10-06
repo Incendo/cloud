@@ -49,14 +49,26 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
     private final Tuple names;
     private final Tuple parserTuple;
 
-    CompoundArgument(final boolean required,
-                     final @NonNull String name,
-                     final @NonNull Tuple names,
-                     final @NonNull Tuple parserTuple,
-                     final @NonNull Tuple types,
-                     final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
-                     final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
-                     final @NonNull TypeToken<O> valueType) {
+    /**
+     * Construct a Compound Argument
+     *
+     * @param required     Whether or not the argument is required
+     * @param name         The argument name
+     * @param names        Names of the sub-arguments (in order)
+     * @param parserTuple  The sub arguments
+     * @param types        Types of the sub-arguments (in order)
+     * @param mapper       Mapper that maps the sub-arguments to the output type
+     * @param tupleFactory Function to use when creating tuple
+     * @param valueType    The output type
+     */
+    public CompoundArgument(final boolean required,
+                            final @NonNull String name,
+                            final @NonNull Tuple names,
+                            final @NonNull Tuple parserTuple,
+                            final @NonNull Tuple types,
+                            final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
+                            final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
+                            final @NonNull TypeToken<O> valueType) {
         super(required,
               name,
               new CompoundParser<>(parserTuple, mapper, tupleFactory),
