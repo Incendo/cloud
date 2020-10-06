@@ -207,7 +207,8 @@ public final class ExamplePlugin extends JavaPlugin {
                                             TypeToken.get(Vector.class),
                                             Triplet.of("x", "y", "z"),
                                             Triplet.of(Integer.class, Integer.class, Integer.class),
-                                            triplet -> new Vector(triplet.getFirst(), triplet.getSecond(), triplet.getThird()),
+                                            (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
+                                                                            triplet.getThird()),
                                             Description.of("Coordinates"))
                                     .handler(context -> manager.taskRecipe().begin(context)
                                              .synchronous(commandContext -> {
