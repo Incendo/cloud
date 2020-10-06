@@ -18,7 +18,7 @@ Bukkit mappings for cloud. If `commodore` is present on the classpath and the se
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-bukkit</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -56,7 +56,7 @@ You can check whether or not the running server supports Brigadier, by using `bu
 
 ## cloud-paper
 
-An example plugin using the `cloud-paper` API can be found [here](https://github.com/Sauilitired/cloud/tree/master/cloud-minecraft/cloud-bukkit).
+An example plugin using the `cloud-paper` API can be found [here](https://github.com/Sauilitired/cloud/tree/master/examples/example-bukkit).
 
 `cloud-paper`works on all Bukkit derivatives and has graceful fallbacks for cases where Paper specific features are missing. It is initialized the same way as the Bukkit manager, except `PaperCommandManager`is used instead. When using Paper 1.15+ Brigadier mappings are available even without commodore present.
 
@@ -65,7 +65,7 @@ An example plugin using the `cloud-paper` API can be found [here](https://github
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-paper</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -80,7 +80,7 @@ BungeeCord mappings for cloud.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-bungee</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -103,7 +103,7 @@ An example plugin using the `cloud-velocity` API can be found [here](https://git
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-velocity</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 Simply do:

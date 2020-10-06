@@ -34,6 +34,7 @@ import me.lucko.commodore.CommodoreProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collections;
 
@@ -69,13 +70,21 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
                 }, false, cmd);
         final CommandNode existingNode = this.commodore.getDispatcher().findNode(Collections.singletonList(label));
         if (existingNode != null) {
-            for (final CommandNode child : literalCommandNode.getChildren()) {
-                if (existingNode.getChild(child.getName()) == null) {
-                    existingNode.addChild(child);
-                }
-            }
+            this.mergeChildren(existingNode, literalCommandNode);
         } else {
             this.commodore.register(literalCommandNode);
         }
     }
+
+    private void mergeChildren(@Nullable final CommandNode<?> existingNode, @Nullable final CommandNode<?> node) {
+        for (final CommandNode child : node.getChildren()) {
+            final CommandNode<?> existingChild = existingNode.getChild(child.getName());
+            if (existingChild == null) {
+                existingNode.addChild(child);
+            } else {
+                this.mergeChildren(existingChild, child);
+            }
+        }
+    }
+
 }

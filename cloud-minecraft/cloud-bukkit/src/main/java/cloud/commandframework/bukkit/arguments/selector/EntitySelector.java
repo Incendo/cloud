@@ -66,4 +66,14 @@ public abstract class EntitySelector {
     public @NonNull String getSelector() {
         return this.selector;
     }
+
+    /**
+     * Check whether the selector selected at least one entity
+     *
+     * @return {@code true} if at least one entity was selected, else {@code false}
+     */
+    public boolean hasAny() {
+        return !this.entities.isEmpty();
+    }
+
 }
