@@ -1,6 +1,7 @@
 dependencies {
     api project(':cloud-core')
     api project(':cloud-brigadier')
+    api project(':cloud-tasks')
     compileOnly 'org.bukkit:bukkit:1.13.2-R0.1-SNAPSHOT'
     compileOnly 'me.lucko:commodore:1.9'
 }
