@@ -56,10 +56,12 @@ public final class CommandHelpHandler<C> {
         for (final Command<C> command : this.commandManager.getCommands()) {
             final List<CommandArgument<C, ?>> arguments = command.getArguments();
             final String description = command.getCommandMeta().getOrDefault("description", "");
-            syntaxHints.add(new VerboseHelpEntry<>(command,
-                                                   this.commandManager.getCommandSyntaxFormatter()
-                                                                      .apply(arguments, null),
-                                                   description));
+            syntaxHints.add(new VerboseHelpEntry<>(
+                    command,
+                    this.commandManager.getCommandSyntaxFormatter()
+                            .apply(arguments, null),
+                    description
+            ));
         }
         syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::getSyntaxString));
         return syntaxHints;
@@ -75,56 +77,16 @@ public final class CommandHelpHandler<C> {
     public @NonNull List<@NonNull String> getLongestSharedChains() {
         final List<String> chains = new ArrayList<>();
         this.commandManager.getCommandTree().getRootNodes().forEach(node ->
-            chains.add(Objects.requireNonNull(node.getValue())
-                              .getName() + this.commandManager.getCommandSyntaxFormatter()
-                                                           .apply(Collections
-                                                                          .emptyList(),
-                                                                  node)));
+                chains.add(Objects.requireNonNull(node.getValue())
+                        .getName() + this.commandManager
+                        .getCommandSyntaxFormatter()
+                        .apply(
+                                Collections
+                                        .emptyList(),
+                                node
+                        )));
         chains.sort(String::compareTo);
         return chains;
-    }
-
-
-    public static final class VerboseHelpEntry<C> {
-
-        private final Command<C> command;
-        private final String syntaxString;
-        private final String description;
-
-        private VerboseHelpEntry(final @NonNull Command<C> command,
-                                 final @NonNull String syntaxString,
-                                 final @NonNull String description) {
-            this.command = command;
-            this.syntaxString = syntaxString;
-            this.description = description;
-        }
-
-        /**
-         * Get the command
-         *
-         * @return Command
-         */
-        public @NonNull Command<C> getCommand() {
-            return this.command;
-        }
-
-        /**
-         * Get the syntax string
-         *
-         * @return Syntax string
-         */
-        public @NonNull String getSyntaxString() {
-            return this.syntaxString;
-        }
-
-        /**
-         * Get the command description
-         *
-         * @return Command description
-         */
-        public @NonNull String getDescription() {
-            return this.description;
-        }
     }
 
     /**
@@ -144,12 +106,15 @@ public final class CommandHelpHandler<C> {
      * @param query     Query string
      * @return Help topic, will return an empty {@link IndexHelpTopic} if no results were found
      */
-    public @NonNull HelpTopic<C> queryHelp(final @Nullable C recipient,
-                                           final @NonNull String query) {
+    public @NonNull HelpTopic<C> queryHelp(
+            final @Nullable C recipient,
+            final @NonNull String query
+    ) {
         final List<VerboseHelpEntry<C>> commands = this.getAllCommands();
-        commands.removeIf(command -> recipient != null && !this.commandManager.hasPermission(recipient,
-                                                                                             command.getCommand()
-                                                                                                    .getCommandPermission()));
+        commands.removeIf(command -> recipient != null && !this.commandManager.hasPermission(
+                recipient,
+                command.getCommand().getCommandPermission()
+        ));
         if (query.replace(" ", "").isEmpty()) {
             return new IndexHelpTopic<>(commands);
         }
@@ -166,7 +131,7 @@ public final class CommandHelpHandler<C> {
         for (final VerboseHelpEntry<C> entry : commands) {
             final Command<C> command = entry.getCommand();
             @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) command.getArguments()
-                                                                                                               .get(0);
+                    .get(0);
             for (final String alias : staticArgument.getAliases()) {
                 if (alias.toLowerCase(Locale.ENGLISH).startsWith(rootFragment.toLowerCase(Locale.ENGLISH))) {
                     availableCommands.add(command);
@@ -199,10 +164,12 @@ public final class CommandHelpHandler<C> {
             for (final Command<C> command : availableCommands) {
                 final List<CommandArgument<C, ?>> arguments = command.getArguments();
                 final String description = command.getCommandMeta().getOrDefault("description", "");
-                syntaxHints.add(new VerboseHelpEntry<>(command,
-                                                       this.commandManager.getCommandSyntaxFormatter()
-                                                                          .apply(arguments, null),
-                                                       description));
+                syntaxHints.add(new VerboseHelpEntry<>(
+                        command,
+                        this.commandManager.getCommandSyntaxFormatter()
+                                .apply(arguments, null),
+                        description
+                ));
             }
             syntaxHints.sort(Comparator.comparing(VerboseHelpEntry::getSyntaxString));
             syntaxHints.removeIf(command -> recipient != null
@@ -212,22 +179,23 @@ public final class CommandHelpHandler<C> {
 
         /* Traverse command to find the most specific help topic */
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.getCommandTree()
-                                                                                .getNamedNode(availableCommandLabels.iterator()
-                                                                                                                    .next());
+                .getNamedNode(availableCommandLabels.iterator()
+                        .next());
 
         final List<CommandArgument<C, ?>> traversedNodes = new LinkedList<>();
         CommandTree.Node<CommandArgument<C, ?>> head = node;
         int index = 0;
 
-        outer: while (head != null) {
+        outer:
+        while (head != null) {
             ++index;
             traversedNodes.add(head.getValue());
 
             if (head.getValue() != null && head.getValue().getOwningCommand() != null) {
                 if (head.isLeaf() || index == queryFragments.length) {
                     if (recipient == null || this.commandManager.hasPermission(recipient, head.getValue()
-                                                                                              .getOwningCommand()
-                                                                                              .getCommandPermission())) {
+                            .getOwningCommand()
+                            .getCommandPermission())) {
                         return new VerboseHelpTopic<>(head.getValue().getOwningCommand());
                     }
                 }
@@ -239,8 +207,8 @@ public final class CommandHelpHandler<C> {
                 if (index < queryFragments.length) {
                     /* We might still be able to match an argument */
                     for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
-                        @SuppressWarnings("unchecked")
-                        final StaticArgument<C> childArgument = (StaticArgument<C>) child.getValue();
+                        @SuppressWarnings("unchecked") final StaticArgument<C> childArgument = (StaticArgument<C>) child
+                                .getValue();
                         if (childArgument == null) {
                             continue;
                         }
@@ -260,8 +228,10 @@ public final class CommandHelpHandler<C> {
                     if (recipient == null
                             || child.getValue() == null
                             || child.getValue().getOwningCommand() == null
-                            || this.commandManager.hasPermission(recipient,
-                                                                 child.getValue().getOwningCommand().getCommandPermission())) {
+                            || this.commandManager.hasPermission(
+                            recipient,
+                            child.getValue().getOwningCommand().getCommandPermission()
+                    )) {
                         traversedNodesSub.add(child.getValue());
                         childSuggestions.add(this.commandManager.getCommandSyntaxFormatter().apply(traversedNodesSub, child));
                     }
@@ -272,7 +242,6 @@ public final class CommandHelpHandler<C> {
 
         return new IndexHelpTopic<>(Collections.emptyList());
     }
-
 
     /**
      * Something that can be returned as the result of a help query
@@ -287,8 +256,53 @@ public final class CommandHelpHandler<C> {
      * @param <C> Command sender type
      */
     public interface HelpTopic<C> {
+
     }
 
+    public static final class VerboseHelpEntry<C> {
+
+        private final Command<C> command;
+        private final String syntaxString;
+        private final String description;
+
+        private VerboseHelpEntry(
+                final @NonNull Command<C> command,
+                final @NonNull String syntaxString,
+                final @NonNull String description
+        ) {
+            this.command = command;
+            this.syntaxString = syntaxString;
+            this.description = description;
+        }
+
+        /**
+         * Get the command
+         *
+         * @return Command
+         */
+        public @NonNull Command<C> getCommand() {
+            return this.command;
+        }
+
+        /**
+         * Get the syntax string
+         *
+         * @return Syntax string
+         */
+        public @NonNull String getSyntaxString() {
+            return this.syntaxString;
+        }
+
+        /**
+         * Get the command description
+         *
+         * @return Command description
+         */
+        public @NonNull String getDescription() {
+            return this.description;
+        }
+
+    }
 
     /**
      * Index of available commands
@@ -371,8 +385,10 @@ public final class CommandHelpHandler<C> {
         private final String longestPath;
         private final List<String> childSuggestions;
 
-        private MultiHelpTopic(final @NonNull String longestPath,
-                               final @NonNull List<@NonNull String> childSuggestions) {
+        private MultiHelpTopic(
+                final @NonNull String longestPath,
+                final @NonNull List<@NonNull String> childSuggestions
+        ) {
             this.longestPath = longestPath;
             this.childSuggestions = childSuggestions;
         }

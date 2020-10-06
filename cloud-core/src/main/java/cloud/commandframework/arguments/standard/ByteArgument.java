@@ -41,13 +41,15 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     private final byte min;
     private final byte max;
 
-    private ByteArgument(final boolean required,
-                         final @NonNull String name,
-                         final byte min,
-                         final byte max,
-                         final @NonNull String defaultValue,
-                         final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                 @NonNull List<@NonNull String>> suggestionsProvider) {
+    private ByteArgument(
+            final boolean required,
+            final @NonNull String name,
+            final byte min,
+            final byte max,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new ByteParser<>(min, max), defaultValue, Byte.class, suggestionsProvider);
         this.min = min;
         this.max = max;
@@ -94,8 +96,10 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Byte> optional(final @NonNull String name,
-                                                                 final byte defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Byte> optional(
+            final @NonNull String name,
+            final byte defaultNum
+    ) {
         return ByteArgument.<C>newBuilder(name).asOptionalWithDefault(Byte.toString(defaultNum)).build();
     }
 
@@ -156,7 +160,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         @Override
         public @NonNull ByteArgument<C> build() {
             return new ByteArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                                      this.getDefaultValue(), this.getSuggestionsProvider());
+                    this.getDefaultValue(), this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -180,7 +185,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         @Override
         public @NonNull ArgumentParseResult<Byte> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue) {
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -189,16 +195,19 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
                 final byte value = Byte.parseByte(input);
                 if (value < this.min || value > this.max) {
                     return ArgumentParseResult.failure(
-                            new ByteParseException(input,
-                                                   this.min,
-                                                   this.max));
+                            new ByteParseException(
+                                    input,
+                                    this.min,
+                                    this.max
+                            ));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
                 return ArgumentParseResult.failure(
                         new ByteParseException(input, this.min,
-                                               this.max));
+                                this.max
+                        ));
             }
         }
 
@@ -208,8 +217,10 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
         }
 

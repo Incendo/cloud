@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.services;
 
-import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.annotations.Order;
 import cloud.commandframework.services.types.Service;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -66,8 +66,10 @@ public final class ServiceRepository<Context, Response> {
      * @param filters Filters that will be used to determine whether or not the service gets used
      * @param <T>     Type of the implementation
      */
-    <T extends Service<Context, Response>> void registerImplementation(final @NonNull T service,
-                                                                       final @NonNull Collection<Predicate<Context>> filters) {
+    <T extends Service<Context, Response>> void registerImplementation(
+            final @NonNull T service,
+            final @NonNull Collection<Predicate<Context>> filters
+    ) {
         synchronized (this.lock) {
             this.implementations.add(new ServiceWrapper<>(service, filters));
         }
@@ -101,8 +103,10 @@ public final class ServiceRepository<Context, Response> {
         private final int registrationOrder = ServiceRepository.this.registrationOrder++;
         private final ExecutionOrder executionOrder;
 
-        private ServiceWrapper(final @NonNull T implementation,
-                               final @NonNull Collection<Predicate<Context>> filters) {
+        private ServiceWrapper(
+                final @NonNull T implementation,
+                final @NonNull Collection<Predicate<Context>> filters
+        ) {
             this.defaultImplementation = implementations.isEmpty();
             this.implementation = implementation;
             this.filters = filters;
@@ -136,15 +140,16 @@ public final class ServiceRepository<Context, Response> {
         public String toString() {
             return String
                     .format("ServiceWrapper{type=%s,implementation=%s}", serviceType.toString(),
-                            TypeToken.get(implementation.getClass()).toString());
+                            TypeToken.get(implementation.getClass()).toString()
+                    );
         }
 
         @Override
         public int compareTo(final @NonNull ServiceWrapper<T> other) {
             return Comparator.<ServiceWrapper<T>>comparingInt(
                     wrapper -> wrapper.isDefaultImplementation()
-                               ? Integer.MIN_VALUE
-                               : Integer.MAX_VALUE).thenComparingInt(wrapper -> wrapper.executionOrder.ordinal())
+                            ? Integer.MIN_VALUE
+                            : Integer.MAX_VALUE).thenComparingInt(wrapper -> wrapper.executionOrder.ordinal())
                     .thenComparingInt(wrapper -> wrapper.registrationOrder).compare(this, other);
         }
 

@@ -43,8 +43,10 @@ public abstract class EntitySelector {
      * @param selector The input string used to create this selector
      * @param entities The List of Bukkit {@link Entity entities} to construct the {@link EntitySelector} from
      */
-    public EntitySelector(final @NonNull String selector,
-                          final @NonNull List<@NonNull Entity> entities) {
+    public EntitySelector(
+            final @NonNull String selector,
+            final @NonNull List<@NonNull Entity> entities
+    ) {
         this.selector = selector;
         this.entities = entities;
     }

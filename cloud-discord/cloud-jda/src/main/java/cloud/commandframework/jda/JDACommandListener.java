@@ -75,51 +75,58 @@ public class JDACommandListener<C> extends ListenerAdapter {
         content = content.substring(prefix.length());
 
         commandManager.executeCommand(sender, content)
-                      .whenComplete((commandResult, throwable) -> {
-                          if (throwable == null) {
-                              return;
-                          }
+                .whenComplete((commandResult, throwable) -> {
+                    if (throwable == null) {
+                        return;
+                    }
 
-                          if (throwable instanceof InvalidSyntaxException) {
-                              this.commandManager.handleException(sender,
-                                                                  InvalidSyntaxException.class,
-                                                                  (InvalidSyntaxException) throwable, (c, e) -> {
-                                          this.sendMessage(event,
-                                                           MESSAGE_INVALID_SYNTAX + prefix + ((InvalidSyntaxException) throwable)
-                                                                   .getCorrectSyntax());
-                                      });
-                          } else if (throwable instanceof InvalidCommandSenderException) {
-                              this.commandManager.handleException(sender,
-                                                                  InvalidCommandSenderException.class,
-                                                                  (InvalidCommandSenderException) throwable, (c, e) ->
-                                                                          this.sendMessage(event, throwable.getMessage())
-                              );
-                          } else if (throwable instanceof NoPermissionException) {
-                              this.commandManager.handleException(sender,
-                                                                  NoPermissionException.class,
-                                                                  (NoPermissionException) throwable, (c, e) ->
-                                                                          this.sendMessage(event, MESSAGE_NO_PERMS)
-                              );
-                          } else if (throwable instanceof NoSuchCommandException) {
-                              this.commandManager.handleException(sender,
-                                                                  NoSuchCommandException.class,
-                                                                  (NoSuchCommandException) throwable, (c, e) ->
-                                                                          this.sendMessage(event, MESSAGE_UNKNOWN_COMMAND)
-                              );
-                          } else if (throwable instanceof ArgumentParseException) {
-                              this.commandManager.handleException(sender, ArgumentParseException.class,
-                                                                  (ArgumentParseException) throwable, (c, e) -> {
-                                          this.sendMessage(event,
-                                                           "Invalid Command Argument: " + throwable.getCause()
-                                                                                                   .getMessage());
-                                      });
-                          } else {
-                              this.sendMessage(event, throwable.getMessage());
-                          }
-                      });
+                    if (throwable instanceof InvalidSyntaxException) {
+                        this.commandManager.handleException(sender,
+                                InvalidSyntaxException.class,
+                                (InvalidSyntaxException) throwable, (c, e) -> {
+                                    this.sendMessage(
+                                            event,
+                                            MESSAGE_INVALID_SYNTAX + prefix + ((InvalidSyntaxException) throwable)
+                                                    .getCorrectSyntax()
+                                    );
+                                }
+                        );
+                    } else if (throwable instanceof InvalidCommandSenderException) {
+                        this.commandManager.handleException(sender,
+                                InvalidCommandSenderException.class,
+                                (InvalidCommandSenderException) throwable, (c, e) ->
+                                        this.sendMessage(event, throwable.getMessage())
+                        );
+                    } else if (throwable instanceof NoPermissionException) {
+                        this.commandManager.handleException(sender,
+                                NoPermissionException.class,
+                                (NoPermissionException) throwable, (c, e) ->
+                                        this.sendMessage(event, MESSAGE_NO_PERMS)
+                        );
+                    } else if (throwable instanceof NoSuchCommandException) {
+                        this.commandManager.handleException(sender,
+                                NoSuchCommandException.class,
+                                (NoSuchCommandException) throwable, (c, e) ->
+                                        this.sendMessage(event, MESSAGE_UNKNOWN_COMMAND)
+                        );
+                    } else if (throwable instanceof ArgumentParseException) {
+                        this.commandManager.handleException(sender, ArgumentParseException.class,
+                                (ArgumentParseException) throwable, (c, e) -> {
+                                    this.sendMessage(
+                                            event,
+                                            "Invalid Command Argument: " + throwable.getCause()
+                                                    .getMessage()
+                                    );
+                                }
+                        );
+                    } else {
+                        this.sendMessage(event, throwable.getMessage());
+                    }
+                });
     }
 
     private void sendMessage(final @NonNull MessageReceivedEvent event, final @NonNull String message) {
         event.getChannel().sendMessage(message).queue();
     }
+
 }

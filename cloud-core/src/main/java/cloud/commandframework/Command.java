@@ -73,11 +73,13 @@ public class Command<C> {
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
-    public Command(final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
-                   final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-                   final @Nullable Class<? extends C> senderType,
-                   final @NonNull CommandPermission commandPermission,
-                   final @NonNull CommandMeta commandMeta) {
+    public Command(
+            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
+            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
+            final @Nullable Class<? extends C> senderType,
+            final @NonNull CommandPermission commandPermission,
+            final @NonNull CommandMeta commandMeta
+    ) {
         this.arguments = Objects.requireNonNull(commandArguments, "Command arguments may not be null");
         if (this.arguments.size() == 0) {
             throw new IllegalArgumentException("At least one command argument is required");
@@ -90,8 +92,10 @@ public class Command<C> {
             }
             if (foundOptional && argument.isRequired()) {
                 throw new IllegalArgumentException(
-                        String.format("Command argument '%s' cannot be placed after an optional argument",
-                                      argument.getName()));
+                        String.format(
+                                "Command argument '%s' cannot be placed after an optional argument",
+                                argument.getName()
+                        ));
             } else if (!argument.isRequired()) {
                 foundOptional = true;
             }
@@ -110,10 +114,12 @@ public class Command<C> {
      * @param senderType              Required sender type. May be {@code null}
      * @param commandMeta             Command meta instance
      */
-    public Command(final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
-                   final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-                   final @Nullable Class<? extends C> senderType,
-                   final @NonNull CommandMeta commandMeta) {
+    public Command(
+            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
+            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
+            final @Nullable Class<? extends C> senderType,
+            final @NonNull CommandMeta commandMeta
+    ) {
         this(commandArguments, commandExecutionHandler, senderType, Permission.empty(), commandMeta);
     }
 
@@ -125,10 +131,12 @@ public class Command<C> {
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
-    public Command(final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
-                   final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-                   final @NonNull CommandPermission commandPermission,
-                   final @NonNull CommandMeta commandMeta) {
+    public Command(
+            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
+            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
+            final @NonNull CommandPermission commandPermission,
+            final @NonNull CommandMeta commandMeta
+    ) {
         this(commandArguments, commandExecutionHandler, null, commandPermission, commandMeta);
     }
 
@@ -143,19 +151,23 @@ public class Command<C> {
      * @param <C>         Command sender type
      * @return Command builder
      */
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String commandName,
-                                                     final @NonNull CommandMeta commandMeta,
-                                                     final @NonNull Description description,
-                                                     final @NonNull String... aliases) {
+    public static <C> @NonNull Builder<C> newBuilder(
+            final @NonNull String commandName,
+            final @NonNull CommandMeta commandMeta,
+            final @NonNull Description description,
+            final @NonNull String... aliases
+    ) {
         final Map<@NonNull CommandArgument<C, ?>, @NonNull Description> map = new LinkedHashMap<>();
         map.put(StaticArgument.of(commandName, aliases), description);
-        return new Builder<>(null,
-                             commandMeta,
-                             null,
-                             map,
-                             new CommandExecutionHandler.NullCommandExecutionHandler<>(),
-                             Permission.empty(),
-                             Collections.emptyList());
+        return new Builder<>(
+                null,
+                commandMeta,
+                null,
+                map,
+                new CommandExecutionHandler.NullCommandExecutionHandler<>(),
+                Permission.empty(),
+                Collections.emptyList()
+        );
     }
 
     /**
@@ -168,18 +180,22 @@ public class Command<C> {
      * @param <C>         Command sender type
      * @return Command builder
      */
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String commandName,
-                                                     final @NonNull CommandMeta commandMeta,
-                                                     final @NonNull String... aliases) {
+    public static <C> @NonNull Builder<C> newBuilder(
+            final @NonNull String commandName,
+            final @NonNull CommandMeta commandMeta,
+            final @NonNull String... aliases
+    ) {
         final Map<CommandArgument<C, ?>, Description> map = new LinkedHashMap<>();
         map.put(StaticArgument.of(commandName, aliases), Description.empty());
-        return new Builder<>(null,
-                             commandMeta,
-                             null,
-                             map,
-                             new CommandExecutionHandler.NullCommandExecutionHandler<>(),
-                             Permission.empty(),
-                             Collections.emptyList());
+        return new Builder<>(
+                null,
+                commandMeta,
+                null,
+                map,
+                new CommandExecutionHandler.NullCommandExecutionHandler<>(),
+                Permission.empty(),
+                Collections.emptyList()
+        );
     }
 
     /**
@@ -273,13 +289,15 @@ public class Command<C> {
         private final CommandManager<C> commandManager;
         private final Collection<CommandFlag<?>> flags;
 
-        private Builder(final @Nullable CommandManager<C> commandManager,
-                        final @NonNull CommandMeta commandMeta,
-                        final @Nullable Class<? extends C> senderType,
-                        final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
-                        final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-                        final @NonNull CommandPermission commandPermission,
-                        final @NonNull Collection<CommandFlag<?>> flags) {
+        private Builder(
+                final @Nullable CommandManager<C> commandManager,
+                final @NonNull CommandMeta commandMeta,
+                final @Nullable Class<? extends C> senderType,
+                final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
+                final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
+                final @NonNull CommandPermission commandPermission,
+                final @NonNull Collection<CommandFlag<?>> flags
+        ) {
             this.commandManager = commandManager;
             this.senderType = senderType;
             this.commandArguments = Objects.requireNonNull(commandArguments, "Arguments may not be null");
@@ -298,13 +316,15 @@ public class Command<C> {
          */
         public @NonNull Builder<C> meta(final @NonNull String key, final @NonNull String value) {
             final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
-            return new Builder<>(this.commandManager,
-                                 commandMeta,
-                                 this.senderType,
-                                 this.commandArguments,
-                                 this.commandExecutionHandler,
-                                 this.commandPermission,
-                                 this.flags);
+            return new Builder<>(
+                    this.commandManager,
+                    commandMeta,
+                    this.senderType,
+                    this.commandArguments,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags
+            );
         }
 
         /**
@@ -316,13 +336,15 @@ public class Command<C> {
          * @return New builder instance using the provided command manager
          */
         public @NonNull Builder<C> manager(final @Nullable CommandManager<C> commandManager) {
-            return new Builder<>(commandManager,
-                                 this.commandMeta,
-                                 this.senderType,
-                                 this.commandArguments,
-                                 this.commandExecutionHandler,
-                                 this.commandPermission,
-                                 this.flags);
+            return new Builder<>(
+                    commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    this.commandArguments,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags
+            );
         }
 
         /**
@@ -332,8 +354,10 @@ public class Command<C> {
          * @param aliases Argument aliases
          * @return New builder instance with the modified command chain
          */
-        public @NonNull Builder<C> literal(final @NonNull String main,
-                                           final @NonNull String... aliases) {
+        public @NonNull Builder<C> literal(
+                final @NonNull String main,
+                final @NonNull String... aliases
+        ) {
             return this.argument(StaticArgument.of(main, aliases));
         }
 
@@ -345,9 +369,11 @@ public class Command<C> {
          * @param aliases     Argument aliases
          * @return New builder instance with the modified command chain
          */
-        public @NonNull Builder<C> literal(final @NonNull String main,
-                                           final @NonNull Description description,
-                                           final @NonNull String... aliases) {
+        public @NonNull Builder<C> literal(
+                final @NonNull String main,
+                final @NonNull Description description,
+                final @NonNull String... aliases
+        ) {
             return this.argument(StaticArgument.of(main, aliases), description);
         }
 
@@ -382,22 +408,26 @@ public class Command<C> {
          * @param <T>         Argument type
          * @return New builder instance with the command argument inserted into the argument list
          */
-        public <T> @NonNull Builder<C> argument(final @NonNull CommandArgument<C, T> argument,
-                                                final @NonNull Description description) {
+        public <T> @NonNull Builder<C> argument(
+                final @NonNull CommandArgument<C, T> argument,
+                final @NonNull Description description
+        ) {
             if (argument.isArgumentRegistered()) {
                 throw new IllegalArgumentException("The provided argument has already been associated with a command."
-                                                 + " Use CommandArgument#copy to create a copy of the argument.");
+                        + " Use CommandArgument#copy to create a copy of the argument.");
             }
             argument.setArgumentRegistered();
             final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
             commandArgumentMap.put(argument, description);
-            return new Builder<>(this.commandManager,
-                                 this.commandMeta,
-                                 this.senderType,
-                                 commandArgumentMap,
-                                 this.commandExecutionHandler,
-                                 this.commandPermission,
-                                 this.flags);
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    commandArgumentMap,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags
+            );
         }
 
         /**
@@ -409,17 +439,21 @@ public class Command<C> {
          * @param <T>         Argument type
          * @return New builder instance with the command argument inserted into the argument list
          */
-        public <T> @NonNull Builder<C> argument(final CommandArgument.@NonNull Builder<C, T> builder,
-                                                final @NonNull Description description) {
+        public <T> @NonNull Builder<C> argument(
+                final CommandArgument.@NonNull Builder<C, T> builder,
+                final @NonNull Description description
+        ) {
             final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
             commandArgumentMap.put(builder.build(), description);
-            return new Builder<>(this.commandManager,
-                                 this.commandMeta,
-                                 this.senderType,
-                                 commandArgumentMap,
-                                 this.commandExecutionHandler,
-                                 this.commandPermission,
-                                 this.flags);
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    commandArgumentMap,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags
+            );
         }
 
         /**
@@ -431,9 +465,11 @@ public class Command<C> {
          * @param <T>             Argument type
          * @return New builder instance with the command argument inserted into the argument list
          */
-        public <T> @NonNull Builder<C> argument(final @NonNull Class<T> clazz,
-                                                final @NonNull String name,
-                                                final @NonNull Consumer<CommandArgument.Builder<C, T>> builderConsumer) {
+        public <T> @NonNull Builder<C> argument(
+                final @NonNull Class<T> clazz,
+                final @NonNull String name,
+                final @NonNull Consumer<CommandArgument.Builder<C, T>> builderConsumer
+        ) {
             final CommandArgument.Builder<C, T> builder = CommandArgument.ofType(clazz, name);
             if (this.commandManager != null) {
                 builder.manager(this.commandManager);
@@ -461,10 +497,12 @@ public class Command<C> {
          * @param <V>         Second type
          * @return Builder instance with the argument inserted
          */
-        public <U, V> @NonNull Builder<C> argumentPair(final @NonNull String name,
-                                                       final @NonNull Pair<@NonNull String, @NonNull String> names,
-                                                       final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                                                       final @NonNull Description description) {
+        public <U, V> @NonNull Builder<C> argumentPair(
+                final @NonNull String name,
+                final @NonNull Pair<@NonNull String, @NonNull String> names,
+                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                final @NonNull Description description
+        ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
@@ -491,18 +529,21 @@ public class Command<C> {
          * @param <O>         Output type
          * @return Builder instance with the argument inserted
          */
-        public <U, V, O> @NonNull Builder<C> argumentPair(final @NonNull String name,
-                                                          final @NonNull TypeToken<O> outputType,
-                                                          final @NonNull Pair<String, String> names,
-                                                          final @NonNull Pair<Class<U>, Class<V>> parserPair,
-                                                          final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
-                                                          final @NonNull Description description) {
+        public <U, V, O> @NonNull Builder<C> argumentPair(
+                final @NonNull String name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Pair<String, String> names,
+                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final @NonNull Description description
+        ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
             return this.argument(
                     ArgumentPair.of(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
-                    description);
+                    description
+            );
         }
 
         /**
@@ -523,10 +564,12 @@ public class Command<C> {
          * @param <W>           Third type
          * @return Builder instance with the argument inserted
          */
-        public <U, V, W> @NonNull Builder<C> argumentTriplet(final @NonNull String name,
-                                                             final @NonNull Triplet<String, String, String> names,
-                                                             final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                                                             final @NonNull Description description) {
+        public <U, V, W> @NonNull Builder<C> argumentTriplet(
+                final @NonNull String name,
+                final @NonNull Triplet<String, String, String> names,
+                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull Description description
+        ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
@@ -554,19 +597,22 @@ public class Command<C> {
          * @param <O>           Output type
          * @return Builder instance with the argument inserted
          */
-        public <U, V, W, O> @NonNull Builder<C> argumentTriplet(final @NonNull String name,
-                                                                final @NonNull TypeToken<O> outputType,
-                                                                final @NonNull Triplet<String, String, String> names,
-                                                                final @NonNull Triplet<Class<U>, Class<V>,
-                                                                        Class<W>> parserTriplet,
-                                                                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                                                                final @NonNull Description description) {
+        public <U, V, W, O> @NonNull Builder<C> argumentTriplet(
+                final @NonNull String name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Triplet<String, String, String> names,
+                final @NonNull Triplet<Class<U>, Class<V>,
+                        Class<W>> parserTriplet,
+                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
+                final @NonNull Description description
+        ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
             return this.argument(
                     ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
-                    description);
+                    description
+            );
         }
 
         // End of compound helper methods
@@ -578,13 +624,15 @@ public class Command<C> {
          * @return New builder instance using the command execution handler
          */
         public @NonNull Builder<C> handler(final @NonNull CommandExecutionHandler<C> commandExecutionHandler) {
-            return new Builder<>(this.commandManager,
-                                 this.commandMeta,
-                                 this.senderType,
-                                 this.commandArguments,
-                                 commandExecutionHandler,
-                                 this.commandPermission,
-                                 this.flags);
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    this.commandArguments,
+                    commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags
+            );
         }
 
         /**
@@ -593,14 +641,16 @@ public class Command<C> {
          * @param senderType Required sender type
          * @return New builder instance using the command execution handler
          */
-        public @NonNull Builder<C> withSenderType(final @NonNull Class<? extends C> senderType) {
-            return new Builder<>(this.commandManager,
-                                 this.commandMeta,
-                                 senderType,
-                                 this.commandArguments,
-                                 this.commandExecutionHandler,
-                                 this.commandPermission,
-                                 this.flags);
+        public @NonNull Builder<C> senderType(final @NonNull Class<? extends C> senderType) {
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    senderType,
+                    this.commandArguments,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags
+            );
         }
 
         /**
@@ -610,13 +660,15 @@ public class Command<C> {
          * @return New builder instance using the command permission
          */
         public @NonNull Builder<C> withPermission(final @NonNull CommandPermission permission) {
-            return new Builder<>(this.commandManager,
-                                 this.commandMeta,
-                                 this.senderType,
-                                 this.commandArguments,
-                                 this.commandExecutionHandler,
-                                 permission,
-                                 this.flags);
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    this.commandArguments,
+                    this.commandExecutionHandler,
+                    permission,
+                    this.flags
+            );
         }
 
         /**
@@ -626,13 +678,15 @@ public class Command<C> {
          * @return New builder instance using the command permission
          */
         public @NonNull Builder<C> withPermission(final @NonNull String permission) {
-            return new Builder<>(this.commandManager,
-                                 this.commandMeta,
-                                 this.senderType,
-                                 this.commandArguments,
-                                 this.commandExecutionHandler,
-                                 Permission.of(permission),
-                                 this.flags);
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    this.commandArguments,
+                    this.commandExecutionHandler,
+                    Permission.of(permission),
+                    this.flags
+            );
         }
 
         /**
@@ -681,13 +735,15 @@ public class Command<C> {
         public @NonNull <T> Builder<C> flag(final @NonNull CommandFlag<T> flag) {
             final List<CommandFlag<?>> flags = new ArrayList<>(this.flags);
             flags.add(flag);
-            return new Builder<>(this.commandManager,
-                                 this.commandMeta,
-                                 this.senderType,
-                                 this.commandArguments,
-                                 this.commandExecutionHandler,
-                                 this.commandPermission,
-                                 Collections.unmodifiableList(flags));
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    this.commandArguments,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    Collections.unmodifiableList(flags)
+            );
         }
 
         /**
@@ -713,11 +769,13 @@ public class Command<C> {
                 final FlagArgument<C> flagArgument = new FlagArgument<>(this.flags);
                 commandArguments.put(flagArgument, Description.of("Command flags"));
             }
-            return new Command<>(Collections.unmodifiableMap(commandArguments),
-                                 this.commandExecutionHandler,
-                                 this.senderType,
-                                 this.commandPermission,
-                                 this.commandMeta);
+            return new Command<>(
+                    Collections.unmodifiableMap(commandArguments),
+                    this.commandExecutionHandler,
+                    this.senderType,
+                    this.commandPermission,
+                    this.commandMeta
+            );
         }
 
     }

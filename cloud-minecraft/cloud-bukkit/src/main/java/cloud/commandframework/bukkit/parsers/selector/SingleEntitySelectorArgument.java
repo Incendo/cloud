@@ -41,11 +41,13 @@ import java.util.function.BiFunction;
 
 public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, SingleEntitySelector> {
 
-    private SingleEntitySelectorArgument(final boolean required,
-                                         final @NonNull String name,
-                                         final @NonNull String defaultValue,
-                                         final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                                 @NonNull List<@NonNull String>> suggestionsProvider) {
+    private SingleEntitySelectorArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new SingleEntitySelectorParser<>(), defaultValue, SingleEntitySelector.class, suggestionsProvider);
     }
 
@@ -90,8 +92,10 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> optional(final @NonNull String name,
-                                                                                 final @NonNull String defaultEntitySelector) {
+    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> optional(
+            final @NonNull String name,
+            final @NonNull String defaultEntitySelector
+    ) {
         return SingleEntitySelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
@@ -110,7 +114,8 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
         @Override
         public @NonNull SingleEntitySelectorArgument<C> build() {
             return new SingleEntitySelectorArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                                                      this.getSuggestionsProvider());
+                    this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -119,8 +124,10 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
     public static final class SingleEntitySelectorParser<C> implements ArgumentParser<C, SingleEntitySelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<SingleEntitySelector> parse(final @NonNull CommandContext<C> commandContext,
-                                                                        final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<SingleEntitySelector> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
                 return ArgumentParseResult.failure(
@@ -146,6 +153,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
 
             return ArgumentParseResult.success(new SingleEntitySelector(input, entities));
         }
+
     }
 
 }

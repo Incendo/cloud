@@ -95,9 +95,10 @@ public final class CloudBrigadierManager<C, S> {
      * @param commandManager       Command manager
      * @param dummyContextProvider Provider of dummy context for completions
      */
-    public CloudBrigadierManager(final @NonNull CommandManager<C> commandManager,
-                                 final @NonNull Supplier<@NonNull CommandContext<C>>
-                                         dummyContextProvider) {
+    public CloudBrigadierManager(
+            final @NonNull CommandManager<C> commandManager,
+            final @NonNull Supplier<@NonNull CommandContext<C>> dummyContextProvider
+    ) {
         this.mappers = new HashMap<>();
         this.defaultArgumentTypeSuppliers = new HashMap<>();
         this.commandManager = commandManager;
@@ -199,10 +200,12 @@ public final class CloudBrigadierManager<C, S> {
      * @param <K>               cloud argument type
      * @param <O>               Brigadier argument type value
      */
-    public <T, K extends ArgumentParser<C, T>, O> void registerMapping(final @NonNull TypeToken<K> argumentType,
-                                                                       final boolean nativeSuggestions,
-                                                                       final @NonNull Function<@NonNull ? extends K,
-                                                                               @NonNull ? extends ArgumentType<O>> mapper) {
+    public <T, K extends ArgumentParser<C, T>, O> void registerMapping(
+            final @NonNull TypeToken<K> argumentType,
+            final boolean nativeSuggestions,
+            final @NonNull Function<@NonNull ? extends K,
+                    @NonNull ? extends ArgumentType<O>> mapper
+    ) {
         this.mappers.put(GenericTypeReflector.erase(argumentType.getType()), Pair.of(mapper, nativeSuggestions));
     }
 
@@ -212,8 +215,10 @@ public final class CloudBrigadierManager<C, S> {
      * @param clazz    Type to map
      * @param supplier Supplier that supplies the argument type
      */
-    public void registerDefaultArgumentTypeSupplier(final @NonNull Class<?> clazz,
-                                                    final @NonNull Supplier<@Nullable ArgumentType<?>> supplier) {
+    public void registerDefaultArgumentTypeSupplier(
+            final @NonNull Class<?> clazz,
+            final @NonNull Supplier<@Nullable ArgumentType<?>> supplier
+    ) {
         this.defaultArgumentTypeSuppliers.put(clazz, supplier);
     }
 
@@ -221,19 +226,23 @@ public final class CloudBrigadierManager<C, S> {
     private <T, K extends ArgumentParser<?, ?>> @Nullable Pair<@NonNull ArgumentType<?>, @NonNull Boolean> getArgument(
             final @NonNull TypeToken<?> valueType,
             final @NonNull TypeToken<T> argumentType,
-            final @NonNull K argument) {
+            final @NonNull K argument
+    ) {
         final ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
         final Pair pair = this.mappers.get(GenericTypeReflector.erase(argumentType.getType()));
         if (pair == null || pair.getFirst() == null) {
             return this.createDefaultMapper(valueType, commandArgument);
         }
-        return Pair.of((ArgumentType<?>) ((Function) pair.getFirst()).apply(commandArgument),
-                          (boolean) pair.getSecond());
+        return Pair.of(
+                (ArgumentType<?>) ((Function) pair.getFirst()).apply(commandArgument),
+                (boolean) pair.getSecond()
+        );
     }
 
     private <T, K extends ArgumentParser<C, T>> @NonNull Pair<@NonNull ArgumentType<?>, @NonNull Boolean> createDefaultMapper(
             final @NonNull TypeToken<?> clazz,
-            final @NonNull ArgumentParser<C, T> argument) {
+            final @NonNull ArgumentParser<C, T> argument
+    ) {
         final Supplier<ArgumentType<?>> argumentTypeSupplier = this.defaultArgumentTypeSuppliers
                 .get(GenericTypeReflector.erase(clazz.getType()));
         final @Nullable ArgumentType<?> defaultType;
@@ -258,20 +267,24 @@ public final class CloudBrigadierManager<C, S> {
      * @param executor          Command executor
      * @return Literal command node
      */
-    public @NonNull LiteralCommandNode<S> createLiteralCommandNode(final @NonNull String label,
-                                                                   final @NonNull Command<C> cloudCommand,
-                                                                   final @NonNull BiPredicate<@NonNull S,
-                                                                           @NonNull CommandPermission> permissionChecker,
-                                                                   final boolean forceRegister,
-                                                                   final com.mojang.brigadier.@NonNull Command<S> executor) {
+    public @NonNull LiteralCommandNode<S> createLiteralCommandNode(
+            final @NonNull String label,
+            final @NonNull Command<C> cloudCommand,
+            final @NonNull BiPredicate<@NonNull S,
+                    @NonNull CommandPermission> permissionChecker,
+            final boolean forceRegister,
+            final com.mojang.brigadier.@NonNull Command<S> executor
+    ) {
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
                 .getCommandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
         final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(node.getValue(), context, builder);
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
                 .<S>literal(label)
                 .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.getNodeMeta()
-                                                                                           .getOrDefault("permission",
-                                                                                                         Permission.empty())));
+                        .getOrDefault(
+                                "permission",
+                                Permission.empty()
+                        )));
         if (forceRegister || (node.getValue() != null && node.getValue().getOwningCommand() != null)) {
             literalArgumentBuilder.executes(executor);
         }
@@ -279,7 +292,8 @@ public final class CloudBrigadierManager<C, S> {
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandArgument<C, ?>> child : node.getChildren()) {
             constructedRoot.addChild(this.constructCommandNode(forceRegister, child,
-                                                               permissionChecker, executor, provider).build());
+                    permissionChecker, executor, provider
+            ).build());
         }
         return constructedRoot;
     }
@@ -299,19 +313,25 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull LiteralCommandNode<S> root,
             final @NonNull SuggestionProvider<S> suggestionProvider,
             final com.mojang.brigadier.@NonNull Command<S> executor,
-            final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker) {
+            final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker
+    ) {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
-                .requires(sender -> permissionChecker.test(sender,
-                                                           (CommandPermission) cloudCommand.getNodeMeta()
-                                                                                           .getOrDefault("permission",
-                                                                                                         Permission.empty())));
+                .requires(sender -> permissionChecker.test(
+                        sender,
+                        (CommandPermission) cloudCommand.getNodeMeta()
+                                .getOrDefault(
+                                        "permission",
+                                        Permission.empty()
+                                )
+                ));
         if (cloudCommand.getValue() != null && cloudCommand.getValue().getOwningCommand() != null) {
             literalArgumentBuilder.executes(executor);
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandArgument<C, ?>> child : cloudCommand.getChildren()) {
             constructedRoot.addChild(this.constructCommandNode(false, child, permissionChecker,
-                                                               executor, suggestionProvider).build());
+                    executor, suggestionProvider
+            ).build());
         }
         return constructedRoot;
     }
@@ -321,10 +341,10 @@ public final class CloudBrigadierManager<C, S> {
             final CommandTree.@NonNull Node<CommandArgument<C, ?>> root,
             final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker,
             final com.mojang.brigadier.@NonNull Command<S> executor,
-            final SuggestionProvider<S> suggestionProvider) {
+            final SuggestionProvider<S> suggestionProvider
+    ) {
         if (root.getValue() instanceof CompoundArgument) {
-            @SuppressWarnings("unchecked")
-            final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) root.getValue();
+            @SuppressWarnings("unchecked") final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) root.getValue();
             final Object[] parsers = compoundArgument.getParserTuple().toArray();
             final Object[] types = compoundArgument.getTypes().toArray();
             final Object[] names = compoundArgument.getNames().toArray();
@@ -334,18 +354,24 @@ public final class CloudBrigadierManager<C, S> {
 
             for (int i = parsers.length - 1; i >= 0; i--) {
                 @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) parsers[i];
-                final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(TypeToken.get((Class<?>) types[i]),
-                                                                             TypeToken.get(parser.getClass()),
-                                                                             parser);
+                final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(
+                        TypeToken.get((Class<?>) types[i]),
+                        TypeToken.get(parser.getClass()),
+                        parser
+                );
                 final SuggestionProvider<S> provider = pair.getSecond() ? null : suggestionProvider;
 
                 final ArgumentBuilder<S, ?> fragmentBuilder = RequiredArgumentBuilder
                         .<S, Object>argument((String) names[i], (ArgumentType<Object>) pair.getFirst())
                         .suggests(provider)
-                        .requires(sender -> permissionChecker.test(sender,
-                                                                   (CommandPermission) root.getNodeMeta()
-                                                                                           .getOrDefault("permission",
-                                                                                                         Permission.empty())));
+                        .requires(sender -> permissionChecker.test(
+                                sender,
+                                (CommandPermission) root.getNodeMeta()
+                                        .getOrDefault(
+                                                "permission",
+                                                Permission.empty()
+                                        )
+                        ));
                 argumentBuilders[i] = fragmentBuilder;
 
                 if (forceExecutor || (i == parsers.length - 1) && (root.isLeaf() || !root.getValue().isRequired())) {
@@ -369,24 +395,33 @@ public final class CloudBrigadierManager<C, S> {
         if (root.getValue() instanceof StaticArgument) {
             argumentBuilder = LiteralArgumentBuilder.<S>literal(root.getValue().getName())
                     .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.getNodeMeta()
-                                                                                               .getOrDefault("permission",
-                                                                                                             Permission.empty())))
+                            .getOrDefault(
+                                    "permission",
+                                    Permission.empty()
+                            )))
                     .executes(executor);
         } else {
-            final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(root.getValue().getValueType(),
-                                                                         TypeToken.get(root.getValue().getParser().getClass()),
-                                                                         root.getValue().getParser());
+            final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(
+                    root.getValue().getValueType(),
+                    TypeToken.get(root.getValue().getParser().getClass()),
+                    root.getValue().getParser()
+            );
             final SuggestionProvider<S> provider = pair.getSecond()
-                                                   ? null
-                                                   : (context, builder) -> this.buildSuggestions(root.getValue(),
-                                                                                                 context, builder);
+                    ? null
+                    : (context, builder) -> this.buildSuggestions(root.getValue(),
+                            context, builder
+                    );
             argumentBuilder = RequiredArgumentBuilder
                     .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getFirst())
                     .suggests(provider)
-                    .requires(sender -> permissionChecker.test(sender,
-                                                               (CommandPermission) root.getNodeMeta()
-                                                                                       .getOrDefault("permission",
-                                                                                                     Permission.empty())));
+                    .requires(sender -> permissionChecker.test(
+                            sender,
+                            (CommandPermission) root.getNodeMeta()
+                                    .getOrDefault(
+                                            "permission",
+                                            Permission.empty()
+                                    )
+                    ));
         }
         if (forceExecutor || root.isLeaf() || !root.getValue().isRequired()) {
             argumentBuilder.executes(executor);
@@ -400,7 +435,8 @@ public final class CloudBrigadierManager<C, S> {
     private @NonNull CompletableFuture<Suggestions> buildSuggestions(
             final @NonNull CommandArgument<C, ?> argument,
             final com.mojang.brigadier.context.@NonNull CommandContext<S> s,
-            final @NonNull SuggestionsBuilder builder) {
+            final @NonNull SuggestionsBuilder builder
+    ) {
         final CommandContext<C> commandContext = this.dummyContextProvider.get();
         final LinkedList<String> inputQueue = new LinkedList<>(Collections.singletonList(builder.getInput()));
         final CommandPreprocessingContext<C> commandPreprocessingContext =

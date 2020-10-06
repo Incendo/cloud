@@ -67,22 +67,31 @@ public class ServicesTest {
         final SecondaryMockService secondaryMockService = new SecondaryMockService();
         servicePipeline
                 .registerServiceImplementation(TypeToken.get(MockService.class), secondaryMockService,
-                        Collections.singleton(secondaryMockService));
-        servicePipeline.registerServiceImplementation(MockService.class,
+                        Collections.singleton(secondaryMockService)
+                );
+        servicePipeline.registerServiceImplementation(
+                MockService.class,
                 mockContext -> new MockService.MockResult(-91),
-                Collections.singleton(mockContext -> mockContext.getString().startsWith("-91")));
-        Assertions.assertEquals(32,
+                Collections.singleton(mockContext -> mockContext.getString().startsWith("-91"))
+        );
+        Assertions.assertEquals(
+                32,
                 servicePipeline.pump(new MockService.MockContext("Hello")).through(MockService.class)
-                        .getResult().getInteger());
+                        .getResult().getInteger()
+        );
         servicePipeline.pump(new MockService.MockContext("Hello")).through(MockService.class)
                 .getResult(
                         (mockResult, throwable) -> Assertions.assertEquals(32, mockResult.getInteger()));
-        Assertions.assertEquals(999,
+        Assertions.assertEquals(
+                999,
                 servicePipeline.pump(new MockService.MockContext("potato")).through(MockService.class)
-                        .getResult().getInteger());
-        Assertions.assertEquals(-91,
+                        .getResult().getInteger()
+        );
+        Assertions.assertEquals(
+                -91,
                 servicePipeline.pump(new MockService.MockContext("-91")).through(MockService.class)
-                        .getResult().getInteger());
+                        .getResult().getInteger()
+        );
         Assertions.assertNotNull(
                 servicePipeline.pump(new MockService.MockContext("oi")).through(MockService.class)
                         .getResultAsynchronously().get());
@@ -92,66 +101,98 @@ public class ServicesTest {
     @Test
     public void testSideEffectServices() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build();
-        servicePipeline.registerServiceType(TypeToken.get(MockSideEffectService.class),
-                new DefaultSideEffectService());
+        servicePipeline.registerServiceType(
+                TypeToken.get(MockSideEffectService.class),
+                new DefaultSideEffectService()
+        );
         final MockSideEffectService.MockPlayer mockPlayer =
                 new MockSideEffectService.MockPlayer(20);
         Assertions.assertEquals(20, mockPlayer.getHealth());
-        Assertions.assertEquals(State.ACCEPTED,
-                servicePipeline.pump(mockPlayer).through(MockSideEffectService.class).getResult());
+        Assertions.assertEquals(
+                State.ACCEPTED,
+                servicePipeline.pump(mockPlayer).through(MockSideEffectService.class).getResult()
+        );
         Assertions.assertEquals(0, mockPlayer.getHealth());
         mockPlayer.setHealth(20);
         servicePipeline.registerServiceImplementation(MockSideEffectService.class,
-                new SecondaryMockSideEffectService(), Collections.emptyList());
-        Assertions.assertThrows(IllegalStateException.class,
+                new SecondaryMockSideEffectService(), Collections.emptyList()
+        );
+        Assertions.assertThrows(
+                IllegalStateException.class,
                 () -> servicePipeline.pump(mockPlayer).through(MockSideEffectService.class)
-                        .getResult());
+                        .getResult()
+        );
     }
 
     @Test
     public void testForwarding() throws Exception {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService())
-                .registerServiceType(TypeToken.get(MockResultConsumer.class), new MockResultConsumer());
-        Assertions.assertEquals(State.ACCEPTED,
+                .registerServiceType(
+                        TypeToken.get(MockService.class),
+                        new DefaultMockService()
+                )
+                .registerServiceType(
+                        TypeToken.get(MockResultConsumer.class),
+                        new MockResultConsumer()
+                );
+        Assertions.assertEquals(
+                State.ACCEPTED,
                 servicePipeline.pump(new MockService.MockContext("huh")).through(MockService.class)
-                        .forward().through(MockResultConsumer.class).getResult());
-        Assertions.assertEquals(State.ACCEPTED,
+                        .forward().through(MockResultConsumer.class).getResult()
+        );
+        Assertions.assertEquals(
+                State.ACCEPTED,
                 servicePipeline.pump(new MockService.MockContext("Something"))
                         .through(MockService.class).forwardAsynchronously()
                         .thenApply(pump -> pump.through(MockResultConsumer.class))
-                        .thenApply(ServiceSpigot::getResult).get());
+                        .thenApply(ServiceSpigot::getResult).get()
+        );
     }
 
     @Test
     public void testSorting() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
+                .registerServiceType(
+                        TypeToken.get(MockService.class),
+                        new DefaultMockService()
+                );
         servicePipeline.registerServiceImplementation(MockService.class, new MockOrderedFirst(),
-                Collections.emptyList());
+                Collections.emptyList()
+        );
         servicePipeline.registerServiceImplementation(MockService.class, new MockOrderedLast(),
-                Collections.emptyList());
+                Collections.emptyList()
+        );
         // Test that the annotations worked
-        Assertions.assertEquals(1,
+        Assertions.assertEquals(
+                1,
                 servicePipeline.pump(new MockService.MockContext("")).through(MockService.class)
-                        .getResult().getInteger());
+                        .getResult().getInteger()
+        );
     }
 
     @Test
     public void testRecognisedTypes() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
+                .registerServiceType(
+                        TypeToken.get(MockService.class),
+                        new DefaultMockService()
+                );
         Assertions.assertEquals(1, servicePipeline.getRecognizedTypes().size());
     }
 
     @Test
     public void testImplementationGetters() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
+                .registerServiceType(
+                        TypeToken.get(MockService.class),
+                        new DefaultMockService()
+                );
         servicePipeline.registerServiceImplementation(MockService.class, new MockOrderedFirst(),
-                Collections.emptyList());
+                Collections.emptyList()
+        );
         servicePipeline.registerServiceImplementation(MockService.class, new MockOrderedLast(),
-                Collections.emptyList());
+                Collections.emptyList()
+        );
         final TypeToken<? extends Service<?, ?>> first = TypeToken.get(MockOrderedFirst.class),
                 last = TypeToken.get(MockOrderedLast.class);
         final TypeToken<MockService> mockServiceType = TypeToken.get(MockService.class);
@@ -171,21 +212,31 @@ public class ServicesTest {
     @Test
     public void testAnnotatedMethods() throws Exception {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService())
+                .registerServiceType(
+                        TypeToken.get(MockService.class),
+                        new DefaultMockService()
+                )
                 .registerMethods(new AnnotatedMethodTest());
         final String testString = UUID.randomUUID().toString();
-        Assertions.assertEquals(testString.length(),
+        Assertions.assertEquals(
+                testString.length(),
                 servicePipeline.pump(new MockService.MockContext(testString)).through(MockService.class)
-                        .getResult().getInteger());
+                        .getResult().getInteger()
+        );
     }
 
     @Test
     public void testConsumerServices() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.get(MockConsumerService.class),
-                        new StateSettingConsumerService())
-                .registerServiceImplementation(MockConsumerService.class,
-                        new InterruptingMockConsumer(), Collections.emptyList());
+                .registerServiceType(
+                        TypeToken.get(MockConsumerService.class),
+                        new StateSettingConsumerService()
+                )
+                .registerServiceImplementation(
+                        MockConsumerService.class,
+                        new InterruptingMockConsumer(),
+                        Collections.emptyList()
+                );
         final MockService.MockContext context = new MockService.MockContext("");
         servicePipeline.pump(context).through(MockConsumerService.class).getResult();
         Assertions.assertEquals("", context.getState());
@@ -194,10 +245,15 @@ public class ServicesTest {
     @Test
     public void testPartialResultServices() {
         final ServicePipeline servicePipeline = ServicePipeline.builder().build()
-                .registerServiceType(TypeToken.get(MockPartialResultService.class),
-                        new DefaultPartialRequestService())
-                .registerServiceImplementation(MockPartialResultService.class,
-                        new CompletingPartialResultService(), Collections.emptyList());
+                .registerServiceType(
+                        TypeToken.get(MockPartialResultService.class),
+                        new DefaultPartialRequestService()
+                )
+                .registerServiceImplementation(
+                        MockPartialResultService.class,
+                        new CompletingPartialResultService(),
+                        Collections.emptyList()
+                );
         final MockChunkedRequest.Animal cow = new MockChunkedRequest.Animal("cow");
         final MockChunkedRequest.Animal dog = new MockChunkedRequest.Animal("dog");
         final MockChunkedRequest.Animal cat = new MockChunkedRequest.Animal("cat");
@@ -215,16 +271,22 @@ public class ServicesTest {
         Assertions.assertNotNull(servicePipeline);
         servicePipeline
                 .registerServiceType(TypeToken.get(MockService.class), new DefaultMockService());
-        final PipelineException pipelineException = Assertions.assertThrows(PipelineException.class,
+        final PipelineException pipelineException = Assertions.assertThrows(
+                PipelineException.class,
                 () -> servicePipeline.pump(new MockService.MockContext("pls throw exception"))
-                        .through(MockService.class).getResult());
-        Assertions.assertEquals(DefaultMockService.TotallyIntentionalException.class,
-                pipelineException.getCause().getClass());
+                        .through(MockService.class).getResult()
+        );
+        Assertions.assertEquals(
+                DefaultMockService.TotallyIntentionalException.class,
+                pipelineException.getCause().getClass()
+        );
         servicePipeline.pump(new MockService.MockContext("pls throw exception"))
                 .through(MockService.class).getResult((result, throwable) -> {
             Assertions.assertNotNull(throwable);
-            Assertions.assertEquals(DefaultMockService.TotallyIntentionalException.class,
-                    throwable.getClass());
+            Assertions.assertEquals(
+                    DefaultMockService.TotallyIntentionalException.class,
+                    throwable.getClass()
+            );
             Assertions.assertNull(result);
         });
     }

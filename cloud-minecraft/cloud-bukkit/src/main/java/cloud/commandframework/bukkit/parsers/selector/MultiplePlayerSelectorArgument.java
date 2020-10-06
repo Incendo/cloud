@@ -45,13 +45,16 @@ import java.util.function.BiFunction;
 
 public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, MultiplePlayerSelector> {
 
-    private MultiplePlayerSelectorArgument(final boolean required,
-                                           final @NonNull String name,
-                                           final @NonNull String defaultValue,
-                                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                                   @NonNull List<@NonNull String>> suggestionsProvider) {
+    private MultiplePlayerSelectorArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new MultiplePlayerSelectorParser<>(), defaultValue, MultiplePlayerSelector.class,
-              suggestionsProvider);
+                suggestionsProvider
+        );
     }
 
     /**
@@ -95,8 +98,10 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> optional(final @NonNull String name,
-                                                                                   final @NonNull String defaultEntitySelector) {
+    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> optional(
+            final @NonNull String name,
+            final @NonNull String defaultEntitySelector
+    ) {
         return MultiplePlayerSelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
@@ -115,7 +120,8 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         @Override
         public @NonNull MultiplePlayerSelectorArgument<C> build() {
             return new MultiplePlayerSelectorArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                                                        this.getSuggestionsProvider());
+                    this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -124,8 +130,10 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
     public static final class MultiplePlayerSelectorParser<C> implements ArgumentParser<C, MultiplePlayerSelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<MultiplePlayerSelector> parse(final @NonNull CommandContext<C> commandContext,
-                                                                          final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<MultiplePlayerSelector> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -160,8 +168,10 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             List<String> output = new ArrayList<>();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -170,6 +180,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
 
             return output;
         }
+
     }
 
 }

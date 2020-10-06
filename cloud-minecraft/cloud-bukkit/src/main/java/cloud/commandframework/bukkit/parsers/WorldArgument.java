@@ -44,10 +44,12 @@ import java.util.stream.Collectors;
  */
 public class WorldArgument<C> extends CommandArgument<C, World> {
 
-    protected WorldArgument(final boolean required,
-                            final @NonNull String name,
-                            final @NonNull String defaultValue,
-                            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+    protected WorldArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+    ) {
         super(required, name, new WorldParser<>(), defaultValue, World.class, suggestionsProvider);
     }
 
@@ -92,8 +94,10 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>          Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, World> optional(final @NonNull String name,
-                                                                  final @NonNull String defaultValue) {
+    public static <C> @NonNull CommandArgument<C, World> optional(
+            final @NonNull String name,
+            final @NonNull String defaultValue
+    ) {
         return WorldArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
     }
 
@@ -108,14 +112,17 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         public @NonNull CommandArgument<C, World> build() {
             return new WorldArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
         }
+
     }
 
 
     public static final class WorldParser<C> implements ArgumentParser<C, World> {
 
         @Override
-        public @NonNull ArgumentParseResult<World> parse(final @NonNull CommandContext<C> commandContext,
-                                                         final @NonNull Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<World> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -164,6 +171,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         public String getMessage() {
             return String.format("'%s' is not a valid Minecraft world", this.input);
         }
+
     }
 
 }

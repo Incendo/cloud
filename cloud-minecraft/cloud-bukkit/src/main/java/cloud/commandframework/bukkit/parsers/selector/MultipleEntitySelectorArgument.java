@@ -41,13 +41,16 @@ import java.util.function.BiFunction;
 
 public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
 
-    private MultipleEntitySelectorArgument(final boolean required,
-                                           final @NonNull String name,
-                                           final @NonNull String defaultValue,
-                                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                                   @NonNull List<@NonNull String>> suggestionsProvider) {
+    private MultipleEntitySelectorArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new MultipleEntitySelectorParser<>(), defaultValue, MultipleEntitySelector.class,
-              suggestionsProvider);
+                suggestionsProvider
+        );
     }
 
     /**
@@ -91,8 +94,10 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultipleEntitySelector> optional(final @NonNull String name,
-                                                                                   final @NonNull String defaultEntitySelector) {
+    public static <C> @NonNull CommandArgument<C, MultipleEntitySelector> optional(
+            final @NonNull String name,
+            final @NonNull String defaultEntitySelector
+    ) {
         return MultipleEntitySelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
@@ -111,7 +116,8 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
         @Override
         public @NonNull MultipleEntitySelectorArgument<C> build() {
             return new MultipleEntitySelectorArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                                                        this.getSuggestionsProvider());
+                    this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -120,8 +126,10 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
     public static final class MultipleEntitySelectorParser<C> implements ArgumentParser<C, MultipleEntitySelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<MultipleEntitySelector> parse(final @NonNull CommandContext<C> commandContext,
-                                                                          final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<MultipleEntitySelector> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
                 return ArgumentParseResult.failure(
@@ -142,6 +150,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
 
             return ArgumentParseResult.success(new MultipleEntitySelector(input, entities));
         }
+
     }
 
 }

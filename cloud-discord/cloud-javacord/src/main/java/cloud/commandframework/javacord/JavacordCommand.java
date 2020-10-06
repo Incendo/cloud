@@ -48,9 +48,11 @@ public class JavacordCommand<C> implements MessageCreateListener {
     private final CommandArgument<C, ?> command;
     private final cloud.commandframework.Command<C> cloudCommand;
 
-    JavacordCommand(final cloud.commandframework.@NonNull Command<C> cloudCommand,
-                    final @NonNull CommandArgument<C, ?> command,
-                    final @NonNull JavacordCommandManager<C> manager) {
+    JavacordCommand(
+            final cloud.commandframework.@NonNull Command<C> cloudCommand,
+            final @NonNull CommandArgument<C, ?> command,
+            final @NonNull JavacordCommandManager<C> manager
+    ) {
         this.command = command;
         this.manager = manager;
         this.cloudCommand = cloudCommand;
@@ -85,70 +87,78 @@ public class JavacordCommand<C> implements MessageCreateListener {
         final String finalContent = messageContent;
         //noinspection unchecked
         if (((StaticArgument<C>) command).getAliases()
-                                         .stream()
-                                         .map(String::toLowerCase)
-                                         .noneMatch(commandAlias -> finalContent.toLowerCase().startsWith(commandAlias))) {
+                .stream()
+                .map(String::toLowerCase)
+                .noneMatch(commandAlias -> finalContent.toLowerCase().startsWith(commandAlias))) {
             return;
         }
 
         manager.executeCommand(sender, finalContent)
-               .whenComplete(((commandResult, throwable) -> {
-                   if (throwable == null) {
-                       return;
-                   }
+                .whenComplete(((commandResult, throwable) -> {
+                    if (throwable == null) {
+                        return;
+                    }
 
-                   if (throwable instanceof CompletionException) {
-                       throwable = throwable.getCause();
-                   }
+                    if (throwable instanceof CompletionException) {
+                        throwable = throwable.getCause();
+                    }
 
-                   if (throwable instanceof NoSuchCommandException) {
-                       //Ignore, should never happen
-                       return;
-                   }
+                    if (throwable instanceof NoSuchCommandException) {
+                        //Ignore, should never happen
+                        return;
+                    }
 
-                   if (throwable instanceof InvalidSyntaxException) {
-                       manager.handleException(sender,
-                                               InvalidSyntaxException.class,
-                                               (InvalidSyntaxException) throwable,
-                                               (c, e) -> commandSender.sendErrorMessage(
-                                                       "Invalid Command Syntax. Correct command syntax is: `"
-                                                               + e.getCorrectSyntax()
-                                                               + "`")
-                       );
+                    if (throwable instanceof InvalidSyntaxException) {
+                        manager.handleException(
+                                sender,
+                                InvalidSyntaxException.class,
+                                (InvalidSyntaxException) throwable,
+                                (c, e) -> commandSender.sendErrorMessage(
+                                        "Invalid Command Syntax. Correct command syntax is: `"
+                                                + e.getCorrectSyntax()
+                                                + "`")
+                        );
 
-                       return;
-                   }
+                        return;
+                    }
 
-                   if (throwable instanceof InvalidCommandSenderException) {
-                       manager.handleException(sender,
-                                               InvalidCommandSenderException.class,
-                                               (InvalidCommandSenderException) throwable,
-                                               (c, e) -> commandSender.sendErrorMessage(e.getMessage()));
+                    if (throwable instanceof InvalidCommandSenderException) {
+                        manager.handleException(
+                                sender,
+                                InvalidCommandSenderException.class,
+                                (InvalidCommandSenderException) throwable,
+                                (c, e) -> commandSender.sendErrorMessage(e.getMessage())
+                        );
 
-                       return;
-                   }
+                        return;
+                    }
 
-                   if (throwable instanceof NoPermissionException) {
-                       manager.handleException(sender,
-                                               NoPermissionException.class,
-                                               (NoPermissionException) throwable,
-                                               (c, e) -> commandSender.sendErrorMessage(MESSAGE_NO_PERMS));
+                    if (throwable instanceof NoPermissionException) {
+                        manager.handleException(
+                                sender,
+                                NoPermissionException.class,
+                                (NoPermissionException) throwable,
+                                (c, e) -> commandSender.sendErrorMessage(MESSAGE_NO_PERMS)
+                        );
 
-                       return;
-                   }
+                        return;
+                    }
 
-                   if (throwable instanceof ArgumentParseException) {
-                       manager.handleException(sender,
-                                               ArgumentParseException.class,
-                                               (ArgumentParseException) throwable,
-                                               (c, e) -> commandSender.sendErrorMessage(
-                                                       "Invalid Command Argument: `" + e.getCause().getMessage() + "`"));
+                    if (throwable instanceof ArgumentParseException) {
+                        manager.handleException(
+                                sender,
+                                ArgumentParseException.class,
+                                (ArgumentParseException) throwable,
+                                (c, e) -> commandSender.sendErrorMessage(
+                                        "Invalid Command Argument: `" + e.getCause().getMessage() + "`")
+                        );
 
-                       return;
-                   }
+                        return;
+                    }
 
-                   commandSender.sendErrorMessage(throwable.getMessage());
-                   throwable.printStackTrace();
-               }));
+                    commandSender.sendErrorMessage(throwable.getMessage());
+                    throwable.printStackTrace();
+                }));
     }
+
 }

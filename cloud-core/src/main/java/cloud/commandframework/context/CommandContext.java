@@ -61,8 +61,10 @@ public final class CommandContext<C> {
      * @param suggestions   Whether or not the context is created for command suggestions
      * @param commandSender Sender of the command
      */
-    public CommandContext(final boolean suggestions,
-                          final @NonNull C commandSender) {
+    public CommandContext(
+            final boolean suggestions,
+            final @NonNull C commandSender
+    ) {
         this.commandSender = commandSender;
         this.suggestions = suggestions;
     }
@@ -181,8 +183,10 @@ public final class CommandContext<C> {
      * @param <T>          Argument type
      * @return Stored value, or supplied default value
      */
-    public <T> @Nullable T getOrDefault(final @NonNull CommandArgument<C, T> argument,
-                                        final @Nullable T defaultValue) {
+    public <T> @Nullable T getOrDefault(
+            final @NonNull CommandArgument<C, T> argument,
+            final @Nullable T defaultValue
+    ) {
         return this.<T>getOptional(argument.getName()).orElse(defaultValue);
     }
 
@@ -194,8 +198,10 @@ public final class CommandContext<C> {
      * @param <T>          Argument type
      * @return Argument, or supplied default value
      */
-    public <T> @Nullable T getOrDefault(final @NonNull String key,
-                                        final @Nullable T defaultValue) {
+    public <T> @Nullable T getOrDefault(
+            final @NonNull String key,
+            final @Nullable T defaultValue
+    ) {
         return this.<T>getOptional(key).orElse(defaultValue);
     }
 

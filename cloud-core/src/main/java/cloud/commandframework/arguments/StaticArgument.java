@@ -56,8 +56,10 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
      * @param <C>     Command sender type
      * @return Constructed argument
      */
-    public static <C> @NonNull StaticArgument<C> of(final @NonNull String name,
-                                                    final @NonNull String... aliases) {
+    public static <C> @NonNull StaticArgument<C> of(
+            final @NonNull String name,
+            final @NonNull String... aliases
+    ) {
         return new StaticArgument<>(true, name, aliases);
     }
 
@@ -104,8 +106,10 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         }
 
         @Override
-        public @NonNull ArgumentParseResult<String> parse(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<String> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String string = inputQueue.peek();
             if (string == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input provided"));
@@ -118,8 +122,10 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             return Collections.singletonList(this.name);
         }
 

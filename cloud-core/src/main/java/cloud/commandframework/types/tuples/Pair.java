@@ -38,8 +38,10 @@ public class Pair<U, V> implements Tuple {
     private final U first;
     private final V second;
 
-    protected Pair(final U first,
-                   final V second) {
+    protected Pair(
+            final U first,
+            final V second
+    ) {
         this.first = first;
         this.second = second;
     }
@@ -53,8 +55,10 @@ public class Pair<U, V> implements Tuple {
      * @param <V>    Second type
      * @return Created pair
      */
-    public static <U, V> @NonNull Pair<U, V> of(final U first,
-                                                final V second) {
+    public static <U, V> @NonNull Pair<U, V> of(
+            final U first,
+            final V second
+    ) {
         return new Pair<>(first, second);
     }
 

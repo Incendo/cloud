@@ -44,11 +44,13 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
     private final X fourth;
     private final Y fifth;
 
-    protected Quintet(final @NonNull U first,
-                      final @NonNull V second,
-                      final @NonNull W third,
-                      final @NonNull X fourth,
-                      final @NonNull Y fifth) {
+    protected Quintet(
+            final @NonNull U first,
+            final @NonNull V second,
+            final @NonNull W third,
+            final @NonNull X fourth,
+            final @NonNull Y fifth
+    ) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -76,7 +78,8 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
             final @NonNull V second,
             final @NonNull W third,
             final @NonNull X fourth,
-            final @NonNull Y fifth) {
+            final @NonNull Y fifth
+    ) {
         return new Quintet<>(first, second, third, fourth, fifth);
     }
 

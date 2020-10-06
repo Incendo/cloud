@@ -89,11 +89,13 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    public BukkitCommandManager(final @NonNull Plugin owningPlugin,
-                                final @NonNull Function<@NonNull CommandTree<C>,
-                                        @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                                final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
-                                final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper)
+    public BukkitCommandManager(
+            final @NonNull Plugin owningPlugin,
+            final @NonNull Function<@NonNull CommandTree<C>,
+                    @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
+            final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
+    )
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
         ((BukkitPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
@@ -108,14 +110,16 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         int version = -1;
         try {
             final Matcher matcher = Pattern.compile("\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?\\)")
-                                           .matcher(Bukkit.getVersion());
+                    .matcher(Bukkit.getVersion());
             if (matcher.find()) {
-                version = Integer.parseInt(matcher.toMatchResult().group(2),
-                                           VERSION_RADIX);
+                version = Integer.parseInt(
+                        matcher.toMatchResult().group(2),
+                        VERSION_RADIX
+                );
             }
         } catch (final Exception e) {
             this.owningPlugin.getLogger().severe("Failed to determine Minecraft version "
-                                                         + "for cloud Bukkit capability detection");
+                    + "for cloud Bukkit capability detection");
         }
         this.minecraftVersion = version;
 
@@ -132,13 +136,17 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
 
         /* Register Bukkit Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), params -> new WorldArgument.WorldParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class),
-                                                        params -> new MaterialArgument.MaterialParser<>());
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(Material.class),
+                params -> new MaterialArgument.MaterialParser<>()
+        );
         this.getParserRegistry()
-            .registerParserSupplier(TypeToken.get(Player.class), params -> new PlayerArgument.PlayerParser<>());
+                .registerParserSupplier(TypeToken.get(Player.class), params -> new PlayerArgument.PlayerParser<>());
         this.getParserRegistry()
-            .registerParserSupplier(TypeToken.get(OfflinePlayer.class),
-                                    params -> new OfflinePlayerArgument.OfflinePlayerParser<>());
+                .registerParserSupplier(
+                        TypeToken.get(OfflinePlayer.class),
+                        params -> new OfflinePlayerArgument.OfflinePlayerParser<>()
+                );
         /* Register Entity Selector Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());
@@ -195,18 +203,20 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 
-    protected final void setSplitAliases(final boolean value) {
-        this.splitAliases = value;
-    }
-
     protected final boolean getSplitAliases() {
         return this.splitAliases;
     }
 
+    protected final void setSplitAliases(final boolean value) {
+        this.splitAliases = value;
+    }
+
     protected final void checkBrigadierCompatibility() throws BrigadierFailureException {
         if (!this.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
-            throw new BrigadierFailureException(BrigadierFailureReason.VERSION_TOO_LOW,
-                                                new IllegalArgumentException("Version: " + this.minecraftVersion));
+            throw new BrigadierFailureException(
+                    BrigadierFailureReason.VERSION_TOO_LOW,
+                    new IllegalArgumentException("Version: " + this.minecraftVersion)
+            );
         }
     }
 
@@ -229,21 +239,27 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         if (this.paper) {
             if (this.minecraftVersion >= ASYNC_TAB_MINIMUM_VERSION) {
                 if (this.minecraftVersion >= PAPER_BRIGADIER_VERSION) {
-                    return EnumSet.of(CloudBukkitCapabilities.NATIVE_BRIGADIER,
-                                      CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
-                                      CloudBukkitCapabilities.BRIGADIER);
+                    return EnumSet.of(
+                            CloudBukkitCapabilities.NATIVE_BRIGADIER,
+                            CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
+                            CloudBukkitCapabilities.BRIGADIER
+                    );
                 } else if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
-                    return EnumSet.of(CloudBukkitCapabilities.COMMODORE_BRIGADIER,
-                                      CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
-                                      CloudBukkitCapabilities.BRIGADIER);
+                    return EnumSet.of(
+                            CloudBukkitCapabilities.COMMODORE_BRIGADIER,
+                            CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
+                            CloudBukkitCapabilities.BRIGADIER
+                    );
                 } else {
                     return EnumSet.of(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION);
                 }
             }
         } else {
             if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
-                return EnumSet.of(CloudBukkitCapabilities.COMMODORE_BRIGADIER,
-                                  CloudBukkitCapabilities.BRIGADIER);
+                return EnumSet.of(
+                        CloudBukkitCapabilities.COMMODORE_BRIGADIER,
+                        CloudBukkitCapabilities.BRIGADIER
+                );
             }
         }
         return EnumSet.noneOf(CloudBukkitCapabilities.class);
@@ -320,9 +336,11 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
 
         @Override
         public String getMessage() {
-            return String.format("Could not initialize Brigadier mappings. Reason: %s (%s)",
-                                 this.reason.name().toLowerCase().replace("_", " "),
-                                 this.getCause() == null ? "" : this.getCause().getMessage());
+            return String.format(
+                    "Could not initialize Brigadier mappings. Reason: %s (%s)",
+                    this.reason.name().toLowerCase().replace("_", " "),
+                    this.getCause() == null ? "" : this.getCause().getMessage()
+            );
         }
 
     }

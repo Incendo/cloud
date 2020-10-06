@@ -28,5 +28,10 @@ package cloud.commandframework.services;
  */
 @SuppressWarnings("unused")
 public enum ExecutionOrder {
-  LAST, LATER, LATE, SOON, SOONER, FIRST
+    LAST,
+    LATER,
+    LATE,
+    SOON,
+    SOONER,
+    FIRST
 }

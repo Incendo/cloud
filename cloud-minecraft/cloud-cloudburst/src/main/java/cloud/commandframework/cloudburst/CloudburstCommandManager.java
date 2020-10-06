@@ -54,11 +54,13 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      */
-    public CloudburstCommandManager(final @NonNull Plugin owningPlugin,
-                                    final @NonNull Function<@NonNull CommandTree<C>,
-                                            @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                                    final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
-                                    final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper) {
+    public CloudburstCommandManager(
+            final @NonNull Plugin owningPlugin,
+            final @NonNull Function<@NonNull CommandTree<C>,
+                    @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
+            final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
+    ) {
         super(commandExecutionCoordinator, new CloudburstPluginRegistrationHandler<>());
         ((CloudburstPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.commandSenderMapper = commandSenderMapper;
@@ -67,8 +69,10 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
     }
 
     @Override
-    public final boolean hasPermission(final @NonNull C sender,
-                                       final @NonNull String permission) {
+    public final boolean hasPermission(
+            final @NonNull C sender,
+            final @NonNull String permission
+    ) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 

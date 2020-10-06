@@ -33,7 +33,8 @@ enum ServiceFilterHandler {
 
     <Context> boolean passes(
             final @NonNull ServiceRepository<Context, ?>.ServiceWrapper<? extends Service<Context, ?>> service,
-            final @NonNull Context context) {
+            final @NonNull Context context
+    ) {
         if (!service.isDefaultImplementation()) {
             for (final Predicate<Context> predicate : service.getFilters()) {
                 try {
@@ -43,7 +44,8 @@ enum ServiceFilterHandler {
                 } catch (final Exception e) {
                     throw new PipelineException(String
                             .format("Failed to evaluate filter '%s' for '%s'",
-                                    predicate.getClass().getCanonicalName(), service.toString()), e);
+                                    predicate.getClass().getCanonicalName(), service.toString()
+                            ), e);
                 }
             }
         }

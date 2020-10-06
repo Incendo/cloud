@@ -118,6 +118,7 @@ public abstract class ArgumentParseResult<T> {
         public @NonNull Optional<Throwable> getFailure() {
             return Optional.of(this.failure);
         }
+
     }
 
 }

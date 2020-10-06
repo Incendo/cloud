@@ -64,17 +64,20 @@ class AnnotationParserTest {
 
     @ProxiedBy("proxycommand")
     @CommandMethod("test|t literal <int> [string]")
-    public void testCommand(final TestCommandSender sender,
-                            @Argument("int") @Range(max = "100") final int argument,
-                            @Argument(value = "string", defaultValue = "potato", parserName = "potato")
-                                final String string) {
+    public void testCommand(
+            final TestCommandSender sender,
+            @Argument("int") @Range(max = "100") final int argument,
+            @Argument(value = "string", defaultValue = "potato", parserName = "potato") final String string
+    ) {
         System.out.printf("Received int: %d and string '%s'\n", argument, string);
     }
 
     @CommandMethod("flagcommand")
-    public void testFlags(final TestCommandSender sender,
-                          @Flag(value = "print", aliases = "p") boolean print,
-                          @Flag(value = "word", aliases = "w") String word) {
+    public void testFlags(
+            final TestCommandSender sender,
+            @Flag(value = "print", aliases = "p") boolean print,
+            @Flag(value = "word", aliases = "w") String word
+    ) {
         if (print) {
             System.out.println(word);
         }

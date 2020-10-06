@@ -37,14 +37,17 @@ import java.util.function.BiFunction;
 
 @SuppressWarnings("unused")
 public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
+
     private final boolean liberal;
 
-    private BooleanArgument(final boolean required,
-                            final @NonNull String name,
-                            final boolean liberal,
-                            final @NonNull String defaultValue,
-                            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                    @NonNull List<@NonNull String>> suggestionsProvider) {
+    private BooleanArgument(
+            final boolean required,
+            final @NonNull String name,
+            final boolean liberal,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class, suggestionsProvider);
         this.liberal = liberal;
     }
@@ -90,8 +93,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      * @param <C>            Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Boolean> optional(final @NonNull String name,
-                                                                    final boolean defaultBoolean) {
+    public static <C> @NonNull CommandArgument<C, Boolean> optional(
+            final @NonNull String name,
+            final boolean defaultBoolean
+    ) {
         return BooleanArgument.<C>newBuilder(name).asOptionalWithDefault(Boolean.toString(defaultBoolean)).build();
     }
 
@@ -131,7 +136,8 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         @Override
         public @NonNull BooleanArgument<C> build() {
             return new BooleanArgument<>(this.isRequired(), this.getName(), this.liberal,
-                                         this.getDefaultValue(), this.getSuggestionsProvider());
+                    this.getDefaultValue(), this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -154,8 +160,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         }
 
         @Override
-        public @NonNull ArgumentParseResult<Boolean> parse(final @NonNull CommandContext<C> commandContext,
-                                                           final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<Boolean> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -188,8 +196,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             if (!liberal) {
                 return Arrays.asList("TRUE", "FALSE");
             }
@@ -201,6 +211,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         public boolean isContextFree() {
             return true;
         }
+
     }
 
 
@@ -218,8 +229,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          * @param input   String input
          * @param liberal Liberal value
          */
-        public BooleanParseException(final @NonNull String input,
-                                     final boolean liberal) {
+        public BooleanParseException(
+                final @NonNull String input,
+                final boolean liberal
+        ) {
             this.input = input;
             this.liberal = liberal;
         }
@@ -246,5 +259,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         public String getMessage() {
             return String.format("Could not parse boolean from '%s'.", input);
         }
+
     }
+
 }

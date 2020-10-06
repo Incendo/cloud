@@ -27,4 +27,5 @@ package cloud.commandframework.tasks;
  * Part of a {@link TaskRecipe}
  */
 public interface TaskRecipeStep {
+
 }

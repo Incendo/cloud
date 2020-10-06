@@ -25,9 +25,9 @@ package cloud.commandframework.services.mock;
 
 public class StateSettingConsumerService implements MockConsumerService {
 
-  @Override
-  public void accept(final MockService.MockContext mockContext) {
-    mockContext.setState("");
-  }
+    @Override
+    public void accept(final MockService.MockContext mockContext) {
+        mockContext.setState("");
+    }
 
 }

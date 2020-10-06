@@ -30,13 +30,13 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
+import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
-import cloud.commandframework.arguments.parser.ParserParameters;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -77,9 +77,11 @@ public final class AnnotationParser<C> {
      *                           {@link ParserParameter}. Mappers for the
      *                           parser parameters can be registered using {@link #registerAnnotationMapper(Class, Function)}
      */
-    public AnnotationParser(final @NonNull CommandManager<C> manager,
-                            final @NonNull Class<C> commandSenderClass,
-                            final @NonNull Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper) {
+    public AnnotationParser(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull Class<C> commandSenderClass,
+            final @NonNull Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper
+    ) {
         this.commandSenderClass = commandSenderClass;
         this.manager = manager;
         this.metaFactory = new MetaFactory(this, metaMapper);
@@ -96,9 +98,11 @@ public final class AnnotationParser<C> {
      * @param mapper     Mapping function
      * @param <A>        Annotation type
      */
-    public <A extends Annotation> void registerAnnotationMapper(final @NonNull Class<A> annotation,
-                                                                final @NonNull Function<@NonNull A,
-                                                                        @NonNull ParserParameters> mapper) {
+    public <A extends Annotation> void registerAnnotationMapper(
+            final @NonNull Class<A> annotation,
+            final @NonNull Function<@NonNull A,
+                    @NonNull ParserParameters> mapper
+    ) {
         this.annotationMappers.put(annotation, mapper);
     }
 
@@ -122,8 +126,10 @@ public final class AnnotationParser<C> {
                 method.setAccessible(true);
             }
             if (method.getReturnType() != Void.TYPE) {
-                throw new IllegalArgumentException(String.format("@CommandMethod annotated method '%s' has non-void return type",
-                                                                 method.getName()));
+                throw new IllegalArgumentException(String.format(
+                        "@CommandMethod annotated method '%s' has non-void return type",
+                        method.getName()
+                ));
             }
             commandMethodPairs.add(new CommandMethodPair(method, commandMethod));
         }
@@ -139,7 +145,8 @@ public final class AnnotationParser<C> {
     @SuppressWarnings("unchecked")
     private @NonNull Collection<@NonNull Command<C>> construct(
             final @NonNull Object instance,
-            final @NonNull Collection<@NonNull CommandMethodPair> methodPairs) {
+            final @NonNull Collection<@NonNull CommandMethodPair> methodPairs
+    ) {
         final Collection<Command<C>> commands = new ArrayList<>();
         for (final CommandMethodPair commandMethodPair : methodPairs) {
             final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
@@ -149,24 +156,28 @@ public final class AnnotationParser<C> {
             final String commandToken = commandMethod.value().split(" ")[0].split("\\|")[0];
             @SuppressWarnings("ALL") final CommandManager manager = this.manager;
             final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
-                                                                           .with(this.metaFactory.apply(method.getAnnotations()));
+                    .with(this.metaFactory.apply(method.getAnnotations()));
             if (method.isAnnotationPresent(Confirmation.class)) {
                 metaBuilder.with(CommandConfirmationManager.CONFIRMATION_REQUIRED_META, "true");
             }
 
             @SuppressWarnings("ALL")
-            Command.Builder builder = manager.commandBuilder(commandToken,
-                                                             tokens.get(commandToken).getMinor(),
-                                                             metaBuilder.build());
+            Command.Builder builder = manager.commandBuilder(
+                    commandToken,
+                    tokens.get(commandToken).getMinor(),
+                    metaBuilder.build()
+            );
             final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
             final Collection<CommandFlag<?>> flags = this.flagExtractor.apply(method);
             final Map<String, CommandArgument<C, ?>> commandArguments = new HashMap<>();
             final Map<CommandArgument<C, ?>, String> argumentDescriptions = new HashMap<>();
             /* Go through all annotated parameters and build up the argument tree */
             for (final ArgumentParameterPair argumentPair : arguments) {
-                final CommandArgument<C, ?> argument = this.buildArgument(method,
-                                                                          tokens.get(argumentPair.getArgument().value()),
-                                                                          argumentPair);
+                final CommandArgument<C, ?> argument = this.buildArgument(
+                        method,
+                        tokens.get(argumentPair.getArgument().value()),
+                        argumentPair
+                );
                 commandArguments.put(argument.getName(), argument);
                 argumentDescriptions.put(argument, argumentPair.getArgument().description());
             }
@@ -209,9 +220,9 @@ public final class AnnotationParser<C> {
             }
 
             if (commandMethod.requiredSender() != Object.class) {
-                builder = builder.withSenderType(commandMethod.requiredSender());
+                builder = builder.senderType(commandMethod.requiredSender());
             } else if (senderType != null) {
-                builder = builder.withSenderType(senderType);
+                builder = builder.senderType(senderType);
             }
             try {
                 /* Construct the handler */
@@ -240,7 +251,7 @@ public final class AnnotationParser<C> {
                     throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
                 }
                 Command.Builder<C> proxyBuilder = manager.commandBuilder(proxy, builtCommand.getCommandMeta())
-                                                         .proxies(builtCommand);
+                        .proxies(builtCommand);
                 if (proxyAnnotation.hidden()) {
                     proxyBuilder = proxyBuilder.hidden();
                 }
@@ -251,34 +262,38 @@ public final class AnnotationParser<C> {
     }
 
     @SuppressWarnings("unchecked")
-    private @NonNull CommandArgument<C, ?> buildArgument(final @NonNull Method method,
-                                                         final @Nullable SyntaxFragment syntaxFragment,
-                                                         final @NonNull ArgumentParameterPair argumentPair) {
+    private @NonNull CommandArgument<C, ?> buildArgument(
+            final @NonNull Method method,
+            final @Nullable SyntaxFragment syntaxFragment,
+            final @NonNull ArgumentParameterPair argumentPair
+    ) {
         final Parameter parameter = argumentPair.getParameter();
         final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
         final TypeToken<?> token = TypeToken.get(parameter.getParameterizedType());
         final ParserParameters parameters = this.manager.getParserRegistry()
-                                                        .parseAnnotations(token, annotations);
+                .parseAnnotations(token, annotations);
 
         final ArgumentParser<C, ?> parser;
         if (argumentPair.getArgument().parserName().isEmpty()) {
             parser = this.manager.getParserRegistry()
-                                 .createParser(token, parameters)
-                                 .orElseThrow(() -> new IllegalArgumentException(
-                                         String.format("Parameter '%s' in method '%s' "
-                                                               + "has parser '%s' but no parser exists "
-                                                               + "for that type",
-                                                       parameter.getName(), method.getName(),
-                                                       token.toString())));
+                    .createParser(token, parameters)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            String.format("Parameter '%s' in method '%s' "
+                                            + "has parser '%s' but no parser exists "
+                                            + "for that type",
+                                    parameter.getName(), method.getName(),
+                                    token.toString()
+                            )));
         } else {
             parser = this.manager.getParserRegistry()
-                                 .createParser(argumentPair.getArgument().parserName(), parameters)
-                                 .orElseThrow(() -> new IllegalArgumentException(
-                                         String.format("Parameter '%s' in method '%s' "
-                                                               + "has parser '%s' but no parser exists "
-                                                               + "for that type",
-                                                       parameter.getName(), method.getName(),
-                                                       token.toString())));
+                    .createParser(argumentPair.getArgument().parserName(), parameters)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            String.format("Parameter '%s' in method '%s' "
+                                            + "has parser '%s' but no parser exists "
+                                            + "for that type",
+                                    parameter.getName(), method.getName(),
+                                    token.toString()
+                            )));
         }
 
         if (syntaxFragment == null || syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
@@ -287,8 +302,10 @@ public final class AnnotationParser<C> {
                             + "Missing syntax mapping", argumentPair.getArgument().value(), method.getName()));
         }
         final Argument argument = argumentPair.getArgument();
-        @SuppressWarnings("ALL") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(parameter.getType(),
-                                                                                                        argument.value());
+        @SuppressWarnings("ALL") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
+                parameter.getType(),
+                argument.value()
+        );
         if (syntaxFragment.getArgumentMode() == ArgumentMode.OPTIONAL) {
             if (argument.defaultValue().isEmpty()) {
                 argumentBuilder.asOptional();

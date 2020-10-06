@@ -50,10 +50,11 @@ class CommandHelpHandlerTest {
                 argument(IntegerArgument.of("int"), Description.of("A number")).build());
 
         manager.command(manager.commandBuilder("vec")
-                               .meta("description", "Takes in a vector")
-                               .argumentPair("vec", Pair.of("x", "y"),
-                                             Pair.of(Double.class, Double.class), Description.of("Vector"))
-                               .build());
+                .meta("description", "Takes in a vector")
+                .argumentPair("vec", Pair.of("x", "y"),
+                        Pair.of(Double.class, Double.class), Description.of("Vector")
+                )
+                .build());
     }
 
     @Test
@@ -88,8 +89,10 @@ class CommandHelpHandlerTest {
         this.printTopic("vec", query4);
     }
 
-    private void printTopic(final String query,
-                           final CommandHelpHandler.HelpTopic<TestCommandSender> helpTopic) {
+    private void printTopic(
+            final String query,
+            final CommandHelpHandler.HelpTopic<TestCommandSender> helpTopic
+    ) {
         System.out.printf("Showing results for query: \"/%s\"\n", query);
         if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
             this.printIndexHelpTopic((CommandHelpHandler.IndexHelpTopic<TestCommandSender>) helpTopic);
@@ -135,7 +138,7 @@ class CommandHelpHandlerTest {
 
     private void printVerboseHelpTopic(final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> helpTopic) {
         System.out.printf("└── Command: /%s\n", manager.getCommandSyntaxFormatter()
-                                                      .apply(helpTopic.getCommand().getArguments(), null));
+                .apply(helpTopic.getCommand().getArguments(), null));
         System.out.printf("    ├── Description: %s\n", helpTopic.getDescription());
         System.out.println("    └── Args: ");
         final Iterator<CommandArgument<TestCommandSender, ?>> iterator = helpTopic.getCommand().getArguments().iterator();

@@ -57,8 +57,10 @@ class CommandPermissionTest {
         }
 
         @Override
-        public boolean hasPermission(final TestCommandSender sender,
-                                     final String permission) {
+        public boolean hasPermission(
+                final TestCommandSender sender,
+                final String permission
+        ) {
             return acceptOne && permission.equalsIgnoreCase("test.permission.four");
         }
 
@@ -66,6 +68,7 @@ class CommandPermissionTest {
         public CommandMeta createDefaultCommandMeta() {
             return SimpleCommandMeta.empty();
         }
+
     }
 
 }

@@ -40,24 +40,26 @@ public class CommandPreProcessorTest {
     static void newTree() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .argument(EnumArgument.of(SampleEnum.class, "enum"))
-                               .handler(
-                                       commandContext -> System.out.printf("enum = %s | integer = %d\n",
-                                                                           commandContext.<SampleEnum>getOptional(
-                                                                                   "enum").orElse(
-                                                                                   SampleEnum.VALUE1),
-                                                                           commandContext.<Integer>getOptional(
-                                                                                   "int").orElseThrow(
-                                                                                   () -> new NullPointerException(
-                                                                                           "int"))))
-                               .build());
+                .argument(EnumArgument.of(SampleEnum.class, "enum"))
+                .handler(
+                        commandContext -> System.out.printf(
+                                "enum = %s | integer = %d\n",
+                                commandContext.<SampleEnum>getOptional(
+                                        "enum").orElse(
+                                        SampleEnum.VALUE1),
+                                commandContext.<Integer>getOptional(
+                                        "int").orElseThrow(
+                                        () -> new NullPointerException(
+                                                "int"))
+                        ))
+                .build());
         manager.registerCommandPreProcessor(new SamplePreprocessor());
     }
 
     @Test
     void testPreprocessing() {
         Assertions.assertEquals(10, manager.executeCommand(new TestCommandSender(), "10 test value1")
-                                           .join().getCommandContext().<Integer>getOptional("int").orElse(0));
+                .join().getCommandContext().<Integer>getOptional("int").orElse(0));
         manager.executeCommand(new TestCommandSender(), "aa test value1").join();
     }
 

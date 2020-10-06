@@ -28,9 +28,9 @@ import cloud.commandframework.services.types.SideEffectService;
 
 public class MockResultConsumer implements SideEffectService<MockService.MockResult> {
 
-  @Override
-  public State handle(final MockService.MockResult mockResultConsumer) {
-    return State.ACCEPTED;
-  }
+    @Override
+    public State handle(final MockService.MockResult mockResultConsumer) {
+        return State.ACCEPTED;
+    }
 
 }

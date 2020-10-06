@@ -38,11 +38,13 @@ import java.util.function.BiFunction;
 @SuppressWarnings("unused")
 public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
-    private UUIDArgument(final boolean required,
-                         final @NonNull String name,
-                         final @NonNull String defaultValue,
-                         final @Nullable BiFunction<@NonNull CommandContext<C>,
-                                 @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
+    private UUIDArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new UUIDParser<>(), defaultValue, UUID.class, suggestionsProvider);
     }
 
@@ -87,8 +89,10 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @param <C>         Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, UUID> optional(final @NonNull String name,
-                                                                 final @NonNull UUID defaultUUID) {
+    public static <C> @NonNull CommandArgument<C, UUID> optional(
+            final @NonNull String name,
+            final @NonNull UUID defaultUUID
+    ) {
         return UUIDArgument.<C>newBuilder(name).asOptionalWithDefault(defaultUUID.toString()).build();
     }
 
@@ -117,7 +121,8 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
         @Override
         public @NonNull ArgumentParseResult<UUID> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue) {
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -136,6 +141,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
         public boolean isContextFree() {
             return true;
         }
+
     }
 
 
@@ -156,5 +162,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
         public String getMessage() {
             return String.format("Could not parse UUID from '%s'.", input);
         }
+
     }
+
 }

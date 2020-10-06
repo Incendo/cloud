@@ -53,8 +53,10 @@ public final class ParserParameters {
      * @param <T>       Value type
      * @return Constructed instance
      */
-    public static <T> @NonNull ParserParameters single(final @NonNull ParserParameter<T> parameter,
-                                                       final @NonNull T value) {
+    public static <T> @NonNull ParserParameters single(
+            final @NonNull ParserParameter<T> parameter,
+            final @NonNull T value
+    ) {
         final ParserParameters parameters = new ParserParameters();
         parameters.store(parameter, value);
         return parameters;
@@ -78,8 +80,10 @@ public final class ParserParameters {
      * @param value     Object
      * @param <T>       Parameter type
      */
-    public <T> void store(final @NonNull ParserParameter<T> parameter,
-                          final @NonNull T value) {
+    public <T> void store(
+            final @NonNull ParserParameter<T> parameter,
+            final @NonNull T value
+    ) {
         this.internalMap.put(parameter, value);
     }
 
@@ -92,8 +96,10 @@ public final class ParserParameters {
      * @return Parameter value
      */
     @SuppressWarnings("unchecked")
-    public <T> @NonNull T get(final @NonNull ParserParameter<T> parameter,
-                              final @NonNull T defaultValue) {
+    public <T> @NonNull T get(
+            final @NonNull ParserParameter<T> parameter,
+            final @NonNull T defaultValue
+    ) {
         return (T) this.internalMap.getOrDefault(parameter, defaultValue);
     }
 

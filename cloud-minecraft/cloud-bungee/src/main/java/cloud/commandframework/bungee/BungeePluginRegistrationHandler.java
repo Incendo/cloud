@@ -54,10 +54,11 @@ final class BungeePluginRegistrationHandler<C> implements CommandRegistrationHan
         @SuppressWarnings("unchecked") final BungeeCommand<C> bungeeCommand = new BungeeCommand<>(
                 (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
-                this.bungeeCommandManager);
+                this.bungeeCommandManager
+        );
         this.registeredCommands.put(commandArgument, bungeeCommand);
         this.bungeeCommandManager.getOwningPlugin().getProxy().getPluginManager()
-                                 .registerCommand(this.bungeeCommandManager.getOwningPlugin(), bungeeCommand);
+                .registerCommand(this.bungeeCommandManager.getOwningPlugin(), bungeeCommand);
         return true;
     }
 

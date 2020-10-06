@@ -79,7 +79,8 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
 
         final String label;
         final String prefixedLabel = String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(),
-                                                   commandArgument.getName()).toLowerCase();
+                commandArgument.getName()
+        ).toLowerCase();
         if (!(this.bukkitCommandManager.getCommandRegistrationHandler() instanceof CloudCommodoreManager)
                 && bukkitCommands.containsKey(commandArgument.getName())) {
             label = prefixedLabel;
@@ -87,8 +88,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             label = commandArgument.getName();
         }
 
-        @SuppressWarnings("unchecked")
-        final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
+        @SuppressWarnings("unchecked") final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
 
         if (!label.contains(":")) {
             aliases.add(prefixedLabel);
@@ -99,11 +99,14 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                 (this.bukkitCommandManager.getSplitAliases() ? Collections.<String>emptyList() : aliases),
                 (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
-                this.bukkitCommandManager);
+                this.bukkitCommandManager
+        );
         this.registeredCommands.put(commandArgument, bukkitCommand);
-        this.commandMap.register(label,
-                                 this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
-                                 bukkitCommand);
+        this.commandMap.register(
+                label,
+                this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
+                bukkitCommand
+        );
         this.registerExternal(label, command, bukkitCommand);
         this.recognizedAliases.add(label);
 
@@ -115,10 +118,12 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                             Collections.emptyList(),
                             (Command<C>) command,
                             (CommandArgument<C, ?>) commandArgument,
-                            this.bukkitCommandManager);
+                            this.bukkitCommandManager
+                    );
                     this.commandMap.register(alias, this.bukkitCommandManager.getOwningPlugin()
-                                                                             .getName().toLowerCase(),
-                                             bukkitCommand);
+                                    .getName().toLowerCase(),
+                            bukkitCommand
+                    );
                     this.registerExternal(alias, command, aliasCommand);
                     this.recognizedAliases.add(alias);
                 }
@@ -138,9 +143,11 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         return this.recognizedAliases.contains(alias);
     }
 
-    protected void registerExternal(final @NonNull String label,
-                                    final @NonNull Command<?> command,
-                                    final @NonNull BukkitCommand<C> bukkitCommand) {
+    protected void registerExternal(
+            final @NonNull String label,
+            final @NonNull Command<?> command,
+            final @NonNull BukkitCommand<C> bukkitCommand
+    ) {
     }
 
 }

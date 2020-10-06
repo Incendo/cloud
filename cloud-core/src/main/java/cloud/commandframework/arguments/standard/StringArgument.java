@@ -40,14 +40,17 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
     private final StringMode stringMode;
 
-    private StringArgument(final boolean required,
-                           final @NonNull String name,
-                           final @NonNull StringMode stringMode,
-                           final @NonNull String defaultValue,
-                           final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                   @NonNull List<@NonNull String>> suggestionsProvider) {
+    private StringArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull StringMode stringMode,
+            final @NonNull String defaultValue,
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new StringParser<>(stringMode, suggestionsProvider),
-              defaultValue, String.class, suggestionsProvider);
+                defaultValue, String.class, suggestionsProvider
+        );
         this.stringMode = stringMode;
     }
 
@@ -81,8 +84,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, String> of(final @NonNull String name,
-                                                             final @NonNull StringMode stringMode) {
+    public static <C> @NonNull CommandArgument<C, String> of(
+            final @NonNull String name,
+            final @NonNull StringMode stringMode
+    ) {
         return StringArgument.<C>newBuilder(name).withMode(stringMode).asRequired().build();
     }
 
@@ -105,8 +110,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, String> optional(final @NonNull String name,
-                                                                   final @NonNull StringMode stringMode) {
+    public static <C> @NonNull CommandArgument<C, String> optional(
+            final @NonNull String name,
+            final @NonNull StringMode stringMode
+    ) {
         return StringArgument.<C>newBuilder(name).withMode(stringMode).asOptional().build();
     }
 
@@ -118,8 +125,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @param <C>           Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, String> optional(final @NonNull String name,
-                                                                   final @NonNull String defaultString) {
+    public static <C> @NonNull CommandArgument<C, String> optional(
+            final @NonNull String name,
+            final @NonNull String defaultString
+    ) {
         return StringArgument.<C>newBuilder(name).asOptionalWithDefault(defaultString).build();
     }
 
@@ -190,8 +199,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @param suggestionsProvider Suggestions provider
          * @return Builder instance
          */
-        public @NonNull Builder<C> withSuggestionsProvider(final @NonNull BiFunction<@NonNull CommandContext<C>,
-                @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
+        public @NonNull Builder<C> withSuggestionsProvider(
+                final @NonNull BiFunction<@NonNull CommandContext<C>,
+                        @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
+        ) {
             this.suggestionsProvider = suggestionsProvider;
             return this;
         }
@@ -204,7 +215,8 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         @Override
         public @NonNull StringArgument<C> build() {
             return new StringArgument<>(this.isRequired(), this.getName(), this.stringMode,
-                                        this.getDefaultValue(), this.suggestionsProvider);
+                    this.getDefaultValue(), this.suggestionsProvider
+            );
         }
 
     }
@@ -221,16 +233,20 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @param stringMode          String parsing mode
          * @param suggestionsProvider Suggestions provider
          */
-        public StringParser(final @NonNull StringMode stringMode,
-                            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                    @NonNull List<@NonNull String>> suggestionsProvider) {
+        public StringParser(
+                final @NonNull StringMode stringMode,
+                final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                        @NonNull List<@NonNull String>> suggestionsProvider
+        ) {
             this.stringMode = stringMode;
             this.suggestionsProvider = suggestionsProvider;
         }
 
         @Override
-        public @NonNull ArgumentParseResult<String> parse(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<String> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -294,8 +310,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             return this.suggestionsProvider.apply(commandContext, input);
         }
 
@@ -312,6 +330,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         public @NonNull StringMode getStringMode() {
             return this.stringMode;
         }
+
     }
 
 

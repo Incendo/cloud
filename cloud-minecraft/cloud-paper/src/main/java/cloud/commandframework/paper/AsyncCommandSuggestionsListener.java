@@ -52,16 +52,17 @@ class AsyncCommandSuggestionsListener<C> implements Listener {
         if (this.paperCommandManager.getCommandTree().getNamedNode(arguments[0]) == null) {
             return;
         }
-        @SuppressWarnings("unchecked")
-        final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
+        @SuppressWarnings("unchecked") final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
                 (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.getCommandRegistrationHandler();
         if (!bukkitPluginRegistrationHandler.isRecognized(arguments[0])) {
             return;
         }
         final CommandSender sender = event.getSender();
         final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
-        final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggest(cloudSender,
-                                                                                          event.getBuffer().substring(1)));
+        final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggest(
+                cloudSender,
+                event.getBuffer().substring(1)
+        ));
         event.setCompletions(suggestions);
         event.setHandled(true);
     }

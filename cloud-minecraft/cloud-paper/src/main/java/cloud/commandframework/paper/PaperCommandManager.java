@@ -50,11 +50,13 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
-    public PaperCommandManager(final @NonNull Plugin owningPlugin,
-                               final @NonNull Function<CommandTree<C>,
-                                       CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                               final @NonNull Function<CommandSender, C> commandSenderMapper,
-                               final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper) throws
+    public PaperCommandManager(
+            final @NonNull Plugin owningPlugin,
+            final @NonNull Function<CommandTree<C>,
+                    CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<CommandSender, C> commandSenderMapper,
+            final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper
+    ) throws
             Exception {
         super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
 
@@ -73,8 +75,10 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         } else {
             try {
                 final PaperBrigadierListener<C> brigadierListener = new PaperBrigadierListener<>(this);
-                Bukkit.getPluginManager().registerEvents(brigadierListener,
-                                                         this.getOwningPlugin());
+                Bukkit.getPluginManager().registerEvents(
+                        brigadierListener,
+                        this.getOwningPlugin()
+                );
                 this.setSplitAliases(true);
             } catch (final Throwable e) {
                 throw new BrigadierFailureException(BrigadierFailureReason.PAPER_BRIGADIER_INITIALIZATION_FAILURE, e);

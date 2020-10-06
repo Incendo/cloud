@@ -41,13 +41,15 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     private final double min;
     private final double max;
 
-    private DoubleArgument(final boolean required,
-                           final @NonNull String name,
-                           final double min,
-                           final double max,
-                           final String defaultValue,
-                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                   @NonNull List<@NonNull String>> suggestionsProvider) {
+    private DoubleArgument(
+            final boolean required,
+            final @NonNull String name,
+            final double min,
+            final double max,
+            final String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class, suggestionsProvider);
         this.min = min;
         this.max = max;
@@ -94,8 +96,10 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Double> optional(final @NonNull String name,
-                                                                   final double defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Double> optional(
+            final @NonNull String name,
+            final double defaultNum
+    ) {
         return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(Double.toString(defaultNum)).build();
     }
 
@@ -156,7 +160,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         @Override
         public @NonNull DoubleArgument<C> build() {
             return new DoubleArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                                        this.getDefaultValue(), this.getSuggestionsProvider());
+                    this.getDefaultValue(), this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -180,7 +185,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         @Override
         public @NonNull ArgumentParseResult<Double> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue) {
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));

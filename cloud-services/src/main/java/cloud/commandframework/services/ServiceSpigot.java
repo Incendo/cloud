@@ -23,10 +23,10 @@
 //
 package cloud.commandframework.services;
 
-import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.services.types.Service;
 import cloud.commandframework.services.types.SideEffectService;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.LinkedList;
@@ -45,9 +45,11 @@ public final class ServiceSpigot<Context, Result> {
     private final ServicePipeline pipeline;
     private final ServiceRepository<Context, Result> repository;
 
-    ServiceSpigot(final @NonNull ServicePipeline pipeline,
-                  final @NonNull Context context,
-                  final @NonNull TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type) {
+    ServiceSpigot(
+            final @NonNull ServicePipeline pipeline,
+            final @NonNull Context context,
+            final @NonNull TypeToken<? extends Service<@NonNull Context, @NonNull Result>> type
+    ) {
         this.context = context;
         this.pipeline = pipeline;
         this.repository = pipeline.getRepository(type);
@@ -71,7 +73,7 @@ public final class ServiceSpigot<Context, Result> {
      *                               PipelineException}. Use {@link PipelineException#getCause()} to
      *                               get the exception that was thrown.
      * @see PipelineException PipelineException wraps exceptions thrown during filtering and result
-     * retrieval
+     *         retrieval
      */
     @SuppressWarnings("unchecked")
     public @NonNull Result getResult()

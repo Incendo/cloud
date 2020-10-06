@@ -48,7 +48,7 @@ public interface CommandRegistrationHandler {
      *
      * @param command Command to register
      * @return {@code true} if the command was registered successfully,
-     * else {@code false}
+     *         else {@code false}
      */
     boolean registerCommand(@NonNull Command<?> command);
 

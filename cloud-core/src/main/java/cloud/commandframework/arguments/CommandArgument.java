@@ -23,13 +23,13 @@
 //
 package cloud.commandframework.arguments;
 
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import io.leangen.geantyref.TypeToken;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.context.CommandContext;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -99,12 +99,14 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param valueType           Type produced by the parser
      * @param suggestionsProvider Suggestions provider
      */
-    public CommandArgument(final boolean required,
-                           final @NonNull String name,
-                           final @NonNull ArgumentParser<C, T> parser,
-                           final @NonNull String defaultValue,
-                           final @NonNull TypeToken<T> valueType,
-                           final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider) {
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @NonNull TypeToken<T> valueType,
+            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+    ) {
         this.required = required;
         this.name = Objects.requireNonNull(name, "Name may not be null");
         if (!NAME_PATTERN.asPredicate().test(name)) {
@@ -114,8 +116,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         this.defaultValue = defaultValue;
         this.valueType = valueType;
         this.suggestionsProvider = suggestionsProvider == null
-                                   ? buildDefaultSuggestionsProvider(this)
-                                   : suggestionsProvider;
+                ? buildDefaultSuggestionsProvider(this)
+                : suggestionsProvider;
     }
 
     /**
@@ -128,13 +130,15 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param valueType           Type produced by the parser
      * @param suggestionsProvider Suggestions provider
      */
-    public CommandArgument(final boolean required,
-                           final @NonNull String name,
-                           final @NonNull ArgumentParser<C, T> parser,
-                           final @NonNull String defaultValue,
-                           final @NonNull Class<T> valueType,
-                           final @Nullable BiFunction<@NonNull CommandContext<C>,
-                                   @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @NonNull Class<T> valueType,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         this(required, name, parser, defaultValue, TypeToken.get(valueType), suggestionsProvider);
     }
 
@@ -146,10 +150,12 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param parser    The argument parser
      * @param valueType Type produced by the parser
      */
-    public CommandArgument(final boolean required,
-                           final @NonNull String name,
-                           final @NonNull ArgumentParser<C, T> parser,
-                           final @NonNull Class<T> valueType) {
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull Class<T> valueType
+    ) {
         this(required, name, parser, "", valueType, null);
     }
 
@@ -167,8 +173,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param <T>   Argument Type. Used to make the compiler happy.
      * @return Argument builder
      */
-    public static <C, T> CommandArgument.@NonNull Builder<C, T> ofType(final @NonNull TypeToken<T> clazz,
-                                                                       final @NonNull String name) {
+    public static <C, T> CommandArgument.@NonNull Builder<C, T> ofType(
+            final @NonNull TypeToken<T> clazz,
+            final @NonNull String name
+    ) {
         return new Builder<>(clazz, name);
     }
 
@@ -181,8 +189,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param <T>   Argument Type. Used to make the compiler happy.
      * @return Argument builder
      */
-    public static <C, T> CommandArgument.@NonNull Builder<@NonNull C, @NonNull T> ofType(final @NonNull Class<T> clazz,
-                                                                                         final @NonNull String name) {
+    public static <C, T> CommandArgument.@NonNull Builder<@NonNull C, @NonNull T> ofType(
+            final @NonNull Class<T> clazz,
+            final @NonNull String name
+    ) {
         return new Builder<>(TypeToken.get(clazz), name);
     }
 
@@ -366,14 +376,18 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         private String defaultValue = "";
         private BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider;
 
-        protected Builder(final @NonNull TypeToken<T> valueType,
-                          final @NonNull String name) {
+        protected Builder(
+                final @NonNull TypeToken<T> valueType,
+                final @NonNull String name
+        ) {
             this.valueType = valueType;
             this.name = name;
         }
 
-        protected Builder(final @NonNull Class<T> valueType,
-                          final @NonNull String name) {
+        protected Builder(
+                final @NonNull Class<T> valueType,
+                final @NonNull String name
+        ) {
             this(TypeToken.get(valueType), name);
         }
 
@@ -452,7 +466,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
          */
         public @NonNull Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
-                        @NonNull String, @NonNull List<String>> suggestionsProvider) {
+                        @NonNull String, @NonNull List<String>> suggestionsProvider
+        ) {
             this.suggestionsProvider = suggestionsProvider;
             return this;
         }
@@ -465,7 +480,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         public @NonNull CommandArgument<@NonNull C, @NonNull T> build() {
             if (this.parser == null && this.manager != null) {
                 this.parser = this.manager.getParserRegistry().createParser(valueType, ParserParameters.empty())
-                                          .orElse(null);
+                        .orElse(null);
             }
             if (this.parser == null) {
                 this.parser = (c, i) -> ArgumentParseResult
@@ -475,7 +490,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
                 this.suggestionsProvider = new DelegatingSuggestionsProvider<>(this.name, this.parser);
             }
             return new CommandArgument<>(this.required, this.name, this.parser,
-                                         this.defaultValue, this.valueType, this.suggestionsProvider);
+                    this.defaultValue, this.valueType, this.suggestionsProvider
+            );
         }
 
         protected final @NonNull String getName() {

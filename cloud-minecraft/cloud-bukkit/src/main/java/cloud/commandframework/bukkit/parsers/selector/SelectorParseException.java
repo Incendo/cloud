@@ -54,4 +54,5 @@ public final class SelectorParseException extends IllegalArgumentException {
     public String getMessage() {
         return String.format("Selector '%s' is malformed.", input);
     }
+
 }

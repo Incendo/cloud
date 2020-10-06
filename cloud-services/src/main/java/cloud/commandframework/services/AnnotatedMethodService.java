@@ -40,58 +40,61 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
     private final Method method;
     private final Object instance;
 
-    AnnotatedMethodService(final @NonNull Object instance,
-                           final @NonNull Method method)
-        throws Exception {
-      ExecutionOrder executionOrder = ExecutionOrder.SOON;
-      try {
-        final Order order = method.getAnnotation(Order.class);
-        if (order != null) {
-          executionOrder = order.value();
+    AnnotatedMethodService(
+            final @NonNull Object instance,
+            final @NonNull Method method
+    )
+            throws Exception {
+        ExecutionOrder executionOrder = ExecutionOrder.SOON;
+        try {
+            final Order order = method.getAnnotation(Order.class);
+            if (order != null) {
+                executionOrder = order.value();
+            }
+        } catch (final Exception ignored) {
         }
-      } catch (final Exception ignored) {
-      }
-      this.instance = instance;
-      this.executionOrder = executionOrder;
-      method.setAccessible(true);
-      this.methodHandle = MethodHandles.lookup().unreflect(method);
-      this.method = method;
+        this.instance = instance;
+        this.executionOrder = executionOrder;
+        method.setAccessible(true);
+        this.methodHandle = MethodHandles.lookup().unreflect(method);
+        this.method = method;
     }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public @Nullable Result handle(final @NonNull Context context) {
-    try {
-      return (Result) this.methodHandle.invoke(this.instance, context);
-    } catch (final Throwable throwable) {
-      new IllegalStateException(String
-          .format("Failed to call method service implementation '%s' in class '%s'",
-              method.getName(), instance.getClass().getCanonicalName()), throwable)
-          .printStackTrace();
+    @Override
+    @SuppressWarnings("unchecked")
+    public @Nullable Result handle(final @NonNull Context context) {
+        try {
+            return (Result) this.methodHandle.invoke(this.instance, context);
+        } catch (final Throwable throwable) {
+            new IllegalStateException(String
+                    .format("Failed to call method service implementation '%s' in class '%s'",
+                            method.getName(), instance.getClass().getCanonicalName()
+                    ), throwable)
+                    .printStackTrace();
+        }
+        return null;
     }
-    return null;
-  }
 
-  @Override
-  public @NonNull ExecutionOrder order() {
-    return this.executionOrder;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
+    @Override
+    public @NonNull ExecutionOrder order() {
+        return this.executionOrder;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    final AnnotatedMethodService<?, ?> that = (AnnotatedMethodService<?, ?>) o;
-    return Objects.equals(this.methodHandle, that.methodHandle);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.methodHandle);
-  }
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final AnnotatedMethodService<?, ?> that = (AnnotatedMethodService<?, ?>) o;
+        return Objects.equals(this.methodHandle, that.methodHandle);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.methodHandle);
+    }
 
 }

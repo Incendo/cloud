@@ -34,4 +34,5 @@ public class JDAPrivateSender extends JDACommandSender {
     JDAPrivateSender(final @NonNull MessageReceivedEvent event) {
         super(event);
     }
+
 }

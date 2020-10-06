@@ -36,18 +36,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @FunctionalInterface
 public interface SideEffectService<Context> extends Service<Context, State> {
 
-  /**
-   * Consumes the context, if possible. Returns {@link State#ACCEPTED} if the input was consumed,
-   * else {@link State#REJECTED}
-   *
-   * @param context context used in the generation of the response
-   * @return Response. If the response isn't {@link State#ACCEPTED}, the next service in the service
-   * chain will get to act on the context. Otherwise the execution halts, and the provided response
-   * is the final response.
-   * @throws Exception Any exception that occurs during the handling can be thrown, and will be
-   *                   wrapped by a {@link cloud.commandframework.services.PipelineException}
-   */
-  @Override
-  @NonNull State handle(@NonNull Context context) throws Exception;
+    /**
+     * Consumes the context, if possible. Returns {@link State#ACCEPTED} if the input was consumed,
+     * else {@link State#REJECTED}
+     *
+     * @param context context used in the generation of the response
+     * @return Response. If the response isn't {@link State#ACCEPTED}, the next service in the service
+     *         chain will get to act on the context. Otherwise the execution halts, and the provided response
+     *         is the final response.
+     * @throws Exception Any exception that occurs during the handling can be thrown, and will be
+     *                   wrapped by a {@link cloud.commandframework.services.PipelineException}
+     */
+    @Override
+    @NonNull State handle(@NonNull Context context) throws Exception;
 
 }

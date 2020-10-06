@@ -44,9 +44,11 @@ public final class NoSuchCommandException extends CommandParseException {
      * @param currentChain  Chain leading up to the exception
      * @param command       Entered command (following the command chain)
      */
-    public NoSuchCommandException(final @NonNull Object commandSender,
-                                  final @NonNull List<CommandArgument<?, ?>> currentChain,
-                                  final @NonNull String command) {
+    public NoSuchCommandException(
+            final @NonNull Object commandSender,
+            final @NonNull List<CommandArgument<?, ?>> currentChain,
+            final @NonNull String command
+    ) {
         super(commandSender, currentChain);
         this.suppliedCommand = command;
     }

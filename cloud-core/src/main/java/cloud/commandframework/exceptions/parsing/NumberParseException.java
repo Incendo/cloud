@@ -38,9 +38,11 @@ public abstract class NumberParseException extends IllegalArgumentException {
      * @param min   Maximum value
      * @param max   Minimum value
      */
-    public NumberParseException(final @NonNull String input,
-                                final @NonNull Number min,
-                                final @NonNull Number max) {
+    public NumberParseException(
+            final @NonNull String input,
+            final @NonNull Number min,
+            final @NonNull Number max
+    ) {
         this.input = input;
         this.min = min;
         this.max = max;

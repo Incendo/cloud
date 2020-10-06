@@ -42,9 +42,11 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @param requiredSender The sender type that is required
      * @param currentChain   Chain leading up to the exception
      */
-    public InvalidCommandSenderException(final @NonNull Object commandSender,
-                                         final @NonNull Class<?> requiredSender,
-                                         final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain) {
+    public InvalidCommandSenderException(
+            final @NonNull Object commandSender,
+            final @NonNull Class<?> requiredSender,
+            final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain
+    ) {
         super(commandSender, currentChain);
         this.requiredSender = requiredSender;
     }
@@ -60,8 +62,11 @@ public final class InvalidCommandSenderException extends CommandParseException {
 
     @Override
     public String getMessage() {
-        return String.format("%s is not allowed to execute that command. Must be of type %s",
-                             getCommandSender().getClass().getSimpleName(),
-                             requiredSender.getSimpleName());
+        return String.format(
+                "%s is not allowed to execute that command. Must be of type %s",
+                getCommandSender().getClass().getSimpleName(),
+                requiredSender.getSimpleName()
+        );
     }
+
 }

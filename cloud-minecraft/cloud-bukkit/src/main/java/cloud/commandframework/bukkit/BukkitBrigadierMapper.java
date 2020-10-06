@@ -61,8 +61,10 @@ public final class BukkitBrigadierMapper<C> {
      * @param commandManager   The {@link BukkitCommandManager} to use for mapping
      * @param brigadierManager The {@link CloudBrigadierManager} to use for mapping
      */
-    public BukkitBrigadierMapper(final @NonNull BukkitCommandManager<C> commandManager,
-                                 final @NonNull CloudBrigadierManager brigadierManager) {
+    public BukkitBrigadierMapper(
+            final @NonNull BukkitCommandManager<C> commandManager,
+            final @NonNull CloudBrigadierManager brigadierManager
+    ) {
         this.commandManager = commandManager;
         this.brigadierManager = brigadierManager;
 
@@ -90,8 +92,8 @@ public final class BukkitBrigadierMapper<C> {
             this.mapComplexNMS(MultiplePlayerSelector.class, this.getEntitySelectorArgument(false, true));
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin()
-                               .getLogger()
-                               .log(Level.WARNING, "Failed to map Bukkit types to NMS argument types", e);
+                    .getLogger()
+                    .log(Level.WARNING, "Failed to map Bukkit types to NMS argument types", e);
         }
     }
 
@@ -100,8 +102,10 @@ public final class BukkitBrigadierMapper<C> {
      * @param playersOnly Whether the selector is for players only (true), or for all entities (false)
      * @return The NMS ArgumentType
      */
-    private Supplier<ArgumentType<?>> getEntitySelectorArgument(final boolean single,
-                                                                final boolean playersOnly) {
+    private Supplier<ArgumentType<?>> getEntitySelectorArgument(
+            final boolean single,
+            final boolean playersOnly
+    ) {
         return () -> {
             try {
                 final Constructor<?> constructor = this.getNMSArgument("Entity").getDeclaredConstructors()[0];
@@ -132,8 +136,10 @@ public final class BukkitBrigadierMapper<C> {
      * @param type        Type to map
      * @param constructor Constructor that construct the NMS argument type
      */
-    public void mapSimpleNMS(final @NonNull Class<?> type,
-                             final @NonNull Constructor<?> constructor) {
+    public void mapSimpleNMS(
+            final @NonNull Class<?> type,
+            final @NonNull Constructor<?> constructor
+    ) {
         try {
             this.brigadierManager.registerDefaultArgumentTypeSupplier(type, () -> {
                 try {
@@ -145,9 +151,11 @@ public final class BukkitBrigadierMapper<C> {
             });
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin()
-                               .getLogger()
-                               .warning(String.format("Failed to map '%s' to a Mojang serializable argument type",
-                                                      type.getCanonicalName()));
+                    .getLogger()
+                    .warning(String.format(
+                            "Failed to map '%s' to a Mojang serializable argument type",
+                            type.getCanonicalName()
+                    ));
         }
     }
 
@@ -157,15 +165,20 @@ public final class BukkitBrigadierMapper<C> {
      * @param type                 Type to map
      * @param argumentTypeSupplier Supplier of the NMS argument type
      */
-    public void mapComplexNMS(final @NonNull Class<?> type,
-                              final @NonNull Supplier<ArgumentType<?>> argumentTypeSupplier) {
+    public void mapComplexNMS(
+            final @NonNull Class<?> type,
+            final @NonNull Supplier<ArgumentType<?>> argumentTypeSupplier
+    ) {
         try {
             this.brigadierManager.registerDefaultArgumentTypeSupplier(type, argumentTypeSupplier);
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin()
-                               .getLogger()
-                               .warning(String.format("Failed to map '%s' to a Mojang serializable argument type",
-                                                      type.getCanonicalName()));
+                    .getLogger()
+                    .warning(String.format(
+                            "Failed to map '%s' to a Mojang serializable argument type",
+                            type.getCanonicalName()
+                    ));
         }
     }
+
 }

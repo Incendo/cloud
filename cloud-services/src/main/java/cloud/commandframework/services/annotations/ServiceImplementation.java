@@ -45,10 +45,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServiceImplementation {
 
-  /**
+    /**
      * The service class that the method implements
      *
      * @return Service to implement
      */
     Class<? extends Service<?, ?>> value();
+
 }

@@ -31,6 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Wrapper for {@link MessageReceivedEvent}
  */
 public class JDACommandSender {
+
     private final MessageReceivedEvent event;
 
     /**
@@ -40,15 +41,6 @@ public class JDACommandSender {
      */
     public JDACommandSender(final @NonNull MessageReceivedEvent event) {
         this.event = event;
-    }
-
-    /**
-     * Get the {@link MessageReceivedEvent}
-     *
-     * @return Message Received Event
-     */
-    public @NonNull MessageReceivedEvent getEvent() {
-        return event;
     }
 
     /**
@@ -64,4 +56,14 @@ public class JDACommandSender {
 
         return new JDAGuildSender(event);
     }
+
+    /**
+     * Get the {@link MessageReceivedEvent}
+     *
+     * @return Message Received Event
+     */
+    public @NonNull MessageReceivedEvent getEvent() {
+        return event;
+    }
+
 }

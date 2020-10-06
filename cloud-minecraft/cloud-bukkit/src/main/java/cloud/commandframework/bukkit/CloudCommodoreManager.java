@@ -49,7 +49,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             throws BukkitCommandManager.BrigadierFailureException {
         if (!CommodoreProvider.isSupported()) {
             throw new BukkitCommandManager.BrigadierFailureException(BukkitCommandManager
-                                                                             .BrigadierFailureReason.COMMODORE_NOT_PRESENT);
+                    .BrigadierFailureReason.COMMODORE_NOT_PRESENT);
         }
         this.commandManager = commandManager;
         this.commodore = CommodoreProvider.getCommodore(commandManager.getOwningPlugin());
@@ -59,21 +59,27 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     }
 
     @Override
-    protected void registerExternal(final @NonNull String label,
-                                    final @NonNull Command<?> command,
-                                    final @NonNull BukkitCommand<C> bukkitCommand) {
+    protected void registerExternal(
+            final @NonNull String label,
+            final @NonNull Command<?> command,
+            final @NonNull BukkitCommand<C> bukkitCommand
+    ) {
         this.registerWithCommodore(label, command);
         this.registerWithCommodore(String.format("%s:%s", bukkitCommand.getPlugin().getName(), label).toLowerCase(), command);
     }
 
-    private void registerWithCommodore(final @NonNull String label,
-                                       final @NonNull Command<?> command) {
+    private void registerWithCommodore(
+            final @NonNull String label,
+            final @NonNull Command<?> command
+    ) {
         final com.mojang.brigadier.Command<?> cmd = o -> 1;
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
                 .<Object>createLiteralCommandNode(label, command, (o, p) -> {
                     final CommandSender sender = this.commodore.getBukkitSender(o);
-                    return this.commandManager.hasPermission(this.commandManager.getCommandSenderMapper().apply(sender),
-                                                             (CommandPermission) p);
+                    return this.commandManager.hasPermission(
+                            this.commandManager.getCommandSenderMapper().apply(sender),
+                            (CommandPermission) p
+                    );
                 }, false, cmd);
         final CommandNode existingNode = this.commodore.getDispatcher().findNode(Collections.singletonList(label));
         if (existingNode != null) {

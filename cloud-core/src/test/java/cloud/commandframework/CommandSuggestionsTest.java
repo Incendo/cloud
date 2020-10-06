@@ -45,38 +45,40 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("test").literal("one").build());
         manager.command(manager.commandBuilder("test").literal("two").build());
         manager.command(manager.commandBuilder("test")
-                               .literal("var")
-                               .argument(StringArgument.<TestCommandSender>newBuilder("str")
-                                                 .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two")))
-                               .argument(EnumArgument.of(TestEnum.class, "enum")));
+                .literal("var")
+                .argument(StringArgument.<TestCommandSender>newBuilder("str")
+                        .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two")))
+                .argument(EnumArgument.of(TestEnum.class, "enum")));
         manager.command(manager.commandBuilder("test")
-                               .literal("comb")
-                               .argument(StringArgument.<TestCommandSender>newBuilder("str")
-                                                 .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two")))
-                               .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
-                                                 .withMin(1).withMax(95).asOptional()));
+                .literal("comb")
+                .argument(StringArgument.<TestCommandSender>newBuilder("str")
+                        .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two")))
+                .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
+                        .withMin(1).withMax(95).asOptional()));
         manager.command(manager.commandBuilder("test")
-                               .literal("alt")
-                               .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
-                                                 .withSuggestionsProvider((c, s) -> Arrays.asList("3", "33", "333"))));
+                .literal("alt")
+                .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
+                        .withSuggestionsProvider((c, s) -> Arrays.asList("3", "33", "333"))));
 
         manager.command(manager.commandBuilder("com")
-                               .argumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
-                                             Description.empty())
-                               .argument(IntegerArgument.of("int")));
+                .argumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
+                        Description.empty()
+                )
+                .argument(IntegerArgument.of("int")));
 
         manager.command(manager.commandBuilder("com2")
-                               .argumentPair("com", Pair.of("x", "enum"),
-                                             Pair.of(Integer.class, TestEnum.class), Description.empty()));
+                .argumentPair("com", Pair.of("x", "enum"),
+                        Pair.of(Integer.class, TestEnum.class), Description.empty()
+                ));
 
         manager.command(manager.commandBuilder("flags")
-                               .argument(IntegerArgument.of("num"))
-                               .flag(manager.flagBuilder("enum")
-                                            .withArgument(EnumArgument.of(TestEnum.class, "enum"))
-                                            .build())
-                               .flag(manager.flagBuilder("static")
-                                            .build())
-                               .build());
+                .argument(IntegerArgument.of("num"))
+                .flag(manager.flagBuilder("enum")
+                        .withArgument(EnumArgument.of(TestEnum.class, "enum"))
+                        .build())
+                .flag(manager.flagBuilder("static")
+                        .build())
+                .build());
     }
 
     @Test

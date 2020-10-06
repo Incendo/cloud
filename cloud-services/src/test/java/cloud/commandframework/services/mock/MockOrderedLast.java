@@ -29,9 +29,9 @@ import cloud.commandframework.services.annotations.Order;
 @Order(ExecutionOrder.LAST)
 public class MockOrderedLast implements MockService {
 
-  @Override
-  public MockResult handle(final MockContext mockContext) {
-    return new MockResult(2);
-  }
+    @Override
+    public MockResult handle(final MockContext mockContext) {
+        return new MockResult(2);
+    }
 
 }

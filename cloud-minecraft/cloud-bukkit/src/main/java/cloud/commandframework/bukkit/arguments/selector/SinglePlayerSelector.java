@@ -37,8 +37,10 @@ public final class SinglePlayerSelector extends MultiplePlayerSelector {
      * @param selector The input string used to create this selector
      * @param entities The List of Bukkit {@link Entity entities} to construct the {@link EntitySelector} from
      */
-    public SinglePlayerSelector(final @NonNull String selector,
-                                final @NonNull List<@NonNull Entity> entities) {
+    public SinglePlayerSelector(
+            final @NonNull String selector,
+            final @NonNull List<@NonNull Entity> entities
+    ) {
         super(selector, entities);
         if (getPlayers().size() > 1) {
             throw new IllegalArgumentException("More than 1 player selected in single player selector.");

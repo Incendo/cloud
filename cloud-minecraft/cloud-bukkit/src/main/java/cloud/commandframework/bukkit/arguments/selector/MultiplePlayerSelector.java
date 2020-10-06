@@ -42,8 +42,10 @@ public class MultiplePlayerSelector extends MultipleEntitySelector {
      * @param selector The input string used to create this selector
      * @param entities The List of Bukkit {@link Entity}s to construct the {@link EntitySelector} from
      */
-    public MultiplePlayerSelector(final @NonNull String selector,
-                                  final @NonNull List<@NonNull Entity> entities) {
+    public MultiplePlayerSelector(
+            final @NonNull String selector,
+            final @NonNull List<@NonNull Entity> entities
+    ) {
         super(selector, entities);
         entities.forEach(e -> {
             if (e.getType() != EntityType.PLAYER) {

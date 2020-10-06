@@ -29,24 +29,24 @@ public interface MockService extends Service<MockService.MockContext, MockServic
 
     class MockContext {
 
-      private final String string;
-      private String state = "";
+        private final String string;
+        private String state = "";
 
-      public MockContext( final String string) {
-        this.string = string;
-      }
+        public MockContext(final String string) {
+            this.string = string;
+        }
 
-      public String getString() {
-        return this.string;
-      }
+        public String getString() {
+            return this.string;
+        }
 
-      public String getState() {
-        return this.state;
-      }
+        public String getState() {
+            return this.state;
+        }
 
-      public void setState( final String state) {
-        this.state = state;
-      }
+        public void setState(final String state) {
+            this.state = state;
+        }
 
     }
 

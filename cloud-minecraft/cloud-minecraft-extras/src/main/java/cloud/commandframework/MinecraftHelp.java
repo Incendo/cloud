@@ -73,9 +73,11 @@ public final class MinecraftHelp<C> {
      * @param audienceProvider Provider that maps the command sender type to {@link Audience}
      * @param commandManager   Command manager instance
      */
-    public MinecraftHelp(final @NonNull String commandPrefix,
-                         final @NonNull AudienceProvider<C> audienceProvider,
-                         final @NonNull CommandManager<C> commandManager) {
+    public MinecraftHelp(
+            final @NonNull String commandPrefix,
+            final @NonNull AudienceProvider<C> audienceProvider,
+            final @NonNull CommandManager<C> commandManager
+    ) {
         this.commandPrefix = commandPrefix;
         this.audienceProvider = audienceProvider;
         this.commandManager = commandManager;
@@ -85,9 +87,9 @@ public final class MinecraftHelp<C> {
         this.messageMap.put(MESSAGE_QUERY_QUERY, "<gray>Showing search results for query: \"<green>/<query></green>\"</gray>");
         this.messageMap.put(MESSAGE_QUERY_AVAILABLE_COMMANDS, "<dark_gray>└─</dark_gray><gray> Available Commands:</gray>");
         this.messageMap.put(MESSAGE_QUERY_COMMAND_SYNTAX, "<dark_gray>   ├─</dark_gray> <green>"
-        + "<click:run_command:cmdprefix><hover:show_text:\"<gray><description></gray>\">/<command></hover></click></green>");
+                + "<click:run_command:cmdprefix><hover:show_text:\"<gray><description></gray>\">/<command></hover></click></green>");
         this.messageMap.put(MESSAGE_QUERY_COMMAND_SYNTAX_LAST, "<dark_gray>   └─</dark_gray> <green>"
-        + "<click:run_command:cmdprefix><hover:show_text:\"<gray><description></gray>\">/<command></hover></click></green>");
+                + "<click:run_command:cmdprefix><hover:show_text:\"<gray><description></gray>\">/<command></hover></click></green>");
         this.messageMap.put(MESSAGE_QUERY_LONGEST_PATH, "<dark_gray>└─</dark_gray> <green>/<command></green>");
         this.messageMap.put(MESSAGE_QUERY_SUGGESTION, "<dark_gray><indentation><prefix></dark_gray> <green><click:run_command:"
                 + "<cmdprefix>><hover:show_text:\"<gray>Click to show help for this command</gray>\">"
@@ -138,8 +140,10 @@ public final class MinecraftHelp<C> {
      * @param key     Message key
      * @param message Message
      */
-    public void setMessage(final @NonNull String key,
-                           final @NonNull String message) {
+    public void setMessage(
+            final @NonNull String key,
+            final @NonNull String message
+    ) {
         this.messageMap.put(key, message);
     }
 
@@ -149,19 +153,25 @@ public final class MinecraftHelp<C> {
      * @param query     Command query (without leading '/')
      * @param recipient Recipient
      */
-    public void queryCommands(final @NonNull String query,
-                              final @NonNull C recipient) {
+    public void queryCommands(
+            final @NonNull String query,
+            final @NonNull C recipient
+    ) {
         final Audience audience = this.getAudience(recipient);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_HEADER)));
         this.printTopic(recipient, query, this.commandManager.getCommandHelpHandler().queryHelp(recipient, query));
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_FOOTER)));
     }
 
-    private void printTopic(final @NonNull C sender,
-                            final @NonNull String query,
-                            final CommandHelpHandler.@NonNull HelpTopic<C> helpTopic) {
-        this.getAudience(sender).sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_QUERY),
-                                                                    Template.of("query", query)));
+    private void printTopic(
+            final @NonNull C sender,
+            final @NonNull String query,
+            final CommandHelpHandler.@NonNull HelpTopic<C> helpTopic
+    ) {
+        this.getAudience(sender).sendMessage(this.miniMessage.parse(
+                this.messageMap.get(MESSAGE_QUERY_QUERY),
+                Template.of("query", query)
+        ));
         if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
             this.printIndexHelpTopic(sender, (CommandHelpHandler.IndexHelpTopic<C>) helpTopic);
         } else if (helpTopic instanceof CommandHelpHandler.MultiHelpTopic) {
@@ -173,8 +183,10 @@ public final class MinecraftHelp<C> {
         }
     }
 
-    private void printIndexHelpTopic(final @NonNull C sender,
-                                     final CommandHelpHandler.@NonNull IndexHelpTopic<C> helpTopic) {
+    private void printIndexHelpTopic(
+            final @NonNull C sender,
+            final CommandHelpHandler.@NonNull IndexHelpTopic<C> helpTopic
+    ) {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_AVAILABLE_COMMANDS)));
         final Iterator<CommandHelpHandler.VerboseHelpEntry<C>> iterator = helpTopic.getEntries().iterator();
@@ -182,30 +194,34 @@ public final class MinecraftHelp<C> {
             final CommandHelpHandler.VerboseHelpEntry<C> entry = iterator.next();
 
             final String description = entry.getDescription().isEmpty() ? "Click to show help for this command"
-                                                                        : entry.getDescription();
+                    : entry.getDescription();
 
             String message = this.messageMap.get(iterator.hasNext() ? MESSAGE_QUERY_COMMAND_SYNTAX
-                                                                    : MESSAGE_QUERY_COMMAND_SYNTAX_LAST);
+                    : MESSAGE_QUERY_COMMAND_SYNTAX_LAST);
 
             final String suggestedCommand = entry.getSyntaxString()
-                                                 .replace("<", "")
-                                                 .replace(">", "")
-                                                 .replace("[", "")
-                                                 .replace("]", "");
+                    .replace("<", "")
+                    .replace(">", "")
+                    .replace("[", "")
+                    .replace("]", "");
 
             message = message.replace("<command>", entry.getSyntaxString())
-                             .replace("<description>", description)
-                             .replace("cmdprefix", this.commandPrefix + ' ' + suggestedCommand);
+                    .replace("<description>", description)
+                    .replace("cmdprefix", this.commandPrefix + ' ' + suggestedCommand);
 
             audience.sendMessage(this.miniMessage.parse(message));
         }
     }
 
-    private void printMultiHelpTopic(final @NonNull C sender,
-                                     final CommandHelpHandler.@NonNull MultiHelpTopic<C> helpTopic) {
+    private void printMultiHelpTopic(
+            final @NonNull C sender,
+            final CommandHelpHandler.@NonNull MultiHelpTopic<C> helpTopic
+    ) {
         final Audience audience = this.getAudience(sender);
-        audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_LONGEST_PATH),
-                                                    Template.of("command", helpTopic.getLongestPath())));
+        audience.sendMessage(this.miniMessage.parse(
+                this.messageMap.get(MESSAGE_QUERY_LONGEST_PATH),
+                Template.of("command", helpTopic.getLongestPath())
+        ));
         final int headerIndentation = helpTopic.getLongestPath().length();
         final Iterator<String> iterator = helpTopic.getChildSuggestions().iterator();
         while (iterator.hasNext()) {
@@ -224,27 +240,35 @@ public final class MinecraftHelp<C> {
             }
 
             final String suggestedCommand = suggestion.replace("<", "")
-                                                      .replace(">", "")
-                                                      .replace("[", "")
-                                                      .replace("]", "");
+                    .replace(">", "")
+                    .replace("[", "")
+                    .replace("]", "");
 
-            audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_SUGGESTION),
-                                                        Template.of("indentation", indentation.toString()),
-                                                        Template.of("prefix", prefix),
-                                                        Template.of("suggestion", suggestion),
-                                                        Template.of("cmdprefix", this.commandPrefix + ' ' + suggestedCommand)));
+            audience.sendMessage(this.miniMessage.parse(
+                    this.messageMap.get(MESSAGE_QUERY_SUGGESTION),
+                    Template.of("indentation", indentation.toString()),
+                    Template.of("prefix", prefix),
+                    Template.of("suggestion", suggestion),
+                    Template.of("cmdprefix", this.commandPrefix + ' ' + suggestedCommand)
+            ));
         }
     }
 
-    private void printVerboseHelpTopic(final @NonNull C sender,
-                                       final CommandHelpHandler.@NonNull VerboseHelpTopic<C> helpTopic) {
+    private void printVerboseHelpTopic(
+            final @NonNull C sender,
+            final CommandHelpHandler.@NonNull VerboseHelpTopic<C> helpTopic
+    ) {
         final Audience audience = this.getAudience(sender);
         final String command = this.commandManager.getCommandSyntaxFormatter()
-                                                  .apply(helpTopic.getCommand().getArguments(), null);
-        audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_VERBOSE_SYNTAX),
-                                                    Template.of("command", command)));
-        audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_VERBOSE_DESCRIPTION),
-                                                    Template.of("description", helpTopic.getDescription())));
+                .apply(helpTopic.getCommand().getArguments(), null);
+        audience.sendMessage(this.miniMessage.parse(
+                this.messageMap.get(MESSAGE_QUERY_VERBOSE_SYNTAX),
+                Template.of("command", command)
+        ));
+        audience.sendMessage(this.miniMessage.parse(
+                this.messageMap.get(MESSAGE_QUERY_VERBOSE_DESCRIPTION),
+                Template.of("description", helpTopic.getDescription())
+        ));
         audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_VERBOSE_ARGS)));
 
         final Iterator<CommandArgument<C, ?>> iterator = helpTopic.getCommand().getArguments().iterator();
@@ -262,7 +286,7 @@ public final class MinecraftHelp<C> {
             }
 
             String syntax = this.commandManager.getCommandSyntaxFormatter()
-                                               .apply(Collections.singletonList(argument), null);
+                    .apply(Collections.singletonList(argument), null);
 
             if (argument instanceof StaticArgument) {
                 syntax = this.messageMap.get(MESSAGE_QUERY_VERBOSE_LITERAL).replace("<syntax>", syntax);
@@ -278,10 +302,12 @@ public final class MinecraftHelp<C> {
                 message = this.messageMap.get(MESSAGE_QUERY_VERBOSE_OPTIONAL);
             }
 
-            audience.sendMessage(this.miniMessage.parse(message,
-                                                        Template.of("prefix", prefix),
-                                                        Template.of("syntax", syntax),
-                                                        Template.of("description", description)));
+            audience.sendMessage(this.miniMessage.parse(
+                    message,
+                    Template.of("prefix", prefix),
+                    Template.of("syntax", syntax),
+                    Template.of("description", description)
+            ));
         }
     }
 

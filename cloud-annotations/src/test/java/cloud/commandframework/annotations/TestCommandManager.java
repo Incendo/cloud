@@ -40,8 +40,10 @@ public class TestCommandManager extends CommandManager<TestCommandSender> {
     }
 
     @Override
-    public final boolean hasPermission(final TestCommandSender sender,
-                                       final String permission) {
+    public final boolean hasPermission(
+            final TestCommandSender sender,
+            final String permission
+    ) {
         return !permission.equalsIgnoreCase("no");
     }
 

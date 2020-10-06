@@ -59,15 +59,17 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
      * @param commandPermissionMapper      Function used to check if a command sender has the permission to execute a command
      * @throws Exception If the construction of the manager fails
      */
-    public JavacordCommandManager(final @NonNull DiscordApi discordApi,
-                                  final @NonNull Function<@NonNull CommandTree<C>,
-                                          @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                                  final @NonNull Function<@NonNull JavacordCommandSender, @NonNull C> commandSenderMapper,
-                                  final @NonNull Function<@NonNull C,
-                                          @NonNull JavacordCommandSender> backwardsCommandSenderMapper,
-                                  final @NonNull Function<@NonNull C, @NonNull String> commandPrefixMapper,
-                                  final @Nullable BiFunction<@NonNull C,
-                                          @NonNull String, @NonNull Boolean> commandPermissionMapper)
+    public JavacordCommandManager(
+            final @NonNull DiscordApi discordApi,
+            final @NonNull Function<@NonNull CommandTree<C>,
+                    @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull JavacordCommandSender, @NonNull C> commandSenderMapper,
+            final @NonNull Function<@NonNull C,
+                    @NonNull JavacordCommandSender> backwardsCommandSenderMapper,
+            final @NonNull Function<@NonNull C, @NonNull String> commandPrefixMapper,
+            final @Nullable BiFunction<@NonNull C,
+                    @NonNull String, @NonNull Boolean> commandPermissionMapper
+    )
             throws Exception {
         super(commandExecutionCoordinator, new JavacordRegistrationHandler<>());
         ((JavacordRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
@@ -81,7 +83,8 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
 
     @Override
     public final boolean hasPermission(
-            final @NonNull C sender, final @NonNull String permission) {
+            final @NonNull C sender, final @NonNull String permission
+    ) {
         if (permission.isEmpty()) {
             return true;
         }
@@ -131,4 +134,5 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
     public @NonNull DiscordApi getDiscordApi() {
         return this.discordApi;
     }
+
 }
