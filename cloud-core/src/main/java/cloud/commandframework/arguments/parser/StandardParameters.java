@@ -55,6 +55,10 @@ public final class StandardParameters {
      * The command should be hidden from help menus, etc
      */
     public static final ParserParameter<Boolean> HIDDEN = create("hidden", TypeToken.get(Boolean.class));
+    /**
+     * Indicates that a string argument should be greedy
+     */
+    public static final ParserParameter<Boolean> GREEDY = create("greedy", TypeToken.get(Boolean.class));
 
     private StandardParameters() {
     }

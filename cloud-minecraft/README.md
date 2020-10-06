@@ -76,6 +76,8 @@ You can check whether or not the running server supports Brigadier, by using `bu
 
 ## cloud-paper
 
+An example plugin using the `cloud-paper` API can be found [here](https://github.com/Sauilitired/cloud/tree/master/examples/example-bukkit).
+
 `cloud-paper`works on all Bukkit derivatives and has graceful fallbacks for cases where Paper specific features are missing. It is initialized the same way as the Bukkit manager, except `PaperCommandManager`is used instead. When using Paper 1.15+ Brigadier mappings are available even without commodore present.
 
 ### dependency

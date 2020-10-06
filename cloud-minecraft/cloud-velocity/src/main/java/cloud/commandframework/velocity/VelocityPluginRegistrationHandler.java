@@ -72,7 +72,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                 this.brigadierManager.createLiteralCommandNode(command.getArguments().get(0).getName(), (Command<C>) command,
                (c, p) -> this.manager.hasPermission(
                        this.manager.getCommandSenderMapper()
-                                   .apply(c), p),
+                                   .apply(c), p), true,
                commandContext -> {
                    final CommandSource source = commandContext.getSource();
                    final String input = commandContext.getInput();

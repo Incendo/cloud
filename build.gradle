@@ -21,6 +21,16 @@ checkstyle {
     configFile file('config/checkstyle/checkstyle.xml')
 }
 
+gradle.taskGraph.whenReady {
+    gradle.taskGraph.allTasks.each {
+        if (it.project.name.contains('example')) {
+            it.onlyIf {
+                project.hasProperty('compile-examples')
+            }
+        }
+    }
+}
+
 allprojects {
     apply plugin: 'idea'
     apply plugin: 'checkstyle'

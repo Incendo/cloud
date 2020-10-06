@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.specifier.Range;
@@ -101,9 +102,15 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                                                    (double) options.get(StandardParameters.RANGE_MAX, Double.MAX_VALUE)));
         this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<C>());
         /* Make this one less awful */
-        this.registerParserSupplier(TypeToken.get(String.class), options -> new StringArgument.StringParser<C>(
-                StringArgument.StringMode.SINGLE, (context, s) ->
-                Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))));
+        this.registerParserSupplier(TypeToken.get(String.class), options -> {
+            final boolean greedy = options.get(StandardParameters.GREEDY, false);
+            final StringArgument.StringMode stringMode = greedy
+                                                         ? StringArgument.StringMode.GREEDY
+                                                         : StringArgument.StringMode.SINGLE;
+            return new StringArgument.StringParser<C>(
+                    stringMode,
+                    (context, s) -> Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0])));
+        });
         /* Add options to this */
         this.registerParserSupplier(TypeToken.get(Boolean.class), options -> new BooleanArgument.BooleanParser<>(false));
         this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDArgument.UUIDParser<>());
@@ -272,6 +279,17 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 return ParserParameters.single(StandardParameters.COMPLETIONS, splitCompletions);
             }
             return ParserParameters.empty();
+        }
+
+    }
+
+
+    private static final class GreedyMapper implements BiFunction<@NonNull Greedy, @NonNull TypeToken<?>,
+            @NonNull ParserParameters> {
+
+        @Override
+        public @NonNull ParserParameters apply(@NonNull final Greedy greedy, @NonNull final TypeToken<?> typeToken) {
+            return ParserParameters.single(StandardParameters.GREEDY, true);
         }
 
     }
