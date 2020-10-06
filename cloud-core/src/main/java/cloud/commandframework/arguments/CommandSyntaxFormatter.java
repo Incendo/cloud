@@ -44,7 +44,9 @@ public interface CommandSyntaxFormatter<C> {
      * @param node             Trailing node
      * @return Syntax string
      */
-    @NonNull String apply(@NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
-                          CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node);
+    @NonNull String apply(
+            @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
+            CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
+    );
 
 }

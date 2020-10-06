@@ -50,7 +50,7 @@ public final class TaskRecipe {
      *
      * @param input Input
      * @param <I>   Input type
-     * @return      Function that maps the input to itself
+     * @return Function that maps the input to itself
      */
     public <I> @NonNull TaskRecipeComponentOutputting<I, I> begin(final @NonNull I input) {
         this.addAsynchronous(TaskFunction.identity());
@@ -71,8 +71,10 @@ public final class TaskRecipe {
         completableFuture.whenComplete(this.execute(iterator, callback));
     }
 
-    private BiConsumer execute(final @NonNull Iterator<Map.Entry<TaskRecipeStep, Boolean>> iterator,
-                               final @NonNull Runnable callback) {
+    private BiConsumer execute(
+            final @NonNull Iterator<Map.Entry<TaskRecipeStep, Boolean>> iterator,
+            final @NonNull Runnable callback
+    ) {
         return (o, o2) -> {
             if (iterator.hasNext()) {
                 final Map.Entry<TaskRecipeStep, Boolean> entry = iterator.next();
@@ -121,7 +123,7 @@ public final class TaskRecipe {
          * Add a new synchronous step, consuming the input of the earlier step
          *
          * @param function Function mapping the input to some output
-         * @param <T> Output type
+         * @param <T>      Output type
          * @return New task recipe component
          */
         public <T> TaskRecipeComponentOutputting<O, T> synchronous(final @NonNull TaskFunction<O, T> function) {
@@ -133,7 +135,7 @@ public final class TaskRecipe {
          * Add a new asynchronous step, consuming the input of the earlier step
          *
          * @param function Function mapping the input to some output
-         * @param <T> Output type
+         * @param <T>      Output type
          * @return New task recipe component
          */
         public <T> TaskRecipeComponentOutputting<O, T> asynchronous(final @NonNull TaskFunction<O, T> function) {
@@ -176,7 +178,8 @@ public final class TaskRecipe {
          * Execute the recipe
          */
         public void execute() {
-            this.execute(() -> {});
+            this.execute(() -> {
+            });
         }
 
     }
@@ -229,7 +232,8 @@ public final class TaskRecipe {
          * Execute the recipe
          */
         public void execute() {
-            this.execute(() -> {});
+            this.execute(() -> {
+            });
         }
 
     }

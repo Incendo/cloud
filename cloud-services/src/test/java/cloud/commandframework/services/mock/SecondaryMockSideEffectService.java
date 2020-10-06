@@ -27,9 +27,9 @@ import cloud.commandframework.services.State;
 
 public class SecondaryMockSideEffectService implements MockSideEffectService {
 
-  @Override
-  public State handle(final MockPlayer mockPlayer) {
-    return null;
-  }
+    @Override
+    public State handle(final MockPlayer mockPlayer) {
+        return null;
+    }
 
 }

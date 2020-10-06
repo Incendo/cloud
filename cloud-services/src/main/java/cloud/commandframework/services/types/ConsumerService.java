@@ -38,52 +38,52 @@ import java.util.function.Consumer;
  */
 @FunctionalInterface
 public interface ConsumerService<Context>
-    extends SideEffectService<Context>, Consumer<Context> {
+        extends SideEffectService<Context>, Consumer<Context> {
 
-  /**
-   * Immediately terminate the execution and return {@link State#ACCEPTED}
-   *
-   * @throws PipeBurst Pipe burst
-   */
-  static void interrupt() throws PipeBurst {
-    throw new PipeBurst();
-  }
-
-  @Override
-  default @NonNull State handle(final @NonNull Context context) {
-    try {
-      this.accept(context);
-    } catch (final PipeBurst burst) {
-      return State.ACCEPTED;
-    }
-    return State.REJECTED;
-  }
-
-  /**
-   * Accept the context. Call {@link #interrupt()} to interrupt the entire pipeline and immediately
-   * return {@link State#ACCEPTED} to the sink
-   *
-   * @param context Context to consume
-   */
-  @Override
-  void accept(@NonNull Context context);
-
-
-  class PipeBurst extends RuntimeException {
-
-    private PipeBurst() {
+    /**
+     * Immediately terminate the execution and return {@link State#ACCEPTED}
+     *
+     * @throws PipeBurst Pipe burst
+     */
+    static void interrupt() throws PipeBurst {
+        throw new PipeBurst();
     }
 
     @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
+    default @NonNull State handle(final @NonNull Context context) {
+        try {
+            this.accept(context);
+        } catch (final PipeBurst burst) {
+            return State.ACCEPTED;
+        }
+        return State.REJECTED;
     }
 
+    /**
+     * Accept the context. Call {@link #interrupt()} to interrupt the entire pipeline and immediately
+     * return {@link State#ACCEPTED} to the sink
+     *
+     * @param context Context to consume
+     */
     @Override
-    public synchronized Throwable initCause(final Throwable cause) {
-      return this;
-    }
+    void accept(@NonNull Context context);
 
-  }
+
+    class PipeBurst extends RuntimeException {
+
+        private PipeBurst() {
+        }
+
+        @Override
+        public synchronized Throwable fillInStackTrace() {
+            return this;
+        }
+
+        @Override
+        public synchronized Throwable initCause(final Throwable cause) {
+            return this;
+        }
+
+    }
 
 }

@@ -32,8 +32,10 @@ final class CommandMethodPair {
     private final Method method;
     private final CommandMethod commandMethod;
 
-    CommandMethodPair(final @NonNull Method method,
-                      final @NonNull CommandMethod commandMethod) {
+    CommandMethodPair(
+            final @NonNull Method method,
+            final @NonNull CommandMethod commandMethod
+    ) {
         this.method = method;
         this.commandMethod = commandMethod;
     }

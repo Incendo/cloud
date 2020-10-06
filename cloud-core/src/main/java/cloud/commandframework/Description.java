@@ -67,7 +67,7 @@ public final class Description {
      * @return Command description
      */
     public @NonNull String getDescription() {
-       return this.description;
+        return this.description;
     }
 
     /**

@@ -34,4 +34,5 @@ public class JDAGuildSender extends JDACommandSender {
     JDAGuildSender(final @NonNull MessageReceivedEvent event) {
         super(event);
     }
+
 }

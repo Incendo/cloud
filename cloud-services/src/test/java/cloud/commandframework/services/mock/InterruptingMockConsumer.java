@@ -27,9 +27,9 @@ import cloud.commandframework.services.types.ConsumerService;
 
 public class InterruptingMockConsumer implements MockConsumerService {
 
-  @Override
-  public void accept(final MockService.MockContext mockContext) {
-    ConsumerService.interrupt();
-  }
+    @Override
+    public void accept(final MockService.MockContext mockContext) {
+        ConsumerService.interrupt();
+    }
 
 }

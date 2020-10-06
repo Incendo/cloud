@@ -40,11 +40,11 @@ import java.util.regex.Pattern;
 final class SyntaxParser implements Function<@NonNull String, @NonNull LinkedHashMap<@NonNull String, @NonNull SyntaxFragment>> {
 
     private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile("([A-Za-z0-9]+)(|([A-Za-z0-9]+))*")
-                                                                             .asPredicate();
+            .asPredicate();
     private static final Predicate<String> PATTERN_ARGUMENT_REQUIRED = Pattern.compile("<([A-Za-z0-9]+)>")
-                                                                              .asPredicate();
+            .asPredicate();
     private static final Predicate<String> PATTERN_ARGUMENT_OPTIONAL = Pattern.compile("\\[([A-Za-z0-9]+)]")
-                                                                              .asPredicate();
+            .asPredicate();
 
     @Override
     public @NonNull LinkedHashMap<@NonNull String, @NonNull SyntaxFragment> apply(final @NonNull String syntax) {

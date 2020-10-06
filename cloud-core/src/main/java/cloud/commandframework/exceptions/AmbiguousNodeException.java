@@ -51,9 +51,11 @@ public final class AmbiguousNodeException extends IllegalStateException {
      * @param ambiguousNode Node that caused exception
      * @param children      All children of the parent
      */
-    public AmbiguousNodeException(final @Nullable CommandArgument<?, ?> parentNode,
-                                  final @NonNull CommandArgument<?, ?> ambiguousNode,
-                                  final @NonNull List<@NonNull CommandArgument<?, ?>> children) {
+    public AmbiguousNodeException(
+            final @Nullable CommandArgument<?, ?> parentNode,
+            final @NonNull CommandArgument<?, ?> ambiguousNode,
+            final @NonNull List<@NonNull CommandArgument<?, ?>> children
+    ) {
         this.parentNode = parentNode;
         this.ambiguousNode = ambiguousNode;
         this.children = children;
@@ -101,7 +103,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
             }
         }
         return stringBuilder.append(")")
-                            .toString();
+                .toString();
     }
 
 }

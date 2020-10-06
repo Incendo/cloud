@@ -31,4 +31,5 @@ import cloud.commandframework.services.types.ConsumerService;
  * @param <C> Command sender type
  */
 public interface CommandPostprocessor<C> extends ConsumerService<CommandPostprocessingContext<C>> {
+
 }

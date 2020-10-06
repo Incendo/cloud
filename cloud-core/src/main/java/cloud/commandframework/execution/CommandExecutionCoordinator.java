@@ -74,8 +74,10 @@ public abstract class CommandExecutionCoordinator<C> {
      * @param input          Command input
      * @return Future that completes with the result
      */
-    public abstract @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(@NonNull CommandContext<C> commandContext,
-                                                                                     @NonNull Queue<@NonNull String> input);
+    public abstract @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(
+            @NonNull CommandContext<C> commandContext,
+            @NonNull Queue<@NonNull String> input
+    );
 
     /**
      * Get the command tree
@@ -100,8 +102,10 @@ public abstract class CommandExecutionCoordinator<C> {
         }
 
         @Override
-        public CompletableFuture<CommandResult<C>> coordinateExecution(final @NonNull CommandContext<C> commandContext,
-                                                                       final @NonNull Queue<@NonNull String> input) {
+        public CompletableFuture<CommandResult<C>> coordinateExecution(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> input
+        ) {
             final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
             try {
                 final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =

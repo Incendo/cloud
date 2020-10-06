@@ -23,8 +23,8 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.execution.CommandResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -73,7 +73,8 @@ final class CommandPerformanceTest {
         double averageTime = elapsedTime / (double) amount;
 
         System.out.printf("Average literal parse time: %fns (%f ms) | %d samples & %d iterations\n",
-                          averageTime, averageTime / 10e6, 101, 100000);
+                averageTime, averageTime / 10e6, 101, 100000
+        );
     }
 
     @Test
@@ -84,7 +85,7 @@ final class CommandPerformanceTest {
         final Options options = new OptionsBuilder()
                 .include(ExecutionBenchmark.class.getSimpleName())
                 .build();
-        final Collection<RunResult> results =  new Runner(options).run();
+        final Collection<RunResult> results = new Runner(options).run();
         Assertions.assertFalse(results.isEmpty());
     }
 

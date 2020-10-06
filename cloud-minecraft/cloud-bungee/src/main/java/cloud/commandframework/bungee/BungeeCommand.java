@@ -51,12 +51,16 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
     private final cloud.commandframework.Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
-    BungeeCommand(final cloud.commandframework.@NonNull Command<C> cloudCommand,
-                  final @NonNull CommandArgument<C, ?> command,
-                  final @NonNull BungeeCommandManager<C> manager) {
-        super(command.getName(),
-              cloudCommand.getCommandPermission().toString(),
-              ((StaticArgument<C>) command).getAlternativeAliases().toArray(new String[0]));
+    BungeeCommand(
+            final cloud.commandframework.@NonNull Command<C> cloudCommand,
+            final @NonNull CommandArgument<C, ?> command,
+            final @NonNull BungeeCommandManager<C> manager
+    ) {
+        super(
+                command.getName(),
+                cloudCommand.getCommandPermission().toString(),
+                ((StaticArgument<C>) command).getAlternativeAliases().toArray(new String[0])
+        );
         this.command = command;
         this.manager = manager;
         this.cloudCommand = cloudCommand;
@@ -70,86 +74,102 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
             builder.append(" ").append(string);
         }
         final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
-        this.manager.executeCommand(sender,
-                                    builder.toString())
-            .whenComplete(((commandResult, throwable) -> {
-                             if (throwable != null) {
-                                 if (throwable instanceof CompletionException) {
-                                     throwable = throwable.getCause();
-                                 }
-                                 final Throwable finalThrowable = throwable;
-                                 if (throwable instanceof InvalidSyntaxException) {
-                                     this.manager.handleException(sender,
-                                                                  InvalidSyntaxException.class,
-                                                                  (InvalidSyntaxException) throwable, (c, e) ->
-                                          commandSender.sendMessage(
-                                                  new ComponentBuilder("Invalid Command Syntax. Correct command syntax is: ")
-                                                          .color(ChatColor.RED)
-                                                          .append("/")
-                                                          .color(ChatColor.GRAY)
-                                                          .append(((InvalidSyntaxException) finalThrowable).getCorrectSyntax())
-                                                          .color(ChatColor.GRAY)
-                                                          .create()
-                                          )
-                                     );
-                                 } else if (throwable instanceof InvalidCommandSenderException) {
-                                     final Throwable finalThrowable1 = throwable;
-                                     this.manager.handleException(sender,
-                                                                  InvalidCommandSenderException.class,
-                                                                  (InvalidCommandSenderException) throwable, (c, e) ->
-                                          commandSender.sendMessage(new ComponentBuilder(finalThrowable1.getMessage())
-                                                                            .color(ChatColor.RED)
-                                                                            .create())
-                                     );
-                                 } else if (throwable instanceof NoPermissionException) {
-                                     this.manager.handleException(sender,
-                                                                  NoPermissionException.class,
-                                                                  (NoPermissionException) throwable, (c, e) ->
-                                          commandSender.sendMessage(new ComponentBuilder(MESSAGE_NO_PERMS)
-                                                                            .color(ChatColor.WHITE)
-                                                                            .create())
-                                     );
-                                 } else if (throwable instanceof NoSuchCommandException) {
-                                     this.manager.handleException(sender,
-                                                                  NoSuchCommandException.class,
-                                                                  (NoSuchCommandException) throwable, (c, e) ->
-                                          commandSender.sendMessage(new ComponentBuilder(MESSAGE_UNKNOWN_COMMAND)
-                                                                            .color(ChatColor.WHITE)
-                                                                            .create())
-                                     );
-                                 } else if (throwable instanceof ArgumentParseException) {
-                                     this.manager.handleException(sender,
-                                                                  ArgumentParseException.class,
-                                                                  (ArgumentParseException) throwable, (c, e) ->
-                                          commandSender.sendMessage(new ComponentBuilder("Invalid Command Argument: ")
-                                                                            .color(ChatColor.GRAY)
-                                                                            .append(finalThrowable.getCause().getMessage())
-                                                                            .create())
-                                     );
-                                 } else {
-                                     commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
-                                     this.manager.getOwningPlugin().getLogger().warning(
-                                             String.format("(Cloud) Unknown exception type '%s' with cause '%s'",
-                                                           throwable.getClass().getCanonicalName(),
-                                                           throwable.getCause() == null ? "none"
-                                                                                        : throwable.getCause()
-                                                                                                   .getClass().getCanonicalName())
-                                     );
-                                     throwable.printStackTrace();
-                                 }
-                             }
-                         }));
+        this.manager.executeCommand(
+                sender,
+                builder.toString()
+        )
+                .whenComplete(((commandResult, throwable) -> {
+                    if (throwable != null) {
+                        if (throwable instanceof CompletionException) {
+                            throwable = throwable.getCause();
+                        }
+                        final Throwable finalThrowable = throwable;
+                        if (throwable instanceof InvalidSyntaxException) {
+                            this.manager.handleException(sender,
+                                    InvalidSyntaxException.class,
+                                    (InvalidSyntaxException) throwable, (c, e) ->
+                                            commandSender.sendMessage(
+                                                    new ComponentBuilder(
+                                                            "Invalid Command Syntax. Correct command syntax is: ")
+                                                            .color(ChatColor.RED)
+                                                            .append("/")
+                                                            .color(ChatColor.GRAY)
+                                                            .append(((InvalidSyntaxException) finalThrowable)
+                                                                    .getCorrectSyntax())
+                                                            .color(ChatColor.GRAY)
+                                                            .create()
+                                            )
+                            );
+                        } else if (throwable instanceof InvalidCommandSenderException) {
+                            final Throwable finalThrowable1 = throwable;
+                            this.manager.handleException(sender,
+                                    InvalidCommandSenderException.class,
+                                    (InvalidCommandSenderException) throwable, (c, e) ->
+                                            commandSender.sendMessage(new ComponentBuilder(
+                                                    finalThrowable1.getMessage())
+                                                    .color(ChatColor.RED)
+                                                    .create())
+                            );
+                        } else if (throwable instanceof NoPermissionException) {
+                            this.manager.handleException(sender,
+                                    NoPermissionException.class,
+                                    (NoPermissionException) throwable, (c, e) ->
+                                            commandSender.sendMessage(new ComponentBuilder(
+                                                    MESSAGE_NO_PERMS)
+                                                    .color(ChatColor.WHITE)
+                                                    .create())
+                            );
+                        } else if (throwable instanceof NoSuchCommandException) {
+                            this.manager.handleException(sender,
+                                    NoSuchCommandException.class,
+                                    (NoSuchCommandException) throwable, (c, e) ->
+                                            commandSender.sendMessage(new ComponentBuilder(
+                                                    MESSAGE_UNKNOWN_COMMAND)
+                                                    .color(ChatColor.WHITE)
+                                                    .create())
+                            );
+                        } else if (throwable instanceof ArgumentParseException) {
+                            this.manager.handleException(sender,
+                                    ArgumentParseException.class,
+                                    (ArgumentParseException) throwable, (c, e) ->
+                                            commandSender.sendMessage(new ComponentBuilder(
+                                                    "Invalid Command Argument: ")
+                                                    .color(ChatColor.GRAY)
+                                                    .append(finalThrowable
+                                                            .getCause()
+                                                            .getMessage())
+                                                    .create())
+                            );
+                        } else {
+                            commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
+                            this.manager.getOwningPlugin().getLogger().warning(
+                                    String.format(
+                                            "(Cloud) Unknown exception type '%s' with cause '%s'",
+                                            throwable.getClass().getCanonicalName(),
+                                            throwable.getCause() == null ? "none"
+                                                    : throwable.getCause()
+                                                            .getClass().getCanonicalName()
+                                    )
+                            );
+                            throwable.printStackTrace();
+                        }
+                    }
+                }));
     }
 
     @Override
-    public Iterable<String> onTabComplete(final CommandSender sender,
-                                          final String[] args) {
+    public Iterable<String> onTabComplete(
+            final CommandSender sender,
+            final String[] args
+    ) {
         final StringBuilder builder = new StringBuilder(this.command.getName());
         for (final String string : args) {
             builder.append(" ").append(string);
         }
-        return this.manager.suggest(this.manager.getCommandSenderMapper().apply(sender),
-                                    builder.toString());
+        return this.manager.suggest(
+                this.manager.getCommandSenderMapper().apply(sender),
+                builder.toString()
+        );
     }
 
 }

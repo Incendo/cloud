@@ -43,10 +43,13 @@ import java.util.Queue;
  */
 @SuppressWarnings("unused")
 public final class UserArgument<C> extends CommandArgument<C, User> {
+
     private final List<ParserMode> modes;
 
-    private UserArgument(final boolean required, final @NonNull String name,
-                         final @NonNull JDA jda, final @NonNull List<ParserMode> modes) {
+    private UserArgument(
+            final boolean required, final @NonNull String name,
+            final @NonNull JDA jda, final @NonNull List<ParserMode> modes
+    ) {
         super(required, name, new UserParser<>(jda, modes), User.class);
         this.modes = modes;
     }
@@ -105,6 +108,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, User> {
+
         private final JDA jda;
         private List<ParserMode> modes = new ArrayList<>();
 
@@ -138,6 +142,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
 
     public static final class UserParser<C> implements ArgumentParser<C, User> {
+
         private final JDA jda;
         private final List<ParserMode> modes;
 
@@ -149,7 +154,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         @Override
         public @NonNull ArgumentParseResult<User> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue) {
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -218,6 +224,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 return ArgumentParseResult.success(user);
             }
         }
+
     }
 
 
@@ -242,10 +249,12 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         public final @NonNull String getInput() {
             return input;
         }
+
     }
 
 
     public static final class TooManyUsersFoundParseException extends UserParseException {
+
         /**
          * Construct a new UUID parse exception
          *
@@ -259,10 +268,12 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         public @NonNull String getMessage() {
             return String.format("Too many users found for '%s'.", getInput());
         }
+
     }
 
 
     public static final class UserNotFoundParseException extends UserParseException {
+
         /**
          * Construct a new UUID parse exception
          *
@@ -276,5 +287,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         public @NonNull String getMessage() {
             return String.format("User not found for '%s'.", getInput());
         }
+
     }
+
 }

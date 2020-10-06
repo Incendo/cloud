@@ -45,11 +45,13 @@ import java.util.function.BiFunction;
 @SuppressWarnings("unused")
 public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
-    private PlayerArgument(final boolean required,
-                           final @NonNull String name,
-                           final @NonNull String defaultValue,
-                           final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                   @NonNull List<@NonNull String>> suggestionsProvider) {
+    private PlayerArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new PlayerParser<>(), defaultValue, Player.class, suggestionsProvider);
     }
 
@@ -94,8 +96,10 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>           Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, Player> optional(final @NonNull String name,
-                                                                   final @NonNull String defaultPlayer) {
+    public static <C> @NonNull CommandArgument<C, Player> optional(
+            final @NonNull String name,
+            final @NonNull String defaultPlayer
+    ) {
         return PlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultPlayer).build();
     }
 
@@ -122,8 +126,10 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     public static final class PlayerParser<C> implements ArgumentParser<C, Player> {
 
         @Override
-        public @NonNull ArgumentParseResult<Player> parse(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<Player> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -141,8 +147,10 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             List<String> output = new ArrayList<>();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -151,6 +159,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
             return output;
         }
+
     }
 
 
@@ -183,5 +192,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         public String getMessage() {
             return String.format("No player found for input '%s'.", input);
         }
+
     }
+
 }

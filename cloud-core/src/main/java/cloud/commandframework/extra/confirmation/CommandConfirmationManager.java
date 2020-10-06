@@ -72,10 +72,12 @@ public class CommandConfirmationManager<C> {
      * @param notifier        Notifier that gets called when a command gets added to the queue
      * @param errorNotifier   Notifier that gets called when someone tries to confirm a command with nothing in the queue
      */
-    public CommandConfirmationManager(final long timeout,
-                                      final @NonNull TimeUnit timeoutTimeUnit,
-                                      final @NonNull Consumer<@NonNull CommandPostprocessingContext<C>> notifier,
-                                      final @NonNull Consumer<@NonNull C> errorNotifier) {
+    public CommandConfirmationManager(
+            final long timeout,
+            final @NonNull TimeUnit timeoutTimeUnit,
+            final @NonNull Consumer<@NonNull CommandPostprocessingContext<C>> notifier,
+            final @NonNull Consumer<@NonNull C> errorNotifier
+    ) {
         this.notifier = notifier;
         this.errorNotifier = errorNotifier;
         this.pendingCommands = new LinkedHashMap<C, Pair<CommandPostprocessingContext<C>, Long>>() {
@@ -141,8 +143,8 @@ public class CommandConfirmationManager<C> {
             if (pending.isPresent()) {
                 final CommandPostprocessingContext<C> postprocessingContext = pending.get();
                 postprocessingContext.getCommand()
-                                     .getCommandExecutionHandler()
-                                     .execute(postprocessingContext.getCommandContext());
+                        .getCommandExecutionHandler()
+                        .execute(postprocessingContext.getCommandContext());
             } else {
                 this.errorNotifier.accept(context.getSender());
             }
@@ -155,9 +157,9 @@ public class CommandConfirmationManager<C> {
         @Override
         public void accept(final @NonNull CommandPostprocessingContext<C> context) {
             if (!context.getCommand()
-                        .getCommandMeta()
-                        .getOrDefault(CONFIRMATION_REQUIRED_META, "false")
-                        .equals("true")) {
+                    .getCommandMeta()
+                    .getOrDefault(CONFIRMATION_REQUIRED_META, "false")
+                    .equals("true")) {
                 return;
             }
             /* Add it to the "queue" */

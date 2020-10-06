@@ -28,37 +28,39 @@ import cloud.commandframework.services.ChunkedRequestContext;
 import java.util.Collection;
 
 public class MockChunkedRequest
-    extends ChunkedRequestContext<MockChunkedRequest.Animal, MockChunkedRequest.Sound> {
+        extends ChunkedRequestContext<MockChunkedRequest.Animal, MockChunkedRequest.Sound> {
 
-  public MockChunkedRequest(final Collection<Animal> requests) {
-    super(requests);
-  }
-
-  public static class Animal {
-
-    private final String name;
-
-    public Animal(final String name) {
-      this.name = name;
+    public MockChunkedRequest(final Collection<Animal> requests) {
+        super(requests);
     }
 
-    public String getName() {
-      return this.name;
+    public static class Animal {
+
+        private final String name;
+
+        public Animal(final String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
     }
-  }
 
 
-  public static class Sound {
+    public static class Sound {
 
-    private final String sound;
+        private final String sound;
 
-    public Sound(final String sound) {
-      this.sound = sound;
+        public Sound(final String sound) {
+            this.sound = sound;
+        }
+
+        public String getSound() {
+            return this.sound;
+        }
+
     }
-
-    public String getSound() {
-      return this.sound;
-    }
-  }
 
 }

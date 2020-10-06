@@ -55,15 +55,17 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
      * @param mapper        Mapper that maps the sub-arguments to the output type
      * @param valueType     The output type
      */
-    protected ArgumentTriplet(final boolean required,
-                              final @NonNull String name,
-                              final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
-                              final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types,
-                              final @NonNull Triplet<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>,
-                                      @NonNull ArgumentParser<C, W>> parserTriplet,
-                              final @NonNull BiFunction<@NonNull C,
-                                      @NonNull Triplet<U, @NonNull V, @NonNull W>, @NonNull O> mapper,
-                              final @NonNull TypeToken<O> valueType) {
+    protected ArgumentTriplet(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
+            final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types,
+            final @NonNull Triplet<@NonNull ArgumentParser<C, U>, @NonNull ArgumentParser<C, V>,
+                    @NonNull ArgumentParser<C, W>> parserTriplet,
+            final @NonNull BiFunction<@NonNull C,
+                    @NonNull Triplet<U, @NonNull V, @NonNull W>, @NonNull O> mapper,
+            final @NonNull TypeToken<O> valueType
+    ) {
         super(required, name, names, parserTriplet, types, mapper, o -> Triplet.of((U) o[0], (V) o[1], (W) o[2]), valueType);
     }
 
@@ -83,25 +85,34 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
      * @return Intermediary builder
      */
     public static <C, U, V, W> @NonNull ArgumentTripletIntermediaryBuilder<@NonNull C, @NonNull U, @NonNull V, @NonNull W>
-    of(final @NonNull CommandManager<C> manager,
-       final @NonNull String name,
-       final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
-       final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types) {
+    of(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull String name,
+            final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
+            final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types
+    ) {
         final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
-        final ArgumentParser<C, U> firstParser = parserRegistry.createParser(TypeToken.get(types.getFirst()),
-                         ParserParameters.empty()).orElseThrow(() ->
-                                                                       new IllegalArgumentException(
-                                                                               "Could not create parser for primary type"));
-        final ArgumentParser<C, V> secondaryParser = parserRegistry.createParser(TypeToken.get(types.getSecond()),
-                         ParserParameters.empty()).orElseThrow(() ->
-                                                                       new IllegalArgumentException(
-                                                                               "Could not create parser for secondary type"));
-        final ArgumentParser<C, W> tertiaryParser = parserRegistry.createParser(TypeToken.get(types.getThird()),
-                                                                                ParserParameters.empty()).orElseThrow(() ->
-                                                                      new IllegalArgumentException(
-                                                                               "Could not create parser for tertiary type"));
+        final ArgumentParser<C, U> firstParser = parserRegistry.createParser(
+                TypeToken.get(types.getFirst()),
+                ParserParameters.empty()
+        ).orElseThrow(() ->
+                new IllegalArgumentException(
+                        "Could not create parser for primary type"));
+        final ArgumentParser<C, V> secondaryParser = parserRegistry.createParser(
+                TypeToken.get(types.getSecond()),
+                ParserParameters.empty()
+        ).orElseThrow(() ->
+                new IllegalArgumentException(
+                        "Could not create parser for secondary type"));
+        final ArgumentParser<C, W> tertiaryParser = parserRegistry.createParser(
+                TypeToken.get(types.getThird()),
+                ParserParameters.empty()
+        ).orElseThrow(() ->
+                new IllegalArgumentException(
+                        "Could not create parser for tertiary type"));
         return new ArgumentTripletIntermediaryBuilder<>(true, name, names,
-                                                        Triplet.of(firstParser, secondaryParser, tertiaryParser), types);
+                Triplet.of(firstParser, secondaryParser, tertiaryParser), types
+        );
     }
 
     @SuppressWarnings("ALL")
@@ -113,15 +124,17 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
         private final Triplet<String, String, String> names;
         private final Triplet<Class<U>, Class<V>, Class<W>> types;
 
-        private ArgumentTripletIntermediaryBuilder(final boolean required,
-                                                   final @NonNull String name,
-                                                   final @NonNull Triplet<@NonNull String, @NonNull String,
-                                                           @NonNull String> names,
-                                                   final @NonNull Triplet<@NonNull ArgumentParser<C, U>,
-                                                           @NonNull ArgumentParser<C, V>,
-                                                           @NonNull ArgumentParser<C, W>> parserTriplet,
-                                                   final @NonNull Triplet<@NonNull Class<U>,
-                                                           @NonNull Class<V>, @NonNull Class<W>> types) {
+        private ArgumentTripletIntermediaryBuilder(
+                final boolean required,
+                final @NonNull String name,
+                final @NonNull Triplet<@NonNull String, @NonNull String,
+                        @NonNull String> names,
+                final @NonNull Triplet<@NonNull ArgumentParser<C, U>,
+                        @NonNull ArgumentParser<C, V>,
+                        @NonNull ArgumentParser<C, W>> parserTriplet,
+                final @NonNull Triplet<@NonNull Class<U>,
+                        @NonNull Class<V>, @NonNull Class<W>> types
+        ) {
             this.required = required;
             this.name = name;
             this.names = names;
@@ -136,14 +149,16 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          */
         public @NonNull ArgumentTriplet<@NonNull C, @NonNull U, @NonNull V,
                 @NonNull W, Triplet<U, V, W>> simple() {
-            return new ArgumentTriplet<>(this.required,
-                                         this.name,
-                                         this.names,
-                                         this.types,
-                                         this.parserTriplet,
-                                         (sender, triplet) -> triplet,
-                                         new TypeToken<Triplet<U, V, W>>() {
-                                         });
+            return new ArgumentTriplet<>(
+                    this.required,
+                    this.name,
+                    this.names,
+                    this.types,
+                    this.parserTriplet,
+                    (sender, triplet) -> triplet,
+                    new TypeToken<Triplet<U, V, W>>() {
+                    }
+            );
         }
 
         /**
@@ -155,9 +170,11 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          * @return Created triplet
          */
         public <O> @NonNull ArgumentTriplet<@NonNull C, @NonNull U, @NonNull V,
-                @NonNull W, @NonNull O> withMapper(final @NonNull TypeToken<O> clazz,
-                                                   final @NonNull BiFunction<@NonNull C, @NonNull Triplet<@NonNull U,
-                                                           @NonNull V, @NonNull W>, @NonNull O> mapper) {
+                @NonNull W, @NonNull O> withMapper(
+                final @NonNull TypeToken<O> clazz,
+                final @NonNull BiFunction<@NonNull C, @NonNull Triplet<@NonNull U,
+                        @NonNull V, @NonNull W>, @NonNull O> mapper
+        ) {
             return new ArgumentTriplet<>(this.required, this.name, this.names, this.types, this.parserTriplet, mapper, clazz);
         }
 
@@ -169,12 +186,15 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          * @param <O>    Output type
          * @return Created triplet
          */
-        public <O> @NonNull ArgumentTriplet<C, U, V, W, O> withMapper(final @NonNull Class<O> clazz,
-                                                                      final @NonNull BiFunction<@NonNull C, @NonNull Triplet<
-                                                                              @NonNull U, @NonNull V, @NonNull W>,
-                                                                              @NonNull O> mapper) {
+        public <O> @NonNull ArgumentTriplet<C, U, V, W, O> withMapper(
+                final @NonNull Class<O> clazz,
+                final @NonNull BiFunction<@NonNull C, @NonNull Triplet<
+                        @NonNull U, @NonNull V, @NonNull W>,
+                        @NonNull O> mapper
+        ) {
             return new ArgumentTriplet<>(this.required, this.name, this.names, this.types,
-                                         this.parserTriplet, mapper, TypeToken.get(clazz));
+                    this.parserTriplet, mapper, TypeToken.get(clazz)
+            );
         }
 
     }

@@ -46,8 +46,10 @@ public interface ArgumentParser<C, T> {
      * @param inputQueue     The queue of arguments
      * @return Parsed command result
      */
-    @NonNull ArgumentParseResult<@NonNull T> parse(@NonNull CommandContext<@NonNull C> commandContext,
-                                                   @NonNull Queue<@NonNull String> inputQueue);
+    @NonNull ArgumentParseResult<@NonNull T> parse(
+            @NonNull CommandContext<@NonNull C> commandContext,
+            @NonNull Queue<@NonNull String> inputQueue
+    );
 
     /**
      * Get a list of suggested arguments that would be correctly parsed by this parser
@@ -56,8 +58,10 @@ public interface ArgumentParser<C, T> {
      * @param input          Input string
      * @return List of suggestions
      */
-    default @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                       final @NonNull String input) {
+    default @NonNull List<@NonNull String> suggestions(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull String input
+    ) {
         return Collections.emptyList();
     }
 

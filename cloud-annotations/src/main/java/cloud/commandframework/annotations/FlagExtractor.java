@@ -55,8 +55,10 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                 continue;
             }
             final Flag flag = parameter.getAnnotation(Flag.class);
-            final CommandFlag.Builder<Void> builder = this.commandManager.flagBuilder(flag.value())
-                    .withDescription(Description.of(flag.description())).withAliases(flag.aliases());
+            final CommandFlag.Builder<Void> builder = this.commandManager
+                    .flagBuilder(flag.value())
+                    .withDescription(Description.of(flag.description()))
+                    .withAliases(flag.aliases());
             if (parameter.getType().equals(boolean.class)) {
                 flags.add(builder.build());
             } else {
@@ -72,15 +74,17 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                 if (parser == null) {
                     throw new IllegalArgumentException(
                             String.format("Cannot find parser for type '%s' for flag '%s' in method '%s'",
-                                          parameter.getType().getCanonicalName(), flag.value(), method.getName()));
+                                    parameter.getType().getCanonicalName(), flag.value(), method.getName()
+                            ));
                 }
-                @SuppressWarnings("ALL")
-                final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(parameter.getType(), flag.value());
-                @SuppressWarnings("ALL")
-                final CommandArgument argument = argumentBuilder.asRequired()
-                                                                .manager(this.commandManager)
-                                                                .withParser(parser)
-                                                                .build();
+                @SuppressWarnings("ALL") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
+                        parameter.getType(),
+                        flag.value()
+                );
+                @SuppressWarnings("ALL") final CommandArgument argument = argumentBuilder.asRequired()
+                        .manager(this.commandManager)
+                        .withParser(parser)
+                        .build();
                 // noinspection unchecked
                 flags.add(builder.withArgument(argument).build());
             }

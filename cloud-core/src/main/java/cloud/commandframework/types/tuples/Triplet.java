@@ -40,9 +40,11 @@ public class Triplet<U, V, W> implements Tuple {
     private final V second;
     private final W third;
 
-    protected Triplet(final @NonNull U first,
-                      final @NonNull V second,
-                      final @NonNull W third) {
+    protected Triplet(
+            final @NonNull U first,
+            final @NonNull V second,
+            final @NonNull W third
+    ) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -59,9 +61,11 @@ public class Triplet<U, V, W> implements Tuple {
      * @param <W>    Third type
      * @return Created triplet
      */
-    public static <U, V, W> @NonNull Triplet<@NonNull U, @NonNull V, @NonNull W> of(final @NonNull U first,
-                                                                                    final @NonNull V second,
-                                                                                    final @NonNull W third) {
+    public static <U, V, W> @NonNull Triplet<@NonNull U, @NonNull V, @NonNull W> of(
+            final @NonNull U first,
+            final @NonNull V second,
+            final @NonNull W third
+    ) {
         return new Triplet<>(first, second, third);
     }
 

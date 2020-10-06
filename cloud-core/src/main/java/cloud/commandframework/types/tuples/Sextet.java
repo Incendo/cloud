@@ -46,12 +46,14 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
     private final Y fifth;
     private final Z sixth;
 
-    protected Sextet(final @NonNull U first,
-                     final @NonNull V second,
-                     final @NonNull W third,
-                     final @NonNull X fourth,
-                     final @NonNull Y fifth,
-                     final @NonNull Z sixth) {
+    protected Sextet(
+            final @NonNull U first,
+            final @NonNull V second,
+            final @NonNull W third,
+            final @NonNull X fourth,
+            final @NonNull Y fifth,
+            final @NonNull Z sixth
+    ) {
         this.first = first;
         this.second = second;
         this.third = third;
@@ -78,12 +80,13 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
      * @return Created sextet
      */
     public static <U, V, W, X, Y, Z> @NonNull Sextet<@NonNull U, @NonNull V, @NonNull W, @NonNull X, @NonNull Y, @NonNull Z> of(
-                                                                          final @NonNull U first,
-                                                                          final @NonNull V second,
-                                                                          final @NonNull W third,
-                                                                          final @NonNull X fourth,
-                                                                          final @NonNull Y fifth,
-                                                                          final @NonNull Z sixth) {
+            final @NonNull U first,
+            final @NonNull V second,
+            final @NonNull W third,
+            final @NonNull X fourth,
+            final @NonNull Y fifth,
+            final @NonNull Z sixth
+    ) {
         return new Sextet<>(first, second, third, fourth, fifth, sixth);
     }
 
@@ -166,7 +169,8 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
     @Override
     public final String toString() {
         return String.format("(%s, %s, %s, %s, %s, %s)", this.first, this.second, this.third,
-                             this.fourth, this.fifth, this.sixth);
+                this.fourth, this.fifth, this.sixth
+        );
     }
 
     @Override

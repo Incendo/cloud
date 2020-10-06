@@ -121,8 +121,10 @@ public class SimpleCommandMeta extends CommandMeta {
          * @param value Value
          * @return Builder instance
          */
-        public @NonNull Builder with(final @NonNull String key,
-                                     final @NonNull String value) {
+        public @NonNull Builder with(
+                final @NonNull String key,
+                final @NonNull String value
+        ) {
             this.map.put(key, value);
             return this;
         }

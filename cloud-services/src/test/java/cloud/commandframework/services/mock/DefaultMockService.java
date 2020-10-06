@@ -25,19 +25,19 @@ package cloud.commandframework.services.mock;
 
 public class DefaultMockService implements MockService {
 
-  @Override
-  public MockResult handle(final MockContext mockContext)
-      throws Exception {
-    if (mockContext.getString().equals("pls throw exception")) {
-      throw new TotallyIntentionalException();
+    @Override
+    public MockResult handle(final MockContext mockContext)
+            throws Exception {
+        if (mockContext.getString().equals("pls throw exception")) {
+            throw new TotallyIntentionalException();
+        }
+        return new MockResult(32);
     }
-    return new MockResult(32);
-  }
 
 
-  public static class TotallyIntentionalException extends Exception {
+    public static class TotallyIntentionalException extends Exception {
 
-  }
+    }
 
 }
 

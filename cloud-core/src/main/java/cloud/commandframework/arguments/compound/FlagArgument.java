@@ -66,10 +66,12 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
      * @param flags Flags
      */
     public FlagArgument(final Collection<CommandFlag<?>> flags) {
-        super(false,
-              FLAG_ARGUMENT_NAME,
-              new FlagArgumentParser<>(flags.toArray(new CommandFlag<?>[0])),
-              Object.class);
+        super(
+                false,
+                FLAG_ARGUMENT_NAME,
+                new FlagArgumentParser<>(flags.toArray(new CommandFlag<?>[0])),
+                Object.class
+        );
         this.flags = flags;
     }
 
@@ -92,8 +94,10 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         }
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull Object> parse(final @NonNull CommandContext<@NonNull C> commandContext,
-                                                                   final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<@NonNull Object> parse(
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             /*
             This argument must necessarily be the last so we can just consume all remaining input. This argument type
             is similar to a greedy string in that sense. But, we need to keep all flag logic contained to the parser
@@ -144,13 +148,15 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     if (currentFlag == null) {
                         return ArgumentParseResult.failure(
                                 new IllegalArgumentException(String.format("No flag started. Don't"
-                                                                                   + " know what to do with '%s'", string)));
+                                        + " know what to do with '%s'", string)));
                     } else {
                         final ArgumentParseResult<?> result =
                                 ((CommandArgument) currentFlag.getCommandArgument())
                                         .getParser()
-                                        .parse(commandContext,
-                                               new LinkedList<>(Collections.singletonList(string)));
+                                        .parse(
+                                                commandContext,
+                                                new LinkedList<>(Collections.singletonList(string))
+                                        );
                         if (result.getFailure().isPresent()) {
                             return ArgumentParseResult.failure(result.getFailure().get());
                         } else {
@@ -167,8 +173,10 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             /* Check if we have a last flag stored */
             final String lastArg = commandContext.getOrDefault(FLAG_META, "");
             if (lastArg.isEmpty() || !lastArg.startsWith("-")) {

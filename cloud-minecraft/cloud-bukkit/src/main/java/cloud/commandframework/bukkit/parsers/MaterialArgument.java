@@ -44,11 +44,13 @@ import java.util.stream.Collectors;
  */
 public class MaterialArgument<C> extends CommandArgument<C, Material> {
 
-    protected MaterialArgument(final boolean required,
-                               final @NonNull String name,
-                               final @NonNull String defaultValue,
-                               final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                       @NonNull List<@NonNull String>> suggestionsProvider) {
+    protected MaterialArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new MaterialParser<>(), defaultValue, Material.class, suggestionsProvider);
     }
 
@@ -93,8 +95,10 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>      Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Material> optional(final @NonNull String name,
-                                                                     final @NonNull Material material) {
+    public static <C> @NonNull CommandArgument<C, Material> optional(
+            final @NonNull String name,
+            final @NonNull Material material
+    ) {
         return MaterialArgument.<C>newBuilder(name).asOptionalWithDefault(material.name().toLowerCase()).build();
     }
 
@@ -110,8 +114,10 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
     public static final class MaterialParser<C> implements ArgumentParser<C, Material> {
 
         @Override
-        public @NonNull ArgumentParseResult<Material> parse(final @NonNull CommandContext<C> commandContext,
-                                                            final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<Material> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -154,8 +160,9 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
         @Override
         public String getMessage() {
             return EnumSet.allOf(Material.class).stream().map(Material::name).map(String::toLowerCase)
-                          .collect(Collectors.joining(", "));
+                    .collect(Collectors.joining(", "));
         }
+
     }
 
 }

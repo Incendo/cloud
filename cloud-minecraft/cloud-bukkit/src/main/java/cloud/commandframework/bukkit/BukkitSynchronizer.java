@@ -41,12 +41,12 @@ final class BukkitSynchronizer implements TaskSynchronizer {
 
     @Override
     public <I> CompletableFuture<Void> runSynchronous(final @NonNull I input, final @NonNull TaskConsumer<I> consumer) {
-       final CompletableFuture<Void> future = new CompletableFuture<>();
-       this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
-           consumer.accept(input);
-           future.complete(null);
-       });
-       return future;
+        final CompletableFuture<Void> future = new CompletableFuture<>();
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
+            consumer.accept(input);
+            future.complete(null);
+        });
+        return future;
     }
 
     @Override

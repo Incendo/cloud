@@ -33,21 +33,21 @@ import org.junit.jupiter.api.Test;
 
 public class CommandPostProcessorTest {
 
+    private static final boolean[] state = new boolean[]{false};
     private static CommandManager<TestCommandSender> manager;
-    private static final boolean[] state = new boolean[] {false};
 
     @BeforeAll
     static void newTree() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .handler(c -> state[0] = true)
-                               .build());
+                .handler(c -> state[0] = true)
+                .build());
         manager.registerCommandPostProcessor(new SamplePostprocessor());
     }
 
     @Test
     void testPreprocessing() {
-        manager.executeCommand(new TestCommandSender(),"test").join();
+        manager.executeCommand(new TestCommandSender(), "test").join();
         Assertions.assertEquals(false, state[0]);
     }
 

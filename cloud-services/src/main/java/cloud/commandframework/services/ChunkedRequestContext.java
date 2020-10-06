@@ -55,27 +55,27 @@ public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
         this.results = new HashMap<>(requests.size());
     }
 
-  /**
-   * Get a view of the (currently) available results
-   *
-   * @return Unmodifiable map of results
-   */
-  public final @NonNull Map<@NonNull Context, @NonNull Result> getAvailableResults() {
-    synchronized (this.lock) {
-      return Collections.unmodifiableMap(this.results);
+    /**
+     * Get a view of the (currently) available results
+     *
+     * @return Unmodifiable map of results
+     */
+    public final @NonNull Map<@NonNull Context, @NonNull Result> getAvailableResults() {
+        synchronized (this.lock) {
+            return Collections.unmodifiableMap(this.results);
+        }
     }
-  }
 
-  /**
-   * Get all remaining requests
-   *
-   * @return Unmodifiable list of remaining requests
-   */
-  public final @NonNull List<@NonNull Context> getRemaining() {
-    synchronized (this.lock) {
-      return Collections.unmodifiableList(this.requests);
+    /**
+     * Get all remaining requests
+     *
+     * @return Unmodifiable list of remaining requests
+     */
+    public final @NonNull List<@NonNull Context> getRemaining() {
+        synchronized (this.lock) {
+            return Collections.unmodifiableList(this.requests);
+        }
     }
-  }
 
     /**
      * Store a result for a specific context
@@ -90,11 +90,11 @@ public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
         }
     }
 
-  /**
-   * Check if the request has been completed
-   *
-   * @return {@code true} if the request has been completed, {@code false} if not
-   */
+    /**
+     * Check if the request has been completed
+     *
+     * @return {@code true} if the request has been completed, {@code false} if not
+     */
     public final boolean isCompleted() {
         synchronized (this.lock) {
             return this.requests.isEmpty();

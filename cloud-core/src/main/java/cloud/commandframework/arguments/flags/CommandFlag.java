@@ -48,10 +48,12 @@ public final class CommandFlag<T> {
 
     private final @Nullable CommandArgument<?, T> commandArgument;
 
-    private CommandFlag(final @NonNull String name,
-                        final @NonNull String @NonNull [] aliases,
-                        final @NonNull Description description,
-                        final @Nullable CommandArgument<?, T> commandArgument) {
+    private CommandFlag(
+            final @NonNull String name,
+            final @NonNull String @NonNull [] aliases,
+            final @NonNull Description description,
+            final @Nullable CommandArgument<?, T> commandArgument
+    ) {
         this.name = name;
         this.aliases = aliases;
         this.description = description;
@@ -135,10 +137,12 @@ public final class CommandFlag<T> {
         private final Description description;
         private final CommandArgument<?, T> commandArgument;
 
-        private Builder(final @NonNull String name,
-                        final @NonNull String[] aliases,
-                        final @NonNull Description description,
-                        final @Nullable CommandArgument<?, T> commandArgument) {
+        private Builder(
+                final @NonNull String name,
+                final @NonNull String[] aliases,
+                final @NonNull Description description,
+                final @Nullable CommandArgument<?, T> commandArgument
+        ) {
             this.name = name;
             this.aliases = aliases;
             this.description = description;

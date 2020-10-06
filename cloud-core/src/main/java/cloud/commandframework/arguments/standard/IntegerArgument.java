@@ -48,13 +48,15 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
     private final int min;
     private final int max;
 
-    private IntegerArgument(final boolean required,
-                            final @NonNull String name,
-                            final int min,
-                            final int max,
-                            final String defaultValue,
-                            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                    @NonNull List<@NonNull String>> suggestionsProvider) {
+    private IntegerArgument(
+            final boolean required,
+            final @NonNull String name,
+            final int min,
+            final int max,
+            final String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new IntegerParser<>(min, max), defaultValue, Integer.class, suggestionsProvider);
         this.min = min;
         this.max = max;
@@ -101,8 +103,10 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Integer> optional(final @NonNull String name,
-                                                                    final int defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Integer> optional(
+            final @NonNull String name,
+            final int defaultNum
+    ) {
         return IntegerArgument.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
     }
 
@@ -163,7 +167,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         @Override
         public @NonNull IntegerArgument<C> build() {
             return new IntegerArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                                         this.getDefaultValue(), this.getSuggestionsProvider());
+                    this.getDefaultValue(), this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -209,7 +214,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         @Override
         public @NonNull ArgumentParseResult<Integer> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue) {
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -250,8 +256,10 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             return getSuggestions(this.min, this.max, input);
         }
 

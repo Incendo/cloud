@@ -47,10 +47,12 @@ class PaperBrigadierListener<C> implements Listener {
 
     PaperBrigadierListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
-        this.brigadierManager = new CloudBrigadierManager<>(this.paperCommandManager,
-                                                            () -> new CommandContext<>(
-                                                                    this.paperCommandManager.getCommandSenderMapper()
-                                                                                            .apply(Bukkit.getConsoleSender())));
+        this.brigadierManager = new CloudBrigadierManager<>(
+                this.paperCommandManager,
+                () -> new CommandContext<>(
+                        this.paperCommandManager.getCommandSenderMapper()
+                                .apply(Bukkit.getConsoleSender()))
+        );
         new BukkitBrigadierMapper<>(this.paperCommandManager, this.brigadierManager);
     }
 
@@ -79,11 +81,13 @@ class PaperBrigadierListener<C> implements Listener {
             final C sender = this.paperCommandManager.getCommandSenderMapper().apply(s.getBukkitSender());
             return this.paperCommandManager.hasPermission(sender, p);
         };
-        event.setLiteral(this.brigadierManager.createLiteralCommandNode(node,
-                                                                        event.getLiteral(),
-                                                                        event.getBrigadierCommand(),
-                                                                        event.getBrigadierCommand(),
-                                                                        permissionChecker));
+        event.setLiteral(this.brigadierManager.createLiteralCommandNode(
+                node,
+                event.getLiteral(),
+                event.getBrigadierCommand(),
+                event.getBrigadierCommand(),
+                permissionChecker
+        ));
     }
 
 }

@@ -50,9 +50,11 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     private final Executor executor;
     private final boolean synchronizeParsing;
 
-    private AsynchronousCommandExecutionCoordinator(final @Nullable Executor executor,
-                                                    final boolean synchronizeParsing,
-                                                    final @NonNull CommandTree<C> commandTree) {
+    private AsynchronousCommandExecutionCoordinator(
+            final @Nullable Executor executor,
+            final boolean synchronizeParsing,
+            final @NonNull CommandTree<C> commandTree
+    ) {
         super(commandTree);
         this.executor = executor == null ? ForkJoinPool.commonPool() : executor;
         this.synchronizeParsing = synchronizeParsing;
@@ -70,8 +72,10 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     }
 
     @Override
-    public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(final @NonNull CommandContext<C> commandContext,
-                                                                            final @NonNull Queue<@NonNull String> input) {
+    public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull Queue<@NonNull String> input
+    ) {
 
         final Consumer<Command<C>> commandConsumer = command -> {
             if (this.commandManager.postprocessContext(commandContext, command) == State.ACCEPTED) {

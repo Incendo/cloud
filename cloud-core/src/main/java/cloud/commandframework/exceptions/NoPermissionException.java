@@ -46,9 +46,11 @@ public class NoPermissionException extends CommandParseException {
      * @param commandSender     Command sender
      * @param currentChain      Chain leading up to the exception
      */
-    public NoPermissionException(final @NonNull CommandPermission missingPermission,
-                                 final @NonNull Object commandSender,
-                                 final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain) {
+    public NoPermissionException(
+            final @NonNull CommandPermission missingPermission,
+            final @NonNull Object commandSender,
+            final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain
+    ) {
         super(commandSender, currentChain);
         this.missingPermission = missingPermission;
     }

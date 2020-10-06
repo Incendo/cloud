@@ -89,7 +89,7 @@ public final class ExamplePlugin extends JavaPlugin {
         // asynchronously
         //
         final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-                 AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
+                AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
         //
         // However, in many cases it is fine for to run everything synchronously:
         //
@@ -161,9 +161,9 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         final Function<ParserParameters, CommandMeta> commandMetaFunction = p ->
                 BukkitCommandMetaBuilder.builder()
-                                        // This will allow you to decorate commands with descriptions
-                                        .withDescription(p.get(StandardParameters.DESCRIPTION, "No description"))
-                                        .build();
+                        // This will allow you to decorate commands with descriptions
+                        .withDescription(p.get(StandardParameters.DESCRIPTION, "No description"))
+                        .build();
         this.annotationParser = new AnnotationParser<>(
                 /* Manager */ this.manager,
                 /* Command sender type */ CommandSender.class,
@@ -188,8 +188,8 @@ public final class ExamplePlugin extends JavaPlugin {
         // Add a confirmation command
         //
         this.manager.command(builder.literal("confirm")
-                                    .meta("description", "Confirm a pending command")
-                                    .handler(this.confirmationManager.createConfirmationExecutionHandler()));
+                .meta("description", "Confirm a pending command")
+                .handler(this.confirmationManager.createConfirmationExecutionHandler()));
         //
         // Create a world argument
         //
@@ -198,63 +198,70 @@ public final class ExamplePlugin extends JavaPlugin {
         // Create a teleportation command
         //
         this.manager.command(builder.literal("teleport")
-                                    .literal("me")
-                                    // Require a player sender
-                                    .withSenderType(Player.class)
-                                    .argument(worldArgument, Description.of("World name"))
-                                    .argumentTriplet(
-                                            "coords",
-                                            TypeToken.get(Vector.class),
-                                            Triplet.of("x", "y", "z"),
-                                            Triplet.of(Integer.class, Integer.class, Integer.class),
-                                            (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
-                                                                            triplet.getThird()),
-                                            Description.of("Coordinates"))
-                                    .handler(context -> manager.taskRecipe().begin(context)
-                                             .synchronous(commandContext -> {
-                                                 final Player player = (Player) commandContext.getSender();
-                                                 final World world = commandContext.get(worldArgument);
-                                                 final Vector coords = commandContext.get("coords");
-                                                 final Location location = coords.toLocation(world);
-                                                 player.teleport(location);
-                                             }).execute()))
-                    .command(builder.literal("teleport")
-                                    .literal("entity")
-                                    .withSenderType(Player.class)
-                                    .argument(SingleEntitySelectorArgument.of("entity"),
-                                              Description.of("Entity to teleport"))
-                                    .literal("here")
-                                    .handler(
-                                            context -> manager.taskRecipe().begin(context)
-                                            .synchronous(commandContext -> {
-                                                final Player player = (Player) commandContext.getSender();
-                                                final SingleEntitySelector singleEntitySelector = commandContext.get("entity");
-                                                if (singleEntitySelector.hasAny()) {
-                                                    singleEntitySelector.getEntity().teleport(player);
-                                                    player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
-                                                } else {
-                                                    player.sendMessage(ChatColor.RED + "No entity matched your query.");
-                                                }
-                                            }).execute()
-                                    ));
+                .literal("me")
+                // Require a player sender
+                .senderType(Player.class)
+                .argument(worldArgument, Description.of("World name"))
+                .argumentTriplet(
+                        "coords",
+                        TypeToken.get(Vector.class),
+                        Triplet.of("x", "y", "z"),
+                        Triplet.of(Integer.class, Integer.class, Integer.class),
+                        (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
+                                triplet.getThird()
+                        ),
+                        Description.of("Coordinates")
+                )
+                .handler(context -> manager.taskRecipe().begin(context)
+                        .synchronous(commandContext -> {
+                            final Player player = (Player) commandContext.getSender();
+                            final World world = commandContext.get(worldArgument);
+                            final Vector coords = commandContext.get("coords");
+                            final Location location = coords.toLocation(world);
+                            player.teleport(location);
+                        }).execute()))
+                .command(builder.literal("teleport")
+                        .literal("entity")
+                        .senderType(Player.class)
+                        .argument(
+                                SingleEntitySelectorArgument.of("entity"),
+                                Description.of("Entity to teleport")
+                        )
+                        .literal("here")
+                        .handler(
+                                context -> manager.taskRecipe().begin(context)
+                                        .synchronous(commandContext -> {
+                                            final Player player = (Player) commandContext.getSender();
+                                            final SingleEntitySelector singleEntitySelector = commandContext
+                                                    .get("entity");
+                                            if (singleEntitySelector.hasAny()) {
+                                                singleEntitySelector.getEntity().teleport(player);
+                                                player.sendMessage(ChatColor.GREEN + "The entity was teleported to you!");
+                                            } else {
+                                                player.sendMessage(ChatColor.RED + "No entity matched your query.");
+                                            }
+                                        }).execute()
+                        ));
         manager.command(builder.literal("tasktest")
-                                .handler(context -> manager.taskRecipe()
-                                                           .begin(context)
-                                                           .asynchronous(c -> {
-                                                               c.getSender().sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
-                                                               return c;
-                                                           })
-                                                           .synchronous(c -> {
-                                                               c.getSender().sendMessage("SYNC: " + Bukkit.isPrimaryThread());
-                                                           })
-                                                           .execute(() -> context.getSender().sendMessage("DONE!"))
-                                ));
+                .handler(context -> manager.taskRecipe()
+                        .begin(context)
+                        .asynchronous(c -> {
+                            c.getSender().sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
+                            return c;
+                        })
+                        .synchronous(c -> {
+                            c.getSender().sendMessage("SYNC: " + Bukkit.isPrimaryThread());
+                        })
+                        .execute(() -> context.getSender().sendMessage("DONE!"))
+                ));
     }
 
     @CommandMethod("example help [query]")
     @CommandDescription("Help menu")
-    private void commandHelp(final @NonNull CommandSender sender,
-                             final @Argument("query") @Greedy String query) {
+    private void commandHelp(
+            final @NonNull CommandSender sender,
+            final @Argument("query") @Greedy String query
+    ) {
         this.minecraftHelp.queryCommands(query == null ? "" : query, sender);
     }
 
@@ -265,21 +272,25 @@ public final class ExamplePlugin extends JavaPlugin {
     private void commandClear(final @NonNull Player player) {
         player.getInventory().clear();
         this.bukkitAudiences.player(player)
-                            .sendMessage(Component.text("Your inventory has been cleared", NamedTextColor.GOLD));
+                .sendMessage(Component.text("Your inventory has been cleared", NamedTextColor.GOLD));
     }
 
     @CommandMethod("example give <material> <amount>")
     @CommandDescription("Give yourself an item")
-    private void commandGive(final @NonNull Player player,
-                             final @NonNull @Argument("material") Material material,
-                             final @Argument("amount") int number,
-                             final @Nullable @Flag("color") ChatColor nameColor) {
+    private void commandGive(
+            final @NonNull Player player,
+            final @NonNull @Argument("material") Material material,
+            final @Argument("amount") int number,
+            final @Nullable @Flag("color") ChatColor nameColor
+    ) {
         final ItemStack itemStack = new ItemStack(material, number);
-        String itemName = String.format("%s's %s",
-                                        player.getName(),
-                                        material.name()
-                                                .toLowerCase()
-                                                .replace('_', ' '));
+        String itemName = String.format(
+                "%s's %s",
+                player.getName(),
+                material.name()
+                        .toLowerCase()
+                        .replace('_', ' ')
+        );
         if (nameColor != null) {
             itemName = nameColor + itemName;
         }

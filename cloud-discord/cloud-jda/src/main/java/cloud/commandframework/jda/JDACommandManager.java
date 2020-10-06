@@ -45,6 +45,7 @@ import java.util.function.Function;
  * @param <C> Command sender type
  */
 public class JDACommandManager<C> extends CommandManager<C> {
+
     private final long botId;
 
     private final Function<@NonNull C, @NonNull String> prefixMapper;
@@ -63,12 +64,14 @@ public class JDACommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link MessageReceivedEvent}
      * @throws InterruptedException If the jda instance does not ready correctly
      */
-    public JDACommandManager(final @NonNull JDA jda,
-                             final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
-                             final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
-                             final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-                             final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper,
-                             final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper)
+    public JDACommandManager(
+            final @NonNull JDA jda,
+            final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
+            final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
+            final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper,
+            final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper
+    )
             throws InterruptedException {
         super(commandExecutionCoordinator, CommandRegistrationHandler.nullCommandRegistrationHandler());
         this.prefixMapper = prefixMapper;
@@ -130,4 +133,5 @@ public class JDACommandManager<C> extends CommandManager<C> {
     public final @NonNull CommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
+
 }

@@ -49,11 +49,13 @@ import java.util.function.BiFunction;
 @SuppressWarnings("unused")
 public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePlayer> {
 
-    private OfflinePlayerArgument(final boolean required,
-                                  final @NonNull String name,
-                                  final @NonNull String defaultValue,
-                                  final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                                          @NonNull List<@NonNull String>> suggestionsProvider) {
+    private OfflinePlayerArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new OfflinePlayerParser<>(), defaultValue, OfflinePlayer.class, suggestionsProvider);
     }
 
@@ -98,8 +100,10 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      * @param <C>           Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, OfflinePlayer> optional(final @NonNull String name,
-                                                                          final @NonNull String defaultPlayer) {
+    public static <C> @NonNull CommandArgument<C, OfflinePlayer> optional(
+            final @NonNull String name,
+            final @NonNull String defaultPlayer
+    ) {
         return OfflinePlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultPlayer).build();
     }
 
@@ -118,7 +122,8 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
         @Override
         public @NonNull OfflinePlayerArgument<C> build() {
             return new OfflinePlayerArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                                               this.getSuggestionsProvider());
+                    this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -127,8 +132,10 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
     public static final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePlayer> {
 
         @Override
-        public @NonNull ArgumentParseResult<OfflinePlayer> parse(final @NonNull CommandContext<C> commandContext,
-                                                        final @NonNull Queue<String> inputQueue) {
+        public @NonNull ArgumentParseResult<OfflinePlayer> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -146,8 +153,10 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             List<String> output = new ArrayList<>();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -156,6 +165,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
 
             return output;
         }
+
     }
 
 
@@ -188,5 +198,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
         public String getMessage() {
             return String.format("No player found for input '%s'.", input);
         }
+
     }
+
 }

@@ -79,7 +79,7 @@
     <!-- https://checkstyle.org/config_filters.html#SuppressionFilter -->
     <module name="SuppressionFilter">
         <property name="file" value="${org.checkstyle.sun.suppressionfilter.config}"
-                  default="checkstyle-suppressions.xml" />
+                  default="checkstyle-suppressions.xml"/>
         <property name="optional" value="true"/>
     </module>
 
@@ -100,7 +100,7 @@
     <module name="FileLength"/>
     <module name="LineLength">
         <property name="fileExtensions" value="java"/>
-        <property name="max" value="130" />
+        <property name="max" value="130"/>
     </module>
 
     <!-- Checks for whitespace                               -->
@@ -131,7 +131,7 @@
         <module name="JavadocMethod"/>
         <module name="JavadocType"/>
         <module name="JavadocStyle">
-            <property name="checkFirstSentence" value="false" />
+            <property name="checkFirstSentence" value="false"/>
         </module>
         <module name="MissingJavadocMethod"/>
 
@@ -210,7 +210,7 @@
         <!-- https://checkstyle.org/config_filters.html#SuppressionXpathFilter -->
         <module name="SuppressionXpathFilter">
             <property name="file" value="${org.checkstyle.sun.suppressionxpathfilter.config}"
-                      default="checkstyle-xpath-suppressions.xml" />
+                      default="checkstyle-xpath-suppressions.xml"/>
             <property name="optional" value="true"/>
         </module>
 

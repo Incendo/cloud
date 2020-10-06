@@ -27,10 +27,10 @@ import cloud.commandframework.services.State;
 
 public class DefaultSideEffectService implements MockSideEffectService {
 
-  @Override
-  public State handle(final MockPlayer mockPlayer) {
-    mockPlayer.setHealth(0);
-    return State.ACCEPTED;
-  }
+    @Override
+    public State handle(final MockPlayer mockPlayer) {
+        mockPlayer.setHealth(0);
+        return State.ACCEPTED;
+    }
 
 }

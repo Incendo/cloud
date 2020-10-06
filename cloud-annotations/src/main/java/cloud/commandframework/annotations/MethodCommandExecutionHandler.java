@@ -43,10 +43,12 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
     private final MethodHandle methodHandle;
     private final Map<String, CommandArgument<C, ?>> commandArguments;
 
-    MethodCommandExecutionHandler(final @NonNull Object instance,
-                                  final @NonNull Map<@NonNull String,
-                                          @NonNull CommandArgument<@NonNull C, @NonNull ?>> commandArguments,
-                                  @NonNull  final Method method) throws Exception {
+    MethodCommandExecutionHandler(
+            final @NonNull Object instance,
+            final @NonNull Map<@NonNull String,
+                    @NonNull CommandArgument<@NonNull C, @NonNull ?>> commandArguments,
+            @NonNull final Method method
+    ) throws Exception {
         this.commandArguments = commandArguments;
         method.setAccessible(true);
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);

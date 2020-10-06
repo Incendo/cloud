@@ -39,29 +39,29 @@ class StringArgumentTest {
     static void setup() {
         manager = new TestCommandManager();
         manager.command(manager.commandBuilder("quoted")
-                               .argument(StringArgument.of("message1", StringArgument.StringMode.QUOTED))
-                               .argument(StringArgument.of("message2"))
-                               .handler(c -> {
-                                    final String message1 = c.get("message1");
-                                    final String message2 = c.get("message2");
-                                    storage[0] = message1;
-                                    storage[1] = message2;
-                               })
-                               .build());
+                .argument(StringArgument.of("message1", StringArgument.StringMode.QUOTED))
+                .argument(StringArgument.of("message2"))
+                .handler(c -> {
+                    final String message1 = c.get("message1");
+                    final String message2 = c.get("message2");
+                    storage[0] = message1;
+                    storage[1] = message2;
+                })
+                .build());
         manager.command(manager.commandBuilder("single")
-                               .argument(StringArgument.of("message"))
-                               .handler(c -> {
-                                    final String message = c.get("message");
-                                    storage[0] = message;
-                               })
-                               .build());
+                .argument(StringArgument.of("message"))
+                .handler(c -> {
+                    final String message = c.get("message");
+                    storage[0] = message;
+                })
+                .build());
         manager.command(manager.commandBuilder("greedy")
-                               .argument(StringArgument.of("message", StringArgument.StringMode.GREEDY))
-                               .handler(c -> {
-                                   final String message = c.get("message");
-                                   storage[0] = message;
-                               })
-                               .build());
+                .argument(StringArgument.of("message", StringArgument.StringMode.GREEDY))
+                .handler(c -> {
+                    final String message = c.get("message");
+                    storage[0] = message;
+                })
+                .build());
     }
 
     private static void clear() {

@@ -49,7 +49,8 @@ final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull Comm
     @Override
     public String toString() {
         return String.format("DelegatingSuggestionsProvider{name='%s',parser='%s'}", this.argumentName,
-                             this.parser.getClass().getCanonicalName());
+                this.parser.getClass().getCanonicalName()
+        );
     }
 
 }

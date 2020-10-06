@@ -68,11 +68,13 @@ public class ParserRegistryTest {
         final ParserParameters parserParameters = parserRegistry.parseAnnotations(parsedType, Collections.singleton(range));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MIN));
         Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MAX));
-        final ArgumentParser<TestCommandSender, ?> parser = parserRegistry.createParser(parsedType,
-                                                                                        parserParameters)
-                                                                          .orElseThrow(
-                                                                                  () -> new NullPointerException(
-                                                                                          "No parser found"));
+        final ArgumentParser<TestCommandSender, ?> parser = parserRegistry.createParser(
+                parsedType,
+                parserParameters
+        )
+                .orElseThrow(
+                        () -> new NullPointerException(
+                                "No parser found"));
         Assertions.assertTrue(parser instanceof IntegerArgument.IntegerParser);
         @SuppressWarnings("unchecked") final IntegerArgument.IntegerParser<TestCommandSender> integerParser =
                 (IntegerArgument.IntegerParser<TestCommandSender>) parser;
@@ -81,11 +83,11 @@ public class ParserRegistryTest {
 
         /* Test integer */
         parserRegistry.createParser(TypeToken.get(int.class), ParserParameters.empty())
-                      .orElseThrow(() -> new IllegalArgumentException("No parser found for int.class"));
+                .orElseThrow(() -> new IllegalArgumentException("No parser found for int.class"));
 
         /* Test Enum */
         parserRegistry.createParser(TypeToken.get(CommandManager.ManagerSettings.class), ParserParameters.empty())
-                      .orElseThrow(() -> new IllegalArgumentException("No parser found for enum"));
+                .orElseThrow(() -> new IllegalArgumentException("No parser found for enum"));
     }
 
 }

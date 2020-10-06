@@ -61,20 +61,24 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
      * @param tupleFactory Function to use when creating tuple
      * @param valueType    The output type
      */
-    public CompoundArgument(final boolean required,
-                            final @NonNull String name,
-                            final @NonNull Tuple names,
-                            final @NonNull Tuple parserTuple,
-                            final @NonNull Tuple types,
-                            final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
-                            final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
-                            final @NonNull TypeToken<O> valueType) {
-        super(required,
-              name,
-              new CompoundParser<>(parserTuple, mapper, tupleFactory),
-              "",
-              valueType,
-              null);
+    public CompoundArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull Tuple names,
+            final @NonNull Tuple parserTuple,
+            final @NonNull Tuple types,
+            final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
+            final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
+            final @NonNull TypeToken<O> valueType
+    ) {
+        super(
+                required,
+                name,
+                new CompoundParser<>(parserTuple, mapper, tupleFactory),
+                "",
+                valueType,
+                null
+        );
         this.parserTuple = parserTuple;
         this.names = names;
         this.types = types;
@@ -114,17 +118,21 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
         private final BiFunction<C, T, O> mapper;
         private final Function<Object[], T> tupleFactory;
 
-        private CompoundParser(final @NonNull Tuple parserTuple,
-                               final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
-                               final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory) {
+        private CompoundParser(
+                final @NonNull Tuple parserTuple,
+                final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
+                final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory
+        ) {
             this.parsers = parserTuple.toArray();
             this.mapper = mapper;
             this.tupleFactory = tupleFactory;
         }
 
         @Override
-        public @NonNull ArgumentParseResult<O> parse(final @NonNull CommandContext<C> commandContext,
-                                                     final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<O> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final Object[] output = new Object[this.parsers.length];
             for (int i = 0; i < this.parsers.length; i++) {
                 @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) this.parsers[i];
@@ -141,16 +149,20 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
              * Now check if the mapper threw any exceptions
              */
             try {
-                return ArgumentParseResult.success(this.mapper.apply(commandContext.getSender(),
-                                                                     this.tupleFactory.apply(output)));
+                return ArgumentParseResult.success(this.mapper.apply(
+                        commandContext.getSender(),
+                        this.tupleFactory.apply(output)
+                ));
             } catch (final Exception e) {
                 return ArgumentParseResult.failure(e);
             }
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(final @NonNull CommandContext<C> commandContext,
-                                                          final @NonNull String input) {
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             /*
             This method will be called n times, each time for each of the internal types.
             The problem is that we need to then know which of the parsers to forward the
@@ -163,6 +175,7 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
             //noinspection all
             return ((ArgumentParser<C, ?>) this.parsers[argument]).suggestions(commandContext, input);
         }
+
     }
 
 }

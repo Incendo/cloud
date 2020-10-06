@@ -49,8 +49,10 @@ public interface ParserRegistry<C> {
      *                 to configure the parser, many of which are documented in {@link StandardParameters}
      * @param <T>      Generic type specifying what is produced by the parser
      */
-    <T> void registerParserSupplier(@NonNull TypeToken<T> type,
-                                    @NonNull Function<@NonNull ParserParameters, @NonNull ArgumentParser<C, ?>> supplier);
+    <T> void registerParserSupplier(
+            @NonNull TypeToken<T> type,
+            @NonNull Function<@NonNull ParserParameters, @NonNull ArgumentParser<C, ?>> supplier
+    );
 
     /**
      * Register a named parser supplier
@@ -59,8 +61,10 @@ public interface ParserRegistry<C> {
      * @param supplier The function that generates the parser. The map supplied my contain parameters used
      *                 to configure the parser, many of which are documented in {@link StandardParameters}
      */
-    void registerNamedParserSupplier(@NonNull String name,
-                                     @NonNull Function<@NonNull ParserParameters, @NonNull ArgumentParser<C, ?>> supplier);
+    void registerNamedParserSupplier(
+            @NonNull String name,
+            @NonNull Function<@NonNull ParserParameters, @NonNull ArgumentParser<C, ?>> supplier
+    );
 
     /**
      * Register a mapper that maps annotation instances to a map of parameter-object pairs
@@ -71,9 +75,11 @@ public interface ParserRegistry<C> {
      * @param <A>        Annotation type
      * @param <T>        Type of the object that the parser is retrieved for
      */
-    <A extends Annotation, T> void registerAnnotationMapper(@NonNull Class<A> annotation,
-                                                            @NonNull BiFunction<@NonNull A, @NonNull TypeToken<?>,
-                                                                    @NonNull ParserParameters> mapper);
+    <A extends Annotation, T> void registerAnnotationMapper(
+            @NonNull Class<A> annotation,
+            @NonNull BiFunction<@NonNull A, @NonNull TypeToken<?>,
+                    @NonNull ParserParameters> mapper
+    );
 
     /**
      * Parse annotations into {@link ParserParameters}
@@ -82,8 +88,10 @@ public interface ParserRegistry<C> {
      * @param annotations The annotations to be parsed
      * @return Parsed parameters
      */
-    @NonNull ParserParameters parseAnnotations(@NonNull TypeToken<?> parsingType,
-                                               @NonNull Collection<? extends Annotation> annotations);
+    @NonNull ParserParameters parseAnnotations(
+            @NonNull TypeToken<?> parsingType,
+            @NonNull Collection<? extends Annotation> annotations
+    );
 
     /**
      * Attempt to create a {@link ArgumentParser} for a specified type, using
@@ -94,8 +102,10 @@ public interface ParserRegistry<C> {
      * @param <T>              Generic type
      * @return Parser, if one can be created
      */
-    <T> @NonNull Optional<ArgumentParser<C, T>> createParser(@NonNull TypeToken<T> type,
-                                                    @NonNull ParserParameters parserParameters);
+    <T> @NonNull Optional<ArgumentParser<C, T>> createParser(
+            @NonNull TypeToken<T> type,
+            @NonNull ParserParameters parserParameters
+    );
 
     /**
      * Attempt to create a {@link ArgumentParser} for a specified type, using
@@ -106,7 +116,9 @@ public interface ParserRegistry<C> {
      * @param <T>              Generic type
      * @return Parser, if one can be created
      */
-    <T> @NonNull Optional<ArgumentParser<C, T>> createParser(@NonNull String name,
-                                                             @NonNull ParserParameters parserParameters);
+    <T> @NonNull Optional<ArgumentParser<C, T>> createParser(
+            @NonNull String name,
+            @NonNull ParserParameters parserParameters
+    );
 
 }

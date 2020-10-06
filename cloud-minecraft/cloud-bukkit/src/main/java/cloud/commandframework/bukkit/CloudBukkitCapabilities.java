@@ -27,5 +27,8 @@ package cloud.commandframework.bukkit;
  * Capabilities for the Bukkit module
  */
 public enum CloudBukkitCapabilities {
-    BRIGADIER, COMMODORE_BRIGADIER, NATIVE_BRIGADIER, ASYNCHRONOUS_COMPLETION
+    BRIGADIER,
+    COMMODORE_BRIGADIER,
+    NATIVE_BRIGADIER,
+    ASYNCHRONOUS_COMPLETION
 }

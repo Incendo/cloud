@@ -32,8 +32,10 @@ final class ArgumentParameterPair {
     private final Parameter parameter;
     private final Argument argument;
 
-    ArgumentParameterPair(final @NonNull Parameter parameter,
-                          final @NonNull Argument argument) {
+    ArgumentParameterPair(
+            final @NonNull Parameter parameter,
+            final @NonNull Argument argument
+    ) {
         this.parameter = parameter;
         this.argument = argument;
     }

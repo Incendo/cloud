@@ -40,7 +40,7 @@ class CommandTest {
     void ensureOrdering() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 Command.newBuilder("test", SimpleCommandMeta.empty()).argument(StringArgument.optional("something"))
-                       .argument(StaticArgument.of("somethingelse")).build());
+                        .argument(StaticArgument.of("somethingelse")).build());
     }
 
 }

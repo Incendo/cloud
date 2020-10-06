@@ -57,7 +57,8 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
             final @NonNull ProxyServer proxyServer,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper) {
+            final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper
+    ) {
         super(commandExecutionCoordinator, new VelocityPluginRegistrationHandler<>());
         ((VelocityPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.proxyServer = proxyServer;

@@ -41,13 +41,15 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     private final float min;
     private final float max;
 
-    private FloatArgument(final boolean required,
-                          final @NonNull String name,
-                          final float min,
-                          final float max,
-                          final @NonNull String defaultValue,
-                          final @Nullable BiFunction<@NonNull CommandContext<C>,
-                                  @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
+    private FloatArgument(
+            final boolean required,
+            final @NonNull String name,
+            final float min,
+            final float max,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new FloatParser<>(min, max), defaultValue, Float.class, suggestionsProvider);
         this.min = min;
         this.max = max;
@@ -94,8 +96,10 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Float> optional(final @NonNull String name,
-                                                                  final float defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Float> optional(
+            final @NonNull String name,
+            final float defaultNum
+    ) {
         return FloatArgument.<C>newBuilder(name).asOptionalWithDefault(Float.toString(defaultNum)).build();
     }
 
@@ -156,7 +160,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         @Override
         public @NonNull FloatArgument<C> build() {
             return new FloatArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                                       this.getDefaultValue(), this.getSuggestionsProvider());
+                    this.getDefaultValue(), this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -180,7 +185,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         @Override
         public @NonNull ArgumentParseResult<Float> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<String> inputQueue) {
+                final @NonNull Queue<String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));

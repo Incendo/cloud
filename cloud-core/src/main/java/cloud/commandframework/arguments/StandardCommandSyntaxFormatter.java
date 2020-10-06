@@ -46,8 +46,10 @@ import java.util.List;
 public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
 
     @Override
-    public final @NonNull String apply(final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
-                                       final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node) {
+    public final @NonNull String apply(
+            final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
+            final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
+    ) {
         final StringBuilder stringBuilder = new StringBuilder();
         final Iterator<CommandArgument<C, ?>> iterator = commandArguments.iterator();
         while (iterator.hasNext()) {
@@ -73,8 +75,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
 
                     if (commandArgument instanceof FlagArgument) {
                         final StringBuilder flagBuilder = new StringBuilder();
-                        @SuppressWarnings("unchecked")
-                        final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) commandArgument).getFlags().iterator();
+                        @SuppressWarnings("unchecked") final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) commandArgument)
+                                .getFlags()
+                                .iterator();
                         while (flagIterator.hasNext()) {
                             final CommandFlag<?> flag = flagIterator.next();
                             flagBuilder.append("--").append(flag.getName());
@@ -140,8 +143,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 stringBuilder.append(suffix);
             } else if (argument instanceof FlagArgument) {
                 final StringBuilder flagBuilder = new StringBuilder();
-                @SuppressWarnings("unchecked")
-                final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) argument).getFlags().iterator();
+                @SuppressWarnings("unchecked") final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) argument)
+                        .getFlags()
+                        .iterator();
                 while (flagIterator.hasNext()) {
                     final CommandFlag<?> flag = flagIterator.next();
                     flagBuilder.append("--").append(flag.getName());
@@ -153,14 +157,14 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                     }
                 }
                 stringBuilder.append(" ")
-                             .append(prefix)
-                             .append(flagBuilder)
-                             .append(suffix);
+                        .append(prefix)
+                        .append(flagBuilder)
+                        .append(suffix);
             } else {
                 stringBuilder.append(" ")
-                             .append(prefix)
-                             .append(argument.getName())
-                             .append(suffix);
+                        .append(prefix)
+                        .append(argument.getName())
+                        .append(suffix);
             }
             tail = tail.getChildren().get(0);
         }

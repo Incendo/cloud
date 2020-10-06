@@ -37,11 +37,13 @@ import java.util.function.BiFunction;
 @SuppressWarnings("unused")
 public final class CharArgument<C> extends CommandArgument<C, Character> {
 
-    private CharArgument(final boolean required,
-                         final @NonNull String name,
-                         final @NonNull String defaultValue,
-                         final @Nullable BiFunction<@NonNull CommandContext<C>,
-                                 @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider) {
+    private CharArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
+    ) {
         super(required, name, new CharacterParser<>(), defaultValue, Character.class, suggestionsProvider);
     }
 
@@ -86,8 +88,10 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Character> optional(final @NonNull String name,
-                                                                      final @NonNull String defaultNum) {
+    public static <C> @NonNull CommandArgument<C, Character> optional(
+            final @NonNull String name,
+            final @NonNull String defaultNum
+    ) {
         return CharArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
@@ -106,7 +110,8 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         @Override
         public @NonNull CharArgument<C> build() {
             return new CharArgument<>(this.isRequired(), this.getName(),
-                                      this.getDefaultValue(), this.getSuggestionsProvider());
+                    this.getDefaultValue(), this.getSuggestionsProvider()
+            );
         }
 
     }
@@ -115,8 +120,10 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
     public static final class CharacterParser<C> implements ArgumentParser<C, Character> {
 
         @Override
-        public @NonNull ArgumentParseResult<Character> parse(final @NonNull CommandContext<C> commandContext,
-                                                             final @NonNull Queue<@NonNull String> inputQueue) {
+        public @NonNull ArgumentParseResult<Character> parse(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
@@ -166,5 +173,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         public String getMessage() {
             return String.format("'%s' is not a valid character.", input);
         }
+
     }
+
 }

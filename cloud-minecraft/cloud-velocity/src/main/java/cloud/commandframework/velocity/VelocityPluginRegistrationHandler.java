@@ -23,10 +23,10 @@
 //
 package cloud.commandframework.velocity;
 
-import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -56,11 +56,12 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
 
     void initialize(final @NonNull VelocityCommandManager<C> velocityCommandManager) {
         this.manager = velocityCommandManager;
-        this.brigadierManager = new CloudBrigadierManager<>(velocityCommandManager,
-            () -> new CommandContext<>(
-                    velocityCommandManager.getCommandSenderMapper()
-                                          .apply(velocityCommandManager.getProxyServer()
-                                                                       .getConsoleCommandSource()))
+        this.brigadierManager = new CloudBrigadierManager<>(
+                velocityCommandManager,
+                () -> new CommandContext<>(
+                        velocityCommandManager.getCommandSenderMapper()
+                                .apply(velocityCommandManager.getProxyServer()
+                                        .getConsoleCommandSource()))
         );
     }
 
@@ -70,67 +71,107 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         final List<String> aliases = ((StaticArgument<C>) argument).getAlternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
                 this.brigadierManager.createLiteralCommandNode(command.getArguments().get(0).getName(), (Command<C>) command,
-               (c, p) -> this.manager.hasPermission(
-                       this.manager.getCommandSenderMapper()
-                                   .apply(c), p), true,
-               commandContext -> {
-                   final CommandSource source = commandContext.getSource();
-                   final String input = commandContext.getInput();
-                   final C sender = this.manager.getCommandSenderMapper().apply(source);
-                   this.manager.executeCommand(sender, input).whenComplete((result, throwable) -> {
-                       if (throwable != null) {
-                           if (throwable instanceof CompletionException) {
-                               throwable = throwable.getCause();
-                           }
-                           final Throwable finalThrowable = throwable;
-                           if (throwable instanceof InvalidSyntaxException) {
-                               this.manager.handleException(sender,
-                                                            InvalidSyntaxException.class,
-                                                            (InvalidSyntaxException) throwable, (c, e) ->
-                                source.sendMessage(TextComponent.builder("Invalid Command Syntax. Correct command syntax is: ",
-                                                                         NamedTextColor.RED)
-                                                                .append(e.getCorrectSyntax(), NamedTextColor.GRAY).build())
-                               );
-                           } else if (throwable instanceof InvalidCommandSenderException) {
-                               this.manager.handleException(sender,
-                                                            InvalidCommandSenderException.class,
-                                                            (InvalidCommandSenderException) throwable, (c, e) ->
-                                   source.sendMessage(TextComponent.of(finalThrowable.getMessage()).color(NamedTextColor.RED))
-                               );
-                           } else if (throwable instanceof NoPermissionException) {
-                               this.manager.handleException(sender,
-                                                            NoPermissionException.class,
-                                                            (NoPermissionException) throwable, (c, e) ->
-                                   source.sendMessage(TextComponent.of(MESSAGE_NO_PERMS))
-                               );
-                           } else if (throwable instanceof NoSuchCommandException) {
-                               this.manager.handleException(sender,
-                                                            NoSuchCommandException.class,
-                                                            (NoSuchCommandException) throwable, (c, e) ->
-                                   source.sendMessage(TextComponent.of(MESSAGE_UNKNOWN_COMMAND))
-                               );
-                           } else if (throwable instanceof ArgumentParseException) {
-                               this.manager.handleException(sender,
-                                                            ArgumentParseException.class,
-                                                            (ArgumentParseException) throwable, (c, e) ->
-                                   source.sendMessage(TextComponent.builder("Invalid Command Argument: ",
-                                                                            NamedTextColor.RED)
-                                                                   .append(finalThrowable.getCause().getMessage(),
-                                                                           NamedTextColor.GRAY)
-                                                                   .build())
-                               );
-                           } else {
-                               source.sendMessage(TextComponent.of(throwable.getMessage()).color(NamedTextColor.RED));
-                               throwable.printStackTrace();
-                           }
-                       }
-                   });
-                   return com.mojang.brigadier.Command.SINGLE_SUCCESS;
-               })
+                        (c, p) -> this.manager.hasPermission(
+                                this.manager.getCommandSenderMapper()
+                                        .apply(c), p), true,
+                        commandContext -> {
+                            final CommandSource source = commandContext.getSource();
+                            final String input = commandContext.getInput();
+                            final C sender = this.manager.getCommandSenderMapper().apply(
+                                    source);
+                            this.manager
+                                    .executeCommand(sender, input)
+                                    .whenComplete((result, throwable) -> {
+                                        if (throwable != null) {
+                                            if (throwable instanceof CompletionException) {
+                                                throwable = throwable.getCause();
+                                            }
+                                            final Throwable finalThrowable = throwable;
+                                            if (throwable instanceof InvalidSyntaxException) {
+                                                this.manager.handleException(
+                                                        sender,
+                                                        InvalidSyntaxException.class,
+                                                        (InvalidSyntaxException) throwable,
+                                                        (c, e) ->
+                                                                source.sendMessage(
+                                                                        TextComponent
+                                                                                .builder(
+                                                                                        "Invalid Command Syntax. Correct command syntax is: ",
+                                                                                        NamedTextColor.RED
+                                                                                )
+                                                                                .append(
+                                                                                        e.getCorrectSyntax(),
+                                                                                        NamedTextColor.GRAY
+                                                                                )
+                                                                                .build())
+                                                );
+                                            } else if (throwable instanceof InvalidCommandSenderException) {
+                                                this.manager.handleException(
+                                                        sender,
+                                                        InvalidCommandSenderException.class,
+                                                        (InvalidCommandSenderException) throwable,
+                                                        (c, e) ->
+                                                                source.sendMessage(
+                                                                        TextComponent
+                                                                                .of(finalThrowable
+                                                                                        .getMessage())
+                                                                                .color(NamedTextColor.RED))
+                                                );
+                                            } else if (throwable instanceof NoPermissionException) {
+                                                this.manager.handleException(
+                                                        sender,
+                                                        NoPermissionException.class,
+                                                        (NoPermissionException) throwable,
+                                                        (c, e) ->
+                                                                source.sendMessage(
+                                                                        TextComponent
+                                                                                .of(MESSAGE_NO_PERMS))
+                                                );
+                                            } else if (throwable instanceof NoSuchCommandException) {
+                                                this.manager.handleException(
+                                                        sender,
+                                                        NoSuchCommandException.class,
+                                                        (NoSuchCommandException) throwable,
+                                                        (c, e) ->
+                                                                source.sendMessage(
+                                                                        TextComponent
+                                                                                .of(MESSAGE_UNKNOWN_COMMAND))
+                                                );
+                                            } else if (throwable instanceof ArgumentParseException) {
+                                                this.manager.handleException(
+                                                        sender,
+                                                        ArgumentParseException.class,
+                                                        (ArgumentParseException) throwable,
+                                                        (c, e) ->
+                                                                source.sendMessage(
+                                                                        TextComponent
+                                                                                .builder(
+                                                                                        "Invalid Command Argument: ",
+                                                                                        NamedTextColor.RED
+                                                                                )
+                                                                                .append(
+                                                                                        finalThrowable
+                                                                                                .getCause()
+                                                                                                .getMessage(),
+                                                                                        NamedTextColor.GRAY
+                                                                                )
+                                                                                .build())
+                                                );
+                                            } else {
+                                                source.sendMessage(TextComponent
+                                                        .of(throwable.getMessage())
+                                                        .color(NamedTextColor.RED));
+                                                throwable.printStackTrace();
+                                            }
+                                        }
+                                    });
+                            return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                        }
+                )
         );
         final CommandMeta commandMeta = this.manager.getProxyServer().getCommandManager()
-                                                    .metaBuilder(brigadierCommand)
-                                                    .aliases(aliases.toArray(new String[0])).build();
+                .metaBuilder(brigadierCommand)
+                .aliases(aliases.toArray(new String[0])).build();
         aliases.forEach(this.manager.getProxyServer().getCommandManager()::unregister);
         this.manager.getProxyServer().getCommandManager().register(commandMeta, brigadierCommand);
         return true;

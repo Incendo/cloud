@@ -36,12 +36,6 @@ import java.util.function.Function;
 public interface TaskFunction<I, O> extends Function<@NonNull I, @NonNull O>, TaskRecipeStep {
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NonNull O apply(@NonNull I input);
-
-    /**
      * Equivalent to {@link Function#identity()}
      *
      * @param <I> Input type
@@ -50,5 +44,11 @@ public interface TaskFunction<I, O> extends Function<@NonNull I, @NonNull O>, Ta
     static <I> TaskFunction<I, I> identity() {
         return i -> i;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @NonNull O apply(@NonNull I input);
 
 }

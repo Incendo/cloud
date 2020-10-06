@@ -51,102 +51,113 @@ class CommandTreeTest {
 
         /* Build general test commands */
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .literal("one").build())
-               .command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                               .literal("two").withPermission("no").build())
-               .command(manager.commandBuilder("test", Collections.singleton("other"),
-                                               SimpleCommandMeta.empty())
-                               .literal("opt", "öpt")
-                               .argument(IntegerArgument
-                                                 .optional("num", EXPECTED_INPUT_NUMBER))
-                               .build())
-               .command(manager.commandBuilder("req").withSenderType(SpecificCommandSender.class).build());
+                .literal("one").build())
+                .command(manager.commandBuilder("test", SimpleCommandMeta.empty())
+                        .literal("two").withPermission("no").build())
+                .command(manager.commandBuilder("test", Collections.singleton("other"),
+                        SimpleCommandMeta.empty()
+                )
+                        .literal("opt", "öpt")
+                        .argument(IntegerArgument
+                                .optional("num", EXPECTED_INPUT_NUMBER))
+                        .build())
+                .command(manager.commandBuilder("req").senderType(SpecificCommandSender.class).build());
 
         /* Build command to test command proxying */
         final Command<TestCommandSender> toProxy = manager.commandBuilder("test")
-                                                          .literal("unproxied")
-                                                          .argument(StringArgument.of("string"))
-                                                          .argument(IntegerArgument.of("int"))
-                                                          .literal("anotherliteral")
-                                                          .handler(c -> {
-                                                          })
-                                                          .build();
+                .literal("unproxied")
+                .argument(StringArgument.of("string"))
+                .argument(IntegerArgument.of("int"))
+                .literal("anotherliteral")
+                .handler(c -> {
+                })
+                .build();
         manager.command(toProxy);
         manager.command(manager.commandBuilder("proxy").proxies(toProxy).build());
 
         /* Build command for testing intermediary and final executors */
         manager.command(manager.commandBuilder("command")
-                               .withPermission("command.inner")
-                               .literal("inner")
-                               .handler(c -> System.out.println("Using inner command")));
+                .withPermission("command.inner")
+                .literal("inner")
+                .handler(c -> System.out.println("Using inner command")));
         manager.command(manager.commandBuilder("command")
-                               .withPermission("command.outer")
-                               .handler(c -> System.out.println("Using outer command")));
+                .withPermission("command.outer")
+                .handler(c -> System.out.println("Using outer command")));
 
         /* Build command for testing compound types */
         manager.command(manager.commandBuilder("pos")
-                               .argument(ArgumentPair.of(manager, "pos", Pair.of("x", "y"),
-                                                         Pair.of(Integer.class, Integer.class))
-                                                     .simple())
-                               .handler(c -> {
-                                   final Pair<Integer, Integer> pair = c.get("pos");
-                                   System.out.printf("X: %d | Y: %d\n", pair.getFirst(), pair.getSecond());
-                               }));
+                .argument(ArgumentPair.of(manager, "pos", Pair.of("x", "y"),
+                        Pair.of(Integer.class, Integer.class)
+                )
+                        .simple())
+                .handler(c -> {
+                    final Pair<Integer, Integer> pair = c.get("pos");
+                    System.out.printf("X: %d | Y: %d\n", pair.getFirst(), pair.getSecond());
+                }));
         manager.command(manager.commandBuilder("vec")
-                               .argument(ArgumentPair.of(manager, "vec", Pair.of("x", "y"),
-                                                         Pair.of(Double.class, Double.class))
-                                                     .withMapper(Vector2.class,
-                                                                 (sender, pair) -> new Vector2(pair.getFirst(), pair.getSecond()))
-                               )
-                               .handler(c -> {
-                                   final Vector2 vector2 = c.get("vec");
-                                   System.out.printf("X: %f | Y: %f\n", vector2.getX(), vector2.getY());
-                               }));
+                .argument(ArgumentPair.of(manager, "vec", Pair.of("x", "y"),
+                        Pair.of(Double.class, Double.class)
+                        )
+                                .withMapper(
+                                        Vector2.class,
+                                        (sender, pair) -> new Vector2(pair.getFirst(), pair.getSecond())
+                                )
+                )
+                .handler(c -> {
+                    final Vector2 vector2 = c.get("vec");
+                    System.out.printf("X: %f | Y: %f\n", vector2.getX(), vector2.getY());
+                }));
 
         /* Build command for testing flags */
         manager.command(manager.commandBuilder("flags")
-                               .flag(manager.flagBuilder("test")
-                                            .withAliases("t")
-                                            .build())
-                               .flag(manager.flagBuilder("test2")
-                                            .build())
-                               .flag(manager.flagBuilder("num")
-                                            .withArgument(IntegerArgument.of("num")).build())
-                               .handler(c -> {
-                                   System.out.println("Flag present? " + c.flags().isPresent("test"));
-                                   System.out.println("Numerical flag: " + c.flags().getValue("num", -10));
-                               })
-                               .build());
+                .flag(manager.flagBuilder("test")
+                        .withAliases("t")
+                        .build())
+                .flag(manager.flagBuilder("test2")
+                        .build())
+                .flag(manager.flagBuilder("num")
+                        .withArgument(IntegerArgument.of("num")).build())
+                .handler(c -> {
+                    System.out.println("Flag present? " + c.flags().isPresent("test"));
+                    System.out.println("Numerical flag: " + c.flags().getValue("num", -10));
+                })
+                .build());
     }
 
     @Test
     void parse() {
         final Pair<Command<TestCommandSender>, Exception> command = manager.getCommandTree()
-                                                                           .parse(new CommandContext<>(
-                                                                                          new TestCommandSender()),
-                                                                                  new LinkedList<>(
-                                                                                          Arrays.asList("test",
-                                                                                                        "one")));
+                .parse(
+                        new CommandContext<>(
+                                new TestCommandSender()),
+                        new LinkedList<>(
+                                Arrays.asList(
+                                        "test",
+                                        "one"
+                                ))
+                );
         Assertions.assertNotNull(command.getFirst());
         Assertions.assertEquals(NoPermissionException.class, manager.getCommandTree()
-                                                                    .parse(new CommandContext<>(
-                                                                                   new TestCommandSender()),
-                                                                           new LinkedList<>(
-                                                                                   Arrays.asList("test", "two")))
-                                                                    .getSecond().getClass());
+                .parse(
+                        new CommandContext<>(
+                                new TestCommandSender()),
+                        new LinkedList<>(
+                                Arrays.asList("test", "two"))
+                )
+                .getSecond().getClass());
         manager.getCommandTree()
-               .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt")))
-               .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
+                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt")))
+                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
         manager.getCommandTree()
-               .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt", "12")))
-               .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
+                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt", "12")))
+                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
     }
 
     @Test
     void testAlias() {
         manager.getCommandTree()
-               .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("other", "öpt", "12")))
-               .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
+                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("other", "öpt", "12")))
+                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
     }
 
     @Test
@@ -166,11 +177,11 @@ class CommandTreeTest {
     void testDefaultParser() {
         manager.command(
                 manager.commandBuilder("default")
-                       .argument(manager.argumentBuilder(Integer.class, "int"))
-                       .handler(context -> {
-                           final int number = context.get("int");
-                           System.out.printf("Supplied number is: %d\n", number);
-                       })
+                        .argument(manager.argumentBuilder(Integer.class, "int"))
+                        .handler(context -> {
+                            final int number = context.get("int");
+                            System.out.printf("Supplied number is: %d\n", number);
+                        })
         );
         manager.executeCommand(new TestCommandSender(), "default 5").join();
     }
@@ -224,6 +235,7 @@ class CommandTreeTest {
 
 
     public static final class SpecificCommandSender extends TestCommandSender {
+
     }
 
 
