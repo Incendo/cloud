@@ -170,9 +170,9 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
          * @return Created triplet
          */
         public <O> @NonNull ArgumentTriplet<C, U, V, W, O> withMapper(final @NonNull Class<O> clazz,
-                                                                      final @NonNull BiFunction<@NonNull C,
-                                                                              @NonNull Triplet<@NonNull U, @NonNull V,
-                                                                                      @NonNull W>, @NonNull O> mapper) {
+                                                                      final @NonNull BiFunction<@NonNull C, @NonNull Triplet<
+                                                                              @NonNull U, @NonNull V, @NonNull W>,
+                                                                              @NonNull O> mapper) {
             return new ArgumentTriplet<>(this.required, this.name, this.names, this.types,
                                          this.parserTriplet, mapper, TypeToken.get(clazz));
         }
