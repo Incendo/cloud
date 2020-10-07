@@ -91,10 +91,6 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         @SuppressWarnings("unchecked")
         final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
 
-        if (!label.contains(":")) {
-            aliases.add(prefixedLabel);
-        }
-
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
                 label,
                 (this.bukkitCommandManager.getSplitAliases() ? Collections.<String>emptyList() : aliases),
