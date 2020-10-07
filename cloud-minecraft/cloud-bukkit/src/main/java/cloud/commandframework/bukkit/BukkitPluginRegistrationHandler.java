@@ -76,17 +76,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                 && this.registeredCommands.containsKey(commandArgument)) {
             return false;
         }
-
-        final String label;
-        final String prefixedLabel = String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(),
-                commandArgument.getName()
-        ).toLowerCase();
-        if (!(this.bukkitCommandManager.getCommandRegistrationHandler() instanceof CloudCommodoreManager)
-                && bukkitCommands.containsKey(commandArgument.getName())) {
-            label = prefixedLabel;
-        } else {
-            label = commandArgument.getName();
-        }
+        final String label = commandArgument.getName();
 
         @SuppressWarnings("unchecked")
         final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
