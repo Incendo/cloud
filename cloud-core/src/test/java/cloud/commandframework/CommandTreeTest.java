@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.standard.EnumArgument;
+import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
@@ -126,6 +127,13 @@ class CommandTreeTest {
                     System.out.println("Enum: " + c.flags().getValue("enum", FlagEnum.PROXI));
                 })
                 .build());
+
+        /* Build command for testing float */
+        manager.command(manager.commandBuilder("float")
+                .argument(FloatArgument.of("num"))
+                .handler(c -> {
+                    System.out.printf("%f\n", c.<Float>get("num"));
+                }));
     }
 
     @Test
@@ -236,6 +244,12 @@ class CommandTreeTest {
         manager.command(manager.commandBuilder("one").argument(argument));
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 manager.command(manager.commandBuilder("two").argument(argument)));
+    }
+
+    @Test
+    void testFloats() {
+        manager.executeCommand(new TestCommandSender(), "float 0.0").join();
+        manager.executeCommand(new TestCommandSender(), "float 100").join();
     }
 
 

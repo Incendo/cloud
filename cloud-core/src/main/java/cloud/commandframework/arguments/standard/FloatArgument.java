@@ -123,8 +123,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Float> {
 
-        private float min = Float.MIN_VALUE;
-        private float max = Float.MAX_VALUE;
+        private float min = Float.NEGATIVE_INFINITY;
+        private float max = Float.POSITIVE_INFINITY;
 
         protected Builder(final @NonNull String name) {
             super(Float.class, name);

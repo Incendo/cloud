@@ -123,8 +123,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Double> {
 
-        private double min = Double.MIN_VALUE;
-        private double max = Double.MAX_VALUE;
+        private double min = Double.NEGATIVE_INFINITY;
+        private double max = Double.POSITIVE_INFINITY;
 
         protected Builder(final @NonNull String name) {
             super(Double.class, name);
