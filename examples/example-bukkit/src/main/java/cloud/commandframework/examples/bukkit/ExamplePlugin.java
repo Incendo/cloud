@@ -38,6 +38,8 @@ import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
+import cloud.commandframework.arguments.standard.EnumArgument;
+import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.BukkitCommandMetaBuilder;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
@@ -254,6 +256,17 @@ public final class ExamplePlugin extends JavaPlugin {
                         })
                         .execute(() -> context.getSender().sendMessage("DONE!"))
                 ));
+        manager.command(manager.commandBuilder("give")
+                .senderType(Player.class)
+                .argument(EnumArgument.of(Material.class, "material"))
+                .argument(IntegerArgument.of("amount"))
+                .handler(c -> {
+                    final Material material = c.get("material");
+                    final int amount = c.get("amount");
+                    final ItemStack itemStack = new ItemStack(material, amount);
+                    ((Player) c.getSender()).getInventory().addItem(itemStack);
+                    c.getSender().sendMessage("You've been given stuff, bro.");
+                }));
     }
 
     @CommandMethod("example help [query]")

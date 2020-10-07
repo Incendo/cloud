@@ -163,6 +163,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                             final CommandFlag erasedFlag = currentFlag;
                             final Object value = result.getParsedValue().get();
                             commandContext.flags().addValueFlag(erasedFlag, value);
+                            currentFlag = null;
                         }
                     }
                 }

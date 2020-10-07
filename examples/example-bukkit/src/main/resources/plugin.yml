@@ -2,3 +2,4 @@ name: ExamplePlugin
 version: 1.0.0
 api-version: 1.13
 main: cloud.commandframework.examples.bukkit.ExamplePlugin
+depends: [Essentials]
