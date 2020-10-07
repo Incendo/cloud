@@ -285,7 +285,7 @@ public abstract class CommandManager<C> {
             final @NonNull Description description,
             final @NonNull CommandMeta meta
     ) {
-        return Command.newBuilder(name, meta, description, aliases.toArray(new String[0]));
+        return Command.<C>newBuilder(name, meta, description, aliases.toArray(new String[0])).manager(this);
     }
 
     /**
@@ -301,7 +301,7 @@ public abstract class CommandManager<C> {
             final @NonNull Collection<String> aliases,
             final @NonNull CommandMeta meta
     ) {
-        return Command.newBuilder(name, meta, Description.empty(), aliases.toArray(new String[0]));
+        return Command.<C>newBuilder(name, meta, Description.empty(), aliases.toArray(new String[0])).manager(this);
     }
 
     /**
@@ -319,7 +319,7 @@ public abstract class CommandManager<C> {
             final @NonNull Description description,
             final @NonNull String... aliases
     ) {
-        return Command.newBuilder(name, meta, description, aliases);
+        return Command.<C>newBuilder(name, meta, description, aliases).manager(this);
     }
 
     /**
@@ -335,7 +335,7 @@ public abstract class CommandManager<C> {
             final @NonNull CommandMeta meta,
             final @NonNull String... aliases
     ) {
-        return Command.newBuilder(name, meta, Description.empty(), aliases);
+        return Command.<C>newBuilder(name, meta, Description.empty(), aliases).manager(this);
     }
 
     /**
