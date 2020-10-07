@@ -83,6 +83,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         /* Register standard mappers */
         this.<Range, Number>registerAnnotationMapper(Range.class, new RangeMapper<>());
         this.<Completions, String>registerAnnotationMapper(Completions.class, new CompletionsMapper());
+        this.<Greedy, String>registerAnnotationMapper(Greedy.class, new GreedyMapper());
 
         /* Register standard types */
         this.registerParserSupplier(TypeToken.get(Byte.class), options ->
