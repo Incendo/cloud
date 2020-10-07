@@ -1,4 +1,0 @@
-dependencies {
-    compileOnly 'org.jline:jline:3.16.0'
-    api project(':cloud-core')
-}

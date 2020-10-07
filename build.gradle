@@ -48,6 +48,8 @@ allprojects {
         mapping 'java', 'DOUBLESLASH_STYLE'
         includes(["**/*.java"])
     }
+
+    build.dependsOn(checkstyleMain)
 }
 
 subprojects {
