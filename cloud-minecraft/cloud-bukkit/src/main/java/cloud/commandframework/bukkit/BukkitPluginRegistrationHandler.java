@@ -88,7 +88,8 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             label = commandArgument.getName();
         }
 
-        @SuppressWarnings("unchecked") final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
+        @SuppressWarnings("unchecked")
+        final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
 
         if (!label.contains(":")) {
             aliases.add(prefixedLabel);

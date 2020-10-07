@@ -60,7 +60,6 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 ## modules
 - **cloud-core**: Core module containing most of the cloud API, and shared implementations
 - **cloud-annotations**: Annotation processing code that allows you to use annotated methods rather than builders
-- **cloud-jline**: W.I.P JLine3 implementation of cloud
 - **cloud-services**: Services for Cloud
 - **cloud-minecraft/cloud-brigadier**: Brigadier mappings for cloud
 - **cloud-minecraft/cloud-bukkit**: Bukkit 1.8.8+ implementation of cloud
