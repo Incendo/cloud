@@ -45,6 +45,7 @@ import java.util.function.Function;
  * @param <C> Command sender type
  */
 public class JDACommandManager<C> extends CommandManager<C> {
+
     private final JDA jda;
     private final long botId;
 
@@ -82,6 +83,9 @@ public class JDACommandManager<C> extends CommandManager<C> {
         jda.addEventListener(new JDACommandListener<>(this));
         jda.awaitReady();
         this.botId = jda.getSelfUser().getIdLong();
+
+        /* Register JDA Preprocessor */
+        this.registerCommandPreProcessor(new JDACommandPreprocessor<>(this));
     }
 
     /**
