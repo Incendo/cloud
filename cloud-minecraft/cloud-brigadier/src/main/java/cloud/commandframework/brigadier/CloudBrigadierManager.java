@@ -39,7 +39,6 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.types.tuples.Pair;
@@ -62,9 +61,7 @@ import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -438,28 +435,23 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull SuggestionsBuilder builder
     ) {
         final CommandContext<C> commandContext = this.dummyContextProvider.get();
-        final LinkedList<String> inputQueue = new LinkedList<>(Collections.singletonList(builder.getInput()));
-        final CommandPreprocessingContext<C> commandPreprocessingContext =
-                new CommandPreprocessingContext<>(commandContext, inputQueue);
-        /*
-          List<String> results = server.tabComplete(context.getSource().getBukkitSender(), builder.getInput(),
-           context.getSource().getWorld(), context.getSource().getPosition(), true);
-         */
 
         String command = builder.getInput();
         if (command.startsWith("/") /* Minecraft specific */) {
             command = command.substring(1);
         }
-        final List<String> suggestions = this.commandManager.suggest(commandContext.getSender(), command);
 
-        /*
-        System.out.println("Filtering out with: " + builder.getInput());
-        final CommandSuggestionProcessor<C> processor = this.commandManager.getCommandSuggestionProcessor();
-        final List<String> filteredSuggestions = processor.apply(commandPreprocessingContext, suggestions);
-        System.out.println("Current suggestions: ");
-        for (final String suggestion : filteredSuggestions) {
-            System.out.printf("- %s\n", suggestion);
-        }*/
+        /* Remove namespace */
+        String leading = command.split(" ")[0];
+        if (leading.contains(":")) {
+            command = command.substring(leading.split(":")[0].length() + 1);
+        }
+
+        final List<String> suggestions = this.commandManager.suggest(
+                commandContext.getSender(),
+                command
+        );
+
         for (final String suggestion : suggestions) {
             String tooltip = argument.getName();
             if (!(argument instanceof StaticArgument)) {

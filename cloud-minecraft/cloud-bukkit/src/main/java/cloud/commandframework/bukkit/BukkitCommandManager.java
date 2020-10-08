@@ -156,6 +156,12 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
                 new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
                 new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
+
+        /* Register suggestion listener */
+        this.owningPlugin.getServer().getPluginManager().registerEvents(
+                new CommandSuggestionsListener<>(this),
+                this.owningPlugin
+        );
     }
 
     /**
@@ -280,6 +286,32 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         } catch (final Throwable e) {
             throw new BrigadierFailureException(BrigadierFailureReason.COMMODORE_NOT_PRESENT, e);
         }
+    }
+
+    /**
+     * Strip the plugin namespace from a plugin namespaced command. This
+     * will also strip the leading '/' if it's present
+     *
+     * @param command Command
+     * @return Stripped command
+     */
+    public final @NonNull String stripNamespace(final @NonNull String command) {
+        @NonNull String input;
+
+        /* Remove leading '/' */
+        if (command.charAt(0) == '/') {
+            input = command.substring(1);
+        } else {
+            input = command;
+        }
+
+        /* Remove leading plugin namespace */
+        final String namespace = String.format("%s:", this.getOwningPlugin().getName().toLowerCase());
+        if (input.startsWith(namespace)) {
+            input = input.substring(namespace.length());
+        }
+
+        return input;
     }
 
     /**

@@ -75,6 +75,8 @@ import java.util.function.Function;
  */
 public abstract class CommandManager<C> {
 
+    private static final List<String> SINGLE_EMPTY_SUGGESTION = Collections.unmodifiableList(Collections.singletonList(""));
+
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
     private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(
             ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
@@ -167,15 +169,23 @@ public abstract class CommandManager<C> {
     ) {
         final CommandContext<C> context = this.commandContextFactory.create(true, commandSender);
         final LinkedList<String> inputQueue = tokenize(input);
+
+        final List<String> suggestions;
         if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
-            return this.commandSuggestionProcessor.apply(
+            suggestions = this.commandSuggestionProcessor.apply(
                     new CommandPreprocessingContext<>(context, inputQueue),
                     this.commandTree.getSuggestions(
                             context, inputQueue)
             );
         } else {
-            return Collections.emptyList();
+            suggestions = Collections.emptyList();
         }
+
+        if (this.getSetting(ManagerSettings.FORCE_SUGGESTION) && suggestions.isEmpty()) {
+            return SINGLE_EMPTY_SUGGESTION;
+        }
+
+        return suggestions;
     }
 
     /**
@@ -635,7 +645,12 @@ public abstract class CommandManager<C> {
          * for child permission values, if a preceding command in the tree path
          * has a command handler attached
          */
-        ENFORCE_INTERMEDIARY_PERMISSIONS
+        ENFORCE_INTERMEDIARY_PERMISSIONS,
+        /**
+         * Force sending of an empty suggestion (i.e. a singleton list containing an empty string)
+         * when no suggestions are present
+         */
+        FORCE_SUGGESTION
     }
 
 }
