@@ -21,35 +21,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.paper;
+package cloud.commandframework.bukkit;
 
-import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
-import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.server.TabCompleteEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-final class AsyncCommandSuggestionsListener<C> implements Listener {
+final class CommandSuggestionsListener<C> implements Listener {
 
-    private final PaperCommandManager<C> paperCommandManager;
+    private final BukkitCommandManager<C> bukkitCommandManager;
 
-    AsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
-        this.paperCommandManager = paperCommandManager;
+    CommandSuggestionsListener(final @NonNull BukkitCommandManager<C> bukkitCommandManager) {
+        this.bukkitCommandManager = bukkitCommandManager;
     }
 
     @EventHandler
-    void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
+    void onTabCompletion(final @NonNull TabCompleteEvent event) {
         if (event.getBuffer().isEmpty() || !event.getBuffer().startsWith("/")) {
             return;
         }
 
-        @SuppressWarnings("unchecked")
-        final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
-                (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.getCommandRegistrationHandler();
+        @SuppressWarnings("unchecked") final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
+                (BukkitPluginRegistrationHandler<C>) this.bukkitCommandManager.getCommandRegistrationHandler();
 
         /* Turn '/plugin:command arg1 arg2 ...' into 'plugin:command' */
         final String commandLabel = event.getBuffer().substring(1).split(" ")[0];
@@ -58,16 +56,15 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         }
 
         final CommandSender sender = event.getSender();
-        final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
-        final String inputBuffer = this.paperCommandManager.stripNamespace(event.getBuffer());
+        final C cloudSender = this.bukkitCommandManager.getCommandSenderMapper().apply(sender);
+        final String inputBuffer = this.bukkitCommandManager.stripNamespace(event.getBuffer());
 
-        final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggest(
+        final List<String> suggestions = new ArrayList<>(this.bukkitCommandManager.suggest(
                 cloudSender,
                 inputBuffer
         ));
 
         event.setCompletions(suggestions);
-        event.setHandled(true);
     }
 
 }
