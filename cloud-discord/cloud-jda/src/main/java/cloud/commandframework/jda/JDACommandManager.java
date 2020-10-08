@@ -45,7 +45,7 @@ import java.util.function.Function;
  * @param <C> Command sender type
  */
 public class JDACommandManager<C> extends CommandManager<C> {
-
+    private final JDA jda;
     private final long botId;
 
     private final Function<@NonNull C, @NonNull String> prefixMapper;
@@ -74,6 +74,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
     )
             throws InterruptedException {
         super(commandExecutionCoordinator, CommandRegistrationHandler.nullCommandRegistrationHandler());
+        this.jda = jda;
         this.prefixMapper = prefixMapper;
         this.permissionMapper = permissionMapper;
         this.commandSenderMapper = commandSenderMapper;
@@ -81,6 +82,15 @@ public class JDACommandManager<C> extends CommandManager<C> {
         jda.addEventListener(new JDACommandListener<>(this));
         jda.awaitReady();
         this.botId = jda.getSelfUser().getIdLong();
+    }
+
+    /**
+     * Get the JDA instance
+     *
+     * @return JDA instance
+     */
+    public final @NonNull JDA getJDA() {
+        return jda;
     }
 
     /**
@@ -99,6 +109,15 @@ public class JDACommandManager<C> extends CommandManager<C> {
      */
     public final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
+    }
+
+    /**
+     * Get the backwards command sender plugin
+     *
+     * @return The backwards command sender mapper
+     */
+    public final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> getBackwardsCommandSenderMapper() {
+        return this.backwardsCommandSenderMapper;
     }
 
     /**
