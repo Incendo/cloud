@@ -24,47 +24,56 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.StaticArgument;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Opinionated extension of {@link CommandHelpHandler} for Minecraft
  *
  * @param <C> Command sender type
  */
+@SuppressWarnings("unused")
 public final class MinecraftHelp<C> {
 
-    /* General help */
-    public static final String MESSAGE_HELP_HEADER = "help_header";
-    public static final String MESSAGE_HELP_FOOTER = "help_footer";
-    /* Query specific */
-    public static final String MESSAGE_QUERY_QUERY = "help_query_query";
-    public static final String MESSAGE_QUERY_AVAILABLE_COMMANDS = "help_query_available_comments";
-    public static final String MESSAGE_QUERY_COMMAND_SYNTAX = "help_query_command_syntax";
-    public static final String MESSAGE_QUERY_COMMAND_SYNTAX_LAST = "help_query_command_syntax_last";
-    public static final String MESSAGE_QUERY_LONGEST_PATH = "help_query_longest_path";
-    public static final String MESSAGE_QUERY_SUGGESTION = "help_query_suggestion";
-    public static final String MESSAGE_QUERY_VERBOSE_SYNTAX = "help_query_verbose_syntax";
-    public static final String MESSAGE_QUERY_VERBOSE_DESCRIPTION = "help_query_verbose_description";
-    public static final String MESSAGE_QUERY_VERBOSE_ARGS = "help_query_verbose_args";
-    public static final String MESSAGE_QUERY_VERBOSE_OPTIONAL = "help_query_verbose_optional";
-    public static final String MESSAGE_QUERY_VERBOSE_REQUIRED = "help_query_verbose_required";
-    public static final String MESSAGE_QUERY_VERBOSE_LITERAL = "help_query_verbose_literal";
+    public static final HelpColors DEFAULT_HELP_COLORS = HelpColors.of(
+            NamedTextColor.GOLD,
+            NamedTextColor.GREEN,
+            NamedTextColor.YELLOW,
+            NamedTextColor.GRAY,
+            NamedTextColor.DARK_GRAY
+    );
 
-    private final MiniMessage miniMessage = MiniMessage.builder().build();
-    private final Map<String, String> messageMap = new HashMap<>();
+    public static final String MESSAGE_HELP = "help";
+    public static final String MESSAGE_COMMAND = "command";
+    public static final String MESSAGE_DESCRIPTION = "description";
+    public static final String MESSAGE_NO_DESCRIPTION = "no_description";
+    public static final String MESSAGE_ARGUMENTS = "arguments";
+    public static final String MESSAGE_OPTIONAL = "optional";
+    public static final String MESSAGE_UNKNOWN_HELP_TOPIC_TYPE = "unknown_help_topic_type";
+    public static final String MESSAGE_SHOWING_RESULTS_FOR_QUERY = "showing_results_for_query";
+    public static final String MESSAGE_AVAILABLE_COMMANDS = "available_commands";
+    public static final String MESSAGE_CLICK_TO_SHOW_HELP = "click_to_show_help";
+
+    private static final Pattern SPECIAL_CHARACTERS_PATTERN = Pattern.compile("[^\\s\\w]");
 
     private final AudienceProvider<C> audienceProvider;
     private final CommandManager<C> commandManager;
     private final String commandPrefix;
+    private final Map<String, String> messageMap = new HashMap<>();
+
+    private HelpColors colors = DEFAULT_HELP_COLORS;
 
     /**
      * Construct a new Minecraft help instance
@@ -81,29 +90,18 @@ public final class MinecraftHelp<C> {
         this.commandPrefix = commandPrefix;
         this.audienceProvider = audienceProvider;
         this.commandManager = commandManager;
-        /* Default messages */
-        this.messageMap.put(MESSAGE_HELP_HEADER, "<gold><bold>------------ Help ------------</bold></gold>");
-        this.messageMap.put(MESSAGE_HELP_FOOTER, "<gold><bold>----------------------------</bold></gold>");
-        this.messageMap.put(MESSAGE_QUERY_QUERY, "<gray>Showing search results for query: \"<green>/<query></green>\"</gray>");
-        this.messageMap.put(MESSAGE_QUERY_AVAILABLE_COMMANDS, "<dark_gray>└─</dark_gray><gray> Available Commands:</gray>");
-        this.messageMap.put(MESSAGE_QUERY_COMMAND_SYNTAX, "<dark_gray>   ├─</dark_gray> <green>"
-                + "<click:run_command:cmdprefix><hover:show_text:\"<gray><description></gray>\">/<command></hover></click></green>");
-        this.messageMap.put(MESSAGE_QUERY_COMMAND_SYNTAX_LAST, "<dark_gray>   └─</dark_gray> <green>"
-                + "<click:run_command:cmdprefix><hover:show_text:\"<gray><description></gray>\">/<command></hover></click></green>");
-        this.messageMap.put(MESSAGE_QUERY_LONGEST_PATH, "<dark_gray>└─</dark_gray> <green>/<command></green>");
-        this.messageMap.put(MESSAGE_QUERY_SUGGESTION, "<dark_gray><indentation><prefix></dark_gray> <green><click:run_command:"
-                + "<cmdprefix>><hover:show_text:\"<gray>Click to show help for this command</gray>\">"
-                + "<suggestion></hover></click></green>");
-        this.messageMap.put(MESSAGE_QUERY_VERBOSE_SYNTAX, "<dark_gray>└─</dark_gray> <gold>Command:"
-                + " </gold><green>/<command></green>");
-        this.messageMap.put(MESSAGE_QUERY_VERBOSE_DESCRIPTION, "<dark_gray>   ├─</dark_gray>"
-                + " <gold>Description:</gold> <gray><description></gray>");
-        this.messageMap.put(MESSAGE_QUERY_VERBOSE_ARGS, "<dark_gray>   └─</dark_gray> <gold>Args:</gold>");
-        this.messageMap.put(MESSAGE_QUERY_VERBOSE_OPTIONAL, "<dark_gray>       <prefix></dark_gray> <white><syntax><white> "
-                + "<yellow>(Optional)</yellow> <dark_gray>-</dark_gray> <gray><description></gray>");
-        this.messageMap.put(MESSAGE_QUERY_VERBOSE_REQUIRED, "<dark_gray>       <prefix></dark_gray> <white><syntax><white> "
-                + "<dark_gray>-</dark_gray> <gray><description></gray>");
-        this.messageMap.put(MESSAGE_QUERY_VERBOSE_LITERAL, "<gray><syntax></gray>");
+
+        /* Default Messages */
+        this.messageMap.put(MESSAGE_HELP, "Help");
+        this.messageMap.put(MESSAGE_COMMAND, "Command");
+        this.messageMap.put(MESSAGE_DESCRIPTION, "Description");
+        this.messageMap.put(MESSAGE_NO_DESCRIPTION, "No description");
+        this.messageMap.put(MESSAGE_ARGUMENTS, "Arguments");
+        this.messageMap.put(MESSAGE_OPTIONAL, "Optional");
+        this.messageMap.put(MESSAGE_UNKNOWN_HELP_TOPIC_TYPE, "Unknown help topic type");
+        this.messageMap.put(MESSAGE_SHOWING_RESULTS_FOR_QUERY, "Showing search results for query");
+        this.messageMap.put(MESSAGE_AVAILABLE_COMMANDS, "Available Commands");
+        this.messageMap.put(MESSAGE_CLICK_TO_SHOW_HELP, "Click to show help for this command");
     }
 
     /**
@@ -135,16 +133,44 @@ public final class MinecraftHelp<C> {
     }
 
     /**
-     * Configure a message
+     * Set message for a key
      *
-     * @param key     Message key
-     * @param message Message
+     * @param key   The key for the message. These are constants in {@link MinecraftHelp}
+     * @param value The text for the message
      */
     public void setMessage(
             final @NonNull String key,
-            final @NonNull String message
+            final @NonNull String value
     ) {
-        this.messageMap.put(key, message);
+        this.messageMap.put(key, value);
+    }
+
+    /**
+     * Get the message for a key
+     *
+     * @param key The key for the message. These are constants in {@link MinecraftHelp}
+     * @return The text for the message
+     */
+    public @NonNull String getMessage(final @NonNull String key) {
+        return this.messageMap.get(key);
+    }
+
+    /**
+     * Get the colors currently used for help messages.
+     *
+     * @return The current {@link HelpColors} for this {@link MinecraftHelp} instance
+     */
+    public @NonNull HelpColors getHelpColors() {
+        return this.colors;
+    }
+
+    /**
+     * Set the colors to use for help messages.
+     *
+     * @param colors The new {@link HelpColors} to use
+     */
+    public void setHelpColors(final @NonNull HelpColors colors) {
+        this.colors = colors;
     }
 
     /**
@@ -158,9 +184,12 @@ public final class MinecraftHelp<C> {
             final @NonNull C recipient
     ) {
         final Audience audience = this.getAudience(recipient);
-        audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_HEADER)));
+        audience.sendMessage(this.line(13)
+                .append(Component.text(" " + this.messageMap.get(MESSAGE_HELP) + " ", this.colors.highlight))
+                .append(this.line(13))
+        );
         this.printTopic(recipient, query, this.commandManager.getCommandHelpHandler().queryHelp(recipient, query));
-        audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_HELP_FOOTER)));
+        audience.sendMessage(this.line(30));
     }
 
     private void printTopic(
@@ -168,10 +197,11 @@ public final class MinecraftHelp<C> {
             final @NonNull String query,
             final CommandHelpHandler.@NonNull HelpTopic<C> helpTopic
     ) {
-        this.getAudience(sender).sendMessage(this.miniMessage.parse(
-                this.messageMap.get(MESSAGE_QUERY_QUERY),
-                Template.of("query", query)
-        ));
+        this.getAudience(sender).sendMessage(
+                Component.text(this.messageMap.get(MESSAGE_SHOWING_RESULTS_FOR_QUERY) + ": \"", this.colors.text)
+                        .append(this.highlight(Component.text("/" + query, this.colors.highlight)))
+                        .append(Component.text("\"", this.colors.text))
+        );
         if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
             this.printIndexHelpTopic(sender, (CommandHelpHandler.IndexHelpTopic<C>) helpTopic);
         } else if (helpTopic instanceof CommandHelpHandler.MultiHelpTopic) {
@@ -179,7 +209,7 @@ public final class MinecraftHelp<C> {
         } else if (helpTopic instanceof CommandHelpHandler.VerboseHelpTopic) {
             this.printVerboseHelpTopic(sender, (CommandHelpHandler.VerboseHelpTopic<C>) helpTopic);
         } else {
-            throw new IllegalArgumentException("Unknown help topic type");
+            throw new IllegalArgumentException(this.messageMap.get(MESSAGE_UNKNOWN_HELP_TOPIC_TYPE));
         }
     }
 
@@ -188,28 +218,25 @@ public final class MinecraftHelp<C> {
             final CommandHelpHandler.@NonNull IndexHelpTopic<C> helpTopic
     ) {
         final Audience audience = this.getAudience(sender);
-        audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_AVAILABLE_COMMANDS)));
+        audience.sendMessage(lastBranch()
+                .append(Component.text(
+                        String.format(" %s:", this.messageMap.get(MESSAGE_AVAILABLE_COMMANDS)),
+                        this.colors.text
+                )));
         final Iterator<CommandHelpHandler.VerboseHelpEntry<C>> iterator = helpTopic.getEntries().iterator();
         while (iterator.hasNext()) {
             final CommandHelpHandler.VerboseHelpEntry<C> entry = iterator.next();
 
-            final String description = entry.getDescription().isEmpty() ? "Click to show help for this command"
+            final String description = entry.getDescription().isEmpty() ? this.messageMap.get(MESSAGE_CLICK_TO_SHOW_HELP)
                     : entry.getDescription();
 
-            String message = this.messageMap.get(iterator.hasNext() ? MESSAGE_QUERY_COMMAND_SYNTAX
-                    : MESSAGE_QUERY_COMMAND_SYNTAX_LAST);
+            Component message = Component.text("   ")
+                    .append(iterator.hasNext() ? branch() : lastBranch())
+                    .append(this.highlight(Component.text(String.format(" /%s", entry.getSyntaxString()), this.colors.highlight))
+                            .hoverEvent(Component.text(description, this.colors.text))
+                            .clickEvent(ClickEvent.runCommand(this.commandPrefix + ' ' + entry.getSyntaxString())));
 
-            final String suggestedCommand = entry.getSyntaxString()
-                    .replace("<", "")
-                    .replace(">", "")
-                    .replace("[", "")
-                    .replace("]", "");
-
-            message = message.replace("<command>", entry.getSyntaxString())
-                    .replace("<description>", description)
-                    .replace("cmdprefix", this.commandPrefix + ' ' + suggestedCommand);
-
-            audience.sendMessage(this.miniMessage.parse(message));
+            audience.sendMessage(message);
         }
     }
 
@@ -218,10 +245,8 @@ public final class MinecraftHelp<C> {
             final CommandHelpHandler.@NonNull MultiHelpTopic<C> helpTopic
     ) {
         final Audience audience = this.getAudience(sender);
-        audience.sendMessage(this.miniMessage.parse(
-                this.messageMap.get(MESSAGE_QUERY_LONGEST_PATH),
-                Template.of("command", helpTopic.getLongestPath())
-        ));
+        audience.sendMessage(lastBranch()
+                .append(this.highlight(Component.text(" /" + helpTopic.getLongestPath(), this.colors.highlight))));
         final int headerIndentation = helpTopic.getLongestPath().length();
         final Iterator<String> iterator = helpTopic.getChildSuggestions().iterator();
         while (iterator.hasNext()) {
@@ -232,25 +257,13 @@ public final class MinecraftHelp<C> {
                 indentation.append(" ");
             }
 
-            final String prefix;
-            if (iterator.hasNext()) {
-                prefix = "├─";
-            } else {
-                prefix = "└─";
-            }
-
-            final String suggestedCommand = suggestion.replace("<", "")
-                    .replace(">", "")
-                    .replace("[", "")
-                    .replace("]", "");
-
-            audience.sendMessage(this.miniMessage.parse(
-                    this.messageMap.get(MESSAGE_QUERY_SUGGESTION),
-                    Template.of("indentation", indentation.toString()),
-                    Template.of("prefix", prefix),
-                    Template.of("suggestion", suggestion),
-                    Template.of("cmdprefix", this.commandPrefix + ' ' + suggestedCommand)
-            ));
+            audience.sendMessage(
+                    Component.text(indentation.toString())
+                            .append(iterator.hasNext() ? this.branch() : this.lastBranch())
+                            .append(this.highlight(Component.text(" /" + suggestion, this.colors.highlight))
+                                    .hoverEvent(Component.text(this.messageMap.get(MESSAGE_CLICK_TO_SHOW_HELP), this.colors.text))
+                                    .clickEvent(ClickEvent.runCommand(this.commandPrefix + ' ' + suggestion)))
+            );
         }
     }
 
@@ -261,54 +274,157 @@ public final class MinecraftHelp<C> {
         final Audience audience = this.getAudience(sender);
         final String command = this.commandManager.getCommandSyntaxFormatter()
                 .apply(helpTopic.getCommand().getArguments(), null);
-        audience.sendMessage(this.miniMessage.parse(
-                this.messageMap.get(MESSAGE_QUERY_VERBOSE_SYNTAX),
-                Template.of("command", command)
-        ));
-        audience.sendMessage(this.miniMessage.parse(
-                this.messageMap.get(MESSAGE_QUERY_VERBOSE_DESCRIPTION),
-                Template.of("description", helpTopic.getDescription())
-        ));
-        audience.sendMessage(this.miniMessage.parse(this.messageMap.get(MESSAGE_QUERY_VERBOSE_ARGS)));
+        audience.sendMessage(
+                this.lastBranch()
+                        .append(Component.text(" " + this.messageMap.get(MESSAGE_COMMAND) + ": ", this.colors.primary))
+                        .append(this.highlight(Component.text("/" + command, this.colors.highlight)))
+        );
+        audience.sendMessage(
+                Component.text("   ")
+                        .append(this.branch())
+                        .append(Component.text(" " + this.messageMap.get(MESSAGE_DESCRIPTION) + ": ", this.colors.primary))
+                        .append(Component.text(helpTopic.getDescription(), this.colors.text))
+        );
+        audience.sendMessage(
+                Component.text("   ")
+                        .append(this.lastBranch())
+                        .append(Component.text(" " + this.messageMap.get(MESSAGE_ARGUMENTS) + ":", this.colors.primary))
+        );
 
         final Iterator<CommandArgument<C, ?>> iterator = helpTopic.getCommand().getArguments().iterator();
         /* Skip the first one because it's the command literal */
         iterator.next();
-
-        boolean hasLast;
 
         while (iterator.hasNext()) {
             final CommandArgument<C, ?> argument = iterator.next();
 
             String description = helpTopic.getCommand().getArgumentDescription(argument);
             if (description.isEmpty()) {
-                description = "No description";
+                description = this.messageMap.get(MESSAGE_NO_DESCRIPTION);
             }
 
             String syntax = this.commandManager.getCommandSyntaxFormatter()
                     .apply(Collections.singletonList(argument), null);
 
-            if (argument instanceof StaticArgument) {
-                syntax = this.messageMap.get(MESSAGE_QUERY_VERBOSE_LITERAL).replace("<syntax>", syntax);
+            final TextComponent.Builder component = Component.text()
+                    .append(Component.text("       "))
+                    .append(iterator.hasNext() ? this.branch() : this.lastBranch())
+                    .append(this.highlight(Component.text(" " + syntax, this.colors.highlight)));
+            if (!argument.isRequired()) {
+                component.append(Component.text(
+                        " (" + this.messageMap.get(MESSAGE_OPTIONAL) + ")",
+                        this.colors.alternateHighlight
+                ));
             }
+            component
+                    .append(Component.text(" - ", this.colors.accent))
+                    .append(Component.text(description, this.colors.text));
 
-            final String prefix = iterator.hasNext() ? "├─" : "└─";
-            hasLast = !iterator.hasNext();
-
-            final String message;
-            if (argument.isRequired()) {
-                message = this.messageMap.get(MESSAGE_QUERY_VERBOSE_REQUIRED);
-            } else {
-                message = this.messageMap.get(MESSAGE_QUERY_VERBOSE_OPTIONAL);
-            }
-
-            audience.sendMessage(this.miniMessage.parse(
-                    message,
-                    Template.of("prefix", prefix),
-                    Template.of("syntax", syntax),
-                    Template.of("description", description)
-            ));
+            audience.sendMessage(component);
         }
+    }
+
+    private @NonNull Component line(final int length) {
+        final TextComponent.Builder line = Component.text();
+        for (int i = 0; i < length; i++) {
+            line.append(Component.text("-", this.colors.primary, TextDecoration.STRIKETHROUGH));
+        }
+        return line.build();
+    }
+
+    private @NonNull Component branch() {
+        return Component.text("├─", this.colors.accent);
+    }
+
+    private @NonNull Component lastBranch() {
+        return Component.text("└─", this.colors.accent);
+    }
+
+    private @NonNull Component highlight(final @NonNull Component component) {
+        return component.replaceText(
+                SPECIAL_CHARACTERS_PATTERN,
+                match -> match.color(this.colors.alternateHighlight)
+        );
+    }
+
+    /**
+     * Class for holding the {@link TextColor}s used for help menus
+     */
+    public static final class HelpColors {
+
+        private final TextColor primary;
+        private final TextColor highlight;
+        private final TextColor alternateHighlight;
+        private final TextColor text;
+        private final TextColor accent;
+
+        private HelpColors(
+                final @NonNull TextColor primary,
+                final @NonNull TextColor highlight,
+                final @NonNull TextColor alternateHighlight,
+                final @NonNull TextColor text,
+                final @NonNull TextColor accent
+        ) {
+            this.primary = primary;
+            this.highlight = highlight;
+            this.alternateHighlight = alternateHighlight;
+            this.text = text;
+            this.accent = accent;
+        }
+
+        /**
+         * @return The primary color for the color scheme
+         */
+        public @NonNull TextColor primary() {
+            return this.primary;
+        }
+
+        /**
+         * @return The primary color used to highlight commands and queries
+         */
+        public @NonNull TextColor highlight() {
+            return this.highlight;
+        }
+
+        /**
+         * @return The secondary color used to highlight commands and queries
+         */
+        public @NonNull TextColor alternateHighlight() {
+            return this.alternateHighlight;
+        }
+
+        /**
+         * @return The color used for description text
+         */
+        public @NonNull TextColor text() {
+            return this.text;
+        }
+
+        /**
+         * @return The color used for accents and symbols
+         */
+        public @NonNull TextColor accent() {
+            return this.accent;
+        }
+
+        /**
+         * @param primary            The primary color for the color scheme
+         * @param highlight          The primary color used to highlight commands and queries
+         * @param alternateHighlight The secondary color used to highlight commands and queries
+         * @param text               The color used for description text
+         * @param accent             The color used for accents and symbols
+         * @return A new {@link HelpColors} instance
+         */
+        public static HelpColors of(
+                final @NonNull TextColor primary,
+                final @NonNull TextColor highlight,
+                final @NonNull TextColor alternateHighlight,
+                final @NonNull TextColor text,
+                final @NonNull TextColor accent
+        ) {
+            return new HelpColors(primary, highlight, alternateHighlight, text, accent);
+        }
+
     }
 
 }
