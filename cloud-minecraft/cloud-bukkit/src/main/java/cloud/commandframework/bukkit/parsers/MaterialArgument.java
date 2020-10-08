@@ -31,11 +31,9 @@ import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * cloud argument type that parses Bukkit {@link Material materials}
@@ -118,17 +116,23 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
-            final String input = inputQueue.peek();
+            String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
+            /* Pre-process input */
+            if (input.contains("minecraft:")) {
+                input = input.substring("minecraft:".length());
+            }
+            input = input.toUpperCase();
+
             try {
-                final Material material = Material.valueOf(input.replace("minecraft:", "").toUpperCase());
+                final Material material = Material.valueOf(input);
                 inputQueue.remove();
                 return ArgumentParseResult.success(material);
             } catch (final IllegalArgumentException exception) {
-                return ArgumentParseResult.failure(new MaterialParseException(input));
+                return ArgumentParseResult.failure(new MaterialParseException(inputQueue.peek()));
             }
         }
 
@@ -159,8 +163,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
 
         @Override
         public String getMessage() {
-            return EnumSet.allOf(Material.class).stream().map(Material::name).map(String::toLowerCase)
-                    .collect(Collectors.joining(", "));
+            return String.format("'%s' is not a valid material name", this.input);
         }
 
     }
