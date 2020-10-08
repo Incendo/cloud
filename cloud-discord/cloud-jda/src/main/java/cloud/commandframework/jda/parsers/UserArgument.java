@@ -48,9 +48,9 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     private UserArgument(
             final boolean required, final @NonNull String name,
-            final @NonNull JDA jda, final @NonNull List<ParserMode> modes
+            final @NonNull List<ParserMode> modes
     ) {
-        super(required, name, new UserParser<>(jda, modes), User.class);
+        super(required, name, new UserParser<>(modes), User.class);
         this.modes = modes;
     }
 
@@ -58,36 +58,33 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * Create a new builder
      *
      * @param name Name of the component
-     * @param jda  JDA instance
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name, final @NonNull JDA jda) {
-        return new Builder<>(name, jda);
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
      * Create a new required command component
      *
      * @param name Component name
-     * @param jda  JDA instance
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, User> of(final @NonNull String name, final @NonNull JDA jda) {
-        return UserArgument.<C>newBuilder(name, jda).asRequired().build();
+    public static <C> @NonNull CommandArgument<C, User> of(final @NonNull String name) {
+        return UserArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
      * Create a new optional command component
      *
      * @param name Component name
-     * @param jda  JDA instance
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, User> optional(final @NonNull String name, final @NonNull JDA jda) {
-        return UserArgument.<C>newBuilder(name, jda).asOptional().build();
+    public static <C> @NonNull CommandArgument<C, User> optional(final @NonNull String name) {
+        return UserArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
@@ -109,12 +106,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, User> {
 
-        private final JDA jda;
         private List<ParserMode> modes = new ArrayList<>();
 
-        protected Builder(final @NonNull String name, final @NonNull JDA jda) {
+        protected Builder(final @NonNull String name) {
             super(User.class, name);
-            this.jda = jda;
         }
 
         /**
@@ -135,7 +130,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
          */
         @Override
         public @NonNull UserArgument<C> build() {
-            return new UserArgument<>(this.isRequired(), this.getName(), jda, modes);
+            return new UserArgument<>(this.isRequired(), this.getName(), modes);
         }
 
     }
@@ -143,11 +138,9 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     public static final class UserParser<C> implements ArgumentParser<C, User> {
 
-        private final JDA jda;
         private final List<ParserMode> modes;
 
-        private UserParser(final @NonNull JDA jda, final @NonNull List<ParserMode> modes) {
-            this.jda = jda;
+        private UserParser(final @NonNull List<ParserMode> modes) {
             this.modes = modes;
         }
 
@@ -161,10 +154,11 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
+            final JDA jda = commandContext.get("JDA");
             Exception exception = null;
 
             if (modes.contains(ParserMode.MENTION)) {
-                if (input.endsWith(">")) {
+                if (input.endsWith(">") || modes.size() == 1) {
                     final String id;
                     if (input.startsWith("<@!")) {
                         id = input.substring(3, input.length() - 1);
@@ -173,7 +167,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     }
 
                     try {
-                        final ArgumentParseResult<User> result = this.userFromId(input, id);
+                        final ArgumentParseResult<User> result = this.userFromId(jda, input, id);
                         inputQueue.remove();
                         return result;
                     } catch (final UserNotFoundParseException | NumberFormatException e) {
@@ -184,7 +178,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
             if (modes.contains(ParserMode.ID)) {
                 try {
-                    final ArgumentParseResult<User> result = this.userFromId(input, input);
+                    final ArgumentParseResult<User> result = this.userFromId(jda, input, input);
                     inputQueue.remove();
                     return result;
                 } catch (final UserNotFoundParseException | NumberFormatException e) {
@@ -214,7 +208,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             return true;
         }
 
-        private @NonNull ArgumentParseResult<User> userFromId(final @NonNull String input, final @NonNull String id)
+        private @NonNull ArgumentParseResult<User> userFromId(
+                final @NonNull JDA jda, final @NonNull String input,
+                final @NonNull String id
+        )
                 throws UserNotFoundParseException, NumberFormatException {
             final User user = jda.getUserById(id);
 
@@ -233,7 +230,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         private final String input;
 
         /**
-         * Construct a new UUID parse exception
+         * Construct a new user parse exception
          *
          * @param input String input
          */
@@ -256,7 +253,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     public static final class TooManyUsersFoundParseException extends UserParseException {
 
         /**
-         * Construct a new UUID parse exception
+         * Construct a new user parse exception
          *
          * @param input String input
          */
@@ -275,7 +272,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     public static final class UserNotFoundParseException extends UserParseException {
 
         /**
-         * Construct a new UUID parse exception
+         * Construct a new user parse exception
          *
          * @param input String input
          */
