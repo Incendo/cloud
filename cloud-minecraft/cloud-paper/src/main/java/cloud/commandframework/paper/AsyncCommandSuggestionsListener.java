@@ -35,8 +35,6 @@ import java.util.List;
 
 class AsyncCommandSuggestionsListener<C> implements Listener {
 
-    private static final long CACHE_EXPIRATION_TIME = 30L;
-
     private final PaperCommandManager<C> paperCommandManager;
 
     AsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
@@ -48,20 +46,22 @@ class AsyncCommandSuggestionsListener<C> implements Listener {
         if (event.getBuffer().isEmpty() || !event.getBuffer().startsWith("/")) {
             return;
         }
-        final String[] arguments = event.getBuffer().substring(1).split(" ");
-        if (this.paperCommandManager.getCommandTree().getNamedNode(arguments[0]) == null) {
-            return;
-        }
         @SuppressWarnings("unchecked") final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
                 (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.getCommandRegistrationHandler();
-        if (!bukkitPluginRegistrationHandler.isRecognized(arguments[0])) {
+        if (!bukkitPluginRegistrationHandler.isRecognized(event.getBuffer().substring(1).split(" ")[0])) {
             return;
         }
         final CommandSender sender = event.getSender();
         final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
+        final String inputBuffer =
+                event.getBuffer().substring(1).startsWith(
+                        this.paperCommandManager.getOwningPlugin().getName().toLowerCase() + ":")
+                        ? event.getBuffer().substring(1).replaceFirst(
+                        this.paperCommandManager.getOwningPlugin().getName().toLowerCase() + ":", "")
+                        : event.getBuffer().substring(1);
         final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggest(
                 cloudSender,
-                event.getBuffer().substring(1)
+                inputBuffer
         ));
         event.setCompletions(suggestions);
         event.setHandled(true);

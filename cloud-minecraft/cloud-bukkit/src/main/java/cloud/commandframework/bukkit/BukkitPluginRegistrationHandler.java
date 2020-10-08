@@ -89,13 +89,16 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                 this.bukkitCommandManager
         );
         this.registeredCommands.put(commandArgument, bukkitCommand);
+        if (!this.bukkitCommands.containsKey(label)) {
+            this.recognizedAliases.add(label);
+        }
+        this.recognizedAliases.add(getNamespacedLabel(label));
         this.commandMap.register(
                 label,
                 this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
                 bukkitCommand
         );
         this.registerExternal(label, command, bukkitCommand);
-        this.recognizedAliases.add(label);
 
         if (this.bukkitCommandManager.getSplitAliases()) {
             for (final String alias : aliases) {
@@ -107,17 +110,25 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                             (CommandArgument<C, ?>) commandArgument,
                             this.bukkitCommandManager
                     );
-                    this.commandMap.register(alias, this.bukkitCommandManager.getOwningPlugin()
-                                    .getName().toLowerCase(),
+                    if (!this.bukkitCommands.containsKey(alias)) {
+                        this.recognizedAliases.add(alias);
+                    }
+                    this.recognizedAliases.add(getNamespacedLabel(alias));
+                    this.commandMap.register(
+                            alias,
+                            this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
                             bukkitCommand
                     );
                     this.registerExternal(alias, command, aliasCommand);
-                    this.recognizedAliases.add(alias);
                 }
             }
         }
 
         return true;
+    }
+
+    private @NonNull String getNamespacedLabel(final @NonNull String label) {
+        return String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(), label).toLowerCase();
     }
 
     /**
