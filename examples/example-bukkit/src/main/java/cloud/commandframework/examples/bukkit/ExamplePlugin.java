@@ -49,6 +49,8 @@ import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.BukkitCommandMetaBuilder;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
+import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
+import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
 import cloud.commandframework.context.CommandContext;
@@ -71,6 +73,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -287,7 +291,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 ));
         manager.command(manager.commandBuilder("give")
                 .senderType(Player.class)
-                .argument(EnumArgument.of(Material.class, "material"))
+                .argument(MaterialArgument.of("material"))
                 .argument(IntegerArgument.of("amount"))
                 .handler(c -> {
                     final Material material = c.get("material");
@@ -296,6 +300,21 @@ public final class ExamplePlugin extends JavaPlugin {
                     ((Player) c.getSender()).getInventory().addItem(itemStack);
                     c.getSender().sendMessage("You've been given stuff, bro.");
                 }));
+        manager.command(builder.literal("summon")
+                .senderType(Player.class)
+                .argument(EnumArgument.of(EntityType.class, "type"))
+                .handler(c -> manager.taskRecipe().begin(c).synchronous(ctx -> {
+                    final Location loc = ((Player) ctx.getSender()).getLocation();
+                    loc.getWorld().spawnEntity(loc, ctx.get("type"));
+                }).execute()));
+        manager.command(builder.literal("enchant")
+                .senderType(Player.class)
+                .argument(EnchantmentArgument.of("enchant"))
+                .argument(IntegerArgument.of("level"))
+                .handler(c -> manager.taskRecipe().begin(c).synchronous(ctx -> {
+                    final Player player = ((Player) ctx.getSender());
+                    player.getInventory().getItemInHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));
+                }).execute()));
 
         //
         // An Argument Parser for TextColor that accepts NamedTextColor names or RGB colors in the format 'RRGGBB'
@@ -419,7 +438,8 @@ public final class ExamplePlugin extends JavaPlugin {
             final @NonNull Player player,
             final @NonNull @Argument("material") Material material,
             final @Argument("amount") int number,
-            final @Nullable @Flag("color") ChatColor nameColor
+            final @Nullable @Flag("color") ChatColor nameColor,
+            final @Nullable @Flag("enchant") Enchantment enchant
     ) {
         final ItemStack itemStack = new ItemStack(material, number);
         String itemName = String.format(
@@ -436,6 +456,9 @@ public final class ExamplePlugin extends JavaPlugin {
         if (meta != null) {
             meta.setDisplayName(itemName);
             itemStack.setItemMeta(meta);
+        }
+        if (enchant != null) {
+            itemStack.addUnsafeEnchantment(enchant, 10);
         }
         player.getInventory().addItem(itemStack);
         player.sendMessage(ChatColor.GREEN + String.format("You have been given %d x %s", number, material));

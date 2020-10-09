@@ -1,5 +1,4 @@
 dependencies {
-    api 'net.kyori:adventure-api:4.0.0-SNAPSHOT'
     api project(':cloud-core')
-    api 'net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT'
+    api 'net.kyori:adventure-api:4.0.0-SNAPSHOT'
 }

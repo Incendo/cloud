@@ -56,10 +56,8 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
                     CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull Function<CommandSender, C> commandSenderMapper,
             final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper
-    ) throws
-            Exception {
+    ) throws Exception {
         super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
-
     }
 
     /**
