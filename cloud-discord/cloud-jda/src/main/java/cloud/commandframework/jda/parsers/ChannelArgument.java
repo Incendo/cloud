@@ -27,8 +27,9 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,20 +38,20 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * Command Argument for {@link User}
+ * Command Argument for {@link MessageChannel}
  *
  * @param <C> Command sender type
  */
 @SuppressWarnings("unused")
-public final class UserArgument<C> extends CommandArgument<C, User> {
+public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel> {
 
     private final List<ParserMode> modes;
 
-    private UserArgument(
+    private ChannelArgument(
             final boolean required, final @NonNull String name,
             final @NonNull List<ParserMode> modes
     ) {
-        super(required, name, new UserParser<>(modes), User.class);
+        super(required, name, new MessageParser<>(modes), MessageChannel.class);
         this.modes = modes;
     }
 
@@ -72,8 +73,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, User> of(final @NonNull String name) {
-        return UserArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull CommandArgument<C, MessageChannel> of(final @NonNull String name) {
+        return ChannelArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
@@ -83,8 +84,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, User> optional(final @NonNull String name) {
-        return UserArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull CommandArgument<C, MessageChannel> optional(final @NonNull String name) {
+        return ChannelArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
@@ -104,12 +105,12 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, User> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, MessageChannel> {
 
         private List<ParserMode> modes = new ArrayList<>();
 
         protected Builder(final @NonNull String name) {
-            super(User.class, name);
+            super(MessageChannel.class, name);
         }
 
         /**
@@ -129,23 +130,23 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
          * @return Constructed component
          */
         @Override
-        public @NonNull UserArgument<C> build() {
-            return new UserArgument<>(this.isRequired(), this.getName(), modes);
+        public @NonNull ChannelArgument<C> build() {
+            return new ChannelArgument<>(this.isRequired(), this.getName(), modes);
         }
 
     }
 
 
-    public static final class UserParser<C> implements ArgumentParser<C, User> {
+    public static final class MessageParser<C> implements ArgumentParser<C, MessageChannel> {
 
         private final List<ParserMode> modes;
 
-        private UserParser(final @NonNull List<ParserMode> modes) {
+        private MessageParser(final @NonNull List<ParserMode> modes) {
             this.modes = modes;
         }
 
         @Override
-        public @NonNull ArgumentParseResult<User> parse(
+        public @NonNull ArgumentParseResult<MessageChannel> parse(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
@@ -154,23 +155,18 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
-            final JDA jda = commandContext.get("JDA");
+            final MessageReceivedEvent event = commandContext.get("MessageReceivedEvent");
             Exception exception = null;
 
             if (modes.contains(ParserMode.MENTION)) {
-                if (input.endsWith(">") || modes.size() == 1) {
-                    final String id;
-                    if (input.startsWith("<@!")) {
-                        id = input.substring(3, input.length() - 1);
-                    } else {
-                        id = input.substring(2, input.length() - 1);
-                    }
+                if (input.startsWith("<#") || modes.size() == 1) {
+                    final String id = input.substring(2, input.length() - 1);
 
                     try {
-                        final ArgumentParseResult<User> result = this.userFromId(jda, input, id);
+                        final ArgumentParseResult<MessageChannel> channel = this.channelFromId(event, input, id);
                         inputQueue.remove();
-                        return result;
-                    } catch (final UserNotFoundParseException | NumberFormatException e) {
+                        return channel;
+                    } catch (final ChannelNotFoundException | NumberFormatException e) {
                         exception = e;
                     }
                 }
@@ -178,24 +174,24 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
             if (modes.contains(ParserMode.ID)) {
                 try {
-                    final ArgumentParseResult<User> result = this.userFromId(jda, input, input);
+                    final ArgumentParseResult<MessageChannel> result = this.channelFromId(event, input, input);
                     inputQueue.remove();
                     return result;
-                } catch (final UserNotFoundParseException | NumberFormatException e) {
+                } catch (final ChannelNotFoundException | NumberFormatException e) {
                     exception = e;
                 }
             }
 
             if (modes.contains(ParserMode.NAME)) {
-                final List<User> users = jda.getUsersByName(input, true);
+                final List<TextChannel> channels = event.getGuild().getTextChannelsByName(input, true);
 
-                if (users.size() == 0) {
-                    exception = new UserNotFoundParseException(input);
-                } else if (users.size() > 1) {
-                    exception = new TooManyUsersFoundParseException(input);
+                if (channels.size() == 0) {
+                    exception = new ChannelNotFoundException(input);
+                } else if (channels.size() > 1) {
+                    exception = new TooManyChannelsFoundParseException(input);
                 } else {
                     inputQueue.remove();
-                    return ArgumentParseResult.success(users.get(0));
+                    return ArgumentParseResult.success(channels.get(0));
                 }
             }
 
@@ -208,40 +204,41 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             return true;
         }
 
-        private @NonNull ArgumentParseResult<User> userFromId(
-                final @NonNull JDA jda, final @NonNull String input,
+        private @NonNull ArgumentParseResult<MessageChannel> channelFromId(
+                final @NonNull MessageReceivedEvent event,
+                final @NonNull String input,
                 final @NonNull String id
         )
-                throws UserNotFoundParseException, NumberFormatException {
-            final User user = jda.getUserById(id);
+                throws ChannelNotFoundException, NumberFormatException {
+            final MessageChannel channel = event.getGuild().getTextChannelById(id);
 
-            if (user == null) {
-                throw new UserNotFoundParseException(input);
-            } else {
-                return ArgumentParseResult.success(user);
+            if (channel == null) {
+                throw new ChannelNotFoundException(input);
             }
+
+            return ArgumentParseResult.success(channel);
         }
 
     }
 
 
-    public static class UserParseException extends IllegalArgumentException {
+    public static class ChannelParseException extends IllegalArgumentException {
 
         private final String input;
 
         /**
-         * Construct a new user parse exception
+         * Construct a new channel parse exception
          *
          * @param input String input
          */
-        public UserParseException(final @NonNull String input) {
+        public ChannelParseException(final @NonNull String input) {
             this.input = input;
         }
 
         /**
          * Get the users input
          *
-         * @return Users input
+         * @return users input
          */
         public final @NonNull String getInput() {
             return input;
@@ -250,39 +247,39 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     }
 
 
-    public static final class TooManyUsersFoundParseException extends UserParseException {
+    public static final class TooManyChannelsFoundParseException extends ChannelParseException {
 
         /**
-         * Construct a new user parse exception
+         * Construct a new channel parse exception
          *
          * @param input String input
          */
-        public TooManyUsersFoundParseException(final @NonNull String input) {
+        public TooManyChannelsFoundParseException(final @NonNull String input) {
             super(input);
         }
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("Too many users found for '%s'.", getInput());
+            return String.format("Too many channels found for '%s'.", getInput());
         }
 
     }
 
 
-    public static final class UserNotFoundParseException extends UserParseException {
+    public static final class ChannelNotFoundException extends ChannelParseException {
 
         /**
-         * Construct a new user parse exception
+         * Construct a new channel parse exception
          *
          * @param input String input
          */
-        public UserNotFoundParseException(final @NonNull String input) {
+        public ChannelNotFoundException(final @NonNull String input) {
             super(input);
         }
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("User not found for '%s'.", getInput());
+            return String.format("Channel not found for '%s'.", getInput());
         }
 
     }
