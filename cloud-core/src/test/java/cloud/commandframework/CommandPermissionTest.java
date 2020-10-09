@@ -37,10 +37,10 @@ class CommandPermissionTest {
 
     @BeforeAll
     static void setup() {
-        manager.command(manager.commandBuilder("test").literal("foo").withPermission("test.permission.one").build());
-        manager.command(manager.commandBuilder("test").literal("bar").withPermission("test.permission.two").build());
-        manager.command(manager.commandBuilder("test").literal("fizz").withPermission("test.permission.three").build());
-        manager.command(manager.commandBuilder("test").literal("buzz").withPermission("test.permission.four").build());
+        manager.command(manager.commandBuilder("test").literal("foo").permission("test.permission.one").build());
+        manager.command(manager.commandBuilder("test").literal("bar").permission("test.permission.two").build());
+        manager.command(manager.commandBuilder("test").literal("fizz").permission("test.permission.three").build());
+        manager.command(manager.commandBuilder("test").literal("buzz").permission("test.permission.four").build());
     }
 
     @Test

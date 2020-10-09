@@ -216,7 +216,7 @@ public final class AnnotationParser<C> {
             }
 
             if (method.isAnnotationPresent(CommandPermission.class)) {
-                builder = builder.withPermission(method.getAnnotation(CommandPermission.class).value());
+                builder = builder.permission(method.getAnnotation(CommandPermission.class).value());
             }
 
             if (commandMethod.requiredSender() != Object.class) {

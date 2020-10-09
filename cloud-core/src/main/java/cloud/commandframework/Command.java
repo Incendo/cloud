@@ -659,7 +659,7 @@ public class Command<C> {
          * @param permission Command permission
          * @return New builder instance using the command permission
          */
-        public @NonNull Builder<C> withPermission(final @NonNull CommandPermission permission) {
+        public @NonNull Builder<C> permission(final @NonNull CommandPermission permission) {
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
@@ -677,7 +677,7 @@ public class Command<C> {
          * @param permission Command permission
          * @return New builder instance using the command permission
          */
-        public @NonNull Builder<C> withPermission(final @NonNull String permission) {
+        public @NonNull Builder<C> permission(final @NonNull String permission) {
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
@@ -710,7 +710,7 @@ public class Command<C> {
                 builder = builder.argument(builtArgument, Description.of(command.getArgumentDescription(argument)));
             }
             if (this.commandPermission.toString().isEmpty()) {
-                builder = builder.withPermission(command.getCommandPermission());
+                builder = builder.permission(command.getCommandPermission());
             }
             return builder.handler(command.commandExecutionHandler);
         }

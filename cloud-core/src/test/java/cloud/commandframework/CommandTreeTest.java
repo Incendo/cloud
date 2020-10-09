@@ -55,7 +55,7 @@ class CommandTreeTest {
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
                 .literal("one").build())
                 .command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                        .literal("two").withPermission("no").build())
+                        .literal("two").permission("no").build())
                 .command(manager.commandBuilder("test", Collections.singleton("other"),
                         SimpleCommandMeta.empty()
                 )
@@ -79,11 +79,11 @@ class CommandTreeTest {
 
         /* Build command for testing intermediary and final executors */
         manager.command(manager.commandBuilder("command")
-                .withPermission("command.inner")
+                .permission("command.inner")
                 .literal("inner")
                 .handler(c -> System.out.println("Using inner command")));
         manager.command(manager.commandBuilder("command")
-                .withPermission("command.outer")
+                .permission("command.outer")
                 .handler(c -> System.out.println("Using outer command")));
 
         /* Build command for testing compound types */
