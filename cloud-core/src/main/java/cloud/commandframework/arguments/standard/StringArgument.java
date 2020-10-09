@@ -133,6 +133,39 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
     /**
+     * Create a new required command argument with the 'single' parsing mode
+     *
+     * @param name Argument name
+     * @param <C>  Command sender type
+     * @return Created argument
+     */
+    public static <C> @NonNull CommandArgument<C, String> single(final @NonNull String name) {
+        return of(name, StringMode.SINGLE);
+    }
+
+    /**
+     * Create a new required command argument with the 'greedy' parsing mode
+     *
+     * @param name Argument name
+     * @param <C>  Command sender type
+     * @return Created argument
+     */
+    public static <C> @NonNull CommandArgument<C, String> greedy(final @NonNull String name) {
+        return of(name, StringMode.GREEDY);
+    }
+
+    /**
+     * Create a new required command argument with the 'quoted' parsing mode
+     *
+     * @param name Argument name
+     * @param <C>  Command sender type
+     * @return Created argument
+     */
+    public static <C> @NonNull CommandArgument<C, String> quoted(final @NonNull String name) {
+        return of(name, StringMode.QUOTED);
+    }
+
+    /**
      * Get the string mode
      *
      * @return String mode
@@ -158,6 +191,12 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             super(String.class, name);
         }
 
+        /**
+         * Set the String mode
+         *
+         * @param stringMode String mode to parse with
+         * @return Builder instance
+         */
         private @NonNull Builder<C> withMode(final @NonNull StringMode stringMode) {
             this.stringMode = stringMode;
             return this;

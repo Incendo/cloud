@@ -29,7 +29,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Equivalent to {@link cloud.commandframework.Command.Builder#withPermission(String)}
+ * Equivalent to {@link cloud.commandframework.Command.Builder#permission(String)}
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
