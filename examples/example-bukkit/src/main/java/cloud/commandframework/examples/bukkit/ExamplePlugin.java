@@ -35,6 +35,7 @@ import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.CommandPermission;
 import cloud.commandframework.annotations.Confirmation;
 import cloud.commandframework.annotations.Flag;
+import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -438,6 +439,18 @@ public final class ExamplePlugin extends JavaPlugin {
         }
         player.getInventory().addItem(itemStack);
         player.sendMessage(ChatColor.GREEN + String.format("You have been given %d x %s", number, material));
+    }
+
+    @CommandMethod("example pay <money>")
+    @CommandDescription("Command to test the preprocessing system")
+    private void commandPay(
+            final @NonNull CommandSender sender,
+            final @Argument("money") @Regex("(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$") String money
+    ) {
+        bukkitAudiences.sender(sender).sendMessage(
+                Component.text().append(Component.text("You have been given ", NamedTextColor.AQUA))
+                        .append(Component.text(money, NamedTextColor.GOLD))
+        );
     }
 
 }

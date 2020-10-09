@@ -135,8 +135,12 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          */
         @Override
         public @NonNull BooleanArgument<C> build() {
-            return new BooleanArgument<>(this.isRequired(), this.getName(), this.liberal,
-                    this.getDefaultValue(), this.getSuggestionsProvider()
+            return new BooleanArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.liberal,
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
             );
         }
 

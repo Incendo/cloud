@@ -25,6 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
+import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
@@ -134,6 +135,14 @@ class CommandTreeTest {
                 .handler(c -> {
                     System.out.printf("%f\n", c.<Float>get("num"));
                 }));
+
+        /* Build command for testing preprocessing */
+        manager.command(manager.commandBuilder("preprocess")
+                .argument(
+                        StringArgument.<TestCommandSender>of("argument")
+                                .addPreprocessor(RegexPreprocessor.of("[A-Za-z]{3,5}"))
+                )
+        );
     }
 
     @Test
@@ -250,6 +259,15 @@ class CommandTreeTest {
     void testFloats() {
         manager.executeCommand(new TestCommandSender(), "float 0.0").join();
         manager.executeCommand(new TestCommandSender(), "float 100").join();
+    }
+
+    @Test
+    void testPreprocessors() {
+       manager.executeCommand(new TestCommandSender(), "preprocess abc").join();
+       Assertions.assertThrows(
+               CompletionException.class,
+               () -> manager.executeCommand(new TestCommandSender(), "preprocess ab").join()
+       );
     }
 
 

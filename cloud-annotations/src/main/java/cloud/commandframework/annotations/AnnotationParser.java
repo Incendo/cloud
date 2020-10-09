@@ -28,10 +28,13 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
+import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
+import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
@@ -49,6 +52,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -63,6 +68,8 @@ public final class AnnotationParser<C> {
 
     private final CommandManager<C> manager;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
+    private final Map<Class<? extends Annotation>, Function<? extends Annotation, BiFunction<@NonNull CommandContext<C>,
+            @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>>> preprocessorMappers;
     private final Class<C> commandSenderClass;
     private final MetaFactory metaFactory;
     private final FlagExtractor flagExtractor;
@@ -86,9 +93,11 @@ public final class AnnotationParser<C> {
         this.manager = manager;
         this.metaFactory = new MetaFactory(this, metaMapper);
         this.annotationMappers = new HashMap<>();
+        this.preprocessorMappers = new HashMap<>();
         this.flagExtractor = new FlagExtractor(manager);
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
+        this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(annotation.value()));
     }
 
     /**
@@ -104,6 +113,21 @@ public final class AnnotationParser<C> {
                     @NonNull ParserParameters> mapper
     ) {
         this.annotationMappers.put(annotation, mapper);
+    }
+
+    /**
+     * Register a preprocessor mapper
+     *
+     * @param annotation         Annotation class
+     * @param preprocessorMapper Preprocessor mapper
+     * @param <A>                Annotation type
+     */
+    public <A extends Annotation> void registerPreprocessorMapper(
+            final @NonNull Class<A> annotation,
+            final @NonNull Function<A, BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+                    @NonNull ArgumentParseResult<Boolean>>> preprocessorMapper
+    ) {
+        this.preprocessorMappers.put(annotation, preprocessorMapper);
     }
 
     /**
@@ -315,7 +339,22 @@ public final class AnnotationParser<C> {
         } else {
             argumentBuilder.asRequired();
         }
-        return argumentBuilder.manager(this.manager).withParser(parser).build();
+
+        final CommandArgument<C, ?> builtArgument = argumentBuilder.manager(this.manager).withParser(parser).build();
+
+        /* Add preprocessors */
+        for (final Annotation annotation : annotations) {
+            @SuppressWarnings("ALL") final Function preprocessorMapper =
+                    this.preprocessorMappers.get(annotation.annotationType());
+            if (preprocessorMapper != null) {
+                final BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+                        @NonNull ArgumentParseResult<Boolean>> preprocessor = (BiFunction<CommandContext<C>,
+                        Queue<String>, ArgumentParseResult<Boolean>>) preprocessorMapper.apply(annotation);
+                builtArgument.addPreprocessor(preprocessor);
+            }
+        }
+
+        return builtArgument;
     }
 
     @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>,

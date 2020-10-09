@@ -357,9 +357,20 @@ public final class CommandTree<C> {
                 final CommandArgument<C, ?> argument = child.getValue();
                 final CommandContext.ArgumentTiming argumentTiming = commandContext.createTiming(argument);
 
+                // START: Parsing
                 argumentTiming.setStart(System.nanoTime());
-                final ArgumentParseResult<?> result = argument.getParser().parse(commandContext, commandQueue);
+                final ArgumentParseResult<?> result;
+                final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
+                        commandContext,
+                        commandQueue
+                );
+                if (!preParseResult.getFailure().isPresent() && preParseResult.getParsedValue().orElse(false)) {
+                    result = argument.getParser().parse(commandContext, commandQueue);
+                } else {
+                    result = preParseResult;
+                }
                 argumentTiming.setEnd(System.nanoTime(), result.getFailure().isPresent());
+                // END: Parsing
 
                 if (result.getParsedValue().isPresent()) {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
@@ -476,6 +487,19 @@ public final class CommandTree<C> {
                 } else if (commandQueue.peek().isEmpty()) {
                     return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());
                 }
+
+                // START: Preprocessing
+                final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
+                        commandContext,
+                        commandQueue
+                );
+                if (preParseResult.getFailure().isPresent() || !preParseResult.getParsedValue().orElse(false)) {
+                    final String value = commandQueue.peek() == null ? "" : commandQueue.peek();
+                    return child.getValue().getSuggestionsProvider().apply(commandContext, value);
+                }
+                // END: Preprocessing
+
+                // START: Parsing
                 final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                 if (result.getParsedValue().isPresent()) {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
@@ -484,6 +508,7 @@ public final class CommandTree<C> {
                     final String value = commandQueue.peek() == null ? "" : commandQueue.peek();
                     return child.getValue().getSuggestionsProvider().apply(commandContext, value);
                 }
+                // END: Parsing
             }
         }
         /* There are 0 or more static arguments as children. No variable child arguments are present */

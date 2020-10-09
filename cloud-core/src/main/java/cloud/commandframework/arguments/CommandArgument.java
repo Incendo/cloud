@@ -33,8 +33,12 @@ import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
@@ -83,11 +87,52 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      */
     private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
     /**
+     * Argument preprocessors that allows for extensions to existing argument types
+     * without having to update all parsers
+     */
+    private final Collection<BiFunction<@NonNull CommandContext<C>,
+            @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors;
+    /**
      * Whether or not the argument has been used before
      */
     private boolean argumentRegistered = false;
 
     private Command<C> owningCommand;
+
+    /**
+     * Construct a new command argument
+     *
+     * @param required              Whether or not the argument is required
+     * @param name                  The argument name
+     * @param parser                The argument parser
+     * @param defaultValue          Default value used when no value is provided by the command sender
+     * @param valueType             Type produced by the parser
+     * @param suggestionsProvider   Suggestions provider
+     * @param argumentPreprocessors Argument preprocessors
+     */
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @NonNull TypeToken<T> valueType,
+            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+                    @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
+    ) {
+        this.required = required;
+        this.name = Objects.requireNonNull(name, "Name may not be null");
+        if (!NAME_PATTERN.asPredicate().test(name)) {
+            throw new IllegalArgumentException("Name must be alphanumeric");
+        }
+        this.parser = Objects.requireNonNull(parser, "Parser may not be null");
+        this.defaultValue = defaultValue;
+        this.valueType = valueType;
+        this.suggestionsProvider = suggestionsProvider == null
+                ? buildDefaultSuggestionsProvider(this)
+                : suggestionsProvider;
+        this.argumentPreprocessors = new LinkedList<>(argumentPreprocessors);
+    }
 
     /**
      * Construct a new command argument
@@ -107,17 +152,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
             final @NonNull TypeToken<T> valueType,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
     ) {
-        this.required = required;
-        this.name = Objects.requireNonNull(name, "Name may not be null");
-        if (!NAME_PATTERN.asPredicate().test(name)) {
-            throw new IllegalArgumentException("Name must be alphanumeric");
-        }
-        this.parser = Objects.requireNonNull(parser, "Parser may not be null");
-        this.defaultValue = defaultValue;
-        this.valueType = valueType;
-        this.suggestionsProvider = suggestionsProvider == null
-                ? buildDefaultSuggestionsProvider(this)
-                : suggestionsProvider;
+        this(required, name, parser, defaultValue, valueType, suggestionsProvider, Collections.emptyList());
     }
 
     /**
@@ -227,6 +262,48 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
     @Override
     public final @NonNull String toString() {
         return String.format("%s{name=%s}", this.getClass().getSimpleName(), this.name);
+    }
+
+    /**
+     * Register a new preprocessor. If all preprocessor has succeeding {@link ArgumentParseResult results}
+     * that all return {@code true}, the argument will be passed onto the parser.
+     * <p>
+     * It is important that the preprocessor doesn't pop any input. Instead, it should only peek.
+     *
+     * @param preprocessor Preprocessor
+     * @return {@code this}
+     */
+    public @NonNull CommandArgument<C, T> addPreprocessor(
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
+                    @NonNull ArgumentParseResult<Boolean>> preprocessor
+    ) {
+        this.argumentPreprocessors.add(preprocessor);
+        return this;
+    }
+
+    /**
+     * Preprocess command input. This will immediately forward any failed argument parse results.
+     * If none fails, a {@code true} result will be returned
+     *
+     * @param context Command context
+     * @param input   Remaining command input. None will be popped
+     * @return Parsing error, or argument containing {@code true}
+     */
+    public @NonNull ArgumentParseResult<Boolean> preprocess(
+            final @NonNull CommandContext<C> context,
+            final @NonNull Queue<String> input
+    ) {
+        for (final BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
+                @NonNull ArgumentParseResult<Boolean>> preprocessor : this.argumentPreprocessors) {
+            final ArgumentParseResult<Boolean> result = preprocessor.apply(
+                    context,
+                    input
+            );
+            if (result.getFailure().isPresent()) {
+                return result;
+            }
+        }
+        return ArgumentParseResult.success(true);
     }
 
     /**
@@ -376,6 +453,9 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
         private String defaultValue = "";
         private BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider;
 
+        private final Collection<BiFunction<@NonNull CommandContext<C>,
+                @NonNull String, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors = new LinkedList<>();
+
         protected Builder(
                 final @NonNull TypeToken<T> valueType,
                 final @NonNull String name
@@ -489,8 +569,13 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
             if (this.suggestionsProvider == null) {
                 this.suggestionsProvider = new DelegatingSuggestionsProvider<>(this.name, this.parser);
             }
-            return new CommandArgument<>(this.required, this.name, this.parser,
-                    this.defaultValue, this.valueType, this.suggestionsProvider
+            return new CommandArgument<>(
+                    this.required,
+                    this.name,
+                    this.parser,
+                    this.defaultValue,
+                    this.valueType,
+                    this.suggestionsProvider
             );
         }
 
