@@ -305,46 +305,46 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // A command to change the color scheme for the help command
         //
-        manager.command(
-                manager.commandBuilder("example")
-                        .literal("helpcolors")
-                        .argument(
-                                manager.argumentBuilder(TextColor.class, "primary")
-                                        .withParser(textColorArgumentParser)
-                                        .withSuggestionsProvider(textColorSuggestionsProvider),
-                                Description.of("The primary color for the color scheme")
-                        )
-                        .argument(
-                                manager.argumentBuilder(TextColor.class, "highlight")
-                                        .withParser(textColorArgumentParser)
-                                        .withSuggestionsProvider(textColorSuggestionsProvider),
-                                Description.of("The primary color used to highlight commands and queries")
-                        )
-                        .argument(
-                                manager.argumentBuilder(TextColor.class, "alternate_highlight")
-                                        .withParser(textColorArgumentParser)
-                                        .withSuggestionsProvider(textColorSuggestionsProvider),
-                                Description.of("The secondary color used to highlight commands and queries")
-                        )
-                        .argument(
-                                manager.argumentBuilder(TextColor.class, "text")
-                                        .withParser(textColorArgumentParser)
-                                        .withSuggestionsProvider(textColorSuggestionsProvider),
-                                Description.of("The color used for description text")
-                        )
-                        .argument(
-                                manager.argumentBuilder(TextColor.class, "accent")
-                                        .withParser(textColorArgumentParser)
-                                        .withSuggestionsProvider(textColorSuggestionsProvider),
-                                Description.of("The color used for accents and symbols")
-                        )
-                        .handler(c -> minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
-                                c.get("primary"),
-                                c.get("highlight"),
-                                c.get("alternate_highlight"),
-                                c.get("text"),
-                                c.get("accent")
-                        )))
+        manager.command(builder
+                .meta("description", "Sets the color scheme for '/example help'")
+                .literal("helpcolors")
+                .argument(
+                        manager.argumentBuilder(TextColor.class, "primary")
+                                .withParser(textColorArgumentParser)
+                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        Description.of("The primary color for the color scheme")
+                )
+                .argument(
+                        manager.argumentBuilder(TextColor.class, "highlight")
+                                .withParser(textColorArgumentParser)
+                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        Description.of("The primary color used to highlight commands and queries")
+                )
+                .argument(
+                        manager.argumentBuilder(TextColor.class, "alternate_highlight")
+                                .withParser(textColorArgumentParser)
+                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        Description.of("The secondary color used to highlight commands and queries")
+                )
+                .argument(
+                        manager.argumentBuilder(TextColor.class, "text")
+                                .withParser(textColorArgumentParser)
+                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        Description.of("The color used for description text")
+                )
+                .argument(
+                        manager.argumentBuilder(TextColor.class, "accent")
+                                .withParser(textColorArgumentParser)
+                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        Description.of("The color used for accents and symbols")
+                )
+                .handler(c -> minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
+                        c.get("primary"),
+                        c.get("highlight"),
+                        c.get("alternate_highlight"),
+                        c.get("text"),
+                        c.get("accent")
+                )))
         );
     }
 
