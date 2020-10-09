@@ -26,6 +26,7 @@ package cloud.commandframework.examples.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.Description;
+import cloud.commandframework.MinecraftExceptionHandler;
 import cloud.commandframework.MinecraftHelp;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
@@ -178,6 +179,23 @@ public final class ExamplePlugin extends JavaPlugin {
                 /* Command sender type */ CommandSender.class,
                 /* Mapper for command meta instances */ commandMetaFunction
         );
+        //
+        // Override the default exception handlers
+        //
+        new MinecraftExceptionHandler<CommandSender>()
+                .withInvalidSyntaxHandler()
+                .withInvalidSenderHandler()
+                .withNoPermissionHandler()
+                .withArgumentParsingHandler()
+                .withDecorator(
+                        component -> Component.text().append(
+                                Component.text("[", NamedTextColor.DARK_GRAY)
+                        ).append(
+                                Component.text("Example", NamedTextColor.GOLD)
+                        ).append(
+                                Component.text("] ", NamedTextColor.DARK_GRAY)
+                        ).append(component).build()
+                ).apply(manager, bukkitAudiences::sender);
         //
         // Create the commands
         //
