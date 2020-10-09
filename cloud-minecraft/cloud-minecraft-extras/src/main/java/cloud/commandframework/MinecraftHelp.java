@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 /**
@@ -66,7 +67,7 @@ public final class MinecraftHelp<C> {
     public static final String MESSAGE_AVAILABLE_COMMANDS = "available_commands";
     public static final String MESSAGE_CLICK_TO_SHOW_HELP = "click_to_show_help";
 
-    private static final Pattern SPECIAL_CHARACTERS_PATTERN = Pattern.compile("[^\\s\\w]");
+    private static final Pattern SPECIAL_CHARACTERS_PATTERN = Pattern.compile("[^\\s\\w\\-]");
 
     private final AudienceProvider<C> audienceProvider;
     private final CommandManager<C> commandManager;
@@ -74,6 +75,7 @@ public final class MinecraftHelp<C> {
     private final Map<String, String> messageMap = new HashMap<>();
 
     private HelpColors colors = DEFAULT_HELP_COLORS;
+    private BiFunction<C, String, String> messageProvider = (sender, key) -> this.messageMap.get(key);
 
     /**
      * Construct a new Minecraft help instance
@@ -133,9 +135,9 @@ public final class MinecraftHelp<C> {
     }
 
     /**
-     * Set message for a key
+     * Configure a message
      *
-     * @param key   The key for the message. These are constants in {@link MinecraftHelp}
+     * @param key   Message key. These are constants in {@link MinecraftHelp}
      * @param value The text for the message
      */
     public void setMessage(
@@ -146,13 +148,14 @@ public final class MinecraftHelp<C> {
     }
 
     /**
-     * Get the message for a key
+     * Set a custom message provider function to be used for getting messages from keys.
+     * <p>
+     * The keys are constants in {@link MinecraftHelp}.
      *
-     * @param key The key for the message. These are constants in {@link MinecraftHelp}
-     * @return The text for the message
+     * @param messageProvider The message provider to use
      */
-    public @NonNull String getMessage(final @NonNull String key) {
-        return this.messageMap.get(key);
+    public void setMessageProvider(final @NonNull BiFunction<C, String, String> messageProvider) {
+        this.messageProvider = messageProvider;
     }
 
     /**
@@ -185,7 +188,7 @@ public final class MinecraftHelp<C> {
     ) {
         final Audience audience = this.getAudience(recipient);
         audience.sendMessage(this.line(13)
-                .append(Component.text(" " + this.messageMap.get(MESSAGE_HELP) + " ", this.colors.highlight))
+                .append(Component.text(" " + this.messageProvider.apply(recipient, MESSAGE_HELP) + " ", this.colors.highlight))
                 .append(this.line(13))
         );
         this.printTopic(recipient, query, this.commandManager.getCommandHelpHandler().queryHelp(recipient, query));
@@ -198,7 +201,7 @@ public final class MinecraftHelp<C> {
             final CommandHelpHandler.@NonNull HelpTopic<C> helpTopic
     ) {
         this.getAudience(sender).sendMessage(
-                Component.text(this.messageMap.get(MESSAGE_SHOWING_RESULTS_FOR_QUERY) + ": \"", this.colors.text)
+                Component.text(this.messageProvider.apply(sender, MESSAGE_SHOWING_RESULTS_FOR_QUERY) + ": \"", this.colors.text)
                         .append(this.highlight(Component.text("/" + query, this.colors.highlight)))
                         .append(Component.text("\"", this.colors.text))
         );
@@ -209,7 +212,7 @@ public final class MinecraftHelp<C> {
         } else if (helpTopic instanceof CommandHelpHandler.VerboseHelpTopic) {
             this.printVerboseHelpTopic(sender, (CommandHelpHandler.VerboseHelpTopic<C>) helpTopic);
         } else {
-            throw new IllegalArgumentException(this.messageMap.get(MESSAGE_UNKNOWN_HELP_TOPIC_TYPE));
+            throw new IllegalArgumentException(this.messageProvider.apply(sender, MESSAGE_UNKNOWN_HELP_TOPIC_TYPE));
         }
     }
 
@@ -220,14 +223,17 @@ public final class MinecraftHelp<C> {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(lastBranch()
                 .append(Component.text(
-                        String.format(" %s:", this.messageMap.get(MESSAGE_AVAILABLE_COMMANDS)),
+                        String.format(" %s:", this.messageProvider.apply(sender, MESSAGE_AVAILABLE_COMMANDS)),
                         this.colors.text
                 )));
         final Iterator<CommandHelpHandler.VerboseHelpEntry<C>> iterator = helpTopic.getEntries().iterator();
         while (iterator.hasNext()) {
             final CommandHelpHandler.VerboseHelpEntry<C> entry = iterator.next();
 
-            final String description = entry.getDescription().isEmpty() ? this.messageMap.get(MESSAGE_CLICK_TO_SHOW_HELP)
+            final String description = entry.getDescription().isEmpty() ? this.messageProvider.apply(
+                    sender,
+                    MESSAGE_CLICK_TO_SHOW_HELP
+            )
                     : entry.getDescription();
 
             Component message = Component.text("   ")
@@ -261,7 +267,10 @@ public final class MinecraftHelp<C> {
                     Component.text(indentation.toString())
                             .append(iterator.hasNext() ? this.branch() : this.lastBranch())
                             .append(this.highlight(Component.text(" /" + suggestion, this.colors.highlight))
-                                    .hoverEvent(Component.text(this.messageMap.get(MESSAGE_CLICK_TO_SHOW_HELP), this.colors.text))
+                                    .hoverEvent(Component.text(
+                                            this.messageProvider.apply(sender, MESSAGE_CLICK_TO_SHOW_HELP),
+                                            this.colors.text
+                                    ))
                                     .clickEvent(ClickEvent.runCommand(this.commandPrefix + ' ' + suggestion)))
             );
         }
@@ -276,19 +285,28 @@ public final class MinecraftHelp<C> {
                 .apply(helpTopic.getCommand().getArguments(), null);
         audience.sendMessage(
                 this.lastBranch()
-                        .append(Component.text(" " + this.messageMap.get(MESSAGE_COMMAND) + ": ", this.colors.primary))
+                        .append(Component.text(
+                                " " + this.messageProvider.apply(sender, MESSAGE_COMMAND) + ": ",
+                                this.colors.primary
+                        ))
                         .append(this.highlight(Component.text("/" + command, this.colors.highlight)))
         );
         audience.sendMessage(
                 Component.text("   ")
                         .append(this.branch())
-                        .append(Component.text(" " + this.messageMap.get(MESSAGE_DESCRIPTION) + ": ", this.colors.primary))
+                        .append(Component.text(
+                                " " + this.messageProvider.apply(sender, MESSAGE_DESCRIPTION) + ": ",
+                                this.colors.primary
+                        ))
                         .append(Component.text(helpTopic.getDescription(), this.colors.text))
         );
         audience.sendMessage(
                 Component.text("   ")
                         .append(this.lastBranch())
-                        .append(Component.text(" " + this.messageMap.get(MESSAGE_ARGUMENTS) + ":", this.colors.primary))
+                        .append(Component.text(
+                                " " + this.messageProvider.apply(sender, MESSAGE_ARGUMENTS) + ":",
+                                this.colors.primary
+                        ))
         );
 
         final Iterator<CommandArgument<C, ?>> iterator = helpTopic.getCommand().getArguments().iterator();
@@ -300,7 +318,7 @@ public final class MinecraftHelp<C> {
 
             String description = helpTopic.getCommand().getArgumentDescription(argument);
             if (description.isEmpty()) {
-                description = this.messageMap.get(MESSAGE_NO_DESCRIPTION);
+                description = this.messageProvider.apply(sender, MESSAGE_NO_DESCRIPTION);
             }
 
             String syntax = this.commandManager.getCommandSyntaxFormatter()
@@ -312,7 +330,7 @@ public final class MinecraftHelp<C> {
                     .append(this.highlight(Component.text(" " + syntax, this.colors.highlight)));
             if (!argument.isRequired()) {
                 component.append(Component.text(
-                        " (" + this.messageMap.get(MESSAGE_OPTIONAL) + ")",
+                        " (" + this.messageProvider.apply(sender, MESSAGE_OPTIONAL) + ")",
                         this.colors.alternateHighlight
                 ));
             }

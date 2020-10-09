@@ -318,7 +318,7 @@ public final class ExamplePlugin extends JavaPlugin {
                                 manager.argumentBuilder(TextColor.class, "highlight")
                                         .withParser(textColorArgumentParser)
                                         .withSuggestionsProvider(textColorSuggestionsProvider),
-                                Description.of("he primary color used to highlight commands and queries")
+                                Description.of("The primary color used to highlight commands and queries")
                         )
                         .argument(
                                 manager.argumentBuilder(TextColor.class, "alternate_highlight")
