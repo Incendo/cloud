@@ -39,6 +39,7 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.types.tuples.Pair;
+import io.leangen.geantyref.GenericTypeReflector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -451,6 +452,14 @@ public final class CommandTree<C> {
                 }
             }
             // END: Flags
+
+            // START: Array arguments
+            if (child.getValue() != null && GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
+                while (commandQueue.size() > 1) {
+                    commandQueue.remove();
+                }
+            }
+            // END: Array arguments
 
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {

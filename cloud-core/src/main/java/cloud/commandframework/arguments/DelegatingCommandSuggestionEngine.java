@@ -67,6 +67,8 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
             @NonNull final String input
     ) {
         final @NonNull LinkedList<@NonNull String> inputQueue = new CommandInputTokenizer(input).tokenize();
+        /* Store a copy of the input queue in the context */
+        context.store("__raw_input__", new LinkedList<>(inputQueue));
         final List<String> suggestions;
         if (this.commandManager.preprocessContext(context, inputQueue) == State.ACCEPTED) {
             suggestions = this.commandManager.getCommandSuggestionProcessor().apply(

@@ -35,6 +35,7 @@ import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
@@ -112,6 +113,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                         (double) options.get(StandardParameters.RANGE_MAX, Double.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<C>());
+        this.registerParserSupplier(TypeToken.get(String[].class), options -> new StringArrayArgument.StringArrayParser<>());
         /* Make this one less awful */
         this.registerParserSupplier(TypeToken.get(String.class), options -> {
             final boolean greedy = options.get(StandardParameters.GREEDY, false);

@@ -43,6 +43,7 @@ import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.BukkitCommandMetaBuilder;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
@@ -62,6 +63,7 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -76,6 +78,7 @@ import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
@@ -363,6 +366,30 @@ public final class ExamplePlugin extends JavaPlugin {
                         c.get("text"),
                         c.get("accent")
                 )))
+        );
+        //
+        // Create a Bukkit-like command
+        //
+        manager.command(
+                manager.commandBuilder(
+                        "arraycommand",
+                        Description.of("Bukkit-esque cmmand")
+                ).argument(
+                        StringArrayArgument.optional(
+                                "args",
+                                (context, lastString) -> {
+                                    final List<String> allArgs = context.getRawInput();
+                                    if (allArgs.size() > 1 && allArgs.get(1).equals("curry")) {
+                                        return Collections.singletonList("hot");
+                                    }
+                                    return Collections.emptyList();
+                                }
+                        ),
+                        Description.of("Arguments")
+                ).handler(context -> {
+                    final String[] args = context.getOrDefault("args", new String[0]);
+                    context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));
+                })
         );
     }
 

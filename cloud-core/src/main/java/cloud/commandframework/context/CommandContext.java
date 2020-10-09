@@ -30,6 +30,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
@@ -203,6 +204,15 @@ public final class CommandContext<C> {
             final @Nullable T defaultValue
     ) {
         return this.<T>getOptional(key).orElse(defaultValue);
+    }
+
+    /**
+     * Get the raw input. This should only be used when {@link #isSuggestions()} is {@code true}
+     *
+     * @return Raw input in token form
+     */
+    public @NonNull LinkedList<@NonNull String> getRawInput() {
+        return this.getOrDefault("__raw_input__", new LinkedList<>());
     }
 
     /**
