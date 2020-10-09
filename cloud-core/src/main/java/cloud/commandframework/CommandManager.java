@@ -24,7 +24,9 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.CommandSuggestionEngine;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
+import cloud.commandframework.arguments.DelegatingCommandSuggestionEngineFactory;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -44,6 +46,7 @@ import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.execution.preprocessor.AcceptingCommandPreprocessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
+import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
@@ -63,7 +66,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -75,8 +77,6 @@ import java.util.function.Function;
  */
 public abstract class CommandManager<C> {
 
-    private static final List<String> SINGLE_EMPTY_SUGGESTION = Collections.unmodifiableList(Collections.singletonList(""));
-
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
     private final EnumSet<ManagerSettings> managerSettings = EnumSet.of(
             ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS);
@@ -87,6 +87,7 @@ public abstract class CommandManager<C> {
     private final Collection<Command<C>> commands = new LinkedList<>();
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
+    private final CommandSuggestionEngine<C> commandSuggestionEngine;
 
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
@@ -105,28 +106,11 @@ public abstract class CommandManager<C> {
         this.commandTree = CommandTree.newTree(this);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
+        this.commandSuggestionEngine = new DelegatingCommandSuggestionEngineFactory<>(this).create();
         this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
         }, new AcceptingCommandPreprocessor<>());
         this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
         }, new AcceptingCommandPostprocessor<>());
-    }
-
-    /**
-     * Tokenize an input string
-     *
-     * @param input Input string
-     * @return List of tokens
-     */
-    public static @NonNull LinkedList<@NonNull String> tokenize(final @NonNull String input) {
-        final StringTokenizer stringTokenizer = new StringTokenizer(input, " ");
-        final LinkedList<String> tokens = new LinkedList<>();
-        while (stringTokenizer.hasMoreElements()) {
-            tokens.add(stringTokenizer.nextToken());
-        }
-        if (input.endsWith(" ")) {
-            tokens.add("");
-        }
-        return tokens;
     }
 
     /**
@@ -141,7 +125,7 @@ public abstract class CommandManager<C> {
             final @NonNull String input
     ) {
         final CommandContext<C> context = this.commandContextFactory.create(false, commandSender);
-        final LinkedList<String> inputQueue = tokenize(input);
+        final LinkedList<String> inputQueue = new CommandInputTokenizer(input).tokenize();
         try {
             if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
                 return this.commandExecutionCoordinator.coordinateExecution(context, inputQueue);
@@ -167,25 +151,11 @@ public abstract class CommandManager<C> {
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
-        final CommandContext<C> context = this.commandContextFactory.create(true, commandSender);
-        final LinkedList<String> inputQueue = tokenize(input);
-
-        final List<String> suggestions;
-        if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
-            suggestions = this.commandSuggestionProcessor.apply(
-                    new CommandPreprocessingContext<>(context, inputQueue),
-                    this.commandTree.getSuggestions(
-                            context, inputQueue)
-            );
-        } else {
-            suggestions = Collections.emptyList();
-        }
-
-        if (this.getSetting(ManagerSettings.FORCE_SUGGESTION) && suggestions.isEmpty()) {
-            return SINGLE_EMPTY_SUGGESTION;
-        }
-
-        return suggestions;
+        final CommandContext<C> context = this.commandContextFactory.create(
+                true,
+                commandSender
+        );
+        return this.commandSuggestionEngine.getSuggestions(context, input);
     }
 
     /**
@@ -281,7 +251,14 @@ public abstract class CommandManager<C> {
     public abstract boolean hasPermission(@NonNull C sender, @NonNull String permission);
 
     /**
-     * Create a new command builder
+     * Create a new command builder. This will also register the creating manager in the command
+     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
+     * builder is associated with the creating manager. This allows for parser inference based on
+     * the type, with the help of the {@link ParserRegistry parser registry}
+     * <p>
+     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
+     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
+     * {@link Command command} instance
      *
      * @param name        Command name
      * @param aliases     Command aliases
@@ -295,11 +272,25 @@ public abstract class CommandManager<C> {
             final @NonNull Description description,
             final @NonNull CommandMeta meta
     ) {
-        return Command.<C>newBuilder(name, meta, description, aliases.toArray(new String[0])).manager(this);
+        return Command.<C>newBuilder(
+                name,
+                meta,
+                description,
+                aliases.toArray(new String[0])
+        ).manager(this);
     }
 
     /**
-     * Create a new command builder
+     * Create a new command builder with an empty description.
+     * <p>
+     * This will also register the creating manager in the command
+     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
+     * builder is associated with the creating manager. This allows for parser inference based on
+     * the type, with the help of the {@link ParserRegistry parser registry}
+     * <p>
+     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
+     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
+     * {@link Command command} instance
      *
      * @param name    Command name
      * @param aliases Command aliases
@@ -311,11 +302,23 @@ public abstract class CommandManager<C> {
             final @NonNull Collection<String> aliases,
             final @NonNull CommandMeta meta
     ) {
-        return Command.<C>newBuilder(name, meta, Description.empty(), aliases.toArray(new String[0])).manager(this);
+        return Command.<C>newBuilder(
+                name,
+                meta,
+                Description.empty(),
+                aliases.toArray(new String[0])
+        ).manager(this);
     }
 
     /**
-     * Create a new command builder
+     * Create a new command builder. This will also register the creating manager in the command
+     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
+     * builder is associated with the creating manager. This allows for parser inference based on
+     * the type, with the help of the {@link ParserRegistry parser registry}
+     * <p>
+     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
+     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
+     * {@link Command command} instance
      *
      * @param name        Command name
      * @param meta        Command meta
@@ -329,11 +332,25 @@ public abstract class CommandManager<C> {
             final @NonNull Description description,
             final @NonNull String... aliases
     ) {
-        return Command.<C>newBuilder(name, meta, description, aliases).manager(this);
+        return Command.<C>newBuilder(
+                name,
+                meta,
+                description,
+                aliases
+        ).manager(this);
     }
 
     /**
-     * Create a new command builder
+     * Create a new command builder with an empty description.
+     * <p>
+     * This will also register the creating manager in the command
+     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
+     * builder is associated with the creating manager. This allows for parser inference based on
+     * the type, with the help of the {@link ParserRegistry parser registry}
+     * <p>
+     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
+     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
+     * {@link Command command} instance
      *
      * @param name    Command name
      * @param meta    Command meta
@@ -345,11 +362,25 @@ public abstract class CommandManager<C> {
             final @NonNull CommandMeta meta,
             final @NonNull String... aliases
     ) {
-        return Command.<C>newBuilder(name, meta, Description.empty(), aliases).manager(this);
+        return Command.<C>newBuilder(
+                name,
+                meta,
+                Description.empty(),
+                aliases
+        ).manager(this);
     }
 
     /**
-     * Create a new command builder using a default command meta instance.
+     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}.
+     * <p>
+     * This will also register the creating manager in the command
+     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
+     * builder is associated with the creating manager. This allows for parser inference based on
+     * the type, with the help of the {@link ParserRegistry parser registry}
+     * <p>
+     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
+     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
+     * {@link Command command} instance
      *
      * @param name        Command name
      * @param description Command description
@@ -363,11 +394,26 @@ public abstract class CommandManager<C> {
             final @NonNull Description description,
             final @NonNull String... aliases
     ) {
-        return Command.<C>newBuilder(name, this.createDefaultCommandMeta(), description, aliases).manager(this);
+        return Command.<C>newBuilder(
+                name,
+                this.createDefaultCommandMeta(),
+                description,
+                aliases
+        ).manager(this);
     }
 
     /**
-     * Create a new command builder using a default command meta instance.
+     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}, and
+     * an empty description.
+     * <p>
+     * This will also register the creating manager in the command
+     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
+     * builder is associated with the creating manager. This allows for parser inference based on
+     * the type, with the help of the {@link ParserRegistry parser registry}
+     * <p>
+     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
+     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
+     * {@link Command command} instance
      *
      * @param name    Command name
      * @param aliases Command aliases
@@ -379,11 +425,20 @@ public abstract class CommandManager<C> {
             final @NonNull String name,
             final @NonNull String... aliases
     ) {
-        return Command.<C>newBuilder(name, this.createDefaultCommandMeta(), Description.empty(), aliases).manager(this);
+        return Command.<C>newBuilder(
+                name,
+                this.createDefaultCommandMeta(),
+                Description.empty(),
+                aliases
+        ).manager(this);
     }
 
     /**
-     * Create a new command argument builder
+     * Create a new command argument builder.
+     * <p>
+     * This will also invoke {@link CommandArgument.Builder#manager(CommandManager)}
+     * so that the argument is associated with the calling command manager. This allows for parser inference based on
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      *
      * @param type Argument type
      * @param name Argument name
@@ -433,8 +488,10 @@ public abstract class CommandManager<C> {
      * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
      */
     public void registerCommandPreProcessor(final @NonNull CommandPreprocessor<C> processor) {
-        this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPreprocessor<C>>() {
-                                                           }, processor,
+        this.servicePipeline.registerServiceImplementation(
+                new TypeToken<CommandPreprocessor<C>>() {
+                },
+                processor,
                 Collections.emptyList()
         );
     }
@@ -612,6 +669,7 @@ public abstract class CommandManager<C> {
      *
      * @param setting Setting
      * @return {@code true} if the setting is activated or {@code false} if it's not
+     * @see #setSetting(ManagerSettings, boolean) Update a manager setting
      */
     public boolean getSetting(final @NonNull ManagerSettings setting) {
         return this.managerSettings.contains(setting);
@@ -622,6 +680,7 @@ public abstract class CommandManager<C> {
      *
      * @param setting Setting to set
      * @param value   Value
+     * @see #getSetting(ManagerSettings) Get a manager setting
      */
     @SuppressWarnings("unused")
     public void setSetting(
@@ -638,6 +697,9 @@ public abstract class CommandManager<C> {
 
     /**
      * Configurable command related settings
+     *
+     * @see CommandManager#setSetting(ManagerSettings, boolean) Set a manager setting
+     * @see CommandManager#getSetting(ManagerSettings) Get a manager setting
      */
     public enum ManagerSettings {
         /**
