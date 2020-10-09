@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 /**
  * Exception handler that sends {@link Component} to the sender. All component builders
@@ -44,57 +45,47 @@ import java.util.function.Function;
  */
 public final class MinecraftExceptionHandler<C> {
 
+    private static final Pattern SPECIAL_CHARACTERS_PATTERN = Pattern.compile("[^\\s\\w\\-]");
+
     /**
      * Default component builder for {@link InvalidSyntaxException}
      */
     public static final Function<Exception, Component> DEFAULT_INVALID_SYNTAX_FUNCTION =
             e -> Component.text()
-                    .append(
-                            Component.text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED)
-                    ).append(
-                            Component.text(
-                                    String.format("/%s", ((InvalidSyntaxException) e).getCorrectSyntax()),
-                                    NamedTextColor.GRAY
-                            )
-                    )
+                    .append(Component.text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED))
+                    .append(Component.text(
+                            String.format("/%s", ((InvalidSyntaxException) e).getCorrectSyntax()),
+                            NamedTextColor.GRAY
+                    ).replaceText(SPECIAL_CHARACTERS_PATTERN, match -> match.color(NamedTextColor.WHITE)))
                     .build();
     /**
      * Default component builder for {@link InvalidCommandSenderException}
      */
     public static final Function<Exception, Component> DEFAULT_INVALID_SENDER_FUNCTION =
             e -> Component.text()
-                    .append(
-                            Component.text("Invalid command sender. You must be of type ", NamedTextColor.RED)
-                    ).append(
-                            Component.text(
-                                    ((InvalidCommandSenderException) e).getRequiredSender().getSimpleName(),
-                                    NamedTextColor.GRAY
-                            )
-                    )
+                    .append(Component.text("Invalid command sender. You must be of type ", NamedTextColor.RED))
+                    .append(Component.text(
+                            ((InvalidCommandSenderException) e).getRequiredSender().getSimpleName(),
+                            NamedTextColor.GRAY
+                    ))
                     .build();
     /**
      * Default component builder for {@link NoPermissionException}
      */
     public static final Function<Exception, Component> DEFAULT_NO_PERMISSION_FUNCTION =
-            e -> Component.text()
-                    .append(
-                            Component.text(
-                                    "I'm sorry, but you do not have permission to perform this command. \n"
-                                            + "Please contact the server administrators if you believe that this is in error.",
-                                    NamedTextColor.RED
-                            )
-                    )
-                    .build();
+            e -> Component.text(
+                    "I'm sorry, but you do not have permission to perform this command. \n"
+                            + "Please contact the server administrators if you believe that this is in error.",
+                    NamedTextColor.RED
+            );
     /**
      * Default component builder for {@link ArgumentParseException}
      */
     public static final Function<Exception, Component> DEFAULT_ARGUMENT_PARSING_FUNCTION =
             e -> Component.text()
-                    .append(
-                            Component.text("Invalid command argument: ", NamedTextColor.RED)
-                    ).append(
-                            Component.text(e.getCause().getMessage(), NamedTextColor.GRAY)
-                    ).build();
+                    .append(Component.text("Invalid command argument: ", NamedTextColor.RED))
+                    .append(Component.text(e.getCause().getMessage(), NamedTextColor.GRAY))
+                    .build();
 
     private final Map<ExceptionType, Function<Exception, Component>> componentBuilders = new HashMap<>();
     private Function<Component, Component> decorator = Function.identity();
