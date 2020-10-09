@@ -196,13 +196,11 @@ public final class ExamplePlugin extends JavaPlugin {
                 .withNoPermissionHandler()
                 .withArgumentParsingHandler()
                 .withDecorator(
-                        component -> Component.text().append(
-                                Component.text("[", NamedTextColor.DARK_GRAY)
-                        ).append(
-                                Component.text("Example", NamedTextColor.GOLD)
-                        ).append(
-                                Component.text("] ", NamedTextColor.DARK_GRAY)
-                        ).append(component).build()
+                        component -> Component.text()
+                                .append(Component.text("[", NamedTextColor.DARK_GRAY))
+                                .append(Component.text("Example", NamedTextColor.GOLD))
+                                .append(Component.text("] ", NamedTextColor.DARK_GRAY))
+                                .append(component).build()
                 ).apply(manager, bukkitAudiences::sender);
         //
         // Create the commands
