@@ -230,10 +230,8 @@ public final class MinecraftHelp<C> {
         while (iterator.hasNext()) {
             final CommandHelpHandler.VerboseHelpEntry<C> entry = iterator.next();
 
-            final String description = entry.getDescription().isEmpty() ? this.messageProvider.apply(
-                    sender,
-                    MESSAGE_CLICK_TO_SHOW_HELP
-            )
+            final String description = entry.getDescription().isEmpty()
+                    ? this.messageProvider.apply(sender, MESSAGE_CLICK_TO_SHOW_HELP)
                     : entry.getDescription();
 
             Component message = Component.text("   ")
@@ -291,54 +289,58 @@ public final class MinecraftHelp<C> {
                         ))
                         .append(this.highlight(Component.text("/" + command, this.colors.highlight)))
         );
+        final String topicDescription = helpTopic.getDescription().isEmpty()
+                ? this.messageProvider.apply(sender, MESSAGE_NO_DESCRIPTION)
+                : helpTopic.getDescription();
+        final boolean hasArguments = helpTopic.getCommand().getArguments().size() > 1;
         audience.sendMessage(
                 Component.text("   ")
-                        .append(this.branch())
+                        .append(hasArguments ? this.branch() : this.lastBranch())
                         .append(Component.text(
                                 " " + this.messageProvider.apply(sender, MESSAGE_DESCRIPTION) + ": ",
                                 this.colors.primary
                         ))
-                        .append(Component.text(helpTopic.getDescription(), this.colors.text))
+                        .append(Component.text(topicDescription, this.colors.text))
         );
-        audience.sendMessage(
-                Component.text("   ")
-                        .append(this.lastBranch())
-                        .append(Component.text(
-                                " " + this.messageProvider.apply(sender, MESSAGE_ARGUMENTS) + ":",
-                                this.colors.primary
-                        ))
-        );
+        if (hasArguments) {
+            audience.sendMessage(
+                    Component.text("   ")
+                            .append(this.lastBranch())
+                            .append(Component.text(
+                                    " " + this.messageProvider.apply(sender, MESSAGE_ARGUMENTS) + ":",
+                                    this.colors.primary
+                            ))
+            );
 
-        final Iterator<CommandArgument<C, ?>> iterator = helpTopic.getCommand().getArguments().iterator();
-        /* Skip the first one because it's the command literal */
-        iterator.next();
+            final Iterator<CommandArgument<C, ?>> iterator = helpTopic.getCommand().getArguments().iterator();
+            /* Skip the first one because it's the command literal */
+            iterator.next();
 
-        while (iterator.hasNext()) {
-            final CommandArgument<C, ?> argument = iterator.next();
+            while (iterator.hasNext()) {
+                final CommandArgument<C, ?> argument = iterator.next();
 
-            String description = helpTopic.getCommand().getArgumentDescription(argument);
-            if (description.isEmpty()) {
-                description = this.messageProvider.apply(sender, MESSAGE_NO_DESCRIPTION);
+                String syntax = this.commandManager.getCommandSyntaxFormatter()
+                        .apply(Collections.singletonList(argument), null);
+
+                final TextComponent.Builder component = Component.text()
+                        .append(Component.text("       "))
+                        .append(iterator.hasNext() ? this.branch() : this.lastBranch())
+                        .append(this.highlight(Component.text(" " + syntax, this.colors.highlight)));
+                if (!argument.isRequired()) {
+                    component.append(Component.text(
+                            " (" + this.messageProvider.apply(sender, MESSAGE_OPTIONAL) + ")",
+                            this.colors.alternateHighlight
+                    ));
+                }
+                final String description = helpTopic.getCommand().getArgumentDescription(argument);
+                if (!description.isEmpty()) {
+                    component
+                            .append(Component.text(" - ", this.colors.accent))
+                            .append(Component.text(description, this.colors.text));
+                }
+
+                audience.sendMessage(component);
             }
-
-            String syntax = this.commandManager.getCommandSyntaxFormatter()
-                    .apply(Collections.singletonList(argument), null);
-
-            final TextComponent.Builder component = Component.text()
-                    .append(Component.text("       "))
-                    .append(iterator.hasNext() ? this.branch() : this.lastBranch())
-                    .append(this.highlight(Component.text(" " + syntax, this.colors.highlight)));
-            if (!argument.isRequired()) {
-                component.append(Component.text(
-                        " (" + this.messageProvider.apply(sender, MESSAGE_OPTIONAL) + ")",
-                        this.colors.alternateHighlight
-                ));
-            }
-            component
-                    .append(Component.text(" - ", this.colors.accent))
-                    .append(Component.text(description, this.colors.text));
-
-            audience.sendMessage(component);
         }
     }
 
