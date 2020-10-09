@@ -45,130 +45,245 @@ import java.util.List;
  */
 public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final @NonNull String apply(
             final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
             final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
     ) {
-        final StringBuilder stringBuilder = new StringBuilder();
+        final FormattingInstance formattingInstance = this.createInstance();
         final Iterator<CommandArgument<C, ?>> iterator = commandArguments.iterator();
         while (iterator.hasNext()) {
             final CommandArgument<?, ?> commandArgument = iterator.next();
             if (commandArgument instanceof StaticArgument) {
-                stringBuilder.append(commandArgument.getName());
+                formattingInstance.appendLiteral((StaticArgument<C>) commandArgument);
             } else {
                 if (commandArgument instanceof CompoundArgument) {
-                    final char prefix = commandArgument.isRequired() ? '<' : '[';
-                    final char suffix = commandArgument.isRequired() ? '>' : ']';
-                    stringBuilder.append(prefix);
-                    // noinspection all
-                    final Object[] names = ((CompoundArgument<?, C, ?>) commandArgument).getNames().toArray();
-                    for (int i = 0; i < names.length; i++) {
-                        stringBuilder.append(prefix).append(names[i]).append(suffix);
-                        if ((i + 1) < names.length) {
-                            stringBuilder.append(' ');
-                        }
-                    }
-                    stringBuilder.append(suffix);
+                    formattingInstance.appendCompound((CompoundArgument<?, ?, ?>) commandArgument);
                 } else {
-                    String name = commandArgument.getName();
-
                     if (commandArgument instanceof FlagArgument) {
-                        final StringBuilder flagBuilder = new StringBuilder();
-                        @SuppressWarnings("unchecked") final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) commandArgument)
-                                .getFlags()
-                                .iterator();
-                        while (flagIterator.hasNext()) {
-                            final CommandFlag<?> flag = flagIterator.next();
-                            flagBuilder.append("--").append(flag.getName());
-                            if (flag.getCommandArgument() != null) {
-                                flagBuilder.append(" [").append(flag.getCommandArgument().getName()).append("]");
-                            }
-                            if (flagIterator.hasNext()) {
-                                flagBuilder.append(" | ");
-                            }
-                        }
-                        name = flagBuilder.toString();
+                        formattingInstance.appendFlag((FlagArgument<?>) commandArgument);
                     }
-
                     if (commandArgument.isRequired()) {
-                        stringBuilder.append("<").append(name).append(">");
+                        formattingInstance.appendRequired(commandArgument);
                     } else {
-                        stringBuilder.append("[").append(name).append("]");
+                        formattingInstance.appendOptional(commandArgument);
                     }
                 }
             }
             if (iterator.hasNext()) {
-                stringBuilder.append(" ");
+                formattingInstance.appendBlankSpace();
             }
         }
         CommandTree.Node<CommandArgument<C, ?>> tail = node;
         while (tail != null && !tail.isLeaf()) {
             if (tail.getChildren().size() > 1) {
-                stringBuilder.append(" ");
+                formattingInstance.appendBlankSpace();
                 final Iterator<CommandTree.Node<CommandArgument<C, ?>>> childIterator = tail.getChildren().iterator();
                 while (childIterator.hasNext()) {
                     final CommandTree.Node<CommandArgument<C, ?>> child = childIterator.next();
-                    stringBuilder.append(child.getValue().getName());
+                    formattingInstance.appendName(child.getValue().getName());
                     if (childIterator.hasNext()) {
-                        stringBuilder.append("|");
+                        formattingInstance.appendPipe();
                     }
                 }
                 break;
             }
             final CommandArgument<C, ?> argument = tail.getChildren().get(0).getValue();
-            final String prefix;
-            final String suffix;
-            if (argument instanceof StaticArgument) {
-                prefix = "";
-                suffix = "";
-            } else if (argument.isRequired()) {
-                prefix = "<";
-                suffix = ">";
-            } else {
-                prefix = "[";
-                suffix = "]";
-            }
-
             if (argument instanceof CompoundArgument) {
-                stringBuilder.append(" ").append(prefix);
-                // noinspection all
-                final Object[] names = ((CompoundArgument<?, C, ?>) argument).getNames().toArray();
-                for (int i = 0; i < names.length; i++) {
-                    stringBuilder.append(prefix).append(names[i]).append(suffix);
-                    if ((i + 1) < names.length) {
-                        stringBuilder.append(' ');
-                    }
-                }
-                stringBuilder.append(suffix);
+                formattingInstance.appendBlankSpace();
+                formattingInstance.appendCompound((CompoundArgument<?, ?, ?>) argument);
             } else if (argument instanceof FlagArgument) {
-                final StringBuilder flagBuilder = new StringBuilder();
-                @SuppressWarnings("unchecked") final Iterator<CommandFlag<?>> flagIterator = ((FlagArgument<C>) argument)
-                        .getFlags()
-                        .iterator();
-                while (flagIterator.hasNext()) {
-                    final CommandFlag<?> flag = flagIterator.next();
-                    flagBuilder.append("--").append(flag.getName());
-                    if (flag.getCommandArgument() != null) {
-                        flagBuilder.append(" [").append(flag.getCommandArgument().getName()).append("]");
-                    }
-                    if (flagIterator.hasNext()) {
-                        flagBuilder.append(" | ");
-                    }
-                }
-                stringBuilder.append(" ")
-                        .append(prefix)
-                        .append(flagBuilder)
-                        .append(suffix);
+                formattingInstance.appendBlankSpace();
+                formattingInstance.appendFlag((FlagArgument<?>) argument);
             } else {
-                stringBuilder.append(" ")
-                        .append(prefix)
-                        .append(argument.getName())
-                        .append(suffix);
+                formattingInstance.appendBlankSpace();
+                if (argument.isRequired()) {
+                    formattingInstance.appendRequired(argument);
+                } else {
+                    formattingInstance.appendOptional(argument);
+                }
             }
             tail = tail.getChildren().get(0);
         }
-        return stringBuilder.toString();
+        return formattingInstance.toString();
+    }
+
+    /**
+     * Create a new formatting instance
+     *
+     * @return Formatting instance
+     */
+    protected @NonNull FormattingInstance createInstance() {
+        return new FormattingInstance();
+    }
+
+
+    /**
+     * Instance that is used when building command syntax
+     */
+    public static class FormattingInstance {
+
+        private final StringBuilder builder;
+
+        /**
+         * Create a new formatting instance
+         */
+        protected FormattingInstance() {
+            this.builder = new StringBuilder();
+        }
+
+        @Override
+        public final @NonNull String toString() {
+            return this.builder.toString();
+        }
+
+        /**
+         * Append a literal to the syntax string
+         *
+         * @param literal Literal to append
+         */
+        public void appendLiteral(final @NonNull StaticArgument<?> literal) {
+            this.appendName(literal.getName());
+        }
+
+        /**
+         * Append a compound argument to the syntax string
+         *
+         * @param argument Compound argument to append
+         */
+        public void appendCompound(final @NonNull CompoundArgument<?, ?, ?> argument) {
+            final String prefix = argument.isRequired() ? this.getRequiredPrefix() : this.getOptionalPrefix();
+            final String suffix = argument.isRequired() ? this.getRequiredSuffix() : this.getOptionalSuffix();
+            this.builder.append(prefix);
+            final Object[] names = argument.getNames().toArray();
+            for (int i = 0; i < names.length; i++) {
+                this.builder.append(prefix);
+                this.appendName(names[i].toString());
+                this.builder.append(suffix);
+                if ((i + 1) < names.length) {
+                    this.builder.append(' ');
+                }
+            }
+            this.builder.append(suffix);
+        }
+
+        /**
+         * Append a flag argument
+         *
+         * @param flagArgument Flag argument
+         */
+        public void appendFlag(final @NonNull FlagArgument<?> flagArgument) {
+            this.builder.append(this.getOptionalPrefix());
+
+            final Iterator<CommandFlag<?>> flagIterator = flagArgument
+                    .getFlags()
+                    .iterator();
+
+            while (flagIterator.hasNext()) {
+                final CommandFlag<?> flag = flagIterator.next();
+                this.appendName(String.format("--%s", flag.getName()));
+
+                if (flag.getCommandArgument() != null) {
+                    this.builder.append(' ');
+                    this.builder.append(this.getOptionalPrefix());
+                    this.appendName(flag.getCommandArgument().getName());
+                    this.builder.append(this.getOptionalSuffix());
+                }
+
+                if (flagIterator.hasNext()) {
+                    this.appendBlankSpace();
+                    this.appendPipe();
+                    this.appendBlankSpace();
+                }
+            }
+
+            this.builder.append(this.getOptionalSuffix());
+        }
+
+        /**
+         * Append a required argument
+         *
+         * @param argument Required argument
+         */
+        public void appendRequired(final @NonNull CommandArgument<?, ?> argument) {
+            this.builder.append(this.getRequiredPrefix());
+            this.appendName(argument.getName());
+            this.builder.append(this.getRequiredSuffix());
+        }
+
+        /**
+         * Append an optional argument
+         *
+         * @param argument Optional argument
+         */
+        public void appendOptional(final @NonNull CommandArgument<?, ?> argument) {
+            this.builder.append(this.getOptionalPrefix());
+            this.appendName(argument.getName());
+            this.builder.append(this.getOptionalSuffix());
+        }
+
+        /**
+         * Append the pipe (|) character
+         */
+        public void appendPipe() {
+            this.builder.append("|");
+        }
+
+        /**
+         * Append an argument name
+         *
+         * @param name Name to append
+         */
+        public void appendName(final @NonNull String name) {
+            this.builder.append(name);
+        }
+
+        /**
+         * Get the required argument prefix
+         *
+         * @return Required argument prefix
+         */
+        public @NonNull String getRequiredPrefix() {
+            return "<";
+        }
+
+        /**
+         * Get the required argument suffix
+         *
+         * @return Required argument suffix
+         */
+        public @NonNull String getRequiredSuffix() {
+            return ">";
+        }
+
+        /**
+         * Get the optional argument prefix
+         *
+         * @return Optional argument prefix
+         */
+        public @NonNull String getOptionalPrefix() {
+            return "[";
+        }
+
+        /**
+         * Get the optional argument suffix
+         *
+         * @return Optional argument suffix
+         */
+        public @NonNull String getOptionalSuffix() {
+            return "]";
+        }
+
+        /**
+         * Append a blank space
+         */
+        public void appendBlankSpace() {
+            this.builder.append(' ');
+        }
+
     }
 
 }
