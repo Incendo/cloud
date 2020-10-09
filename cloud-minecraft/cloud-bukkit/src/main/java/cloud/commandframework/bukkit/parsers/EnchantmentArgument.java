@@ -27,7 +27,8 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
-import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -37,20 +38,20 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 
 /**
- * cloud argument type that parses Bukkit {@link Material materials}
+ * cloud argument type that parses Bukkit {@link Enchantment enchantments}
  *
  * @param <C> Command sender type
  */
-public class MaterialArgument<C> extends CommandArgument<C, Material> {
+public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
 
-    protected MaterialArgument(
+    protected EnchantmentArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider
     ) {
-        super(required, name, new MaterialParser<>(), defaultValue, Material.class, suggestionsProvider);
+        super(required, name, new EnchantmentParser<>(), defaultValue, Enchantment.class, suggestionsProvider);
     }
 
     /**
@@ -60,8 +61,8 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> MaterialArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new MaterialArgument.Builder<>(name);
+    public static <C> EnchantmentArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return new EnchantmentArgument.Builder<>(name);
     }
 
     /**
@@ -71,8 +72,8 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Material> of(final @NonNull String name) {
-        return MaterialArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull CommandArgument<C, Enchantment> of(final @NonNull String name) {
+        return EnchantmentArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
@@ -82,52 +83,60 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Material> optional(final @NonNull String name) {
-        return MaterialArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull CommandArgument<C, Enchantment> optional(final @NonNull String name) {
+        return EnchantmentArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
      * Create a new optional argument with a default value
      *
-     * @param name     Argument name
-     * @param material Default value
-     * @param <C>      Command sender type
+     * @param name        Argument name
+     * @param enchantment Default value
+     * @param <C>         Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Material> optional(
+    public static <C> @NonNull CommandArgument<C, Enchantment> optional(
             final @NonNull String name,
-            final @NonNull Material material
+            final @NonNull Enchantment enchantment
     ) {
-        return MaterialArgument.<C>newBuilder(name).asOptionalWithDefault(material.name().toLowerCase()).build();
+        return EnchantmentArgument.<C>newBuilder(name).asOptionalWithDefault(enchantment.getKey().toString()).build();
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Material> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Enchantment> {
 
         protected Builder(final @NonNull String name) {
-            super(Material.class, name);
+            super(Enchantment.class, name);
         }
 
     }
 
-    public static final class MaterialParser<C> implements ArgumentParser<C, Material> {
+    public static final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment> {
 
         @Override
-        public @NonNull ArgumentParseResult<Material> parse(
+        public @NonNull ArgumentParseResult<Enchantment> parse(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
-            String input = inputQueue.peek();
+            final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
             }
 
-            try {
-                final Material material = Material.valueOf(input.toUpperCase());
-                inputQueue.remove();
-                return ArgumentParseResult.success(material);
-            } catch (final IllegalArgumentException exception) {
-                return ArgumentParseResult.failure(new MaterialParseException(input));
+            final NamespacedKey key;
+            if (input.contains(":")) {
+                final String[] splitInput = input.split(":");
+                //noinspection deprecation
+                key = new NamespacedKey(splitInput[0], splitInput[1]);
+            } else {
+                key = NamespacedKey.minecraft(input);
             }
+
+            final Enchantment enchantment = Enchantment.getByKey(key);
+            if (enchantment == null) {
+                return ArgumentParseResult.failure(new EnchantmentParseException(input));
+            }
+            inputQueue.remove();
+            return ArgumentParseResult.success(enchantment);
         }
 
         @Override
@@ -136,8 +145,12 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
                 final @NonNull String input
         ) {
             final List<String> completions = new ArrayList<>();
-            for (Material value : Material.values()) {
-                completions.add(value.name().toLowerCase());
+            for (Enchantment value : Enchantment.values()) {
+                if (value.getKey().getNamespace().equals(NamespacedKey.MINECRAFT)) {
+                    completions.add(value.getKey().getKey());
+                } else {
+                    completions.add(value.getKey().toString());
+                }
             }
             return completions;
         }
@@ -145,16 +158,16 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
     }
 
 
-    public static final class MaterialParseException extends IllegalArgumentException {
+    public static final class EnchantmentParseException extends IllegalArgumentException {
 
         private final String input;
 
         /**
-         * Construct a new MaterialParseException
+         * Construct a new EnchantmentParseException
          *
          * @param input Input
          */
-        public MaterialParseException(final @NonNull String input) {
+        public EnchantmentParseException(final @NonNull String input) {
             this.input = input;
         }
 
@@ -169,7 +182,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
 
         @Override
         public String getMessage() {
-            return String.format("'%s' is not a valid material name", this.input);
+            return String.format("'%s' is not a valid enchantment", this.input);
         }
 
     }

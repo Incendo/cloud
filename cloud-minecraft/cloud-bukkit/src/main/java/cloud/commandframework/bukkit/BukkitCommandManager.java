@@ -29,6 +29,7 @@ import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
+import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
@@ -46,6 +47,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -135,18 +137,16 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
 
         /* Register Bukkit Parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), params -> new WorldArgument.WorldParser<>());
-        this.getParserRegistry().registerParserSupplier(
-                TypeToken.get(Material.class),
-                params -> new MaterialArgument.MaterialParser<>()
-        );
-        this.getParserRegistry()
-                .registerParserSupplier(TypeToken.get(Player.class), params -> new PlayerArgument.PlayerParser<>());
-        this.getParserRegistry()
-                .registerParserSupplier(
-                        TypeToken.get(OfflinePlayer.class),
-                        params -> new OfflinePlayerArgument.OfflinePlayerParser<>()
-                );
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), parserParameters ->
+                new WorldArgument.WorldParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class), parserParameters ->
+                new MaterialArgument.MaterialParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
+                new PlayerArgument.PlayerParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(OfflinePlayer.class), parserParameters ->
+                new OfflinePlayerArgument.OfflinePlayerParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
+                new EnchantmentArgument.EnchantmentParser<>());
         /* Register Entity Selector Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());

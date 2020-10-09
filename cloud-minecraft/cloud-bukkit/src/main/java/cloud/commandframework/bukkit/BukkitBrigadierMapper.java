@@ -30,9 +30,7 @@ import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Constructor;
@@ -81,10 +79,6 @@ public final class BukkitBrigadierMapper<C> {
             }
             /* Map Enchantment */
             this.mapSimpleNMS(Enchantment.class, this.getNMSArgument("Enchantment").getConstructor());
-            /* Map EntityType */
-            this.mapSimpleNMS(EntityType.class, this.getNMSArgument("EntitySummon").getConstructor());
-            /* Map Material */
-            this.mapSimpleNMS(Material.class, this.getNMSArgument("ItemStack").getConstructor());
             /* Map Entity Selectors */
             this.mapComplexNMS(SingleEntitySelector.class, this.getEntitySelectorArgument(true, false));
             this.mapComplexNMS(SinglePlayerSelector.class, this.getEntitySelectorArgument(true, true));
