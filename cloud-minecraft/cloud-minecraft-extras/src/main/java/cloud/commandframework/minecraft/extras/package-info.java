@@ -25,4 +25,4 @@
 /**
  * Minecraft extras
  */
-package cloud.commandframework;
+package cloud.commandframework.minecraft.extras;
