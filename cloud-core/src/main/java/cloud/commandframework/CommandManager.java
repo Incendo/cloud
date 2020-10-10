@@ -33,6 +33,8 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
+import cloud.commandframework.captions.CaptionRegistry;
+import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.StandardCommandContextFactory;
@@ -92,6 +94,7 @@ public abstract class CommandManager<C> {
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
     private CommandRegistrationHandler commandRegistrationHandler;
+    private CaptionRegistry<C> captionRegistry;
 
     /**
      * Create a new command manager instance
@@ -111,6 +114,7 @@ public abstract class CommandManager<C> {
         }, new AcceptingCommandPreprocessor<>());
         this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
         }, new AcceptingCommandPostprocessor<>());
+        this.captionRegistry = new SimpleCaptionRegistryFactory<C>().create();
     }
 
     /**
@@ -124,7 +128,11 @@ public abstract class CommandManager<C> {
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
-        final CommandContext<C> context = this.commandContextFactory.create(false, commandSender);
+        final CommandContext<C> context = this.commandContextFactory.create(
+                false,
+                commandSender,
+                this.captionRegistry
+        );
         final LinkedList<String> inputQueue = new CommandInputTokenizer(input).tokenize();
         try {
             if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
@@ -153,7 +161,8 @@ public abstract class CommandManager<C> {
     ) {
         final CommandContext<C> context = this.commandContextFactory.create(
                 true,
-                commandSender
+                commandSender,
+                this.captionRegistry
         );
         return this.commandSuggestionEngine.getSuggestions(context, input);
     }
@@ -238,6 +247,24 @@ public abstract class CommandManager<C> {
             }
         }
         return false;
+    }
+
+    /**
+     * Get the caption registry
+     *
+     * @return Caption registry
+     */
+    public final @NonNull CaptionRegistry<C> getCaptionRegistry() {
+        return this.captionRegistry;
+    }
+
+    /**
+     * Replace the caption registry
+     *
+     * @param captionRegistry New caption registry
+     */
+    public final void setCaptionRegistry(final @NonNull CaptionRegistry<C> captionRegistry) {
+        this.captionRegistry = captionRegistry;
     }
 
     /**

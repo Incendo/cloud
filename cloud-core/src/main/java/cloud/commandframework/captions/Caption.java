@@ -21,30 +21,56 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.context;
+package cloud.commandframework.captions;
 
-import cloud.commandframework.captions.CaptionRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Objects;
+
 /**
- * Factory for {@link CommandContext} instances
- *
- * @param <C> Command sender
+ * This is a reference to a caption and does not contain any message itself
  */
-public interface CommandContextFactory<C> {
+public final class Caption {
+
+    private final String key;
+
+    private Caption(final @NonNull String key) {
+        this.key = key;
+    }
 
     /**
-     * Create a new command context
+     * Create a new caption with a given key
      *
-     * @param suggestions     Whether or not the sender is requesting suggestions
-     * @param sender          Command sender
-     * @param captionRegistry Caption registry
-     * @return Command context
+     * @param key Caption key
+     * @return Created caption
      */
-    @NonNull CommandContext<C> create(
-            boolean suggestions,
-            @NonNull C sender,
-            @NonNull CaptionRegistry<C> captionRegistry
-            );
+    public static @NonNull Caption of(final @NonNull String key) {
+        return new Caption(key);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Caption caption = (Caption) o;
+        return Objects.equals(key, caption.key);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(key);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Caption{key='%s'}",
+                this.key
+        );
+    }
 
 }

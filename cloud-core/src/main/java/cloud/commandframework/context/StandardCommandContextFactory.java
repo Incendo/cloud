@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.context;
 
+import cloud.commandframework.captions.CaptionRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class StandardCommandContextFactory<C> implements CommandContextFactory<C> {
@@ -30,13 +31,22 @@ public final class StandardCommandContextFactory<C> implements CommandContextFac
     /**
      * Construct a new command context
      *
-     * @param suggestions Whether or not the sender is requesting suggestions
-     * @param sender      Command sender
+     * @param suggestions     Whether or not the sender is requesting suggestions
+     * @param sender          Command sender
+     * @param captionRegistry Caption registry
      * @return Created context
      */
     @Override
-    public CommandContext<C> create(final boolean suggestions, final @NonNull C sender) {
-        return new CommandContext<>(suggestions, sender);
+    public CommandContext<C> create(
+            final boolean suggestions,
+            final @NonNull C sender,
+            final @NonNull CaptionRegistry<C> captionRegistry
+    ) {
+        return new CommandContext<>(
+                suggestions,
+                sender,
+                captionRegistry
+        );
     }
 
 }

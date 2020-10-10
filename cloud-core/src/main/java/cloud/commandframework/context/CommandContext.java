@@ -25,6 +25,11 @@ package cloud.commandframework.context;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
+import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.CaptionRegistry;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.CaptionVariableReplacementHandler;
+import cloud.commandframework.captions.SimpleCaptionVariableReplacementHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -41,33 +46,57 @@ import java.util.Optional;
  */
 public final class CommandContext<C> {
 
+    private final CaptionVariableReplacementHandler captionVariableReplacementHandler =
+            new SimpleCaptionVariableReplacementHandler();
     private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = new HashMap<>();
     private final FlagContext flagContext = FlagContext.create();
     private final Map<String, Object> internalStorage = new HashMap<>();
     private final C commandSender;
     private final boolean suggestions;
+    private final CaptionRegistry<C> captionRegistry;
 
     /**
      * Create a new command context instance
      *
-     * @param commandSender Sender of the command
+     * @param commandSender   Sender of the command
+     * @param captionRegistry Caption registry
      */
-    public CommandContext(final @NonNull C commandSender) {
-        this(false, commandSender);
+    public CommandContext(final @NonNull C commandSender, final @NonNull CaptionRegistry<C> captionRegistry) {
+        this(false, commandSender, captionRegistry);
     }
 
     /**
      * Create a new command context instance
      *
-     * @param suggestions   Whether or not the context is created for command suggestions
-     * @param commandSender Sender of the command
+     * @param suggestions     Whether or not the context is created for command suggestions
+     * @param commandSender   Sender of the command
+     * @param captionRegistry Caption registry
      */
     public CommandContext(
             final boolean suggestions,
-            final @NonNull C commandSender
+            final @NonNull C commandSender,
+            final @NonNull CaptionRegistry<C> captionRegistry
     ) {
         this.commandSender = commandSender;
         this.suggestions = suggestions;
+        this.captionRegistry = captionRegistry;
+    }
+
+    /**
+     * Format a caption
+     *
+     * @param caption   Caption key
+     * @param variables Replacements
+     * @return Formatted message
+     */
+    public @NonNull String formatMessage(
+            final @NonNull Caption caption,
+            final @NonNull CaptionVariable... variables
+    ) {
+        return this.captionVariableReplacementHandler.replaceVariables(
+                this.captionRegistry.getCaption(caption, this.commandSender),
+                variables
+        );
     }
 
     /**

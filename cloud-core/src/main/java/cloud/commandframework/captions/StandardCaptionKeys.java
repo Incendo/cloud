@@ -21,30 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.context;
-
-import cloud.commandframework.captions.CaptionRegistry;
-import org.checkerframework.checker.nullness.qual.NonNull;
+package cloud.commandframework.captions;
 
 /**
- * Factory for {@link CommandContext} instances
- *
- * @param <C> Command sender
+ * {@link Caption} instances for messages in cloud-core
  */
-public interface CommandContextFactory<C> {
+public final class StandardCaptionKeys {
 
     /**
-     * Create a new command context
-     *
-     * @param suggestions     Whether or not the sender is requesting suggestions
-     * @param sender          Command sender
-     * @param captionRegistry Caption registry
-     * @return Command context
+     * Variables: {input}
      */
-    @NonNull CommandContext<C> create(
-            boolean suggestions,
-            @NonNull C sender,
-            @NonNull CaptionRegistry<C> captionRegistry
-            );
+    public static final Caption ARGUMENT_PARSE_FAILURE_BOOLEAN = Caption.of("argument.parse.failure.boolean");
+
+    private StandardCaptionKeys() {
+    }
 
 }
