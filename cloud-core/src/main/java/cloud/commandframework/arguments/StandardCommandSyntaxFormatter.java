@@ -59,18 +59,15 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             final CommandArgument<?, ?> commandArgument = iterator.next();
             if (commandArgument instanceof StaticArgument) {
                 formattingInstance.appendLiteral((StaticArgument<C>) commandArgument);
+            } else if (commandArgument instanceof CompoundArgument) {
+                formattingInstance.appendCompound((CompoundArgument<?, ?, ?>) commandArgument);
+            } else if (commandArgument instanceof FlagArgument) {
+                formattingInstance.appendFlag((FlagArgument<?>) commandArgument);
             } else {
-                if (commandArgument instanceof CompoundArgument) {
-                    formattingInstance.appendCompound((CompoundArgument<?, ?, ?>) commandArgument);
+                if (commandArgument.isRequired()) {
+                    formattingInstance.appendRequired(commandArgument);
                 } else {
-                    if (commandArgument instanceof FlagArgument) {
-                        formattingInstance.appendFlag((FlagArgument<?>) commandArgument);
-                    }
-                    if (commandArgument.isRequired()) {
-                        formattingInstance.appendRequired(commandArgument);
-                    } else {
-                        formattingInstance.appendOptional(commandArgument);
-                    }
+                    formattingInstance.appendOptional(commandArgument);
                 }
             }
             if (iterator.hasNext()) {
