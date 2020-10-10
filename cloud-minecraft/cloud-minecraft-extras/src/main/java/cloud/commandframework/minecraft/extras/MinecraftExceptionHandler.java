@@ -21,8 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework;
+package cloud.commandframework.minecraft.extras;
 
+import cloud.commandframework.CommandManager;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
@@ -35,7 +36,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 /**
  * Exception handler that sends {@link Component} to the sender. All component builders
@@ -45,18 +45,19 @@ import java.util.regex.Pattern;
  */
 public final class MinecraftExceptionHandler<C> {
 
-    private static final Pattern SPECIAL_CHARACTERS_PATTERN = Pattern.compile("[^\\s\\w\\-]");
-
     /**
      * Default component builder for {@link InvalidSyntaxException}
      */
     public static final Function<Exception, Component> DEFAULT_INVALID_SYNTAX_FUNCTION =
             e -> Component.text()
                     .append(Component.text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED))
-                    .append(Component.text(
-                            String.format("/%s", ((InvalidSyntaxException) e).getCorrectSyntax()),
-                            NamedTextColor.GRAY
-                    ).replaceText(SPECIAL_CHARACTERS_PATTERN, match -> match.color(NamedTextColor.WHITE)))
+                    .append(ComponentHelper.highlight(
+                            Component.text(
+                                    String.format("/%s", ((InvalidSyntaxException) e).getCorrectSyntax()),
+                                    NamedTextColor.GRAY
+                            ),
+                            NamedTextColor.WHITE
+                    ))
                     .build();
     /**
      * Default component builder for {@link InvalidCommandSenderException}
@@ -128,6 +129,19 @@ public final class MinecraftExceptionHandler<C> {
     public @NonNull MinecraftExceptionHandler<C> withArgumentParsingHandler() {
         this.componentBuilders.put(ExceptionType.ARGUMENT_PARSING, DEFAULT_ARGUMENT_PARSING_FUNCTION);
         return this;
+    }
+
+    /**
+     * Use all four of the default exception handlers
+     *
+     * @return {@code this}
+     */
+    public @NonNull MinecraftExceptionHandler<C> withDefaultHandlers() {
+        return this
+                .withArgumentParsingHandler()
+                .withInvalidSenderHandler()
+                .withInvalidSyntaxHandler()
+                .withNoPermissionHandler();
     }
 
     /**
