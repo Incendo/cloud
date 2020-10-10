@@ -194,12 +194,22 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
             try {
                 final float value = Float.parseFloat(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new FloatParseException(input, this.min, this.max));
+                    return ArgumentParseResult.failure(new FloatParseException(
+                            input,
+                            this.min,
+                            this.max,
+                            commandContext
+                    ));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new FloatParseException(input, this.min, this.max));
+                return ArgumentParseResult.failure(new FloatParseException(
+                        input,
+                        this.min,
+                        this.max,
+                        commandContext
+                ));
             }
         }
 
@@ -234,12 +244,24 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         /**
          * Construct a new float parse exception
          *
-         * @param input String input
-         * @param min   Minimum value
-         * @param max   Maximum value
+         * @param input          String input
+         * @param min            Minimum value
+         * @param max            Maximum value
+         * @param commandContext Command context
          */
-        public FloatParseException(final @NonNull String input, final float min, final float max) {
-            super(input, min, max);
+        public FloatParseException(
+                final @NonNull String input,
+                final float min,
+                final float max,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(
+                    input,
+                    min,
+                    max,
+                    FloatParser.class,
+                    commandContext
+            );
         }
 
         @Override

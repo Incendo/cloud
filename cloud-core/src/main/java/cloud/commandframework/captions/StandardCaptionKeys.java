@@ -32,6 +32,10 @@ public final class StandardCaptionKeys {
      * Variables: {input}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_BOOLEAN = Caption.of("argument.parse.failure.boolean");
+    /**
+     * Variables: {input}, {min}, {max}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_NUMBER = Caption.of("argument.parse.failure.number");
 
     private StandardCaptionKeys() {
     }

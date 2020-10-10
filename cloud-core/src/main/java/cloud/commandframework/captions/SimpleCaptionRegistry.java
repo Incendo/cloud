@@ -37,10 +37,13 @@ import java.util.function.BiFunction;
 public final class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
 
     /**
-     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_BOOLEAN}. Has
-     * a single variable {input}.
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_BOOLEAN}.
      */
     public static final String ARGUMENT_PARSE_FAILURE_BOOLEAN = "Could not parse boolean from '{input}'";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_NUMBER}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_NUMBER = "'{input}' is not a valid number in the range {min} to {max}";
 
     private final Map<Caption, BiFunction<Caption, C, String>> messageFactories = new HashMap<>();
 
@@ -48,6 +51,10 @@ public final class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
         this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_BOOLEAN
+        );
+        this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NUMBER,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NUMBER
         );
     }
 

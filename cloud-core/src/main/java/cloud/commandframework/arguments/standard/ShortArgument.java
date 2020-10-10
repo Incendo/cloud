@@ -194,12 +194,22 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
             try {
                 final short value = Short.parseShort(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new ShortParseException(input, this.min, this.max));
+                    return ArgumentParseResult.failure(new ShortParseException(
+                            input,
+                            this.min,
+                            this.max,
+                            commandContext
+                    ));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new ShortParseException(input, this.min, this.max));
+                return ArgumentParseResult.failure(new ShortParseException(
+                        input,
+                        this.min,
+                        this.max,
+                        commandContext
+                ));
             }
         }
 
@@ -242,12 +252,24 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         /**
          * Construct a new short parse exception
          *
-         * @param input String input
-         * @param min   Minimum value
-         * @param max   Maximum value
+         * @param input          String input
+         * @param min            Minimum value
+         * @param max            Maximum value
+         * @param commandContext Command context
          */
-        public ShortParseException(final @NonNull String input, final short min, final short max) {
-            super(input, min, max);
+        public ShortParseException(
+                final @NonNull String input,
+                final short min,
+                final short max,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(
+                    input,
+                    min,
+                    max,
+                    ShortParser.class,
+                    commandContext
+            );
         }
 
         @Override

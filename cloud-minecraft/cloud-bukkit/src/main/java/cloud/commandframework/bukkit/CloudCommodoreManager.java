@@ -54,7 +54,10 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         this.commandManager = commandManager;
         this.commodore = CommodoreProvider.getCommodore(commandManager.getOwningPlugin());
         this.brigadierManager = new CloudBrigadierManager<>(commandManager, () ->
-                new CommandContext<>(commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender())));
+                new CommandContext<>(
+                        commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
+                        commandManager.getCaptionRegistry()
+                ));
         new BukkitBrigadierMapper<>(this.commandManager, this.brigadierManager);
     }
 

@@ -29,7 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.ParserException;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -230,7 +230,14 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         private final String input;
         private final boolean liberal;
 
-        protected BooleanParseException(
+        /**
+         * Construct a new boolean parse exception
+         *
+         * @param input   Input
+         * @param liberal Whether or not the parser allows truthy and falsy values, or strictly true/false
+         * @param context Command context
+         */
+        public BooleanParseException(
                 final @NonNull String input,
                 final boolean liberal,
                 final @NonNull CommandContext<?> context

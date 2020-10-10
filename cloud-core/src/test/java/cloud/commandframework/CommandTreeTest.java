@@ -150,7 +150,9 @@ class CommandTreeTest {
         final Pair<Command<TestCommandSender>, Exception> command = manager.getCommandTree()
                 .parse(
                         new CommandContext<>(
-                                new TestCommandSender()),
+                                new TestCommandSender(),
+                                manager.getCaptionRegistry()
+                        ),
                         new LinkedList<>(
                                 Arrays.asList(
                                         "test",
@@ -161,31 +163,58 @@ class CommandTreeTest {
         Assertions.assertEquals(NoPermissionException.class, manager.getCommandTree()
                 .parse(
                         new CommandContext<>(
-                                new TestCommandSender()),
+                                new TestCommandSender(),
+                                manager.getCaptionRegistry()
+                        ),
                         new LinkedList<>(
                                 Arrays.asList("test", "two"))
                 )
                 .getSecond().getClass());
         manager.getCommandTree()
-                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt")))
-                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
+                .parse(
+                        new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                        new LinkedList<>(Arrays.asList("test", "opt"))
+                )
+                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(
+                new TestCommandSender(),
+                manager.getCaptionRegistry()
+        ));
         manager.getCommandTree()
-                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("test", "opt", "12")))
-                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
+                .parse(
+                        new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                        new LinkedList<>(Arrays.asList("test", "opt", "12"))
+                )
+                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(
+                new TestCommandSender(),
+                manager.getCaptionRegistry()
+        ));
     }
 
     @Test
     void testAlias() {
         manager.getCommandTree()
-                .parse(new CommandContext<>(new TestCommandSender()), new LinkedList<>(Arrays.asList("other", "öpt", "12")))
-                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(new TestCommandSender()));
+                .parse(
+                        new CommandContext<>(
+                                new TestCommandSender(),
+                                manager.getCaptionRegistry()
+                        ),
+                        new LinkedList<>(Arrays.asList("other",
+                                "öpt", "12"
+                        ))
+                )
+                .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(
+                new TestCommandSender(),
+                manager.getCaptionRegistry()
+        ));
     }
 
     @Test
     void getSuggestions() {
         Assertions.assertFalse(
-                manager.getCommandTree().getSuggestions(new CommandContext<>(new TestCommandSender()), new LinkedList<>(
-                        Collections.singletonList("test "))).isEmpty());
+                manager.getCommandTree().getSuggestions(
+                        new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                        new LinkedList<>(Collections.singletonList("test "))
+                ).isEmpty());
     }
 
     @Test
@@ -263,11 +292,11 @@ class CommandTreeTest {
 
     @Test
     void testPreprocessors() {
-       manager.executeCommand(new TestCommandSender(), "preprocess abc").join();
-       Assertions.assertThrows(
-               CompletionException.class,
-               () -> manager.executeCommand(new TestCommandSender(), "preprocess ab").join()
-       );
+        manager.executeCommand(new TestCommandSender(), "preprocess abc").join();
+        Assertions.assertThrows(
+                CompletionException.class,
+                () -> manager.executeCommand(new TestCommandSender(), "preprocess ab").join()
+        );
     }
 
 
