@@ -271,7 +271,7 @@ public final class CommandTree<C> {
             // The value has to be a variable
             final Node<CommandArgument<C, ?>> child = children.get(0);
             permission = this.isPermitted(commandContext.getSender(), child);
-            if (permission != null) {
+            if (!commandQueue.isEmpty() && permission != null) {
                 return Pair.of(null, new NoPermissionException(
                         permission,
                         commandContext.getSender(),
@@ -289,7 +289,6 @@ public final class CommandTree<C> {
                     } else if (!child.getValue().isRequired()) {
                         return Pair.of(this.cast(child.getValue().getOwningCommand()), null);
                     } else if (child.isLeaf()) {
-                        /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
                         if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
                             final Command<C> command = root.getValue().getOwningCommand();
                             if (!this.getCommandManager().hasPermission(

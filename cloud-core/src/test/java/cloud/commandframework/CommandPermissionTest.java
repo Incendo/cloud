@@ -23,12 +23,15 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.CompletionException;
 
 class CommandPermissionTest {
 
@@ -50,9 +53,21 @@ class CommandPermissionTest {
         Assertions.assertFalse(manager.suggest(new TestCommandSender(), "t").isEmpty());
     }
 
+    @Test
+    void testComplexPermissions() {
+        manager.command(manager.commandBuilder("first").permission("first"));
+        manager.command(manager.commandBuilder("first").argument(IntegerArgument.of("second")).permission("second"));
+        manager.executeCommand(new TestCommandSender(), "first").join();
+        Assertions.assertThrows(
+                CompletionException.class,
+                () -> manager.executeCommand(new TestCommandSender(), "first 10").join()
+        );
+    }
+
+
     private static final class PermissionOutputtingCommandManager extends CommandManager<TestCommandSender> {
 
-        public PermissionOutputtingCommandManager() {
+        private PermissionOutputtingCommandManager() {
             super(CommandExecutionCoordinator.simpleCoordinator(), cmd -> true);
         }
 
@@ -61,6 +76,12 @@ class CommandPermissionTest {
                 final TestCommandSender sender,
                 final String permission
         ) {
+            if (permission.equalsIgnoreCase("first")) {
+                return true;
+            }
+            if (permission.equalsIgnoreCase("second")) {
+                return false;
+            }
             return acceptOne && permission.equalsIgnoreCase("test.permission.four");
         }
 
