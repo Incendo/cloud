@@ -60,6 +60,15 @@ public final class Caption {
         return Objects.equals(key, caption.key);
     }
 
+    /**
+     * Get the caption key
+     *
+     * @return Caption key
+     */
+    public @NonNull String getKey() {
+        return this.key;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(key);

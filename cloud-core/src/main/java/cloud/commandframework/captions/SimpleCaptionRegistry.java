@@ -49,17 +49,17 @@ public final class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_CHAR = "'{input}' is not a valid character";
     /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_ENUM}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_ENUM = "'{input}' is not one of the following: {acceptableValues}";
+    /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_STRING}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_STRING = "'{input}' is not a valid string";
+    public static final String ARGUMENT_PARSE_FAILURE_STRING = "'{input}' is not a valid string of type {stringMode}";
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_UUID}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_UUID = "Could not parse UUID from '{input}'";
-    /**
-     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_ENUM}
-     */
-    public static final String ARGUMENT_PARSE_FAILURE_ENUM = "'{input}' is not one of the following: {acceptedValues}";
+    public static final String ARGUMENT_PARSE_FAILURE_UUID = "'{input}' is not a valid UUID";
 
     private final Map<Caption, BiFunction<Caption, C, String>> messageFactories = new HashMap<>();
 
@@ -77,16 +77,16 @@ public final class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_CHAR
         );
         this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_ENUM,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_ENUM
+        );
+        this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_STRING,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_STRING
         );
         this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_UUID,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_UUID
-        );
-        this.registerMessageFactory(
-                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_ENUM,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_ENUM
         );
     }
 

@@ -198,8 +198,10 @@ class CommandTreeTest {
                                 new TestCommandSender(),
                                 manager.getCaptionRegistry()
                         ),
-                        new LinkedList<>(Arrays.asList("other",
-                                "öpt", "12"
+                        new LinkedList<>(Arrays.asList(
+                                "other",
+                                "öpt",
+                                "12"
                         ))
                 )
                 .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(

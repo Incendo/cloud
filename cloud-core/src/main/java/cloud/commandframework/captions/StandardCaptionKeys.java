@@ -23,37 +23,64 @@
 //
 package cloud.commandframework.captions;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+
 /**
  * {@link Caption} instances for messages in cloud-core
  */
 public final class StandardCaptionKeys {
 
+    private static final Collection<Caption> RECOGNIZED_CAPTIONS = new LinkedList<>();
+
     /**
      * Variables: {input}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_BOOLEAN = Caption.of("argument.parse.failure.boolean");
+    public static final Caption ARGUMENT_PARSE_FAILURE_BOOLEAN = of("argument.parse.failure.boolean");
     /**
      * Variables: {input}, {min}, {max}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_NUMBER = Caption.of("argument.parse.failure.number");
+    public static final Caption ARGUMENT_PARSE_FAILURE_NUMBER = of("argument.parse.failure.number");
     /**
      * Variables: {input}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_CHAR = Caption.of("argument.parse.failure.char");
+    public static final Caption ARGUMENT_PARSE_FAILURE_CHAR = of("argument.parse.failure.char");
     /**
      * Variables: {input}, {stringMode}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_STRING = Caption.of("argument.parse.failure.number");
+    public static final Caption ARGUMENT_PARSE_FAILURE_STRING = of("argument.parse.failure.number");
     /**
      * Variables: {input}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_UUID = Caption.of("argument.parse.failure.number");
+    public static final Caption ARGUMENT_PARSE_FAILURE_UUID = of("argument.parse.failure.number");
     /**
-     * Variables: {input}, {acceptedValues}
+     * Variables: {input}, {acceptableValues}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_ENUM = Caption.of("argument.parse.failure.enum");
+    public static final Caption ARGUMENT_PARSE_FAILURE_ENUM = of("argument.parse.failure.enum");
+    /**
+     * Variables: {input}, {pattern}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_REGEX = of("argument.parse.failure.regex");
 
     private StandardCaptionKeys() {
+    }
+
+    private static @NonNull Caption of(final @NonNull String key) {
+        final Caption caption = Caption.of(key);
+        RECOGNIZED_CAPTIONS.add(caption);
+        return caption;
+    }
+
+    /**
+     * Get an immutable collection containing all standard caption keys
+     *
+     * @return Immutable collection of keys
+     */
+    public static @NonNull Collection<@NonNull Caption> getStandardCaptionKeys() {
+        return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
 
 }
