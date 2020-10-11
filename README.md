@@ -8,7 +8,7 @@
 Cloud is a general-purpose Java command dispatcher &amp; framework. It allows programmers to define command chains that are then parsed and invoked from user-
 supplied string inputs, to execute pre-defined actions.
 
-Cloud commands consist out of deterministic command chains are the arguments are strongly typed. When you write a command, you know exactly
+Cloud commands consist out of deterministic command chains where the arguments are strongly typed. When you write a command, you know exactly
 what type of data you will get to work with and you won't need to spend hours debugging command contexts while crying profusely. The experience
 of using the framework is like floating on a fluffy cloud in heaven. Its feature set is derived from Already existing Command Frameworks, while being less restrictive, opinionated and confusing.  
 
