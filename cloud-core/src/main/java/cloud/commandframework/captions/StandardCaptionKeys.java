@@ -36,6 +36,22 @@ public final class StandardCaptionKeys {
      * Variables: {input}, {min}, {max}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_NUMBER = Caption.of("argument.parse.failure.number");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_CHAR = Caption.of("argument.parse.failure.char");
+    /**
+     * Variables: {input}, {stringMode}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_STRING = Caption.of("argument.parse.failure.number");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_UUID = Caption.of("argument.parse.failure.number");
+    /**
+     * Variables: {input}, {acceptedValues}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_ENUM = Caption.of("argument.parse.failure.enum");
 
     private StandardCaptionKeys() {
     }

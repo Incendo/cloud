@@ -26,7 +26,10 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -174,7 +177,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
                 }
             }
 
-            return ArgumentParseResult.failure(new EnumParseException(input, this.enumClass));
+            return ArgumentParseResult.failure(new EnumParseException(input, this.enumClass, commandContext));
         }
 
         @Override
@@ -193,7 +196,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     }
 
 
-    public static final class EnumParseException extends IllegalArgumentException {
+    public static final class EnumParseException extends ParserException {
 
         private final String input;
         private final Class<? extends Enum<?>> enumClass;
@@ -203,11 +206,20 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
          *
          * @param input     Input
          * @param enumClass Enum class
+         * @param context   Command context
          */
         public EnumParseException(
                 final @NonNull String input,
-                final @NonNull Class<? extends Enum<?>> enumClass
+                final @NonNull Class<? extends Enum<?>> enumClass,
+                final @NonNull CommandContext<?> context
         ) {
+            super(
+                    EnumParser.class,
+                    context,
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_ENUM,
+                    CaptionVariable.of("input", input),
+                    CaptionVariable.of("acceptableValues", join(enumClass))
+            );
             this.input = input;
             this.enumClass = enumClass;
         }
@@ -236,11 +248,6 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
          */
         public @NonNull Class<? extends Enum<?>> getEnumClass() {
             return this.enumClass;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format("'%s' is not one of the following: %s", this.input, join(enumClass));
         }
 
     }

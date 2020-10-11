@@ -26,7 +26,10 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
@@ -342,7 +345,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             }
 
             if (this.stringMode == StringMode.QUOTED && (!started || !finished)) {
-                return ArgumentParseResult.failure(new StringParseException(sj.toString(), StringMode.GREEDY));
+                return ArgumentParseResult.failure(new StringParseException(sj.toString(), StringMode.GREEDY, commandContext));
             }
 
             return ArgumentParseResult.success(sj.toString());
@@ -373,7 +376,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
 
-    public static final class StringParseException extends IllegalArgumentException {
+    public static final class StringParseException extends ParserException {
 
         private final String input;
         private final StringMode stringMode;
@@ -383,8 +386,20 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          *
          * @param input      Input
          * @param stringMode String mode
+         * @param context    Command context
          */
-        public StringParseException(final @NonNull String input, final @NonNull StringMode stringMode) {
+        public StringParseException(
+                final @NonNull String input,
+                final @NonNull StringMode stringMode,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    StringParser.class,
+                    context,
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_STRING,
+                    CaptionVariable.of("input", input),
+                    CaptionVariable.of("stringMode", stringMode.name())
+            );
             this.input = input;
             this.stringMode = stringMode;
         }
@@ -406,14 +421,6 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          */
         public @NonNull StringMode getStringMode() {
             return this.stringMode;
-        }
-
-        @Override
-        public String getMessage() {
-            if (this.stringMode == StringMode.QUOTED) {
-                return "The string needs to be surrounded by quotation marks";
-            }
-            return String.format("'%s' is not a valid string", this.input);
         }
 
     }
