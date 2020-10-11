@@ -1,5 +1,4 @@
 rootProject.name = 'cloud'
-include(':cloud-jline')
 include(':cloud-core')
 include(':cloud-services')
 include(':cloud-annotations')

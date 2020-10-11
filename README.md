@@ -14,36 +14,51 @@ of using the framework is like floating on a fluffy cloud in heaven. Its feature
 
 Cloud allows for commands to be defined using builder patterns, like this:
 ```java
-mgr.command(mgr.commandBuilder("give")
-               .withSenderType(Player.class)
-               .argument(EnumArgument.of(Material.class, "material"))
-               .argument(IntegerArgument.of("amount"))
-               .handler(c -> {
-                   final Material material = c.get("material");
-                   final int amount = c.get("amount");
-                   final ItemStack itemStack = new ItemStack(material, amount);
-                   ((Player) c.getSender()).getInventory().addItem(itemStack);
-                   c.getSender().sendMessage("You've been given stuff, bro.");
-               }));
+manager.command(
+    manager.commandBuilder("command", Description.of("Test cloud command using a builder"), "alias")
+           .argument(StringArgument.of("input"))
+           .argument(IntegerArgument.newBuilder("number").withMin(1).withMax(100).build())
+           .handler(context -> {
+                String input = context.get("input");
+                int number = context.get("number");
+                context.getSender().sendMessage(String.format(
+                        "I am %d%% hyped for %s!"
+                        number,
+                        input
+                );
+           })
+);
 ```
-
 or using annotated methods, like this:
 ```java
-@CommandPermission("some.permission.node")
 @CommandDescription("Test cloud command using @CommandMethod")
-@CommandMethod("annotation|a <input> [number]")
-private void annotatedCommand(@Nonnull final Player player,
-                              @Argument("input") @Completions("one,two,duck") @Nonnull final String input,
-                              @Argument(value = "number", defaultValue = "5") @Range(min = "10", max = "100")
-                                  final int number) {
-    player.sendMessage(ChatColor.GOLD + "Your input was: " + ChatColor.AQUA + input 
-                          + ChatColor.GREEN + " (" + number + ")");
+@CommandMethod("command|alias <input> <number>")
+private void yourCommand(
+    Player sender,
+    @Argument("input") String input,
+    @Argument("number") @Range(min = "1", max = "100") int number)
+) {
+    player.sendMessage(String.format(
+        "I am %d%% hyped for %s!"
+        number,
+        input
+    ));
 }
 ```
-while allowing you to extend and modify the command experience. The framework supports custom (any) command sender types, argument types &amp; parsers,
-annotation mappers and preprocessors. Cloud also has an advanced command suggestion system, that allows for context aware command completion and suggestions.
+to allow your users to use commands like `/command cloud 100`.
 
-Cloud by default ships with implementations and mappings for the most common Minecraft server platforms, JDA for Discord bots and JLine3 for CLI applications. The core
+All this while allowing you to extend and modify the command experience. The framework supports custom (any) command sender
+types,
+argument types &amp; parsers,
+annotation mappers and preprocessors.
+Cloud also has an advanced command suggestion system, that allows for context aware
+command completion and suggestions.
+
+If using the annotation parsing system, you can create custom annotation mappers to use your own annotation bindings for
+command parsing, preprocessing, etc.
+
+Cloud by default ships with implementations and mappings for the most common Minecraft server platforms and JDA and javacord for
+Discord bots. The core
 module allows you to use Cloud anywhere, simply by implementing the CommandManager for the platform of your choice.
 
 The code is based on a (W.I.P) paper that can be found [here](https://github.com/Sauilitired/Sauilitired/blob/master/AS_2020_09_Commands.pdf).  
@@ -74,12 +89,15 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 ## links  
 
 - JavaDoc: https://javadoc.commandframework.cloud/
+- Wiki: https://github.com/Sauilitired/cloud/wiki
 - Discord: https://discord.gg/KxkjDVg  
   
 ## develop &amp; build  
   
 To clone the repository, use `git clone https://github.com/Sauilitired/cloud.git`.
-To then build it, use `mvn clean package`.
+
+To then build it, use `./gradlew clean build`. If you want to build the examples as well, use `./gradlew clean build
+-Pcompile-examples`.
   
 There is a bash script (`build.sh`) that performs the submodule updating &amp; builds the project.  
 Feel free to use this if you want to.  
