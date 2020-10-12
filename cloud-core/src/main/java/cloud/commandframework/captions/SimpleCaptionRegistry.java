@@ -34,7 +34,7 @@ import java.util.function.BiFunction;
  *
  * @param <C> Command sender type
  */
-public final class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
+public class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
 
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_BOOLEAN}.
@@ -63,7 +63,7 @@ public final class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
 
     private final Map<Caption, BiFunction<Caption, C, String>> messageFactories = new HashMap<>();
 
-    SimpleCaptionRegistry() {
+    protected SimpleCaptionRegistry() {
         this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_BOOLEAN
@@ -91,7 +91,7 @@ public final class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
     }
 
     @Override
-    public @NonNull String getCaption(
+    public final @NonNull String getCaption(
             @NonNull final Caption caption,
             @NonNull final C sender
     ) {

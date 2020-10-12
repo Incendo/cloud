@@ -26,7 +26,10 @@ package cloud.commandframework.bukkit.parsers;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.bukkit.BukkitCaptionKeys;
+import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -126,7 +129,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
                 inputQueue.remove();
                 return ArgumentParseResult.success(material);
             } catch (final IllegalArgumentException exception) {
-                return ArgumentParseResult.failure(new MaterialParseException(input));
+                return ArgumentParseResult.failure(new MaterialParseException(input, commandContext));
             }
         }
 
@@ -145,16 +148,26 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
     }
 
 
-    public static final class MaterialParseException extends IllegalArgumentException {
+    public static final class MaterialParseException extends ParserException {
 
         private final String input;
 
         /**
          * Construct a new MaterialParseException
          *
-         * @param input Input
+         * @param input   Input
+         * @param context Command context
          */
-        public MaterialParseException(final @NonNull String input) {
+        public MaterialParseException(
+                final @NonNull String input,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    MaterialParser.class,
+                    context,
+                    BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_MATERIAL,
+                    CaptionVariable.of("input", input)
+            );
             this.input = input;
         }
 
@@ -165,11 +178,6 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
          */
         public @NonNull String getInput() {
             return this.input;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format("'%s' is not a valid material name", this.input);
         }
 
     }

@@ -146,7 +146,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                 Player player = Bukkit.getPlayer(input);
 
                 if (player == null) {
-                    return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input));
+                    return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
                 }
                 return ArgumentParseResult.success(new MultiplePlayerSelector(input, ImmutableList.of(player)));
             }

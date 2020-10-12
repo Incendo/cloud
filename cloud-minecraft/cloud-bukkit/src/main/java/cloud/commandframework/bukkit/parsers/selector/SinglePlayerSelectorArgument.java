@@ -144,7 +144,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                 Player player = Bukkit.getPlayer(input);
 
                 if (player == null) {
-                    return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input));
+                    return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
                 }
                 return ArgumentParseResult.success(new SinglePlayerSelector(input, ImmutableList.of(player)));
             }

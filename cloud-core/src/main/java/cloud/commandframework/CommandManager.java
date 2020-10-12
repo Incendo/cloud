@@ -34,6 +34,7 @@ import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.captions.CaptionRegistry;
+import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
@@ -264,6 +265,19 @@ public abstract class CommandManager<C> {
      * @param captionRegistry New caption registry
      */
     public final void setCaptionRegistry(final @NonNull CaptionRegistry<C> captionRegistry) {
+        this.captionRegistry = captionRegistry;
+    }
+
+    /**
+     * Replace the default caption registry
+     *
+     * @param captionRegistry Caption registry to use
+     */
+    public final void registerDefaultCaptions(final @NonNull CaptionRegistry<C> captionRegistry) {
+        if (!(captionRegistry instanceof SimpleCaptionRegistry)) {
+            throw new IllegalArgumentException("captionRegistry must extend SimpleCationRegistry");
+        }
+
         this.captionRegistry = captionRegistry;
     }
 

@@ -26,7 +26,10 @@ package cloud.commandframework.bukkit.parsers;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.bukkit.BukkitCaptionKeys;
+import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -140,7 +143,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
             Player player = Bukkit.getPlayer(input);
 
             if (player == null) {
-                return ArgumentParseResult.failure(new PlayerParseException(input));
+                return ArgumentParseResult.failure(new PlayerParseException(input, commandContext));
             }
 
             return ArgumentParseResult.success(player);
@@ -166,16 +169,26 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     /**
      * Player parse exception
      */
-    public static final class PlayerParseException extends IllegalArgumentException {
+    public static final class PlayerParseException extends ParserException {
 
         private final String input;
 
         /**
          * Construct a new Player parse exception
          *
-         * @param input String input
+         * @param input   String input
+         * @param context Command context
          */
-        public PlayerParseException(final @NonNull String input) {
+        public PlayerParseException(
+                final @NonNull String input,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    PlayerParser.class,
+                    context,
+                    BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
+                    CaptionVariable.of("input", input)
+            );
             this.input = input;
         }
 
@@ -186,11 +199,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
          */
         public @NonNull String getInput() {
             return input;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format("No player found for input '%s'.", input);
         }
 
     }
