@@ -34,7 +34,7 @@ import java.util.function.BiFunction;
  *
  * @param <C> Command sender type
  */
-public class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
+public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistry<C> {
 
     /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_BOOLEAN}.
@@ -107,13 +107,8 @@ public class SimpleCaptionRegistry<C> implements CaptionRegistry<C> {
         return messageFactory.apply(caption, sender);
     }
 
-    /**
-     * Register a message factory
-     *
-     * @param caption        Caption key
-     * @param messageFactory Message factory
-     */
-    public void registerMessageFactory(
+    @Override
+    public final void registerMessageFactory(
             final @NonNull Caption caption,
             final @NonNull BiFunction<Caption, C, String> messageFactory
     ) {
