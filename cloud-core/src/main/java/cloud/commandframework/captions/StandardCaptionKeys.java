@@ -51,11 +51,11 @@ public final class StandardCaptionKeys {
     /**
      * Variables: {input}, {stringMode}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_STRING = of("argument.parse.failure.number");
+    public static final Caption ARGUMENT_PARSE_FAILURE_STRING = of("argument.parse.failure.string");
     /**
      * Variables: {input}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_UUID = of("argument.parse.failure.number");
+    public static final Caption ARGUMENT_PARSE_FAILURE_UUID = of("argument.parse.failure.uuid");
     /**
      * Variables: {input}, {acceptableValues}
      */
