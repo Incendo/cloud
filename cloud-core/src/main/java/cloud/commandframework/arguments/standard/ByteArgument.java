@@ -198,15 +198,19 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
                             new ByteParseException(
                                     input,
                                     this.min,
-                                    this.max
+                                    this.max,
+                                    commandContext
                             ));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
                 return ArgumentParseResult.failure(
-                        new ByteParseException(input, this.min,
-                                this.max
+                        new ByteParseException(
+                                input,
+                                this.min,
+                                this.max,
+                                commandContext
                         ));
             }
         }
@@ -253,12 +257,24 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         /**
          * Construct a new byte parse exception
          *
-         * @param input String input
-         * @param min   Minimum value
-         * @param max   Maximum value
+         * @param input   String input
+         * @param min     Minimum value
+         * @param max     Maximum value
+         * @param context Command context
          */
-        public ByteParseException(final @NonNull String input, final byte min, final byte max) {
-            super(input, min, max);
+        public ByteParseException(
+                final @NonNull String input,
+                final byte min,
+                final byte max,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    input,
+                    min,
+                    max,
+                    ByteParser.class,
+                    context
+            );
         }
 
         @Override

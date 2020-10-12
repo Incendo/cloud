@@ -194,12 +194,22 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             try {
                 final double value = Double.parseDouble(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new DoubleParseException(input, this.min, this.max));
+                    return ArgumentParseResult.failure(new DoubleParseException(
+                            input,
+                            this.min,
+                            this.max,
+                            commandContext
+                    ));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new DoubleParseException(input, this.min, this.max));
+                return ArgumentParseResult.failure(new DoubleParseException(
+                        input,
+                        this.min,
+                        this.max,
+                        commandContext
+                ));
             }
         }
 
@@ -234,12 +244,24 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         /**
          * Construct a new double parse exception
          *
-         * @param input String input
-         * @param min   Minimum value
-         * @param max   Maximum value
+         * @param input          String input
+         * @param min            Minimum value
+         * @param max            Maximum value
+         * @param commandContext Command context
          */
-        public DoubleParseException(final @NonNull String input, final double min, final double max) {
-            super(input, min, max);
+        public DoubleParseException(
+                final @NonNull String input,
+                final double min,
+                final double max,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(
+                    input,
+                    min,
+                    max,
+                    DoubleParser.class,
+                    commandContext
+            );
         }
 
         @Override

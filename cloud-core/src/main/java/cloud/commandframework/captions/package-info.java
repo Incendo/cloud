@@ -21,30 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.context;
-
-import cloud.commandframework.captions.CaptionRegistry;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Factory for {@link CommandContext} instances
- *
- * @param <C> Command sender
+ * Classes allowing for the configuration of messages. Mainly used in parser
+ * exception messages
  */
-public interface CommandContextFactory<C> {
-
-    /**
-     * Create a new command context
-     *
-     * @param suggestions     Whether or not the sender is requesting suggestions
-     * @param sender          Command sender
-     * @param captionRegistry Caption registry
-     * @return Command context
-     */
-    @NonNull CommandContext<C> create(
-            boolean suggestions,
-            @NonNull C sender,
-            @NonNull CaptionRegistry<C> captionRegistry
-            );
-
-}
+package cloud.commandframework.captions;

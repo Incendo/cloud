@@ -26,7 +26,10 @@ package cloud.commandframework.bukkit.parsers;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.bukkit.BukkitCaptionKeys;
+import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -146,7 +149,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
             OfflinePlayer player = Bukkit.getOfflinePlayer(input);
 
             if (player == null || (!player.hasPlayedBefore() && !player.isOnline())) {
-                return ArgumentParseResult.failure(new OfflinePlayerParseException(input));
+                return ArgumentParseResult.failure(new OfflinePlayerParseException(input, commandContext));
             }
 
             return ArgumentParseResult.success(player);
@@ -172,16 +175,26 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
     /**
      * OfflinePlayer parse exception
      */
-    public static final class OfflinePlayerParseException extends IllegalArgumentException {
+    public static final class OfflinePlayerParseException extends ParserException {
 
         private final String input;
 
         /**
          * Construct a new OfflinePlayer parse exception
          *
-         * @param input String input
+         * @param input   String input
+         * @param context Command context
          */
-        public OfflinePlayerParseException(final @NonNull String input) {
+        public OfflinePlayerParseException(
+                final @NonNull String input,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    OfflinePlayerParser.class,
+                    context,
+                    BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER,
+                    CaptionVariable.of("input", input)
+            );
             this.input = input;
         }
 
@@ -192,11 +205,6 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
          */
         public @NonNull String getInput() {
             return input;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format("No player found for input '%s'.", input);
         }
 
     }

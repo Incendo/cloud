@@ -223,12 +223,22 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
             try {
                 final int value = Integer.parseInt(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new IntegerParseException(input, this.min, this.max));
+                    return ArgumentParseResult.failure(new IntegerParseException(
+                            input,
+                            this.min,
+                            this.max,
+                            commandContext
+                    ));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new IntegerParseException(input, this.min, this.max));
+                return ArgumentParseResult.failure(new IntegerParseException(
+                        input,
+                        this.min,
+                        this.max,
+                        commandContext
+                ));
             }
         }
 
@@ -271,12 +281,24 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         /**
          * Construct a new integer parse exception
          *
-         * @param input String input
-         * @param min   Minimum value
-         * @param max   Maximum value
+         * @param input          String input
+         * @param min            Minimum value
+         * @param max            Maximum value
+         * @param commandContext Command context
          */
-        public IntegerParseException(final @NonNull String input, final int min, final int max) {
-            super(input, min, max);
+        public IntegerParseException(
+                final @NonNull String input,
+                final int min,
+                final int max,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(
+                    input,
+                    min,
+                    max,
+                    IntegerParser.class,
+                    commandContext
+            );
         }
 
         @Override

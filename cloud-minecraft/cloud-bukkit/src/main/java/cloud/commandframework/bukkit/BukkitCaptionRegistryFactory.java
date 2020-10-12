@@ -21,30 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.context;
+package cloud.commandframework.bukkit;
 
-import cloud.commandframework.captions.CaptionRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Factory for {@link CommandContext} instances
+ * Factory creating {@link BukkitCaptionRegistry} instances
  *
- * @param <C> Command sender
+ * @param <C> Command sender type
  */
-public interface CommandContextFactory<C> {
+public final class BukkitCaptionRegistryFactory<C> {
 
     /**
-     * Create a new command context
+     * Create a new bukkit caption registry instance
      *
-     * @param suggestions     Whether or not the sender is requesting suggestions
-     * @param sender          Command sender
-     * @param captionRegistry Caption registry
-     * @return Command context
+     * @return Created instance
      */
-    @NonNull CommandContext<C> create(
-            boolean suggestions,
-            @NonNull C sender,
-            @NonNull CaptionRegistry<C> captionRegistry
-            );
+    public @NonNull BukkitCaptionRegistry<C> create() {
+        return new BukkitCaptionRegistry<>();
+    }
 
 }

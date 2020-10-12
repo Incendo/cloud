@@ -48,7 +48,9 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                 () -> new CommandContext<>(
                         velocityCommandManager.getCommandSenderMapper()
                                 .apply(velocityCommandManager.getProxyServer()
-                                        .getConsoleCommandSource()))
+                                        .getConsoleCommandSource()),
+                        velocityCommandManager.getCaptionRegistry()
+                )
         );
     }
 

@@ -21,30 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.context;
+package cloud.commandframework.captions;
 
-import cloud.commandframework.captions.CaptionRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.function.BiFunction;
+
 /**
- * Factory for {@link CommandContext} instances
+ * Caption registry that delegates to factory methods
  *
- * @param <C> Command sender
+ * @param <C> Command sender type
  */
-public interface CommandContextFactory<C> {
+public interface FactoryDelegatingCaptionRegistry<C> extends CaptionRegistry<C> {
 
     /**
-     * Create a new command context
+     * Register a message factory
      *
-     * @param suggestions     Whether or not the sender is requesting suggestions
-     * @param sender          Command sender
-     * @param captionRegistry Caption registry
-     * @return Command context
+     * @param caption Caption key
+     * @param factory Message factory
      */
-    @NonNull CommandContext<C> create(
-            boolean suggestions,
-            @NonNull C sender,
-            @NonNull CaptionRegistry<C> captionRegistry
-            );
+    void registerMessageFactory(
+            @NonNull Caption caption,
+            @NonNull BiFunction<Caption, C, String> factory
+    );
 
 }

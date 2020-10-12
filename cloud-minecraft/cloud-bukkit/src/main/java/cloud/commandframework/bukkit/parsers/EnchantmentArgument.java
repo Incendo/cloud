@@ -26,7 +26,10 @@ package cloud.commandframework.bukkit.parsers;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.bukkit.BukkitCaptionKeys;
+import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -143,7 +146,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
 
             final Enchantment enchantment = Enchantment.getByKey(key);
             if (enchantment == null) {
-                return ArgumentParseResult.failure(new EnchantmentParseException(input));
+                return ArgumentParseResult.failure(new EnchantmentParseException(input, commandContext));
             }
             inputQueue.remove();
             return ArgumentParseResult.success(enchantment);
@@ -168,16 +171,26 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
     }
 
 
-    public static final class EnchantmentParseException extends IllegalArgumentException {
+    public static final class EnchantmentParseException extends ParserException {
 
         private final String input;
 
         /**
          * Construct a new EnchantmentParseException
          *
-         * @param input Input
+         * @param input   Input
+         * @param context Command context
          */
-        public EnchantmentParseException(final @NonNull String input) {
+        public EnchantmentParseException(
+                final @NonNull String input,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    EnchantmentParser.class,
+                    context,
+                    BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_ENCHANTMENT,
+                    CaptionVariable.of("input", input)
+            );
             this.input = input;
         }
 
@@ -188,11 +201,6 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
          */
         public @NonNull String getInput() {
             return this.input;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format("'%s' is not a valid enchantment", this.input);
         }
 
     }

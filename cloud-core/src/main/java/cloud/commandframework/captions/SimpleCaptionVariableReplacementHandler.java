@@ -21,30 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.context;
+package cloud.commandframework.captions;
 
-import cloud.commandframework.captions.CaptionRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Factory for {@link CommandContext} instances
- *
- * @param <C> Command sender
+ * Simple implementation of {@link CaptionVariableReplacementHandler}
  */
-public interface CommandContextFactory<C> {
+public final class SimpleCaptionVariableReplacementHandler implements CaptionVariableReplacementHandler {
 
-    /**
-     * Create a new command context
-     *
-     * @param suggestions     Whether or not the sender is requesting suggestions
-     * @param sender          Command sender
-     * @param captionRegistry Caption registry
-     * @return Command context
-     */
-    @NonNull CommandContext<C> create(
-            boolean suggestions,
-            @NonNull C sender,
-            @NonNull CaptionRegistry<C> captionRegistry
-            );
+    @Override
+    public @NonNull String replaceVariables(
+            final @NonNull String string,
+            final @NonNull CaptionVariable... variables
+    ) {
+        String replacedString = string;
+        for (final CaptionVariable variable : variables) {
+            replacedString = replacedString.replace(String.format("{%s}", variable.getKey()), variable.getValue());
+        }
+        return replacedString;
+    }
 
 }

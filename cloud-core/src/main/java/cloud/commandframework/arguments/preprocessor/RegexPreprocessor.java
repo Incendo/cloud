@@ -24,6 +24,9 @@
 package cloud.commandframework.arguments.preprocessor;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -42,21 +45,42 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
 
     private final String rawPattern;
     private final Predicate<@NonNull String> predicate;
+    private final Caption failureCaption;
 
-    private RegexPreprocessor(final @NonNull String pattern) {
+    private RegexPreprocessor(
+            final @NonNull String pattern,
+            final @NonNull Caption failureCaption
+    ) {
         this.rawPattern = pattern;
         this.predicate = Pattern.compile(pattern).asPredicate();
+        this.failureCaption = failureCaption;
     }
 
     /**
-     * Create a new preprocessor
+     * Create a new preprocessor using {@link cloud.commandframework.captions.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
+     * as the failure caption
      *
      * @param pattern Regular expression
      * @param <C>     Command sender type
      * @return Preprocessor instance
      */
     public static <C> @NonNull RegexPreprocessor<C> of(final @NonNull String pattern) {
-        return new RegexPreprocessor<>(pattern);
+        return of(pattern, StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_REGEX);
+    }
+
+    /**
+     * Create a new preprocessor
+     *
+     * @param pattern        Regular expression
+     * @param <C>            Command sender type
+     * @param failureCaption Caption sent when the input is invalid
+     * @return Preprocessor instance
+     */
+    public static <C> @NonNull RegexPreprocessor<C> of(
+            final @NonNull String pattern,
+            final @NonNull Caption failureCaption
+    ) {
+        return new RegexPreprocessor<>(pattern, failureCaption);
     }
 
     @Override
@@ -73,7 +97,9 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
         return ArgumentParseResult.failure(
                 new RegexValidationException(
                         this.rawPattern,
-                        head
+                        head,
+                        this.failureCaption,
+                        context
                 )
         );
     }
@@ -86,21 +112,33 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
 
         private final String pattern;
         private final String failedString;
+        private final Caption failureCaption;
+        private final CommandContext<?> commandContext;
 
         private RegexValidationException(
-                @NonNull final String pattern,
-                @NonNull final String failedString
+                final @NonNull String pattern,
+                final @NonNull String failedString,
+                final @NonNull Caption failureCaption,
+                final @NonNull CommandContext<?> commandContext
         ) {
             this.pattern = pattern;
             this.failedString = failedString;
+            this.failureCaption = failureCaption;
+            this.commandContext = commandContext;
         }
 
         @Override
         public String getMessage() {
-            return String.format(
-                    "Input '%s' does not match the required pattern '%s'",
-                    failedString,
-                    pattern
+            return this.commandContext.formatMessage(
+                    this.failureCaption,
+                    CaptionVariable.of(
+                            "input",
+                            this.failedString
+                    ),
+                    CaptionVariable.of(
+                            "pattern",
+                            this.pattern
+                    )
             );
         }
 

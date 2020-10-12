@@ -21,30 +21,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.context;
+package cloud.commandframework.captions;
 
-import cloud.commandframework.captions.CaptionRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Factory for {@link CommandContext} instances
- *
- * @param <C> Command sender
+ * Key-value pair used to replace variables in captions
  */
-public interface CommandContextFactory<C> {
+public final class CaptionVariable {
+
+    private final String key;
+    private final String value;
+
+    private CaptionVariable(final @NonNull String key, final @NonNull String value) {
+        this.key = key;
+        this.value = value;
+    }
 
     /**
-     * Create a new command context
+     * Create a new caption variable instance
      *
-     * @param suggestions     Whether or not the sender is requesting suggestions
-     * @param sender          Command sender
-     * @param captionRegistry Caption registry
-     * @return Command context
+     * @param key   Key
+     * @param value Replacement
+     * @return Created instance
      */
-    @NonNull CommandContext<C> create(
-            boolean suggestions,
-            @NonNull C sender,
-            @NonNull CaptionRegistry<C> captionRegistry
-            );
+    public static @NonNull CaptionVariable of(final @NonNull String key, final @NonNull String value) {
+        return new CaptionVariable(key, value);
+    }
+
+    /**
+     * Get the variable key
+     *
+     * @return Key
+     */
+    public @NonNull String getKey() {
+        return this.key;
+    }
+
+    /**
+     * Get the variable value
+     *
+     * @return Value
+     */
+    public @NonNull String getValue() {
+        return this.value;
+    }
 
 }

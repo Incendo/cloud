@@ -53,6 +53,8 @@ import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
+import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
@@ -409,6 +411,15 @@ public final class ExamplePlugin extends JavaPlugin {
                     context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));
                 })
         );
+
+        /* Register a custom regex caption */
+        final Caption moneyCaption = Caption.of("regex.money");
+        if (manager.getCaptionRegistry() instanceof SimpleCaptionRegistry) {
+            ((SimpleCaptionRegistry<CommandSender>) manager.getCaptionRegistry()).registerMessageFactory(
+                    moneyCaption,
+                    (sender, key) -> "'{input}' is not very cash money of you"
+            );
+        }
     }
 
     @CommandMethod("example help [query]")
@@ -466,7 +477,8 @@ public final class ExamplePlugin extends JavaPlugin {
     @CommandDescription("Command to test the preprocessing system")
     private void commandPay(
             final @NonNull CommandSender sender,
-            final @Argument("money") @Regex("(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$") String money
+            final @Argument("money") @Regex(value = "(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$",
+                    failureCaption = "regex.money") String money
     ) {
         bukkitAudiences.sender(sender).sendMessage(
                 Component.text().append(Component.text("You have been given ", NamedTextColor.AQUA))

@@ -26,7 +26,10 @@ package cloud.commandframework.bukkit.parsers;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.bukkit.BukkitCaptionKeys;
+import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -130,7 +133,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
 
             final World world = Bukkit.getWorld(input);
             if (world == null) {
-                return ArgumentParseResult.failure(new WorldParseException(input));
+                return ArgumentParseResult.failure(new WorldParseException(input, commandContext));
             }
 
             inputQueue.remove();
@@ -145,16 +148,26 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
     }
 
 
-    public static final class WorldParseException extends IllegalArgumentException {
+    public static final class WorldParseException extends ParserException {
 
         private final String input;
 
         /**
          * Construct a new WorldParseException
          *
-         * @param input Input
+         * @param input   Input
+         * @param context Command context
          */
-        public WorldParseException(final @NonNull String input) {
+        public WorldParseException(
+                final @NonNull String input,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    WorldParser.class,
+                    context,
+                    BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_WORLD,
+                    CaptionVariable.of("input", input)
+            );
             this.input = input;
         }
 
@@ -165,11 +178,6 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
          */
         public @NonNull String getInput() {
             return this.input;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format("'%s' is not a valid Minecraft world", this.input);
         }
 
     }

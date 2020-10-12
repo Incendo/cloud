@@ -26,7 +26,10 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -183,7 +186,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
                     return ArgumentParseResult.success(false);
                 }
 
-                return ArgumentParseResult.failure(new BooleanParseException(input, false));
+                return ArgumentParseResult.failure(new BooleanParseException(input, false, commandContext));
             }
 
             final String uppercaseInput = input.toUpperCase();
@@ -196,7 +199,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
                 return ArgumentParseResult.success(false);
             }
 
-            return ArgumentParseResult.failure(new BooleanParseException(input, true));
+            return ArgumentParseResult.failure(new BooleanParseException(input, true, commandContext));
         }
 
         @Override
@@ -222,7 +225,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     /**
      * Boolean parse exception
      */
-    public static final class BooleanParseException extends IllegalArgumentException {
+    public static final class BooleanParseException extends ParserException {
 
         private final String input;
         private final boolean liberal;
@@ -230,16 +233,25 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         /**
          * Construct a new boolean parse exception
          *
-         * @param input   String input
-         * @param liberal Liberal value
+         * @param input   Input
+         * @param liberal Whether or not the parser allows truthy and falsy values, or strictly true/false
+         * @param context Command context
          */
         public BooleanParseException(
                 final @NonNull String input,
-                final boolean liberal
+                final boolean liberal,
+                final @NonNull CommandContext<?> context
         ) {
+            super(
+                    BooleanParser.class,
+                    context,
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
+                    CaptionVariable.of("input", input)
+            );
             this.input = input;
             this.liberal = liberal;
         }
+
 
         /**
          * Get the supplied input
@@ -257,11 +269,6 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          */
         public boolean isLiberal() {
             return liberal;
-        }
-
-        @Override
-        public String getMessage() {
-            return String.format("Could not parse boolean from '%s'.", input);
         }
 
     }

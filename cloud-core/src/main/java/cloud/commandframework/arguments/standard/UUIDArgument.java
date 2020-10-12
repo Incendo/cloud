@@ -26,7 +26,10 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -133,7 +136,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
                 inputQueue.remove();
                 return ArgumentParseResult.success(uuid);
             } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new UUIDParseException(input));
+                return ArgumentParseResult.failure(new UUIDParseException(input, commandContext));
             }
         }
 
@@ -145,22 +148,36 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     }
 
 
-    public static final class UUIDParseException extends IllegalArgumentException {
+    public static final class UUIDParseException extends ParserException {
 
         private final String input;
 
         /**
          * Construct a new UUID parse exception
          *
-         * @param input String input
+         * @param input   String input
+         * @param context Command context
          */
-        public UUIDParseException(final @NonNull String input) {
+        public UUIDParseException(
+                final @NonNull String input,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    UUIDParser.class,
+                    context,
+                    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_UUID,
+                    CaptionVariable.of("input", input)
+            );
             this.input = input;
         }
 
-        @Override
-        public String getMessage() {
-            return String.format("Could not parse UUID from '%s'.", input);
+        /**
+         * Get the supplied input
+         *
+         * @return String value
+         */
+        public String getInput() {
+            return input;
         }
 
     }

@@ -34,6 +34,7 @@ import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
+import cloud.commandframework.captions.Caption;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
@@ -97,7 +98,10 @@ public final class AnnotationParser<C> {
         this.flagExtractor = new FlagExtractor(manager);
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
-        this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(annotation.value()));
+        this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(
+                annotation.value(),
+                Caption.of(annotation.failureCaption())
+        ));
     }
 
     /**

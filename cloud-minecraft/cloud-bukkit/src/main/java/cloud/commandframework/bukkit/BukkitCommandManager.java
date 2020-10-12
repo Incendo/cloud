@@ -162,6 +162,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
                 new CommandSuggestionsListener<>(this),
                 this.owningPlugin
         );
+
+        this.registerDefaultCaptions(new BukkitCaptionRegistryFactory<C>().create());
     }
 
     /**

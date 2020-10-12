@@ -23,9 +23,12 @@
 //
 package cloud.commandframework.exceptions.parsing;
 
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
+import cloud.commandframework.context.CommandContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public abstract class NumberParseException extends IllegalArgumentException {
+public abstract class NumberParseException extends ParserException {
 
     private final String input;
     private final Number min;
@@ -34,32 +37,30 @@ public abstract class NumberParseException extends IllegalArgumentException {
     /**
      * Construct a new number parse exception
      *
-     * @param input Input
-     * @param min   Maximum value
-     * @param max   Minimum value
+     * @param input       Input
+     * @param min         Maximum value
+     * @param max         Minimum value
+     * @param parserClass Parser class
+     * @param context     Command context
      */
     public NumberParseException(
             final @NonNull String input,
             final @NonNull Number min,
-            final @NonNull Number max
+            final @NonNull Number max,
+            final @NonNull Class<?> parserClass,
+            final @NonNull CommandContext<?> context
     ) {
+        super(
+                parserClass,
+                context,
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NUMBER,
+                CaptionVariable.of("input", input),
+                CaptionVariable.of("min", String.valueOf(min)),
+                CaptionVariable.of("max", String.valueOf(max))
+        );
         this.input = input;
         this.min = min;
         this.max = max;
-    }
-
-    @Override
-    public final String getMessage() {
-        if (this.hasMin() && this.hasMax()) {
-            return "'" + this.input + "' is not a valid " + this.getNumberType() + " in the range ["
-                    + this.min + ", " + this.max + "]";
-        } else if (this.hasMin()) {
-            return "'" + this.input + "' is not a valid " + this.getNumberType() + " above " + this.min;
-        } else if (this.hasMax()) {
-            return "'" + this.input + "' is not a valid " + this.getNumberType() + " below " + this.max;
-        } else {
-            return String.format("'%s' is not a valid %s", this.input, this.getNumberType());
-        }
     }
 
     /**
