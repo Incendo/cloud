@@ -107,6 +107,16 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
             super(Material.class, name);
         }
 
+        @Override
+        public @NonNull CommandArgument<C, Material> build() {
+            return new MaterialArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
+        }
+
     }
 
     public static final class MaterialParser<C> implements ArgumentParser<C, Material> {

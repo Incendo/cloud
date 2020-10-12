@@ -108,6 +108,16 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
             super(Enchantment.class, name);
         }
 
+        @Override
+        public @NonNull CommandArgument<C, Enchantment> build() {
+            return new EnchantmentArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
+        }
+
     }
 
     public static final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment> {
