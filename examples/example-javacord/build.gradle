@@ -17,8 +17,8 @@ dependencies {
     /* Cloud */
     implementation project(":cloud-javacord")
     /* Utilities */
-    implementation "dev.simplix.core:simplixcore-common-api:1.0.0-SNAPSHOT"
-    implementation "dev.simplix.core:simplixcore-common-implementation:1.0.0-SNAPSHOT"
+    implementation "dev.simplix.core:simplixcore-common-api:1.0.0-20201013.155357-1"
+    implementation "dev.simplix.core:simplixcore-common-implementation:1.0.0-20201013.155420-1"
     /* Javacord */
     implementation "org.javacord:javacord:3.1.1"
     /* Logger */
