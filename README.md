@@ -107,10 +107,11 @@ Feel free to use this if you want to.
 To use `cloud` you will first need to add it as a dependency to your project.
 
 Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot repository](https://oss.sonatype.org/content/repositories/snapshots).
-Release builds of Cloud are available throgh the Maven central repository.
+Release builds of Cloud are available through the Maven central repository.
 
 **maven**:
-```xml  
+```xml
+<!-- For snapshot builds ->
 <repository>  
  <id>sonatype-snapshots</id>
  <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -121,7 +122,7 @@ Release builds of Cloud are available throgh the Maven central repository.
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-PLATFORM</artifactId>
- <version>1.0.0-SNAPSHOT</version>
+ <version>1.0.0</version>
 </dependency>
 <!-- 
 ~    Optional: Allows you to use annotated methods
@@ -130,7 +131,7 @@ Release builds of Cloud are available throgh the Maven central repository.
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-annotations</artifactId>
- <version>1.0.0-SNAPSHOT</version>
+ <version>1.0.0</version>
 </dependency>
 ``` 
 
@@ -182,7 +183,7 @@ repositories {
 
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-PLATFORM:1.0.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-PLATFORM:1.0.0'
 }
 ```
 
