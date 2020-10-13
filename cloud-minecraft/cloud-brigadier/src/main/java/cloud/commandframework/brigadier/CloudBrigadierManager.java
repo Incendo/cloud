@@ -456,6 +456,13 @@ public final class CloudBrigadierManager<C, S> {
                 command
         );
 
+        SuggestionsBuilder suggestionsBuilder = builder;
+
+        final int lastIndexOfSpaceInRemainingString = builder.getRemaining().lastIndexOf(' ');
+        if (lastIndexOfSpaceInRemainingString != -1) {
+            suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
+        }
+
         for (final String suggestion : suggestions) {
             String tooltip = argument.getName();
             if (!(argument instanceof StaticArgument)) {
@@ -465,9 +472,10 @@ public final class CloudBrigadierManager<C, S> {
                     tooltip = '[' + tooltip + ']';
                 }
             }
-            builder.suggest(suggestion, new LiteralMessage(tooltip));
+            suggestionsBuilder = suggestionsBuilder.suggest(suggestion, new LiteralMessage(tooltip));
         }
-        return builder.buildFuture();
+
+        return suggestionsBuilder.buildFuture();
     }
 
 }

@@ -34,6 +34,7 @@ import java.util.LinkedList;
  * {@link Caption} instances for messages in cloud-bukkit
  */
 public final class BukkitCaptionKeys {
+
     private static final Collection<Caption> RECOGNIZED_CAPTIONS = new LinkedList<>();
 
     /**

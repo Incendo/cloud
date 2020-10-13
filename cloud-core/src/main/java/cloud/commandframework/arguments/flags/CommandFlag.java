@@ -30,7 +30,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A flag is an optional command argument that may have an associated parser,
@@ -160,7 +162,19 @@ public final class CommandFlag<T> {
          * @return New builder instance
          */
         public Builder<T> withAliases(final @NonNull String... aliases) {
-            return new Builder<>(this.name, aliases, this.description, this.commandArgument);
+            final Set<String> filteredAliases = new HashSet<>();
+            for (final String alias : aliases) {
+                if (alias.isEmpty()) {
+                    continue;
+                }
+                filteredAliases.add(alias);
+            }
+            return new Builder<>(
+                    this.name,
+                    filteredAliases.toArray(new String[0]),
+                    this.description,
+                    this.commandArgument
+            );
         }
 
         /**
