@@ -60,6 +60,22 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_UUID}
      */
     public static final String ARGUMENT_PARSE_FAILURE_UUID = "'{input}' is not a valid UUID";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG = "Unknown flag '{flag}'";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG = "Duplicate flag '{flag}'";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED = "No flag started. Don't know what to do with '{input}'";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT = "Missing argument for '{flag}'";
 
     private final Map<Caption, BiFunction<Caption, C, String>> messageFactories = new HashMap<>();
 
@@ -87,6 +103,22 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
         this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_UUID,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_UUID
+        );
+        this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG
+        );
+        this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG
+        );
+        this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED
+        );
+        this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT
         );
     }
 

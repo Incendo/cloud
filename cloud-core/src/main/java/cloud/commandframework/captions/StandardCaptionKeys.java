@@ -64,6 +64,22 @@ public final class StandardCaptionKeys {
      * Variables: {input}, {pattern}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_REGEX = of("argument.parse.failure.regex");
+    /**
+     * Variables: {flag}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG = of("argument.parse.failure.flag.unknown");
+    /**
+     * Variables: {flag}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG = of("argument.parse.failure.flag.duplicate_flag");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED = of("argument.parse.failure.flag.no_flag_started");
+    /**
+     * Variables: {flag}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT = of("argument.parse.failure.flag.missing_argument");
 
     private StandardCaptionKeys() {
     }
