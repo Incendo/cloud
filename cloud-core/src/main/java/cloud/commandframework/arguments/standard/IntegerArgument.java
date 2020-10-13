@@ -192,20 +192,27 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         static @NonNull List<@NonNull String> getSuggestions(final long min, final long max, final @NonNull String input) {
             if (input.isEmpty()) {
                 return IntStream.range(0, MAX_SUGGESTIONS_INCREMENT).mapToObj(Integer::toString).collect(Collectors.toList());
+            } else if (input.equals("-")) {
+                return IntStream
+                        .range((MAX_SUGGESTIONS_INCREMENT - 1) * -1, 0)
+                        .mapToObj(Integer::toString)
+                        .collect(Collectors.toList());
             }
             try {
                 final long inputNum = Long.parseLong(input);
                 if (inputNum > max) {
                     return Collections.emptyList();
-                } else {
-                    final List<String> suggestions = new LinkedList<>();
-                    suggestions.add(input); /* It's a valid number, so we suggest it */
-                    for (int i = 0; i < MAX_SUGGESTIONS_INCREMENT
-                            && (inputNum * NUMBER_SHIFT_MULTIPLIER) + i <= max; i++) {
-                        suggestions.add(Long.toString((inputNum * NUMBER_SHIFT_MULTIPLIER) + i));
-                    }
-                    return suggestions;
                 }
+                if (inputNum < min) {
+                    return Collections.emptyList();
+                }
+                final List<String> suggestions = new LinkedList<>();
+                suggestions.add(input); /* It's a valid number, so we suggest it */
+                for (int i = 0; i < MAX_SUGGESTIONS_INCREMENT
+                        && (inputNum * NUMBER_SHIFT_MULTIPLIER) + i <= max; i++) {
+                    suggestions.add(Long.toString((inputNum * NUMBER_SHIFT_MULTIPLIER) + i));
+                }
+                return suggestions;
             } catch (final Exception ignored) {
                 return Collections.emptyList();
             }
