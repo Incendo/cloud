@@ -27,7 +27,11 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -106,11 +110,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
             CommandFlag<?> currentFlag = null;
 
             for (final @NonNull String string : inputQueue) {
-                if (string.startsWith("-")) {
-                    if (currentFlag != null && currentFlag.getCommandArgument() != null) {
-                        return ArgumentParseResult.failure(
-                                new IllegalArgumentException(String.format("Missing argument for '%s'", currentFlag.getName())));
-                    }
+                if (string.startsWith("-") && currentFlag == null) {
                     if (string.startsWith("--")) {
                         final String flagName = string.substring(2);
                         for (final CommandFlag<?> flag : this.flags) {
@@ -131,11 +131,17 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                         }
                     }
                     if (currentFlag == null) {
-                        return ArgumentParseResult.failure(
-                                new IllegalArgumentException(String.format("Unknown flag '%s'", string)));
+                        return ArgumentParseResult.failure(new FlagParseException(
+                                string,
+                                FailureReason.UNKNOWN_FLAG,
+                                commandContext
+                        ));
                     } else if (parsedFlags.contains(currentFlag)) {
-                        return ArgumentParseResult.failure(
-                                new IllegalArgumentException(String.format("Duplicate flag '%s'", string)));
+                        return ArgumentParseResult.failure(new FlagParseException(
+                                string,
+                                FailureReason.DUPLICATE_FLAG,
+                                commandContext
+                        ));
                     }
                     parsedFlags.add(currentFlag);
                     if (currentFlag.getCommandArgument() == null) {
@@ -146,9 +152,11 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     }
                 } else {
                     if (currentFlag == null) {
-                        return ArgumentParseResult.failure(
-                                new IllegalArgumentException(String.format("No flag started. Don't"
-                                        + " know what to do with '%s'", string)));
+                        return ArgumentParseResult.failure(new FlagParseException(
+                                string,
+                                FailureReason.NO_FLAG_STARTED,
+                                commandContext
+                        ));
                     } else {
                         final ArgumentParseResult<?> result =
                                 ((CommandArgument) currentFlag.getCommandArgument())
@@ -167,6 +175,13 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                         }
                     }
                 }
+            }
+            if (currentFlag != null) {
+                return ArgumentParseResult.failure(new FlagParseException(
+                        currentFlag.getName(),
+                        FailureReason.MISSING_ARGUMENT,
+                        commandContext
+                ));
             }
             /* We've consumed everything */
             inputQueue.clear();
@@ -219,6 +234,73 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
             }
             commandContext.store(FLAG_META, "");
             return suggestions(commandContext, input);
+        }
+
+    }
+
+    /**
+     * Flag parse exception
+     */
+    public static final class FlagParseException extends ParserException {
+
+        private final String input;
+
+        /**
+         * Construct a new flag parse exception
+         *
+         * @param input         Input
+         * @param failureReason The reason of failure
+         * @param context       Command context
+         */
+        public FlagParseException(
+                final @NonNull String input,
+                final @NonNull FailureReason failureReason,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(
+                    FlagArgument.FlagArgumentParser.class,
+                    context,
+                    failureReason.getCaption(),
+                    CaptionVariable.of("input", input),
+                    CaptionVariable.of("flag", input)
+            );
+            this.input = input;
+        }
+
+        /**
+         * Get the supplied input
+         *
+         * @return String value
+         */
+        public String getInput() {
+            return input;
+        }
+
+    }
+
+    /**
+     * Reasons for which flag parsing may fail
+     */
+    public enum FailureReason {
+
+        UNKNOWN_FLAG(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG),
+        DUPLICATE_FLAG(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_DUPLICATE_FLAG),
+        NO_FLAG_STARTED(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_NO_FLAG_STARTED),
+        MISSING_ARGUMENT(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT);
+
+        private final Caption caption;
+
+        FailureReason(final @NonNull Caption caption) {
+            this.caption = caption;
+        }
+
+        /**
+         * Get the caption used for this failure reason
+         *
+         * @return The caption
+         */
+        public @NonNull Caption getCaption() {
+            return this.caption;
         }
 
     }

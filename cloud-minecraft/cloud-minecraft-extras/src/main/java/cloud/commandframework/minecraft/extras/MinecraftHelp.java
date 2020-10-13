@@ -183,6 +183,15 @@ public final class MinecraftHelp<C> {
     }
 
     /**
+     * Get the colors used for help messages.
+     *
+     * @return The active {@link HelpColors}
+     */
+    public @NonNull HelpColors getHelpColors() {
+        return this.colors;
+    }
+
+    /**
      * Set the length of the header/footer of help menus
      * <p>
      * Defaults to {@link MinecraftHelp#DEFAULT_HEADER_FOOTER_LENGTH}
