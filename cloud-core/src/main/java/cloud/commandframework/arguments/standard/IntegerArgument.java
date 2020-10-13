@@ -35,9 +35,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @SuppressWarnings("unused")
 public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
@@ -190,28 +190,29 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         }
 
         static @NonNull List<@NonNull String> getSuggestions(final long min, final long max, final @NonNull String input) {
-            if (input.isEmpty()) {
-                return IntStream.range(0, MAX_SUGGESTIONS_INCREMENT).mapToObj(Integer::toString).collect(Collectors.toList());
-            } else if (input.equals("-")) {
-                return IntStream
-                        .range((MAX_SUGGESTIONS_INCREMENT - 1) * -1, 0)
-                        .mapToObj(Integer::toString)
-                        .collect(Collectors.toList());
-            }
+            final Set<Long> numbers = new TreeSet<>();
+
             try {
-                final long inputNum = Long.parseLong(input);
-                if (inputNum > max) {
-                    return Collections.emptyList();
-                }
-                if (inputNum < min) {
-                    return Collections.emptyList();
-                }
-                final List<String> suggestions = new LinkedList<>();
-                suggestions.add(input); /* It's a valid number, so we suggest it */
+                final long inputNum = Long.parseLong(input.equals("-") ? "-0" : input.isEmpty() ? "0" : input);
+                final long inputNumAbsolute = Math.abs(inputNum);
+
+                numbers.add(inputNumAbsolute); /* It's a valid number, so we suggest it */
                 for (int i = 0; i < MAX_SUGGESTIONS_INCREMENT
                         && (inputNum * NUMBER_SHIFT_MULTIPLIER) + i <= max; i++) {
-                    suggestions.add(Long.toString((inputNum * NUMBER_SHIFT_MULTIPLIER) + i));
+                    numbers.add((inputNumAbsolute * NUMBER_SHIFT_MULTIPLIER) + i);
                 }
+
+                final List<String> suggestions = new LinkedList<>();
+                for (long number : numbers) {
+                    if (input.startsWith("-")) {
+                        number = -number; /* Preserve sign */
+                    }
+                    if (number < min || number > max) {
+                        continue;
+                    }
+                    suggestions.add(String.valueOf(number));
+                }
+
                 return suggestions;
             } catch (final Exception ignored) {
                 return Collections.emptyList();

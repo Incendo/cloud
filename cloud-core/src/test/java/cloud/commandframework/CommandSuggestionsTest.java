@@ -79,6 +79,11 @@ public class CommandSuggestionsTest {
                 .flag(manager.flagBuilder("static")
                         .build())
                 .build());
+
+        manager.command(manager.commandBuilder("numbers").argument(IntegerArgument.of("num")));
+
+        manager.command(manager.commandBuilder("numberswithmin")
+                .argument(IntegerArgument.<TestCommandSender>newBuilder("num").withMin(5).withMax(100)));
     }
 
     @Test
@@ -124,7 +129,7 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Arrays.asList("one", "two"), suggestions);
         final String input2 = "test comb one ";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions2);
+        Assertions.assertEquals(Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions2);
         final String input3 = "test comb one 9";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Arrays.asList("9", "90", "91", "92", "93", "94", "95"), suggestions3);
@@ -164,6 +169,26 @@ public class CommandSuggestionsTest {
         final String input3 = "flags 10 --enum foo ";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.singletonList("--static"), suggestions3);
+    }
+
+    @Test
+    void testNumbers() {
+        final String input = "numbers ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final String input2 = "numbers 1";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions2);
+        final String input3 = "numbers -";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Arrays.asList("-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"), suggestions3);
+        final String input4 = "numbers -1";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
+                suggestions4);
+        final String input5 = "numberswithmin ";
+        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(Arrays.asList("5", "6", "7", "8", "9"), suggestions5);
     }
 
 
