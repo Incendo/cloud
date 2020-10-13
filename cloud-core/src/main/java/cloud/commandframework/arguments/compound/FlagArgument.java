@@ -199,10 +199,27 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 /* We don't care about the last value and so we expect a flag */
                 final List<String> strings = new LinkedList<>();
                 for (final CommandFlag<?> flag : this.flags) {
-                    strings.add(String.format("--%s", flag.getName()));
-                    for (final String alias : flag.getAliases()) {
-                        strings.add(String.format("-%s", alias));
+                    final String mainFlag = String.format("--%s", flag.getName());
+                    final List<String> rawInput = commandContext.getRawInput();
+                    if (rawInput.contains(mainFlag)) {
+                        continue; /* Flag was already used */
                     }
+                    final List<String> flagAliases = new LinkedList<>();
+                    boolean flagUsed = false;
+                    for (final String alias : flag.getAliases()) {
+                        final String aliasFlag = String.format("-%s", alias);
+                        if (rawInput.contains(aliasFlag)) {
+                            flagUsed = true;
+                            break;
+                        }
+                        flagAliases.add(aliasFlag);
+                    }
+                    if (flagUsed) {
+                        continue; /* Flag was already used via an alias */
+                    }
+
+                    strings.add(mainFlag);
+                    strings.addAll(flagAliases);
                 }
                 return strings;
             } else {

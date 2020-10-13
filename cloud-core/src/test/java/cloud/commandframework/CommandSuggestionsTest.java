@@ -163,7 +163,7 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions2);
         final String input3 = "flags 10 --enum foo ";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Arrays.asList("--enum", "--static"), suggestions3);
+        Assertions.assertEquals(Collections.singletonList("--static"), suggestions3);
     }
 
 
