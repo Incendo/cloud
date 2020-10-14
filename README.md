@@ -196,3 +196,11 @@ This library is licensed under the <a href="https://opensource.org/licenses/MIT"
   
 The <a href="https://iconscout.com/icons/cloud" target="_blank">Cloud</a> icon was created by by <a href="https://iconscout.com/contributors/oviyan">
 Thanga Vignesh P</a> on <a href="https://iconscout.com">Iconscout</a> and Digital rights were purchased under a premium plan.
+
+## projects using cloud
+
+Here are some projects that are using cloud:
+
+- [Hegemony](https://hegemonymc.com): The Premier Minecraft MMORPG with immersive quests, epic open world, 5,000+ custom items,
+700+ recipes, 30+ skills, challenging bosses, player owned shops and NPCs.
+- [YouTrackDiscordBot](https://github.com/Sauilitired/YouTrackDiscordBot): Discord bot for linking YouTrack issues
