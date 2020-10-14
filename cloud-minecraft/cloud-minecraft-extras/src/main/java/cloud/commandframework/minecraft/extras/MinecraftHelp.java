@@ -27,6 +27,7 @@ import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -268,14 +269,14 @@ public final class MinecraftHelp<C> {
     ) {
         final Audience audience = this.getAudience(sender);
         if (helpTopic.isEmpty()) {
-            audience.sendMessage(this.basicHeader(sender));
-            audience.sendMessage(Component.text(
+            audience.sendMessage(Identity.nil(), this.basicHeader(sender));
+            audience.sendMessage(Identity.nil(), Component.text(
                     this.messageProvider.apply(sender, MESSAGE_NO_RESULTS_FOR_QUERY) + ": \"",
                     this.colors.text
             )
                     .append(this.highlight(Component.text("/" + query, this.colors.highlight)))
                     .append(Component.text("\"", this.colors.text)));
-            audience.sendMessage(this.footer(sender));
+            audience.sendMessage(Identity.nil(), this.footer(sender));
             return;
         }
         new Pagination<CommandHelpHandler.VerboseHelpEntry<C>>(
@@ -309,7 +310,8 @@ public final class MinecraftHelp<C> {
                 },
                 (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
                 (attemptedPage, maxPages) -> this.pageOutOfRange(sender, attemptedPage, maxPages)
-        ).render(helpTopic.getEntries(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
+        ).render(helpTopic.getEntries(), page, this.maxResultsPerPage).forEach(line ->
+                audience.sendMessage(Identity.nil(), line));
     }
 
     private void printMultiHelpTopic(
@@ -344,7 +346,8 @@ public final class MinecraftHelp<C> {
                 },
                 (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
                 (attemptedPage, maxPages) -> this.pageOutOfRange(sender, attemptedPage, maxPages)
-        ).render(helpTopic.getChildSuggestions(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
+        ).render(helpTopic.getChildSuggestions(), page, this.maxResultsPerPage).forEach(line ->
+                audience.sendMessage(Identity.nil(), line));
     }
 
     private void printVerboseHelpTopic(
@@ -353,12 +356,12 @@ public final class MinecraftHelp<C> {
             final CommandHelpHandler.@NonNull VerboseHelpTopic<C> helpTopic
     ) {
         final Audience audience = this.getAudience(sender);
-        audience.sendMessage(this.basicHeader(sender));
-        audience.sendMessage(this.showingResults(sender, query));
+        audience.sendMessage(Identity.nil(), this.basicHeader(sender));
+        audience.sendMessage(Identity.nil(), this.showingResults(sender, query));
         final String command = this.commandManager.getCommandSyntaxFormatter()
                 .apply(helpTopic.getCommand().getArguments(), null);
         audience.sendMessage(
-                this.lastBranch()
+                Identity.nil(), this.lastBranch()
                         .append(Component.text(
                                 " " + this.messageProvider.apply(sender, MESSAGE_COMMAND) + ": ",
                                 this.colors.primary
@@ -370,7 +373,7 @@ public final class MinecraftHelp<C> {
                 : helpTopic.getDescription();
         final boolean hasArguments = helpTopic.getCommand().getArguments().size() > 1;
         audience.sendMessage(
-                Component.text("   ")
+                Identity.nil(), Component.text("   ")
                         .append(hasArguments ? this.branch() : this.lastBranch())
                         .append(Component.text(
                                 " " + this.messageProvider.apply(sender, MESSAGE_DESCRIPTION) + ": ",
@@ -380,7 +383,7 @@ public final class MinecraftHelp<C> {
         );
         if (hasArguments) {
             audience.sendMessage(
-                    Component.text("   ")
+                    Identity.nil(), Component.text("   ")
                             .append(this.lastBranch())
                             .append(Component.text(
                                     " " + this.messageProvider.apply(sender, MESSAGE_ARGUMENTS) + ":",
@@ -415,10 +418,10 @@ public final class MinecraftHelp<C> {
                             .append(Component.text(description, this.colors.text));
                 }
 
-                audience.sendMessage(component);
+                audience.sendMessage(Identity.nil(), component);
             }
         }
-        audience.sendMessage(this.footer(sender));
+        audience.sendMessage(Identity.nil(), this.footer(sender));
     }
 
     private @NonNull Component showingResults(
