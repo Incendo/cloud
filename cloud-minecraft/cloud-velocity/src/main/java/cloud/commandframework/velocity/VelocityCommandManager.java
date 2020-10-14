@@ -25,9 +25,13 @@ package cloud.commandframework.velocity;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import com.google.inject.Inject;
+import com.google.inject.Module;
+import com.google.inject.Singleton;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -35,11 +39,20 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.function.Function;
 
 /**
- * {@link CommandManager} implementation for Velocity
+ * {@link CommandManager} implementation for Velocity.
+ * <p>
+ * This can be injected if {@link CloudInjectionModule} is registered in the
+ * injector. This can be achieved by using {@link com.google.inject.Injector#createChildInjector(Module...)}
  *
  * @param <C> Command sender type
  */
+@Singleton
 public class VelocityCommandManager<C> extends CommandManager<C> {
+
+    /**
+     * Default caption for {@link VelocityCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
 
     private final ProxyServer proxyServer;
     private final Function<CommandSource, C> commandSenderMapper;
@@ -53,6 +66,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
      * @param commandSenderMapper          Function that maps {@link CommandSource} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSource}
      */
+    @Inject
     public VelocityCommandManager(
             final @NonNull ProxyServer proxyServer,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
@@ -64,6 +78,13 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
         this.proxyServer = proxyServer;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+        /* Register default captions */
+        if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
+            final FactoryDelegatingCaptionRegistry<C> factoryDelegatingCaptionRegistry = (FactoryDelegatingCaptionRegistry<C>)
+                    this.getCaptionRegistry();
+            factoryDelegatingCaptionRegistry.registerMessageFactory(VelocityCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
+                    (context, key) -> ARGUMENT_PARSE_FAILURE_PLAYER);
+        }
     }
 
     @Override
