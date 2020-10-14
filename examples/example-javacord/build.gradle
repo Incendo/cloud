@@ -1,0 +1,29 @@
+apply plugin: "application"
+apply plugin: "com.github.johnrengelman.shadow"
+
+application {
+    mainClassName = "cloud.commandframework.examples.javacord.ExampleBot"
+}
+
+build.dependsOn(shadowJar)
+
+repositories {
+    maven {
+        url = "https://repo.simplix.dev/repository/simplixsoft-public/"
+    }
+}
+
+dependencies {
+    /* Cloud */
+    implementation project(":cloud-javacord")
+    /* Utilities */
+    implementation "dev.simplix.core:simplixcore-common-api:1.0.0-20201013.161011-1"
+    implementation "dev.simplix.core:simplixcore-common-implementation:1.0.0-20201013.161028-1"
+    /* Javacord */
+    implementation "org.javacord:javacord:3.1.1"
+    /* Logger */
+    implementation "org.slf4j:slf4j-api:2.0.0-alpha1"
+    runtimeOnly "ch.qos.logback:logback-classic:1.3.0-alpha5"
+    runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j:2.11.0'
+}
+
