@@ -3,7 +3,12 @@
  <img src="icons/cloud_spooky.png" width="300px"/>  
 </div>  
   
-# cloud command framework ![license](https://img.shields.io/github/license/Sauilitired/cloud.svg) ![build](https://github.com/Sauilitired/cloud/workflows/Java%20CI%20with%20Maven/badge.svg) [![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/cloud/badge)](https://www.codefactor.io/repository/github/sauilitired/cloud)
+# cloud command framework
+
+![license](https://img.shields.io/github/license/Sauilitired/cloud.svg)
+![build](https://github.com/Sauilitired/cloud/workflows/Java%20CI%20with%20Maven/badge.svg)
+[![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/cloud/badge)](https://www.codefactor.io/repository/github/sauilitired/cloud)
+[![central](https://maven-badges.herokuapp.com/maven-central/cloud.commandframework/cloud-core/badge.svg)](https://search.maven.org/search?q=cloud.commandframework)
 
 Cloud is a general-purpose Java command dispatcher &amp; framework. It allows programmers to define command chains that are then parsed and invoked from user-
 supplied string inputs, to execute pre-defined actions.
