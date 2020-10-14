@@ -102,20 +102,31 @@ To clone the repository, use `git clone https://github.com/Incendo/cloud.git`.
 
 To then build it, use `./gradlew clean build`. If you want to build the examples as well, use `./gradlew clean build
 -Pcompile-examples`.
+  
+There is a bash script (`build.sh`) that performs the submodule updating &amp; builds the project.  
+Feel free to use this if you want to.  
 
 ## use
 
 To use `cloud` you will first need to add it as a dependency to your project.
 
-Release builds of Cloud are available through the Maven central repository.
 Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot repository](https://oss.sonatype.org/content/repositories/snapshots).
+Release builds of Cloud are available through the Maven central repository.
 
 **maven**:
+```xml
+<!-- For snapshot builds ->
+<repository>  
+ <id>sonatype-snapshots</id>
+ <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+</repository>  
+```
+
 ```xml  
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-PLATFORM</artifactId>
- <version>1.0.1</version>
+ <version>1.1.0-SNAPSHOT</version>
 </dependency>
 <!-- 
 ~    Optional: Allows you to use annotated methods
@@ -124,17 +135,9 @@ Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot reposi
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-annotations</artifactId>
- <version>1.0.1</version>
+ <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ``` 
-
-```xml
-<!-- For snapshot builds ->
-<repository>  
- <id>sonatype-snapshots</id>
- <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-</repository>  
-```
 
 If you are shading in cloud, it is highly recommended that you relocate all of our classes to prevent issues
 with conflicting dependencies:
@@ -162,11 +165,11 @@ with conflicting dependencies:
                     <relocations>
                         <relocation>
                             <pattern>cloud.commandframework</pattern>
-                            <shadedPattern>YOUR.PACKAGE.HERE.shaded.cloud</shadedPattern> <!-- Replace this -->
+                            <shadedPattern>YOUR.PACKAGE.HERE.cloud</shadedPattern> <!-- Replace this -->
                         </relocation>
                         <relocation>
-                            <pattern>io.leangen.geantyref</pattern>
-                            <shadedPattern>YOUR.PACKAGE.HERE.shaded.typetoken</shadedPattern>  <!-- Replace this -->
+                            <pattern>cloud.commandframework.services</pattern>
+                            <shadedPattern>YOUR.PACKAGE.HERE.cloud.pipeline</shadedPattern> <!-- Replace this -->
                         </relocation>
                     </relocations>
                 </configuration>
@@ -178,14 +181,13 @@ with conflicting dependencies:
 **gradle**:
 ```groovy
 repositories {
-    //maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' } // For snapshots
-    mavenCentral()
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 ```
 
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-PLATFORM:1.0.1'
+    implementation 'cloud.commandframework:cloud-PLATFORM:1.1.0-SNAPSHOT'
 }
 ```
 
@@ -201,11 +203,3 @@ This library is licensed under the <a href="https://opensource.org/licenses/MIT"
   
 The <a href="https://iconscout.com/icons/cloud" target="_blank">Cloud</a> icon was created by by <a href="https://iconscout.com/contributors/oviyan">
 Thanga Vignesh P</a> on <a href="https://iconscout.com">Iconscout</a> and Digital rights were purchased under a premium plan.
-
-## projects using cloud
-
-Here are some projects that are using cloud:
-
-- [Hegemony](https://hegemonymc.com): The Premier Minecraft MMORPG with immersive quests, epic open world, 5,000+ custom items,
-700+ recipes, 30+ skills, challenging bosses, player owned shops and NPCs.
-- [YouTrackDiscordBot](https://github.com/Sauilitired/YouTrackDiscordBot): Discord bot for linking YouTrack issues
