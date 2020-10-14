@@ -29,6 +29,7 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -186,6 +187,7 @@ public final class MinecraftExceptionHandler<C> {
             manager.registerExceptionHandler(
                     InvalidSyntaxException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
+                            Identity.nil(),
                             this.decorator.apply(this.componentBuilders.get(ExceptionType.INVALID_SYNTAX).apply(e))
                     )
             );
@@ -194,6 +196,7 @@ public final class MinecraftExceptionHandler<C> {
             manager.registerExceptionHandler(
                     InvalidCommandSenderException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
+                            Identity.nil(),
                             this.decorator.apply(this.componentBuilders.get(ExceptionType.INVALID_SENDER).apply(e))
                     )
             );
@@ -202,6 +205,7 @@ public final class MinecraftExceptionHandler<C> {
             manager.registerExceptionHandler(
                     NoPermissionException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
+                            Identity.nil(),
                             this.decorator.apply(this.componentBuilders.get(ExceptionType.NO_PERMISSION).apply(e))
                     )
             );
@@ -210,6 +214,7 @@ public final class MinecraftExceptionHandler<C> {
             manager.registerExceptionHandler(
                     ArgumentParseException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
+                            Identity.nil(),
                             this.decorator.apply(this.componentBuilders.get(ExceptionType.ARGUMENT_PARSING).apply(e))
                     )
             );
