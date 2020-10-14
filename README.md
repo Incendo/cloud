@@ -111,11 +111,11 @@ Release builds of Cloud are available through the Maven central repository.
 Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot repository](https://oss.sonatype.org/content/repositories/snapshots).
 
 **maven**:
-```xml  
+```xml
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-PLATFORM</artifactId>
- <version>1.0.2</version>
+ <version>1.1.0-SNAPSHOT</version>
 </dependency>
 <!-- 
 ~    Optional: Allows you to use annotated methods
@@ -124,16 +124,16 @@ Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot reposi
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-annotations</artifactId>
- <version>1.0.2</version>
+ <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ``` 
 
 ```xml
-<!-- For snapshot builds ->
-<repository>  
+<!-- For snapshot builds -->
+<repository>
  <id>sonatype-snapshots</id>
  <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-</repository>  
+</repository>
 ```
 
 If you are shading in cloud, it is highly recommended that you relocate all of our classes to prevent issues
@@ -178,7 +178,7 @@ with conflicting dependencies:
 **gradle**:
 ```groovy
 repositories {
-    //maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' } // For snapshots
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
 }
 ```
