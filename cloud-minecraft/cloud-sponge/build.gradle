@@ -1,0 +1,10 @@
+repositories {
+   maven { url("https://repo-new.spongepowered.org/repository/maven-snapshots/") }
+}
+
+dependencies {
+    api project(':cloud-core')
+    api project(':cloud-brigadier');
+    implementation('org.spongepowered:spongeapi:8.0.0-20201013.161342-196')
+    implementation('com.mojang:brigadier:1.0.17')
+}
