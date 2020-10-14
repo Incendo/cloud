@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+ - Added ExampleVelocityPlugin
+ - Added CloudInjectionModule to cloud-velocity
+ - Added PlayerArgument to cloud-velocity
 
 ## [1.0.1] - 2020-10-14
 
