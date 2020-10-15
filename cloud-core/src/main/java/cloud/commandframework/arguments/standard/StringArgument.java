@@ -344,8 +344,8 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 inputQueue.remove();
             }
 
-            if (this.stringMode == StringMode.QUOTED && (!started || !finished)) {
-                return ArgumentParseResult.failure(new StringParseException(sj.toString(), StringMode.GREEDY, commandContext));
+            if (this.stringMode == StringMode.QUOTED && !finished) {
+                return ArgumentParseResult.failure(new StringParseException(sj.toString(), StringMode.QUOTED, commandContext));
             }
 
             return ArgumentParseResult.success(sj.toString());
