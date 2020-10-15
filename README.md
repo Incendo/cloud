@@ -5,9 +5,8 @@
   
 # cloud command framework
 
-![license](https://img.shields.io/github/license/Sauilitired/cloud.svg)
-![build](https://github.com/Sauilitired/cloud/workflows/Java%20CI%20with%20Maven/badge.svg)
-[![CodeFactor](https://www.codefactor.io/repository/github/sauilitired/cloud/badge)](https://www.codefactor.io/repository/github/sauilitired/cloud)
+![license](https://img.shields.io/github/license/Incendo/cloud.svg)
+![build](https://github.com/Incendo/cloud/workflows/Java%20CI%20with%20Maven/badge.svg)
 [![central](https://maven-badges.herokuapp.com/maven-central/cloud.commandframework/cloud-core/badge.svg)](https://search.maven.org/search?q=cloud.commandframework)
 
 Cloud is a general-purpose Java command dispatcher &amp; framework. It allows programmers to define command chains that are then parsed and invoked from user-
@@ -94,12 +93,12 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 ## links  
 
 - JavaDoc: https://javadoc.commandframework.cloud/
-- Wiki: https://github.com/Sauilitired/cloud/wiki
-- Discord: https://discord.gg/KxkjDVg  
+- Wiki: https://github.com/Incendo/cloud/wiki
+- Discord: https://discord.gg/aykZu32
   
 ## develop &amp; build  
   
-To clone the repository, use `git clone https://github.com/Sauilitired/cloud.git`.
+To clone the repository, use `git clone https://github.com/Incendo/cloud.git`.
 
 To then build it, use `./gradlew clean build`. If you want to build the examples as well, use `./gradlew clean build
 -Pcompile-examples`.
@@ -193,7 +192,8 @@ dependencies {
 To shade and relocate cloud use [Gradle Shadow](https://github.com/johnrengelman/shadow).
 
 Replace `PLATFORM` with your platform of choice. We currently support: `bukkit`, `paper`, `bungee` and `velocity`for minecraft and `jda` and `javacord` for discord. All modules use the same versions.
-More information about the Minecraft specific modules can be found [here](https://github.com/Sauilitired/cloud/tree/master/cloud-minecraft).
+More information about the Minecraft specific modules can be found [here](https://github
+.com/Incendo/cloud/tree/master/cloud-minecraft).
 
 ## attributions, links &amp; acknowledgements  
   

@@ -138,7 +138,7 @@ subprojects {
 
                 pom {
                     name = project.name
-                    url = 'https://github.com/Sauilitired/cloud'
+                    url = 'https://github.com/Incendo/cloud'
                     description = project.description
 
                     developers {
@@ -152,7 +152,7 @@ subprojects {
 
                     issueManagement {
                         system = 'GitHub Issues'
-                        url = 'https://github.com/Sauilitired/cloud/issues'
+                        url = 'https://github.com/Incendo/cloud/issues'
                     }
 
                     licenses {
@@ -163,9 +163,9 @@ subprojects {
                     }
 
                     scm {
-                        connection = 'scm:git@github.com:Sauilitired/cloud.git'
-                        developerConnection = 'scm:git@github.com:Sauilitired/cloud.git'
-                        url = 'https://github.com/Sauilitired/cloud/'
+                        connection = 'scm:git@github.com:Incendo/cloud.git'
+                        developerConnection = 'scm:git@github.com:Incendo/cloud.git'
+                        url = 'https://github.com/Incendo/cloud/'
                     }
                 }
             }
