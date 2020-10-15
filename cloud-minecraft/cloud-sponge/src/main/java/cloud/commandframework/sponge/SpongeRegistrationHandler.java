@@ -28,15 +28,18 @@ import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.permission.CommandPermission;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.function.BiPredicate;
 
 final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
 
@@ -79,7 +82,9 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
         brigadierManager = new CloudBrigadierManager<>(
                 commandManager,
                 () -> new CommandContext<>(
-                        commandManager.getBackwardsSubjectMapper().apply(subject),
+                        commandManager.getBackwardsSubjectMapper().apply(
+                                CommandCause.create() /* This is bad, fix! */
+                        ),
                         commandManager.getCaptionRegistry()
                 )
         );
@@ -90,19 +95,25 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
         final StaticArgument<?> staticArgument = (StaticArgument<?>) command.getArguments().get(0);
         final String primaryAlias = staticArgument.getName();
         final String[] aliases = staticArgument.getAlternativeAliases().toArray(new String[0]);
-        final LiteralCommandNode<?> literalCommandNode = null;
-        /*
-        this.brigadierManager.createLiteralCommandNode(
+        @SuppressWarnings("all")
+        final LiteralCommandNode<?> literalCommandNode = this.brigadierManager.createLiteralCommandNode(
                 command.getArguments().get(0).getName(),
                 (Command<C>) command,
-                (c, p) -> this.manager.hasPermission(
-                        this.manager.getCommandSenderMapper().apply(c),
-                        p
+                (BiPredicate) (o, permission) -> commandManager.hasPermission(
+                        commandManager.getBackwardsSubjectMapper().apply((CommandCause) o),
+                        (CommandPermission) permission
                 ),
-                true,
-                s -> {}
+                false,
+                (com.mojang.brigadier.Command) context -> {
+                    commandManager.executeCommand(
+                            commandManager.getBackwardsSubjectMapper().apply((CommandCause) context.getSource()),
+                            context.getInput()
+                    ).whenComplete(((result, throwable) -> {
+
+                    }));
+                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
+                }
         );
-        */
         try {
             this.commandRegistrationMethodHandle.invokeWithArguments(
                     this.commandManager.getOwningPlugin(),
