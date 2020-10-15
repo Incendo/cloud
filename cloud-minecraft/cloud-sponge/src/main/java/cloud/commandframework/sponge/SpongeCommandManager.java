@@ -30,11 +30,12 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import com.google.inject.Inject;
 import com.google.inject.Module;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogRegistryEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.plugin.PluginContainer;
 
@@ -53,7 +54,7 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
 
     private final PluginContainer pluginContainer;
     private final Function<C, Subject> subjectMapper;
-    private final Function<Subject, C> backwardsSubjectMapper;
+    private final Function<CommandCause, C> backwardsSubjectMapper;
 
     /**
      * Create a new command manager instance
@@ -68,7 +69,7 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
             final @NonNull PluginContainer pluginContainer,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull Function<@NonNull C, @NonNull Subject> subjectMapper,
-            final @NonNull Function<@NonNull Subject, @NonNull C> backwardsSubjectMapper
+            final @NonNull Function<@NonNull CommandCause, @NonNull C> backwardsSubjectMapper
     ) {
         super(commandExecutionCoordinator, new SpongeRegistrationHandler());
         this.pluginContainer = pluginContainer;
@@ -100,21 +101,12 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
     }
 
     @NonNull
-    final Function<@NonNull Subject, @NonNull C> getBackwardsSubjectMapper() {
+    final Function<@NonNull CommandCause, @NonNull C> getBackwardsSubjectMapper() {
         return this.backwardsSubjectMapper;
     }
 
     @Listener
-    private void onRegistryEvent(final RegisterCatalogRegistryEvent event) {
-        event.register(
-                CloudCommandRegistrar.class,
-                this.getResourceKey()
-        );
-    }
-
-    @NonNull
-    final ResourceKey getResourceKey() {
-        return ResourceKey.builder().namespace(this.pluginContainer).value("cloud-command-manager").build();
+    private void onRegistryEvent(final RegisterCommandEvent<LiteralArgumentBuilder> event) {
     }
 
 }
