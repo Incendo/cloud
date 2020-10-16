@@ -80,6 +80,10 @@ public final class StandardCaptionKeys {
      * Variables: {flag}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT = of("argument.parse.failure.flag.missing_argument");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_COLOR = of("argument.parse.failure.color");
 
     private StandardCaptionKeys() {
     }
