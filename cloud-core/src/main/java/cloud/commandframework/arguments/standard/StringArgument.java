@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -291,7 +292,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        StringParser.class,
+                        commandContext
+                ));
             }
 
             if (this.stringMode == StringMode.SINGLE) {

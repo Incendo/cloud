@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -128,7 +129,10 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        WorldParser.class,
+                        commandContext
+                ));
             }
 
             final World world = Bukkit.getWorld(input);

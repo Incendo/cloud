@@ -37,6 +37,10 @@ import java.util.function.BiFunction;
 public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistry<C> {
 
     /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED}.
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED = "No input was provided";
+    /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_BOOLEAN}.
      */
     public static final String ARGUMENT_PARSE_FAILURE_BOOLEAN = "Could not parse boolean from '{input}'";
@@ -84,6 +88,10 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
     private final Map<Caption, BiFunction<Caption, C, String>> messageFactories = new HashMap<>();
 
     protected SimpleCaptionRegistry() {
+        this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED
+        );
         this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_BOOLEAN

@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.velocity.VelocityCaptionKeys;
 import com.velocitypowered.api.proxy.Player;
@@ -170,11 +171,10 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(
-                        new NullPointerException(
-                                "No input was provided"
-                        )
-                );
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        PlayerParser.class,
+                        commandContext
+                ));
             }
             final Player player = this.proxyServer.getPlayer(input).orElse(null);
             if (player == null) {
