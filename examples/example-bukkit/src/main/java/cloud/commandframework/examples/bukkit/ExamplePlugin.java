@@ -57,7 +57,7 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.minecraft.extras.ColorArgument;
+import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
@@ -319,23 +319,23 @@ public final class ExamplePlugin extends JavaPlugin {
                 .meta("description", "Sets the color scheme for '/example help'")
                 .literal("helpcolors")
                 .argument(
-                        ColorArgument.of("primary"),
+                        TextColorArgument.of("primary"),
                         Description.of("The primary color for the color scheme")
                 )
                 .argument(
-                        ColorArgument.of("highlight"),
+                        TextColorArgument.of("highlight"),
                         Description.of("The primary color used to highlight commands and queries")
                 )
                 .argument(
-                        ColorArgument.of("alternate_highlight"),
+                        TextColorArgument.of("alternate_highlight"),
                         Description.of("The secondary color used to highlight commands and queries")
                 )
                 .argument(
-                        ColorArgument.of("text"),
+                        TextColorArgument.of("text"),
                         Description.of("The color used for description text")
                 )
                 .argument(
-                        ColorArgument.of("accent"),
+                        TextColorArgument.of("accent"),
                         Description.of("The color used for accents and symbols")
                 )
                 .handler(c -> minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
