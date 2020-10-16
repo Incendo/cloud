@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added ExampleVelocityPlugin
  - Added CloudInjectionModule to cloud-velocity
  - Added PlayerArgument to cloud-velocity
+ - Added TextColorArgument to minecraft-extras
 
 ## [1.0.2] - 2020-10-18
 
