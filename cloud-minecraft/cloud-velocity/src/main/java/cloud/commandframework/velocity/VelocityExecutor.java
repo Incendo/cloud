@@ -32,6 +32,7 @@ import cloud.commandframework.execution.CommandResult;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.velocitypowered.api.command.CommandSource;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -79,6 +80,7 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                             (InvalidSyntaxException) throwable,
                             (c, e) ->
                                     source.sendMessage(
+                                            Identity.nil(),
                                             Component
                                                     .text()
                                                     .append(
@@ -100,6 +102,7 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                             (InvalidCommandSenderException) throwable,
                             (c, e) ->
                                     source.sendMessage(
+                                            Identity.nil(),
                                             Component.text(
                                                     finalThrowable.getMessage(),
                                                     NamedTextColor.RED
@@ -111,14 +114,14 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                             sender,
                             NoPermissionException.class,
                             (NoPermissionException) throwable,
-                            (c, e) -> source.sendMessage(Component.text(MESSAGE_NO_PERMS))
+                            (c, e) -> source.sendMessage(Identity.nil(), Component.text(MESSAGE_NO_PERMS))
                     );
                 } else if (throwable instanceof NoSuchCommandException) {
                     this.manager.handleException(
                             sender,
                             NoSuchCommandException.class,
                             (NoSuchCommandException) throwable,
-                            (c, e) -> source.sendMessage(Component.text(MESSAGE_UNKNOWN_COMMAND))
+                            (c, e) -> source.sendMessage(Identity.nil(), Component.text(MESSAGE_UNKNOWN_COMMAND))
                     );
                 } else if (throwable instanceof ArgumentParseException) {
                     this.manager.handleException(
@@ -127,6 +130,7 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                             (ArgumentParseException) throwable,
                             (c, e) ->
                                     source.sendMessage(
+                                            Identity.nil(),
                                             Component.text()
                                             .append(Component.text(
                                                     "Invalid Command Argument: ",
@@ -140,6 +144,7 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                     );
                 } else {
                     source.sendMessage(
+                            Identity.nil(),
                             Component.text(throwable.getMessage(), NamedTextColor.RED)
                     );
                     throwable.printStackTrace();
