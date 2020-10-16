@@ -53,7 +53,7 @@ public final class CloudInjectionModule<C> extends AbstractModule {
      *
      * @param commandSenderType            Your command sender type
      * @param commandExecutionCoordinator  Command execution coordinator
-     * @param commandSenderMapper          Mapper from command source to the custom command sender type
+     * @param commandSenderMapper          Mapper to command source to the custom command sender type
      * @param backwardsCommandSenderMapper Mapper from the custom command sender type to a velocity command source
      */
     public CloudInjectionModule(
