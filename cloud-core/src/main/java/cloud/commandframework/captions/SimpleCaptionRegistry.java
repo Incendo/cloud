@@ -76,6 +76,10 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT}
      */
     public static final String ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT = "Missing argument for '{flag}'";
+    /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_COLOR}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_COLOR = "'{input}' is not a valid color";
 
     private final Map<Caption, BiFunction<Caption, C, String>> messageFactories = new HashMap<>();
 
@@ -119,6 +123,10 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
         this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_FLAG_MISSING_ARGUMENT
+        );
+        this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_COLOR,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_COLOR
         );
     }
 
