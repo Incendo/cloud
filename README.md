@@ -19,18 +19,18 @@ of using the framework is like floating on a fluffy cloud in heaven. Its feature
 Cloud allows for commands to be defined using builder patterns, like this:
 ```java
 manager.command(
-    manager.commandBuilder("command", Description.of("Test cloud command using a builder"), "alias")
-           .argument(StringArgument.of("input"))
-           .argument(IntegerArgument.newBuilder("number").withMin(1).withMax(100).build())
-           .handler(context -> {
-                String input = context.get("input");
-                int number = context.get("number");
-                context.getSender().sendMessage(String.format(
-                        "I am %d%% hyped for %s!"
-                        number,
-                        input
-                );
-           })
+        manager.commandBuilder("command", Description.of("Test cloud command using a builder"), "alias")
+                .argument(StringArgument.of("input"))
+                .argument(IntegerArgument.<CommandSender>newBuilder("number").withMin(1).withMax(100).build())
+                .handler(context -> {
+                    String input = context.get("input");
+                    int number = context.get("number");
+                    context.getSender().sendMessage(String.format(
+                            "I am %d%% hyped for %s!",
+                            number,
+                            input
+                    ));
+                })
 );
 ```
 or using annotated methods, like this:
@@ -38,14 +38,14 @@ or using annotated methods, like this:
 @CommandDescription("Test cloud command using @CommandMethod")
 @CommandMethod("command|alias <input> <number>")
 private void yourCommand(
-    Player sender,
-    @Argument("input") String input,
-    @Argument("number") @Range(min = "1", max = "100") int number)
+        CommandSender sender,
+        @Argument("input") String input,
+        @Argument("number") @Range(min = "1", max = "100") int number
 ) {
-    player.sendMessage(String.format(
-        "I am %d%% hyped for %s!"
-        number,
-        input
+    sender.sendMessage(String.format(
+            "I am %d%% hyped for %s!",
+            number,
+            input
     ));
 }
 ```
@@ -141,37 +141,37 @@ with conflicting dependencies:
 
 ```xml
 <build>
-    <plugins>
-         <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
-                    <relocations>
-                        <relocation>
-                            <pattern>cloud.commandframework</pattern>
-                            <shadedPattern>YOUR.PACKAGE.HERE.shaded.cloud</shadedPattern> <!-- Replace this -->
-                        </relocation>
-                        <relocation>
-                            <pattern>io.leangen.geantyref</pattern>
-                            <shadedPattern>YOUR.PACKAGE.HERE.shaded.typetoken</shadedPattern>  <!-- Replace this -->
-                        </relocation>
-                    </relocations>
-                </configuration>
-            </plugin>
-    </plugins>
+   <plugins>
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-shade-plugin</artifactId>
+         <version>3.2.4</version>
+         <executions>
+            <execution>
+               <phase>package</phase>
+               <goals>
+                  <goal>shade</goal>
+               </goals>
+               <configuration>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+               </configuration>
+            </execution>
+         </executions>
+         <configuration>
+            <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+            <relocations>
+               <relocation>
+                  <pattern>cloud.commandframework</pattern>
+                  <shadedPattern>YOUR.PACKAGE.HERE.shaded.cloud</shadedPattern> <!-- Replace this -->
+               </relocation>
+               <relocation>
+                  <pattern>io.leangen.geantyref</pattern>
+                  <shadedPattern>YOUR.PACKAGE.HERE.shaded.typetoken</shadedPattern> <!-- Replace this -->
+               </relocation>
+            </relocations>
+         </configuration>
+      </plugin>
+   </plugins>
 </build>
 ```
 
