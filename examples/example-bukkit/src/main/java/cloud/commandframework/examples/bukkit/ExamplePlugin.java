@@ -26,8 +26,6 @@ package cloud.commandframework.examples.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.Description;
-import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
-import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandDescription;
@@ -38,8 +36,6 @@ import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.standard.EnumArgument;
@@ -55,20 +51,20 @@ import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.SimpleCaptionRegistry;
-import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.minecraft.extras.ColorArgument;
+import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.types.tuples.Triplet;
-import com.google.common.collect.ImmutableList;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -89,7 +85,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -318,66 +313,29 @@ public final class ExamplePlugin extends JavaPlugin {
                 }).execute()));
 
         //
-        // An Argument Parser for TextColor that accepts NamedTextColor names or RGB colors in the format 'RRGGBB'
-        //
-        final ArgumentParser<CommandSender, TextColor> textColorArgumentParser = (context, inputQueue) -> {
-            final String input = inputQueue.peek();
-            if (input == null) {
-                return ArgumentParseResult.failure(new IllegalArgumentException("No input provided"));
-            }
-            if (NamedTextColor.NAMES.keys().contains(input.toLowerCase())) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(NamedTextColor.NAMES.value(input.toLowerCase()));
-            }
-            final TextColor hex = TextColor.fromHexString("#" + input);
-            if (hex != null) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(hex);
-            }
-            return ArgumentParseResult.failure(new IllegalArgumentException(
-                    "No such color. Try a NamedTextColor or Hex in the format 'RRGGBB'"));
-        };
-
-        //
-        // A Suggestions Provider which returns the list of NamedTextColors
-        //
-        final BiFunction<CommandContext<CommandSender>, String, List<String>> textColorSuggestionsProvider =
-                (context, input) -> ImmutableList.copyOf(NamedTextColor.NAMES.keys());
-
-        //
         // A command to change the color scheme for the help command
         //
         manager.command(builder
                 .meta("description", "Sets the color scheme for '/example help'")
                 .literal("helpcolors")
                 .argument(
-                        manager.argumentBuilder(TextColor.class, "primary")
-                                .withParser(textColorArgumentParser)
-                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        ColorArgument.of("primary"),
                         Description.of("The primary color for the color scheme")
                 )
                 .argument(
-                        manager.argumentBuilder(TextColor.class, "highlight")
-                                .withParser(textColorArgumentParser)
-                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        ColorArgument.of("highlight"),
                         Description.of("The primary color used to highlight commands and queries")
                 )
                 .argument(
-                        manager.argumentBuilder(TextColor.class, "alternate_highlight")
-                                .withParser(textColorArgumentParser)
-                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        ColorArgument.of("alternate_highlight"),
                         Description.of("The secondary color used to highlight commands and queries")
                 )
                 .argument(
-                        manager.argumentBuilder(TextColor.class, "text")
-                                .withParser(textColorArgumentParser)
-                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        ColorArgument.of("text"),
                         Description.of("The color used for description text")
                 )
                 .argument(
-                        manager.argumentBuilder(TextColor.class, "accent")
-                                .withParser(textColorArgumentParser)
-                                .withSuggestionsProvider(textColorSuggestionsProvider),
+                        ColorArgument.of("accent"),
                         Description.of("The color used for accents and symbols")
                 )
                 .handler(c -> minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
@@ -388,6 +346,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         c.get("accent")
                 )))
         );
+
         //
         // Create a Bukkit-like command
         //
