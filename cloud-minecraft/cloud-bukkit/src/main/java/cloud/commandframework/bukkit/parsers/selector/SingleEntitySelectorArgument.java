@@ -130,8 +130,12 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
         ) {
             if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
-                return ArgumentParseResult.failure(
-                        new IllegalArgumentException("Entity selector argument type not supported below Minecraft 1.13."));
+                return ArgumentParseResult.failure(new SelectorParseException(
+                        "",
+                        commandContext,
+                        SelectorParseException.FailureReason.UNSUPPORTED_VERSION,
+                        SingleEntitySelectorParser.class
+                ));
             }
             final String input = inputQueue.peek();
             if (input == null) {
@@ -143,12 +147,21 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
             try {
                 entities = Bukkit.selectEntities(commandContext.get("BukkitCommandSender"), input);
             } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new SelectorParseException(input));
+                return ArgumentParseResult.failure(new SelectorParseException(
+                        input,
+                        commandContext,
+                        SelectorParseException.FailureReason.MALFORMED_SELECTOR,
+                        SingleEntitySelectorParser.class
+                ));
             }
 
             if (entities.size() > 1) {
-                return ArgumentParseResult.failure(
-                        new IllegalArgumentException("More than 1 entity selected in single entity selector."));
+                return ArgumentParseResult.failure(new SelectorParseException(
+                        input,
+                        commandContext,
+                        SelectorParseException.FailureReason.TOO_MANY_ENTITIES,
+                        SingleEntitySelectorParser.class
+                ));
             }
 
             return ArgumentParseResult.success(new SingleEntitySelector(input, entities));
