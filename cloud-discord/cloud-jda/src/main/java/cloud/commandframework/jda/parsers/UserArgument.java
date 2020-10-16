@@ -27,6 +27,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -151,7 +152,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        UserParser.class,
+                        commandContext
+                ));
             }
 
             final JDA jda = commandContext.get("JDA");

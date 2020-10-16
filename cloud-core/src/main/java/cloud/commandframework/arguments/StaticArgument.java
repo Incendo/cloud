@@ -26,6 +26,7 @@ package cloud.commandframework.arguments;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
@@ -112,7 +113,10 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         ) {
             final String string = inputQueue.peek();
             if (string == null) {
-                return ArgumentParseResult.failure(new NullPointerException("No input provided"));
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        StaticArgumentParser.class,
+                        commandContext
+                ));
             }
             if (this.allAcceptedAliases.contains(string)) {
                 inputQueue.remove();
