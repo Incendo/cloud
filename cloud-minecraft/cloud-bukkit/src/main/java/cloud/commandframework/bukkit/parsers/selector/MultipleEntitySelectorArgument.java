@@ -132,8 +132,12 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
         ) {
             if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
-                return ArgumentParseResult.failure(
-                        new IllegalArgumentException("Entity selector argument type not supported below Minecraft 1.13."));
+                return ArgumentParseResult.failure(new SelectorParseException(
+                        "",
+                        commandContext,
+                        SelectorParseException.FailureReason.UNSUPPORTED_VERSION,
+                        MultipleEntitySelectorParser.class
+                ));
             }
             final String input = inputQueue.peek();
             if (input == null) {
@@ -145,7 +149,12 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
             try {
                 entities = Bukkit.selectEntities(commandContext.get("BukkitCommandSender"), input);
             } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new SelectorParseException(input));
+                return ArgumentParseResult.failure(new SelectorParseException(
+                        input,
+                        commandContext,
+                        SelectorParseException.FailureReason.MALFORMED_SELECTOR,
+                        MultipleEntitySelectorParser.class
+                ));
             }
 
             return ArgumentParseResult.success(new MultipleEntitySelector(input, entities));

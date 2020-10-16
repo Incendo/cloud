@@ -57,6 +57,29 @@ public final class BukkitCaptionKeys {
      * Variables: {input}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_WORLD = of("argument.parse.failure.world");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED = of("argument.parse.failure.selector.malformed");
+    /**
+     * Variables: None
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED = of("argument.parse.failure.selector.unsupported");
+    /**
+     * Variables: None
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS = of(
+            "argument.parse.failure.selector.too_many_players");
+    /**
+     * Variables: None
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES = of(
+            "argument.parse.failure.selector.too_many_entities");
+    /**
+     * Variables: None
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER = of(
+            "argument.parse.failure.selector.non_player_in_player_selector");
 
     private BukkitCaptionKeys() {
     }
