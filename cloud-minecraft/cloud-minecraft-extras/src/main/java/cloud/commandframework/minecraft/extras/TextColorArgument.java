@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
@@ -44,11 +45,13 @@ import java.util.Queue;
 import java.util.regex.Pattern;
 
 /**
- * Parser for color codes
+ * Parser for color codes.
+ * <p>
+ * Accepts {@link NamedTextColor NamedTextColors}, Legacy Minecraft {@literal &} color codes, Hex Codes (#RRGGBB)
  *
  * @param <C> Command sender type
  */
-public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
+public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
 
     private static final Pattern LEGACY_PREDICATE = Pattern.compile(
             "&[0-9a-fA-F]"
@@ -77,7 +80,7 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
             Pair.of('f', NamedTextColor.WHITE)
     );
 
-    private ColorArgument(
+    private TextColorArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue
@@ -85,7 +88,7 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
         super(
                 required,
                 name,
-                new ColorArgumentParser<>(),
+                new TextColorParser<>(),
                 defaultValue,
                 TypeToken.get(TextColor.class),
                 null,
@@ -94,14 +97,14 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
     }
 
     /**
-     * Create a new required colour argument
+     * Create a new required TextColor argument
      *
      * @param name Argument name
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull ColorArgument<C> of(final @NonNull String name) {
-        return new ColorArgument<>(
+    public static <C> @NonNull TextColorArgument<C> of(final @NonNull String name) {
+        return new TextColorArgument<>(
                 true,
                 name,
                 ""
@@ -109,14 +112,14 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
     }
 
     /**
-     * Create a new optional colour argument
+     * Create a new optional TextColor argument
      *
      * @param name Argument name
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull ColorArgument<C> optional(final @NonNull String name) {
-        return new ColorArgument<>(
+    public static <C> @NonNull TextColorArgument<C> optional(final @NonNull String name) {
+        return new TextColorArgument<>(
                 false,
                 name,
                 ""
@@ -124,18 +127,18 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
     }
 
     /**
-     * Create a new optional colour argument
+     * Create a new optional TextColor argument
      *
      * @param name         Argument name
      * @param defaultValue Default value
      * @param <C>          Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull ColorArgument<C> optionalWithDefault(
+    public static <C> @NonNull TextColorArgument<C> optionalWithDefault(
             final @NonNull String name,
             final @NonNull String defaultValue
     ) {
-        return new ColorArgument<>(
+        return new TextColorArgument<>(
                 false,
                 name,
                 defaultValue
@@ -143,7 +146,7 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
     }
 
 
-    public static final class ColorArgumentParser<C> implements ArgumentParser<C, TextColor> {
+    public static final class TextColorParser<C> implements ArgumentParser<C, TextColor> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull TextColor> parse(
@@ -152,9 +155,10 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                throw new NullPointerException(
-                        "No input was supplied"
-                );
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        TextColorParser.class,
+                        commandContext
+                ));
             }
             if (LEGACY_PREDICATE.matcher(input).matches()) {
                 final char code = input.substring(1).toLowerCase().charAt(0);
@@ -181,7 +185,7 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
                 );
             }
             return ArgumentParseResult.failure(
-                    new ColorArgumentParseException(
+                    new TextColorParseException(
                             commandContext,
                             input
                     )
@@ -211,14 +215,14 @@ public final class ColorArgument<C> extends CommandArgument<C, TextColor> {
     }
 
 
-    private static final class ColorArgumentParseException extends ParserException {
+    private static final class TextColorParseException extends ParserException {
 
-        private ColorArgumentParseException(
+        private TextColorParseException(
                 final @NonNull CommandContext<?> commandContext,
                 final @NonNull String input
         ) {
             super(
-                    ColorArgumentParser.class,
+                    TextColorParser.class,
                     commandContext,
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_COLOR,
                     CaptionVariable.of("input", input)
