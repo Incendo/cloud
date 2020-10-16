@@ -30,6 +30,7 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -134,7 +135,10 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        SinglePlayerSelectorParser.class,
+                        commandContext
+                ));
             }
             inputQueue.remove();
 

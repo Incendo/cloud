@@ -37,6 +37,10 @@ public final class StandardCaptionKeys {
     private static final Collection<Caption> RECOGNIZED_CAPTIONS = new LinkedList<>();
 
     /**
+     * Variables: None
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED = of("argument.parse.failure.no_input_was_provided");
+    /**
      * Variables: {input}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_BOOLEAN = of("argument.parse.failure.boolean");
