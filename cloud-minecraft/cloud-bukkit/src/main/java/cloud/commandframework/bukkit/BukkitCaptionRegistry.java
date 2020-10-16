@@ -37,21 +37,43 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_ENCHANTMENT = "'{input}' is not a valid enchantment";
     /**
-     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_ENCHANTMENT}
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_MATERIAL}
      */
     public static final String ARGUMENT_PARSE_FAILURE_MATERIAL = "'{input}' is not a valid material name";
     /**
-     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_ENCHANTMENT}
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER}
      */
     public static final String ARGUMENT_PARSE_FAILURE_OFFLINEPLAYER = "No player found for input '{input}'";
     /**
-     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_ENCHANTMENT}
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
      */
     public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "No player found for input '{input}'";
     /**
-     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_ENCHANTMENT}
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_WORLD}
      */
     public static final String ARGUMENT_PARSE_FAILURE_WORLD = "'{input}' is not a valid Minecraft world";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED = "Selector '{input}' is malformed.";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED =
+            "Entity selector argument type not supported below Minecraft 1.13.";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS = "More than 1 player selected in single player selector";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES = "More than 1 entity selected in single entity selector.";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER = "Non-player(s) selected in player selector.";
+
 
     protected BukkitCaptionRegistry() {
         super();
@@ -74,6 +96,26 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
         this.registerMessageFactory(
                 BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_WORLD,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_WORLD
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER
         );
     }
 

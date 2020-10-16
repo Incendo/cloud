@@ -23,21 +23,40 @@
 //
 package cloud.commandframework.bukkit.parsers.selector;
 
+import cloud.commandframework.bukkit.BukkitCaptionKeys;
+import cloud.commandframework.captions.Caption;
+import cloud.commandframework.captions.CaptionVariable;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * EntitySelector parse exception
  */
-public final class SelectorParseException extends IllegalArgumentException {
+public final class SelectorParseException extends ParserException {
 
     private final String input;
 
     /**
      * Construct a new EntitySelector parse exception
      *
-     * @param input String input
+     * @param input   String input
+     * @param context Command context
+     * @param reason  Reason for parse failure
+     * @param parser  The parser class
      */
-    public SelectorParseException(final @NonNull String input) {
+    public SelectorParseException(
+            final @NonNull String input,
+            final @NonNull CommandContext<?> context,
+            final @NonNull FailureReason reason,
+            final @NonNull Class<?> parser
+    ) {
+        super(
+                parser,
+                context,
+                reason.getCaption(),
+                CaptionVariable.of("input", input)
+        );
         this.input = input;
     }
 
@@ -50,9 +69,33 @@ public final class SelectorParseException extends IllegalArgumentException {
         return input;
     }
 
-    @Override
-    public String getMessage() {
-        return String.format("Selector '%s' is malformed.", input);
+    /**
+     * Reasons for which selector parsing may fail
+     */
+    public enum FailureReason {
+
+        UNSUPPORTED_VERSION(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED),
+        MALFORMED_SELECTOR(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED),
+        TOO_MANY_PLAYERS(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS),
+        TOO_MANY_ENTITIES(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES),
+        NON_PLAYER_IN_PLAYER_SELECTOR(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER);
+
+
+        private final Caption caption;
+
+        FailureReason(final @NonNull Caption caption) {
+            this.caption = caption;
+        }
+
+        /**
+         * Get the caption used for this failure reason
+         *
+         * @return The caption
+         */
+        public @NonNull Caption getCaption() {
+            return this.caption;
+        }
+
     }
 
 }

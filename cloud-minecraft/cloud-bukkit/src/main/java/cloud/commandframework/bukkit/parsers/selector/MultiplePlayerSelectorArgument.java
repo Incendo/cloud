@@ -155,12 +155,22 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             try {
                 entities = Bukkit.selectEntities(commandContext.get("BukkitCommandSender"), input);
             } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new SelectorParseException(input));
+                return ArgumentParseResult.failure(new SelectorParseException(
+                        input,
+                        commandContext,
+                        SelectorParseException.FailureReason.MALFORMED_SELECTOR,
+                        MultiplePlayerSelectorParser.class
+                ));
             }
 
             for (Entity e : entities) {
                 if (!(e instanceof Player)) {
-                    return ArgumentParseResult.failure(new IllegalArgumentException("Non-players selected in player selector."));
+                    return ArgumentParseResult.failure(new SelectorParseException(
+                            input,
+                            commandContext,
+                            SelectorParseException.FailureReason.NON_PLAYER_IN_PLAYER_SELECTOR,
+                            MultiplePlayerSelectorParser.class
+                    ));
                 }
             }
 
