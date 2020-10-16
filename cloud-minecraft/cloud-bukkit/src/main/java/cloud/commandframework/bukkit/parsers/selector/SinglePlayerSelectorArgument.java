@@ -153,17 +153,31 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
             try {
                 entities = Bukkit.selectEntities(commandContext.get("BukkitCommandSender"), input);
             } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new SelectorParseException(input));
+                return ArgumentParseResult.failure(new SelectorParseException(
+                        input,
+                        commandContext,
+                        SelectorParseException.FailureReason.MALFORMED_SELECTOR,
+                        SinglePlayerSelectorParser.class
+                ));
             }
 
             for (Entity e : entities) {
                 if (!(e instanceof Player)) {
-                    return ArgumentParseResult.failure(new IllegalArgumentException("Non-players selected in player selector."));
+                    return ArgumentParseResult.failure(new SelectorParseException(
+                            input,
+                            commandContext,
+                            SelectorParseException.FailureReason.NON_PLAYER_IN_PLAYER_SELECTOR,
+                            SinglePlayerSelectorParser.class
+                    ));
                 }
             }
             if (entities.size() > 1) {
-                return ArgumentParseResult.failure(
-                        new IllegalArgumentException("More than 1 player selected in single player selector"));
+                return ArgumentParseResult.failure(new SelectorParseException(
+                        input,
+                        commandContext,
+                        SelectorParseException.FailureReason.TOO_MANY_PLAYERS,
+                        SinglePlayerSelectorParser.class
+                ));
             }
 
             return ArgumentParseResult.success(new SinglePlayerSelector(input, entities));
