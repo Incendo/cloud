@@ -28,6 +28,7 @@ import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Queue;
@@ -89,7 +90,10 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
     ) {
         final String head = strings.peek();
         if (head == null) {
-            throw new NullPointerException("No input");
+            return ArgumentParseResult.failure(new NoInputProvidedException(
+                    RegexPreprocessor.class,
+                    context
+            ));
         }
         if (predicate.test(head)) {
             return ArgumentParseResult.success(true);

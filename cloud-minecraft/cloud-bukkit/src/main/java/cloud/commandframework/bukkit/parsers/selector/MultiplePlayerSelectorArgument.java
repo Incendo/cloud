@@ -30,6 +30,7 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import com.google.common.collect.ImmutableList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -136,7 +137,10 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        MultiplePlayerSelectorParser.class,
+                        commandContext
+                ));
             }
             inputQueue.remove();
 

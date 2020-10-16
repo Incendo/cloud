@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -135,7 +136,10 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NullPointerException("No input was provided"));
+                return ArgumentParseResult.failure(new NoInputProvidedException(
+                        PlayerParser.class,
+                        commandContext
+                ));
             }
             inputQueue.remove();
 
