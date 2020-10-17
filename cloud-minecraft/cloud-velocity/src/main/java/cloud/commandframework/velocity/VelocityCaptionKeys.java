@@ -42,6 +42,11 @@ public final class VelocityCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_PLAYER = of("argument.parse.failure.player");
 
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_SERVER = of("argument.parse.failure.server");
+
     private VelocityCaptionKeys() {
     }
 
