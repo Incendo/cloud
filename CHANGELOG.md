@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added PlayerArgument to cloud-velocity
  - Added TextColorArgument to minecraft-extras
  - Added LocationArgument to cloud-bukkit
+ - Added ServerArgument to cloud-velocity
 
 ## [1.0.1] - 2020-10-14
 

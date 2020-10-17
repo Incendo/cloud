@@ -27,6 +27,7 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.velocity.CloudInjectionModule;
 import cloud.commandframework.velocity.VelocityCommandManager;
 import cloud.commandframework.velocity.arguments.PlayerArgument;
+import cloud.commandframework.velocity.arguments.ServerArgument;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -37,6 +38,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -93,6 +95,21 @@ public final class ExampleVelocityPlugin {
                                     );
                                 }
                         )
+        );
+        commandManager.command(
+                commandManager.commandBuilder("example-server")
+                .argument(ServerArgument.of("server", this.server))
+                .handler(context -> {
+                            final RegisteredServer server = context.get("server");
+                            context.getSender().sendMessage(
+                                    Identity.nil(),
+                                    Component.text().append(
+                                            Component.text("Selected ", NamedTextColor.GOLD)
+                                    ).append(
+                                            Component.text(server.getServerInfo().getName(), NamedTextColor.AQUA)
+                                    ).build()
+                            );
+                })
         );
     }
 

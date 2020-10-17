@@ -38,6 +38,7 @@ import java.util.function.Function;
  * Injection module that allows for {@link VelocityCommandManager} to be injectable
  *
  * @param <C> Command sender type
+ * @since 1.1.0
  */
 public final class CloudInjectionModule<C> extends AbstractModule {
 

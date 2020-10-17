@@ -26,6 +26,8 @@ package cloud.commandframework.examples.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.Description;
+import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandDescription;
@@ -43,6 +45,7 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.BukkitCommandMetaBuilder;
+import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
@@ -54,8 +57,6 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
-import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.tasks.TaskConsumer;
@@ -143,6 +144,18 @@ public final class ExamplePlugin extends JavaPlugin {
                 /* Audience mapper */ this.bukkitAudiences::sender,
                 /* Manager */ this.manager
         );
+        //
+        // Register Brigadier mappings
+        //
+        if (manager.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+            manager.registerBrigadier();
+        }
+        //
+        // Register asynchronous completions
+        //
+        if (manager.queryCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
+            ((PaperCommandManager<CommandSender>) this.manager).registerAsynchronousCompletions();
+        }
         //
         // Create the confirmation manager. This allows us to require certain commands to be
         // confirmed before they can be executed
