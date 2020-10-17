@@ -28,13 +28,13 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
-import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
@@ -56,7 +56,6 @@ import java.util.function.BiFunction;
 public final class LocationArgument<C> extends CommandArgument<C, Location> {
 
     private LocationArgument(
-            final @NonNull BukkitCommandManager<C> bukkitCommandManager,
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -67,7 +66,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
         super(
                 required,
                 name,
-                new LocationParser<>(bukkitCommandManager),
+                new LocationParser<>(),
                 defaultValue,
                 TypeToken.get(Location.class),
                 suggestionsProvider,
@@ -78,32 +77,27 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     /**
      * Create a new argument builder
      *
-     * @param bukkitCommandManager Bukkit command manager
      * @param name                 Argument name
      * @param <C>                  Command sender type
      * @return Builder instance
      */
     public static <C> @NonNull Builder<C> newBuilder(
-            final @NonNull BukkitCommandManager<C> bukkitCommandManager,
             final @NonNull String name
     ) {
-        return new Builder<>(bukkitCommandManager, name);
+        return new Builder<>(name);
     }
 
     /**
      * Create a new required argument
      *
-     * @param bukkitCommandManager Bukkit command manager
      * @param name                 Argument name
      * @param <C>                  Command sender type
      * @return Constructed argument
      */
     public static <C> @NonNull CommandArgument<C, Location> of(
-            final @NonNull BukkitCommandManager<C> bukkitCommandManager,
             final @NonNull String name
     ) {
         return LocationArgument.<C>newBuilder(
-                bukkitCommandManager,
                 name
         ).asRequired().build();
     }
@@ -111,17 +105,14 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     /**
      * Create a new optional argument
      *
-     * @param bukkitCommandManager Bukkit command manager
      * @param name                 Argument name
      * @param <C>                  Command sender type
      * @return Constructed argument
      */
     public static <C> @NonNull CommandArgument<C, Location> optional(
-            final @NonNull BukkitCommandManager<C> bukkitCommandManager,
             final @NonNull String name
     ) {
         return LocationArgument.<C>newBuilder(
-                bukkitCommandManager,
                 name
         ).asOptional().build();
     }
@@ -129,23 +120,18 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Location> {
 
-        private final BukkitCommandManager<C> bukkitCommandManager;
-
         private Builder(
-                final @NonNull BukkitCommandManager<C> bukkitCommandManager,
                 final @NonNull String name
         ) {
             super(
                     TypeToken.get(Location.class),
                     name
             );
-            this.bukkitCommandManager = bukkitCommandManager;
         }
 
         @Override
         public @NonNull CommandArgument<@NonNull C, @NonNull Location> build() {
             return new LocationArgument<>(
-                    this.bukkitCommandManager,
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
@@ -159,18 +145,6 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     public static final class LocationParser<C> implements ArgumentParser<C, Location> {
 
         private final LocationCoordinateParser<C> locationCoordinateParser = new LocationCoordinateParser<>();
-        private final BukkitCommandManager<C> bukkitCommandManager;
-
-        /**
-         * Create a new location parser
-         *
-         * @param bukkitCommandManager Bukkit command manager
-         */
-        public LocationParser(
-                final @NonNull BukkitCommandManager<C> bukkitCommandManager
-        ) {
-            this.bukkitCommandManager = bukkitCommandManager;
-        }
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull Location> parse(
@@ -205,11 +179,12 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                 coordinates[i] = coordinate.getParsedValue().orElseThrow(NullPointerException::new);
             }
             final Location originalLocation;
-            final CommandSender mappedSender = this.bukkitCommandManager.getBackwardsCommandSenderMapper()
-                    .apply(commandContext.getSender());
+            final CommandSender bukkitSender = commandContext.get("BukkitCommandSender");
 
-            if (mappedSender instanceof Entity) {
-                originalLocation = ((Entity) mappedSender).getLocation();
+            if (bukkitSender instanceof BlockCommandSender) {
+                originalLocation = ((BlockCommandSender) bukkitSender).getBlock().getLocation();
+            } else if (bukkitSender instanceof Entity) {
+                originalLocation = ((Entity) bukkitSender).getLocation();
             } else {
                 originalLocation = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
             }
@@ -247,7 +222,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
             }
 
             if (coordinates[2].getType() == LocationCoordinateType.ABSOLUTE) {
-                originalLocation.setX(coordinates[2].getCoordinate());
+                originalLocation.setZ(coordinates[2].getCoordinate());
             } else if (coordinates[2].getType() == LocationCoordinateType.RELATIVE) {
                 originalLocation.add(0, 0, coordinates[2].getCoordinate());
             } else {

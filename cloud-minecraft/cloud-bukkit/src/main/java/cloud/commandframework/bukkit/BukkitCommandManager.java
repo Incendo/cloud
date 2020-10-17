@@ -150,7 +150,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
                 new EnchantmentArgument.EnchantmentParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
-                new LocationArgument.LocationParser<>(this));
+                new LocationArgument.LocationParser<>());
         /* Register Entity Selector Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());
