@@ -25,15 +25,31 @@ package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.bungee.arguments.PlayerArgument;
+import cloud.commandframework.bungee.arguments.ServerArgument;
+import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import io.leangen.geantyref.TypeToken;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Function;
 
 public class BungeeCommandManager<C> extends CommandManager<C> {
+
+    /**
+     * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
+
+    /**
+     * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
 
     private final Plugin owningPlugin;
     private final Function<CommandSender, C> commandSenderMapper;
@@ -46,7 +62,6 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
      * @param commandExecutionCoordinator  Coordinator provider
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
-     * @throws Exception If the construction of the manager fails
      */
     public BungeeCommandManager(
             final @NonNull Plugin owningPlugin,
@@ -54,13 +69,32 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
                     @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
-    )
-            throws Exception {
+    ) {
         super(commandExecutionCoordinator, new BungeePluginRegistrationHandler<>());
         ((BungeePluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+
+        /* Register Bungee Parsers */
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(ProxiedPlayer.class), parserParameters ->
+                new PlayerArgument.PlayerParser<>(owningPlugin.getProxy()));
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(ServerInfo.class), parserParameters ->
+                new ServerArgument.ServerParser<>(owningPlugin.getProxy()));
+
+        /* Register default captions */
+        if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
+            final FactoryDelegatingCaptionRegistry<C> factoryDelegatingCaptionRegistry = (FactoryDelegatingCaptionRegistry<C>)
+                    this.getCaptionRegistry();
+            factoryDelegatingCaptionRegistry.registerMessageFactory(
+                    BungeeCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
+                    (context, key) -> ARGUMENT_PARSE_FAILURE_PLAYER
+            );
+            factoryDelegatingCaptionRegistry.registerMessageFactory(
+                    BungeeCaptionKeys.ARGUMENT_PARSE_FAILURE_SERVER,
+                    (context, key) -> ARGUMENT_PARSE_FAILURE_SERVER
+            );
+        }
     }
 
     @Override
