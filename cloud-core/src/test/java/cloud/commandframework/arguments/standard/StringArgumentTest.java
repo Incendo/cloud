@@ -30,6 +30,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.CompletionException;
+
 class StringArgumentTest {
 
     private static final String[] storage = new String[2];
@@ -85,6 +87,13 @@ class StringArgumentTest {
         manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted");
         Assertions.assertEquals("quoted", storage[0]);
         Assertions.assertEquals("unquoted", storage[1]);
+        clear();
+        manager.executeCommand(new TestCommandSender(), "quoted \"quoted \\\" string\" unquoted").join();
+        Assertions.assertEquals("quoted \" string", storage[0]);
+        Assertions.assertEquals("unquoted", storage[1]);
+        clear();
+        Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(new TestCommandSender(),
+                "'quoted quoted unquoted").join());
     }
 
     @Test
