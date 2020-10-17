@@ -71,6 +71,8 @@ public final class SelectorParseException extends ParserException {
 
     /**
      * Reasons for which selector parsing may fail
+     *
+     * @since 1.1.0
      */
     public enum FailureReason {
 

@@ -29,6 +29,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * An exception which is thrown when an argument's input is unexpectedly null or empty
+ *
+ * @since 1.1.0
  */
 public class NoInputProvidedException extends ParserException {
 

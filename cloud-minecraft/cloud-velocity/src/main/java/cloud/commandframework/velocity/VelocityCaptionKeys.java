@@ -32,6 +32,7 @@ import java.util.LinkedList;
 
 /**
  * Velocity specific {@link Caption caption keys}
+ * @since 1.1.0
  */
 public final class VelocityCaptionKeys {
 
