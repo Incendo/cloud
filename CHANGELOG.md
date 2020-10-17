@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added LocationArgument to cloud-bukkit
  - Added ServerArgument to cloud-velocity
 
+### Fixed
+ - Fixed quoted parsing in StringArgument
+
 ## [1.0.1] - 2020-10-14
 
 ### Changes
