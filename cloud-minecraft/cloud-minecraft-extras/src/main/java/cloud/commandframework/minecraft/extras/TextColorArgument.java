@@ -50,6 +50,7 @@ import java.util.regex.Pattern;
  * Accepts {@link NamedTextColor NamedTextColors}, Legacy Minecraft {@literal &} color codes, Hex Codes (#RRGGBB)
  *
  * @param <C> Command sender type
+ * @since 1.1.0
  */
 public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
 

@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
  * Argument parser for {@link RegisteredServer servers}
  *
  * @param <C> Command sender type
+ * @since 1.1.0
  */
 public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer> {
 
