@@ -59,6 +59,7 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
+import cloud.commandframework.tasks.TaskConsumer;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.identity.Identity;
@@ -445,6 +446,15 @@ public final class ExamplePlugin extends JavaPlugin {
                 Component.text().append(Component.text("You have been given ", NamedTextColor.AQUA))
                         .append(Component.text(money, NamedTextColor.GOLD))
         );
+    }
+
+    @CommandMethod("example teleport complex <location>")
+    private void teleportComplex(
+            final @NonNull Player sender,
+            final @NonNull @Argument("location") Location location
+    ) {
+        this.manager.taskRecipe().begin(location).synchronous((@NonNull TaskConsumer<Location>) sender::teleport)
+                .execute(() -> sender.sendMessage("You have been teleported!"));
     }
 
 }
