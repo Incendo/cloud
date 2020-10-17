@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixes
  - Fixes chained optionals not allowing the command to be executed when more than one optional is omitted
 
+### Fixed
+ - Fixed quoted parsing in StringArgument
+
 ## [1.0.1] - 2020-10-14
 
 ### Changes

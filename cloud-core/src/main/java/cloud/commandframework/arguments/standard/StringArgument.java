@@ -37,9 +37,14 @@ import java.util.List;
 import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public final class StringArgument<C> extends CommandArgument<C, String> {
+
+    private static final Pattern QUOTED_DOUBLE = Pattern.compile("\"(?<inner>(?:[^\"\\\\]|\\\\.)*)\"");
+    private static final Pattern QUOTED_SINGLE = Pattern.compile("'(?<inner>(?:[^'\\\\]|\\\\.)*)'");
 
     private final StringMode stringMode;
 
@@ -305,6 +310,40 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(input);
+            } else if (this.stringMode == StringMode.QUOTED) {
+                final StringJoiner sj = new StringJoiner(" ");
+                for (final String string : inputQueue) {
+                    sj.add(string);
+                }
+                final String string = sj.toString();
+
+                Matcher matcher = QUOTED_DOUBLE.matcher(string);
+                String inner = null;
+                if (matcher.find()) {
+                    inner = matcher.group("inner");
+                } else {
+                    matcher = QUOTED_SINGLE.matcher(string);
+                    if (matcher.find()) {
+                        inner = matcher.group("inner");
+                    }
+                }
+
+                if (inner != null) {
+                    final int numSpaces = (int) inner.chars().filter(c -> c == ' ').count();
+                    for (int i = 0; i <= numSpaces; i++) {
+                        inputQueue.remove();
+                    }
+                } else {
+                    inner = inputQueue.remove();
+                    if (inner.startsWith("\"") || inner.startsWith("'")) {
+                        return ArgumentParseResult.failure(new StringParseException(sj.toString(),
+                                StringMode.QUOTED, commandContext));
+                    }
+                }
+
+                inner = inner.replace("\\\"", "\"").replace("\\\'", "\"");
+
+                return ArgumentParseResult.success(inner);
             }
 
             final StringJoiner sj = new StringJoiner(" ");
@@ -321,31 +360,8 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     break;
                 }
 
-                if (this.stringMode == StringMode.QUOTED) {
-                    if (!started) {
-                        if (string.startsWith("\"") || string.startsWith("'")) {
-                            start = string.charAt(0);
-                            string = string.substring(1);
-                            started = true;
-                        } else {
-                            /* Just read a single string instead */
-                            inputQueue.remove();
-                            return ArgumentParseResult.success(string);
-                        }
-                    } else if (string.endsWith(Character.toString(start))) {
-                        sj.add(string.substring(0, string.length() - 1));
-                        inputQueue.remove();
-                        finished = true;
-                        break;
-                    }
-                }
-
                 sj.add(string);
                 inputQueue.remove();
-            }
-
-            if (this.stringMode == StringMode.QUOTED && !finished) {
-                return ArgumentParseResult.failure(new StringParseException(sj.toString(), StringMode.QUOTED, commandContext));
             }
 
             return ArgumentParseResult.success(sj.toString());
