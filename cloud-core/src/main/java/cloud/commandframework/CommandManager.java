@@ -99,8 +99,17 @@ public abstract class CommandManager<C> {
     /**
      * Create a new command manager instance
      *
-     * @param commandExecutionCoordinator Execution coordinator instance
-     * @param commandRegistrationHandler  Command registration handler
+     * @param commandExecutionCoordinator Execution coordinator instance. The coordinator is in charge of executing incoming
+     *                                    commands. Some considerations must be made when picking a suitable execution coordinator
+     *                                    for your platform. For example, an entirely asynchronous coordinator is not suitable
+     *                                    when the parsers used in that particular platform are not thread safe. If you have
+     *                                    commands that perform blocking operations, however, it might not be a good idea to
+     *                                    use a synchronous execution coordinator. In most cases you will want to pick between
+     *                                    {@link CommandExecutionCoordinator#simpleCoordinator()} and
+     *                                    {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}
+     * @param commandRegistrationHandler  Command registration handler. This will get called every time a new command is
+     *                                    registered to the command manager. This may be used to forward command registration
+     *                                    to the platform.
      */
     public CommandManager(
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
@@ -110,19 +119,35 @@ public abstract class CommandManager<C> {
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
         this.commandSuggestionEngine = new DelegatingCommandSuggestionEngineFactory<>(this).create();
+        /* Register service types */
         this.servicePipeline.registerServiceType(new TypeToken<CommandPreprocessor<C>>() {
         }, new AcceptingCommandPreprocessor<>());
         this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
         }, new AcceptingCommandPostprocessor<>());
+        /* Create the caption registry */
         this.captionRegistry = new SimpleCaptionRegistryFactory<C>().create();
     }
 
     /**
-     * Execute a command and get a future that completes with the result
+     * Execute a command and get a future that completes with the result. The command may be executed immediately
+     * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
+     * <p>
+     * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
+     * or by the {@link CommandArgument} command arguments during parsing. The execution may also be filtered out
+     * after parsing by a {@link CommandPostprocessor}. In the case that a command was filtered out at any of the
+     * execution stages, the future will complete with {@code null}.
+     * <p>
+     * The future may also complete exceptionally. The command manager contains some utilities that allow users to
+     * register exception handlers ({@link #registerExceptionHandler(Class, BiConsumer)} and these can be retrieved using
+     * {@link #getExceptionHandler(Class)}, or used with {@link #handleException(Object, Class, Exception, BiConsumer)}. It
+     * is highly recommended that these methods are used in the command manager, as it allows users of the command manager
+     * to override the exception handling as they wish.
      *
      * @param commandSender Sender of the command
-     * @param input         Input provided by the sender
-     * @return Command result
+     * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
+     *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
+     * @return future that completes with the command result, or {@code null} if the execution was cancelled at any of the
+     *         processing stages.
      */
     public @NonNull CompletableFuture<CommandResult<C>> executeCommand(
             final @NonNull C commandSender,
@@ -148,11 +173,13 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get command suggestions for the "next" argument that would yield a correctly
-     * parsing command input
+     * Get command suggestions for the "next" argument that would yield a correctly parsing command input. The command
+     * suggestions provided by the command argument parsers will be filtered using the {@link CommandSuggestionProcessor}
+     * before being returned.
      *
      * @param commandSender Sender of the command
-     * @param input         Input provided by the sender
+     * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
+     *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
      * @return List of suggestions
      */
     public @NonNull List<@NonNull String> suggest(
@@ -168,10 +195,16 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Register a new command
+     * Register a new command to the command manager and insert it into the underlying command tree. The command will be
+     * forwarded to the {@link CommandRegistrationHandler} and will, depending on the platform, be forwarded to the platform.
+     * <p>
+     * Different command manager implementations have different requirements for the command registration. It is possible
+     * that a command manager may only allow registration during certain stages of the application lifetime. Read the platform
+     * command manager documentation to find out more about your particular platform
      *
      * @param command Command to register
-     * @return The command manager instance
+     * @return The command manager instance. This is returned so that these method calls may be chained. This will always
+     *         return {@code this}.
      */
     public @NonNull CommandManager<C> command(final @NonNull Command<C> command) {
         this.commandTree.insertCommand(command);
@@ -259,7 +292,8 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Replace the caption registry
+     * Replace the caption registry. Some platforms may inject their own captions into the default registry,
+     * and so you may need to insert these captions yourself if you do decide to replace the caption registry.
      *
      * @param captionRegistry New caption registry
      */
@@ -271,6 +305,7 @@ public abstract class CommandManager<C> {
      * Replace the default caption registry
      *
      * @param captionRegistry Caption registry to use
+     * @deprecated Use {@link #setCaptionRegistry(CaptionRegistry)} These methods are identical.
      */
     public final void registerDefaultCaptions(final @NonNull CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
@@ -712,10 +747,11 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Set the setting
+     * Update a command manager setting
      *
-     * @param setting Setting to set
-     * @param value   Value
+     * @param setting Setting to update
+     * @param value   Value. In most cases {@code true} will enable a feature, whereas {@code false} will disable it.
+     *                The value passed to the method will be reflected in {@link #getSetting(ManagerSettings)}
      * @see #getSetting(ManagerSettings) Get a manager setting
      */
     @SuppressWarnings("unused")
