@@ -73,7 +73,11 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER}
      */
     public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER = "Non-player(s) selected in player selector.";
-
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_LOCATION =
+            "'{input}' is not a valid location. Required format is '<x> <y> <z>'";
 
     protected BukkitCaptionRegistry() {
         super();
@@ -116,6 +120,10 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
         this.registerMessageFactory(
                 BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_LOCATION
         );
     }
 

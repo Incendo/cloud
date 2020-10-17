@@ -40,6 +40,11 @@ import java.util.Queue;
 public interface ArgumentParser<C, T> {
 
     /**
+     * Default amount of arguments that the parser expects to consume
+     */
+    int DEFAULT_ARGUMENT_COUNT = 1;
+
+    /**
      * Parse command input into a command result
      *
      * @param commandContext Command context
@@ -73,6 +78,16 @@ public interface ArgumentParser<C, T> {
      */
     default boolean isContextFree() {
         return false;
+    }
+
+    /**
+     * Get the amount of arguments that this parsers seeks to
+     * consume
+     *
+     * @return The number of arguments tha the parser expects
+     */
+    default int getRequestedArgumentCount() {
+        return DEFAULT_ARGUMENT_COUNT;
     }
 
 }
