@@ -190,7 +190,18 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
             this.max = max;
         }
 
-        static @NonNull List<@NonNull String> getSuggestions(final long min, final long max, final @NonNull String input) {
+        /**
+         * Get integer suggestions. This supports both positive and negative numbers
+         *
+         * @param min   Minimum value
+         * @param max   Maximum value
+         * @param input Input
+         * @return List of suggestions
+         */
+        public static @NonNull List<@NonNull String> getSuggestions(
+                final long min,
+                final long max,
+                final @NonNull String input) {
             final Set<Long> numbers = new TreeSet<>();
 
             try {
