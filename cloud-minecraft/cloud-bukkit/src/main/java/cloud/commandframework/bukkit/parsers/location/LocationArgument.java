@@ -46,6 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * Argument parser that parses {@link Location} from three doubles. This will use the command
@@ -143,6 +144,8 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     }
 
     public static final class LocationParser<C> implements ArgumentParser<C, Location> {
+
+        private static final int EXPECTED_PARAMETER_COUNT = 3;
 
         private final LocationCoordinateParser<C> locationCoordinateParser = new LocationCoordinateParser<>();
 
@@ -258,16 +261,24 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                 final @NonNull String input
         ) {
             final String workingInput;
+            final String prefix;
             if (input.startsWith("~") || input.startsWith("^")) {
+                prefix = Character.toString(input.charAt(0));
                 workingInput = input.substring(1);
             } else {
+                prefix = "";
                 workingInput = input;
             }
             return IntegerArgument.IntegerParser.getSuggestions(
                     Integer.MIN_VALUE,
                     Integer.MAX_VALUE,
                     workingInput
-            );
+            ).stream().map(string -> prefix + string).collect(Collectors.toList());
+        }
+
+        @Override
+        public int getRequestedArgumentCount() {
+            return EXPECTED_PARAMETER_COUNT;
         }
 
     }

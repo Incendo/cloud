@@ -462,7 +462,7 @@ public final class CommandTree<C> {
                     commandQueue.remove();
                 }
             } else if (child.getValue() != null) {
-                for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1; i++) {
+                for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1 && commandQueue.size()> 1; i++) {
                     commandContext.store(
                             String.format("%s_%d", child.getValue().getName(), i),
                             commandQueue.remove()
