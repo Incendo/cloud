@@ -25,6 +25,8 @@ package cloud.commandframework.bukkit.parsers.location;
 
 /**
  * Type of location coordinates
+ *
+ * @since 1.1.0
  */
 public enum LocationCoordinateType {
     /**

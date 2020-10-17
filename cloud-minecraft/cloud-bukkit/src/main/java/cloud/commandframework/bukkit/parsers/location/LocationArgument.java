@@ -53,6 +53,7 @@ import java.util.stream.Collectors;
  * senders world when it exists, or else it'll use the first loaded Bukkit world
  *
  * @param <C> Command sender type
+ * @since 1.1.0
  */
 public final class LocationArgument<C> extends CommandArgument<C, Location> {
 
@@ -151,7 +152,8 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull Location> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext, @NonNull final Queue<@NonNull String> inputQueue
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
         ) {
             if (inputQueue.size() < 3) {
                 final StringBuilder input = new StringBuilder();

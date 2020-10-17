@@ -37,6 +37,7 @@ import java.util.Queue;
  * A single coordinate, meant to be used as an element in a position vector
  *
  * @param <C> Command sender type
+ * @since 1.1.0
  */
 public final class LocationCoordinateParser<C> implements ArgumentParser<C, LocationCoordinate> {
 

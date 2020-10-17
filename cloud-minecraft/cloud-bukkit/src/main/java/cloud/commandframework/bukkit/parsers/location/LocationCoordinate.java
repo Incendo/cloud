@@ -29,6 +29,8 @@ import java.util.Objects;
 
 /**
  * Single coordinate with a type
+ *
+ * @since 1.1.0
  */
 public final class LocationCoordinate {
 
