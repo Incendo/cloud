@@ -30,6 +30,7 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import cloud.commandframework.util.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
@@ -317,19 +318,30 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 }
                 final String string = sj.toString();
 
-                Matcher matcher = QUOTED_DOUBLE.matcher(string);
+                final Matcher doubleMatcher = QUOTED_DOUBLE.matcher(string);
+                String doubleMatch = null;
+                if (doubleMatcher.find()) {
+                    doubleMatch = doubleMatcher.group("inner");
+                }
+                final Matcher singleMatcher = QUOTED_SINGLE.matcher(string);
+                String singleMatch = null;
+                if (singleMatcher.find()) {
+                    singleMatch = singleMatcher.group("inner");
+                }
+
                 String inner = null;
-                if (matcher.find()) {
-                    inner = matcher.group("inner");
-                } else {
-                    matcher = QUOTED_SINGLE.matcher(string);
-                    if (matcher.find()) {
-                        inner = matcher.group("inner");
-                    }
+                if (singleMatch != null && doubleMatch != null) {
+                    final int singleIndex = string.indexOf(singleMatch);
+                    final int doubleIndex = string.indexOf(doubleMatch);
+                    inner = doubleIndex < singleIndex ? doubleMatch : singleMatch;
+                } else if (singleMatch == null && doubleMatch != null) {
+                    inner = doubleMatch;
+                } else if (singleMatch != null) {
+                    inner = singleMatch;
                 }
 
                 if (inner != null) {
-                    final int numSpaces = (int) inner.chars().filter(c -> c == ' ').count();
+                    final int numSpaces = StringUtils.countCharOccurrences(inner, ' ');
                     for (int i = 0; i <= numSpaces; i++) {
                         inputQueue.remove();
                     }
@@ -341,7 +353,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     }
                 }
 
-                inner = inner.replace("\\\"", "\"").replace("\\\'", "\"");
+                inner = inner.replace("\\\"", "\"").replace("\\'", "'");
 
                 return ArgumentParseResult.success(inner);
             }
