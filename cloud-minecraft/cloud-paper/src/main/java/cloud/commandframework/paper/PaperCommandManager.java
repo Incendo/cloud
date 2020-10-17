@@ -44,8 +44,32 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
     /**
      * Construct a new Paper command manager
      *
-     * @param owningPlugin                 Plugin that is constructing the manager
-     * @param commandExecutionCoordinator  Coordinator provider
+     * @param owningPlugin                 Plugin that is constructing the manager. This will be used when registering the
+     *                                     commands to the Bukkit command map.
+     * @param commandExecutionCoordinator  Execution coordinator instance. The coordinator is in charge of executing incoming
+     *                                     commands. Some considerations must be made when picking a suitable execution
+     *                                     coordinator. For example, an entirely asynchronous coordinator is not suitable
+     *                                     when the parsers used in your commands are not thread safe. If you have
+     *                                     commands that perform blocking operations, however, it might not be a good idea to
+     *                                     use a synchronous execution coordinator. In most cases you will want to pick between
+     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}.
+     *                                     <p>
+     *                                     A word of caution: When using the asynchronous command executor in Bukkit, it is very
+     *                                     likely that you will have to perform manual synchronization when executing the commands
+     *                                     in many cases, as Bukkit makes no guarantees of thread safety in common classes. To
+     *                                     make this easier, {@link #taskRecipe()} is provided. Furthermore, it may be unwise to
+     *                                     use asynchronous command parsing, especially when dealing with things such as players
+     *                                     and entities. To make this more safe, the asynchronous command execution allows you
+     *                                     to state that you want synchronous command parsing.
+     *                                     <p>
+     *                                     The execution coordinator will not have an impact on command suggestions. More
+     *                                     specifically, using an asynchronous command executor does not mean that command
+     *                                     suggestions will be provided asynchronously. Instead, use
+     *                                     {@link #registerAsynchronousCompletions()} to register asynchronous completions. This
+     *                                     will only work on Paper servers. Be aware that cloud does not synchronize the command
+     *                                     suggestions for you, and this should only be used if your command suggestion providers
+     *                                     are thread safe.
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
@@ -89,12 +113,16 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * is up to the caller to guarantee that such is the case
      *
      * @throws IllegalStateException when the server does not support asynchronous completions.
+     * @see #queryCapability(CloudBukkitCapabilities) Check if the capability is present
      */
     public void registerAsynchronousCompletions() throws IllegalStateException {
         if (!this.queryCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             throw new IllegalStateException("Failed to register asynchronous command completion listener.");
         }
-        Bukkit.getServer().getPluginManager().registerEvents(new AsyncCommandSuggestionsListener<>(this), this.getOwningPlugin());
+        Bukkit.getServer().getPluginManager().registerEvents(
+                new AsyncCommandSuggestionsListener<>(this),
+                this.getOwningPlugin()
+        );
     }
 
 }
