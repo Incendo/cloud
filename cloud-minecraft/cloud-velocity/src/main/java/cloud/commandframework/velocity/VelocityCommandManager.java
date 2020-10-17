@@ -54,6 +54,11 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
 
+    /**
+     * Default caption for {@link VelocityCaptionKeys#ARGUMENT_PARSE_FAILURE_SERVER}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
+
     private final ProxyServer proxyServer;
     private final Function<CommandSource, C> commandSenderMapper;
     private final Function<C, CommandSource> backwardsCommandSenderMapper;
@@ -82,8 +87,14 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
         if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
             final FactoryDelegatingCaptionRegistry<C> factoryDelegatingCaptionRegistry = (FactoryDelegatingCaptionRegistry<C>)
                     this.getCaptionRegistry();
-            factoryDelegatingCaptionRegistry.registerMessageFactory(VelocityCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
-                    (context, key) -> ARGUMENT_PARSE_FAILURE_PLAYER);
+            factoryDelegatingCaptionRegistry.registerMessageFactory(
+                    VelocityCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
+                    (context, key) -> ARGUMENT_PARSE_FAILURE_PLAYER
+            );
+            factoryDelegatingCaptionRegistry.registerMessageFactory(
+                    VelocityCaptionKeys.ARGUMENT_PARSE_FAILURE_SERVER,
+                    (context, key) -> ARGUMENT_PARSE_FAILURE_SERVER
+            );
         }
     }
 
