@@ -451,30 +451,28 @@ public final class CommandTree<C> {
                         commandContext.store("__parsing_argument__", i + 2);
                     }
                 }
-            }
-            // END: Compound arguments
-
-            // START: Flags
-            if (child.getValue() instanceof FlagArgument) {
+            } else if (child.getValue() instanceof FlagArgument) {
                 /* Remove all but last */
                 while (commandQueue.size() > 1) {
                     commandContext.store(FlagArgument.FLAG_META, commandQueue.remove());
                 }
-            }
-            // END: Flags
-
-            // START: Array arguments
-            if (child.getValue() != null && GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
+            } else if (child.getValue() != null
+                    && GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
                 while (commandQueue.size() > 1) {
                     commandQueue.remove();
                 }
+            } else if (child.getValue() != null) {
+                for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1; i++) {
+                    commandContext.store(
+                            String.format("%s_%d", child.getValue().getName(), i),
+                            commandQueue.remove()
+                    );
+                }
             }
-            // END: Array arguments
 
             if (child.getValue() != null) {
                 if (commandQueue.isEmpty()) {
                     return Collections.emptyList();
-                    // return child.getValue().getParser().suggestions(commandContext, "");
                 } else if (child.isLeaf() && commandQueue.size() < 2) {
                     return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
                 } else if (child.isLeaf()) {
