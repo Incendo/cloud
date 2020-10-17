@@ -80,6 +80,10 @@ public final class BukkitCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER = of(
             "argument.parse.failure.selector.non_player_in_player_selector");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_LOCATION = of("argument.parse.failure.location");
 
     private BukkitCaptionKeys() {
     }

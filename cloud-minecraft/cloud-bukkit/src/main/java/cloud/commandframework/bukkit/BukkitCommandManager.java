@@ -34,6 +34,7 @@ import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
+import cloud.commandframework.bukkit.parsers.location.LocationArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
@@ -43,6 +44,7 @@ import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -163,6 +165,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
                 new OfflinePlayerArgument.OfflinePlayerParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
                 new EnchantmentArgument.EnchantmentParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
+                new LocationArgument.LocationParser<>());
         /* Register Entity Selector Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());

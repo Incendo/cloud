@@ -30,6 +30,7 @@ import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -84,6 +85,8 @@ public final class BukkitBrigadierMapper<C> {
             this.mapComplexNMS(SinglePlayerSelector.class, this.getEntitySelectorArgument(true, true));
             this.mapComplexNMS(MultipleEntitySelector.class, this.getEntitySelectorArgument(false, false));
             this.mapComplexNMS(MultiplePlayerSelector.class, this.getEntitySelectorArgument(false, true));
+            /* Map Vec3 */
+            this.mapComplexNMS(Location.class, this.getArgumentVec3());
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin()
                     .getLogger()
@@ -107,6 +110,18 @@ public final class BukkitBrigadierMapper<C> {
                 return (ArgumentType<?>) constructor.newInstance(single, playersOnly);
             } catch (final Exception e) {
                 this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Selector Argument", e);
+                return null;
+            }
+        };
+    }
+
+    private Supplier<ArgumentType<?>> getArgumentVec3() {
+        return () -> {
+            try {
+                return (ArgumentType<?>) this.getNMSArgument("Vec3").getDeclaredConstructor(boolean.class)
+                        .newInstance(true);
+            } catch (final Exception e) {
+                this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve vector argument", e);
                 return null;
             }
         };
