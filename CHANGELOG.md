@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added ServerArgument to cloud-velocity
  - Added LockableCommandManager to cloud-core
  - Added VelocityCommandPreprocessor to cloud-velocity
+ - Added PlayerArgument to cloud-bungee
+ - Added ServerArgument to cloud-bungee
+ - Added ExampleBungeePlugin
+ - Added CaptionKeys to cloud-bungee
 
 ## [1.0.2] - 2020-10-18
 
