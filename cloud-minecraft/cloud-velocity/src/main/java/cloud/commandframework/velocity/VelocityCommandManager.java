@@ -29,11 +29,16 @@ import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.velocity.arguments.PlayerArgument;
+import cloud.commandframework.velocity.arguments.ServerArgument;
 import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Function;
@@ -83,6 +88,13 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
         this.proxyServer = proxyServer;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+
+        /* Register Velocity Parsers */
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
+                new PlayerArgument.PlayerParser<>(proxyServer));
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(RegisteredServer.class), parserParameters ->
+                new ServerArgument.ServerParser<>(proxyServer));
+
         /* Register default captions */
         if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
             final FactoryDelegatingCaptionRegistry<C> factoryDelegatingCaptionRegistry = (FactoryDelegatingCaptionRegistry<C>)
