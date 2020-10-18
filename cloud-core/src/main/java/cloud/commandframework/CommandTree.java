@@ -436,7 +436,6 @@ public final class CommandTree<C> {
             // The value has to be a variable
             final Node<CommandArgument<C, ?>> child = children.get(0);
 
-            // START: Compound arguments
             /* When we get in here, we need to treat compound arguments a little differently */
             if (child.getValue() instanceof CompoundArgument) {
                 @SuppressWarnings("unchecked") final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) child
@@ -461,8 +460,10 @@ public final class CommandTree<C> {
                 while (commandQueue.size() > 1) {
                     commandQueue.remove();
                 }
-            } else if (child.getValue() != null) {
-                for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1 && commandQueue.size()> 1; i++) {
+            } else if (child.getValue() != null
+                    && commandQueue.size() <= child.getValue().getParser().getRequestedArgumentCount()) {
+                for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1
+                        && commandQueue.size() > 1; i++) {
                     commandContext.store(
                             String.format("%s_%d", child.getValue().getName(), i),
                             commandQueue.remove()
