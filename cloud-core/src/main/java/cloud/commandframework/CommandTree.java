@@ -287,7 +287,20 @@ public final class CommandTree<C> {
                     if (child.getValue().hasDefaultValue()) {
                         commandQueue.add(child.getValue().getDefaultValue());
                     } else if (!child.getValue().isRequired()) {
-                        return Pair.of(this.cast(child.getValue().getOwningCommand()), null);
+                        if (child.getValue().getOwningCommand() == null) {
+                            /*
+                             * If there are multiple children with different owning commands then it's ambiguous and
+                             * not allowed, therefore we're able to pick any child command, as long as we can find it
+                             */
+                            Node<CommandArgument<C, ?>> node = child;
+                            while (!node.isLeaf()) {
+                                node = node.getChildren().get(0);
+                                if (node.getValue() != null && node.getValue().getOwningCommand() != null) {
+                                    child.getValue().setOwningCommand(node.getValue().getOwningCommand());
+                                }
+                            }
+                        }
+                        return Pair.of(child.getValue().getOwningCommand(), null);
                     } else if (child.isLeaf()) {
                         if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
                             final Command<C> command = root.getValue().getOwningCommand();

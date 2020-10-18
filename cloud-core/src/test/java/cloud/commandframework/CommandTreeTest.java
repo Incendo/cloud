@@ -143,6 +143,13 @@ class CommandTreeTest {
                                 .addPreprocessor(RegexPreprocessor.of("[A-Za-z]{3,5}"))
                 )
         );
+
+        /* Build command for testing multiple optionals */
+        manager.command(
+                manager.commandBuilder("optionals")
+                       .argument(StringArgument.optional("opt1"))
+                       .argument(StringArgument.optional("opt2"))
+        );
     }
 
     @Test
@@ -299,6 +306,11 @@ class CommandTreeTest {
                 CompletionException.class,
                 () -> manager.executeCommand(new TestCommandSender(), "preprocess ab").join()
         );
+    }
+
+    @Test
+    void testOptionals() {
+        manager.executeCommand(new TestCommandSender(), "optionals").join();
     }
 
 
