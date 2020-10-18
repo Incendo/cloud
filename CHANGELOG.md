@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
  - Fixed quoted parsing in StringArgument
+ - Fixed wrong suggestions following invalid literals
 
 ## [1.0.1] - 2020-10-14
 
