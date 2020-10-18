@@ -526,14 +526,23 @@ public final class CommandTree<C> {
                         }
                     }
                 }
+                if (commandQueue.size() > 1) {
+                    /*
+                     * In this case we were unable to match any of the literals, and so we cannot
+                     * possibly attempt to match any of its children (which is what we want, according
+                     * to the input queue). Because of this, we terminate immediately
+                     */
+                    return Collections.emptyList();
+                }
             }
             final List<String> suggestions = new LinkedList<>();
             for (final Node<CommandArgument<C, ?>> argument : root.getChildren()) {
                 if (argument.getValue() == null || this.isPermitted(commandContext.getSender(), argument) != null) {
                     continue;
                 }
-                suggestions.addAll(argument.getValue().getSuggestionsProvider()
-                        .apply(commandContext, stringOrEmpty(commandQueue.peek())));
+                final List<String> suggestionsToAdd = argument.getValue().getSuggestionsProvider()
+                        .apply(commandContext, stringOrEmpty(commandQueue.peek()));
+                suggestions.addAll(suggestionsToAdd);
             }
             return suggestions;
         }
