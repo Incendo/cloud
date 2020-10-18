@@ -191,6 +191,19 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Arrays.asList("5", "6", "7", "8", "9"), suggestions5);
     }
 
+    @Test
+    void testInvalidLiteralThenSpace() {
+        final String input = "test o";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Collections.singletonList("one"), suggestions);
+        final String input2 = "test o ";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Collections.emptyList(), suggestions2);
+        final String input3 = "test o abc123xyz";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Collections.emptyList(), suggestions3);
+    }
+
 
     public enum TestEnum {
         FOO,
