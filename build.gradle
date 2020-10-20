@@ -13,8 +13,8 @@ plugins {
     id 'checkstyle'
     id 'com.github.hierynomus.license' version '0.15.0'
     id 'java-library'
-    id 'com.github.johnrengelman.shadow' version '6.0.0'
-    id 'de.marcphilipp.nexus-publish' version '0.3.0'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'de.marcphilipp.nexus-publish' version '0.4.0'
 }
 
 checkstyle {
@@ -114,7 +114,7 @@ subprojects {
     }
 
     dependencies {
-        compileOnly 'org.checkerframework:checker-qual:3.5.0'
+        compileOnly 'org.checkerframework:checker-qual:3.7.0'
         api 'io.leangen.geantyref:geantyref:1.3.11'
         testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     }
