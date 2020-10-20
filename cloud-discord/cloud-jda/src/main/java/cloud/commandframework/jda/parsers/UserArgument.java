@@ -33,9 +33,10 @@ import net.dv8tion.jda.api.entities.User;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * Command Argument for {@link User}
@@ -45,11 +46,11 @@ import java.util.Queue;
 @SuppressWarnings("unused")
 public final class UserArgument<C> extends CommandArgument<C, User> {
 
-    private final List<ParserMode> modes;
+    private final Set<ParserMode> modes;
 
     private UserArgument(
             final boolean required, final @NonNull String name,
-            final @NonNull List<ParserMode> modes
+            final @NonNull Set<ParserMode> modes
     ) {
         super(required, name, new UserParser<>(modes), User.class);
         this.modes = modes;
@@ -74,7 +75,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, User> of(final @NonNull String name) {
-        return UserArgument.<C>newBuilder(name).asRequired().build();
+        return UserArgument.<C>newBuilder(name).withParserMode(ParserMode.MENTION).asRequired().build();
     }
 
     /**
@@ -85,7 +86,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, User> optional(final @NonNull String name) {
-        return UserArgument.<C>newBuilder(name).asOptional().build();
+        return UserArgument.<C>newBuilder(name).withParserMode(ParserMode.MENTION).asOptional().build();
     }
 
     /**
@@ -93,7 +94,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      *
      * @return List of Modes
      */
-    public @NotNull List<ParserMode> getModes() {
+    public @NotNull Set<ParserMode> getModes() {
         return modes;
     }
 
@@ -107,7 +108,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, User> {
 
-        private List<ParserMode> modes = new ArrayList<>();
+        private Set<ParserMode> modes = new HashSet<>();
 
         protected Builder(final @NonNull String name) {
             super(User.class, name);
@@ -119,8 +120,19 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
          * @param modes List of Modes
          * @return Builder instance
          */
-        public @NonNull Builder<C> withParsers(final @NonNull List<ParserMode> modes) {
+        public @NonNull Builder<C> withParsers(final @NonNull Set<ParserMode> modes) {
             this.modes = modes;
+            return this;
+        }
+
+        /**
+         * Add a parser mode to use
+         *
+         * @param mode Parser mode to add
+         * @return Builder instance
+         */
+        public @NonNull Builder<C> withParserMode(final @NonNull ParserMode mode) {
+            this.modes.add(mode);
             return this;
         }
 
@@ -139,9 +151,9 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     public static final class UserParser<C> implements ArgumentParser<C, User> {
 
-        private final List<ParserMode> modes;
+        private final Set<ParserMode> modes;
 
-        private UserParser(final @NonNull List<ParserMode> modes) {
+        private UserParser(final @NonNull Set<ParserMode> modes) {
             this.modes = modes;
         }
 
