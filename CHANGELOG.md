@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added TextColorArgument to minecraft-extras
  - Added LocationArgument to cloud-bukkit
  - Added ServerArgument to cloud-velocity
+ - Added LockableCommandManager to cloud-core
 
 ## [1.0.2] - 2020-10-18
 
