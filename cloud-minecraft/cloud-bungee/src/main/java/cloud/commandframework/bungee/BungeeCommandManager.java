@@ -76,11 +76,14 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
 
+        /* Register Bungee Preprocessor */
+        this.registerCommandPreProcessor(new BungeeCommandPreprocessor<>(this));
+
         /* Register Bungee Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(ProxiedPlayer.class), parserParameters ->
-                new PlayerArgument.PlayerParser<>(owningPlugin.getProxy()));
+                new PlayerArgument.PlayerParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(ServerInfo.class), parserParameters ->
-                new ServerArgument.ServerParser<>(owningPlugin.getProxy()));
+                new ServerArgument.ServerParser<>());
 
         /* Register default captions */
         if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {

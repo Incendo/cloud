@@ -111,8 +111,8 @@ public final class ExamplePlugin extends Plugin {
                 .meta("description", "Confirm a pending command")
                 .handler(this.confirmationManager.createConfirmationExecutionHandler()));
 
-        final CommandArgument<CommandSender, ProxiedPlayer> playerArgument = PlayerArgument.of("player", this.getProxy());
-        final CommandArgument<CommandSender, ServerInfo> serverArgument = ServerArgument.of("server", this.getProxy());
+        final CommandArgument<CommandSender, ProxiedPlayer> playerArgument = PlayerArgument.of("player");
+        final CommandArgument<CommandSender, ServerInfo> serverArgument = ServerArgument.of("server");
 
         //
         // Create a player command

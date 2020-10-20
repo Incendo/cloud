@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added ServerArgument to cloud-bungee
  - Added ExampleBungeePlugin
  - Added CaptionKeys to cloud-bungee
+ - Added BungeeCommandPreprocessor to cloud-bungee
 
 ## [1.0.2] - 2020-10-18
 
