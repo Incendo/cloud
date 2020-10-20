@@ -23,16 +23,53 @@
 //
 package cloud.commandframework.jda;
 
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Guild specific JDA Command Sender
  */
 public class JDAGuildSender extends JDACommandSender {
 
-    JDAGuildSender(final @NonNull MessageReceivedEvent event) {
-        super(event);
+    private final Member member;
+    private final TextChannel channel;
+
+    /**
+     * Construct a JDA Guild Sender using an event
+     *
+     * @param event   Message received event
+     * @param member  Sending member
+     * @param channel Channel sent in
+     */
+    public JDAGuildSender(
+            final @Nullable MessageReceivedEvent event,
+            final @NonNull Member member,
+            final @NonNull TextChannel channel
+    ) {
+        super(event, member.getUser(), channel);
+        this.member = member;
+        this.channel = channel;
+    }
+
+    /**
+     * Get the member the command sender represents
+     *
+     * @return Member that sent the message
+     */
+    public @NonNull Member getMember() {
+        return member;
+    }
+
+    /**
+     * Get the channel the user sent the message in
+     *
+     * @return Channel that the message was sent in
+     */
+    public @NonNull TextChannel getTextChannel() {
+        return channel;
     }
 
 }

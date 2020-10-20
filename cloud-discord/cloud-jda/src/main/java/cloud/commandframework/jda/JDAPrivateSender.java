@@ -23,16 +23,40 @@
 //
 package cloud.commandframework.jda;
 
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Private message specific JDA Command Sender
  */
 public class JDAPrivateSender extends JDACommandSender {
 
-    JDAPrivateSender(final @NonNull MessageReceivedEvent event) {
-        super(event);
+    private final PrivateChannel channel;
+
+    /**
+     * Construct a JDA Private Sender using an event
+     *
+     * @param event   Message received event
+     * @param user    Sending user
+     * @param channel Channel sent in
+     */
+    public JDAPrivateSender(
+            final @Nullable MessageReceivedEvent event, final @NonNull User user, final @NonNull PrivateChannel channel
+    ) {
+        super(event, user, channel);
+        this.channel = channel;
+    }
+
+    /**
+     * Get the channel the user sent the message in
+     *
+     * @return Channel that the message was sent in
+     */
+    public PrivateChannel getPrivateChannel() {
+        return channel;
     }
 
 }
