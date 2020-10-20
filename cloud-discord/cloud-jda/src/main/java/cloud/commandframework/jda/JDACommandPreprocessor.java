@@ -51,8 +51,6 @@ final class JDACommandPreprocessor<C> implements CommandPreprocessor<C> {
      */
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store("MessageReceivedEvent", mgr.getBackwardsCommandSenderMapper().apply(
-                context.getCommandContext().getSender()));
         context.getCommandContext().store("JDA", mgr.getJDA());
     }
 
