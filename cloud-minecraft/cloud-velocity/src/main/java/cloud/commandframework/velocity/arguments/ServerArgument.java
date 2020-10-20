@@ -53,7 +53,6 @@ import java.util.stream.Collectors;
 public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer> {
 
     private ServerArgument(
-            final @NonNull ProxyServer proxyServer,
             final boolean required,
             final @NonNull String name,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
@@ -63,7 +62,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
         super(
                 required,
                 name,
-                new ServerParser<>(proxyServer),
+                new ServerParser<>(),
                 "",
                 TypeToken.get(RegisteredServer.class),
                 suggestionsProvider,
@@ -75,21 +74,16 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
      * Create a new argument builder
      *
      * @param name        Argument name
-     * @param proxyServer Proxy server instance
      * @param <C>         Command sender type
      * @return Constructed builder
      */
     public static <C> CommandArgument.@NonNull Builder<C, RegisteredServer> newBuilder(
-            final @NonNull String name,
-            final @NonNull ProxyServer proxyServer
+            final @NonNull String name
     ) {
         return new Builder<C>(
-                name,
-                proxyServer
+                name
         ).withParser(
-                new ServerParser<>(
-                        proxyServer
-                )
+                new ServerParser<>()
         );
     }
 
@@ -97,48 +91,35 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
      * Create a new required player argument
      *
      * @param name        Argument name
-     * @param proxyServer Proxy server instance
      * @param <C>         Command sender type
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, RegisteredServer> of(
-            final @NonNull String name,
-            final @NonNull ProxyServer proxyServer
+            final @NonNull String name
     ) {
-        return ServerArgument.<C>newBuilder(name, proxyServer).asRequired().build();
+        return ServerArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
      * Create a new optional server argument
      *
-     * @param name        Argument name
-     * @param proxyServer Proxy server instance
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, RegisteredServer> optional(
-            final @NonNull String name,
-            final @NonNull ProxyServer proxyServer
-    ) {
-        return ServerArgument.<C>newBuilder(name, proxyServer).asOptional().build();
+    public static <C> @NonNull CommandArgument<C, RegisteredServer> optional(final @NonNull String name) {
+        return ServerArgument.<C>newBuilder(name).asOptional().build();
     }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, RegisteredServer> {
 
-        private final ProxyServer proxyServer;
-
-        private Builder(
-                final @NonNull String name,
-                final @NonNull ProxyServer proxyServer
-        ) {
+        private Builder(final @NonNull String name) {
             super(TypeToken.get(RegisteredServer.class), name);
-            this.proxyServer = proxyServer;
         }
 
         @Override
         public @NonNull CommandArgument<@NonNull C, @NonNull RegisteredServer> build() {
             return new ServerArgument<>(
-                    this.proxyServer,
                     this.isRequired(),
                     this.getName(),
                     this.getSuggestionsProvider(),
@@ -149,19 +130,6 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
     }
 
     public static final class ServerParser<C> implements ArgumentParser<C, RegisteredServer> {
-
-        private final ProxyServer proxyServer;
-
-        /**
-         * Create a new server parser
-         *
-         * @param proxyServer Proxy server instance
-         */
-        public ServerParser(
-                @NonNull final ProxyServer proxyServer
-        ) {
-            this.proxyServer = proxyServer;
-        }
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull RegisteredServer> parse(
@@ -175,7 +143,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                         commandContext
                 ));
             }
-            final RegisteredServer server = this.proxyServer.getServer(input).orElse(null);
+            final RegisteredServer server = commandContext.<ProxyServer>get("ProxyServer").getServer(input).orElse(null);
             if (server == null) {
                 return ArgumentParseResult.failure(
                         new ServerParseException(
@@ -193,7 +161,11 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return this.proxyServer.getAllServers().stream().map(s -> s.getServerInfo().getName()).collect(Collectors.toList());
+            return commandContext.<ProxyServer>get("ProxyServer")
+                    .getAllServers()
+                    .stream()
+                    .map(s -> s.getServerInfo().getName())
+                    .collect(Collectors.toList());
         }
 
     }
