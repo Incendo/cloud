@@ -193,8 +193,7 @@ dependencies {
 To shade and relocate cloud use [Gradle Shadow](https://github.com/johnrengelman/shadow).
 
 Replace `PLATFORM` with your platform of choice. We currently support: `bukkit`, `paper`, `bungee` and `velocity`for minecraft and `jda` and `javacord` for discord. All modules use the same versions.
-More information about the Minecraft specific modules can be found [here](https://github
-.com/Incendo/cloud/tree/master/cloud-minecraft).
+More information about the Minecraft specific modules can be found [here](https://github.com/Incendo/cloud/tree/master/cloud-minecraft).
 
 ## attributions, links &amp; acknowledgements  
   
