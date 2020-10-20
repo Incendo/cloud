@@ -89,11 +89,14 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
 
+        /* Register Velocity Preprocessor */
+        this.registerCommandPreProcessor(new VelocityCommandPreprocessor<>(this));
+
         /* Register Velocity Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
-                new PlayerArgument.PlayerParser<>(proxyServer));
+                new PlayerArgument.PlayerParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(RegisteredServer.class), parserParameters ->
-                new ServerArgument.ServerParser<>(proxyServer));
+                new ServerArgument.ServerParser<>());
 
         /* Register default captions */
         if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
