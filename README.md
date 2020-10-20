@@ -185,7 +185,7 @@ repositories {
 
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-PLATFORM:1.0.2'
+    implementation 'cloud.commandframework:cloud-PLATFORM:1.1.0-SNAPSHOT'
 }
 ```
 
