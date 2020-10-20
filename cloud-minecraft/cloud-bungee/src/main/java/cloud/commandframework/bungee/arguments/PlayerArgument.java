@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
 
     private PlayerArgument(
-            final @NonNull ProxyServer proxyServer,
             final boolean required,
             final @NonNull String name,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionProvider,
@@ -62,7 +61,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
         super(
                 required,
                 name,
-                new PlayerParser<>(proxyServer),
+                new PlayerParser<>(),
                 "",
                 TypeToken.get(ProxiedPlayer.class),
                 suggestionProvider,
@@ -74,21 +73,16 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
      * Create a new argument builder
      *
      * @param name        Argument name
-     * @param proxyServer Proxy server instance
      * @param <C>         Command sender type
      * @return Constructed builder
      **/
     public static <C> CommandArgument.@NonNull Builder<C, ProxiedPlayer> newBuilder(
-            final @NonNull String name,
-            final @NonNull ProxyServer proxyServer
+            final @NonNull String name
     ) {
         return new Builder<C>(
-                name,
-                proxyServer
+                name
         ).withParser(
-                new PlayerParser<>(
-                        proxyServer
-                )
+                new PlayerParser<>()
         );
     }
 
@@ -96,49 +90,40 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
      * Create a new required player argument
      *
      * @param name        Argument name
-     * @param proxyServer Proxy server instance
      * @param <C>         Command sender type
      * @return Created argument
      */
     public static <C> CommandArgument<C, ProxiedPlayer> of(
-            final @NonNull String name,
-            final @NonNull ProxyServer proxyServer
+            final @NonNull String name
     ) {
-        return PlayerArgument.<C>newBuilder(name, proxyServer).asRequired().build();
+        return PlayerArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
      * Create a new optional player argument
      *
      * @param name        Argument name
-     * @param proxyServer Proxy server instance
      * @param <C>         Command sender type
      * @return Created argument
      */
     public static <C> CommandArgument<C, ProxiedPlayer> optional(
-            final @NonNull String name,
-            final @NonNull ProxyServer proxyServer
+            final @NonNull String name
     ) {
-        return PlayerArgument.<C>newBuilder(name, proxyServer).asOptional().build();
+        return PlayerArgument.<C>newBuilder(name).asOptional().build();
     }
 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, ProxiedPlayer> {
 
-        private final ProxyServer proxyServer;
-
         private Builder(
-                final @NonNull String name,
-                final @NonNull ProxyServer proxyServer
+                final @NonNull String name
         ) {
             super(TypeToken.get(ProxiedPlayer.class), name);
-            this.proxyServer = proxyServer;
         }
 
         @Override
         public @NonNull CommandArgument<@NonNull C, @NonNull ProxiedPlayer> build() {
             return new PlayerArgument<>(
-                    this.proxyServer,
                     this.isRequired(),
                     this.getName(),
                     this.getSuggestionsProvider(),
@@ -150,19 +135,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
 
 
     public static final class PlayerParser<C> implements ArgumentParser<C, ProxiedPlayer> {
-
-        private final ProxyServer proxyServer;
-
-        /**
-         * Create a new player parser
-         *
-         * @param proxyServer Proxy server instance
-         */
-        public PlayerParser(
-                final @NonNull ProxyServer proxyServer
-        ) {
-            this.proxyServer = proxyServer;
-        }
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProxiedPlayer> parse(
@@ -176,7 +148,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
                         commandContext
                 ));
             }
-            final ProxiedPlayer player = this.proxyServer.getPlayer(input);
+            final ProxiedPlayer player = commandContext.<ProxyServer>get("ProxyServer").getPlayer(input);
             if (player == null) {
                 return ArgumentParseResult.failure(
                         new PlayerParseException(
@@ -194,7 +166,11 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return this.proxyServer.getPlayers().stream().map(ProxiedPlayer::getDisplayName).collect(Collectors.toList());
+            return commandContext.<ProxyServer>get("ProxyServer")
+                    .getPlayers()
+                    .stream()
+                    .map(ProxiedPlayer::getDisplayName)
+                    .collect(Collectors.toList());
         }
 
         @Override
