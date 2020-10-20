@@ -23,9 +23,15 @@
 //
 package cloud.commandframework.jda;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Wrapper for {@link MessageReceivedEvent}
@@ -33,14 +39,24 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class JDACommandSender {
 
     private final MessageReceivedEvent event;
+    private final User user;
+    private final MessageChannel channel;
 
     /**
-     * Construct a JDA Command Sender using an event
+     * Construct a JDA Command Sender
      *
-     * @param event Message Received Event
+     * @param event   Message received event
+     * @param user    Sending user
+     * @param channel Channel sent in
      */
-    public JDACommandSender(final @NonNull MessageReceivedEvent event) {
+    protected JDACommandSender(
+            final @Nullable MessageReceivedEvent event,
+            final @NonNull User user,
+            final @NonNull MessageChannel channel
+    ) {
         this.event = event;
+        this.user = user;
+        this.channel = channel;
     }
 
     /**
@@ -51,19 +67,37 @@ public class JDACommandSender {
      */
     public static JDACommandSender of(final @NonNull MessageReceivedEvent event) {
         if (event.isFromType(ChannelType.PRIVATE)) {
-            return new JDAPrivateSender(event);
+            return new JDAPrivateSender(event, event.getAuthor(), event.getPrivateChannel());
         }
 
-        return new JDAGuildSender(event);
+        return new JDAGuildSender(event, Objects.requireNonNull(event.getMember()), event.getTextChannel());
     }
 
     /**
-     * Get the {@link MessageReceivedEvent}
+     * Get the message receive event
      *
-     * @return Message Received Event
+     * @return Optional of the message receive event
      */
-    public @NonNull MessageReceivedEvent getEvent() {
-        return event;
+    public final @NonNull Optional<MessageReceivedEvent> getEvent() {
+        return Optional.ofNullable(event);
+    }
+
+    /**
+     * Get the user the command sender represents
+     *
+     * @return User that sent the message
+     */
+    public final @NonNull User getUser() {
+        return user;
+    }
+
+    /**
+     * Get the channel the user sent the message in
+     *
+     * @return Channel that the message was sent in
+     */
+    public final @NonNull MessageChannel getChannel() {
+        return channel;
     }
 
 }
