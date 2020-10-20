@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 /**
  * Parser for color codes.
  * <p>
- * Accepts {@link NamedTextColor NamedTextColors}, Legacy Minecraft {@literal &} color codes, Hex Codes (#RRGGBB)
+ * Accepts {@link NamedTextColor NamedTextColors}, Legacy Minecraft {@literal &} color codes, and Hex Codes (#RRGGBB or RRGGBB)
  *
  * @param <C> Command sender type
  * @since 1.1.0

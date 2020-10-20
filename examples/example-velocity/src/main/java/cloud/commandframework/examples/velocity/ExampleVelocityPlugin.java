@@ -82,7 +82,7 @@ public final class ExampleVelocityPlugin {
         );
         commandManager.command(
                 commandManager.commandBuilder("example")
-                        .argument(PlayerArgument.of("player", this.server))
+                        .argument(PlayerArgument.of("player"))
                         .handler(context -> {
                                     final Player player = context.get("player");
                                     context.getSender().sendMessage(
@@ -98,7 +98,7 @@ public final class ExampleVelocityPlugin {
         );
         commandManager.command(
                 commandManager.commandBuilder("example-server")
-                .argument(ServerArgument.of("server", this.server))
+                .argument(ServerArgument.of("server"))
                 .handler(context -> {
                             final RegisteredServer server = context.get("server");
                             context.getSender().sendMessage(
