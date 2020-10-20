@@ -127,7 +127,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
     }
 
     private void sendMessage(final @NonNull MessageReceivedEvent event, final @NonNull String message) {
-        event.getChannel().sendMessage(message).complete();
+        event.getChannel().sendMessage(message).queue();
     }
 
 }
