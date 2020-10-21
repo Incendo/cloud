@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     implementation project(":cloud-jda")
-    implementation 'net.dv8tion:JDA:4.2.0_207'
+    implementation 'net.dv8tion:JDA:4.2.0_209'
     implementation 'org.slf4j:slf4j-simple:1.7.21'
 }
 
