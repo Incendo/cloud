@@ -31,7 +31,7 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -42,7 +42,9 @@ import java.util.function.Function;
  * Command manager for use with JDA
  *
  * @param <C> Command sender type
+ * @deprecated Use {@link JDA4CommandManager}
  */
+@Deprecated
 public class JDACommandManager<C> extends CommandManager<C> {
 
     private final JDA jda;
@@ -50,8 +52,8 @@ public class JDACommandManager<C> extends CommandManager<C> {
 
     private final Function<@NonNull C, @NonNull String> prefixMapper;
     private final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
-    private final Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
-    private final Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
+    private final Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper;
+    private final Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper;
 
     /**
      * Construct a new JDA Command Manager
@@ -60,8 +62,8 @@ public class JDACommandManager<C> extends CommandManager<C> {
      * @param prefixMapper                 Function that maps the sender to a command prefix string
      * @param permissionMapper             Function used to check if a command sender has the permission to execute a command
      * @param commandExecutionCoordinator  Coordination provider
-     * @param commandSenderMapper          Function that maps {@link JDACommandSender} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link Member}
+     * @param commandSenderMapper          Function that maps {@link MessageReceivedEvent} to the command sender type
+     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link MessageReceivedEvent}
      * @throws InterruptedException If the jda instance does not ready correctly
      */
     public JDACommandManager(
@@ -69,8 +71,8 @@ public class JDACommandManager<C> extends CommandManager<C> {
             final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
             final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
             final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper
+            final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper,
+            final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper
     )
             throws InterruptedException {
         super(commandExecutionCoordinator, CommandRegistrationHandler.nullCommandRegistrationHandler());
@@ -110,7 +112,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      *
      * @return Command sender mapper
      */
-    public final @NonNull Function<@NonNull JDACommandSender, @NonNull C> getCommandSenderMapper() {
+    public final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
     }
 
@@ -119,7 +121,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      *
      * @return The backwards command sender mapper
      */
-    public final @NonNull Function<@NonNull C, @NonNull JDACommandSender> getBackwardsCommandSenderMapper() {
+    public final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> getBackwardsCommandSenderMapper() {
         return this.backwardsCommandSenderMapper;
     }
 
@@ -142,7 +144,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
             return this.permissionMapper.apply(sender, permission);
         }
 
-        final JDACommandSender jdaSender = this.backwardsCommandSenderMapper.apply(sender);
+        final JDACommandSender jdaSender = this.backwardsCommandSenderMapper.andThen(JDACommandSender::of).apply(sender);
 
         if (!(jdaSender instanceof JDAGuildSender)) {
             return true;
