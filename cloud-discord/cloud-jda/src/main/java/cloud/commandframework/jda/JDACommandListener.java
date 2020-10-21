@@ -60,7 +60,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
     public final void onMessageReceived(final @NonNull MessageReceivedEvent event) {
         final Message message = event.getMessage();
         final JDACommandSender jdaCommandSender = JDACommandSender.of(event);
-        final C sender = this.commandManager.getCommandSenderMapper().apply(jdaCommandSender);
+        final C sender = this.commandManager.getCommandSenderMapper().apply(event);
 
         if (this.commandManager.getBotId() == event.getAuthor().getIdLong()) {
             return;

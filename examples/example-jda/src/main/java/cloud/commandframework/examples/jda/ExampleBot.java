@@ -26,7 +26,7 @@ package cloud.commandframework.examples.jda;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.jda.JDACommandManager;
+import cloud.commandframework.jda.JDA4CommandManager;
 import cloud.commandframework.jda.JDAGuildSender;
 import cloud.commandframework.jda.JDAPrivateSender;
 import cloud.commandframework.jda.parsers.UserArgument;
@@ -66,7 +66,7 @@ public final class ExampleBot {
 
         final PermissionRegistry permissionRegistry = new PermissionRegistry();
 
-        final JDACommandManager<CustomUser> commandManager = new JDACommandManager<>(
+        final JDA4CommandManager<CustomUser> commandManager = new JDA4CommandManager<>(
                 jda,
                 message -> "!",
                 (sender, permission) -> permissionRegistry.hasPermission(sender.getUser().getIdLong(), permission),
