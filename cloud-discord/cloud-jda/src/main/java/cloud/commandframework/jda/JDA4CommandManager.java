@@ -47,7 +47,14 @@ public class JDA4CommandManager<C> extends JDACommandManager<C> {
      * @param jda                          JDA instance to register against
      * @param prefixMapper                 Function that maps the sender to a command prefix string
      * @param permissionMapper             Function used to check if a command sender has the permission to execute a command
-     * @param commandExecutionCoordinator  Coordination provider
+     * @param commandExecutionCoordinator  Execution coordinator instance. The coordinator is in charge of executing incoming
+     *                                     commands. Some considerations must be made when picking a suitable execution coordinator
+     *                                     for your platform. For example, an entirely asynchronous coordinator is not suitable
+     *                                     when the parsers used in that particular platform are not thread safe. If you have
+     *                                     commands that perform blocking operations, however, it might not be a good idea to
+     *                                     use a synchronous execution coordinator. In most cases you will want to pick between
+     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}
      * @param commandSenderMapper          Function that maps {@link JDACommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link JDACommandSender}
      * @throws InterruptedException If the jda instance does not ready correctly
@@ -61,7 +68,8 @@ public class JDA4CommandManager<C> extends JDACommandManager<C> {
             final @NonNull Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper
     )
             throws InterruptedException {
-        super(jda,
+        super(
+                jda,
                 prefixMapper,
                 permissionMapper,
                 commandExecutionCoordinator,

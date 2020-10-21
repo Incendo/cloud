@@ -65,7 +65,7 @@ public class JDACommandSender {
      * @param event Message Received Event
      * @return Constructed JDA Command Sender
      */
-    public static JDACommandSender of(final @NonNull MessageReceivedEvent event) {
+    public static @NonNull JDACommandSender of(final @NonNull MessageReceivedEvent event) {
         if (event.isFromType(ChannelType.PRIVATE)) {
             return new JDAPrivateSender(event, event.getAuthor(), event.getPrivateChannel());
         }
@@ -79,7 +79,7 @@ public class JDACommandSender {
      * @return Optional of the message receive event
      */
     public final @NonNull Optional<MessageReceivedEvent> getEvent() {
-        return Optional.ofNullable(event);
+        return Optional.ofNullable(this.event);
     }
 
     /**
@@ -88,7 +88,7 @@ public class JDACommandSender {
      * @return User that sent the message
      */
     public final @NonNull User getUser() {
-        return user;
+        return this.user;
     }
 
     /**
@@ -97,7 +97,7 @@ public class JDACommandSender {
      * @return Channel that the message was sent in
      */
     public final @NonNull MessageChannel getChannel() {
-        return channel;
+        return this.channel;
     }
 
 }
