@@ -60,7 +60,7 @@ public class JDAGuildSender extends JDACommandSender {
      * @return Member that sent the message
      */
     public @NonNull Member getMember() {
-        return member;
+        return this.member;
     }
 
     /**
@@ -69,7 +69,7 @@ public class JDAGuildSender extends JDACommandSender {
      * @return Channel that the message was sent in
      */
     public @NonNull TextChannel getTextChannel() {
-        return channel;
+        return this.channel;
     }
 
 }

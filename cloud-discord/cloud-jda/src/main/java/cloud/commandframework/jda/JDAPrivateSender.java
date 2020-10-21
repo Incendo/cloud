@@ -44,7 +44,9 @@ public class JDAPrivateSender extends JDACommandSender {
      * @param channel Channel sent in
      */
     public JDAPrivateSender(
-            final @Nullable MessageReceivedEvent event, final @NonNull User user, final @NonNull PrivateChannel channel
+            final @Nullable MessageReceivedEvent event,
+            final @NonNull User user,
+            final @NonNull PrivateChannel channel
     ) {
         super(event, user, channel);
         this.channel = channel;
@@ -55,8 +57,8 @@ public class JDAPrivateSender extends JDACommandSender {
      *
      * @return Channel that the message was sent in
      */
-    public PrivateChannel getPrivateChannel() {
-        return channel;
+    public @NonNull PrivateChannel getPrivateChannel() {
+        return this.channel;
     }
 
 }
