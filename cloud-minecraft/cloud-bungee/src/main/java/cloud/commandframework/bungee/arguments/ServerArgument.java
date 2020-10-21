@@ -48,6 +48,7 @@ import java.util.function.BiFunction;
  * Argument parser for {@link net.md_5.bungee.api.config.ServerInfo servers}
  *
  * @param <C> Command sender type
+ * @since 1.1.0
  */
 public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
 
