@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  * Maps to {@link StandardParameters#DESCRIPTION}
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface CommandDescription {
 
     /**

@@ -28,9 +28,10 @@ import cloud.commandframework.meta.CommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.function.Function;
 
-class MetaFactory implements Function<@NonNull Annotation @NonNull [], @NonNull CommandMeta> {
+class MetaFactory implements Function<@NonNull Method, @NonNull CommandMeta> {
 
     private final AnnotationParser<?> annotationParser;
     private final Function<ParserParameters, CommandMeta> metaMapper;
@@ -44,17 +45,16 @@ class MetaFactory implements Function<@NonNull Annotation @NonNull [], @NonNull 
     }
 
     @Override
-    public @NonNull CommandMeta apply(final @NonNull Annotation @NonNull [] annotations) {
+    public @NonNull CommandMeta apply(final @NonNull Method method) {
         final ParserParameters parameters = ParserParameters.empty();
-        for (final Annotation annotation : annotations) {
-            @SuppressWarnings("ALL") final Function function = this.annotationParser.getAnnotationMappers()
-                    .get(annotation.annotationType());
-            if (function == null) {
-                continue;
+        this.annotationParser.getAnnotationMappers().forEach(((annotationClass, mapper) -> {
+            final Annotation annotation = AnnotationParser.getMethodOrClassAnnotation(method, annotationClass);
+            if (annotation != null) {
+                @SuppressWarnings("ALL") final Function function = (Function) mapper;
+                //noinspection unchecked
+                parameters.merge((ParserParameters) function.apply(annotation));
             }
-            //noinspection unchecked
-            parameters.merge((ParserParameters) function.apply(annotation));
-        }
+        }));
         return this.metaMapper.apply(parameters);
     }
 

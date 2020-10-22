@@ -106,6 +106,25 @@ public final class AnnotationParser<C> {
         ));
     }
 
+    protected static <A extends Annotation> @Nullable A getMethodOrClassAnnotation(
+            final @NonNull Method method,
+            final @NonNull Class<A> clazz
+    ) {
+        if (method.isAnnotationPresent(clazz)) {
+            return method.getAnnotation(clazz);
+        } else if (method.getDeclaringClass().isAnnotationPresent(clazz)) {
+            return method.getDeclaringClass().getAnnotation(clazz);
+        }
+        return null;
+    }
+
+    protected static <A extends Annotation> boolean methodOrClassHasAnnotation(
+            final @NonNull Method method,
+            final @NonNull Class<A> clazz
+    ) {
+        return getMethodOrClassAnnotation(method, clazz) != null;
+    }
+
     /**
      * Register an annotation mapper
      *
@@ -186,8 +205,8 @@ public final class AnnotationParser<C> {
             final String commandToken = commandMethod.value().split(" ")[0].split("\\|")[0];
             @SuppressWarnings("ALL") final CommandManager manager = this.manager;
             final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
-                    .with(this.metaFactory.apply(method.getAnnotations()));
-            if (method.isAnnotationPresent(Confirmation.class)) {
+                    .with(this.metaFactory.apply(method));
+            if (methodOrClassHasAnnotation(method, Confirmation.class)) {
                 metaBuilder.with(CommandConfirmationManager.CONFIRMATION_REQUIRED_META, "true");
             }
 
@@ -245,8 +264,9 @@ public final class AnnotationParser<C> {
                 }
             }
 
-            if (method.isAnnotationPresent(CommandPermission.class)) {
-                builder = builder.permission(method.getAnnotation(CommandPermission.class).value());
+            final CommandPermission commandPermission = getMethodOrClassAnnotation(method, CommandPermission.class);
+            if (commandPermission != null) {
+                builder = builder.permission(commandPermission.value());
             }
 
             if (commandMethod.requiredSender() != Object.class) {
@@ -263,7 +283,7 @@ public final class AnnotationParser<C> {
                 throw new RuntimeException("Failed to construct command execution handler", e);
             }
             /* Check if the command should be hidden */
-            if (method.isAnnotationPresent(Hidden.class)) {
+            if (methodOrClassHasAnnotation(method, Hidden.class)) {
                 builder = builder.hidden();
             }
             /* Apply flags */

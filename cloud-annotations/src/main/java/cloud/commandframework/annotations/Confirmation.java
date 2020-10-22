@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * Require confirmation for the command
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Confirmation {
 
 }
