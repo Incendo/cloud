@@ -32,11 +32,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletionException;
 
 class AnnotationParserTest {
+
+    private static final List<String> NAMED_SUGGESTIONS = Arrays.asList("Dancing-Queen", "Gimme!-Gimme!-Gimme!", "Waterloo");
 
     private static CommandManager<TestCommandSender> manager;
     private static AnnotationParser<TestCommandSender> annotationParser;
@@ -47,6 +51,11 @@ class AnnotationParserTest {
         annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
         manager.getParserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
                 StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList("potato")));
+        /* Register a suggestion provider */
+        manager.getParserRegistry().registerSuggestionProvider(
+                "some-name",
+                (context, input) -> NAMED_SUGGESTIONS
+        );
     }
 
     @Test
@@ -62,6 +71,11 @@ class AnnotationParserTest {
         manager.executeCommand(new TestCommandSender(), "flagcommand --print --word peanut").join();
     }
 
+    @Test
+    void testNamedSuggestionProvider() {
+        Assertions.assertEquals(NAMED_SUGGESTIONS, manager.suggest(new TestCommandSender(), "namedsuggestions "));
+    }
+
     @ProxiedBy("proxycommand")
     @CommandMethod("test|t literal <int> [string]")
     public void testCommand(
@@ -75,12 +89,18 @@ class AnnotationParserTest {
     @CommandMethod("flagcommand")
     public void testFlags(
             final TestCommandSender sender,
-            @Flag(value = "print", aliases = "p") boolean print,
-            @Flag(value = "word", aliases = "w") String word
+            @Flag(value = "print", aliases = "p") final boolean print,
+            @Flag(value = "word", aliases = "w") final String word
     ) {
         if (print) {
             System.out.println(word);
         }
+    }
+
+    @CommandMethod("namedsuggestions <input>")
+    public void testNamedSuggestionProviders(
+            @Argument(value = "input", suggestions = "some-name") final String argument
+    ) {
     }
 
 }
