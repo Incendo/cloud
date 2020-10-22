@@ -39,9 +39,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Container for flag parsing logic. This should not be be used directly.
@@ -50,6 +53,9 @@ import java.util.function.BiFunction;
  * @param <C> Command sender type
  */
 public final class FlagArgument<C> extends CommandArgument<C, Object> {
+
+    private static final Pattern FLAG_ALIAS_PATTERN = Pattern.compile(" -(?<name>([A-Za-z]+))");
+    private static final Pattern FLAG_PRIMARY_PATTERN = Pattern.compile(" --(?<name>([A-Za-z]+))");
 
     /**
      * Dummy object that indicates that flags were parsed successfully
@@ -121,11 +127,45 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                         }
                     } else {
                         final String flagName = string.substring(1);
-                        for (final CommandFlag<?> flag : this.flags) {
-                            for (final String alias : flag.getAliases()) {
-                                if (alias.equalsIgnoreCase(flagName)) {
-                                    currentFlag = flag;
-                                    break;
+                        if (flagName.length() > 1) {
+                            boolean oneAdded = false;
+                            /* This is a multi-alias flag, find all flags that apply */
+                            for (final CommandFlag<?> flag : this.flags) {
+                                if (flag.getCommandArgument() != null) {
+                                    continue;
+                                }
+                                for (final String alias : flag.getAliases()) {
+                                    if (flagName.toLowerCase(Locale.ENGLISH).contains(alias.toLowerCase(Locale.ENGLISH))) {
+                                        if (parsedFlags.contains(flag)) {
+                                            return ArgumentParseResult.failure(new FlagParseException(
+                                                    string,
+                                                    FailureReason.DUPLICATE_FLAG,
+                                                    commandContext
+                                            ));
+                                        }
+                                        parsedFlags.add(flag);
+                                        commandContext.flags().addPresenceFlag(flag);
+                                        oneAdded = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            /* We need to parse at least one flag */
+                            if (!oneAdded) {
+                                return ArgumentParseResult.failure(new FlagParseException(
+                                        string,
+                                        FailureReason.NO_FLAG_STARTED,
+                                        commandContext
+                                ));
+                            }
+                            continue;
+                        } else {
+                            for (final CommandFlag<?> flag : this.flags) {
+                                for (final String alias : flag.getAliases()) {
+                                    if (alias.equalsIgnoreCase(flagName)) {
+                                        currentFlag = flag;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -196,30 +236,76 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
             /* Check if we have a last flag stored */
             final String lastArg = commandContext.getOrDefault(FLAG_META, "");
             if (lastArg.isEmpty() || !lastArg.startsWith("-")) {
-                /* We don't care about the last value and so we expect a flag */
-                final List<String> strings = new LinkedList<>();
-                for (final CommandFlag<?> flag : this.flags) {
-                    final String mainFlag = String.format("--%s", flag.getName());
-                    final List<String> rawInput = commandContext.getRawInput();
-                    if (rawInput.contains(mainFlag)) {
-                        continue; /* Flag was already used */
-                    }
-                    final List<String> flagAliases = new LinkedList<>();
-                    boolean flagUsed = false;
-                    for (final String alias : flag.getAliases()) {
-                        final String aliasFlag = String.format("-%s", alias);
-                        if (rawInput.contains(aliasFlag)) {
-                            flagUsed = true;
+                final String rawInput = commandContext.getRawInputJoined();
+                /* Collection containing all used flags */
+                final List<CommandFlag<?>> usedFlags = new LinkedList<>();
+                /* Find all "primary" flags, using --flag */
+                final Matcher primaryMatcher = FLAG_PRIMARY_PATTERN.matcher(rawInput);
+                while (primaryMatcher.find()) {
+                    final String name = primaryMatcher.group("name");
+                    for (final CommandFlag<?> flag : this.flags) {
+                        if (flag.getName().equalsIgnoreCase(name)) {
+                            usedFlags.add(flag);
                             break;
                         }
-                        flagAliases.add(aliasFlag);
                     }
-                    if (flagUsed) {
-                        continue; /* Flag was already used via an alias */
+                }
+                /* Find all alias flags */
+                final Matcher aliasMatcher = FLAG_ALIAS_PATTERN.matcher(rawInput);
+                while (aliasMatcher.find()) {
+                    final String name = aliasMatcher.group("name");
+                    for (final CommandFlag<?> flag : this.flags) {
+                        for (final String alias : flag.getAliases()) {
+                            /* Aliases are single-char strings */
+                            if (name.contains(alias)) {
+                                usedFlags.add(flag);
+                                break;
+                            }
+                        }
                     }
-
-                    strings.add(mainFlag);
-                    strings.addAll(flagAliases);
+                }
+                /* Suggestions */
+                final List<String> strings = new LinkedList<>();
+                /* Recommend "primary" flags */
+                for (final CommandFlag<?> flag : this.flags) {
+                    if (usedFlags.contains(flag)) {
+                        continue;
+                    }
+                    strings.add(
+                            String.format(
+                                    "--%s",
+                                    flag.getName()
+                            )
+                    );
+                }
+                /* Recommend aliases */
+                final boolean suggestCombined = input.length() > 1 && input.charAt(0) == '-' && input.charAt(1) != '-';
+                for (final CommandFlag<?> flag : this.flags) {
+                    if (usedFlags.contains(flag)) {
+                        continue;
+                    }
+                    for (final String alias : flag.getAliases()) {
+                        if (suggestCombined && flag.getCommandArgument() == null) {
+                            strings.add(
+                                    String.format(
+                                            "%s%s",
+                                            input,
+                                            alias
+                                    )
+                            );
+                        } else {
+                            strings.add(
+                                    String.format(
+                                            "-%s",
+                                            alias
+                                    )
+                            );
+                        }
+                    }
+                }
+                /* If we are suggesting the combined flag, then also suggest the current input */
+                if (suggestCombined) {
+                    strings.add(input);
                 }
                 return strings;
             } else {

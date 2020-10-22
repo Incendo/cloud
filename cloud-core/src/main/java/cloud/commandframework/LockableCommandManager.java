@@ -74,7 +74,7 @@ public abstract class LockableCommandManager<C> extends CommandManager<C> {
      * else {@link IllegalStateException} will be called
      *
      * @param command Command to register
-     * @return
+     * @return The command manager instance
      */
     @Override
     public final @NonNull CommandManager<C> command(final @NonNull Command<C> command) {
@@ -95,7 +95,7 @@ public abstract class LockableCommandManager<C> extends CommandManager<C> {
      * else {@link IllegalStateException} will be called
      *
      * @param command Command to register. {@link Command.Builder#build()}} will be invoked.
-     * @return
+     * @return The command manager instance
      */
     @Override
     public final @NonNull CommandManager<C> command(final Command.@NonNull Builder<C> command) {
