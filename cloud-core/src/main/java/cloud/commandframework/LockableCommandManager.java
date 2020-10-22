@@ -91,7 +91,7 @@ public abstract class LockableCommandManager<C> extends CommandManager<C> {
     /**
      * {@inheritDoc}
      * <p>
-     * This should only be called when {@link #isCommandRegistrationAllowed()} is {@code false},
+     * This should only be called when {@link #isCommandRegistrationAllowed()} is {@code true},
      * else {@link IllegalStateException} will be called
      *
      * @param command Command to register. {@link Command.Builder#build()}} will be invoked.

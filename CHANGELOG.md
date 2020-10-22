@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added CaptionKeys to cloud-bungee
  - Added BungeeCommandPreprocessor to cloud-bungee
 
-### Chanced
+### Changed
  - Allow for combined presence flags, such that `-a -b -c` is equivalent to `-abc`
 
 ## [1.0.2] - 2020-10-18
