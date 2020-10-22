@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 /**
  * Equivalent to {@link cloud.commandframework.Command.Builder#permission(String)}
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandPermission {
 
