@@ -7,7 +7,7 @@ ext {
             'jda'           : '4.2.0_209',
             // MINECRAFT DEPENDENCIES
             'brigadier'     : '1.0.17',
-            'bukkit'        : '1.13.2-RO.1-SNAPSHOT',
+            'bukkit'        : '1.13.2-R0.1-SNAPSHOT',
             'commodore'     : '1.9',
             'bungeecord'    : '1.8-SNAPSHOT',
             'cloudburst'    : '1.0.0-SNAPSHOT',
