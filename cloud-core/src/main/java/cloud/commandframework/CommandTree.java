@@ -621,7 +621,7 @@ public final class CommandTree<C> {
                     Objects.requireNonNull(
                             Objects.requireNonNull(
                                     node.value,
-                                    "node.value"
+                                    "node.value: "
                             ).getOwningCommand(),
                             "owning command"
                     ).getCommandPermission()

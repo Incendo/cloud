@@ -37,6 +37,7 @@ import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.standard.UUIDArgument;
+import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -45,6 +46,8 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,6 +78,8 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     private final Map<TypeToken<?>, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new HashMap<>();
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
             annotationMappers = new HashMap<>();
+    private final Map<String, BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>>
+            namedSuggestionProviders = new HashMap<>();
 
     /**
      * Construct a new {@link StandardParserRegistry} instance. This will also
@@ -220,6 +225,24 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 parserParameters);
         return Optional.of(parser);
     }
+
+    @Override
+    public void registerSuggestionProvider(
+            @NonNull final String name,
+            @NonNull final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
+    ) {
+        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider);
+    }
+
+    @Override
+    public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
+            @NonNull final String name
+    ) {
+        final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionProvider =
+                this.namedSuggestionProviders.get(name.toLowerCase(Locale.ENGLISH));
+        return Optional.ofNullable(suggestionProvider);
+    }
+
 
     private static final class RangeMapper<T> implements BiFunction<@NonNull Range, @NonNull TypeToken<?>,
             @NonNull ParserParameters> {

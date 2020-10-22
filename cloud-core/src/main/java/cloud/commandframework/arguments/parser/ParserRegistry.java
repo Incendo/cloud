@@ -23,11 +23,13 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -119,6 +121,32 @@ public interface ParserRegistry<C> {
     <T> @NonNull Optional<ArgumentParser<C, T>> createParser(
             @NonNull String name,
             @NonNull ParserParameters parserParameters
+    );
+
+    /**
+     * Register a new named suggestion provider
+     *
+     * @param name                Name of the suggestions provider. The name is case independent.
+     * @param suggestionsProvider The suggestions provider
+     * @see #getSuggestionProvider(String) Get a suggestion provider
+     * @since 1.1.0
+     */
+    void registerSuggestionProvider(
+            @NonNull String name,
+            @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
+    );
+
+    /**
+     * Get a named suggestion provider, if a suggestion provider with the given name exists in the registry
+     *
+     * @param name Suggestion provider name. The name is case independent.
+     * @return Optional that either contains the suggestion provider name, or nothing ({@link Optional#empty()}) if no
+     *         suggestion provider is registered with the given name
+     * @see #registerSuggestionProvider(String, BiFunction) Register a suggestion provider
+     * @since 1.1.0
+     */
+    @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
+            @NonNull String name
     );
 
 }

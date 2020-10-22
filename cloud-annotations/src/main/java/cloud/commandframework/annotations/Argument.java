@@ -27,6 +27,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.function.BiFunction;
 
 /**
  * Annotation used to indicate that a method parameter is a command argument
@@ -48,6 +49,22 @@ public @interface Argument {
      * @return Argument name
      */
     String parserName() default "";
+
+    /**
+     * Name of the suggestions provider to use. If the string is left empty, the default
+     * provider for the argument parser will be used. Otherwise,
+     * the {@link cloud.commandframework.arguments.parser.ParserRegistry} instance in the
+     * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.
+     * <p>
+     * For this to work, the suggestion needs to be registered in the parser registry. To do this, use
+     * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, BiFunction)}.
+     * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#getParserRegistry()}.
+     *
+     * @return The name of the suggestion provider, or {@code ""} if the default suggestion provider for the argument parser
+     *         should be used instead
+     * @since 1.1.0
+     */
+    String suggestions() default "";
 
     /**
      * Get the default value
