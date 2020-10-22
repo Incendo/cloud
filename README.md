@@ -209,3 +209,4 @@ Here are some projects that are using cloud:
 - [Hegemony](https://hegemonymc.com): The Premier Minecraft MMORPG with immersive quests, epic open world, 5,000+ custom items,
 700+ recipes, 30+ skills, challenging bosses, player owned shops and NPCs.
 - [YouTrackDiscordBot](https://github.com/Sauilitired/YouTrackDiscordBot): Discord bot for linking YouTrack issues
+- [bot](https://github.com/Incendo/bot): IRC bot for #incendo on esper.net
