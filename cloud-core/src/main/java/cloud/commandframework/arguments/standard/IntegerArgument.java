@@ -201,7 +201,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         public static @NonNull List<@NonNull String> getSuggestions(
                 final long min,
                 final long max,
-                final @NonNull String input) {
+                final @NonNull String input
+        ) {
             final Set<Long> numbers = new TreeSet<>();
 
             try {
