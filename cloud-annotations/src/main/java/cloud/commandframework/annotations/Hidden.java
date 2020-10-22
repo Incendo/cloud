@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 /**
  * Indicates that the command should be hidden. Similar to {@link Command.Builder#hidden()}
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Hidden {
 
