@@ -61,9 +61,9 @@ command completion and suggestions.
 If using the annotation parsing system, you can create custom annotation mappers to use your own annotation bindings for
 command parsing, preprocessing, etc.
 
-Cloud by default ships with implementations and mappings for the most common Minecraft server platforms and JDA and javacord for
-Discord bots. The core
-module allows you to use Cloud anywhere, simply by implementing the CommandManager for the platform of your choice.
+Cloud by default ships with implementations and mappings for the most common Minecraft server platforms, JDA and javacord for
+Discord bots and PircBotX for IRC.
+The core module allows you to use Cloud anywhere, simply by implementing the CommandManager for the platform of your choice.
 
 The code is based on a (W.I.P) paper that can be found [here](https://github.com/Sauilitired/Sauilitired/blob/master/AS_2020_09_Commands.pdf).  
 
@@ -89,6 +89,7 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 - **cloud-minecraft/cloud-minecraft-extras**: Opinionated Extra Features for cloud-minecraft
 - **cloud-discord/cloud-jda**: JDA v4.2.0_209+ implementation of cloud
 - **cloud-discord/cloud-javacord**: Javacord v3.1.1+ implementation of cloud
+- **cloud-irc/cloud-pircbotx**: PircBotX 2.0+ implementation of cloud
 
 ## links  
 
