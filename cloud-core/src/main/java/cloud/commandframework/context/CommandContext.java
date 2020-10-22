@@ -245,6 +245,16 @@ public final class CommandContext<C> {
     }
 
     /**
+     * Get the raw input as a joined string
+     *
+     * @return {@link #getRawInput()} joined with {@code " "} as the delimiter
+     * @since 1.1.0
+     */
+    public @NonNull String getRawInputJoined() {
+        return String.join(" ", this.getRawInput());
+    }
+
+    /**
      * Create an argument timing for a specific argument
      *
      * @param argument Argument
