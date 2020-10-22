@@ -31,6 +31,8 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.pircbotx.arguments.UserArgument;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -109,6 +111,10 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
             );
         }
         this.registerCommandPreProcessor(context -> context.getCommandContext().store(PIRCBOTX_META_KEY, pircBotX));
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(User.class),
+                parameters -> new UserArgument.UserArgumentParser<>()
+        );
     }
 
     @Override
