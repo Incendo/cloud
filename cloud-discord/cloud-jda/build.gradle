@@ -1,4 +1,4 @@
 dependencies {
     api project(':cloud-core')
-    compileOnly 'net.dv8tion:JDA:4.2.0_209'
+    compileOnly "net.dv8tion:JDA:${vers['jda']}"
 }

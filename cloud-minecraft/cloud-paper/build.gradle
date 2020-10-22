@@ -1,5 +1,5 @@
 dependencies {
     api project(':cloud-bukkit')
-    compileOnly 'com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT'
-    compileOnly 'com.destroystokyo.paper:paper-mojangapi:1.15.2-R0.1-SNAPSHOT'
+    compileOnly "com.destroystokyo.paper:paper-api:${vers['paper-api']}"
+    compileOnly "com.destroystokyo.paper:paper-mojangapi:${vers['paper-api']}"
 }
