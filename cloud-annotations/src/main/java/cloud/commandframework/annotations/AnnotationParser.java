@@ -52,7 +52,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -300,7 +302,7 @@ public final class AnnotationParser<C> {
         final TypeToken<?> token = TypeToken.get(parameter.getParameterizedType());
         final ParserParameters parameters = this.manager.getParserRegistry()
                 .parseAnnotations(token, annotations);
-
+        /* Create the argument parser */
         final ArgumentParser<C, ?> parser;
         if (argumentPair.getArgument().parserName().isEmpty()) {
             parser = this.manager.getParserRegistry()
@@ -323,17 +325,19 @@ public final class AnnotationParser<C> {
                                     token.toString()
                             )));
         }
-
+        /* Check whether or not the corresponding method parameter actually exists */
         if (syntaxFragment == null || syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
             throw new IllegalArgumentException(String.format(
                     "Invalid command argument '%s' in method '%s': "
                             + "Missing syntax mapping", argumentPair.getArgument().value(), method.getName()));
         }
         final Argument argument = argumentPair.getArgument();
+        /* Create the argument builder */
         @SuppressWarnings("ALL") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
                 parameter.getType(),
                 argument.value()
         );
+        /* Set the argument requirement status */
         if (syntaxFragment.getArgumentMode() == ArgumentMode.OPTIONAL) {
             if (argument.defaultValue().isEmpty()) {
                 argumentBuilder.asOptional();
@@ -343,9 +347,21 @@ public final class AnnotationParser<C> {
         } else {
             argumentBuilder.asRequired();
         }
-
+        /* Check whether or not a suggestion provider should be set */
+        if (!argument.suggestions().isEmpty()) {
+            final String suggestionProviderName = argument.suggestions();
+            final Optional<BiFunction<CommandContext<C>, String, List<String>>> suggestionsFunction =
+                    this.manager.getParserRegistry().getSuggestionProvider(suggestionProviderName);
+            argumentBuilder.withSuggestionsProvider(
+                    suggestionsFunction.orElseThrow(() ->
+                    new IllegalArgumentException(String.format(
+                            "There is no suggestion provider with name '%s'. Did you forget to register it?",
+                            suggestionProviderName
+                    )))
+            );
+        }
+        /* Build the argument */
         final CommandArgument<C, ?> builtArgument = argumentBuilder.manager(this.manager).withParser(parser).build();
-
         /* Add preprocessors */
         for (final Annotation annotation : annotations) {
             @SuppressWarnings("ALL") final Function preprocessorMapper =
@@ -357,7 +373,7 @@ public final class AnnotationParser<C> {
                 builtArgument.addPreprocessor(preprocessor);
             }
         }
-
+        /* Yay, we're done */
         return builtArgument;
     }
 
