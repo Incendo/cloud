@@ -142,6 +142,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             final User user;
             try {
                 user = pircBotX.getUserChannelDao().getUser(input);
+                inputQueue.remove();
             } catch (final DaoException exception) {
                 return ArgumentParseResult.failure(
                         new UserParseException(
