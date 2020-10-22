@@ -42,6 +42,7 @@ import java.util.Set;
  * Command Argument for {@link User}
  *
  * @param <C> Command sender type
+ * @since 1.1.0
  */
 @SuppressWarnings("unused")
 public final class UserArgument<C> extends CommandArgument<C, User> {

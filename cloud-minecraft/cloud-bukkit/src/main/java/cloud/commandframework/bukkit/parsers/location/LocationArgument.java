@@ -144,6 +144,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
 
     }
 
+
     public static final class LocationParser<C> implements ArgumentParser<C, Location> {
 
         private static final int EXPECTED_PARAMETER_COUNT = 3;
