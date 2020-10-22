@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added ExampleBungeePlugin
  - Added CaptionKeys to cloud-bungee
  - Added BungeeCommandPreprocessor to cloud-bungee
+ - Added named suggestion providers
 
 ### Changed
  - Allow for combined presence flags, such that `-a -b -c` is equivalent to `-abc`
