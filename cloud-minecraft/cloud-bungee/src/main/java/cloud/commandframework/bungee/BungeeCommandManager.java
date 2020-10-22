@@ -47,7 +47,7 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     public static final String ARGUMENT_PARSE_FAILURE_PLAYER = "'{input}' is not a valid player";
 
     /**
-     * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
+     * Default caption for {@link BungeeCaptionKeys#ARGUMENT_PARSE_FAILURE_SERVER}
      */
     public static final String ARGUMENT_PARSE_FAILURE_SERVER = "'{input}' is not a valid server";
 

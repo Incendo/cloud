@@ -26,6 +26,7 @@ package cloud.commandframework.bukkit.arguments.selector;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 
@@ -48,11 +49,14 @@ public final class SinglePlayerSelector extends MultiplePlayerSelector {
     }
 
     /**
-     * Get the selected player
+     * Get the selected player or null if no player matched
      *
      * @return Gets the single player parsed by the selector
      */
-    public @NonNull Player getPlayer() {
+    public @Nullable Player getPlayer() {
+        if (this.getPlayers().isEmpty()) {
+            return null;
+        }
         return this.getPlayers().get(0);
     }
 

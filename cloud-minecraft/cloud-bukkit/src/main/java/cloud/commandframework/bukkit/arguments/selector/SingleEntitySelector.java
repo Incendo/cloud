@@ -25,6 +25,7 @@ package cloud.commandframework.bukkit.arguments.selector;
 
 import org.bukkit.entity.Entity;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 
@@ -47,11 +48,14 @@ public final class SingleEntitySelector extends MultipleEntitySelector {
     }
 
     /**
-     * Get the selected entity
+     * Get the selected entity or null if no entity matched
      *
      * @return Gets the single Bukkit Entity parsed by the selector
      */
-    public @NonNull Entity getEntity() {
+    public @Nullable Entity getEntity() {
+        if (this.getEntities().isEmpty()) {
+            return null;
+        }
         return this.getEntities().get(0);
     }
 
