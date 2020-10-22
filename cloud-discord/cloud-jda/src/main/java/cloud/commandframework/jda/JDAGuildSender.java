@@ -58,6 +58,7 @@ public class JDAGuildSender extends JDACommandSender {
      * Get the member the command sender represents
      *
      * @return Member that sent the message
+     * @since 1.1.0
      */
     public @NonNull Member getMember() {
         return this.member;
@@ -67,6 +68,7 @@ public class JDAGuildSender extends JDACommandSender {
      * Get the channel the user sent the message in
      *
      * @return Channel that the message was sent in
+     * @since 1.1.0
      */
     public @NonNull TextChannel getTextChannel() {
         return this.channel;

@@ -23,15 +23,15 @@
 //
 package cloud.commandframework.jda;
 
-import java.util.Objects;
-import java.util.Optional;
-
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Wrapper for {@link MessageReceivedEvent}
@@ -77,6 +77,7 @@ public class JDACommandSender {
      * Get the message receive event
      *
      * @return Optional of the message receive event
+     * @since 1.1.0
      */
     public final @NonNull Optional<MessageReceivedEvent> getEvent() {
         return Optional.ofNullable(this.event);
@@ -86,6 +87,7 @@ public class JDACommandSender {
      * Get the user the command sender represents
      *
      * @return User that sent the message
+     * @since 1.1.0
      */
     public final @NonNull User getUser() {
         return this.user;
