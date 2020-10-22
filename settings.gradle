@@ -32,6 +32,9 @@ include(':cloud-sponge')
 project(':cloud-sponge').projectDir = file('cloud-minecraft/cloud-sponge')
 include(':cloud-velocity')
 project(':cloud-velocity').projectDir = file('cloud-minecraft/cloud-velocity')
+// IRC Modules
+include(':cloud-pircbotx')
+project(':cloud-pircbotx').projectDir = file('cloud-irc/cloud-pircbotx')
 //
 // Example Modules
 //
