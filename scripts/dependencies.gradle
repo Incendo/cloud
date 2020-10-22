@@ -14,6 +14,8 @@ ext {
             'adventure-api' : '4.1.1',
             'paper-api'     : '1.15.2-R0.1-SNAPSHOT',
             'velocity-api'  : '1.1.0-SNAPSHOT',
+            // IRC DEPENDENCIES
+            'pircbotx'      : '2.1',
             // TEST DEPENDENCIES
             'jupiter-engine': '5.7.0',
             'jhm'           : '1.25.2'
