@@ -1,4 +1,4 @@
 dependencies {
     api project(':cloud-core')
-    compileOnly 'org.cloudburstmc:cloudburst-server:1.0.0-SNAPSHOT'
+    compileOnly "org.cloudburstmc:cloudburst-server:${vers['cloudburst']}"
 }
