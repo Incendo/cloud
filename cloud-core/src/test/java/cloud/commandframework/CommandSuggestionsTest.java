@@ -80,6 +80,12 @@ public class CommandSuggestionsTest {
                         .build())
                 .build());
 
+        manager.command(manager.commandBuilder("flags2")
+                .flag(manager.flagBuilder("first").withAliases("f"))
+                .flag(manager.flagBuilder("second").withAliases("s"))
+                .flag(manager.flagBuilder("third").withAliases("t"))
+                .build());
+
         manager.command(manager.commandBuilder("numbers").argument(IntegerArgument.of("num")));
 
         manager.command(manager.commandBuilder("numberswithmin")
@@ -169,6 +175,15 @@ public class CommandSuggestionsTest {
         final String input3 = "flags 10 --enum foo ";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.singletonList("--static"), suggestions3);
+        final String input4 = "flags2 ";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Arrays.asList("--first", "--second", "--third", "-f", "-s", "-t"), suggestions4);
+        final String input5 = "flags2 -f";
+        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(Arrays.asList("-fs", "-ft", "-f"), suggestions5);
+        final String input6 = "flags2 -f -s";
+        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(Arrays.asList("-st", "-s"), suggestions6);
     }
 
     @Test

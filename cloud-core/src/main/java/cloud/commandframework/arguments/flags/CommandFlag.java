@@ -56,9 +56,9 @@ public final class CommandFlag<T> {
             final @NonNull Description description,
             final @Nullable CommandArgument<?, T> commandArgument
     ) {
-        this.name = name;
-        this.aliases = aliases;
-        this.description = description;
+        this.name = Objects.requireNonNull(name, "name cannot be null");
+        this.aliases = Objects.requireNonNull(aliases, "aliases cannot be null");
+        this.description = Objects.requireNonNull(description, "description cannot be null");
         this.commandArgument = commandArgument;
     }
 
@@ -156,7 +156,8 @@ public final class CommandFlag<T> {
         }
 
         /**
-         * Create a new builder instance using the given flag aliases
+         * Create a new builder instance using the given flag aliases.
+         * These may at most be one character in length
          *
          * @param aliases Flag aliases
          * @return New builder instance
@@ -166,6 +167,14 @@ public final class CommandFlag<T> {
             for (final String alias : aliases) {
                 if (alias.isEmpty()) {
                     continue;
+                }
+                if (alias.length() > 1) {
+                    throw new IllegalArgumentException(
+                           String.format(
+                                   "Alias '%s' has name longer than one character. This is not allowed",
+                                   alias
+                           )
+                    );
                 }
                 filteredAliases.add(alias);
             }
