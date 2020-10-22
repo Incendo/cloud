@@ -56,6 +56,7 @@ public class JDAPrivateSender extends JDACommandSender {
      * Get the channel the user sent the message in
      *
      * @return Channel that the message was sent in
+     * @since 1.1.0
      */
     public @NonNull PrivateChannel getPrivateChannel() {
         return this.channel;
