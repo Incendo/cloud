@@ -117,6 +117,7 @@ class CommandTreeTest {
                         .withAliases("t")
                         .build())
                 .flag(manager.flagBuilder("test2")
+                        .withAliases("f")
                         .build())
                 .flag(manager.flagBuilder("num")
                         .withArgument(IntegerArgument.of("num")).build())
@@ -124,6 +125,7 @@ class CommandTreeTest {
                         .withArgument(EnumArgument.of(FlagEnum.class, "enum")))
                 .handler(c -> {
                     System.out.println("Flag present? " + c.flags().isPresent("test"));
+                    System.out.println("Second flag present? " + c.flags().isPresent("test2"));
                     System.out.println("Numerical flag: " + c.flags().getValue("num", -10));
                     System.out.println("Enum: " + c.flags().getValue("enum", FlagEnum.PROXI));
                 })
@@ -283,6 +285,7 @@ class CommandTreeTest {
                 manager.executeCommand(new TestCommandSender(), "flags --test test2").join());
         manager.executeCommand(new TestCommandSender(), "flags --num 500").join();
         manager.executeCommand(new TestCommandSender(), "flags --num 63 --enum potato --test").join();
+        manager.executeCommand(new TestCommandSender(), "flags -tf --num 63 --enum potato").join();
     }
 
     @Test
