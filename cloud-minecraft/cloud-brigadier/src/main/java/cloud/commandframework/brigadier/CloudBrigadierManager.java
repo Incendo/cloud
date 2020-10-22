@@ -427,6 +427,9 @@ public final class CloudBrigadierManager<C, S> {
         if (forceExecutor || root.isLeaf() || !root.getValue().isRequired()) {
             argumentBuilder.executes(executor);
         }
+        if (root.getChildren().stream().noneMatch(node -> node.getValue().isRequired())) {
+            argumentBuilder.executes(executor);
+        }
         for (final CommandTree.Node<CommandArgument<C, ?>> node : root.getChildren()) {
             argumentBuilder.then(constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
         }
