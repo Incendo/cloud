@@ -37,6 +37,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class NoPermissionException extends CommandParseException {
 
+    private static final long serialVersionUID = 7103413337750692843L;
     private final CommandPermission missingPermission;
 
     /**

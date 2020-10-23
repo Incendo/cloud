@@ -111,7 +111,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
         private Set<ParserMode> modes = new HashSet<>();
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(User.class, name);
         }
 
@@ -244,6 +244,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     public static class UserParseException extends IllegalArgumentException {
 
+        private static final long serialVersionUID = -6728909884195850077L;
         private final String input;
 
         /**
@@ -269,6 +270,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     public static final class TooManyUsersFoundParseException extends UserParseException {
 
+        private static final long serialVersionUID = 7222089412615886672L;
+
         /**
          * Construct a new user parse exception
          *
@@ -287,6 +290,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
 
     public static final class UserNotFoundParseException extends UserParseException {
+
+        private static final long serialVersionUID = 3689949065073643826L;
 
         /**
          * Construct a new user parse exception

@@ -45,6 +45,7 @@ import java.util.logging.Level;
  *
  * @param <C> Command sender type
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class BukkitBrigadierMapper<C> {
 
     private static final int UUID_ARGUMENT_VERSION = 16;
@@ -115,6 +116,7 @@ public final class BukkitBrigadierMapper<C> {
         };
     }
 
+    @SuppressWarnings("UnnecessaryLambda")
     private Supplier<ArgumentType<?>> getArgumentVec3() {
         return () -> {
             try {
@@ -152,7 +154,7 @@ public final class BukkitBrigadierMapper<C> {
         try {
             this.brigadierManager.registerDefaultArgumentTypeSupplier(type, () -> {
                 try {
-                    return (ArgumentType<?>) constructor.newInstance();
+                    return constructor.newInstance();
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }

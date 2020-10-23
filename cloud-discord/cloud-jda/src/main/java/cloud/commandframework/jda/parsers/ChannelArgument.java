@@ -110,7 +110,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
         private List<ParserMode> modes = new ArrayList<>();
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(MessageChannel.class, name);
         }
 
@@ -228,6 +228,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
     public static class ChannelParseException extends IllegalArgumentException {
 
+        private static final long serialVersionUID = 2724288304060572202L;
         private final String input;
 
         /**
@@ -253,6 +254,8 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
     public static final class TooManyChannelsFoundParseException extends ChannelParseException {
 
+        private static final long serialVersionUID = -507783063742841507L;
+
         /**
          * Construct a new channel parse exception
          *
@@ -271,6 +274,8 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
 
     public static final class ChannelNotFoundException extends ChannelParseException {
+
+        private static final long serialVersionUID = -8299458048947528494L;
 
         /**
          * Construct a new channel parse exception

@@ -159,6 +159,7 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public @NonNull List<@NonNull String> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
@@ -170,7 +171,6 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
             in the context, so we can then extract that number and forward the request
              */
             final int argument = commandContext.getOrDefault("__parsing_argument__", 1) - 1;
-            //noinspection all
             return ((ArgumentParser<C, ?>) this.parsers[argument]).suggestions(commandContext, input);
         }
 

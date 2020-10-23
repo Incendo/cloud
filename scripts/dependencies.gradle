@@ -2,6 +2,7 @@ ext {
     vers = [
             'checker-qual'  : '3.7.0',
             'geantyref'     : '1.3.11',
+            'errorprone'    : '2.4.0',
             // DISCORD DEPENDENCIES
             'javacord'      : '3.1.1',
             'jda'           : '4.2.0_209',
@@ -14,6 +15,8 @@ ext {
             'adventure-api' : '4.1.1',
             'paper-api'     : '1.15.2-R0.1-SNAPSHOT',
             'velocity-api'  : '1.1.0-SNAPSHOT',
+            'jb-annotations': '20.1.0',
+            'guava'         : '30.0-jre',
             // IRC DEPENDENCIES
             'pircbotx'      : '83a4c22e80',
             // TEST DEPENDENCIES

@@ -55,6 +55,7 @@ public interface Service<Context, Result> extends Function<@NonNull Context, @Nu
     @Nullable Result handle(@NonNull Context context) throws Exception;
 
     @Override
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
     default @Nullable Result apply(@NonNull Context context) {
         try {
             return this.handle(context);

@@ -35,6 +35,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class CommandParseException extends IllegalArgumentException {
 
+    private static final long serialVersionUID = -2415981126382517435L;
     private final Object commandSender;
     private final List<CommandArgument<?, ?>> currentChain;
 

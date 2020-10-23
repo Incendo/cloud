@@ -35,6 +35,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public final class NoSuchCommandException extends CommandParseException {
 
+    private static final long serialVersionUID = -7775865652882764771L;
     private final String suppliedCommand;
 
     /**

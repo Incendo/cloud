@@ -55,6 +55,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean registerCommand(final @NonNull Command<?> command) {
         final CommandArgument<?, ?> argument = command.getArguments().get(0);
         final List<String> aliases = ((StaticArgument<C>) argument).getAlternativeAliases();

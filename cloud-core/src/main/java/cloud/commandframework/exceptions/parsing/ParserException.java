@@ -30,6 +30,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class ParserException extends IllegalArgumentException {
 
+    private static final long serialVersionUID = -4409795575435072170L;
     private final Class<?> argumentParser;
     private final CommandContext<?> context;
     private final Caption errorCaption;

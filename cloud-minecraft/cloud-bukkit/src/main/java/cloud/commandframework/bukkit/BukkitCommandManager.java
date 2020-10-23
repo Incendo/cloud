@@ -79,7 +79,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
 
-    private final BukkitSynchronizer bukkitSynchronizer;
     private final TaskFactory taskFactory;
 
     private boolean splitAliases = false;
@@ -109,6 +108,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      * @throws Exception If the construction of the manager fails
      */
+    @SuppressWarnings("unchecked")
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull Function<@NonNull CommandTree<C>,
@@ -123,8 +123,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
 
-        this.bukkitSynchronizer = new BukkitSynchronizer(owningPlugin);
-        this.taskFactory = new TaskFactory(this.bukkitSynchronizer);
+        final BukkitSynchronizer bukkitSynchronizer = new BukkitSynchronizer(owningPlugin);
+        this.taskFactory = new TaskFactory(bukkitSynchronizer);
 
         /* Try to determine the Minecraft version */
         int version = -1;
@@ -148,6 +148,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
             Class.forName("com.destroystokyo.paper.PaperConfig");
             paper = true;
         } catch (final Exception ignored) {
+            // This is fine
         }
         this.paper = paper;
 
@@ -183,7 +184,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
                 this.owningPlugin
         );
 
-        this.registerDefaultCaptions(new BukkitCaptionRegistryFactory<C>().create());
+        this.setCaptionRegistry(new BukkitCaptionRegistryFactory<C>().create());
     }
 
     /**
@@ -363,6 +364,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
 
     public static final class BrigadierFailureException extends IllegalStateException {
 
+        private static final long serialVersionUID = 7816660840063155703L;
         private final BrigadierFailureReason reason;
 
         /**

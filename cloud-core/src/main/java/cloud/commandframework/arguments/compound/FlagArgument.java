@@ -104,6 +104,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         }
 
         @Override
+        @SuppressWarnings({"unchecked", "rawtypes"})
         public @NonNull ArgumentParseResult<@NonNull Object> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
@@ -207,11 +208,13 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                                         );
                         if (result.getFailure().isPresent()) {
                             return ArgumentParseResult.failure(result.getFailure().get());
-                        } else {
+                        } else if (result.getParsedValue().isPresent()) {
                             final CommandFlag erasedFlag = currentFlag;
                             final Object value = result.getParsedValue().get();
                             commandContext.flags().addValueFlag(erasedFlag, value);
                             currentFlag = null;
+                        } else {
+                            throw new IllegalStateException("Neither result or value were present. Panicking.");
                         }
                     }
                 }
@@ -229,6 +232,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         }
 
         @Override
+        @SuppressWarnings({"unchecked", "rawtypes"})
         public @NonNull List<@NonNull String> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
@@ -330,7 +334,6 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     }
                 }
                 if (currentFlag != null && currentFlag.getCommandArgument() != null) {
-                    // noinspection all
                     return (List<String>) ((BiFunction) currentFlag.getCommandArgument().getSuggestionsProvider())
                             .apply(commandContext, input);
                 }
@@ -346,6 +349,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
      */
     public static final class FlagParseException extends ParserException {
 
+        private static final long serialVersionUID = -7725389394142868549L;
         private final String input;
 
         /**

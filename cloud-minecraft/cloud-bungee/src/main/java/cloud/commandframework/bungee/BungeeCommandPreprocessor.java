@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
  * with Bungee specific objects
  *
- * @param <C>
+ * @param <C> Command sender type
  * @since 1.1.0
  */
 final class BungeeCommandPreprocessor<C> implements CommandPreprocessor<C> {

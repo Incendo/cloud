@@ -114,7 +114,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
 
     public static final class Builder<C> extends CommandArgument.Builder<C, OfflinePlayer> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(OfflinePlayer.class, name);
         }
 
@@ -136,6 +136,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
     public static final class OfflinePlayerParser<C> implements ArgumentParser<C, OfflinePlayer> {
 
         @Override
+        @SuppressWarnings("deprecation")
         public @NonNull ArgumentParseResult<OfflinePlayer> parse(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<String> inputQueue
@@ -149,10 +150,9 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
             }
             inputQueue.remove();
 
-            //noinspection deprecation
-            OfflinePlayer player = Bukkit.getOfflinePlayer(input);
+            final OfflinePlayer player = Bukkit.getOfflinePlayer(input);
 
-            if (player == null || (!player.hasPlayedBefore() && !player.isOnline())) {
+            if (!player.hasPlayedBefore() && !player.isOnline()) {
                 return ArgumentParseResult.failure(new OfflinePlayerParseException(input, commandContext));
             }
 
@@ -181,6 +181,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      */
     public static final class OfflinePlayerParseException extends ParserException {
 
+        private static final long serialVersionUID = 7632293268451349508L;
         private final String input;
 
         /**

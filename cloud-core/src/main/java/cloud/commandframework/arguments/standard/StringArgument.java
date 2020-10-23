@@ -197,7 +197,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         private StringMode stringMode = StringMode.SINGLE;
         private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(String.class, name);
         }
 
@@ -248,6 +248,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @param suggestionsProvider Suggestions provider
          * @return Builder instance
          */
+        @Override
         public @NonNull Builder<C> withSuggestionsProvider(
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
                         @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
@@ -410,6 +411,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
     public static final class StringParseException extends ParserException {
 
+        private static final long serialVersionUID = -8903115465005472945L;
         private final String input;
         private final StringMode stringMode;
 

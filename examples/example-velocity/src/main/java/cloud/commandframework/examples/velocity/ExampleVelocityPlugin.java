@@ -37,7 +37,6 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -45,7 +44,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 @Plugin(
         id = "example-plugin",
@@ -54,10 +52,6 @@ import java.util.logging.Logger;
 )
 public final class ExampleVelocityPlugin {
 
-    @Inject
-    private ProxyServer server;
-    @Inject
-    private Logger logger;
     @Inject
     private Injector injector;
 

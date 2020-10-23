@@ -25,9 +25,11 @@ package cloud.commandframework.permission;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -84,7 +86,9 @@ public final class OrPermission implements CommandPermission {
             return false;
         }
         final OrPermission that = (OrPermission) o;
-        return Objects.equals(getPermissions(), that.getPermissions());
+        final List<CommandPermission> local = new ArrayList<>(this.getPermissions());
+        final List<CommandPermission> foreign = new ArrayList<>(that.getPermissions());
+        return local.equals(foreign);
     }
 
     @Override

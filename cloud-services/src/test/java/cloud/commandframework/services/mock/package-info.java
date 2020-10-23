@@ -21,44 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.examples.jda;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-public abstract class CustomUser {
-
-    private final User user;
-    private final MessageChannel channel;
-
-    /**
-     * Construct a user
-     *
-     * @param user    Sending user
-     * @param channel Channel that the message was sent in
-     */
-    protected CustomUser(final @NonNull User user, final @NonNull MessageChannel channel) {
-        this.user = user;
-        this.channel = channel;
-    }
-
-    /**
-     * Get the user that sent the message
-     *
-     * @return Sending user
-     */
-    public final @NonNull User getUser() {
-        return user;
-    }
-
-    /**
-     * Get the channel the message was sent in
-     *
-     * @return Message channel
-     */
-    public final @NonNull MessageChannel getChannel() {
-        return channel;
-    }
-
-}
+/**
+ * Mock service files
+ */
+package cloud.commandframework.services.mock;

@@ -140,7 +140,7 @@ public final class CommandContext<C> {
     public <T> @NonNull Optional<T> getOptional(final @NonNull String key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
-            @SuppressWarnings("ALL") final T castedValue = (T) value;
+            @SuppressWarnings("unchecked") final T castedValue = (T) value;
             return Optional.of(castedValue);
         } else {
             return Optional.empty();
@@ -155,10 +155,11 @@ public final class CommandContext<C> {
      * @param <T>      Value type
      * @return Value
      */
+    @SuppressWarnings("unused")
     public <T> @NonNull Optional<T> getOptional(final @NonNull CommandArgument<C, T> argument) {
         final Object value = this.internalStorage.get(argument.getName());
         if (value != null) {
-            @SuppressWarnings("ALL") final T castedValue = (T) value;
+            @SuppressWarnings("unchecked") final T castedValue = (T) value;
             return Optional.of(castedValue);
         } else {
             return Optional.empty();
@@ -183,7 +184,7 @@ public final class CommandContext<C> {
      * @return Argument
      * @throws NullPointerException If no such argument is stored
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
     public <T> @NonNull T get(final @NonNull String key) {
         final Object value = this.internalStorage.get(key);
         if (value == null) {

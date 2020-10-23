@@ -49,6 +49,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("unchecked")
     public final @NonNull String apply(
             final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
             final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node

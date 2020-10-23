@@ -179,6 +179,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
     public static final class PlayerParseException extends ParserException {
 
+        private static final long serialVersionUID = -4839583631837040297L;
+
         private PlayerParseException(
                 final @NonNull String input,
                 final @NonNull CommandContext<?> context

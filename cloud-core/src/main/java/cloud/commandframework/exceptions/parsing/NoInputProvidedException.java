@@ -34,6 +34,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public class NoInputProvidedException extends ParserException {
 
+    private static final long serialVersionUID = 3485754951593709559L;
+
     /**
      * Construct a new NoInputProvidedException
      *

@@ -88,7 +88,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                 sender,
                 builder.toString()
         )
-                .whenComplete(((commandResult, throwable) -> {
+                .whenComplete((commandResult, throwable) -> {
                     if (throwable != null) {
                         if (throwable instanceof CompletionException) {
                             throwable = throwable.getCause();
@@ -138,7 +138,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                             throwable.printStackTrace();
                         }
                     }
-                }));
+                });
         return true;
     }
 

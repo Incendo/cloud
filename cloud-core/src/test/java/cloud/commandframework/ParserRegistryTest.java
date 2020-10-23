@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
+import java.util.Objects;
 
 public class ParserRegistryTest {
 
@@ -60,6 +61,20 @@ public class ParserRegistryTest {
             @Override
             public String max() {
                 return Integer.toString(RANGE_MAX);
+            }
+
+            @Override
+            public boolean equals(final Object obj) {
+               if (!(obj instanceof Range)) {
+                   return false;
+               }
+               final Range range = (Range) obj;
+               return this.min().equals(range.min()) && this.max().equals(range.max());
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(this.min(), this.max());
             }
         };
 

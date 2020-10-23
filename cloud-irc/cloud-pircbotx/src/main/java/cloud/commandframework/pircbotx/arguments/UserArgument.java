@@ -159,6 +159,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     public static final class UserParseException extends ParserException {
 
+        private static final long serialVersionUID = -1758590697299611905L;
+
         private UserParseException(
                 final @NonNull CommandContext<?> context,
                 final @NonNull String input

@@ -54,6 +54,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      * @param mapper     Mapper that maps the sub-arguments to the output type
      * @param valueType  The output type
      */
+    @SuppressWarnings("unchecked")
     protected ArgumentPair(
             final boolean required,
             final @NonNull String name,

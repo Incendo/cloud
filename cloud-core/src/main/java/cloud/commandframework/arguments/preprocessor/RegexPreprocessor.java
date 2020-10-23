@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
  *
  * @param <C> Command sender type
  */
+@SuppressWarnings("unused")
 public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
         @NonNull ArgumentParseResult<Boolean>> {
 
@@ -114,6 +115,7 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
      */
     public static final class RegexValidationException extends IllegalArgumentException {
 
+        private static final long serialVersionUID = 747826566058072233L;
         private final String pattern;
         private final String failedString;
         private final Caption failureCaption;

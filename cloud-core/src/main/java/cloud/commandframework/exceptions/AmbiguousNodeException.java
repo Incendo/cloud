@@ -40,6 +40,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public final class AmbiguousNodeException extends IllegalStateException {
 
+    private static final long serialVersionUID = -200207173805584709L;
     private final CommandArgument<?, ?> parentNode;
     private final CommandArgument<?, ?> ambiguousNode;
     private final List<CommandArgument<?, ?>> children;

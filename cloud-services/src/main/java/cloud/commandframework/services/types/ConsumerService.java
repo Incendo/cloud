@@ -50,6 +50,7 @@ public interface ConsumerService<Context>
     }
 
     @Override
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
     default @NonNull State handle(final @NonNull Context context) {
         try {
             this.accept(context);
@@ -70,6 +71,8 @@ public interface ConsumerService<Context>
 
 
     class PipeBurst extends RuntimeException {
+
+        private static final long serialVersionUID = -1143137258194595985L;
 
         private PipeBurst() {
         }

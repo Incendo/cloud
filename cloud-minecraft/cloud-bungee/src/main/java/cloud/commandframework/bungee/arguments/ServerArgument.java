@@ -172,6 +172,8 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
 
     public static final class ServerParseException extends ParserException {
 
+        private static final long serialVersionUID = -3825941611365494659L;
+
         private ServerParseException(
                 final @NonNull String input,
                 final @NonNull CommandContext<?> context

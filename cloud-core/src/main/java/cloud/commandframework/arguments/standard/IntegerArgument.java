@@ -134,7 +134,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         private int min = Integer.MIN_VALUE;
         private int max = Integer.MAX_VALUE;
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Integer.class, name);
         }
 
@@ -198,6 +198,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          * @param input Input
          * @return List of suggestions
          */
+        @SuppressWarnings("MixedMutabilityReturnType")
         public static @NonNull List<@NonNull String> getSuggestions(
                 final long min,
                 final long max,
@@ -301,6 +302,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
 
     public static final class IntegerParseException extends NumberParseException {
+
+        private static final long serialVersionUID = -6933923056628373853L;
 
         /**
          * Construct a new integer parse exception

@@ -108,7 +108,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, World> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(World.class, name);
         }
 
@@ -154,6 +154,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
 
     public static final class WorldParseException extends ParserException {
 
+        private static final long serialVersionUID = 561648144491587450L;
         private final String input;
 
         /**
