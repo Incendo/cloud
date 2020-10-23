@@ -127,7 +127,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         private byte min = Byte.MIN_VALUE;
         private byte max = Byte.MAX_VALUE;
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Byte.class, name);
         }
 
@@ -257,6 +257,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * Byte parse exception
      */
     public static final class ByteParseException extends NumberParseException {
+
+        private static final long serialVersionUID = -4724241304872989208L;
 
         /**
          * Construct a new byte parse exception

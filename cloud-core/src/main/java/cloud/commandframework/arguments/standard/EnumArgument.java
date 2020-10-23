@@ -131,7 +131,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
         private final Class<E> enumClass;
 
-        protected Builder(final @NonNull String name, final @NonNull Class<E> enumClass) {
+        private Builder(final @NonNull String name, final @NonNull Class<E> enumClass) {
             super(enumClass, name);
             this.enumClass = enumClass;
         }
@@ -202,6 +202,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
     public static final class EnumParseException extends ParserException {
 
+        private static final long serialVersionUID = 3465389578951428862L;
         private final String input;
         private final Class<? extends Enum<?>> enumClass;
 
@@ -228,7 +229,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             this.enumClass = enumClass;
         }
 
-        @SuppressWarnings("all")
+        @SuppressWarnings({"unchecked", "rawtypes"})
         private static @NonNull String join(final @NonNull Class<? extends Enum> clazz) {
             final EnumSet<?> enumSet = EnumSet.allOf(clazz);
             return enumSet.stream()

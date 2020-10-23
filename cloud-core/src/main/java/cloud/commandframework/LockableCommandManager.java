@@ -60,7 +60,7 @@ public abstract class LockableCommandManager<C> extends CommandManager<C> {
      * @param commandRegistrationHandler  Command registration handler. This will get called every time a new command is
      *                                    registered to the command manager. This may be used to forward command registration
      */
-    public LockableCommandManager(
+    protected LockableCommandManager(
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull CommandRegistrationHandler commandRegistrationHandler
     ) {

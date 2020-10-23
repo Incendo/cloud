@@ -38,7 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collections;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings({"unchecked", "rawtypes"})
 class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
 
     private final BukkitCommandManager<C> commandManager;
@@ -77,7 +77,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     ) {
         final com.mojang.brigadier.Command<?> cmd = o -> 1;
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
-                .<Object>createLiteralCommandNode(label, command, (o, p) -> {
+                .createLiteralCommandNode(label, command, (o, p) -> {
                     final CommandSender sender = this.commodore.getBukkitSender(o);
                     return this.commandManager.hasPermission(
                             this.commandManager.getCommandSenderMapper().apply(sender),

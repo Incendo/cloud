@@ -50,7 +50,7 @@ final class Pagination<T> {
         this.outOfRangeRenderer = outOfRangeRenderer;
     }
 
-    public @NonNull List<Component> render(
+    @NonNull List<Component> render(
             final @NonNull List<T> content,
             final int page,
             final int itemsPerPage
@@ -73,7 +73,7 @@ final class Pagination<T> {
 
         renderedContent.add(this.footerRenderer.apply(page, pages));
 
-        return renderedContent;
+        return Collections.unmodifiableList(renderedContent);
     }
 
 }

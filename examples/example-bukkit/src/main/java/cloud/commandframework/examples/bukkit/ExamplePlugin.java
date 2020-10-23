@@ -91,6 +91,7 @@ import java.util.function.Function;
 /**
  * Example plugin class
  */
+@SuppressWarnings("unused")
 public final class ExamplePlugin extends JavaPlugin {
 
     private BukkitCommandManager<CommandSender> manager;

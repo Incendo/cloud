@@ -57,8 +57,8 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link Object}
      * @param commandPrefixMapper          Function that maps the command sender type to the command prefix
      * @param commandPermissionMapper      Function used to check if a command sender has the permission to execute a command
-     * @throws Exception If the construction of the manager fails
      */
+    @SuppressWarnings("unchecked")
     public JavacordCommandManager(
             final @NonNull DiscordApi discordApi,
             final @NonNull Function<@NonNull CommandTree<C>,
@@ -69,8 +69,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
             final @NonNull Function<@NonNull C, @NonNull String> commandPrefixMapper,
             final @Nullable BiFunction<@NonNull C,
                     @NonNull String, @NonNull Boolean> commandPermissionMapper
-    )
-            throws Exception {
+    ) {
         super(commandExecutionCoordinator, new JavacordRegistrationHandler<>());
         ((JavacordRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.discordApi = discordApi;

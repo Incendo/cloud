@@ -34,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @SuppressWarnings("unused")
 public final class NoCommandInLeafException extends IllegalStateException {
 
+    private static final long serialVersionUID = 3373529875213310821L;
     private final CommandArgument<?, ?> commandArgument;
 
     /**

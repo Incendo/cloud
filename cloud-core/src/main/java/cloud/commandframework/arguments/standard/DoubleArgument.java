@@ -127,7 +127,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         private double min = Double.NEGATIVE_INFINITY;
         private double max = Double.POSITIVE_INFINITY;
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Double.class, name);
         }
 
@@ -244,6 +244,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
 
     public static final class DoubleParseException extends NumberParseException {
+
+        private static final long serialVersionUID = 1764554911581976586L;
 
         /**
          * Construct a new double parse exception

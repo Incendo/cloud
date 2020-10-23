@@ -107,7 +107,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Material> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Material.class, name);
         }
 
@@ -164,6 +164,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
 
     public static final class MaterialParseException extends ParserException {
 
+        private static final long serialVersionUID = 1615554107385965610L;
         private final String input;
 
         /**

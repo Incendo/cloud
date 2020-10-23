@@ -108,7 +108,7 @@ public final class ServicePipeline {
      * @return Service pipeline instance
      * @throws Exception Any exceptions thrown during the registration process
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> @NonNull ServicePipeline registerMethods(
             final @NonNull T instance
     ) throws Exception {

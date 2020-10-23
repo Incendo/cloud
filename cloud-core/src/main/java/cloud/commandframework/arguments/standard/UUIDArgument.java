@@ -103,7 +103,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, UUID> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(UUID.class, name);
         }
 
@@ -154,6 +154,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     public static final class UUIDParseException extends ParserException {
 
+        private static final long serialVersionUID = 6399602590976540023L;
         private final String input;
 
         /**

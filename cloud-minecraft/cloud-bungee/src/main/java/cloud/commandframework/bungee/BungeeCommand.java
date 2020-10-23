@@ -48,7 +48,6 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
 
     private final BungeeCommandManager<C> manager;
     private final CommandArgument<C, ?> command;
-    private final cloud.commandframework.Command<C> cloudCommand;
 
     @SuppressWarnings("unchecked")
     BungeeCommand(
@@ -63,7 +62,6 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         );
         this.command = command;
         this.manager = manager;
-        this.cloudCommand = cloudCommand;
     }
 
     @Override
@@ -78,7 +76,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                 sender,
                 builder.toString()
         )
-                .whenComplete(((commandResult, throwable) -> {
+                .whenComplete((commandResult, throwable) -> {
                     if (throwable != null) {
                         if (throwable instanceof CompletionException) {
                             throwable = throwable.getCause();
@@ -154,7 +152,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                             throwable.printStackTrace();
                         }
                     }
-                }));
+                });
     }
 
     @Override

@@ -108,7 +108,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Enchantment> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Enchantment.class, name);
         }
 
@@ -127,6 +127,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
     public static final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment> {
 
         @Override
+        @SuppressWarnings("deprecation")
         public @NonNull ArgumentParseResult<Enchantment> parse(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
@@ -142,7 +143,6 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
             final NamespacedKey key;
             if (input.contains(":")) {
                 final String[] splitInput = input.split(":");
-                //noinspection deprecation
                 key = new NamespacedKey(splitInput[0], splitInput[1]);
             } else {
                 key = NamespacedKey.minecraft(input);
@@ -177,6 +177,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
 
     public static final class EnchantmentParseException extends ParserException {
 
+        private static final long serialVersionUID = 1415174766296065151L;
         private final String input;
 
         /**

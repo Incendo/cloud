@@ -77,6 +77,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSource}
      */
     @Inject
+    @SuppressWarnings("unchecked")
     public VelocityCommandManager(
             final @NonNull ProxyServer proxyServer,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,

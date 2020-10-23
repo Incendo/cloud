@@ -48,6 +48,7 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public @NonNull Collection<@NonNull CommandFlag<?>> apply(final @NonNull Method method) {
         final Collection<CommandFlag<?>> flags = new LinkedList<>();
         for (final Parameter parameter : method.getParameters()) {
@@ -77,15 +78,14 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                                     parameter.getType().getCanonicalName(), flag.value(), method.getName()
                             ));
                 }
-                @SuppressWarnings("ALL") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
+                final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
                         parameter.getType(),
                         flag.value()
                 );
-                @SuppressWarnings("ALL") final CommandArgument argument = argumentBuilder.asRequired()
+                final CommandArgument argument = argumentBuilder.asRequired()
                         .manager(this.commandManager)
                         .withParser(parser)
                         .build();
-                // noinspection unchecked
                 flags.add(builder.withArgument(argument).build());
             }
         }

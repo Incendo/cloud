@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
  * with Velocity specific objects
  *
- * @param <C>
+ * @param <C> Command sender type
  * @since 1.1.0
  */
 final class VelocityCommandPreprocessor<C> implements CommandPreprocessor<C> {

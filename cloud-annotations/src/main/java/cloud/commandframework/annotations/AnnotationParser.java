@@ -106,7 +106,7 @@ public final class AnnotationParser<C> {
         ));
     }
 
-    protected static <A extends Annotation> @Nullable A getMethodOrClassAnnotation(
+    static <A extends Annotation> @Nullable A getMethodOrClassAnnotation(
             final @NonNull Method method,
             final @NonNull Class<A> clazz
     ) {
@@ -118,7 +118,7 @@ public final class AnnotationParser<C> {
         return null;
     }
 
-    protected static <A extends Annotation> boolean methodOrClassHasAnnotation(
+    static <A extends Annotation> boolean methodOrClassHasAnnotation(
             final @NonNull Method method,
             final @NonNull Class<A> clazz
     ) {
@@ -163,6 +163,7 @@ public final class AnnotationParser<C> {
      * @param <T>      Type of the instance
      * @return Collection of parsed annotations
      */
+    @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
     public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {
         final Method[] methods = instance.getClass().getDeclaredMethods();
         final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
@@ -184,9 +185,7 @@ public final class AnnotationParser<C> {
         }
         final Collection<Command<C>> commands = this.construct(instance, commandMethodPairs);
         for (final Command<C> command : commands) {
-            @SuppressWarnings("ALL") final CommandManager commandManager = this.manager;
-            //noinspection all
-            commandManager.command(command);
+            ((CommandManager) this.manager).command(command);
         }
         return commands;
     }
@@ -203,14 +202,14 @@ public final class AnnotationParser<C> {
             final LinkedHashMap<String, SyntaxFragment> tokens = this.syntaxParser.apply(commandMethod.value());
             /* Determine command name */
             final String commandToken = commandMethod.value().split(" ")[0].split("\\|")[0];
-            @SuppressWarnings("ALL") final CommandManager manager = this.manager;
+            @SuppressWarnings("rawtypes") final CommandManager manager = this.manager;
             final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
                     .with(this.metaFactory.apply(method));
             if (methodOrClassHasAnnotation(method, Confirmation.class)) {
                 metaBuilder.with(CommandConfirmationManager.CONFIRMATION_REQUIRED_META, "true");
             }
 
-            @SuppressWarnings("ALL")
+            @SuppressWarnings("rawtypes")
             Command.Builder builder = manager.commandBuilder(
                     commandToken,
                     tokens.get(commandToken).getMinor(),
@@ -353,7 +352,7 @@ public final class AnnotationParser<C> {
         }
         final Argument argument = argumentPair.getArgument();
         /* Create the argument builder */
-        @SuppressWarnings("ALL") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
+        @SuppressWarnings("rawtypes") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
                 parameter.getType(),
                 argument.value()
         );
@@ -384,7 +383,7 @@ public final class AnnotationParser<C> {
         final CommandArgument<C, ?> builtArgument = argumentBuilder.manager(this.manager).withParser(parser).build();
         /* Add preprocessors */
         for (final Annotation annotation : annotations) {
-            @SuppressWarnings("ALL") final Function preprocessorMapper =
+            @SuppressWarnings("rawtypes") final Function preprocessorMapper =
                     this.preprocessorMappers.get(annotation.annotationType());
             if (preprocessorMapper != null) {
                 final BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
