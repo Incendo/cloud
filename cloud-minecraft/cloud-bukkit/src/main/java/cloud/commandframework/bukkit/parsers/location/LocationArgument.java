@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
+import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.ParserException;
@@ -167,6 +168,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                 return ArgumentParseResult.failure(
                         new LocationParseException(
                                 commandContext,
+                                LocationParseException.FailureReason.WRONG_FORMAT,
                                 input.toString()
                         )
                 );
@@ -200,17 +202,11 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                     || ((coordinates[0].getType() == LocationCoordinateType.LOCAL)
                     != (coordinates[2].getType() == LocationCoordinateType.LOCAL))
             ) {
-                final StringBuilder input = new StringBuilder();
-                for (int i = 0; i < inputQueue.size(); i++) {
-                    input.append(((LinkedList<String>) inputQueue).get(i));
-                    if ((i + 1) < inputQueue.size()) {
-                        input.append(" ");
-                    }
-                }
                 return ArgumentParseResult.failure(
                         new LocationParseException(
                                 commandContext,
-                                input.toString()
+                                LocationParseException.FailureReason.MIXED_LOCAL_ABSOLUTE,
+                                ""
                         )
                 );
             }
@@ -293,14 +289,42 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
 
         protected LocationParseException(
                 final @NonNull CommandContext<?> context,
+                final @NonNull FailureReason reason,
                 final @NonNull String input
         ) {
             super(
                     LocationParser.class,
                     context,
-                    BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION,
+                    reason.getCaption(),
                     CaptionVariable.of("input", input)
             );
+        }
+
+
+        /**
+         * Reasons for which location parsing may fail
+         */
+        public enum FailureReason {
+
+            WRONG_FORMAT(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT),
+            MIXED_LOCAL_ABSOLUTE(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE);
+
+
+            private final Caption caption;
+
+            FailureReason(final @NonNull Caption caption) {
+                this.caption = caption;
+            }
+
+            /**
+             * Get the caption used for this failure reason
+             *
+             * @return The caption
+             */
+            public @NonNull Caption getCaption() {
+                return this.caption;
+            }
+
         }
 
     }
