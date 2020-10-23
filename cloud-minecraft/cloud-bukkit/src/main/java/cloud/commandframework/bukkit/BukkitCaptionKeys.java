@@ -83,7 +83,13 @@ public final class BukkitCaptionKeys {
     /**
      * Variables: {input}
      */
-    public static final Caption ARGUMENT_PARSE_FAILURE_LOCATION = of("argument.parse.failure.location");
+    public static final Caption ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT = of(
+            "argument.parse.failure.location.invalid_format");
+    /**
+     * Variables: None
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE = of(
+            "argument.parse.failure.location.mixed_local_absolute");
 
     private BukkitCaptionKeys() {
     }
