@@ -434,6 +434,7 @@ public final class CommandTree<C> {
         return getSuggestions(context, commandQueue, this.internalTree);
     }
 
+    @SuppressWarnings("MixedMutabilityReturnType")
     private @NonNull List<@NonNull String> getSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,

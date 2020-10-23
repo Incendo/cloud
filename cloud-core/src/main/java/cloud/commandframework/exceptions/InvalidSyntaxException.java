@@ -34,6 +34,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class InvalidSyntaxException extends CommandParseException {
 
+    private static final long serialVersionUID = -4183356059293785202L;
     private final String correctSyntax;
 
     /**

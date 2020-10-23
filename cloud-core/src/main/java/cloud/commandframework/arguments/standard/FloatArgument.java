@@ -127,7 +127,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         private float min = Float.NEGATIVE_INFINITY;
         private float max = Float.POSITIVE_INFINITY;
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Float.class, name);
         }
 
@@ -244,6 +244,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
 
     public static final class FloatParseException extends NumberParseException {
+
+        private static final long serialVersionUID = -1162983846751812292L;
 
         /**
          * Construct a new float parse exception

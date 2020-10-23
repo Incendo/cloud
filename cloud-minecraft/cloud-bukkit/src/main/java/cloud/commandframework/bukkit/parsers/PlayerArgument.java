@@ -110,7 +110,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Player> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Player.class, name);
         }
 
@@ -130,6 +130,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     public static final class PlayerParser<C> implements ArgumentParser<C, Player> {
 
         @Override
+        @SuppressWarnings("deprecation")
         public @NonNull ArgumentParseResult<Player> parse(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
@@ -143,7 +144,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
             }
             inputQueue.remove();
 
-            //noinspection deprecation
             Player player = Bukkit.getPlayer(input);
 
             if (player == null) {
@@ -175,6 +175,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      */
     public static final class PlayerParseException extends ParserException {
 
+        private static final long serialVersionUID = 927476591631527552L;
         private final String input;
 
         /**

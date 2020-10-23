@@ -68,6 +68,7 @@ public final class CloudInjectionModule<C> extends AbstractModule {
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void configure() {
         final Type commandTreeType = Types.newParameterizedType(CommandTree.class, this.commandSenderType);
         final Type commandExecutionCoordinatorType = Types.newParameterizedType(CommandExecutionCoordinator.class,

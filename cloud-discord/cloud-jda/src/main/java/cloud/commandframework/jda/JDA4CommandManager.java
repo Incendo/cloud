@@ -25,13 +25,12 @@ package cloud.commandframework.jda;
 
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import net.dv8tion.jda.api.JDA;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * Command manager for use with JDA 4
@@ -39,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  * @since 1.1.0
  */
+@SuppressWarnings("deprecation")
 public class JDA4CommandManager<C> extends JDACommandManager<C> {
 
     /**

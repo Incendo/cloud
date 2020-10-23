@@ -289,6 +289,8 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
 
     private static class LocationParseException extends ParserException {
 
+        private static final long serialVersionUID = -3261835227265878218L;
+
         protected LocationParseException(
                 final @NonNull CommandContext<?> context,
                 final @NonNull String input

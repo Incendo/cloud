@@ -52,6 +52,7 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
                 executionOrder = order.value();
             }
         } catch (final Exception ignored) {
+            // This is fine
         }
         this.instance = instance;
         this.executionOrder = executionOrder;

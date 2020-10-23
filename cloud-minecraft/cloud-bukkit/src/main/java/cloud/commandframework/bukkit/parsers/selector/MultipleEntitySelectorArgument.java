@@ -105,7 +105,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, MultipleEntitySelector> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(MultipleEntitySelector.class, name);
         }
 

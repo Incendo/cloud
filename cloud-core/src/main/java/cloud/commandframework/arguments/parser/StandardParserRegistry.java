@@ -59,9 +59,13 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
+@SuppressWarnings({"unused", "unchecked", "rawtypes"})
 public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
+    @SuppressWarnings({"DoubleBraceInitialization"})
     private static final Map<Class<?>, Class<?>> PRIMITIVE_MAPPINGS = new HashMap<Class<?>, Class<?>>() {
+        private static final long serialVersionUID = 958977651563195489L;
+
         {
             put(char.class, Character.class);
             put(int.class, Integer.class);
@@ -93,31 +97,31 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
         /* Register standard types */
         this.registerParserSupplier(TypeToken.get(Byte.class), options ->
-                new ByteArgument.ByteParser<C>(
+                new ByteArgument.ByteParser<>(
                         (byte) options.get(StandardParameters.RANGE_MIN, Byte.MIN_VALUE),
                         (byte) options.get(StandardParameters.RANGE_MAX, Byte.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Short.class), options ->
-                new ShortArgument.ShortParser<C>(
+                new ShortArgument.ShortParser<>(
                         (short) options.get(StandardParameters.RANGE_MIN, Short.MIN_VALUE),
                         (short) options.get(StandardParameters.RANGE_MAX, Short.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Integer.class), options ->
-                new IntegerArgument.IntegerParser<C>(
+                new IntegerArgument.IntegerParser<>(
                         (int) options.get(StandardParameters.RANGE_MIN, Integer.MIN_VALUE),
                         (int) options.get(StandardParameters.RANGE_MAX, Integer.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Float.class), options ->
-                new FloatArgument.FloatParser<C>(
+                new FloatArgument.FloatParser<>(
                         (float) options.get(StandardParameters.RANGE_MIN, Float.MIN_VALUE),
                         (float) options.get(StandardParameters.RANGE_MAX, Float.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Double.class), options ->
-                new DoubleArgument.DoubleParser<C>(
+                new DoubleArgument.DoubleParser<>(
                         (double) options.get(StandardParameters.RANGE_MIN, Double.MIN_VALUE),
                         (double) options.get(StandardParameters.RANGE_MAX, Double.MAX_VALUE)
                 ));
-        this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<C>());
+        this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<>());
         this.registerParserSupplier(TypeToken.get(String[].class), options -> new StringArrayArgument.StringArrayParser<>());
         /* Make this one less awful */
         this.registerParserSupplier(TypeToken.get(String.class), options -> {
@@ -125,7 +129,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final StringArgument.StringMode stringMode = greedy
                     ? StringArgument.StringMode.GREEDY
                     : StringArgument.StringMode.SINGLE;
-            return new StringArgument.StringParser<C>(
+            return new StringArgument.StringParser<>(
                     stringMode,
                     (context, s) -> Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))
             );
@@ -167,6 +171,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public @NonNull ParserParameters parseAnnotations(
             final @NonNull TypeToken<?> parsingType,
             final @NonNull Collection<@NonNull ? extends Annotation> annotations
@@ -186,6 +191,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> @NonNull Optional<ArgumentParser<C, T>> createParser(
             final @NonNull TypeToken<T> type,
             final @NonNull ParserParameters parserParameters
@@ -200,9 +206,9 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         if (producer == null) {
             /* Give enums special treatment */
             if (GenericTypeReflector.isSuperType(Enum.class, actualType.getType())) {
-                @SuppressWarnings("all") final EnumArgument.EnumParser enumArgument
-                        = new EnumArgument.EnumParser((Class<Enum>) GenericTypeReflector.erase(actualType.getType()));
-                // noinspection all
+                @SuppressWarnings("rawtypes")
+                final EnumArgument.EnumParser enumArgument
+                        = new EnumArgument.EnumParser(GenericTypeReflector.erase(actualType.getType()));
                 return Optional.of(enumArgument);
             }
             return Optional.empty();

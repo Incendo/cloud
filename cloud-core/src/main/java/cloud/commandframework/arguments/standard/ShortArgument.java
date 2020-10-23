@@ -127,7 +127,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         private short min = Short.MIN_VALUE;
         private short max = Short.MAX_VALUE;
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Short.class, name);
         }
 
@@ -252,6 +252,8 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
 
 
     public static final class ShortParseException extends NumberParseException {
+
+        private static final long serialVersionUID = -478674263339091032L;
 
         /**
          * Construct a new short parse exception

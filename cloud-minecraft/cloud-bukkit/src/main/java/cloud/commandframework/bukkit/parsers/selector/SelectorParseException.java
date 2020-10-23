@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class SelectorParseException extends ParserException {
 
+    private static final long serialVersionUID = 1900826717897819065L;
     private final String input;
 
     /**

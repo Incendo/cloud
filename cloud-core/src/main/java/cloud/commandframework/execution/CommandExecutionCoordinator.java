@@ -31,6 +31,7 @@ import cloud.commandframework.types.tuples.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -52,7 +53,7 @@ public abstract class CommandExecutionCoordinator<C> {
      *
      * @param commandTree Command tree
      */
-    public CommandExecutionCoordinator(final @NonNull CommandTree<C> commandTree) {
+    protected CommandExecutionCoordinator(final @NonNull CommandTree<C> commandTree) {
         this.commandTree = commandTree;
     }
 
@@ -113,7 +114,7 @@ public abstract class CommandExecutionCoordinator<C> {
                 if (pair.getSecond() != null) {
                     completableFuture.completeExceptionally(pair.getSecond());
                 } else {
-                    final Command<C> command = pair.getFirst();
+                    final Command<C> command = Objects.requireNonNull(pair.getFirst());
                     if (this.getCommandTree().getCommandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
                         command.getCommandExecutionHandler().execute(commandContext);
                     }

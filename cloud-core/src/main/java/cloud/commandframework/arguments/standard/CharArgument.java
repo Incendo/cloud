@@ -102,7 +102,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Character> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Character.class, name);
         }
 
@@ -156,6 +156,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      */
     public static final class CharParseException extends ParserException {
 
+        private static final long serialVersionUID = 6458851071584278854L;
         private final String input;
 
         /**

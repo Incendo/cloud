@@ -48,7 +48,6 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
 
     private final CommandArgument<C, ?> command;
     private final CloudburstCommandManager<C> manager;
-    private final Command<C> cloudCommand;
 
     CloudburstCommand(
             final @NonNull String label,
@@ -64,7 +63,6 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
                 .build());
         this.command = command;
         this.manager = manager;
-        this.cloudCommand = cloudCommand;
     }
 
     @Override
@@ -83,7 +81,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
                 sender,
                 builder.toString()
         )
-                .whenComplete(((commandResult, throwable) -> {
+                .whenComplete((commandResult, throwable) -> {
                     if (throwable != null) {
                         if (throwable instanceof CompletionException) {
                             throwable = throwable.getCause();
@@ -131,7 +129,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
                             throwable.printStackTrace();
                         }
                     }
-                }));
+                });
         return true;
     }
 

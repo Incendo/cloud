@@ -55,6 +55,7 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
      * @param mapper        Mapper that maps the sub-arguments to the output type
      * @param valueType     The output type
      */
+    @SuppressWarnings("unchecked")
     protected ArgumentTriplet(
             final boolean required,
             final @NonNull String name,
