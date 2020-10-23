@@ -114,7 +114,7 @@ subprojects {
     }
 
     dependencies {
-        compileOnly 'org.checkerframework:checker-qual:3.5.0'
+        compileOnly 'org.checkerframework:checker-qual:3.7.0'
         api 'io.leangen.geantyref:geantyref:1.3.11'
         testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     }
