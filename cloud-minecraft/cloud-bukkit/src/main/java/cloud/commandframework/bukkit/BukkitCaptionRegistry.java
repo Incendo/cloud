@@ -74,10 +74,15 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER = "Non-player(s) selected in player selector.";
     /**
-     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION}
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT}
      */
-    public static final String ARGUMENT_PARSE_FAILURE_LOCATION =
+    public static final String ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT =
             "'{input}' is not a valid location. Required format is '<x> <y> <z>'";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE =
+            "Cannot mix local and absolute coordinates. (either all coordinates use '^' or none do)";
 
     protected BukkitCaptionRegistry() {
         super();
@@ -122,8 +127,12 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER
         );
         this.registerMessageFactory(
-                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_LOCATION
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE
         );
     }
 
