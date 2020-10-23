@@ -588,6 +588,8 @@ public final class MinecraftHelp<C> {
         }
 
         /**
+         * Get the configured primary color
+         *
          * @return The primary color for the color scheme
          */
         public @NonNull TextColor primary() {
@@ -595,6 +597,8 @@ public final class MinecraftHelp<C> {
         }
 
         /**
+         * Get the configured highlight color
+         *
          * @return The primary color used to highlight commands and queries
          */
         public @NonNull TextColor highlight() {
@@ -602,6 +606,8 @@ public final class MinecraftHelp<C> {
         }
 
         /**
+         * Get the configured alternate highlight color
+         *
          * @return The secondary color used to highlight commands and queries
          */
         public @NonNull TextColor alternateHighlight() {
@@ -609,6 +615,8 @@ public final class MinecraftHelp<C> {
         }
 
         /**
+         * Get the configured text color
+         *
          * @return The color used for description text
          */
         public @NonNull TextColor text() {
@@ -616,6 +624,8 @@ public final class MinecraftHelp<C> {
         }
 
         /**
+         * Get the configured accent color
+         *
          * @return The color used for accents and symbols
          */
         public @NonNull TextColor accent() {
@@ -623,6 +633,8 @@ public final class MinecraftHelp<C> {
         }
 
         /**
+         * Create a new {@link HelpColors} instance
+         *
          * @param primary            The primary color for the color scheme
          * @param highlight          The primary color used to highlight commands and queries
          * @param alternateHighlight The secondary color used to highlight commands and queries

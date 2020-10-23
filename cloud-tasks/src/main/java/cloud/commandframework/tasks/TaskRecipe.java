@@ -35,7 +35,7 @@ import java.util.function.BiConsumer;
  * A task recipe is a chain of tasks with optional synchronization steps,
  * that can be used to produce some sort of result from some input
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "overloads"})
 public final class TaskRecipe {
 
     private final TaskSynchronizer synchronizer;

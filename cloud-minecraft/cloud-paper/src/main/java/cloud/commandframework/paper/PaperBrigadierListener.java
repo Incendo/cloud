@@ -30,7 +30,6 @@ import cloud.commandframework.bukkit.BukkitBrigadierMapper;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.permission.CommandPermission;
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
-import com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.event.EventHandler;
@@ -60,7 +59,8 @@ class PaperBrigadierListener<C> implements Listener {
 
     @EventHandler
     @SuppressWarnings("deprecation")
-    public void onCommandRegister(final @NonNull CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
+    public void onCommandRegister(final com.destroystokyo.paper.event.brigadier
+            .@NonNull CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
         if (!(event.getCommand() instanceof PluginIdentifiableCommand)) {
             return;
         } else if (!((PluginIdentifiableCommand) event.getCommand())

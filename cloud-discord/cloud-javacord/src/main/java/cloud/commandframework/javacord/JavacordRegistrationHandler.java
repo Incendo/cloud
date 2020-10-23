@@ -52,7 +52,6 @@ final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler
             return false;
         }
         @SuppressWarnings("unchecked") final JavacordCommand<C> javacordCommand = new JavacordCommand<>(
-                (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
                 this.javacordCommandManager
         );

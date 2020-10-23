@@ -111,7 +111,7 @@ public abstract class CommandManager<C> {
      *                                    registered to the command manager. This may be used to forward command registration
      *                                    to the platform.
      */
-    public CommandManager(
+    protected CommandManager(
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull CommandRegistrationHandler commandRegistrationHandler
     ) {
@@ -307,6 +307,7 @@ public abstract class CommandManager<C> {
      * @param captionRegistry Caption registry to use
      * @deprecated Use {@link #setCaptionRegistry(CaptionRegistry)} These methods are identical.
      */
+    @Deprecated
     public final void registerDefaultCaptions(final @NonNull CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
     }
@@ -669,13 +670,13 @@ public abstract class CommandManager<C> {
      * @return Exception handler, or {@code null}
      * @see #registerCommandPreProcessor(CommandPreprocessor) Registering an exception handler
      */
+    @SuppressWarnings("unchecked")
     public final <E extends Exception> @Nullable BiConsumer<@NonNull C, @NonNull E>
     getExceptionHandler(final @NonNull Class<E> clazz) {
         final BiConsumer<C, ? extends Exception> consumer = this.exceptionHandlers.get(clazz);
         if (consumer == null) {
             return null;
         }
-        //noinspection unchecked
         return (BiConsumer<C, E>) consumer;
     }
 

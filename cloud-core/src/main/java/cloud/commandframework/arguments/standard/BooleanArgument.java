@@ -117,7 +117,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
 
         private boolean liberal = false;
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Boolean.class, name);
         }
 
@@ -231,6 +231,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      */
     public static final class BooleanParseException extends ParserException {
 
+        private static final long serialVersionUID = -2688852086944850025L;
         private final String input;
         private final boolean liberal;
 

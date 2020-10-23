@@ -54,6 +54,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
      * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
      * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      */
+    @SuppressWarnings("unchecked")
     public CloudburstCommandManager(
             final @NonNull Plugin owningPlugin,
             final @NonNull Function<@NonNull CommandTree<C>,

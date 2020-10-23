@@ -30,6 +30,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class NumberParseException extends ParserException {
 
+    private static final long serialVersionUID = 3018775374056029797L;
     private final String input;
     private final Number min;
     private final Number max;
@@ -43,7 +44,7 @@ public abstract class NumberParseException extends ParserException {
      * @param parserClass Parser class
      * @param context     Command context
      */
-    public NumberParseException(
+    protected NumberParseException(
             final @NonNull String input,
             final @NonNull Number min,
             final @NonNull Number max,

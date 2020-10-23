@@ -46,19 +46,17 @@ public class JavacordCommand<C> implements MessageCreateListener {
 
     private final JavacordCommandManager<C> manager;
     private final CommandArgument<C, ?> command;
-    private final cloud.commandframework.Command<C> cloudCommand;
 
     JavacordCommand(
-            final cloud.commandframework.@NonNull Command<C> cloudCommand,
             final @NonNull CommandArgument<C, ?> command,
             final @NonNull JavacordCommandManager<C> manager
     ) {
         this.command = command;
         this.manager = manager;
-        this.cloudCommand = cloudCommand;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public final void onMessageCreate(final @NonNull MessageCreateEvent event) {
         MessageAuthor messageAuthor = event.getMessageAuthor();
 
@@ -85,7 +83,6 @@ public class JavacordCommand<C> implements MessageCreateListener {
         messageContent = messageContent.replaceFirst(commandPrefix, "");
 
         final String finalContent = messageContent;
-        //noinspection unchecked
         if (((StaticArgument<C>) command).getAliases()
                 .stream()
                 .map(String::toLowerCase)
@@ -94,7 +91,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
         }
 
         manager.executeCommand(sender, finalContent)
-                .whenComplete(((commandResult, throwable) -> {
+                .whenComplete((commandResult, throwable) -> {
                     if (throwable == null) {
                         return;
                     }
@@ -158,7 +155,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
 
                     commandSender.sendErrorMessage(throwable.getMessage());
                     throwable.printStackTrace();
-                }));
+                });
     }
 
 }

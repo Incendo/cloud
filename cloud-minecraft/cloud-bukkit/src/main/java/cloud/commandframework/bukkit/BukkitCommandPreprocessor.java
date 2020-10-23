@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
  * with Bukkit specific objects
  *
- * @param <C>
+ * @param <C> Command sender type
  */
 final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
 

@@ -61,7 +61,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         this.commandMap = (CommandMap) getCommandMap.invoke(Bukkit.getServer());
         final Field knownCommands = SimpleCommandMap.class.getDeclaredField("knownCommands");
         knownCommands.setAccessible(true);
-        @SuppressWarnings("ALL") final Map<String, org.bukkit.command.Command> bukkitCommands =
+        @SuppressWarnings("unchecked") final Map<String, org.bukkit.command.Command> bukkitCommands =
                 (Map<String, org.bukkit.command.Command>) knownCommands.get(commandMap);
         this.bukkitCommands = bukkitCommands;
         this.bukkitCommandManager = bukkitCommandManager;
@@ -83,7 +83,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
 
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
                 label,
-                (this.bukkitCommandManager.getSplitAliases() ? Collections.<String>emptyList() : aliases),
+                (this.bukkitCommandManager.getSplitAliases() ? Collections.emptyList() : aliases),
                 (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
                 this.bukkitCommandManager

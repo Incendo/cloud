@@ -38,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@SuppressWarnings("deprecation")
 public class JDACommandListener<C> extends ListenerAdapter {
 
     private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: ";
@@ -59,7 +60,6 @@ public class JDACommandListener<C> extends ListenerAdapter {
     @Override
     public final void onMessageReceived(final @NonNull MessageReceivedEvent event) {
         final Message message = event.getMessage();
-        final JDACommandSender jdaCommandSender = JDACommandSender.of(event);
         final C sender = this.commandManager.getCommandSenderMapper().apply(event);
 
         if (this.commandManager.getBotId() == event.getAuthor().getIdLong()) {
@@ -84,13 +84,11 @@ public class JDACommandListener<C> extends ListenerAdapter {
                     if (throwable instanceof InvalidSyntaxException) {
                         this.commandManager.handleException(sender,
                                 InvalidSyntaxException.class,
-                                (InvalidSyntaxException) throwable, (c, e) -> {
-                                    this.sendMessage(
-                                            event,
-                                            MESSAGE_INVALID_SYNTAX + prefix + ((InvalidSyntaxException) throwable)
-                                                    .getCorrectSyntax()
-                                    );
-                                }
+                                (InvalidSyntaxException) throwable, (c, e) -> this.sendMessage(
+                                        event,
+                                        MESSAGE_INVALID_SYNTAX + prefix + ((InvalidSyntaxException) throwable)
+                                                .getCorrectSyntax()
+                                )
                         );
                     } else if (throwable instanceof InvalidCommandSenderException) {
                         this.commandManager.handleException(sender,
@@ -112,13 +110,11 @@ public class JDACommandListener<C> extends ListenerAdapter {
                         );
                     } else if (throwable instanceof ArgumentParseException) {
                         this.commandManager.handleException(sender, ArgumentParseException.class,
-                                (ArgumentParseException) throwable, (c, e) -> {
-                                    this.sendMessage(
-                                            event,
-                                            "Invalid Command Argument: " + throwable.getCause()
-                                                    .getMessage()
-                                    );
-                                }
+                                (ArgumentParseException) throwable, (c, e) -> this.sendMessage(
+                                        event,
+                                        "Invalid Command Argument: " + throwable.getCause()
+                                                .getMessage()
+                                )
                         );
                     } else {
                         this.sendMessage(event, throwable.getMessage());

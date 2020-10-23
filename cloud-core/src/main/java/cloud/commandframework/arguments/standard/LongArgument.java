@@ -127,7 +127,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         private long min = Long.MIN_VALUE;
         private long max = Long.MAX_VALUE;
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(Long.class, name);
         }
 
@@ -228,6 +228,8 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
 
 
     public static final class LongParseException extends NumberParseException {
+
+        private static final long serialVersionUID = 4366856282301198232L;
 
         /**
          * Construct a new long parse exception

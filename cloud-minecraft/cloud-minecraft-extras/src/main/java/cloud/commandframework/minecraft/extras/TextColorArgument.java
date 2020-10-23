@@ -218,6 +218,8 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
 
     private static final class TextColorParseException extends ParserException {
 
+        private static final long serialVersionUID = -6236625328843879518L;
+
         private TextColorParseException(
                 final @NonNull CommandContext<?> commandContext,
                 final @NonNull String input

@@ -109,7 +109,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
 
     public static final class Builder<C> extends CommandArgument.Builder<C, MultiplePlayerSelector> {
 
-        protected Builder(final @NonNull String name) {
+        private Builder(final @NonNull String name) {
             super(MultiplePlayerSelector.class, name);
         }
 

@@ -29,7 +29,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Command sender that proxies {@link org.bukkit.command.CommandSender}
- * {@inheritDoc}
  */
 public abstract class BukkitCommandSender {
 
@@ -40,7 +39,7 @@ public abstract class BukkitCommandSender {
      *
      * @param internalSender Bukkit command sender
      */
-    public BukkitCommandSender(final org.bukkit.command.@NonNull CommandSender internalSender) {
+    protected BukkitCommandSender(final org.bukkit.command.@NonNull CommandSender internalSender) {
         this.internalSender = internalSender;
     }
 

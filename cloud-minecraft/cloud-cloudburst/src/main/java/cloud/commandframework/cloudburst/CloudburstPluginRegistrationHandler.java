@@ -48,6 +48,7 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public final boolean registerCommand(final @NonNull Command<?> command) {
         /* We only care about the root command argument */
         final CommandArgument<?, ?> commandArgument = command.getArguments().get(0);
