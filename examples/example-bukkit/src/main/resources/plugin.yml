@@ -1,5 +1,5 @@
 name: ExamplePlugin
-version: 1.0.2
+version: 1.2.0-SNAPSHOT
 api-version: 1.13
 main: cloud.commandframework.examples.bukkit.ExamplePlugin
 depends: [Essentials]
