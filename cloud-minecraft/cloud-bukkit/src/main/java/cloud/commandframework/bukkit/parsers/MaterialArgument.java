@@ -105,7 +105,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
         return MaterialArgument.<C>newBuilder(name).asOptionalWithDefault(material.name().toLowerCase()).build();
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Material> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Material, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(Material.class, name);

@@ -108,7 +108,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Player> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Player, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(Player.class, name);

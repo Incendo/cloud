@@ -77,7 +77,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @param <C>         Command sender type
      * @return Constructed builder
      */
-    public static <C> CommandArgument.@NonNull Builder<C, Player> newBuilder(
+    public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String name
     ) {
         return new Builder<C>(
@@ -114,7 +114,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Player> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Player, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(TypeToken.get(Player.class), name);

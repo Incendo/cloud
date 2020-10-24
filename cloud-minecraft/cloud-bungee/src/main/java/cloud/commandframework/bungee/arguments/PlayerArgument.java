@@ -77,7 +77,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
      * @param <C>         Command sender type
      * @return Constructed builder
      **/
-    public static <C> CommandArgument.@NonNull Builder<C, ProxiedPlayer> newBuilder(
+    public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String name
     ) {
         return new Builder<C>(
@@ -114,7 +114,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, ProxiedPlayer> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, ProxiedPlayer, Builder<C>> {
 
         private Builder(
                 final @NonNull String name

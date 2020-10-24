@@ -122,7 +122,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         return this.max;
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Short> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Short, Builder<C>> {
 
         private short min = Short.MIN_VALUE;
         private short max = Short.MAX_VALUE;

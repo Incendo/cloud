@@ -64,7 +64,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> CommandArgument.@NonNull Builder<C, World> newBuilder(final @NonNull String name) {
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new WorldArgument.Builder<>(name);
     }
 
@@ -106,7 +106,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, World> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, World, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(World.class, name);

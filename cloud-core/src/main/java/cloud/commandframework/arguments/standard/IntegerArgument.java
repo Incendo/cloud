@@ -129,7 +129,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         return this.max;
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Integer> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Integer, Builder<C>> {
 
         private int min = Integer.MIN_VALUE;
         private int max = Integer.MAX_VALUE;

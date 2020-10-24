@@ -517,7 +517,7 @@ public abstract class CommandManager<C> {
      * @param <T>  Generic argument name
      * @return Argument builder
      */
-    public <T> CommandArgument.@NonNull Builder<C, T> argumentBuilder(
+    public <T> CommandArgument.@NonNull Builder<C, T, ?> argumentBuilder(
             final @NonNull Class<T> type,
             final @NonNull String name
     ) {

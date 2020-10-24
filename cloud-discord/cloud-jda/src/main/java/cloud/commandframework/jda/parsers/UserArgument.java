@@ -107,7 +107,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, User> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, User, Builder<C>> {
 
         private Set<ParserMode> modes = new HashSet<>();
 

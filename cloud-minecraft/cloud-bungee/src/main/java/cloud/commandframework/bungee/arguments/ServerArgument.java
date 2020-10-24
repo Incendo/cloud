@@ -77,7 +77,7 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
      * @param <C>         Command sender type
      * @return Constructed builder
      */
-    public static <C> CommandArgument.@NonNull Builder<C, ServerInfo> newBuilder(
+    public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String name
     ) {
         return new Builder<C>(
@@ -113,7 +113,7 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
         return ServerArgument.<C>newBuilder(name).asOptional().build();
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, ServerInfo> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, ServerInfo, Builder<C>> {
 
         private Builder(
                 final @NonNull String name
