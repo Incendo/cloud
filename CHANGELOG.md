@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Argument builders now use generics to preserve their type when using functions from the base class.
 
-## [Unreleased]
+## [1.1.0] - 2020-10-24
 
 ### Added
  - Added ExampleVelocityPlugin
