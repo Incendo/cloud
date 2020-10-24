@@ -116,10 +116,8 @@ public final class AnnotationParser<C> {
     ) {
         A innerCandidate = null;
         for (final Annotation annotation : annotations) {
-            if (checkedAnnotations.contains(annotation.annotationType())) {
+            if (!checkedAnnotations.add(annotation.annotationType())) {
                 continue;
-            } else {
-                checkedAnnotations.add(annotation.annotationType());
             }
             if (annotation.annotationType().equals(clazz)) {
                 return (A) annotation;
