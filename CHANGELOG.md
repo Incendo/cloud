@@ -30,7 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
  - Allow for combined presence flags, such that `-a -b -c` is equivalent to `-abc`
- - Allow for class annotations as a default for when an annotation is not present on a method.
+ - Allow for class annotations as a default for when an annotation is not present on a method
+ - Allow for annotated annotations
  
 ### Fixed
  - Fix arguments with no required children not being executors (cloud-brigadier)
