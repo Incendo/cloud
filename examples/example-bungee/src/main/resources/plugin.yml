@@ -1,5 +1,5 @@
 name: ExampleBungee
-version: "0.2.2"
+version: "1.2.0-SNAPSHOT"
 main: cloud.commandframework.examples.bungee.ExamplePlugin
 author: Cloud Contributors
 description: "An Example plugin for the Cloud command framework"
