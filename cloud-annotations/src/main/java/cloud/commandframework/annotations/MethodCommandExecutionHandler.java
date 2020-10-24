@@ -81,6 +81,8 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
             } else {
                 if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
                     arguments.add(commandContext.getSender());
+                } else if (parameter.getType().equals(commandContext.getClass())) {
+                    arguments.add(commandContext);
                 } else {
                     throw new IllegalArgumentException(String.format(
                             "Unknown command parameter '%s' in method '%s'",
