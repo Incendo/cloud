@@ -122,7 +122,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         return this.max;
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Float> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Float, Builder<C>> {
 
         private float min = Float.NEGATIVE_INFINITY;
         private float max = Float.POSITIVE_INFINITY;

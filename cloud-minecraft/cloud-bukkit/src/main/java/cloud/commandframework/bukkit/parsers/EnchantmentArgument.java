@@ -106,7 +106,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
         return EnchantmentArgument.<C>newBuilder(name).asOptionalWithDefault(enchantment.getKey().toString()).build();
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Enchantment> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Enchantment, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(Enchantment.class, name);

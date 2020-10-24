@@ -192,7 +192,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, String> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, String, Builder<C>> {
 
         private StringMode stringMode = StringMode.SINGLE;
         private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();

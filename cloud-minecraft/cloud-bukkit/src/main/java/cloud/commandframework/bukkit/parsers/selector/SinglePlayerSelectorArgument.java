@@ -105,7 +105,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, SinglePlayerSelector> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, SinglePlayerSelector, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(SinglePlayerSelector.class, name);

@@ -208,7 +208,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param <T>   Argument Type. Used to make the compiler happy.
      * @return Argument builder
      */
-    public static <C, T> CommandArgument.@NonNull Builder<C, T> ofType(
+    public static <C, T> @NonNull Builder<@NonNull C, @NonNull T, ?> ofType(
             final @NonNull TypeToken<T> clazz,
             final @NonNull String name
     ) {
@@ -224,7 +224,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @param <T>   Argument Type. Used to make the compiler happy.
      * @return Argument builder
      */
-    public static <C, T> CommandArgument.@NonNull Builder<@NonNull C, @NonNull T> ofType(
+    public static <C, T> @NonNull Builder<@NonNull C, @NonNull T, ?> ofType(
             final @NonNull Class<T> clazz,
             final @NonNull String name
     ) {
@@ -406,7 +406,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      * @return Copied argument
      */
     public @NonNull CommandArgument<C, T> copy() {
-        CommandArgument.Builder<C, T> builder = ofType(this.valueType, this.name);
+        CommandArgument.Builder<C, T, ?> builder = ofType(this.valueType, this.name);
         builder = builder.withSuggestionsProvider(this.suggestionsProvider);
         builder = builder.withParser(this.parser);
         if (this.isRequired()) {
@@ -441,8 +441,9 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
      *
      * @param <C> Command sender type
      * @param <T> Argument value type
+     * @param <B> Builder type
      */
-    public static class Builder<C, T> {
+    public static class Builder<C, T, B extends Builder<C, T, B>> {
 
         private final TypeToken<T> valueType;
         private final String name;
@@ -478,9 +479,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
          * @param manager Command manager
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> manager(final @NonNull CommandManager<C> manager) {
+        @SuppressWarnings("unchecked")
+        public @NonNull B manager(final @NonNull CommandManager<C> manager) {
             this.manager = manager;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -492,9 +494,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
          *
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> asRequired() {
+        @SuppressWarnings("unchecked")
+        public @NonNull B asRequired() {
             this.required = true;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -506,9 +509,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
          *
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> asOptional() {
+        @SuppressWarnings("unchecked")
+        public @NonNull B asOptional() {
             this.required = false;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -521,10 +525,11 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
          * @param defaultValue Default value that will be used if none was supplied
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> asOptionalWithDefault(final @NonNull String defaultValue) {
+        @SuppressWarnings("unchecked")
+        public @NonNull B asOptionalWithDefault(final @NonNull String defaultValue) {
             this.defaultValue = defaultValue;
             this.required = false;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -533,9 +538,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
          * @param parser Argument parser
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> withParser(final @NonNull ArgumentParser<@NonNull C, @NonNull T> parser) {
+        @SuppressWarnings("unchecked")
+        public @NonNull B withParser(final @NonNull ArgumentParser<@NonNull C, @NonNull T> parser) {
             this.parser = Objects.requireNonNull(parser, "Parser may not be null");
-            return this;
+            return (B) this;
         }
 
         /**
@@ -544,12 +550,13 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
          * @param suggestionsProvider Suggestions provider
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
+        @SuppressWarnings("unchecked")
+        public @NonNull B withSuggestionsProvider(
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
                         @NonNull String, @NonNull List<String>> suggestionsProvider
         ) {
             this.suggestionsProvider = suggestionsProvider;
-            return this;
+            return (B) this;
         }
 
         /**

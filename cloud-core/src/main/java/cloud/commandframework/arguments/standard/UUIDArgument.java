@@ -101,7 +101,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, UUID> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, UUID, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(UUID.class, name);

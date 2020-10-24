@@ -214,7 +214,7 @@ public final class CommandFlag<T> {
          * @param <N>     New argument type
          * @return New builder instance
          */
-        public <N> Builder<N> withArgument(final CommandArgument.@NonNull Builder<?, N> builder) {
+        public <N> Builder<N> withArgument(final CommandArgument.@NonNull Builder<?, N, ?> builder) {
             return this.withArgument(builder.build());
         }
 

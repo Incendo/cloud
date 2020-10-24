@@ -77,7 +77,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
      * @param <C>         Command sender type
      * @return Constructed builder
      */
-    public static <C> CommandArgument.@NonNull Builder<C, RegisteredServer> newBuilder(
+    public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String name
     ) {
         return new Builder<C>(
@@ -111,7 +111,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
         return ServerArgument.<C>newBuilder(name).asOptional().build();
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, RegisteredServer> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, RegisteredServer, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(TypeToken.get(RegisteredServer.class), name);

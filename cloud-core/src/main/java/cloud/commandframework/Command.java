@@ -385,7 +385,7 @@ public class Command<C> {
          * @param <T>     Argument type
          * @return New builder instance with the command argument inserted into the argument list
          */
-        public <T> @NonNull Builder<C> argument(final CommandArgument.@NonNull Builder<C, T> builder) {
+        public <T> @NonNull Builder<C> argument(final CommandArgument.@NonNull Builder<C, T, ?> builder) {
             return this.argument(builder.build(), Description.empty());
         }
 
@@ -440,7 +440,7 @@ public class Command<C> {
          * @return New builder instance with the command argument inserted into the argument list
          */
         public <T> @NonNull Builder<C> argument(
-                final CommandArgument.@NonNull Builder<C, T> builder,
+                final CommandArgument.@NonNull Builder<C, T, ?> builder,
                 final @NonNull Description description
         ) {
             final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
@@ -468,9 +468,9 @@ public class Command<C> {
         public <T> @NonNull Builder<C> argument(
                 final @NonNull Class<T> clazz,
                 final @NonNull String name,
-                final @NonNull Consumer<CommandArgument.Builder<C, T>> builderConsumer
+                final @NonNull Consumer<CommandArgument.Builder<C, T, ?>> builderConsumer
         ) {
-            final CommandArgument.Builder<C, T> builder = CommandArgument.ofType(clazz, name);
+            final CommandArgument.Builder<C, T, ?> builder = CommandArgument.ofType(clazz, name);
             if (this.commandManager != null) {
                 builder.manager(this.commandManager);
             }

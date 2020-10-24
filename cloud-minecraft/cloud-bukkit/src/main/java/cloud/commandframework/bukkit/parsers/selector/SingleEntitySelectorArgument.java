@@ -101,7 +101,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, SingleEntitySelector> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, SingleEntitySelector, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(SingleEntitySelector.class, name);

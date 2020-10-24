@@ -113,7 +113,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         return liberal;
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Boolean> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Boolean, Builder<C>> {
 
         private boolean liberal = false;
 

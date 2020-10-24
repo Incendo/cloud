@@ -122,7 +122,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         return this.max;
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Double> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Double, Builder<C>> {
 
         private double min = Double.NEGATIVE_INFINITY;
         private double max = Double.POSITIVE_INFINITY;

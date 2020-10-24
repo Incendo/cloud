@@ -122,7 +122,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         return this.max;
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Byte> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Byte, Builder<C>> {
 
         private byte min = Byte.MIN_VALUE;
         private byte max = Byte.MAX_VALUE;

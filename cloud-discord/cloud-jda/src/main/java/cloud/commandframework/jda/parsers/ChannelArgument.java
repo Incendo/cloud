@@ -106,7 +106,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, MessageChannel> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, MessageChannel, Builder<C>> {
 
         private List<ParserMode> modes = new ArrayList<>();
 
