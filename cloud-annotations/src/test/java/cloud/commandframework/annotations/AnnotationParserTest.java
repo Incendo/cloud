@@ -105,6 +105,7 @@ class AnnotationParserTest {
         Assertions.assertEquals("method", commandMethod.value());
 
         System.out.println("Looking for @Regex");
+        @SuppressWarnings("unused")
         final Regex regex = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod, Regex.class);
     }
 
