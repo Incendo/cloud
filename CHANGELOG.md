@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+ - Argument builders now use generics to preserve their type when using functions from the base class.
+
+## [Unreleased]
+
 ### Added
  - JDA Role argument parser
 
