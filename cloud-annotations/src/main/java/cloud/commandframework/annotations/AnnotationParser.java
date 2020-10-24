@@ -51,11 +51,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -109,17 +111,23 @@ public final class AnnotationParser<C> {
     @SuppressWarnings("unchecked")
     static <A extends Annotation> @Nullable A getAnnotationRecursively(
             final @NonNull Annotation[] annotations,
-            final @NonNull Class<A> clazz
+            final @NonNull Class<A> clazz,
+            final @NonNull Set<Class<? extends Annotation>> checkedAnnotations
     ) {
         A innerCandidate = null;
         for (final Annotation annotation : annotations) {
+            if (checkedAnnotations.contains(annotation.annotationType())) {
+                continue;
+            } else {
+                checkedAnnotations.add(annotation.annotationType());
+            }
             if (annotation.annotationType().equals(clazz)) {
                 return (A) annotation;
             }
             if (annotation.annotationType().getPackage().getName().startsWith("java.lang")) {
                 continue;
             }
-            final A inner = getAnnotationRecursively(annotation.annotationType().getAnnotations(), clazz);
+            final A inner = getAnnotationRecursively(annotation.annotationType().getAnnotations(), clazz, checkedAnnotations);
             if (inner != null) {
                 innerCandidate = inner;
             }
@@ -131,9 +139,9 @@ public final class AnnotationParser<C> {
             final @NonNull Method method,
             final @NonNull Class<A> clazz
     ) {
-        A annotation = getAnnotationRecursively(method.getAnnotations(), clazz);
+        A annotation = getAnnotationRecursively(method.getAnnotations(), clazz, new HashSet<>());
         if (annotation == null) {
-            annotation = getAnnotationRecursively(method.getDeclaringClass().getAnnotations(), clazz);
+            annotation = getAnnotationRecursively(method.getDeclaringClass().getAnnotations(), clazz, new HashSet<>());
         }
         return annotation;
     }
