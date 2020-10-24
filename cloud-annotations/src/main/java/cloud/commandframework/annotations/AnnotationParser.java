@@ -106,16 +106,36 @@ public final class AnnotationParser<C> {
         ));
     }
 
+    @SuppressWarnings("unchecked")
+    static <A extends Annotation> @Nullable A getAnnotationRecursively(
+            final @NonNull Annotation[] annotations,
+            final @NonNull Class<A> clazz
+    ) {
+        A innerCandidate = null;
+        for (final Annotation annotation : annotations) {
+            if (annotation.annotationType().equals(clazz)) {
+                return (A) annotation;
+            }
+            if (annotation.annotationType().getPackage().getName().startsWith("java.lang")) {
+                continue;
+            }
+            final A inner = getAnnotationRecursively(annotation.annotationType().getAnnotations(), clazz);
+            if (inner != null) {
+                innerCandidate = inner;
+            }
+        }
+        return innerCandidate;
+    }
+
     static <A extends Annotation> @Nullable A getMethodOrClassAnnotation(
             final @NonNull Method method,
             final @NonNull Class<A> clazz
     ) {
-        if (method.isAnnotationPresent(clazz)) {
-            return method.getAnnotation(clazz);
-        } else if (method.getDeclaringClass().isAnnotationPresent(clazz)) {
-            return method.getDeclaringClass().getAnnotation(clazz);
+        A annotation = getAnnotationRecursively(method.getAnnotations(), clazz);
+        if (annotation == null) {
+            annotation = getAnnotationRecursively(method.getDeclaringClass().getAnnotations(), clazz);
         }
-        return null;
+        return annotation;
     }
 
     static <A extends Annotation> boolean methodOrClassHasAnnotation(

@@ -32,6 +32,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,6 +81,27 @@ class AnnotationParserTest {
         Assertions.assertEquals(NAMED_SUGGESTIONS, manager.suggest(new TestCommandSender(), "namedsuggestions "));
     }
 
+    @Test
+    void testAnnotationResolver() throws Exception {
+        final Class<AnnotatedClass> annotatedClass = AnnotatedClass.class;
+        final Method annotatedMethod = annotatedClass.getDeclaredMethod("annotatedMethod");
+
+        final CommandDescription commandDescription = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
+                CommandDescription.class);
+        Assertions.assertNotNull(commandDescription);
+        Assertions.assertEquals("Hello World!", commandDescription.value());
+
+        final CommandPermission commandPermission = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
+                CommandPermission.class);
+        Assertions.assertNotNull(commandPermission);
+        Assertions.assertEquals("some.permission", commandPermission.value());
+
+        final CommandMethod commandMethod = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
+                CommandMethod.class);
+        Assertions.assertNotNull(commandMethod);
+        Assertions.assertEquals("method", commandMethod.value());
+    }
+
     @ProxiedBy("proxycommand")
     @CommandMethod("test|t literal <int> [string]")
     public void testCommand(
@@ -101,6 +127,24 @@ class AnnotationParserTest {
     public void testNamedSuggestionProviders(
             @Argument(value = "input", suggestions = "some-name") final String argument
     ) {
+    }
+
+
+    @CommandPermission("some.permission")
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface AnnotatedAnnotation {
+    }
+
+
+    @CommandDescription("Hello World!")
+    private static class AnnotatedClass {
+
+        @CommandMethod("method")
+        @AnnotatedAnnotation
+        public static void annotatedMethod() {
+        }
+
     }
 
 }
