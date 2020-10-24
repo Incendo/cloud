@@ -32,6 +32,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,6 +81,34 @@ class AnnotationParserTest {
         Assertions.assertEquals(NAMED_SUGGESTIONS, manager.suggest(new TestCommandSender(), "namedsuggestions "));
     }
 
+    @Test
+    void testAnnotationResolver() throws Exception {
+        final Class<AnnotatedClass> annotatedClass = AnnotatedClass.class;
+        final Method annotatedMethod = annotatedClass.getDeclaredMethod("annotatedMethod");
+
+        System.out.println("Looking for @CommandDescription");
+        final CommandDescription commandDescription = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
+                CommandDescription.class);
+        Assertions.assertNotNull(commandDescription);
+        Assertions.assertEquals("Hello World!", commandDescription.value());
+
+        System.out.println("Looking for @CommandPermission");
+        final CommandPermission commandPermission = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
+                CommandPermission.class);
+        Assertions.assertNotNull(commandPermission);
+        Assertions.assertEquals("some.permission", commandPermission.value());
+
+        System.out.println("Looking for @CommandMethod");
+        final CommandMethod commandMethod = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
+                CommandMethod.class);
+        Assertions.assertNotNull(commandMethod);
+        Assertions.assertEquals("method", commandMethod.value());
+
+        System.out.println("Looking for @Regex");
+        @SuppressWarnings("unused")
+        final Regex regex = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod, Regex.class);
+    }
+
     @ProxiedBy("proxycommand")
     @CommandMethod("test|t literal <int> [string]")
     public void testCommand(
@@ -101,6 +134,39 @@ class AnnotationParserTest {
     public void testNamedSuggestionProviders(
             @Argument(value = "input", suggestions = "some-name") final String argument
     ) {
+    }
+
+
+    @CommandPermission("some.permission")
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface AnnotatedAnnotation {
+    }
+
+
+    @Bad1
+    @CommandDescription("Hello World!")
+    private static class AnnotatedClass {
+
+        @CommandMethod("method")
+        @AnnotatedAnnotation
+        public static void annotatedMethod() {
+        }
+
+    }
+
+
+    @Bad2
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface Bad1 {
+    }
+
+
+    @Bad1
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface Bad2 {
     }
 
 }
