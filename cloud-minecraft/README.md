@@ -22,14 +22,14 @@ Bukkit mappings for cloud. If `commodore` is present on the classpath and the se
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-bukkit</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-bukkit:1.1.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-bukkit:1.1.0'
 }
 ```
 
@@ -86,14 +86,14 @@ An example plugin using the `cloud-paper` API can be found [here](https://github
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-paper</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-paper:1.1.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-paper:1.1.0'
 }
 ```
 
@@ -109,14 +109,14 @@ BungeeCord mappings for cloud.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-bungee</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-bungee:1.1.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-bungee:1.1.0'
 }
 ```
 
@@ -138,14 +138,14 @@ cloud mappings for Velocity 1.1.0.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-velocity</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-velocity:1.1.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-velocity:1.1.0'
 }
 ```
 
@@ -166,14 +166,14 @@ cloud mappings for CloudBurst 1.0.0-SNAPSHOT.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-cloudburst</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-velocity:1.1.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-velocity:1.1.0'
 }
 ```
 
