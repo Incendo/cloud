@@ -48,7 +48,7 @@ import java.util.function.Function;
 @Plugin(
         id = "example-plugin",
         name = "Cloud example plugin",
-        version = "1.1.0"
+        version = "1.2.0-SNAPSHOT"
 )
 public final class ExampleVelocityPlugin {
 
