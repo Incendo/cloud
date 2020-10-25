@@ -26,6 +26,8 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
+import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -70,6 +72,7 @@ public final class AnnotationParser<C> {
 
     private final SyntaxParser syntaxParser = new SyntaxParser();
     private final ArgumentExtractor argumentExtractor = new ArgumentExtractor();
+    private final ParameterInjectorRegistry<C> parameterInjectorRegistry = new ParameterInjectorRegistry<>();
 
     private final CommandManager<C> manager;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
@@ -106,16 +109,26 @@ public final class AnnotationParser<C> {
                 annotation.value(),
                 Caption.of(annotation.failureCaption())
         ));
+        this.getParameterInjectorRegistry().registerInjector(
+                CommandContext.class,
+                (context, annotations) -> context
+        );
+        this.getParameterInjectorRegistry().registerInjector(
+                String[].class,
+                (context, annotations) -> annotations.annotation(RawArgs.class) == null
+                        ? null
+                        : context.getRawInput().toArray(new String[0])
+        );
     }
 
     @SuppressWarnings("unchecked")
     static <A extends Annotation> @Nullable A getAnnotationRecursively(
-            final @NonNull Annotation[] annotations,
+            final @NonNull AnnotationAccessor annotations,
             final @NonNull Class<A> clazz,
             final @NonNull Set<Class<? extends Annotation>> checkedAnnotations
     ) {
         A innerCandidate = null;
-        for (final Annotation annotation : annotations) {
+        for (final Annotation annotation : annotations.annotations()) {
             if (!checkedAnnotations.add(annotation.annotationType())) {
                 continue;
             }
@@ -125,7 +138,10 @@ public final class AnnotationParser<C> {
             if (annotation.annotationType().getPackage().getName().startsWith("java.lang")) {
                 continue;
             }
-            final A inner = getAnnotationRecursively(annotation.annotationType().getAnnotations(), clazz, checkedAnnotations);
+            final A inner = getAnnotationRecursively(
+                    AnnotationAccessor.of(annotation.annotationType()),
+                    clazz,
+                    checkedAnnotations);
             if (inner != null) {
                 innerCandidate = inner;
             }
@@ -137,9 +153,17 @@ public final class AnnotationParser<C> {
             final @NonNull Method method,
             final @NonNull Class<A> clazz
     ) {
-        A annotation = getAnnotationRecursively(method.getAnnotations(), clazz, new HashSet<>());
+        A annotation = getAnnotationRecursively(
+                AnnotationAccessor.of(method),
+                clazz,
+                new HashSet<>()
+        );
         if (annotation == null) {
-            annotation = getAnnotationRecursively(method.getDeclaringClass().getAnnotations(), clazz, new HashSet<>());
+            annotation = getAnnotationRecursively(
+                    AnnotationAccessor.of(method.getDeclaringClass()),
+                    clazz,
+                    new HashSet<>()
+            );
         }
         return annotation;
     }
@@ -179,6 +203,17 @@ public final class AnnotationParser<C> {
                     @NonNull ArgumentParseResult<Boolean>>> preprocessorMapper
     ) {
         this.preprocessorMappers.put(annotation, preprocessorMapper);
+    }
+
+    /**
+     * Get the parameter injector registry instance that is used to inject non-{@link Argument argument} parameters
+     * into {@link CommandMethod} annotated {@link Method methods}
+     *
+     * @return Parameter injector registry
+     * @since 1.2.0
+     */
+    public @NonNull ParameterInjectorRegistry<C> getParameterInjectorRegistry() {
+        return this.parameterInjectorRegistry;
     }
 
     /**
@@ -302,7 +337,7 @@ public final class AnnotationParser<C> {
             try {
                 /* Construct the handler */
                 final CommandExecutionHandler<C> commandExecutionHandler
-                        = new MethodCommandExecutionHandler<>(instance, commandArguments, method);
+                        = new MethodCommandExecutionHandler<>(instance, commandArguments, method, this.parameterInjectorRegistry);
                 builder = builder.handler(commandExecutionHandler);
             } catch (final Exception e) {
                 throw new RuntimeException("Failed to construct command execution handler", e);
@@ -399,10 +434,10 @@ public final class AnnotationParser<C> {
                     this.manager.getParserRegistry().getSuggestionProvider(suggestionProviderName);
             argumentBuilder.withSuggestionsProvider(
                     suggestionsFunction.orElseThrow(() ->
-                    new IllegalArgumentException(String.format(
-                            "There is no suggestion provider with name '%s'. Did you forget to register it?",
-                            suggestionProviderName
-                    )))
+                            new IllegalArgumentException(String.format(
+                                    "There is no suggestion provider with name '%s'. Did you forget to register it?",
+                                    suggestionProviderName
+                            )))
             );
         }
         /* Build the argument */
