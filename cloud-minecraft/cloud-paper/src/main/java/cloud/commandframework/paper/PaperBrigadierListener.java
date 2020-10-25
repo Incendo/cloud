@@ -57,10 +57,16 @@ class PaperBrigadierListener<C> implements Listener {
         new BukkitBrigadierMapper<>(this.paperCommandManager, this.brigadierManager);
     }
 
+    protected @NonNull CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager() {
+        return this.brigadierManager;
+    }
+
     @EventHandler
     @SuppressWarnings("deprecation")
-    public void onCommandRegister(final com.destroystokyo.paper.event.brigadier
-            .@NonNull CommandRegisteredEvent<BukkitBrigadierCommandSource> event) {
+    public void onCommandRegister(
+            final com.destroystokyo.paper.event.brigadier.
+            @NonNull CommandRegisteredEvent<BukkitBrigadierCommandSource> event
+    ) {
         if (!(event.getCommand() instanceof PluginIdentifiableCommand)) {
             return;
         } else if (!((PluginIdentifiableCommand) event.getCommand())
