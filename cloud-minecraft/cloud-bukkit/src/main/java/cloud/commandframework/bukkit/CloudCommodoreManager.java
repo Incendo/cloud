@@ -71,6 +71,10 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         this.registerWithCommodore(String.format("%s:%s", bukkitCommand.getPlugin().getName(), label).toLowerCase(), command);
     }
 
+    protected @NonNull CloudBrigadierManager brigadierManager() {
+        return this.brigadierManager;
+    }
+
     private void registerWithCommodore(
             final @NonNull String label,
             final @NonNull Command<?> command
