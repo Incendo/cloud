@@ -23,6 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.annotations.injection.ParameterInjector;
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.context.CommandContext;
@@ -34,6 +36,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -42,17 +45,21 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
     private final Parameter[] parameters;
     private final MethodHandle methodHandle;
     private final Map<String, CommandArgument<C, ?>> commandArguments;
+    private final ParameterInjectorRegistry<C> injectorRegistry;
+    private final AnnotationAccessor annotationAccessor;
 
     MethodCommandExecutionHandler(
             final @NonNull Object instance,
-            final @NonNull Map<@NonNull String,
-                    @NonNull CommandArgument<@NonNull C, @NonNull ?>> commandArguments,
-            @NonNull final Method method
+            final @NonNull Map<@NonNull String, @NonNull CommandArgument<@NonNull C, @NonNull ?>> commandArguments,
+            final @NonNull Method method,
+            final @NonNull ParameterInjectorRegistry<C> injectorRegistry
     ) throws Exception {
         this.commandArguments = commandArguments;
         method.setAccessible(true);
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
         this.parameters = method.getParameters();
+        this.injectorRegistry = injectorRegistry;
+        this.annotationAccessor = AnnotationAccessor.of(method);
     }
 
     @Override
@@ -61,6 +68,7 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
         final FlagContext flagContext = commandContext.flags();
 
         /* Bind parameters to context */
+        outer:
         for (final Parameter parameter : this.parameters) {
             if (parameter.isAnnotationPresent(Argument.class)) {
                 final Argument argument = parameter.getAnnotation(Argument.class);
@@ -82,6 +90,17 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
                 if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
                     arguments.add(commandContext.getSender());
                 } else {
+                    final Collection<ParameterInjector<C, ?>> injectors = this.injectorRegistry.injectors(parameter.getType());
+                    for (final ParameterInjector<C, ?> injector : injectors) {
+                        final Object value = injector.create(
+                                commandContext,
+                                this.annotationAccessor
+                        );
+                        if (value != null) {
+                            arguments.add(value);
+                            continue outer;
+                        }
+                    }
                     throw new IllegalArgumentException(String.format(
                             "Unknown command parameter '%s' in method '%s'",
                             parameter.getName(), this.methodHandle.toString()

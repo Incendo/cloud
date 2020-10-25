@@ -26,6 +26,7 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -70,6 +71,7 @@ public final class AnnotationParser<C> {
 
     private final SyntaxParser syntaxParser = new SyntaxParser();
     private final ArgumentExtractor argumentExtractor = new ArgumentExtractor();
+    private final ParameterInjectorRegistry<C> parameterInjectorRegistry = new ParameterInjectorRegistry<>();
 
     private final CommandManager<C> manager;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
@@ -179,6 +181,16 @@ public final class AnnotationParser<C> {
                     @NonNull ArgumentParseResult<Boolean>>> preprocessorMapper
     ) {
         this.preprocessorMappers.put(annotation, preprocessorMapper);
+    }
+
+    /**
+     * Get the parameter injector registry instance that is used to inject non-{@link Argument argument} parameters
+     * into {@link CommandMethod} annotated {@link Method methods}
+     *
+     * @return Parameter injector registry
+     */
+    public @NonNull ParameterInjectorRegistry<C> getParameterInjectorRegistry() {
+        return this.parameterInjectorRegistry;
     }
 
     /**
@@ -302,7 +314,7 @@ public final class AnnotationParser<C> {
             try {
                 /* Construct the handler */
                 final CommandExecutionHandler<C> commandExecutionHandler
-                        = new MethodCommandExecutionHandler<>(instance, commandArguments, method);
+                        = new MethodCommandExecutionHandler<>(instance, commandArguments, method, this.parameterInjectorRegistry);
                 builder = builder.handler(commandExecutionHandler);
             } catch (final Exception e) {
                 throw new RuntimeException("Failed to construct command execution handler", e);
