@@ -108,6 +108,10 @@ public final class AnnotationParser<C> {
                 annotation.value(),
                 Caption.of(annotation.failureCaption())
         ));
+        this.getParameterInjectorRegistry().registerInjector(
+                CommandContext.class,
+                (context, annotations) -> context
+        );
     }
 
     @SuppressWarnings("unchecked")
