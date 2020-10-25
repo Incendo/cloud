@@ -55,6 +55,8 @@ public final class CommandContext<C> {
     private final boolean suggestions;
     private final CaptionRegistry<C> captionRegistry;
 
+    private CommandArgument<C, ?> currentArgument = null;
+
     /**
      * Create a new command context instance
      *
@@ -283,6 +285,30 @@ public final class CommandContext<C> {
      */
     public @NonNull FlagContext flags() {
         return this.flagContext;
+    }
+
+    /**
+     * Get the argument that is currently being parsed for this command context.
+     * This value will be updated whenever the context is used to provide new
+     * suggestions or parse a new command argument
+     *
+     * @return Currently parsing {@link CommandArgument} or {@code null}
+     * @since 1.2.0
+     */
+    public @Nullable CommandArgument<C, ?> getCurrentArgument() {
+        return this.currentArgument;
+    }
+
+    /**
+     * Set the argument that is currently being parsed for this command context.
+     * This value should be updated whenever the context is used to provide new
+     * suggestions or parse a new command argument
+     *
+     * @param argument Currently parsing {@link CommandArgument} or {@code null}
+     * @since 1.2.0
+     */
+    public void setCurrentArgument(final @Nullable CommandArgument<C, ?> argument) {
+        this.currentArgument = argument;
     }
 
 
