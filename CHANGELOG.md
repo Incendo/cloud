@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - Added access to the CloudBrigadierManager from Brigadier-enabled command managers
  - Added parameter injectors
+ - Store currently parsing command argument in the command context
 
 ## [1.1.0] - 2020-10-24
 
