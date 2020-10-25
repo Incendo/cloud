@@ -192,6 +192,7 @@ public final class AnnotationParser<C> {
      * into {@link CommandMethod} annotated {@link Method methods}
      *
      * @return Parameter injector registry
+     * @since 1.2.0
      */
     public @NonNull ParameterInjectorRegistry<C> getParameterInjectorRegistry() {
         return this.parameterInjectorRegistry;
@@ -415,10 +416,10 @@ public final class AnnotationParser<C> {
                     this.manager.getParserRegistry().getSuggestionProvider(suggestionProviderName);
             argumentBuilder.withSuggestionsProvider(
                     suggestionsFunction.orElseThrow(() ->
-                    new IllegalArgumentException(String.format(
-                            "There is no suggestion provider with name '%s'. Did you forget to register it?",
-                            suggestionProviderName
-                    )))
+                            new IllegalArgumentException(String.format(
+                                    "There is no suggestion provider with name '%s'. Did you forget to register it?",
+                                    suggestionProviderName
+                            )))
             );
         }
         /* Build the argument */

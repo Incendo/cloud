@@ -37,6 +37,7 @@ import java.util.Map;
  * Registry containing mappings between {@link Class classes} and {@link ParameterInjector injectors}
  *
  * @param <C> Command sender type
+ * @since 1.2.0
  */
 public final class ParameterInjectorRegistry<C> {
 

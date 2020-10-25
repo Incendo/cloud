@@ -34,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  * @param <T> Type of the value that is injected by this injector
+ * @since 1.2.0
  */
 @FunctionalInterface
 public interface ParameterInjector<C, T> {

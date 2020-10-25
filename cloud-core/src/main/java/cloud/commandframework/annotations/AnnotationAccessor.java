@@ -32,6 +32,8 @@ import java.util.Collection;
 
 /**
  * Managed access for {@link java.lang.annotation.Annotation} instances
+ *
+ * @since 1.2.0
  */
 public interface AnnotationAccessor {
 
