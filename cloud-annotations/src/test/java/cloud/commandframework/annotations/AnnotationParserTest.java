@@ -61,6 +61,11 @@ class AnnotationParserTest {
                 "some-name",
                 (context, input) -> NAMED_SUGGESTIONS
         );
+        /* Register a parameter injector */
+        annotationParser.getParameterInjectorRegistry().registerInjector(
+                InjectableValue.class,
+                (context, annotations) -> new InjectableValue("Hello World!")
+        );
     }
 
     @Test
@@ -109,6 +114,11 @@ class AnnotationParserTest {
         final Regex regex = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod, Regex.class);
     }
 
+    @Test
+    void testParameterInjection() {
+        manager.executeCommand(new TestCommandSender(), "inject").join();
+    }
+
     @ProxiedBy("proxycommand")
     @CommandMethod("test|t literal <int> [string]")
     public void testCommand(
@@ -136,6 +146,12 @@ class AnnotationParserTest {
     ) {
     }
 
+    @CommandMethod("inject")
+    public void testInjectedParameters(
+            final InjectableValue injectableValue
+    ) {
+        System.out.printf("Injected value: %s\n", injectableValue.toString());
+    }
 
     @CommandPermission("some.permission")
     @Target(ElementType.METHOD)
@@ -167,6 +183,22 @@ class AnnotationParserTest {
     @Target({ElementType.METHOD, ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     private @interface Bad2 {
+    }
+
+
+    private static final class InjectableValue {
+
+        private final String value;
+
+        private InjectableValue(final String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
     }
 
 }
