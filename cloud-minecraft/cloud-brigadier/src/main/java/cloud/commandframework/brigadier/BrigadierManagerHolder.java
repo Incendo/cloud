@@ -29,6 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * This interface is implemented by command managers capable of registering commands to Brigadier.
  *
  * @param <C> Command sender type
+ * @since 1.2.0
  */
 public interface BrigadierManagerHolder<C> {
 
@@ -41,6 +42,7 @@ public interface BrigadierManagerHolder<C> {
      *
      * @return The Brigadier manager instance, if commands are being registered to Brigadier.
      *         Else, {@code null}
+     * @since 1.2.0
      */
     @Nullable CloudBrigadierManager<C, ?> brigadierManager();
 
