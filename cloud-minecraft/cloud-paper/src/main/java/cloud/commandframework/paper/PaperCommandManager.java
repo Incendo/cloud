@@ -24,6 +24,7 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
@@ -31,6 +32,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Function;
 
@@ -40,6 +42,8 @@ import java.util.function.Function;
  * @param <C> Command sender type
  */
 public class PaperCommandManager<C> extends BukkitCommandManager<C> {
+
+    private PaperBrigadierListener<C> paperBrigadierListener = null;
 
     /**
      * Construct a new Paper command manager
@@ -96,9 +100,9 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
             super.registerBrigadier();
         } else {
             try {
-                final PaperBrigadierListener<C> brigadierListener = new PaperBrigadierListener<>(this);
+                this.paperBrigadierListener = new PaperBrigadierListener<>(this);
                 Bukkit.getPluginManager().registerEvents(
-                        brigadierListener,
+                        this.paperBrigadierListener,
                         this.getOwningPlugin()
                 );
                 this.setSplitAliases(true);
@@ -106,6 +110,17 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
                 throw new BrigadierFailureException(BrigadierFailureReason.PAPER_BRIGADIER_INITIALIZATION_FAILURE, e);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
+        if (this.paperBrigadierListener != null) {
+            return this.paperBrigadierListener.brigadierManager();
+        }
+        return super.brigadierManager();
     }
 
     /**

@@ -25,6 +25,8 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.brigadier.BrigadierManagerHolder;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
@@ -53,6 +55,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -65,7 +68,8 @@ import java.util.regex.Pattern;
  *
  * @param <C> Command sender type
  */
-public class BukkitCommandManager<C> extends CommandManager<C> {
+@SuppressWarnings("unchecked")
+public class BukkitCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
 
     private static final int VERSION_RADIX = 10;
     private static final int BRIGADIER_MINIMUM_VERSION = 13;
@@ -315,6 +319,17 @@ public class BukkitCommandManager<C> extends CommandManager<C> {
         } catch (final Throwable e) {
             throw new BrigadierFailureException(BrigadierFailureReason.COMMODORE_NOT_PRESENT, e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
+        if (this.getCommandRegistrationHandler() instanceof CloudCommodoreManager) {
+            return ((CloudCommodoreManager<C>) this.getCommandRegistrationHandler()).brigadierManager();
+        }
+        return null;
     }
 
     /**
