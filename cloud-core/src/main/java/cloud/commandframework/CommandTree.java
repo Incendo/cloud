@@ -209,6 +209,7 @@ public final class CommandTree<C> {
                         final CommandContext.ArgumentTiming argumentTiming = commandContext.createTiming(argument);
 
                         argumentTiming.setStart(System.nanoTime());
+                        commandContext.setCurrentArgument(argument);
                         final ArgumentParseResult<?> result = argument.getParser().parse(commandContext, commandQueue);
                         argumentTiming.setEnd(System.nanoTime(), result.getFailure().isPresent());
 
@@ -377,6 +378,7 @@ public final class CommandTree<C> {
                         commandQueue
                 );
                 if (!preParseResult.getFailure().isPresent() && preParseResult.getParsedValue().orElse(false)) {
+                    commandContext.setCurrentArgument(argument);
                     result = argument.getParser().parse(commandContext, commandQueue);
                 } else {
                     result = preParseResult;
@@ -489,14 +491,17 @@ public final class CommandTree<C> {
                 if (commandQueue.isEmpty()) {
                     return Collections.emptyList();
                 } else if (child.isLeaf() && commandQueue.size() < 2) {
+                    commandContext.setCurrentArgument(child.getValue());
                     return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
                 } else if (child.isLeaf()) {
                     if (child.getValue() instanceof CompoundArgument) {
                         final String last = ((LinkedList<String>) commandQueue).getLast();
+                        commandContext.setCurrentArgument(child.getValue());
                         return child.getValue().getSuggestionsProvider().apply(commandContext, last);
                     }
                     return Collections.emptyList();
                 } else if (commandQueue.peek().isEmpty()) {
+                    commandContext.setCurrentArgument(child.getValue());
                     return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());
                 }
 
@@ -507,17 +512,20 @@ public final class CommandTree<C> {
                 );
                 if (preParseResult.getFailure().isPresent() || !preParseResult.getParsedValue().orElse(false)) {
                     final String value = commandQueue.peek() == null ? "" : commandQueue.peek();
+                    commandContext.setCurrentArgument(child.getValue());
                     return child.getValue().getSuggestionsProvider().apply(commandContext, value);
                 }
                 // END: Preprocessing
 
                 // START: Parsing
+                commandContext.setCurrentArgument(child.getValue());
                 final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
                 if (result.getParsedValue().isPresent()) {
                     commandContext.store(child.getValue().getName(), result.getParsedValue().get());
                     return this.getSuggestions(commandContext, commandQueue, child);
                 } else if (result.getFailure().isPresent()) {
                     final String value = commandQueue.peek() == null ? "" : commandQueue.peek();
+                    commandContext.setCurrentArgument(child.getValue());
                     return child.getValue().getSuggestionsProvider().apply(commandContext, value);
                 }
                 // END: Parsing
@@ -532,6 +540,7 @@ public final class CommandTree<C> {
                 while (childIterator.hasNext()) {
                     final Node<CommandArgument<C, ?>> child = childIterator.next();
                     if (child.getValue() != null) {
+                        commandContext.setCurrentArgument(child.getValue());
                         final ArgumentParseResult<?> result = child.getValue().getParser().parse(
                                 commandContext,
                                 commandQueue
@@ -555,6 +564,7 @@ public final class CommandTree<C> {
                 if (argument.getValue() == null || this.isPermitted(commandContext.getSender(), argument) != null) {
                     continue;
                 }
+                commandContext.setCurrentArgument(argument.getValue());
                 final List<String> suggestionsToAdd = argument.getValue().getSuggestionsProvider()
                         .apply(commandContext, stringOrEmpty(commandQueue.peek()));
                 suggestions.addAll(suggestionsToAdd);
