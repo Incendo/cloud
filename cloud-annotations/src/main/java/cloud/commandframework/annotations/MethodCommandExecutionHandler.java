@@ -68,7 +68,6 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
         final FlagContext flagContext = commandContext.flags();
 
         /* Bind parameters to context */
-        outer:
         for (final Parameter parameter : this.parameters) {
             if (parameter.isAnnotationPresent(Argument.class)) {
                 final Argument argument = parameter.getAnnotation(Argument.class);
@@ -91,20 +90,24 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
                     arguments.add(commandContext.getSender());
                 } else {
                     final Collection<ParameterInjector<C, ?>> injectors = this.injectorRegistry.injectors(parameter.getType());
+                    Object value = null;
                     for (final ParameterInjector<C, ?> injector : injectors) {
-                        final Object value = injector.create(
+                        value = injector.create(
                                 commandContext,
                                 this.annotationAccessor
                         );
                         if (value != null) {
-                            arguments.add(value);
-                            continue outer;
+                           break;
                         }
                     }
-                    throw new IllegalArgumentException(String.format(
-                            "Unknown command parameter '%s' in method '%s'",
-                            parameter.getName(), this.methodHandle.toString()
-                    ));
+                    if (value != null) {
+                        arguments.add(value);
+                    } else {
+                        throw new IllegalArgumentException(String.format(
+                                "Unknown command parameter '%s' in method '%s'",
+                                parameter.getName(), this.methodHandle.toString()
+                        ));
+                    }
                 }
             }
         }
