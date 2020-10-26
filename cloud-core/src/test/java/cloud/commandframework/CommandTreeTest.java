@@ -31,6 +31,7 @@ import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
@@ -286,6 +287,16 @@ class CommandTreeTest {
         manager.executeCommand(new TestCommandSender(), "flags --num 500").join();
         manager.executeCommand(new TestCommandSender(), "flags --num 63 --enum potato --test").join();
         manager.executeCommand(new TestCommandSender(), "flags -tf --num 63 --enum potato").join();
+    }
+
+    @Test
+    void testAmbiguousNodes() {
+        manager.command(manager.commandBuilder("ambiguous")
+                .argument(StringArgument.of("string"))
+        );
+        Assertions.assertThrows(AmbiguousNodeException.class, () ->
+                manager.command(manager.commandBuilder("ambiguous")
+                        .argument(IntegerArgument.of("integer"))));
     }
 
     @Test
