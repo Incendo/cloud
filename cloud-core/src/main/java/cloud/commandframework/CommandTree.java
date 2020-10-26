@@ -729,7 +729,9 @@ public final class CommandTree<C> {
         }
         final int size = node.children.size();
         for (final Node<CommandArgument<C, ?>> child : node.children) {
-            if (child.getValue() != null && !child.getValue().isRequired() && size > 1) {
+            if (child.getValue() != null
+                    && !(child.getValue() instanceof StaticArgument)
+                    && size > 1) {
                 throw new AmbiguousNodeException(
                         node.getValue(),
                         child.getValue(),
