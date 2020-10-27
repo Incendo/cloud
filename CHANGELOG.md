@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added parameter injectors
  - Store currently parsing command argument in the command context
  
+### Changed
+ - Allow for use of `@Completions` annotation with argument types other than String
+ 
 ### Fixed
  - Use the correct default range for Double and Float parsers in the StandardParserRegistry
 

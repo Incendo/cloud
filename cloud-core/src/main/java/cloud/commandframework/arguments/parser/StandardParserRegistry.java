@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.standard.BooleanArgument;
@@ -92,7 +91,6 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     public StandardParserRegistry() {
         /* Register standard mappers */
         this.<Range, Number>registerAnnotationMapper(Range.class, new RangeMapper<>());
-        this.<Completions, String>registerAnnotationMapper(Completions.class, new CompletionsMapper());
         this.<Greedy, String>registerAnnotationMapper(Greedy.class, new GreedyMapper());
 
         /* Register standard types */
@@ -317,21 +315,6 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 parserParameters.store(StandardParameters.RANGE_MAX, max);
             }
             return parserParameters;
-        }
-
-    }
-
-
-    private static final class CompletionsMapper implements BiFunction<@NonNull Completions, @NonNull TypeToken<?>,
-            @NonNull ParserParameters> {
-
-        @Override
-        public @NonNull ParserParameters apply(final @NonNull Completions completions, final @NonNull TypeToken<?> token) {
-            if (GenericTypeReflector.erase(token.getType()).equals(String.class)) {
-                final String[] splitCompletions = completions.value().replace(" ", "").split(",");
-                return ParserParameters.single(StandardParameters.COMPLETIONS, splitCompletions);
-            }
-            return ParserParameters.empty();
         }
 
     }
