@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  
 ### Fixed
  - Use the correct default range for Double and Float parsers in the StandardParserRegistry
+ - Fix Bukkit alias command suggestions without Brigadier
 
 ## [1.1.0] - 2020-10-24
 
