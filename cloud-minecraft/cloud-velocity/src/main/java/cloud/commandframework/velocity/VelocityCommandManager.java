@@ -25,6 +25,8 @@ package cloud.commandframework.velocity;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.brigadier.BrigadierManagerHolder;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
@@ -52,7 +54,7 @@ import java.util.function.Function;
  * @param <C> Command sender type
  */
 @Singleton
-public class VelocityCommandManager<C> extends CommandManager<C> {
+public class VelocityCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
 
     /**
      * Default caption for {@link VelocityCaptionKeys#ARGUMENT_PARSE_FAILURE_PLAYER}
@@ -122,6 +124,20 @@ public class VelocityCommandManager<C> extends CommandManager<C> {
     @Override
     public final @NonNull CommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * In the case of the {@link VelocityCommandManager}, Brigadier is always used for command registration,
+     * and therefore this method will never return {@code null}.
+     *
+     * @since 1.2.0
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public @NonNull CloudBrigadierManager<C, CommandSource> brigadierManager() {
+        return ((VelocityPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).brigadierManager();
     }
 
     final @NonNull ProxyServer getProxyServer() {

@@ -79,4 +79,8 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         return true;
     }
 
+    @NonNull CloudBrigadierManager<C, CommandSource> brigadierManager() {
+        return this.brigadierManager;
+    }
+
 }
