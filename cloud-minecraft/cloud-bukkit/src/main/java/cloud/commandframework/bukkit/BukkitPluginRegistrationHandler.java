@@ -88,6 +88,29 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                 (CommandArgument<C, ?>) commandArgument,
                 this.bukkitCommandManager
         );
+
+        for (final String alias : aliases) {
+            this.recognizedAliases.add(getNamespacedLabel(alias));
+            if (!this.bukkitCommands.containsKey(alias)) {
+                this.recognizedAliases.add(alias);
+                if (this.bukkitCommandManager.getSplitAliases()) {
+                    @SuppressWarnings("unchecked") final BukkitCommand<C> aliasCommand = new BukkitCommand<>(
+                            alias,
+                            Collections.emptyList(),
+                            (Command<C>) command,
+                            (CommandArgument<C, ?>) commandArgument,
+                            this.bukkitCommandManager
+                    );
+                    this.commandMap.register(
+                            alias,
+                            this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
+                            bukkitCommand
+                    );
+                    this.registerExternal(alias, command, aliasCommand);
+                }
+            }
+        }
+
         this.registeredCommands.put(commandArgument, bukkitCommand);
         if (!this.bukkitCommands.containsKey(label)) {
             this.recognizedAliases.add(label);
@@ -99,30 +122,6 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                 bukkitCommand
         );
         this.registerExternal(label, command, bukkitCommand);
-
-        if (this.bukkitCommandManager.getSplitAliases()) {
-            for (final String alias : aliases) {
-                if (!this.bukkitCommands.containsKey(alias)) {
-                    @SuppressWarnings("unchecked") final BukkitCommand<C> aliasCommand = new BukkitCommand<>(
-                            alias,
-                            Collections.emptyList(),
-                            (Command<C>) command,
-                            (CommandArgument<C, ?>) commandArgument,
-                            this.bukkitCommandManager
-                    );
-                    if (!this.bukkitCommands.containsKey(alias)) {
-                        this.recognizedAliases.add(alias);
-                    }
-                    this.recognizedAliases.add(getNamespacedLabel(alias));
-                    this.commandMap.register(
-                            alias,
-                            this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
-                            bukkitCommand
-                    );
-                    this.registerExternal(alias, command, aliasCommand);
-                }
-            }
-        }
 
         return true;
     }

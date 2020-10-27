@@ -42,7 +42,7 @@ public class CommandSuggestionsTest {
     @BeforeAll
     static void setupManager() {
         manager = new TestCommandManager();
-        manager.command(manager.commandBuilder("test").literal("one").build());
+        manager.command(manager.commandBuilder("test", "testalias").literal("one").build());
         manager.command(manager.commandBuilder("test").literal("two").build());
         manager.command(manager.commandBuilder("test")
                 .literal("var")
@@ -90,6 +90,15 @@ public class CommandSuggestionsTest {
 
         manager.command(manager.commandBuilder("numberswithmin")
                 .argument(IntegerArgument.<TestCommandSender>newBuilder("num").withMin(5).withMax(100)));
+    }
+
+    @Test
+    void testRootAliases() {
+        final String input = "test ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        final String input2 = "testalias ";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestions, suggestions2);
     }
 
     @Test

@@ -642,7 +642,7 @@ public final class MinecraftHelp<C> {
          * @param accent             The color used for accents and symbols
          * @return A new {@link HelpColors} instance
          */
-        public static HelpColors of(
+        public static @NonNull HelpColors of(
                 final @NonNull TextColor primary,
                 final @NonNull TextColor highlight,
                 final @NonNull TextColor alternateHighlight,
