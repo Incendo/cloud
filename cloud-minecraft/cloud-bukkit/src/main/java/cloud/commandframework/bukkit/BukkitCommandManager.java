@@ -323,6 +323,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
     /**
      * {@inheritDoc}
+     *
+     * @since 1.2.0
      */
     @Override
     public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
