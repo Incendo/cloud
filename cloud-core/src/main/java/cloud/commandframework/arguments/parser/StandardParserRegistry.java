@@ -113,13 +113,13 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 ));
         this.registerParserSupplier(TypeToken.get(Float.class), options ->
                 new FloatArgument.FloatParser<>(
-                        (float) options.get(StandardParameters.RANGE_MIN, Float.MIN_VALUE),
-                        (float) options.get(StandardParameters.RANGE_MAX, Float.MAX_VALUE)
+                        (float) options.get(StandardParameters.RANGE_MIN, Float.NEGATIVE_INFINITY),
+                        (float) options.get(StandardParameters.RANGE_MAX, Float.POSITIVE_INFINITY)
                 ));
         this.registerParserSupplier(TypeToken.get(Double.class), options ->
                 new DoubleArgument.DoubleParser<>(
-                        (double) options.get(StandardParameters.RANGE_MIN, Double.MIN_VALUE),
-                        (double) options.get(StandardParameters.RANGE_MAX, Double.MAX_VALUE)
+                        (double) options.get(StandardParameters.RANGE_MIN, Double.NEGATIVE_INFINITY),
+                        (double) options.get(StandardParameters.RANGE_MAX, Double.POSITIVE_INFINITY)
                 ));
         this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<>());
         this.registerParserSupplier(TypeToken.get(String[].class), options -> new StringArrayArgument.StringArrayParser<>());
