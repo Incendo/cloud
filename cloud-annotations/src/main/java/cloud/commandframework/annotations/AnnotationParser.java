@@ -28,6 +28,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
+import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -427,8 +428,14 @@ public final class AnnotationParser<C> {
         } else {
             argumentBuilder.asRequired();
         }
-        /* Check whether or not a suggestion provider should be set */
-        if (!argument.suggestions().isEmpty()) {
+        /* Check for Completions annotation */
+        final Completions completions = parameter.getDeclaredAnnotation(Completions.class);
+        if (completions != null) {
+            final List<String> suggestions = Arrays.asList(
+                    completions.value().replace(" ", "").split(",")
+            );
+            argumentBuilder.withSuggestionsProvider((commandContext, input) -> suggestions);
+        } else if (!argument.suggestions().isEmpty()) { /* Check whether or not a suggestion provider should be set */
             final String suggestionProviderName = argument.suggestions();
             final Optional<BiFunction<CommandContext<C>, String, List<String>>> suggestionsFunction =
                     this.manager.getParserRegistry().getSuggestionProvider(suggestionProviderName);
