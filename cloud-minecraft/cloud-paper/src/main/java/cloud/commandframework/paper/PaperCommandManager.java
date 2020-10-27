@@ -114,6 +114,8 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
 
     /**
      * {@inheritDoc}
+     *
+     * @since 1.2.0
      */
     @Override
     public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
