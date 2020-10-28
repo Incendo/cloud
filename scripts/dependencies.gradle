@@ -14,7 +14,7 @@ ext {
             'cloudburst'    : '1.0.0-SNAPSHOT',
             'adventure-api' : '4.1.1',
             'paper-api'     : '1.15.2-R0.1-SNAPSHOT',
-            'velocity-api'  : '1.1.0-SNAPSHOT',
+            'velocity-api'  : '1.1.0',
             'jb-annotations': '20.1.0',
             'guava'         : '30.0-jre',
             // IRC DEPENDENCIES
