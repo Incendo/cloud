@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added access to the CloudBrigadierManager from Brigadier-enabled command managers
  - Added parameter injectors
  - Store currently parsing command argument in the command context
+ - Added a method to CloudBrigadierManager to enable or disable Brigadier native suggestions for specific argument types
  
 ### Changed
  - Allow for use of `@Completions` annotation with argument types other than String
