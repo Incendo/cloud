@@ -146,12 +146,12 @@ public final class CloudBrigadierManager<C, S> {
         /* Map float to FloatArgumentType */
         this.registerMapping(new TypeToken<FloatArgument.FloatParser<C>>() {
         }, true, argument -> {
-            final boolean hasMin = argument.getMin() != Float.MIN_VALUE;
-            final boolean hasMax = argument.getMax() != Float.MAX_VALUE;
+            final boolean hasMin = argument.getMin() != Float.NEGATIVE_INFINITY;
+            final boolean hasMax = argument.getMax() != Float.POSITIVE_INFINITY;
             if (hasMin) {
                 return FloatArgumentType.floatArg(argument.getMin(), argument.getMax());
             } else if (hasMax) {
-                return FloatArgumentType.floatArg(Float.MIN_VALUE, argument.getMax());
+                return FloatArgumentType.floatArg(Float.NEGATIVE_INFINITY, argument.getMax());
             } else {
                 return FloatArgumentType.floatArg();
             }
@@ -159,12 +159,12 @@ public final class CloudBrigadierManager<C, S> {
         /* Map double to DoubleArgumentType */
         this.registerMapping(new TypeToken<DoubleArgument.DoubleParser<C>>() {
         }, true, argument -> {
-            final boolean hasMin = argument.getMin() != Double.MIN_VALUE;
-            final boolean hasMax = argument.getMax() != Double.MAX_VALUE;
+            final boolean hasMin = argument.getMin() != Double.NEGATIVE_INFINITY;
+            final boolean hasMax = argument.getMax() != Double.POSITIVE_INFINITY;
             if (hasMin) {
                 return DoubleArgumentType.doubleArg(argument.getMin(), argument.getMax());
             } else if (hasMax) {
-                return DoubleArgumentType.doubleArg(Double.MIN_VALUE, argument.getMax());
+                return DoubleArgumentType.doubleArg(Double.NEGATIVE_INFINITY, argument.getMax());
             } else {
                 return DoubleArgumentType.doubleArg();
             }
@@ -190,6 +190,74 @@ public final class CloudBrigadierManager<C, S> {
         /* Map String[] to a greedy string */
         this.registerMapping(new TypeToken<StringArrayArgument.StringArrayParser<C>>() {
         }, false, argument -> StringArgumentType.greedyString());
+    }
+
+    /**
+     * Set whether to use Brigadier's native suggestions for number argument types.
+     * <p>
+     * If Brigadier's suggestions are not used, cloud's default number suggestion provider will be used.
+     *
+     * @param nativeNumberSuggestions Whether or not Brigadier suggestions should be used for numbers
+     * @since 1.2.0
+     */
+    public void setNativeNumberSuggestions(final boolean nativeNumberSuggestions) {
+        this.setNativeSuggestions(
+                new TypeToken<ByteArgument.ByteParser<C>>() {
+                },
+                nativeNumberSuggestions
+        );
+        this.setNativeSuggestions(
+                new TypeToken<ShortArgument.ShortParser<C>>() {
+                },
+                nativeNumberSuggestions
+        );
+        this.setNativeSuggestions(
+                new TypeToken<IntegerArgument.IntegerParser<C>>() {
+                },
+                nativeNumberSuggestions
+        );
+        this.setNativeSuggestions(
+                new TypeToken<FloatArgument.FloatParser<C>>() {
+                },
+                nativeNumberSuggestions
+        );
+        this.setNativeSuggestions(
+                new TypeToken<DoubleArgument.DoubleParser<C>>() {
+                },
+                nativeNumberSuggestions
+        );
+    }
+
+    /**
+     * Set whether to use Brigadier's native suggestions for an argument type with an already registered mapper.
+     * <p>
+     * If Brigadier's suggestions are not used, suggestions will fall back to the cloud suggestion provider.
+     *
+     * @param argumentType      cloud argument parser type
+     * @param nativeSuggestions Whether or not Brigadier suggestions should be used
+     * @param <T>               argument type
+     * @param <K>               cloud argument parser type
+     * @throws IllegalArgumentException when there is no mapper registered for the provided argument type
+     * @since 1.2.0
+     */
+    public <T, K extends ArgumentParser<C, T>> void setNativeSuggestions(
+            final @NonNull TypeToken<K> argumentType,
+            final boolean nativeSuggestions
+    ) throws IllegalArgumentException {
+        final Pair<Function<? extends ArgumentParser<C, ?>, ? extends ArgumentType<?>>, Boolean> pair = this.mappers.get(
+                GenericTypeReflector.erase(argumentType.getType())
+        );
+        if (pair == null) {
+            throw new IllegalArgumentException(
+                    "No mapper registered for type: " + GenericTypeReflector
+                            .erase(argumentType.getType())
+                            .toGenericString()
+            );
+        }
+        this.mappers.put(
+                GenericTypeReflector.erase(argumentType.getType()),
+                Pair.of(pair.getFirst(), nativeSuggestions)
+        );
     }
 
     /**
