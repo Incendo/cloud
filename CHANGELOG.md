@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  
 ### Changed
  - Allow for use of `@Completions` annotation with argument types other than String
+ - Allow for use of a BiFunction<C, E, Component> instead of just a Function<E, Component> in MinecraftExceptionHandler
  
 ### Fixed
  - Use the correct default range for Double and Float parsers in the StandardParserRegistry
