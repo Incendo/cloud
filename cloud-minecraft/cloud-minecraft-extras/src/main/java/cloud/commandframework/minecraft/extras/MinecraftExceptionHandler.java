@@ -36,6 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -89,7 +90,7 @@ public final class MinecraftExceptionHandler<C> {
                     .append(Component.text(e.getCause().getMessage(), NamedTextColor.GRAY))
                     .build();
 
-    private final Map<ExceptionType, Function<Exception, Component>> componentBuilders = new HashMap<>();
+    private final Map<ExceptionType, BiFunction<C, Exception, Component>> componentBuilders = new HashMap<>();
     private Function<Component, Component> decorator = Function.identity();
 
     /**
@@ -98,8 +99,7 @@ public final class MinecraftExceptionHandler<C> {
      * @return {@code this}
      */
     public @NonNull MinecraftExceptionHandler<C> withInvalidSyntaxHandler() {
-        this.componentBuilders.put(ExceptionType.INVALID_SYNTAX, DEFAULT_INVALID_SYNTAX_FUNCTION);
-        return this;
+        return this.withHandler(ExceptionType.INVALID_SYNTAX, DEFAULT_INVALID_SYNTAX_FUNCTION);
     }
 
     /**
@@ -108,8 +108,7 @@ public final class MinecraftExceptionHandler<C> {
      * @return {@code this}
      */
     public @NonNull MinecraftExceptionHandler<C> withInvalidSenderHandler() {
-        this.componentBuilders.put(ExceptionType.INVALID_SENDER, DEFAULT_INVALID_SENDER_FUNCTION);
-        return this;
+        return this.withHandler(ExceptionType.INVALID_SENDER, DEFAULT_INVALID_SENDER_FUNCTION);
     }
 
     /**
@@ -118,8 +117,7 @@ public final class MinecraftExceptionHandler<C> {
      * @return {@code this}
      */
     public @NonNull MinecraftExceptionHandler<C> withNoPermissionHandler() {
-        this.componentBuilders.put(ExceptionType.NO_PERMISSION, DEFAULT_NO_PERMISSION_FUNCTION);
-        return this;
+        return this.withHandler(ExceptionType.NO_PERMISSION, DEFAULT_NO_PERMISSION_FUNCTION);
     }
 
     /**
@@ -128,8 +126,7 @@ public final class MinecraftExceptionHandler<C> {
      * @return {@code this}
      */
     public @NonNull MinecraftExceptionHandler<C> withArgumentParsingHandler() {
-        this.componentBuilders.put(ExceptionType.ARGUMENT_PARSING, DEFAULT_ARGUMENT_PARSING_FUNCTION);
-        return this;
+        return this.withHandler(ExceptionType.ARGUMENT_PARSING, DEFAULT_ARGUMENT_PARSING_FUNCTION);
     }
 
     /**
@@ -156,7 +153,28 @@ public final class MinecraftExceptionHandler<C> {
             final @NonNull ExceptionType type,
             final @NonNull Function<@NonNull Exception, @NonNull Component> componentBuilder
     ) {
-        this.componentBuilders.put(type, componentBuilder);
+        return this.withHandler(
+                type,
+                (sender, exception) -> componentBuilder.apply(exception)
+        );
+    }
+
+    /**
+     * Specify an exception handler
+     *
+     * @param type             Exception type
+     * @param componentBuilder Component builder
+     * @return {@code this}
+     * @since 1.2.0
+     */
+    public @NonNull MinecraftExceptionHandler<C> withHandler(
+            final @NonNull ExceptionType type,
+            final @NonNull BiFunction<@NonNull C, @NonNull Exception, @NonNull Component> componentBuilder
+    ) {
+        this.componentBuilders.put(
+                type,
+                componentBuilder
+        );
         return this;
     }
 
@@ -188,7 +206,7 @@ public final class MinecraftExceptionHandler<C> {
                     InvalidSyntaxException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
                             Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.INVALID_SYNTAX).apply(e))
+                            this.decorator.apply(this.componentBuilders.get(ExceptionType.INVALID_SYNTAX).apply(c, e))
                     )
             );
         }
@@ -197,7 +215,7 @@ public final class MinecraftExceptionHandler<C> {
                     InvalidCommandSenderException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
                             Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.INVALID_SENDER).apply(e))
+                            this.decorator.apply(this.componentBuilders.get(ExceptionType.INVALID_SENDER).apply(c, e))
                     )
             );
         }
@@ -206,7 +224,7 @@ public final class MinecraftExceptionHandler<C> {
                     NoPermissionException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
                             Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.NO_PERMISSION).apply(e))
+                            this.decorator.apply(this.componentBuilders.get(ExceptionType.NO_PERMISSION).apply(c, e))
                     )
             );
         }
@@ -215,7 +233,7 @@ public final class MinecraftExceptionHandler<C> {
                     ArgumentParseException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
                             Identity.nil(),
-                            this.decorator.apply(this.componentBuilders.get(ExceptionType.ARGUMENT_PARSING).apply(e))
+                            this.decorator.apply(this.componentBuilders.get(ExceptionType.ARGUMENT_PARSING).apply(c, e))
                     )
             );
         }
