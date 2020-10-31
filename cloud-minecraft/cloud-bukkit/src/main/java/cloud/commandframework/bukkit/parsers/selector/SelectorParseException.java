@@ -37,6 +37,7 @@ public final class SelectorParseException extends ParserException {
 
     private static final long serialVersionUID = 1900826717897819065L;
     private final String input;
+    private final FailureReason reason;
 
     /**
      * Construct a new EntitySelector parse exception
@@ -58,6 +59,7 @@ public final class SelectorParseException extends ParserException {
                 reason.getCaption(),
                 CaptionVariable.of("input", input)
         );
+        this.reason = reason;
         this.input = input;
     }
 
@@ -68,6 +70,16 @@ public final class SelectorParseException extends ParserException {
      */
     public @NonNull String getInput() {
         return input;
+    }
+
+    /**
+     * Get the reason of failure for the selector parser
+     *
+     * @return Failure reason
+     * @since 1.2.0
+     */
+    public @NonNull FailureReason getFailureReason() {
+        return this.reason;
     }
 
     /**
