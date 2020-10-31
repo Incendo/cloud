@@ -334,7 +334,7 @@ public abstract class CommandManager<C> {
      *
      * @param name        Command name
      * @param aliases     Command aliases
-     * @param description Command description
+     * @param description Description for the root literal
      * @param meta        Command meta
      * @return Builder instance
      */
@@ -394,7 +394,7 @@ public abstract class CommandManager<C> {
      *
      * @param name        Command name
      * @param meta        Command meta
-     * @param description Command description
+     * @param description Description for the root literal
      * @param aliases     Command aliases
      * @return Builder instance
      */
@@ -455,7 +455,7 @@ public abstract class CommandManager<C> {
      * {@link Command command} instance
      *
      * @param name        Command name
-     * @param description Command description
+     * @param description Description for the root literal
      * @param aliases     Command aliases
      * @return Builder instance
      * @throws UnsupportedOperationException If the command manager does not support default command meta creation

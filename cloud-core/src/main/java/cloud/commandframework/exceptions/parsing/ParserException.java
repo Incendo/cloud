@@ -37,7 +37,7 @@ public class ParserException extends IllegalArgumentException {
     private final CaptionVariable[] captionVariables;
 
     protected ParserException(
-            final Class<?> argumentParser,
+            final @NonNull Class<?> argumentParser,
             final @NonNull CommandContext<?> context,
             final @NonNull Caption errorCaption,
             final @NonNull CaptionVariable... captionVariables
