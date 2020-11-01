@@ -24,6 +24,7 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.arguments.parser.StandardParameters;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -42,6 +43,6 @@ public @interface CommandDescription {
      *
      * @return Command syntax
      */
-    String value() default "";
+    @NonNull String value() default "";
 
 }
