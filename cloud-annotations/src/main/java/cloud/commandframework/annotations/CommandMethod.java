@@ -23,6 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,13 +42,13 @@ public @interface CommandMethod {
      *
      * @return Command syntax
      */
-    String value();
+    @NonNull String value();
 
     /**
      * The required sender
      *
      * @return Required sender
      */
-    Class<?> requiredSender() default Object.class;
+    @NonNull Class<?> requiredSender() default Object.class;
 
 }

@@ -23,6 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -41,14 +43,14 @@ public @interface Argument {
      *
      * @return Argument name
      */
-    String value();
+    @NonNull String value();
 
     /**
      * Name of the argument parser
      *
      * @return Argument name
      */
-    String parserName() default "";
+    @NonNull String parserName() default "";
 
     /**
      * Name of the suggestions provider to use. If the string is left empty, the default
@@ -64,20 +66,20 @@ public @interface Argument {
      *         should be used instead
      * @since 1.1.0
      */
-    String suggestions() default "";
+    @NonNull String suggestions() default "";
 
     /**
      * Get the default value
      *
      * @return Default value
      */
-    String defaultValue() default "";
+    @NonNull String defaultValue() default "";
 
     /**
      * The argument description
      *
      * @return Argument description
      */
-    String description() default "";
+    @NonNull String description() default "";
 
 }

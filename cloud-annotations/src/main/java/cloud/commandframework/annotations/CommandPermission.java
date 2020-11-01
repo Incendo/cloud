@@ -23,6 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,6 +42,6 @@ public @interface CommandPermission {
      *
      * @return Command permission
      */
-    String value() default "";
+    @NonNull String value() default "";
 
 }
