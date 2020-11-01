@@ -37,6 +37,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNull CommandFlag<?>>> {
@@ -78,14 +80,25 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                                     parameter.getType().getCanonicalName(), flag.value(), method.getName()
                             ));
                 }
-                final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
+                final BiFunction<?, @NonNull String, @NonNull List<String>> suggestionProvider;
+                if (!flag.suggestions().isEmpty()) {
+                    suggestionProvider = registry.getSuggestionProvider(flag.suggestions()).orElse(null);
+                } else {
+                    suggestionProvider = null;
+                }
+                final CommandArgument.Builder argumentBuilder0 = CommandArgument.ofType(
                         parameter.getType(),
                         flag.value()
                 );
-                final CommandArgument argument = argumentBuilder.asRequired()
+                final CommandArgument.Builder argumentBuilder = argumentBuilder0.asRequired()
                         .manager(this.commandManager)
-                        .withParser(parser)
-                        .build();
+                        .withParser(parser);
+                final CommandArgument argument;
+                if (suggestionProvider != null) {
+                    argument = argumentBuilder.withSuggestionsProvider(suggestionProvider).build();
+                } else {
+                    argument = argumentBuilder.build();
+                }
                 flags.add(builder.withArgument(argument).build());
             }
         }

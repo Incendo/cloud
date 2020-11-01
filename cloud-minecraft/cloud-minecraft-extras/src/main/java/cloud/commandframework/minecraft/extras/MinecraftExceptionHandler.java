@@ -253,7 +253,7 @@ public final class MinecraftExceptionHandler<C> {
          */
         INVALID_SENDER,
         /**
-         * The sender does not have permission to execute the command (@{@link NoPermissionException})
+         * The sender does not have permission to execute the command ({@link NoPermissionException})
          */
         NO_PERMISSION,
         /**

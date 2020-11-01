@@ -140,7 +140,7 @@ public interface ParserRegistry<C> {
      * Get a named suggestion provider, if a suggestion provider with the given name exists in the registry
      *
      * @param name Suggestion provider name. The name is case independent.
-     * @return Optional that either contains the suggestion provider name, or nothing ({@link Optional#empty()}) if no
+     * @return Optional that either contains the suggestion provider, or is empty if no
      *         suggestion provider is registered with the given name
      * @see #registerSuggestionProvider(String, BiFunction) Register a suggestion provider
      * @since 1.1.0
