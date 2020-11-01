@@ -245,19 +245,19 @@ public final class MinecraftExceptionHandler<C> {
      */
     public enum ExceptionType {
         /**
-         * The input does not correspond to any known command
+         * The input does not correspond to any known command ({@link InvalidSyntaxException})
          */
         INVALID_SYNTAX,
         /**
-         * The sender is not of the right type
+         * The sender is not of the right type ({@link InvalidCommandSenderException})
          */
         INVALID_SENDER,
         /**
-         * The sender does not have permission to execute the command
+         * The sender does not have permission to execute the command (@{@link NoPermissionException})
          */
         NO_PERMISSION,
         /**
-         * An argument failed to parse
+         * An argument failed to parse ({@link ArgumentParseException})
          */
         ARGUMENT_PARSING
     }
