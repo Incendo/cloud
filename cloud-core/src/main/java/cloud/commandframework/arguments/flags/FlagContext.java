@@ -28,6 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Flag value mappings
@@ -78,16 +79,35 @@ public final class FlagContext {
     }
 
     /**
-     * Check whether or not a flag is present. This will return {@code false}
+     * Check whether a presence flag is present. This will return {@code false}
      * for all value flags.
      *
      * @param flag Flag name
-     * @return {@code true} if the flag is presence and the flag is a presence flag,
+     * @return {@code true} if the flag is a presence flag and is present,
      *         else {@code false}
      */
     public boolean isPresent(final @NonNull String flag) {
         final Object value = this.flagValues.get(flag);
         return FLAG_PRESENCE_VALUE.equals(value);
+    }
+
+    /**
+     * Get a flag value as an optional. Will be empty if the value is not present.
+     *
+     * @param name Flag name
+     * @param <T>  Value type
+     * @return Optional containing stored value if present
+     * @since 1.2.0
+     */
+    public <T> @NonNull Optional<T> getValue(
+            final @NonNull String name
+    ) {
+        final Object value = this.flagValues.get(name);
+        if (value == null) {
+            return Optional.empty();
+        }
+        @SuppressWarnings("unchecked") final T casted = (T) value;
+        return Optional.of(casted);
     }
 
     /**
@@ -102,12 +122,22 @@ public final class FlagContext {
             final @NonNull String name,
             final @Nullable T defaultValue
     ) {
-        final Object value = this.flagValues.get(name);
-        if (value == null) {
-            return defaultValue;
-        }
-        @SuppressWarnings("unchecked") final T casted = (T) value;
-        return casted;
+        return this.<T>getValue(name).orElse(defaultValue);
+    }
+
+    /**
+     * Check whether a flag is present. This will return {@code true} if the flag
+     * is a presence flag and is present, or if the flag is a value flag and has
+     * a value provided.
+     *
+     * @param name Flag name
+     * @return {@code true} if the flag is present, else {@code false}
+     * @since 1.2.0
+     */
+    public boolean hasFlag(
+            final @NonNull String name
+    ) {
+        return this.getValue(name).isPresent();
     }
 
 }
