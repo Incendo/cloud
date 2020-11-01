@@ -86,7 +86,6 @@ subprojects {
                     "CatchAndPrintStackTrace"
             )
         }
-        options.encoding(StandardCharsets.UTF_8.name())
     }
 
     repositories {
@@ -147,8 +146,10 @@ subprojects {
 
     sourceCompatibility = '1.8'
 
-    tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
+    [JavaCompile, Javadoc].forEach { taskType ->
+        tasks.withType(taskType) {
+            options.encoding(StandardCharsets.UTF_8.name())
+        }
     }
 
     publishing {
