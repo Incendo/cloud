@@ -36,7 +36,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,52 +76,51 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             return false;
         }
         final String label = commandArgument.getName();
+        final String namespacedLabel = this.getNamespacedLabel(label);
 
         @SuppressWarnings("unchecked")
         final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
 
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
                 label,
-                (this.bukkitCommandManager.getSplitAliases() ? Collections.emptyList() : aliases),
+                aliases,
                 (Command<C>) command,
                 (CommandArgument<C, ?>) commandArgument,
                 this.bukkitCommandManager
         );
 
         for (final String alias : aliases) {
-            this.recognizedAliases.add(getNamespacedLabel(alias));
+            final String namespacedAlias = this.getNamespacedLabel(alias);
+
+            this.recognizedAliases.add(namespacedAlias);
             if (!this.bukkitCommands.containsKey(alias)) {
                 this.recognizedAliases.add(alias);
-                if (this.bukkitCommandManager.getSplitAliases()) {
-                    @SuppressWarnings("unchecked") final BukkitCommand<C> aliasCommand = new BukkitCommand<>(
-                            alias,
-                            Collections.emptyList(),
-                            (Command<C>) command,
-                            (CommandArgument<C, ?>) commandArgument,
-                            this.bukkitCommandManager
-                    );
-                    this.commandMap.register(
-                            alias,
-                            this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
-                            bukkitCommand
-                    );
-                    this.registerExternal(alias, command, aliasCommand);
+            }
+
+            if (this.bukkitCommandManager.getSplitAliases()) {
+                if (this.bukkitCommands.containsKey(alias)) {
+                    this.registerExternal(namespacedAlias, command, bukkitCommand);
+                } else {
+                    this.registerExternal(namespacedAlias, command, bukkitCommand);
+                    this.registerExternal(alias, command, bukkitCommand);
                 }
             }
         }
 
-        this.registeredCommands.put(commandArgument, bukkitCommand);
         if (!this.bukkitCommands.containsKey(label)) {
             this.recognizedAliases.add(label);
+            this.registerExternal(label, command, bukkitCommand);
         }
-        this.recognizedAliases.add(getNamespacedLabel(label));
+        this.recognizedAliases.add(this.getNamespacedLabel(label));
+        this.registerExternal(namespacedLabel, command, bukkitCommand);
+
         this.commandMap.register(
                 label,
                 this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
                 bukkitCommand
         );
-        this.registerExternal(label, command, bukkitCommand);
 
+        this.registeredCommands.put(commandArgument, bukkitCommand);
         return true;
     }
 
