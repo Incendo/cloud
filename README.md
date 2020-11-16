@@ -1,6 +1,6 @@
 
 <div align="center">  
- <img src="icons/cloud.png" width="300px"/>  
+ <img src="icons/cloud.svg" width="300px"/>  
 </div>  
   
 # cloud command framework
