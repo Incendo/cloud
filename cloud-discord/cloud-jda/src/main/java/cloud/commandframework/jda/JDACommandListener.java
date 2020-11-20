@@ -24,6 +24,7 @@
 package cloud.commandframework.jda;
 
 import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -41,6 +42,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @SuppressWarnings("deprecation")
 public class JDACommandListener<C> extends ListenerAdapter {
 
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: ";
     private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have permission to perform this command. "
             + "Please contact the server administrators if you believe that this is in error.";
@@ -115,6 +117,16 @@ public class JDACommandListener<C> extends ListenerAdapter {
                                         "Invalid Command Argument: " + throwable.getCause()
                                                 .getMessage()
                                 )
+                        );
+                    } else if (throwable instanceof CommandExecutionException) {
+                        this.commandManager.handleException(sender, CommandExecutionException.class,
+                                (CommandExecutionException) throwable, (c, e) -> {
+                                    this.sendMessage(
+                                            event,
+                                            MESSAGE_INTERNAL_ERROR
+                                    );
+                                    throwable.getCause().printStackTrace();
+                                }
                         );
                     } else {
                         this.sendMessage(event, throwable.getMessage());

@@ -24,6 +24,7 @@
 package cloud.commandframework.pircbotx;
 
 import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -34,6 +35,7 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 
 final class CloudListenerAdapter<C> extends ListenerAdapter {
 
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: ";
     private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have permission to perform this command. "
             + "Please contact the server administrators if you believe that this is in error.";
@@ -57,6 +59,7 @@ final class CloudListenerAdapter<C> extends ListenerAdapter {
                     if (throwable == null) {
                         return;
                     }
+                    final Throwable finalThrowable = throwable;
 
                     if (throwable instanceof InvalidSyntaxException) {
                         this.manager.handleException(sender,
@@ -89,6 +92,13 @@ final class CloudListenerAdapter<C> extends ListenerAdapter {
                                 (ArgumentParseException) throwable, (c, e) -> event.respondWith(
                                         "Invalid Command Argument: " + throwable.getCause().getMessage()
                                 )
+                        );
+                    } else if (throwable instanceof CommandExecutionException) {
+                        this.manager.handleException(sender, CommandExecutionException.class,
+                                (CommandExecutionException) throwable, (c, e) -> {
+                                    event.respondWith(MESSAGE_INTERNAL_ERROR);
+                                    finalThrowable.getCause().printStackTrace();
+                                }
                         );
                     } else {
                         event.respondWith(throwable.getMessage());

@@ -26,6 +26,7 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -38,9 +39,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 import java.util.concurrent.CompletionException;
+import java.util.logging.Level;
 
 final class BukkitCommand<C> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
+    private static final String MESSAGE_INTERNAL_ERROR = ChatColor.RED
+            + "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS = ChatColor.RED
             + "I'm sorry, but you do not have permission to perform this command. "
             + "Please contact the server administrators if you believe that this is in error.";
@@ -50,7 +54,6 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     private final BukkitCommandManager<C> manager;
     private final Command<C> cloudCommand;
 
-    @SuppressWarnings("unchecked")
     BukkitCommand(
             final @NonNull String label,
             final @NonNull List<@NonNull String> aliases,
@@ -133,9 +136,25 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
                                                             + ChatColor.GRAY + finalThrowable.getCause()
                                                             .getMessage())
                             );
+                        } else if (throwable instanceof CommandExecutionException) {
+                            this.manager.handleException(sender,
+                                    CommandExecutionException.class,
+                                    (CommandExecutionException) throwable, (c, e) -> {
+                                        commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
+                                        this.manager.getOwningPlugin().getLogger().log(
+                                                Level.SEVERE,
+                                                "Exception executing command handler",
+                                                finalThrowable.getCause()
+                                        );
+                                    }
+                            );
                         } else {
-                            commandSender.sendMessage(throwable.getMessage());
-                            throwable.printStackTrace();
+                            commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
+                            this.manager.getOwningPlugin().getLogger().log(
+                                    Level.SEVERE,
+                                    "An unhandled exception was thrown during command execution",
+                                    throwable
+                            );
                         }
                     }
                 });
