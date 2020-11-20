@@ -28,6 +28,7 @@ import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -115,8 +116,10 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
         /* Invoke the command method */
         try {
             this.methodHandle.invokeWithArguments(arguments);
-        } catch (final Throwable e) {
-            e.printStackTrace();
+        } catch (final Error e) {
+            throw e;
+        } catch (final Throwable throwable) {
+            throw new CommandExecutionException(throwable);
         }
     }
 

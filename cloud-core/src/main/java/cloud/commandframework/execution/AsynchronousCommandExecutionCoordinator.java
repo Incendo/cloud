@@ -27,6 +27,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.services.State;
 import cloud.commandframework.types.tuples.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -76,10 +77,17 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> input
     ) {
+        final CompletableFuture<CommandResult<C>> resultFuture = new CompletableFuture<>();
 
         final Consumer<Command<C>> commandConsumer = command -> {
             if (this.commandManager.postprocessContext(commandContext, command) == State.ACCEPTED) {
-                command.getCommandExecutionHandler().execute(commandContext);
+                try {
+                    command.getCommandExecutionHandler().execute(commandContext);
+                } catch (final CommandExecutionException exception) {
+                    resultFuture.completeExceptionally(exception);
+                } catch (final Exception exception) {
+                    resultFuture.completeExceptionally(new CommandExecutionException(exception));
+                }
             }
         };
 
@@ -96,8 +104,6 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
                 return new CommandResult<>(commandContext);
             }, this.executor);
         }
-
-        final CompletableFuture<CommandResult<C>> resultFuture = new CompletableFuture<>();
 
         this.executor.execute(() -> {
             try {
