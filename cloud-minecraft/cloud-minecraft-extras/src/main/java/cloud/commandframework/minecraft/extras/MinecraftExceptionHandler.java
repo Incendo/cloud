@@ -25,6 +25,7 @@ package cloud.commandframework.minecraft.extras;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -89,6 +90,19 @@ public final class MinecraftExceptionHandler<C> {
                     .append(Component.text("Invalid command argument: ", NamedTextColor.RED))
                     .append(Component.text(e.getCause().getMessage(), NamedTextColor.GRAY))
                     .build();
+    /**
+     * Default component builder for {@link CommandExecutionException}
+     *
+     * @since 1.2.0
+     */
+    public static final Function<Exception, Component> DEFAULT_COMMAND_EXECUTION_FUNCTION =
+            e -> {
+                e.getCause().printStackTrace();
+                return Component.text()
+                        .append(Component.text("An internal error occurred while attempting to perform this command.",
+                                NamedTextColor.RED))
+                        .build();
+            };
 
     private final Map<ExceptionType, BiFunction<C, Exception, Component>> componentBuilders = new HashMap<>();
     private Function<Component, Component> decorator = Function.identity();
@@ -130,7 +144,17 @@ public final class MinecraftExceptionHandler<C> {
     }
 
     /**
-     * Use all four of the default exception handlers
+     * Use the default {@link CommandExecutionException} handler
+     *
+     * @return {@code this}
+     * @since 1.2.0
+     */
+    public @NonNull MinecraftExceptionHandler<C> withCommandExecutionHandler() {
+        return this.withHandler(ExceptionType.COMMAND_EXECUTION, DEFAULT_COMMAND_EXECUTION_FUNCTION);
+    }
+
+    /**
+     * Use all of the default exception handlers
      *
      * @return {@code this}
      */
@@ -139,7 +163,8 @@ public final class MinecraftExceptionHandler<C> {
                 .withArgumentParsingHandler()
                 .withInvalidSenderHandler()
                 .withInvalidSyntaxHandler()
-                .withNoPermissionHandler();
+                .withNoPermissionHandler()
+                .withCommandExecutionHandler();
     }
 
     /**
@@ -237,6 +262,15 @@ public final class MinecraftExceptionHandler<C> {
                     )
             );
         }
+        if (componentBuilders.containsKey(ExceptionType.COMMAND_EXECUTION)) {
+            manager.registerExceptionHandler(
+                    CommandExecutionException.class,
+                    (c, e) -> audienceMapper.apply(c).sendMessage(
+                            Identity.nil(),
+                            this.decorator.apply(this.componentBuilders.get(ExceptionType.COMMAND_EXECUTION).apply(c, e))
+                    )
+            );
+        }
     }
 
 
@@ -259,7 +293,13 @@ public final class MinecraftExceptionHandler<C> {
         /**
          * An argument failed to parse ({@link ArgumentParseException})
          */
-        ARGUMENT_PARSING
+        ARGUMENT_PARSING,
+        /**
+         * A command handler had an exception ({@link CommandExecutionException})
+         *
+         * @since 1.2.0
+         */
+        COMMAND_EXECUTION
     }
 
 }

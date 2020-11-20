@@ -26,6 +26,7 @@ package cloud.commandframework.cloudburst;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -41,6 +42,7 @@ import java.util.concurrent.CompletionException;
 
 final class CloudburstCommand<C> extends PluginCommand<Plugin> {
 
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
             "I'm sorry, but you do not have permission to perform this command. "
                     + "Please contact the server administrators if you believe that this is in error.";
@@ -124,9 +126,23 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
                                                     "Invalid Command Argument: "
                                                             + finalThrowable.getCause().getMessage())
                             );
+                        } else if (throwable instanceof CommandExecutionException) {
+                            this.manager.handleException(sender,
+                                    CommandExecutionException.class,
+                                    (CommandExecutionException) throwable, (c, e) -> {
+                                        commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
+                                        manager.getOwningPlugin().getLogger().error(
+                                                "Exception executing command handler",
+                                                finalThrowable.getCause()
+                                        );
+                                    }
+                            );
                         } else {
-                            commandSender.sendMessage(throwable.getMessage());
-                            throwable.printStackTrace();
+                            commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
+                            manager.getOwningPlugin().getLogger().error(
+                                    "An unhandled exception was thrown during command execution",
+                                    throwable
+                            );
                         }
                     }
                 });

@@ -26,6 +26,7 @@ package cloud.commandframework.bungee;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -38,9 +39,11 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.concurrent.CompletionException;
+import java.util.logging.Level;
 
 public final class BungeeCommand<C> extends Command implements TabExecutor {
 
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
             "I'm sorry, but you do not have permission to perform this command. "
                     + "Please contact the server administrators if you believe that this is in error.";
@@ -138,18 +141,27 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                                                             .getMessage())
                                                     .create())
                             );
-                        } else {
-                            commandSender.sendMessage(new ComponentBuilder(throwable.getMessage()).create());
-                            this.manager.getOwningPlugin().getLogger().warning(
-                                    String.format(
-                                            "(Cloud) Unknown exception type '%s' with cause '%s'",
-                                            throwable.getClass().getCanonicalName(),
-                                            throwable.getCause() == null ? "none"
-                                                    : throwable.getCause()
-                                                            .getClass().getCanonicalName()
-                                    )
+                        } else if (throwable instanceof CommandExecutionException) {
+                            this.manager.handleException(sender,
+                                    CommandExecutionException.class,
+                                    (CommandExecutionException) throwable, (c, e) -> {
+                                        commandSender.sendMessage(new ComponentBuilder(MESSAGE_INTERNAL_ERROR)
+                                                .color(ChatColor.RED)
+                                                .create());
+                                        this.manager.getOwningPlugin().getLogger().log(
+                                                Level.SEVERE,
+                                                "Exception executing command handler",
+                                                finalThrowable.getCause()
+                                        );
+                                    }
                             );
-                            throwable.printStackTrace();
+                        } else {
+                            commandSender.sendMessage(new ComponentBuilder(MESSAGE_INTERNAL_ERROR).color(ChatColor.RED).create());
+                            this.manager.getOwningPlugin().getLogger().log(
+                                    Level.SEVERE,
+                                    "An unhandled exception was thrown during command execution",
+                                    throwable
+                            );
                         }
                     }
                 });

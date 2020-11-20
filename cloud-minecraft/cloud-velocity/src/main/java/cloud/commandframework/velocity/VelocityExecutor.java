@@ -24,6 +24,7 @@
 package cloud.commandframework.velocity;
 
 import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -42,6 +43,7 @@ import java.util.function.BiConsumer;
 
 final class VelocityExecutor<C> implements Command<CommandSource> {
 
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
             "I'm sorry, but you do not have permission to perform this command. "
                     + "Please contact the server administrators if you believe that this is in error.";
@@ -128,10 +130,9 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                             sender,
                             ArgumentParseException.class,
                             (ArgumentParseException) throwable,
-                            (c, e) ->
-                                    source.sendMessage(
-                                            Identity.nil(),
-                                            Component.text()
+                            (c, e) -> source.sendMessage(
+                                    Identity.nil(),
+                                    Component.text()
                                             .append(Component.text(
                                                     "Invalid Command Argument: ",
                                                     NamedTextColor.RED
@@ -140,12 +141,28 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                                                     finalThrowable.getCause().getMessage(),
                                                     NamedTextColor.GRAY
                                             ))
-                                    )
+                            )
+                    );
+                } else if (throwable instanceof CommandExecutionException) {
+                    this.manager.handleException(
+                            sender,
+                            CommandExecutionException.class,
+                            (CommandExecutionException) throwable,
+                            (c, e) -> {
+                                source.sendMessage(
+                                        Identity.nil(),
+                                        Component.text(
+                                                MESSAGE_INTERNAL_ERROR,
+                                                NamedTextColor.RED
+                                        )
+                                );
+                                finalThrowable.getCause().printStackTrace();
+                            }
                     );
                 } else {
                     source.sendMessage(
                             Identity.nil(),
-                            Component.text(throwable.getMessage(), NamedTextColor.RED)
+                            Component.text(MESSAGE_INTERNAL_ERROR, NamedTextColor.RED)
                     );
                     throwable.printStackTrace();
                 }
