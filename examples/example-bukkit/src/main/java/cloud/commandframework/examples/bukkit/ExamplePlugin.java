@@ -195,6 +195,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .withInvalidSenderHandler()
                 .withNoPermissionHandler()
                 .withArgumentParsingHandler()
+                .withCommandExecutionHandler()
                 .withDecorator(
                         component -> Component.text()
                                 .append(Component.text("[", NamedTextColor.DARK_GRAY))

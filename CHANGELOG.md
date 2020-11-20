@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added a method to get the failure reason of SelectorParseExceptions
  - Added some methods to FlagContext to work with flag values as optionals
  - Allow for use of named suggestion providers with `@Flag`s (cloud-annotations)
+ - Added `CommandExecutionException` which wraps any exception thrown during the execution of command handlers. Should be
+  handled using `CommandManager#registerExceptionHandler`, similar to `NoSuchCommandException`, `ArgumentParseException`, etc.
  
 ### Changed
  - Allow for use of `@Completions` annotation with argument types other than String

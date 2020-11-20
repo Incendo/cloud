@@ -26,6 +26,7 @@ package cloud.commandframework.javacord;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -42,6 +43,7 @@ import java.util.concurrent.CompletionException;
 
 public class JavacordCommand<C> implements MessageCreateListener {
 
+    private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have the permission to do this :/";
 
     private final JavacordCommandManager<C> manager;
@@ -95,6 +97,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
                     if (throwable == null) {
                         return;
                     }
+                    final Throwable finalThrowable = throwable;
 
                     if (throwable instanceof CompletionException) {
                         throwable = throwable.getCause();
@@ -148,6 +151,20 @@ public class JavacordCommand<C> implements MessageCreateListener {
                                 (ArgumentParseException) throwable,
                                 (c, e) -> commandSender.sendErrorMessage(
                                         "Invalid Command Argument: `" + e.getCause().getMessage() + "`")
+                        );
+
+                        return;
+                    }
+
+                    if (throwable instanceof CommandExecutionException) {
+                        manager.handleException(
+                                sender,
+                                CommandExecutionException.class,
+                                (CommandExecutionException) throwable,
+                                (c, e) -> {
+                                    commandSender.sendErrorMessage(MESSAGE_INTERNAL_ERROR);
+                                    finalThrowable.getCause().printStackTrace();
+                                }
                         );
 
                         return;

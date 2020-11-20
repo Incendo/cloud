@@ -26,6 +26,7 @@ package cloud.commandframework.execution;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.services.State;
 import cloud.commandframework.types.tuples.Pair;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -103,7 +104,7 @@ public abstract class CommandExecutionCoordinator<C> {
         }
 
         @Override
-        public CompletableFuture<CommandResult<C>> coordinateExecution(
+        public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> input
         ) {
@@ -116,7 +117,13 @@ public abstract class CommandExecutionCoordinator<C> {
                 } else {
                     final Command<C> command = Objects.requireNonNull(pair.getFirst());
                     if (this.getCommandTree().getCommandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
-                        command.getCommandExecutionHandler().execute(commandContext);
+                        try {
+                            command.getCommandExecutionHandler().execute(commandContext);
+                        } catch (final CommandExecutionException exception) {
+                            completableFuture.completeExceptionally(exception);
+                        } catch (final Exception exception) {
+                            completableFuture.completeExceptionally(new CommandExecutionException(exception));
+                        }
                     }
                     completableFuture.complete(new CommandResult<>(commandContext));
                 }
