@@ -320,6 +320,53 @@ class CommandTreeTest {
     }
 
     @Test
+    void testAmbiguousLiteralOverridingArgument() {
+        /* Build two commands for testing literals overriding variable arguments */
+        manager.command(
+                manager.commandBuilder("literalwithvariable")
+                       .argument(StringArgument.of("variable"))
+        );
+
+        manager.command(
+                manager.commandBuilder("literalwithvariable")
+                       .literal("literal", "literalalias")
+        );
+
+        /* Try parsing as a variable, which should match the variable command */
+        final Pair<Command<TestCommandSender>, Exception> variableResult = manager.getCommandTree().parse(
+                        new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                        new LinkedList<>(Arrays.asList("literalwithvariable", "argthatdoesnotmatch"))
+                );
+        Assertions.assertNull(variableResult.getSecond());
+        Assertions.assertEquals("literalwithvariable",
+                variableResult.getFirst().getArguments().get(0).getName());
+        Assertions.assertEquals("variable",
+                variableResult.getFirst().getArguments().get(1).getName());
+
+        /* Try parsing with the main name literal, which should match the literal command */
+        final Pair<Command<TestCommandSender>, Exception> literalResult = manager.getCommandTree().parse(
+                new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                new LinkedList<>(Arrays.asList("literalwithvariable", "literal"))
+        );
+        Assertions.assertNull(literalResult.getSecond());
+        Assertions.assertEquals("literalwithvariable",
+                literalResult.getFirst().getArguments().get(0).getName());
+        Assertions.assertEquals("literal",
+                literalResult.getFirst().getArguments().get(1).getName());
+
+        /* Try parsing with the alias of the literal, which should match the literal command */
+        final Pair<Command<TestCommandSender>, Exception> literalAliasResult = manager.getCommandTree().parse(
+                new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                new LinkedList<>(Arrays.asList("literalwithvariable", "literalalias"))
+        );
+        Assertions.assertNull(literalAliasResult.getSecond());
+        Assertions.assertEquals("literalwithvariable",
+                literalAliasResult.getFirst().getArguments().get(0).getName());
+        Assertions.assertEquals("literal",
+                literalAliasResult.getFirst().getArguments().get(1).getName());
+    }
+
+    @Test
     void testDuplicateArgument() {
         final CommandArgument<TestCommandSender, String> argument = StringArgument.of("test");
         manager.command(manager.commandBuilder("one").argument(argument));

@@ -49,13 +49,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Tree containing all commands and command paths.
@@ -268,148 +271,37 @@ public final class CommandTree<C> {
     ) {
         CommandPermission permission;
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
-        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
-            // The value has to be a variable
-            final Node<CommandArgument<C, ?>> child = children.get(0);
-            permission = this.isPermitted(commandContext.getSender(), child);
-            if (!commandQueue.isEmpty() && permission != null) {
-                return Pair.of(null, new NoPermissionException(
-                        permission,
-                        commandContext.getSender(),
-                        this.getChain(child)
-                                .stream()
-                                .filter(node -> node.getValue() != null)
-                                .map(Node::getValue)
-                                .collect(Collectors.toList())
-                ));
-            }
-            if (child.getValue() != null) {
-                if (commandQueue.isEmpty()) {
-                    if (child.getValue().hasDefaultValue()) {
-                        commandQueue.add(child.getValue().getDefaultValue());
-                    } else if (!child.getValue().isRequired()) {
-                        if (child.getValue().getOwningCommand() == null) {
-                            /*
-                             * If there are multiple children with different owning commands then it's ambiguous and
-                             * not allowed, therefore we're able to pick any child command, as long as we can find it
-                             */
-                            Node<CommandArgument<C, ?>> node = child;
-                            while (!node.isLeaf()) {
-                                node = node.getChildren().get(0);
-                                if (node.getValue() != null && node.getValue().getOwningCommand() != null) {
-                                    child.getValue().setOwningCommand(node.getValue().getOwningCommand());
-                                }
-                            }
-                        }
-                        return Pair.of(child.getValue().getOwningCommand(), null);
-                    } else if (child.isLeaf()) {
-                        if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
-                            final Command<C> command = root.getValue().getOwningCommand();
-                            if (!this.getCommandManager().hasPermission(
-                                    commandContext.getSender(),
-                                    command.getCommandPermission()
-                            )) {
-                                return Pair.of(null, new NoPermissionException(
-                                        command.getCommandPermission(),
-                                        commandContext.getSender(),
-                                        this.getChain(root)
-                                                .stream()
-                                                .filter(node -> node.getValue() != null)
-                                                .map(Node::getValue)
-                                                .collect(Collectors.toList())
-                                ));
-                            }
-                            return Pair.of(command, null);
-                        }
-                        /* Not enough arguments */
-                        return Pair.of(null, new InvalidSyntaxException(
-                                this.commandManager.getCommandSyntaxFormatter()
-                                        .apply(Objects.requireNonNull(
-                                                child.getValue()
-                                                        .getOwningCommand())
-                                                .getArguments(), child),
-                                commandContext.getSender(), this.getChain(root)
-                                .stream()
-                                .filter(node -> node.getValue() != null)
-                                .map(Node::getValue)
-                                .collect(Collectors.toList())
-                        ));
-                    } else {
-                        /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
-                        if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
-                            final Command<C> command = root.getValue().getOwningCommand();
-                            if (!this.getCommandManager().hasPermission(
-                                    commandContext.getSender(),
-                                    command.getCommandPermission()
-                            )) {
-                                return Pair.of(null, new NoPermissionException(
-                                        command.getCommandPermission(),
-                                        commandContext.getSender(),
-                                        this.getChain(root)
-                                                .stream()
-                                                .filter(node -> node.getValue() != null)
-                                                .map(Node::getValue)
-                                                .collect(Collectors.toList())
-                                ));
-                            }
-                            return Pair.of(command, null);
-                        }
-                        /* Child does not have a command and so we cannot proceed */
-                        return Pair.of(null, new InvalidSyntaxException(
-                                this.commandManager.getCommandSyntaxFormatter()
-                                        .apply(parsedArguments, root),
-                                commandContext.getSender(), this.getChain(root)
-                                .stream()
-                                .filter(node -> node.getValue() != null)
-                                .map(Node::getValue)
-                                .collect(Collectors.toList())
-                        ));
-                    }
-                }
 
-                final CommandArgument<C, ?> argument = child.getValue();
-                final CommandContext.ArgumentTiming argumentTiming = commandContext.createTiming(argument);
+        // Check whether it matches any of the static arguments
+        // If so, do not attempt parsing as a variable argument
+        boolean matchesLiteral = false;
+        if (!commandQueue.isEmpty()) {
+            final String literal = commandQueue.peek();
+            matchesLiteral = children.stream()
+                .filter(n -> n.getValue() instanceof StaticArgument)
+                .map(n -> (StaticArgument<?>) n.getValue())
+                .flatMap(arg -> Stream.concat(Stream.of(arg.getName()), arg.getAliases().stream()))
+                .anyMatch(arg -> arg.equals(literal));
+        }
 
-                // START: Parsing
-                argumentTiming.setStart(System.nanoTime());
-                final ArgumentParseResult<?> result;
-                final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
-                        commandContext,
-                        commandQueue
-                );
-                if (!preParseResult.getFailure().isPresent() && preParseResult.getParsedValue().orElse(false)) {
-                    commandContext.setCurrentArgument(argument);
-                    result = argument.getParser().parse(commandContext, commandQueue);
-                } else {
-                    result = preParseResult;
-                }
-                argumentTiming.setEnd(System.nanoTime(), result.getFailure().isPresent());
-                // END: Parsing
+        // If it does not match a literal, try to find the one argument node, if it exists
+        // The ambiguity check guarantees that only one will be present
+        if (!matchesLiteral) {
+            final List<Node<CommandArgument<C, ?>>> argumentNodes = children.stream()
+                .filter(n -> (n.getValue() != null && !(n.getValue() instanceof StaticArgument)))
+                .collect(Collectors.toList());
+            if (argumentNodes.size() > 1) {
+                throw new IllegalStateException("Unexpected ambiguity detected, number of "
+                        + "child nodes should not exceed 1");
+            } else if (!argumentNodes.isEmpty()) {
+                final Node<CommandArgument<C, ?>> child = argumentNodes.get(0);
 
-                if (result.getParsedValue().isPresent()) {
-                    commandContext.store(child.getValue().getName(), result.getParsedValue().get());
-                    if (child.isLeaf()) {
-                        if (commandQueue.isEmpty()) {
-                            return Pair.of(this.cast(child.getValue().getOwningCommand()), null);
-                        } else {
-                            /* Too many arguments. We have a unique path, so we can send the entire context */
-                            return Pair.of(null, new InvalidSyntaxException(
-                                    this.commandManager.getCommandSyntaxFormatter()
-                                            .apply(parsedArguments, child),
-                                    commandContext.getSender(), this.getChain(root)
-                                    .stream()
-                                    .filter(node -> node.getValue() != null)
-                                    .map(Node::getValue)
-                                    .collect(Collectors.toList())
-                            ));
-                        }
-                    } else {
-                        parsedArguments.add(child.getValue());
-                        return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
-                    }
-                } else if (result.getFailure().isPresent()) {
-                    return Pair.of(null, new ArgumentParseException(
-                            result.getFailure().get(), commandContext.getSender(),
+                // The value has to be a variable
+                permission = this.isPermitted(commandContext.getSender(), child);
+                if (!commandQueue.isEmpty() && permission != null) {
+                    return Pair.of(null, new NoPermissionException(
+                            permission,
+                            commandContext.getSender(),
                             this.getChain(child)
                                     .stream()
                                     .filter(node -> node.getValue() != null)
@@ -417,8 +309,144 @@ public final class CommandTree<C> {
                                     .collect(Collectors.toList())
                     ));
                 }
+                if (child.getValue() != null) {
+                    if (commandQueue.isEmpty()) {
+                        if (child.getValue().hasDefaultValue()) {
+                            commandQueue.add(child.getValue().getDefaultValue());
+                        } else if (!child.getValue().isRequired()) {
+                            if (child.getValue().getOwningCommand() == null) {
+                                /*
+                                 * If there are multiple children with different owning commands then it's ambiguous and
+                                 * not allowed, therefore we're able to pick any child command, as long as we can find it
+                                 */
+                                Node<CommandArgument<C, ?>> node = child;
+                                while (!node.isLeaf()) {
+                                    node = node.getChildren().get(0);
+                                    if (node.getValue() != null && node.getValue().getOwningCommand() != null) {
+                                        child.getValue().setOwningCommand(node.getValue().getOwningCommand());
+                                    }
+                                }
+                            }
+                            return Pair.of(child.getValue().getOwningCommand(), null);
+                        } else if (child.isLeaf()) {
+                            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+                                final Command<C> command = root.getValue().getOwningCommand();
+                                if (!this.getCommandManager().hasPermission(
+                                        commandContext.getSender(),
+                                        command.getCommandPermission()
+                                )) {
+                                    return Pair.of(null, new NoPermissionException(
+                                            command.getCommandPermission(),
+                                            commandContext.getSender(),
+                                            this.getChain(root)
+                                                    .stream()
+                                                    .filter(node -> node.getValue() != null)
+                                                    .map(Node::getValue)
+                                                    .collect(Collectors.toList())
+                                    ));
+                                }
+                                return Pair.of(command, null);
+                            }
+                            /* Not enough arguments */
+                            return Pair.of(null, new InvalidSyntaxException(
+                                    this.commandManager.getCommandSyntaxFormatter()
+                                            .apply(Objects.requireNonNull(
+                                                    child.getValue()
+                                                            .getOwningCommand())
+                                                    .getArguments(), child),
+                                    commandContext.getSender(), this.getChain(root)
+                                    .stream()
+                                    .filter(node -> node.getValue() != null)
+                                    .map(Node::getValue)
+                                    .collect(Collectors.toList())
+                            ));
+                        } else {
+                            /* The child is not a leaf, but may have an intermediary executor, attempt to use it */
+                            if (root.getValue() != null && root.getValue().getOwningCommand() != null) {
+                                final Command<C> command = root.getValue().getOwningCommand();
+                                if (!this.getCommandManager().hasPermission(
+                                        commandContext.getSender(),
+                                        command.getCommandPermission()
+                                )) {
+                                    return Pair.of(null, new NoPermissionException(
+                                            command.getCommandPermission(),
+                                            commandContext.getSender(),
+                                            this.getChain(root)
+                                                    .stream()
+                                                    .filter(node -> node.getValue() != null)
+                                                    .map(Node::getValue)
+                                                    .collect(Collectors.toList())
+                                    ));
+                                }
+                                return Pair.of(command, null);
+                            }
+                            /* Child does not have a command and so we cannot proceed */
+                            return Pair.of(null, new InvalidSyntaxException(
+                                    this.commandManager.getCommandSyntaxFormatter()
+                                            .apply(parsedArguments, root),
+                                    commandContext.getSender(), this.getChain(root)
+                                    .stream()
+                                    .filter(node -> node.getValue() != null)
+                                    .map(Node::getValue)
+                                    .collect(Collectors.toList())
+                            ));
+                        }
+                    }
+
+                    final CommandArgument<C, ?> argument = child.getValue();
+                    final CommandContext.ArgumentTiming argumentTiming = commandContext.createTiming(argument);
+
+                    // START: Parsing
+                    argumentTiming.setStart(System.nanoTime());
+                    final ArgumentParseResult<?> result;
+                    final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
+                            commandContext,
+                            commandQueue
+                    );
+                    if (!preParseResult.getFailure().isPresent() && preParseResult.getParsedValue().orElse(false)) {
+                        commandContext.setCurrentArgument(argument);
+                        result = argument.getParser().parse(commandContext, commandQueue);
+                    } else {
+                        result = preParseResult;
+                    }
+                    argumentTiming.setEnd(System.nanoTime(), result.getFailure().isPresent());
+                    // END: Parsing
+
+                    if (result.getParsedValue().isPresent()) {
+                        commandContext.store(child.getValue().getName(), result.getParsedValue().get());
+                        if (child.isLeaf()) {
+                            if (commandQueue.isEmpty()) {
+                                return Pair.of(this.cast(child.getValue().getOwningCommand()), null);
+                            } else {
+                                /* Too many arguments. We have a unique path, so we can send the entire context */
+                                return Pair.of(null, new InvalidSyntaxException(
+                                        this.commandManager.getCommandSyntaxFormatter()
+                                                .apply(parsedArguments, child),
+                                        commandContext.getSender(), this.getChain(root)
+                                        .stream()
+                                        .filter(node -> node.getValue() != null)
+                                        .map(Node::getValue)
+                                        .collect(Collectors.toList())
+                                ));
+                            }
+                        } else {
+                            parsedArguments.add(child.getValue());
+                            return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
+                        }
+                    } else if (result.getFailure().isPresent()) {
+                        return Pair.of(null, new ArgumentParseException(
+                                result.getFailure().get(), commandContext.getSender(),
+                                this.getChain(child)
+                                        .stream()
+                                        .filter(node -> node.getValue() != null)
+                                        .map(Node::getValue)
+                                        .collect(Collectors.toList())
+                        ));
+                    }
+                }
             }
         }
+
         return Pair.of(null, null);
     }
 
@@ -602,10 +630,14 @@ public final class CommandTree<C> {
     public void insertCommand(final @NonNull Command<C> command) {
         synchronized (this.commandLock) {
             Node<CommandArgument<C, ?>> node = this.internalTree;
+            final List<Pair<Node<CommandArgument<C, ?>>,
+                            Node<CommandArgument<C, ?>>>> addedNodeChildren = new ArrayList<>();
+
             for (final CommandArgument<C, ?> argument : command.getArguments()) {
                 Node<CommandArgument<C, ?>> tempNode = node.getChild(argument);
                 if (tempNode == null) {
                     tempNode = node.addChild(argument);
+                    addedNodeChildren.add(Pair.of(node, tempNode));
                 } else if (argument instanceof StaticArgument && tempNode.getValue() != null) {
                     for (final String alias : ((StaticArgument<C>) argument).getAliases()) {
                         ((StaticArgument<C>) tempNode.getValue()).registerAlias(alias);
@@ -619,6 +651,7 @@ public final class CommandTree<C> {
             }
             if (node.getValue() != null) {
                 if (node.getValue().getOwningCommand() != null) {
+                    undoAddingNodeChildren(addedNodeChildren);
                     throw new IllegalStateException(String.format(
                             "Duplicate command chains detected. Node '%s' already has an owning command (%s)",
                             node.toString(), node.getValue().getOwningCommand().toString()
@@ -626,8 +659,26 @@ public final class CommandTree<C> {
                 }
                 node.getValue().setOwningCommand(command);
             }
+
             // Verify the command structure every time we add a new command
-            this.verifyAndRegister();
+            // If we detect a problem, then undo the registration we did earlier
+            try {
+                this.verifyAndRegister();
+            } catch (AmbiguousNodeException ex) {
+                undoAddingNodeChildren(addedNodeChildren);
+                throw ex; // rethrow
+            }
+        }
+    }
+
+    // Only used during command add failure conditions to clean up the tree
+    private void undoAddingNodeChildren(@NonNull final
+            List<@NonNull Pair<@NonNull Node<CommandArgument<C, ?>>,
+                               @NonNull Node<CommandArgument<C, ?>>>> addedNodeChildren
+    ) {
+        for (final Pair<@NonNull Node<CommandArgument<C, ?>>,
+                        @NonNull Node<CommandArgument<C, ?>>> added : addedNodeChildren) {
+            added.getFirst().children.remove(added.getSecond());
         }
     }
 
@@ -740,21 +791,52 @@ public final class CommandTree<C> {
         if (node.isLeaf()) {
             return;
         }
-        final int size = node.children.size();
-        for (final Node<CommandArgument<C, ?>> child : node.children) {
-            if (child.getValue() != null
-                    && !(child.getValue() instanceof StaticArgument)
-                    && size > 1) {
-                throw new AmbiguousNodeException(
-                        node.getValue(),
-                        child.getValue(),
-                        node.getChildren()
-                                .stream()
-                                .filter(n -> n.getValue() != null)
-                                .map(Node::getValue).collect(Collectors.toList())
-                );
+
+        // List of child nodes that are not static arguments, but (parsed) variable ones
+        final List<Node<CommandArgument<C, ?>>> childVariableArguments = node.children.stream()
+                .filter(n -> (n.getValue() != null && !(n.getValue() instanceof StaticArgument)))
+                .collect(Collectors.toList());
+
+        // If more than one child node exists with a variable argument, fail
+        if (childVariableArguments.size() > 1) {
+            Node<CommandArgument<C, ?>> child = childVariableArguments.get(0);
+            throw new AmbiguousNodeException(
+                    node.getValue(),
+                    child.getValue(),
+                    node.getChildren()
+                            .stream()
+                            .filter(n -> n.getValue() != null)
+                            .map(Node::getValue).collect(Collectors.toList())
+            );
+        }
+
+        // List of child nodes that are static arguments, with fixed values
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        final List<Node<StaticArgument<?>>> childStaticArguments = node.children.stream()
+                .filter(n -> n.getValue() instanceof StaticArgument)
+                .map(n -> (Node<StaticArgument<?>>) ((Node) n))
+                .collect(Collectors.toList());
+
+        // Check none of the static arguments are equal to another one
+        // This is done by filling a set and checking there are no duplicates
+        final Set<String> checkedLiterals = new HashSet<>();
+        for (final Node<StaticArgument<?>> child : childStaticArguments) {
+            for (final String nameOrAlias : child.getValue().getAliases()) {
+                if (!checkedLiterals.add(nameOrAlias)) {
+                    // Same literal value, ambiguity detected
+                    throw new AmbiguousNodeException(
+                            node.getValue(),
+                            child.getValue(),
+                            node.getChildren()
+                                    .stream()
+                                    .filter(n -> n.getValue() != null)
+                                    .map(Node::getValue).collect(Collectors.toList())
+                    );
+                }
             }
         }
+
+        // Recursively check child nodes as well
         node.children.forEach(this::checkAmbiguity);
     }
 
