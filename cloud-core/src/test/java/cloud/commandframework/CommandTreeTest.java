@@ -225,7 +225,7 @@ class CommandTreeTest {
         Assertions.assertFalse(
                 manager.getCommandTree().getSuggestions(
                         new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
-                        new LinkedList<>(Collections.singletonList("test "))
+                        new LinkedList<>(Arrays.asList("test", ""))
                 ).isEmpty());
     }
 
