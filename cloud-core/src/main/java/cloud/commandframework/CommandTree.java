@@ -470,20 +470,24 @@ public final class CommandTree<C> {
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> root
     ) {
-
         /* If the sender isn't allowed to access the root node, no suggestions are needed */
         if (this.isPermitted(commandContext.getSender(), root) != null) {
             return Collections.emptyList();
         }
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
-        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
-            return this.suggestionsForDynamicArgument(commandContext, commandQueue, children.get(0));
-        }
-        /* There are 0 or more static arguments as children. No variable child arguments are present */
-        if (children.isEmpty() || commandQueue.isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            final Iterator<Node<CommandArgument<C, ?>>> childIterator = root.getChildren().iterator();
+
+        /* Calculate a list of arguments that are static literals */
+        final List<Node<CommandArgument<C, ?>>> staticArguments = children.stream()
+                .filter(n -> n.getValue() instanceof StaticArgument)
+                .collect(Collectors.toList());
+
+        /*
+         * Try to see if any of the static literals can be parsed (matches exactly)
+         * If so, enter that node of the command tree for deeper suggestions
+         */
+        if (!staticArguments.isEmpty() && !commandQueue.isEmpty()) {
+            final Queue<String> commandQueueCopy = new LinkedList<String>(commandQueue);
+            final Iterator<Node<CommandArgument<C, ?>>> childIterator = staticArguments.iterator();
             if (childIterator.hasNext()) {
                 while (childIterator.hasNext()) {
                     final Node<CommandArgument<C, ?>> child = childIterator.next();
@@ -494,31 +498,51 @@ public final class CommandTree<C> {
                                 commandQueue
                         );
                         if (result.getParsedValue().isPresent()) {
-                            return this.getSuggestions(commandContext, commandQueue, child);
+                            // If further arguments are specified, dive into this literal
+                            if (!commandQueue.isEmpty()) {
+                                return this.getSuggestions(commandContext, commandQueue, child);
+                            }
+
+                            // We've already matched one exactly, no use looking further
+                            break;
                         }
                     }
                 }
-                if (commandQueue.size() > 1) {
-                    /*
-                     * In this case we were unable to match any of the literals, and so we cannot
-                     * possibly attempt to match any of its children (which is what we want, according
-                     * to the input queue). Because of this, we terminate immediately
-                     */
-                    return Collections.emptyList();
-                }
             }
-            final List<String> suggestions = new LinkedList<>();
-            for (final Node<CommandArgument<C, ?>> argument : root.getChildren()) {
-                if (argument.getValue() == null || this.isPermitted(commandContext.getSender(), argument) != null) {
+
+            // Restore original queue
+            commandQueue.clear();
+            commandQueue.addAll(commandQueueCopy);
+        }
+
+        /* Calculate suggestions for the literal arguments */
+        final List<String> suggestions = new LinkedList<>();
+        if (commandQueue.size() <= 1) {
+            final String literalValue = stringOrEmpty(commandQueue.peek());
+            for (final Node<CommandArgument<C, ?>> argument : staticArguments) {
+                if (this.isPermitted(commandContext.getSender(), argument) != null) {
                     continue;
                 }
                 commandContext.setCurrentArgument(argument.getValue());
                 final List<String> suggestionsToAdd = argument.getValue().getSuggestionsProvider()
-                        .apply(commandContext, stringOrEmpty(commandQueue.peek()));
-                suggestions.addAll(suggestionsToAdd);
+                        .apply(commandContext, literalValue);
+                for (String suggestion : suggestionsToAdd) {
+                    if (suggestion.equals(literalValue) || !suggestion.startsWith(literalValue)) {
+                        continue;
+                    }
+                    suggestions.add(suggestion);
+                }
             }
-            return suggestions;
         }
+
+        /* Calculate suggestions for the variable argument, if one exists */
+        for (final Node<CommandArgument<C, ?>> child : root.getChildren()) {
+            if (child.getValue() != null && !(child.getValue() instanceof StaticArgument)) {
+                suggestions.addAll(this.suggestionsForDynamicArgument(commandContext, commandQueue, child));
+            }
+        }
+
+        return suggestions;
     }
 
     private @NonNull List<String> suggestionsForDynamicArgument(
