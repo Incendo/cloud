@@ -62,13 +62,16 @@ import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Manager used to map cloud {@link Command}
@@ -346,7 +349,8 @@ public final class CloudBrigadierManager<C, S> {
     ) {
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
                 .getCommandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
-        final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(node.getValue(), builder);
+        final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(node.getValue(),
+                Collections.emptySet(), builder);
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
                 .<S>literal(label)
                 .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.getNodeMeta()
@@ -470,6 +474,18 @@ public final class CloudBrigadierManager<C, S> {
                             )))
                     .executes(executor);
         } else {
+            // Check for sibling literals (StaticArgument)
+            // These are important when providing suggestions
+            final Set<String> siblingLiterals = (root.getParent() == null) ? Collections.emptySet()
+                    : root.getParent().getChildren().stream()
+                        .filter(n -> n.getValue() instanceof StaticArgument)
+                        .map(n -> (StaticArgument<C>) ((CommandArgument) n.getValue()))
+                        .flatMap(s -> s.getAliases().stream())
+                        .sorted()
+                        .distinct()
+                        .collect(Collectors.toSet());
+
+            // Register argument
             final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(
                     root.getValue().getValueType(),
                     TypeToken.get(root.getValue().getParser().getClass()),
@@ -478,6 +494,7 @@ public final class CloudBrigadierManager<C, S> {
             final SuggestionProvider<S> provider = pair.getSecond()
                     ? null
                     : (context, builder) -> this.buildSuggestions(root.getValue(),
+                            siblingLiterals,
                             builder
                     );
             argumentBuilder = RequiredArgumentBuilder
@@ -506,6 +523,7 @@ public final class CloudBrigadierManager<C, S> {
 
     private @NonNull CompletableFuture<Suggestions> buildSuggestions(
             final @NonNull CommandArgument<C, ?> argument,
+            final @NonNull Set<String> siblingLiterals,
             final @NonNull SuggestionsBuilder builder
     ) {
         final CommandContext<C> commandContext = this.dummyContextProvider.get();
@@ -534,6 +552,12 @@ public final class CloudBrigadierManager<C, S> {
         }
 
         for (final String suggestion : suggestions) {
+            // Skip suggestions that are sibling literals
+            // They are already part of the literal argument construction earlier
+            if (siblingLiterals.contains(suggestion)) {
+                continue;
+            }
+
             String tooltip = argument.getName();
             if (!(argument instanceof StaticArgument)) {
                 if (argument.isRequired()) {
