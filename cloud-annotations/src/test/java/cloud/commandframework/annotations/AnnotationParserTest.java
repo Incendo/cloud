@@ -31,6 +31,7 @@ import cloud.commandframework.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -43,15 +44,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AnnotationParserTest {
 
     private static final List<String> NAMED_SUGGESTIONS = Arrays.asList("Dancing-Queen", "Gimme!-Gimme!-Gimme!", "Waterloo");
 
-    private static CommandManager<TestCommandSender> manager;
-    private static AnnotationParser<TestCommandSender> annotationParser;
+    private CommandManager<TestCommandSender> manager;
+    private AnnotationParser<TestCommandSender> annotationParser;
+    private Collection<Command<TestCommandSender>> commands;
 
     @BeforeAll
-    static void setup() {
+    void setup() {
         manager = new TestCommandManager();
         annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
         manager.getParserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
@@ -66,11 +69,13 @@ class AnnotationParserTest {
                 InjectableValue.class,
                 (context, annotations) -> new InjectableValue("Hello World!")
         );
+
+        /* Parse the class. Required for both testMethodConstruction() and testNamedSuggestionProvider() */
+        commands = annotationParser.parse(this);
     }
 
     @Test
     void testMethodConstruction() {
-        final Collection<Command<TestCommandSender>> commands = annotationParser.parse(this);
         Assertions.assertFalse(commands.isEmpty());
         manager.executeCommand(new TestCommandSender(), "test literal 10").join();
         manager.executeCommand(new TestCommandSender(), "t literal 10 o").join();
