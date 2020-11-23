@@ -90,6 +90,13 @@ public class CommandSuggestionsTest {
 
         manager.command(manager.commandBuilder("numberswithmin")
                 .argument(IntegerArgument.<TestCommandSender>newBuilder("num").withMin(5).withMax(100)));
+
+        manager.command(manager.commandBuilder("partial")
+                .argument(StringArgument.<TestCommandSender>newBuilder("arg").withSuggestionsProvider((contect, input) -> {
+                    return Arrays.asList("hi", "hey", "heya", "hai", "hello");
+                }))
+                .literal("literal")
+                .build());
     }
 
     @Test
@@ -121,7 +128,7 @@ public class CommandSuggestionsTest {
         Assertions.assertTrue(suggestions.isEmpty());
         final String input2 = "test var one";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Collections.emptyList(), suggestions2);
+        Assertions.assertEquals(Collections.singletonList("one"), suggestions2);
         final String input3 = "test var one f";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.singletonList("foo"), suggestions3);
@@ -228,6 +235,47 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Collections.emptyList(), suggestions3);
     }
 
+    @Test
+    void testStringArgumentWithSuggestionProvider() {
+        /*
+         * [/partial] - should not match anything
+         * [/partial ] - should show all possible suggestions unsorted
+         * [/partial h] - should show all starting with 'h' (which is all) unsorted
+         * [/partial he] - should show only those starting with he, unsorted
+         * [/partial hey] - should show 'hey' and 'heya' (matches exactly and starts with)
+         * [/partial hi] - should show only 'hi', it is the only one that matches exactly
+         * [/partial b] - should show no suggestions, none match
+         * [/partial hello ] - should show the literal following the argument (suggested)
+         * [/partial bonjour ] - should show the literal following the argument (not suggested)
+         */
+        final String input = "partial";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Collections.emptyList(), suggestions);
+        final String input2 = "partial ";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("hi", "hey", "heya", "hai", "hello"), suggestions2);
+        final String input3 = "partial h";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Arrays.asList("hi", "hey", "heya", "hai", "hello"), suggestions3);
+        final String input4 = "partial he";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Arrays.asList("hey", "heya", "hello"), suggestions4);
+        final String input5 = "partial hey";
+        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(Arrays.asList("hey", "heya"), suggestions5);
+        final String input6 = "partial hi";
+        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(Collections.singletonList("hi"), suggestions6);
+        final String input7 = "partial b";
+        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        Assertions.assertEquals(Collections.emptyList(), suggestions7);
+        final String input8 = "partial hello ";
+        final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
+        Assertions.assertEquals(Collections.singletonList("literal"), suggestions8);
+        final String input9 = "partial bonjour ";
+        final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        Assertions.assertEquals(Collections.singletonList("literal"), suggestions9);
+    }
 
     public enum TestEnum {
         FOO,
