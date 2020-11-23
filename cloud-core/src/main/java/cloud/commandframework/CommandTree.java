@@ -449,87 +449,7 @@ public final class CommandTree<C> {
         }
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
         if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
-            // The value has to be a variable
-            final Node<CommandArgument<C, ?>> child = children.get(0);
-
-            /* When we get in here, we need to treat compound arguments a little differently */
-            if (child.getValue() instanceof CompoundArgument) {
-                @SuppressWarnings("unchecked") final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) child
-                        .getValue();
-                /* See how many arguments it requires */
-                final int requiredArguments = compoundArgument.getParserTuple().getSize();
-                /* Figure out whether we even need to care about this */
-                if (commandQueue.size() <= requiredArguments) {
-                    /* Attempt to pop as many arguments from the stack as possible */
-                    for (int i = 0; i < requiredArguments - 1 && commandQueue.size() > 1; i++) {
-                        commandQueue.remove();
-                        commandContext.store("__parsing_argument__", i + 2);
-                    }
-                }
-            } else if (child.getValue() instanceof FlagArgument) {
-                /* Remove all but last */
-                while (commandQueue.size() > 1) {
-                    commandContext.store(FlagArgument.FLAG_META, commandQueue.remove());
-                }
-            } else if (child.getValue() != null
-                    && GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
-                while (commandQueue.size() > 1) {
-                    commandQueue.remove();
-                }
-            } else if (child.getValue() != null
-                    && commandQueue.size() <= child.getValue().getParser().getRequestedArgumentCount()) {
-                for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1
-                        && commandQueue.size() > 1; i++) {
-                    commandContext.store(
-                            String.format("%s_%d", child.getValue().getName(), i),
-                            commandQueue.remove()
-                    );
-                }
-            }
-
-            if (child.getValue() != null) {
-                if (commandQueue.isEmpty()) {
-                    return Collections.emptyList();
-                } else if (child.isLeaf() && commandQueue.size() < 2) {
-                    commandContext.setCurrentArgument(child.getValue());
-                    return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
-                } else if (child.isLeaf()) {
-                    if (child.getValue() instanceof CompoundArgument) {
-                        final String last = ((LinkedList<String>) commandQueue).getLast();
-                        commandContext.setCurrentArgument(child.getValue());
-                        return child.getValue().getSuggestionsProvider().apply(commandContext, last);
-                    }
-                    return Collections.emptyList();
-                } else if (commandQueue.peek().isEmpty()) {
-                    commandContext.setCurrentArgument(child.getValue());
-                    return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());
-                }
-
-                // START: Preprocessing
-                final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
-                        commandContext,
-                        commandQueue
-                );
-                if (preParseResult.getFailure().isPresent() || !preParseResult.getParsedValue().orElse(false)) {
-                    final String value = commandQueue.peek() == null ? "" : commandQueue.peek();
-                    commandContext.setCurrentArgument(child.getValue());
-                    return child.getValue().getSuggestionsProvider().apply(commandContext, value);
-                }
-                // END: Preprocessing
-
-                // START: Parsing
-                commandContext.setCurrentArgument(child.getValue());
-                final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
-                if (result.getParsedValue().isPresent()) {
-                    commandContext.store(child.getValue().getName(), result.getParsedValue().get());
-                    return this.getSuggestions(commandContext, commandQueue, child);
-                } else if (result.getFailure().isPresent()) {
-                    final String value = commandQueue.peek() == null ? "" : commandQueue.peek();
-                    commandContext.setCurrentArgument(child.getValue());
-                    return child.getValue().getSuggestionsProvider().apply(commandContext, value);
-                }
-                // END: Parsing
-            }
+            return this.suggestionsForDynamicArgument(commandContext, commandQueue, children.get(0));
         }
         /* There are 0 or more static arguments as children. No variable child arguments are present */
         if (children.isEmpty() || commandQueue.isEmpty()) {
@@ -571,6 +491,99 @@ public final class CommandTree<C> {
             }
             return suggestions;
         }
+    }
+
+    private @NonNull List<String> suggestionsForDynamicArgument(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull Queue<@NonNull String> commandQueue,
+            final @NonNull Node<CommandArgument<C, ?>> child
+    ) {
+        /* When we get in here, we need to treat compound arguments a little differently */
+        if (child.getValue() instanceof CompoundArgument) {
+            @SuppressWarnings("unchecked") final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) child
+                    .getValue();
+            /* See how many arguments it requires */
+            final int requiredArguments = compoundArgument.getParserTuple().getSize();
+            /* Figure out whether we even need to care about this */
+            if (commandQueue.size() <= requiredArguments) {
+                /* Attempt to pop as many arguments from the stack as possible */
+                for (int i = 0; i < requiredArguments - 1 && commandQueue.size() > 1; i++) {
+                    commandQueue.remove();
+                    commandContext.store("__parsing_argument__", i + 2);
+                }
+            }
+        } else if (child.getValue() instanceof FlagArgument) {
+            /* Remove all but last */
+            while (commandQueue.size() > 1) {
+                commandContext.store(FlagArgument.FLAG_META, commandQueue.remove());
+            }
+        } else if (child.getValue() != null
+                && GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
+            while (commandQueue.size() > 1) {
+                commandQueue.remove();
+            }
+        } else if (child.getValue() != null
+                && commandQueue.size() <= child.getValue().getParser().getRequestedArgumentCount()) {
+            for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1
+                    && commandQueue.size() > 1; i++) {
+                commandContext.store(
+                        String.format("%s_%d", child.getValue().getName(), i),
+                        commandQueue.remove()
+                );
+            }
+        }
+
+        if (child.getValue() != null) {
+            if (commandQueue.isEmpty()) {
+                return Collections.emptyList();
+            } else if (child.isLeaf() && commandQueue.size() < 2) {
+                commandContext.setCurrentArgument(child.getValue());
+                return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
+            } else if (child.isLeaf()) {
+                if (child.getValue() instanceof CompoundArgument) {
+                    final String last = ((LinkedList<String>) commandQueue).getLast();
+                    commandContext.setCurrentArgument(child.getValue());
+                    return child.getValue().getSuggestionsProvider().apply(commandContext, last);
+                }
+                return Collections.emptyList();
+            } else if (commandQueue.peek().isEmpty()) {
+                commandContext.setCurrentArgument(child.getValue());
+                return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());
+            }
+
+            // Store original input command queue before the parsers below modify it
+            final Queue<String> commandQueueOriginal = new LinkedList<String>(commandQueue);
+
+            // START: Preprocessing
+            final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
+                    commandContext,
+                    commandQueue
+            );
+            final boolean preParseSuccess = !preParseResult.getFailure().isPresent()
+                    && preParseResult.getParsedValue().orElse(false);
+            // END: Preprocessing
+
+            if (preParseSuccess) {
+                // START: Parsing
+                commandContext.setCurrentArgument(child.getValue());
+                final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+                if (result.getParsedValue().isPresent() && !commandQueue.isEmpty()) {
+                    commandContext.store(child.getValue().getName(), result.getParsedValue().get());
+                    return this.getSuggestions(commandContext, commandQueue, child);
+                }
+                // END: Parsing
+            }
+
+            // Restore original command input queue
+            commandQueue.clear();
+            commandQueue.addAll(commandQueueOriginal);
+
+            // Fallback: use suggestion provider of argument
+            commandContext.setCurrentArgument(child.getValue());
+            return child.getValue().getSuggestionsProvider().apply(commandContext, stringOrEmpty(commandQueue.peek()));
+        }
+
+        return Collections.emptyList();
     }
 
     private @NonNull String stringOrEmpty(final @Nullable String string) {
