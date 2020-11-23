@@ -300,22 +300,30 @@ class CommandTreeTest {
                         .argument(IntegerArgument.of("integer"))));
         newTree();
 
+        // Literal and argument can co-exist, not ambiguous
         manager.command(manager.commandBuilder("ambiguous")
                 .argument(StringArgument.of("string"))
         );
-        Assertions.assertThrows(AmbiguousNodeException.class, () ->
-                manager.command(manager.commandBuilder("ambiguous")
-                        .literal("literal")));
+        manager.command(manager.commandBuilder("ambiguous")
+                .literal("literal"));
         newTree();
 
+        // Two literals (different names) and argument can co-exist, not ambiguous
         manager.command(manager.commandBuilder("ambiguous")
-                .literal("literal")
-        );
+                .literal("literal"));
         manager.command(manager.commandBuilder("ambiguous")
                 .literal("literal2"));
-        Assertions.assertThrows(AmbiguousNodeException.class, () ->
+
+        manager.command(manager.commandBuilder("ambiguous")
+                .argument(IntegerArgument.of("integer")));
+        newTree();
+
+        // Two literals with the same name can not co-exist, causes 'duplicate command chains' error
+        manager.command(manager.commandBuilder("ambiguous")
+                .literal("literal"));
+        Assertions.assertThrows(IllegalStateException.class, () ->
                 manager.command(manager.commandBuilder("ambiguous")
-                        .argument(IntegerArgument.of("integer"))));
+                        .literal("literal")));
         newTree();
     }
 
