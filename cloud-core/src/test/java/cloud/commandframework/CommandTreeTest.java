@@ -291,12 +291,32 @@ class CommandTreeTest {
 
     @Test
     void testAmbiguousNodes() {
+        // Call newTree(); after each time we leave the Tree in an invalid state
         manager.command(manager.commandBuilder("ambiguous")
                 .argument(StringArgument.of("string"))
         );
         Assertions.assertThrows(AmbiguousNodeException.class, () ->
                 manager.command(manager.commandBuilder("ambiguous")
                         .argument(IntegerArgument.of("integer"))));
+        newTree();
+
+        manager.command(manager.commandBuilder("ambiguous")
+                .argument(StringArgument.of("string"))
+        );
+        Assertions.assertThrows(AmbiguousNodeException.class, () ->
+                manager.command(manager.commandBuilder("ambiguous")
+                        .literal("literal")));
+        newTree();
+
+        manager.command(manager.commandBuilder("ambiguous")
+                .literal("literal")
+        );
+        manager.command(manager.commandBuilder("ambiguous")
+                .literal("literal2"));
+        Assertions.assertThrows(AmbiguousNodeException.class, () ->
+                manager.command(manager.commandBuilder("ambiguous")
+                        .argument(IntegerArgument.of("integer"))));
+        newTree();
     }
 
     @Test
