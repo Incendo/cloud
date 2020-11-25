@@ -110,7 +110,7 @@ subprojects {
         }
         maven {
             /* The current Sponge repository */
-            url = 'https://repo.spongepowered.org/maven'
+            url = 'https://repo-new.spongepowered.org/repository/maven-public/'
         }
         maven {
             /* The Spigot repository, used for cloud-bukkit */
