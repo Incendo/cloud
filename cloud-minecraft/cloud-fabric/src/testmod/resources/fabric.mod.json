@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "cloud-testmod",
+  "version": "${version}",
+
+  "name": "Cloud Test mod",
+  "description": "Command framework and dispatcher for the JVM",
+  "authors": [ "Alexander Söderberg" ],
+  "contact": {
+    "homepage": "https://commandframework.cloud/",
+    "sources": "https://github.com/Incendo/cloud"
+  },
+  "license": "MIT",
+  "icon": "assets/cloud/logo.png",
+
+  "entrypoints": {
+    "main": [
+      "cloud.commandframework.fabric.testmod.FabricExample"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric-command-api-v1": "*",
+    "minecraft": ">=1.14",
+    "cloud": "*"
+  }
+}
