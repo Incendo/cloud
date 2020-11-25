@@ -1,0 +1,69 @@
+plugins {
+    id 'fabric-loom' version '0.5-SNAPSHOT'
+}
+
+// Set up a testmod source set
+sourceSets {
+    testmod {
+        dependencies.add(compileClasspathConfigurationName, main.compileClasspath)
+        dependencies.add(runtimeClasspathConfigurationName, main.runtimeClasspath)
+        dependencies.add(implementationConfigurationName, main.output)
+    }
+}
+
+task testmodJar(type: Jar) {
+    archiveClassifier = "testmod-dev"
+    group = LifecycleBasePlugin.BUILD_GROUP
+    from sourceSets.testmod.output
+}
+
+loom.unmappedModCollection.from(tasks.testmodJar)
+
+tasks.withType(ProcessResources).configureEach {
+    inputs.property("version", project.version)
+    filesMatching("fabric.mod.json") {
+        expand(version: project.version)
+    }
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.links("https://maven.fabricmc.net/docs/yarn-${vers['fabricMc']}+build.${vers['fabricYarn']}/")
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${vers['fabricMc']}"
+    mappings "net.fabricmc:yarn:${vers['fabricMc']}+build.${vers['fabricYarn']}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${vers['fabricLoader']}"
+    modImplementation fabricApi.module("fabric-command-api-v1", vers['fabricApi'])
+
+    api include(project(":cloud-core"))
+    implementation include(project(":cloud-brigadier"))
+
+    include project(":cloud-services")
+    include "io.leangen.geantyref:geantyref:${vers['geantyref']}"
+}
+
+publishing.publications.mavenJava {
+    // add all the jars that should be included when publishing to maven
+    artifact(remapJar) {
+        builtBy remapJar
+    }
+    artifact(sourcesJar) {
+        builtBy remapSourcesJar
+    }
+
+    // Loom is broken with project dependencies in the same build (because it resolves dependencies during configuration)
+    // Please look away
+    pom {
+        withXml {
+            def dependencies = asNode().appendNode("dependencies")
+            ["brigadier", "core"].each {
+                def depNode = dependencies.appendNode("dependency")
+                depNode.appendNode("groupId", project.group)
+                depNode.appendNode("artifactId", "cloud-$it")
+                depNode.appendNode("version", project.version)
+                depNode.appendNode("scope", "compile")
+            }
+        }
+    }
+}

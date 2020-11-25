@@ -1,3 +1,12 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url "https://maven.fabricmc.net"
+        }
+    }
+}
+
 rootProject.name = 'cloud'
 //
 // Core Modules
@@ -30,6 +39,8 @@ include(':cloud-paper')
 project(':cloud-paper').projectDir = file('cloud-minecraft/cloud-paper')
 include(':cloud-sponge')
 project(':cloud-sponge').projectDir = file('cloud-minecraft/cloud-sponge')
+include(':cloud-fabric')
+project(':cloud-fabric').projectDir = file('cloud-minecraft/cloud-fabric')
 include(':cloud-velocity')
 project(':cloud-velocity').projectDir = file('cloud-minecraft/cloud-velocity')
 // IRC Modules

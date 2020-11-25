@@ -155,7 +155,10 @@ subprojects {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                from components.java
+                // Loom is bad, rip
+                if (project.name != "cloud-fabric") {
+                    from components.java
+                }
 
                 pom {
                     name = project.name

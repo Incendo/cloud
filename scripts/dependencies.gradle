@@ -17,6 +17,10 @@ ext {
             'velocity-api'  : '1.1.0-SNAPSHOT',
             'jb-annotations': '20.1.0',
             'guava'         : '30.0-jre',
+            'fabricLoader'  : '0.10.8',
+            'fabricMc'      : '1.16.4',
+            'fabricYarn'    : '7',
+            'fabricApi'     : '0.26.3+1.16',
             // IRC DEPENDENCIES
             'pircbotx'      : '83a4c22e80',
             // TEST DEPENDENCIES
