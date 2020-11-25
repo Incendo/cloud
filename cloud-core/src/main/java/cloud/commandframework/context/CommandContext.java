@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Command context used to assist in the parsing of commands
@@ -236,6 +237,22 @@ public final class CommandContext<C> {
             final @Nullable T defaultValue
     ) {
         return this.<T>getOptional(key).orElse(defaultValue);
+    }
+
+    /**
+     * Get a value if it exists, else return the value supplied by the given supplier
+     *
+     * @param key             Argument key
+     * @param defaultSupplier Supplier of default value
+     * @param <T>             Argument type
+     * @return Argument, or supplied default value
+     * @since 1.2.0
+     */
+    public <T> @Nullable T getOrDefault(
+            final @NonNull String key,
+            final @NonNull Supplier<@Nullable T> defaultSupplier
+    ) {
+        return this.<T>getOptional(key).orElseGet(defaultSupplier);
     }
 
     /**
