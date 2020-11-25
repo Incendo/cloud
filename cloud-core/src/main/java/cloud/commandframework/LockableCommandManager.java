@@ -40,11 +40,10 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  * @since 1.1.0
+ * @deprecated Use a normal {@link CommandManager}'s registration state instead
  */
+@Deprecated
 public abstract class LockableCommandManager<C> extends CommandManager<C> {
-
-    private final Object writeLock = new Object();
-    private volatile boolean writeLocked = false;
 
     /**
      * Create a new command manager instance
@@ -68,56 +67,10 @@ public abstract class LockableCommandManager<C> extends CommandManager<C> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * This should only be called when {@link #isCommandRegistrationAllowed()} is {@code true},
-     * else {@link IllegalStateException} will be called
-     *
-     * @param command Command to register
-     * @return The command manager instance
-     */
-    @Override
-    public final @NonNull CommandManager<C> command(final @NonNull Command<C> command) {
-        synchronized (this.writeLock) {
-            if (!isCommandRegistrationAllowed()) {
-                throw new IllegalStateException(
-                        "Command registration is not allowed. The command manager has been locked."
-                );
-            }
-            return super.command(command);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This should only be called when {@link #isCommandRegistrationAllowed()} is {@code true},
-     * else {@link IllegalStateException} will be called
-     *
-     * @param command Command to register. {@link Command.Builder#build()}} will be invoked.
-     * @return The command manager instance
-     */
-    @Override
-    public final @NonNull CommandManager<C> command(final Command.@NonNull Builder<C> command) {
-        return super.command(command);
-    }
-
-    /**
      * Lock writing. After this, {@link #isCommandRegistrationAllowed()} will return {@code false}
      */
     protected final void lockWrites() {
-        synchronized (this.writeLock) {
-            this.writeLocked = true;
-        }
-    }
-
-    /**
-     * Check if command registration is allowed
-     *
-     * @return {@code true} if the registration is allowed, else {@code false}
-     */
-    public final boolean isCommandRegistrationAllowed() {
-        return !this.writeLocked;
+        this.transitionIfNecessary(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
     }
 
 }

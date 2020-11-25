@@ -241,6 +241,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     protected final void setSplitAliases(final boolean value) {
+        this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.splitAliases = value;
     }
 
@@ -311,6 +312,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *                                   supported by the platform
      */
     public void registerBrigadier() throws BrigadierFailureException {
+        this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.checkBrigadierCompatibility();
         try {
             final CloudCommodoreManager<C> cloudCommodoreManager = new CloudCommodoreManager<>(this);
