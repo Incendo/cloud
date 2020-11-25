@@ -50,6 +50,8 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.internal.registration.IgnoringRegistrationService;
+import cloud.commandframework.internal.registration.RegistrationService;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
@@ -124,6 +126,8 @@ public abstract class CommandManager<C> {
         }, new AcceptingCommandPreprocessor<>());
         this.servicePipeline.registerServiceType(new TypeToken<CommandPostprocessor<C>>() {
         }, new AcceptingCommandPostprocessor<>());
+        this.servicePipeline.registerServiceType(new TypeToken<RegistrationService<C>>() {
+        }, new IgnoringRegistrationService<>());
         /* Create the caption registry */
         this.captionRegistry = new SimpleCaptionRegistryFactory<C>().create();
     }
@@ -564,6 +568,17 @@ public abstract class CommandManager<C> {
                 new TypeToken<CommandPreprocessor<C>>() {
                 },
                 processor,
+                Collections.emptyList()
+        );
+    }
+
+    public void registerCommandRegistrationProcessor(
+            final @NonNull RegistrationService<C> registrationService
+    ) {
+        this.servicePipeline.registerServiceImplementation(
+                new TypeToken<RegistrationService<C>>() {
+                },
+                registrationService,
                 Collections.emptyList()
         );
     }
