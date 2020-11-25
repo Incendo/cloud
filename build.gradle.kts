@@ -131,7 +131,9 @@ subprojects {
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
-                from(components["java"])
+                if (project.name != "cloud-fabric") {
+                    from(components["java"])
+                }
 
                 pom {
                     name.set(project.name)

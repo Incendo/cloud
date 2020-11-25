@@ -20,6 +20,10 @@ object Versions {
     const val velocityApi = "1.1.0"
     const val jetbrainsAnnotations = "20.1.0"
     const val guava = "21.0-jre"
+    const val fabricLoader = "0.10.8"
+    const val fabricMc = "1.16.4"
+    const val fabricYarn = "7"
+    const val fabricApi = "0.29.1+1.16"
 
     // IRC DEPENDENCIES
     const val pircbotx = "83a4c22e80"

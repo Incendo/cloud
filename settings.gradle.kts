@@ -1,3 +1,12 @@
+pluginManagement {
+    repositories {
+        maven("https://maven.fabricmc.net") {
+            name = "fabric"
+        }
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = "cloud"
 
 // Core Modules
@@ -16,6 +25,7 @@ setupDiscordModule("cloud-jda")
 // Minecraft Modules
 setupMinecraftModule("cloud-brigadier")
 setupMinecraftModule("cloud-bukkit")
+setupMinecraftModule("cloud-fabric")
 setupMinecraftModule("cloud-paper")
 setupMinecraftModule("cloud-velocity")
 setupMinecraftModule("cloud-sponge")
