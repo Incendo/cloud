@@ -25,6 +25,7 @@ package cloud.commandframework.minecraft.extras;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.TextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -42,8 +43,10 @@ final class ComponentHelper {
             final @NonNull TextColor highlightColor
     ) {
         return component.replaceText(
-                SPECIAL_CHARACTERS_PATTERN,
-                match -> match.color(highlightColor)
+                TextReplacementConfig.builder()
+                        .match(SPECIAL_CHARACTERS_PATTERN)
+                        .replacement(match -> match.color(highlightColor))
+                        .build()
         );
     }
 
