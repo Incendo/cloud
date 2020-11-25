@@ -90,12 +90,17 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
     }
 
     final void lock() {
-        this.transitionIfNecessary(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+        this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
     }
 
     @Override
     public final @NonNull CommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.builder().build();
+    }
+
+    @Override
+    public final boolean isCommandRegistrationAllowed() {
+        return this.getRegistrationState() != RegistrationState.AFTER_REGISTRATION;
     }
 
     final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {

@@ -70,7 +70,7 @@ public abstract class LockableCommandManager<C> extends CommandManager<C> {
      * Lock writing. After this, {@link #isCommandRegistrationAllowed()} will return {@code false}
      */
     protected final void lockWrites() {
-        this.transitionIfNecessary(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+        this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
     }
 
 }

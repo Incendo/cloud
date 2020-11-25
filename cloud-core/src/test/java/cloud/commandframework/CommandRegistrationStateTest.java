@@ -61,8 +61,17 @@ public class CommandRegistrationStateTest {
         final TestCommandManager manager = new TestCommandManager();
         manager.command(manager.commandBuilder("test").handler(ctx -> {}));
 
-        manager.transitionIfNecessary(CommandManager.RegistrationState.REGISTERING, CommandManager.RegistrationState.AFTER_REGISTRATION);
+        manager.transitionOrThrow(CommandManager.RegistrationState.REGISTERING, CommandManager.RegistrationState.AFTER_REGISTRATION);
         assertThrows(IllegalStateException.class, () -> manager.command(manager.commandBuilder("test2").handler(ctx -> {})));
+    }
+
+    @Test
+    void testAllowUnsafeRegistration() {
+        final TestCommandManager manager = new TestCommandManager();
+        manager.setSetting(CommandManager.ManagerSettings.ALLOW_UNSAFE_REGISTRATION, true);
+        manager.command(manager.commandBuilder("test").handler(ctx -> {}));
+        manager.transitionOrThrow(CommandManager.RegistrationState.REGISTERING, CommandManager.RegistrationState.AFTER_REGISTRATION);
+        manager.command(manager.commandBuilder("unsafe").handler(ctx -> {}));
     }
 
 }

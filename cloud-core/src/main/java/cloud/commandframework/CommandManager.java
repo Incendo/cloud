@@ -209,7 +209,11 @@ public abstract class CommandManager<C> {
      *         return {@code this}.
      */
     public @NonNull CommandManager<C> command(final @NonNull Command<C> command) {
-        this.transitionIfNecessary(RegistrationState.BEFORE_REGISTRATION, RegistrationState.REGISTERING);
+        if (!(this.transitionIfPossible(RegistrationState.BEFORE_REGISTRATION, RegistrationState.REGISTERING)
+                || this.isCommandRegistrationAllowed())) {
+            throw new IllegalStateException("Unable to register commands because the manager is no longer in a registration "
+                    + "state. Your platform may allow unsafe registrations by enabling the appropriate manager setting.");
+        }
         this.commandTree.insertCommand(command);
         this.commands.add(command);
         return this;
@@ -778,15 +782,22 @@ public abstract class CommandManager<C> {
      * @param out The ending state
      * @throws IllegalStateException if the manager is in any state but {@code in} or {@code out}
      */
-    protected final void transitionIfNecessary(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
-        if (this.state.compareAndSet(in, out)) {
-            return;
-        }
-
-        if (this.state.get() != out) {
-            throw new IllegalStateException("Command manager was in state " + this.state + ", while we were expecting a state "
+    protected final void transitionOrThrow(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
+        if (!this.transitionIfPossible(in, out)) {
+            throw new IllegalStateException("Command manager was in state " + this.state.get() + ", while we were expecting a state "
                     + "of " + in + " or " + out + "!");
         }
+    }
+
+    /**
+     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
+     *
+     * @param in The starting state
+     * @param out The ending state
+     * @return if the state transition was successful, or the manager was already in the desired state
+     */
+    protected final boolean transitionIfPossible(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
+        return this.state.compareAndSet(in, out) || this.state.get() == out;
     }
 
     /**
@@ -798,7 +809,7 @@ public abstract class CommandManager<C> {
     protected final void requireState(final @NonNull RegistrationState expected) {
         if (this.state.get() != expected) {
             throw new IllegalStateException("This operation required the commands manager to be in state " + expected + ", but it "
-                    + "was in " + this.state + " instead!");
+                    + "was in " + this.state.get() + " instead!");
         }
     }
 
@@ -814,12 +825,15 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Check if command registration is allowed
+     * Check if command registration is allowed.
+     *
+     * <p>On platforms where unsafe registration is possible, this can be overridden by enabling the
+     * {@link ManagerSettings#ALLOW_UNSAFE_REGISTRATION} setting.</p>
      *
      * @return {@code true} if the registration is allowed, else {@code false}
      */
-    public final boolean isCommandRegistrationAllowed() {
-        return this.state.get() != RegistrationState.AFTER_REGISTRATION;
+    public boolean isCommandRegistrationAllowed() {
+        return this.getSetting(ManagerSettings.ALLOW_UNSAFE_REGISTRATION) || this.state.get() != RegistrationState.AFTER_REGISTRATION;
     }
 
     /**
@@ -839,7 +853,16 @@ public abstract class CommandManager<C> {
          * Force sending of an empty suggestion (i.e. a singleton list containing an empty string)
          * when no suggestions are present
          */
-        FORCE_SUGGESTION
+        FORCE_SUGGESTION,
+
+        /**
+         * Allow registering commands even when doing so has the potential to produce inconsistent results.
+         *
+         * <p>For example, if a platform serializes the command tree and sends it to clients,
+         * this will allow modifying the command tree after it has been sent, as long as these modifications are not blocked by
+         * the underlying platform.</p>
+         */
+        ALLOW_UNSAFE_REGISTRATION
     }
 
     /**
