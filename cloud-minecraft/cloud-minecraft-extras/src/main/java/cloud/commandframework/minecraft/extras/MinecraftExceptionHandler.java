@@ -32,9 +32,14 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -97,10 +102,30 @@ public final class MinecraftExceptionHandler<C> {
      */
     public static final Function<Exception, Component> DEFAULT_COMMAND_EXECUTION_FUNCTION =
             e -> {
-                e.getCause().printStackTrace();
+                final Throwable cause = e.getCause();
+                cause.printStackTrace();
+
+                final StringWriter writer = new StringWriter();
+                cause.printStackTrace(new PrintWriter(writer));
+                final String stackTrace = writer.toString().replaceAll("\t", "    ");
+                final HoverEvent<Component> hover = HoverEvent.showText(
+                        Component.text()
+                                .append(Component.text(stackTrace))
+                                .append(Component.newline())
+                                .append(Component.text(
+                                        "    Click to copy",
+                                        NamedTextColor.GRAY,
+                                        TextDecoration.ITALIC
+                                ))
+                );
+                final ClickEvent click = ClickEvent.copyToClipboard(stackTrace);
                 return Component.text()
-                        .append(Component.text("An internal error occurred while attempting to perform this command.",
-                                NamedTextColor.RED))
+                        .append(Component.text(
+                                "An internal error occurred while attempting to perform this command.",
+                                NamedTextColor.RED
+                        ))
+                        .hoverEvent(hover)
+                        .clickEvent(click)
                         .build();
             };
 
