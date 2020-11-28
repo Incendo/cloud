@@ -25,6 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.meta.CommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -55,7 +56,7 @@ public final class CommandHelpHandler<C> {
         final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
         for (final Command<C> command : this.commandManager.getCommands()) {
             final List<CommandArgument<C, ?>> arguments = command.getArguments();
-            final String description = command.getCommandMeta().getOrDefault("description", "");
+            final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
             syntaxHints.add(new VerboseHelpEntry<>(
                     command,
                     this.commandManager.getCommandSyntaxFormatter()
@@ -163,7 +164,7 @@ public final class CommandHelpHandler<C> {
             final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
             for (final Command<C> command : availableCommands) {
                 final List<CommandArgument<C, ?>> arguments = command.getArguments();
-                final String description = command.getCommandMeta().getOrDefault("description", "");
+                final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
                 syntaxHints.add(new VerboseHelpEntry<>(
                         command,
                         this.commandManager.getCommandSyntaxFormatter()
@@ -350,8 +351,8 @@ public final class CommandHelpHandler<C> {
 
         private VerboseHelpTopic(final @NonNull Command<C> command) {
             this.command = command;
-            final String shortDescription = command.getCommandMeta().getOrDefault("description", "No description");
-            this.description = command.getCommandMeta().getOrDefault("long-description", shortDescription);
+            final String shortDescription = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "No description");
+            this.description = command.getCommandMeta().getOrDefault(CommandMeta.LONG_DESCRIPTION, shortDescription);
         }
 
         /**

@@ -215,6 +215,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @return Meta data
      */
     @Override
+    @SuppressWarnings("deprecation")
     public @NonNull BukkitCommandMeta createDefaultCommandMeta() {
         return BukkitCommandMetaBuilder.builder().withDescription("").build();
     }

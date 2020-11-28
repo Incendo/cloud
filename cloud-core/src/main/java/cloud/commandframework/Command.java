@@ -269,7 +269,7 @@ public class Command<C> {
      * @return {@code true} if the command is hidden, {@code false} if not
      */
     public boolean isHidden() {
-        return this.getCommandMeta().getOrDefault("hidden", "true").equals("true");
+        return this.getCommandMeta().getOrDefault(CommandMeta.HIDDEN, false);
     }
 
 
@@ -337,8 +337,31 @@ public class Command<C> {
          * @param key   Meta key
          * @param value Meta value
          * @return New builder instance using the inserted meta key-value pair
+         * @deprecated for removal since 1.2.0, use the typesafe variant at {@link #meta(CommandMeta.Key, Object)} instead.
          */
+        @Deprecated
         public @NonNull Builder<C> meta(final @NonNull String key, final @NonNull String value) {
+            final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
+            return new Builder<>(
+                    this.commandManager,
+                    commandMeta,
+                    this.senderType,
+                    this.commandArguments,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags
+            );
+        }
+
+        /**
+         * Add command meta to the internal command meta map
+         *
+         * @param <V>   Meta value type
+         * @param key   Meta key
+         * @param value Meta value
+         * @return New builder instance using the inserted meta key-value pair
+         */
+        public <V> @NonNull Builder<C> meta(final CommandMeta.@NonNull Key<V> key, final @NonNull V value) {
             final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
             return new Builder<>(
                     this.commandManager,
@@ -746,7 +769,7 @@ public class Command<C> {
          * @return New builder instance that indicates that the constructed command should be hidden
          */
         public @NonNull Builder<C> hidden() {
-            return this.meta("hidden", "true");
+            return this.meta(CommandMeta.HIDDEN, true);
         }
 
         /**

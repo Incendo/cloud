@@ -307,7 +307,7 @@ public final class AnnotationParser<C> {
             final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
                     .with(this.metaFactory.apply(method));
             if (methodOrClassHasAnnotation(method, Confirmation.class)) {
-                metaBuilder.with(CommandConfirmationManager.CONFIRMATION_REQUIRED_META, "true");
+                metaBuilder.with(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true);
             }
 
             @SuppressWarnings("rawtypes")
