@@ -182,9 +182,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         this.getParserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
                 new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
 
-        /* Register suggestion listener */
+        /* Register suggestion and state listener */
         this.owningPlugin.getServer().getPluginManager().registerEvents(
-                new CommandSuggestionsListener<>(this),
+                new CloudBukkitListener<>(this),
                 this.owningPlugin
         );
 
@@ -241,6 +241,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     protected final void setSplitAliases(final boolean value) {
+        this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.splitAliases = value;
     }
 
@@ -311,6 +312,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *                                   supported by the platform
      */
     public void registerBrigadier() throws BrigadierFailureException {
+        this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.checkBrigadierCompatibility();
         try {
             final CloudCommodoreManager<C> cloudCommodoreManager = new CloudCommodoreManager<>(this);
@@ -367,6 +369,12 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      */
     public final @NonNull Function<@NonNull C, @NonNull CommandSender> getBackwardsCommandSenderMapper() {
         return this.backwardsCommandSenderMapper;
+    }
+
+    final void lockIfBrigadierCapable() {
+        if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
+            this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+        }
     }
 
     /**

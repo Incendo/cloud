@@ -30,6 +30,9 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
+import org.cloudburstmc.server.event.EventPriority;
+import org.cloudburstmc.server.event.Listener;
+import org.cloudburstmc.server.event.server.RegistriesClosedEvent;
 import org.cloudburstmc.server.plugin.Plugin;
 
 import java.util.function.Function;
@@ -67,6 +70,15 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
         this.owningPlugin = owningPlugin;
+
+        // Prevent commands from being registered when the server would reject them anyways
+        this.owningPlugin.getServer().getPluginManager().registerEvent(
+                RegistriesClosedEvent.class,
+                CloudListener.INSTANCE,
+                EventPriority.NORMAL,
+                (listener, event) -> this.lock(),
+                this.owningPlugin
+        );
     }
 
     @Override
@@ -77,9 +89,18 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
     }
 
+    final void lock() {
+        this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+    }
+
     @Override
     public final @NonNull CommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.builder().build();
+    }
+
+    @Override
+    public final boolean isCommandRegistrationAllowed() {
+        return this.getRegistrationState() != RegistrationState.AFTER_REGISTRATION;
     }
 
     final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {
@@ -93,6 +114,13 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
      */
     public final @NonNull Plugin getOwningPlugin() {
         return this.owningPlugin;
+    }
+
+    static final class CloudListener implements Listener {
+        static final CloudListener INSTANCE = new CloudListener();
+
+        private CloudListener() {
+        }
     }
 
 }
