@@ -27,7 +27,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.function.Function;
@@ -37,7 +36,7 @@ import java.util.regex.Pattern;
 /**
  * Parses command syntax into syntax fragments
  */
-final class SyntaxParser implements Function<@NonNull String, @NonNull LinkedHashMap<@NonNull String, @NonNull SyntaxFragment>> {
+final class SyntaxParser implements Function<@NonNull String, @NonNull List<@NonNull SyntaxFragment>> {
 
     private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile("([A-Za-z0-9]+)(|([A-Za-z0-9]+))*")
             .asPredicate();
@@ -47,9 +46,9 @@ final class SyntaxParser implements Function<@NonNull String, @NonNull LinkedHas
             .asPredicate();
 
     @Override
-    public @NonNull LinkedHashMap<@NonNull String, @NonNull SyntaxFragment> apply(final @NonNull String syntax) {
+    public @NonNull List<@NonNull SyntaxFragment> apply(final @NonNull String syntax) {
         final StringTokenizer stringTokenizer = new StringTokenizer(syntax, " ");
-        final LinkedHashMap<String, SyntaxFragment> map = new LinkedHashMap<>();
+        final List<SyntaxFragment> syntaxFragments = new ArrayList<>();
         while (stringTokenizer.hasMoreTokens()) {
             final String token = stringTokenizer.nextToken();
             String major;
@@ -70,9 +69,9 @@ final class SyntaxParser implements Function<@NonNull String, @NonNull LinkedHas
             } else {
                 throw new IllegalArgumentException(String.format("Unrecognizable syntax token '%s'", syntax));
             }
-            map.put(major, new SyntaxFragment(major, minor, mode));
+            syntaxFragments.add(new SyntaxFragment(major, minor, mode));
         }
-        return map;
+        return syntaxFragments;
     }
 
 }

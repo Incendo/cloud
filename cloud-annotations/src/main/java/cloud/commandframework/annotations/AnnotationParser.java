@@ -55,7 +55,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -261,7 +260,7 @@ public final class AnnotationParser<C> {
         for (final CommandMethodPair commandMethodPair : methodPairs) {
             final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
             final Method method = commandMethodPair.getMethod();
-            final LinkedHashMap<String, SyntaxFragment> tokens = this.syntaxParser.apply(commandMethod.value());
+            final List<SyntaxFragment> tokens = this.syntaxParser.apply(commandMethod.value());
             /* Determine command name */
             final String commandToken = commandMethod.value().split(" ")[0].split("\\|")[0];
             @SuppressWarnings("rawtypes") final CommandManager manager = this.manager;
@@ -274,7 +273,7 @@ public final class AnnotationParser<C> {
             @SuppressWarnings("rawtypes")
             Command.Builder builder = manager.commandBuilder(
                     commandToken,
-                    tokens.get(commandToken).getMinor(),
+                    tokens.get(0).getMinor(),
                     metaBuilder.build()
             );
             final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
@@ -285,7 +284,7 @@ public final class AnnotationParser<C> {
             for (final ArgumentParameterPair argumentPair : arguments) {
                 final CommandArgument<C, ?> argument = this.buildArgument(
                         method,
-                        tokens.get(argumentPair.getArgument().value()),
+                        this.findSyntaxFragment(tokens, argumentPair.getArgument().value()),
                         argumentPair
                 );
                 commandArguments.put(argument.getName(), argument);
@@ -293,19 +292,19 @@ public final class AnnotationParser<C> {
             }
             boolean commandNameFound = false;
             /* Build the command tree */
-            for (final Map.Entry<String, SyntaxFragment> entry : tokens.entrySet()) {
+            for (final SyntaxFragment token : tokens) {
                 if (!commandNameFound) {
                     commandNameFound = true;
                     continue;
                 }
-                if (entry.getValue().getArgumentMode() == ArgumentMode.LITERAL) {
-                    builder = builder.literal(entry.getKey(), entry.getValue().getMinor().toArray(new String[0]));
+                if (token.getArgumentMode() == ArgumentMode.LITERAL) {
+                    builder = builder.literal(token.getMajor(), token.getMinor().toArray(new String[0]));
                 } else {
-                    final CommandArgument<C, ?> argument = commandArguments.get(entry.getKey());
+                    final CommandArgument<C, ?> argument = commandArguments.get(token.getMajor());
                     if (argument == null) {
                         throw new IllegalArgumentException(String.format(
                                 "Found no mapping for argument '%s' in method '%s'",
-                                entry.getKey(), method.getName()
+                                token.getMajor(), method.getName()
                         ));
                     }
 
@@ -370,6 +369,19 @@ public final class AnnotationParser<C> {
             }
         }
         return commands;
+    }
+
+    private @NonNull SyntaxFragment findSyntaxFragment(
+            final @NonNull List<@NonNull SyntaxFragment> fragments,
+            final @NonNull String argumentName
+    ) {
+        for (SyntaxFragment fragment : fragments) {
+            if (fragment.getArgumentMode() != ArgumentMode.LITERAL
+                    && fragment.getMajor().equals(argumentName)) {
+                return fragment;
+            }
+        }
+        throw new IllegalArgumentException("Argument is not declared in syntax: " + argumentName);
     }
 
     @SuppressWarnings("unchecked")
