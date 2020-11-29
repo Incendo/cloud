@@ -778,9 +778,10 @@ public abstract class CommandManager<C> {
     /**
      * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
      *
-     * @param in The starting state
+     * @param in  The starting state
      * @param out The ending state
      * @throws IllegalStateException if the manager is in any state but {@code in} or {@code out}
+     * @since 1.2.0
      */
     protected final void transitionOrThrow(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
         if (!this.transitionIfPossible(in, out)) {
@@ -792,9 +793,10 @@ public abstract class CommandManager<C> {
     /**
      * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
      *
-     * @param in The starting state
+     * @param in  The starting state
      * @param out The ending state
-     * @return if the state transition was successful, or the manager was already in the desired state
+     * @return {@code true} if the state transition was successful, or the manager was already in the desired state
+     * @since 1.2.0
      */
     protected final boolean transitionIfPossible(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
         return this.state.compareAndSet(in, out) || this.state.get() == out;
@@ -805,6 +807,7 @@ public abstract class CommandManager<C> {
      *
      * @param expected The required state
      * @throws IllegalStateException if the manager is not in the expected state
+     * @since 1.2.0
      */
     protected final void requireState(final @NonNull RegistrationState expected) {
         if (this.state.get() != expected) {
@@ -815,10 +818,11 @@ public abstract class CommandManager<C> {
 
     /**
      * Get the active registration state for this manager.
+     * <p>
+     * If this state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered
      *
-     * <p>If this state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered.</p>
-     *
-     * @return the current state.
+     * @return The current state
+     * @since 1.2.0
      */
     public final @NonNull RegistrationState getRegistrationState() {
         return this.state.get();
@@ -826,11 +830,12 @@ public abstract class CommandManager<C> {
 
     /**
      * Check if command registration is allowed.
-     *
-     * <p>On platforms where unsafe registration is possible, this can be overridden by enabling the
-     * {@link ManagerSettings#ALLOW_UNSAFE_REGISTRATION} setting.</p>
+     * <p>
+     * On platforms where unsafe registration is possible, this can be overridden by enabling the
+     * {@link ManagerSettings#ALLOW_UNSAFE_REGISTRATION} setting.
      *
      * @return {@code true} if the registration is allowed, else {@code false}
+     * @since 1.2.0
      */
     public boolean isCommandRegistrationAllowed() {
         return this.getSetting(ManagerSettings.ALLOW_UNSAFE_REGISTRATION) || this.state.get() != RegistrationState.AFTER_REGISTRATION;
@@ -857,16 +862,18 @@ public abstract class CommandManager<C> {
 
         /**
          * Allow registering commands even when doing so has the potential to produce inconsistent results.
-         *
-         * <p>For example, if a platform serializes the command tree and sends it to clients,
+         * <p>
+         * For example, if a platform serializes the command tree and sends it to clients,
          * this will allow modifying the command tree after it has been sent, as long as these modifications are not blocked by
-         * the underlying platform.</p>
+         * the underlying platform
          */
         ALLOW_UNSAFE_REGISTRATION
     }
 
     /**
-     * The point in the registration lifecycle for this commands manager.
+     * The point in the registration lifecycle for this commands manager
+     *
+     * @since 1.2.0
      */
     public enum RegistrationState {
         /**
