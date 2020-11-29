@@ -37,11 +37,14 @@ import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Function;
 
@@ -69,10 +72,28 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     private final ProxyServer proxyServer;
     private final Function<CommandSource, C> commandSenderMapper;
     private final Function<C, CommandSource> backwardsCommandSenderMapper;
+    /**
+     * Create a new command manager instance.
+     *
+     * @param proxyServer                  ProxyServer instance
+     * @param commandExecutionCoordinator  Coordinator provider
+     * @param commandSenderMapper          Function that maps {@link CommandSource} to the command sender type
+     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSource}
+     */
+    @Deprecated
+    public VelocityCommandManager(
+            final @NonNull ProxyServer proxyServer,
+            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
+            final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper
+    ) {
+        this(null, proxyServer, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
+    }
 
     /**
      * Create a new command manager instance
      *
+     * @param plugin                       Container for the owning plugin. Nullable for backwards compatibility
      * @param proxyServer                  ProxyServer instance
      * @param commandExecutionCoordinator  Coordinator provider
      * @param commandSenderMapper          Function that maps {@link CommandSource} to the command sender type
@@ -81,6 +102,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     @Inject
     @SuppressWarnings("unchecked")
     public VelocityCommandManager(
+            final @Nullable PluginContainer plugin,
             final @NonNull ProxyServer proxyServer,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
@@ -114,6 +136,10 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
                     (context, key) -> ARGUMENT_PARSE_FAILURE_SERVER
             );
         }
+
+        this.proxyServer.getEventManager().register(plugin, ServerPreConnectEvent.class, ev -> {
+            this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+        });
     }
 
     @Override

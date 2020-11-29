@@ -25,18 +25,20 @@ package cloud.commandframework.bukkit;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.server.TabCompleteEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-final class CommandSuggestionsListener<C> implements Listener {
+final class CloudBukkitListener<C> implements Listener {
 
     private final BukkitCommandManager<C> bukkitCommandManager;
 
-    CommandSuggestionsListener(final @NonNull BukkitCommandManager<C> bukkitCommandManager) {
+    CloudBukkitListener(final @NonNull BukkitCommandManager<C> bukkitCommandManager) {
         this.bukkitCommandManager = bukkitCommandManager;
     }
 
@@ -65,6 +67,15 @@ final class CommandSuggestionsListener<C> implements Listener {
         ));
 
         event.setCompletions(suggestions);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    void onPlayerLogin(final @NonNull PlayerLoginEvent event) {
+        /* If the server is brigadier-capable, any registration after players
+           have joined (and been sent a command tree) is unsafe.
+           Bukkit's PlayerJoinEvent is called just after the command tree is sent,
+           so we have to perform this state change at PlayerLoginEvent to lock before that happens. */
+        this.bukkitCommandManager.lockIfBrigadierCapable();
     }
 
 }

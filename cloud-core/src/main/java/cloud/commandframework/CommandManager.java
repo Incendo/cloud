@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -95,6 +96,7 @@ public abstract class CommandManager<C> {
     private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
     private CommandRegistrationHandler commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
+    private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
 
     /**
      * Create a new command manager instance
@@ -207,6 +209,11 @@ public abstract class CommandManager<C> {
      *         return {@code this}.
      */
     public @NonNull CommandManager<C> command(final @NonNull Command<C> command) {
+        if (!(this.transitionIfPossible(RegistrationState.BEFORE_REGISTRATION, RegistrationState.REGISTERING)
+                || this.isCommandRegistrationAllowed())) {
+            throw new IllegalStateException("Unable to register commands because the manager is no longer in a registration "
+                    + "state. Your platform may allow unsafe registrations by enabling the appropriate manager setting.");
+        }
         this.commandTree.insertCommand(command);
         this.commands.add(command);
         return this;
@@ -250,6 +257,7 @@ public abstract class CommandManager<C> {
     }
 
     protected final void setCommandRegistrationHandler(final @NonNull CommandRegistrationHandler commandRegistrationHandler) {
+        this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
@@ -767,6 +775,71 @@ public abstract class CommandManager<C> {
         }
     }
 
+    /**
+     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
+     *
+     * @param in  The starting state
+     * @param out The ending state
+     * @throws IllegalStateException if the manager is in any state but {@code in} or {@code out}
+     * @since 1.2.0
+     */
+    protected final void transitionOrThrow(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
+        if (!this.transitionIfPossible(in, out)) {
+            throw new IllegalStateException("Command manager was in state " + this.state.get() + ", while we were expecting a state "
+                    + "of " + in + " or " + out + "!");
+        }
+    }
+
+    /**
+     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
+     *
+     * @param in  The starting state
+     * @param out The ending state
+     * @return {@code true} if the state transition was successful, or the manager was already in the desired state
+     * @since 1.2.0
+     */
+    protected final boolean transitionIfPossible(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
+        return this.state.compareAndSet(in, out) || this.state.get() == out;
+    }
+
+    /**
+     * Require that the commands manager is in a certain state.
+     *
+     * @param expected The required state
+     * @throws IllegalStateException if the manager is not in the expected state
+     * @since 1.2.0
+     */
+    protected final void requireState(final @NonNull RegistrationState expected) {
+        if (this.state.get() != expected) {
+            throw new IllegalStateException("This operation required the commands manager to be in state " + expected + ", but it "
+                    + "was in " + this.state.get() + " instead!");
+        }
+    }
+
+    /**
+     * Get the active registration state for this manager.
+     * <p>
+     * If this state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered
+     *
+     * @return The current state
+     * @since 1.2.0
+     */
+    public final @NonNull RegistrationState getRegistrationState() {
+        return this.state.get();
+    }
+
+    /**
+     * Check if command registration is allowed.
+     * <p>
+     * On platforms where unsafe registration is possible, this can be overridden by enabling the
+     * {@link ManagerSettings#ALLOW_UNSAFE_REGISTRATION} setting.
+     *
+     * @return {@code true} if the registration is allowed, else {@code false}
+     * @since 1.2.0
+     */
+    public boolean isCommandRegistrationAllowed() {
+        return this.getSetting(ManagerSettings.ALLOW_UNSAFE_REGISTRATION) || this.state.get() != RegistrationState.AFTER_REGISTRATION;
+    }
 
     /**
      * Configurable command related settings
@@ -785,7 +858,46 @@ public abstract class CommandManager<C> {
          * Force sending of an empty suggestion (i.e. a singleton list containing an empty string)
          * when no suggestions are present
          */
-        FORCE_SUGGESTION
+        FORCE_SUGGESTION,
+
+        /**
+         * Allow registering commands even when doing so has the potential to produce inconsistent results.
+         * <p>
+         * For example, if a platform serializes the command tree and sends it to clients,
+         * this will allow modifying the command tree after it has been sent, as long as these modifications are not blocked by
+         * the underlying platform
+         */
+        ALLOW_UNSAFE_REGISTRATION
+    }
+
+    /**
+     * The point in the registration lifecycle for this commands manager
+     *
+     * @since 1.2.0
+     */
+    public enum RegistrationState {
+        /**
+         * The point when no commands have been registered yet.
+         *
+         * <p>At this point, all configuration options can be changed.</p>
+         */
+        BEFORE_REGISTRATION,
+
+        /**
+         * When at least one command has been registered, and more commands have been registered.
+         *
+         * <p>In this state, some options that affect how commands are registered with the platform are frozen. Some platforms
+         * will remain in this state for their lifetime.</p>
+         */
+        REGISTERING,
+
+        /**
+         * Once registration has been completed.
+         *
+         * <p>At this point, the command manager is effectively immutable. On platforms where command registration happens via
+         * callback, this state is achieved the first time the manager's callback is executed for registration.</p>
+         */
+        AFTER_REGISTRATION
     }
 
 }
