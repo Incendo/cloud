@@ -95,6 +95,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      */
     @Override
     public void registerBrigadier() throws BrigadierFailureException {
+        this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.checkBrigadierCompatibility();
         if (!this.queryCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             super.registerBrigadier();
@@ -133,6 +134,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @see #queryCapability(CloudBukkitCapabilities) Check if the capability is present
      */
     public void registerAsynchronousCompletions() throws IllegalStateException {
+        this.requireState(RegistrationState.BEFORE_REGISTRATION);
         if (!this.queryCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             throw new IllegalStateException("Failed to register asynchronous command completion listener.");
         }
