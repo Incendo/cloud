@@ -248,7 +248,7 @@ public final class CommandContext<C> {
      * @return Argument, or supplied default value
      * @since 1.2.0
      */
-    public <T> @Nullable T getOrDefault(
+    public <T> @Nullable T getOrSupplyDefault(
             final @NonNull String key,
             final @NonNull Supplier<@Nullable T> defaultSupplier
     ) {
