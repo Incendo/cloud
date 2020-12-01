@@ -493,10 +493,10 @@ public final class CommandTree<C> {
         }
     }
 
-    private @NonNull List<String> suggestionsForDynamicArgument(
+    private @NonNull List<@NonNull String> suggestionsForDynamicArgument(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,
-            final @NonNull Node<CommandArgument<C, ?>> child
+            final @NonNull Node<@Nullable CommandArgument<C, ?>> child
     ) {
         /* When we get in here, we need to treat compound arguments a little differently */
         if (child.getValue() instanceof CompoundArgument) {
@@ -552,7 +552,7 @@ public final class CommandTree<C> {
             }
 
             // Store original input command queue before the parsers below modify it
-            final Queue<String> commandQueueOriginal = new LinkedList<String>(commandQueue);
+            final Queue<String> commandQueueOriginal = new LinkedList<>(commandQueue);
 
             // START: Preprocessing
             final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(

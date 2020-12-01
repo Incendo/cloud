@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Use the correct default range for Double and Float parsers in the StandardParserRegistry
  - Fix Bukkit alias command suggestions without Brigadier
  - Fix Bukkit command alias registration when using Brigadier
+ - Fixed a bug where providing valid input for an argument caused cloud to no longer make suggestions
 
 ## [1.1.0] - 2020-10-24
 
