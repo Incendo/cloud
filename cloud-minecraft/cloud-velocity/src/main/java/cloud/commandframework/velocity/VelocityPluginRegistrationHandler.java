@@ -52,6 +52,9 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                         velocityCommandManager.getCaptionRegistry()
                 )
         );
+        this.brigadierManager.brigadierSenderMapper(
+                sender -> this.manager.getCommandSenderMapper().apply(sender)
+        );
     }
 
     @Override
