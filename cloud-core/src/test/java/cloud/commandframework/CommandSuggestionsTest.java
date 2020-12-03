@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
@@ -87,7 +88,8 @@ public class CommandSuggestionsTest {
                 .build());
 
         manager.command(manager.commandBuilder("numbers").argument(IntegerArgument.of("num")));
-
+        manager.command(manager.commandBuilder("numberswithfollowingargument").argument(IntegerArgument.of("num"))
+                .argument(BooleanArgument.of("another_argument")));
         manager.command(manager.commandBuilder("numberswithmin")
                 .argument(IntegerArgument.<TestCommandSender>newBuilder("num").withMin(5).withMax(100)));
 
@@ -220,6 +222,23 @@ public class CommandSuggestionsTest {
         final String input5 = "numberswithmin ";
         final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
         Assertions.assertEquals(Arrays.asList("5", "6", "7", "8", "9"), suggestions5);
+    }
+
+    @Test
+    void testNumbersWithFollowingArguments() {
+        final String input = "numberswithfollowingargument ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final String input2 = "numberswithfollowingargument 1";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions2);
+        final String input3 = "numberswithfollowingargument -";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Arrays.asList("-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"), suggestions3);
+        final String input4 = "numberswithfollowingargument -1";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
+                suggestions4);
     }
 
     @Test
