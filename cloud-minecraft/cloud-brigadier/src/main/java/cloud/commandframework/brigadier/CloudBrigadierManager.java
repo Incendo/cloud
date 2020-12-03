@@ -87,6 +87,7 @@ public final class CloudBrigadierManager<C, S> {
     private final Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers;
     private final Supplier<CommandContext<C>> dummyContextProvider;
     private final CommandManager<C> commandManager;
+    private Function<S, C> brigadierCommandSenderMapper;
 
     /**
      * Create a new cloud brigadier manager
@@ -190,6 +191,28 @@ public final class CloudBrigadierManager<C, S> {
         /* Map String[] to a greedy string */
         this.registerMapping(new TypeToken<StringArrayArgument.StringArrayParser<C>>() {
         }, false, argument -> StringArgumentType.greedyString());
+    }
+
+    /**
+     * Set the mapper between the Brigadier command sender type and the Cloud command sender type
+     *
+     * @param mapper Mapper
+     * @since 1.2.0
+     */
+    public void brigadierSenderMapper(
+            final @NonNull Function<@NonNull S, @Nullable C> mapper
+    ) {
+        this.brigadierCommandSenderMapper = mapper;
+    }
+
+    /**
+     * Get the mapper between Brigadier and Cloud command senders, if one exists
+     *
+     * @return Mapper
+     * @since 1.2.0
+     */
+    public @Nullable Function<@NonNull S, @Nullable C> brigadierSenderMapper() {
+        return this.brigadierCommandSenderMapper;
     }
 
     /**
@@ -346,7 +369,11 @@ public final class CloudBrigadierManager<C, S> {
     ) {
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
                 .getCommandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
-        final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(node.getValue(), builder);
+        final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(
+                context,
+                node.getValue(),
+                builder
+        );
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
                 .<S>literal(label)
                 .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.getNodeMeta()
@@ -477,7 +504,9 @@ public final class CloudBrigadierManager<C, S> {
             );
             final SuggestionProvider<S> provider = pair.getSecond()
                     ? null
-                    : (context, builder) -> this.buildSuggestions(root.getValue(),
+                    : (context, builder) -> this.buildSuggestions(
+                            context,
+                            root.getValue(),
                             builder
                     );
             argumentBuilder = RequiredArgumentBuilder
@@ -505,10 +534,21 @@ public final class CloudBrigadierManager<C, S> {
     }
 
     private @NonNull CompletableFuture<Suggestions> buildSuggestions(
+            final com.mojang.brigadier.context.@Nullable CommandContext<S> senderContext,
             final @NonNull CommandArgument<C, ?> argument,
             final @NonNull SuggestionsBuilder builder
     ) {
-        final CommandContext<C> commandContext = this.dummyContextProvider.get();
+        final CommandContext<C> commandContext;
+        if (this.brigadierCommandSenderMapper == null || senderContext == null) {
+            commandContext = this.dummyContextProvider.get();
+        } else {
+            final C cloudSender = this.brigadierCommandSenderMapper.apply(senderContext.getSource());
+            commandContext = new CommandContext<>(
+                    true,
+                    cloudSender,
+                    this.commandManager.getCaptionRegistry()
+            );
+        }
 
         String command = builder.getInput();
         if (command.startsWith("/") /* Minecraft specific */) {
