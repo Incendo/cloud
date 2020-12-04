@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   handled using `CommandManager#registerExceptionHandler`, similar to `NoSuchCommandException`, `ArgumentParseException`, etc.
  - Added registration state to command managers
  - Added ALLOW_UNSAFE_REGISTRATION ManagerSetting to disable state checks when registering commands
+ - Added OVERRIDE_EXISTING_COMMANDS ManagerSetting to allow for overriding of existing commands on supported platforms
  
 ### Changed
  - Allow for use of `@Completions` annotation with argument types other than String

@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
@@ -88,6 +89,11 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
                 (CommandArgument<C, ?>) commandArgument,
                 this.bukkitCommandManager
         );
+
+        if (this.bukkitCommandManager.getSetting(CommandManager.ManagerSettings.OVERRIDE_EXISTING_COMMANDS)) {
+            this.bukkitCommands.remove(label);
+            aliases.forEach(alias -> this.bukkitCommands.remove(alias));
+        }
 
         for (final String alias : aliases) {
             final String namespacedAlias = this.getNamespacedLabel(alias);
