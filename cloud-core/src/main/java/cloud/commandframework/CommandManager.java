@@ -854,6 +854,7 @@ public abstract class CommandManager<C> {
          * has a command handler attached
          */
         ENFORCE_INTERMEDIARY_PERMISSIONS,
+
         /**
          * Force sending of an empty suggestion (i.e. a singleton list containing an empty string)
          * when no suggestions are present
@@ -866,6 +867,8 @@ public abstract class CommandManager<C> {
          * For example, if a platform serializes the command tree and sends it to clients,
          * this will allow modifying the command tree after it has been sent, as long as these modifications are not blocked by
          * the underlying platform
+         *
+         * @since 1.2.0
          */
         ALLOW_UNSAFE_REGISTRATION
     }

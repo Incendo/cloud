@@ -21,10 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Allow for use of named suggestion providers with `@Flag`s (cloud-annotations)
  - Added `CommandExecutionException` which wraps any exception thrown during the execution of command handlers. Should be
   handled using `CommandManager#registerExceptionHandler`, similar to `NoSuchCommandException`, `ArgumentParseException`, etc.
+ - Added registration state to command managers
+ - Added ALLOW_UNSAFE_REGISTRATION ManagerSetting to disable state checks when registering commands
  
 ### Changed
  - Allow for use of `@Completions` annotation with argument types other than String
  - Allow for use of a BiFunction<C, E, Component> instead of just a Function<E, Component> in MinecraftExceptionHandler
+ 
+### Deprecated
+ - Deprecated LockableCommandManager in favor of CommandManager state
  
 ### Fixed
  - Use the correct default range for Double and Float parsers in the StandardParserRegistry
@@ -41,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added TextColorArgument to minecraft-extras
  - Added LocationArgument to cloud-bukkit
  - Added ServerArgument to cloud-velocity
+ - Added LockableCommandManager to cloud-core
  - Added VelocityCommandPreprocessor to cloud-velocity
  - Added PlayerArgument to cloud-bungee
  - Added ServerArgument to cloud-bungee
@@ -49,7 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added BungeeCommandPreprocessor to cloud-bungee
  - Added named suggestion providers
  - Added a PircBotX implementation
- - Added registration state to command managers
 
 ### Changed
  - Allow for combined presence flags, such that `-a -b -c` is equivalent to `-abc`
