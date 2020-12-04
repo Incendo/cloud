@@ -870,7 +870,14 @@ public abstract class CommandManager<C> {
          *
          * @since 1.2.0
          */
-        ALLOW_UNSAFE_REGISTRATION
+        ALLOW_UNSAFE_REGISTRATION,
+
+        /**
+         * Enables overriding of existing commands on supported platforms.
+         *
+         * @since 1.2.0
+         */
+        OVERRIDE_EXISTING_COMMANDS
     }
 
     /**
