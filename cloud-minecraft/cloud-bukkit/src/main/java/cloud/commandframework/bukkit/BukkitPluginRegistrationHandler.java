@@ -99,12 +99,12 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             final String namespacedAlias = this.getNamespacedLabel(alias);
 
             this.recognizedAliases.add(namespacedAlias);
-            if (!this.bukkitCommands.containsKey(alias)) {
+            if (!this.bukkitCommandOrAliasExists(alias)) {
                 this.recognizedAliases.add(alias);
             }
 
             if (this.bukkitCommandManager.getSplitAliases()) {
-                if (this.bukkitCommands.containsKey(alias)) {
+                if (this.bukkitCommandOrAliasExists(alias)) {
                     this.registerExternal(namespacedAlias, command, bukkitCommand);
                 } else {
                     this.registerExternal(namespacedAlias, command, bukkitCommand);
@@ -113,7 +113,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             }
         }
 
-        if (!this.bukkitCommands.containsKey(label)) {
+        if (!this.bukkitCommandExists(label)) {
             this.recognizedAliases.add(label);
             this.registerExternal(label, command, bukkitCommand);
         }
@@ -149,6 +149,30 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             final @NonNull Command<?> command,
             final @NonNull BukkitCommand<C> bukkitCommand
     ) {
+    }
+
+    /**
+     * Returns true if a command exists in the Bukkit command map, and is not an alias.
+     *
+     * @param commandLabel label to check
+     * @return whether the command exists and is not an alias
+     */
+    private boolean bukkitCommandExists(final String commandLabel) {
+        final org.bukkit.command.Command existingCommand = this.bukkitCommands.get(commandLabel);
+        if (existingCommand == null) {
+            return false;
+        }
+        return existingCommand.getLabel().equals(commandLabel);
+    }
+
+    /**
+     * Returns true if a command exists in the Bukkit command map, whether or not it is an alias.
+     *
+     * @param commandLabel label to check
+     * @return whether the command exists
+     */
+    private boolean bukkitCommandOrAliasExists(final String commandLabel) {
+        return this.bukkitCommands.containsKey(commandLabel);
     }
 
 }
