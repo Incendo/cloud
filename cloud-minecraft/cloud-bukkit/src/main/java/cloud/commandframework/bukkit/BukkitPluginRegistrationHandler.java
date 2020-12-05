@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
+import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.help.GenericCommandHelpTopic;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -38,6 +39,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,36 +97,31 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             aliases.forEach(alias -> this.bukkitCommands.remove(alias));
         }
 
+        final Set<String> newAliases = new HashSet<>();
+
         for (final String alias : aliases) {
             final String namespacedAlias = this.getNamespacedLabel(alias);
-
-            this.recognizedAliases.add(namespacedAlias);
+            newAliases.add(namespacedAlias);
             if (!this.bukkitCommandOrAliasExists(alias)) {
-                this.recognizedAliases.add(alias);
-            }
-
-            if (this.bukkitCommandManager.getSplitAliases()) {
-                if (this.bukkitCommandOrAliasExists(alias)) {
-                    this.registerExternal(namespacedAlias, command, bukkitCommand);
-                } else {
-                    this.registerExternal(namespacedAlias, command, bukkitCommand);
-                    this.registerExternal(alias, command, bukkitCommand);
-                }
+                newAliases.add(alias);
             }
         }
 
         if (!this.bukkitCommandExists(label)) {
-            this.recognizedAliases.add(label);
-            this.registerExternal(label, command, bukkitCommand);
+            newAliases.add(label);
         }
-        this.recognizedAliases.add(this.getNamespacedLabel(label));
-        this.registerExternal(namespacedLabel, command, bukkitCommand);
+        newAliases.add(namespacedLabel);
 
         this.commandMap.register(
                 label,
                 this.bukkitCommandManager.getOwningPlugin().getName().toLowerCase(),
                 bukkitCommand
         );
+
+        this.recognizedAliases.addAll(newAliases);
+        if (this.bukkitCommandManager.getSplitAliases()) {
+            newAliases.forEach(alias -> this.registerExternal(alias, command, bukkitCommand));
+        }
 
         this.registeredCommands.put(commandArgument, bukkitCommand);
         return true;
@@ -152,7 +149,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
     }
 
     /**
-     * Returns true if a command exists in the Bukkit command map, and is not an alias.
+     * Returns true if a command exists in the Bukkit command map, is not an alias, and is not owned by us.
      *
      * @param commandLabel label to check
      * @return whether the command exists and is not an alias
@@ -162,17 +159,27 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         if (existingCommand == null) {
             return false;
         }
+        if (existingCommand instanceof PluginIdentifiableCommand) {
+            return existingCommand.getLabel().equals(commandLabel)
+                    && !((PluginIdentifiableCommand) existingCommand).getPlugin().getName()
+                    .equalsIgnoreCase(this.bukkitCommandManager.getOwningPlugin().getName());
+        }
         return existingCommand.getLabel().equals(commandLabel);
     }
 
     /**
-     * Returns true if a command exists in the Bukkit command map, whether or not it is an alias.
+     * Returns true if a command exists in the Bukkit command map, and it is not owned by us, whether or not it is an alias.
      *
      * @param commandLabel label to check
      * @return whether the command exists
      */
     private boolean bukkitCommandOrAliasExists(final String commandLabel) {
-        return this.bukkitCommands.containsKey(commandLabel);
+        final org.bukkit.command.Command command = this.bukkitCommands.get(commandLabel);
+        if (command instanceof PluginIdentifiableCommand) {
+            return !((PluginIdentifiableCommand) command).getPlugin().getName()
+                    .equalsIgnoreCase(this.bukkitCommandManager.getOwningPlugin().getName());
+        }
+        return command != null;
     }
 
 }
