@@ -106,7 +106,6 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
                         this.paperBrigadierListener,
                         this.getOwningPlugin()
                 );
-                this.setSplitAliases(true);
             } catch (final Throwable e) {
                 throw new BrigadierFailureException(BrigadierFailureReason.PAPER_BRIGADIER_INITIALIZATION_FAILURE, e);
             }
