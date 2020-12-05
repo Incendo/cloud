@@ -12,7 +12,7 @@ ext {
             'commodore'     : '1.9',
             'bungeecord'    : '1.8-SNAPSHOT',
             'cloudburst'    : '1.0.0-SNAPSHOT',
-            'adventure-api' : '4.2.0',
+            'adventure-api' : '4.3.0',
             'paper-api'     : '1.15.2-R0.1-SNAPSHOT',
             'velocity-api'  : '1.1.0-SNAPSHOT',
             'jb-annotations': '20.1.0',
