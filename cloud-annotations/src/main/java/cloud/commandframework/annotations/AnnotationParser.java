@@ -141,7 +141,8 @@ public final class AnnotationParser<C> {
             final A inner = getAnnotationRecursively(
                     AnnotationAccessor.of(annotation.annotationType()),
                     clazz,
-                    checkedAnnotations);
+                    checkedAnnotations
+            );
             if (inner != null) {
                 innerCandidate = inner;
             }

@@ -73,8 +73,8 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
     /**
      * Create a new argument builder
      *
-     * @param name        Argument name
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Constructed builder
      */
     public static <C> CommandArgument.@NonNull Builder<C, RegisteredServer> newBuilder(
@@ -90,8 +90,8 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
     /**
      * Create a new required player argument
      *
-     * @param name        Argument name
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, RegisteredServer> of(

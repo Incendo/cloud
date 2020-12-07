@@ -150,8 +150,8 @@ class CommandTreeTest {
         /* Build command for testing multiple optionals */
         manager.command(
                 manager.commandBuilder("optionals")
-                       .argument(StringArgument.optional("opt1"))
-                       .argument(StringArgument.optional("opt2"))
+                        .argument(StringArgument.optional("opt1"))
+                        .argument(StringArgument.optional("opt2"))
         );
     }
 

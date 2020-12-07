@@ -71,18 +71,23 @@ public final class CloudInjectionModule<C> extends AbstractModule {
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void configure() {
         final Type commandTreeType = Types.newParameterizedType(CommandTree.class, this.commandSenderType);
-        final Type commandExecutionCoordinatorType = Types.newParameterizedType(CommandExecutionCoordinator.class,
-                this.commandSenderType);
+        final Type commandExecutionCoordinatorType = Types.newParameterizedType(
+                CommandExecutionCoordinator.class,
+                this.commandSenderType
+        );
         final Type executorFunction = Types.newParameterizedType(Function.class, commandTreeType,
-                commandExecutionCoordinatorType);
+                commandExecutionCoordinatorType
+        );
         final Key executorFunctionKey = Key.get(executorFunction);
         this.bind(executorFunctionKey).toInstance(this.commandExecutionCoordinator);
         final Type commandSenderMapperFunction = Types.newParameterizedType(Function.class, CommandSource.class,
-                this.commandSenderType);
+                this.commandSenderType
+        );
         final Key commandSenderMapperFunctionKey = Key.get(commandSenderMapperFunction);
         this.bind(commandSenderMapperFunctionKey).toInstance(this.commandSenderMapper);
         final Type backwardsCommandSenderMapperFunction = Types.newParameterizedType(Function.class, this.commandSenderType,
-                CommandSource.class);
+                CommandSource.class
+        );
         final Key backwardsCommandSenderMapperFunctionKey = Key.get(backwardsCommandSenderMapperFunction);
         this.bind(backwardsCommandSenderMapperFunctionKey).toInstance(this.backwardsCommandSenderMapper);
     }

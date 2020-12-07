@@ -95,7 +95,8 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                                                             e.getCorrectSyntax(),
                                                             NamedTextColor.GRAY
                                                     )
-                                            ).build())
+                                            ).build()
+                                    )
                     );
                 } else if (throwable instanceof InvalidCommandSenderException) {
                     this.manager.handleException(

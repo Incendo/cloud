@@ -98,7 +98,7 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
                                 this.annotationAccessor
                         );
                         if (value != null) {
-                           break;
+                            break;
                         }
                     }
                     if (value != null) {

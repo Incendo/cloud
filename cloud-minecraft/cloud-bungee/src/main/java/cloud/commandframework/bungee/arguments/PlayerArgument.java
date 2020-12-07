@@ -73,8 +73,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
     /**
      * Create a new argument builder
      *
-     * @param name        Argument name
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Constructed builder
      **/
     public static <C> CommandArgument.@NonNull Builder<C, ProxiedPlayer> newBuilder(
@@ -90,8 +90,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
     /**
      * Create a new required player argument
      *
-     * @param name        Argument name
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Created argument
      */
     public static <C> CommandArgument<C, ProxiedPlayer> of(
@@ -103,8 +103,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
     /**
      * Create a new optional player argument
      *
-     * @param name        Argument name
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Created argument
      */
     public static <C> CommandArgument<C, ProxiedPlayer> optional(
