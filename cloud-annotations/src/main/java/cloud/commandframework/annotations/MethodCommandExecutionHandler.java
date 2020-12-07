@@ -106,7 +106,8 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
                     } else {
                         throw new IllegalArgumentException(String.format(
                                 "Unknown command parameter '%s' in method '%s'",
-                                parameter.getName(), this.methodHandle.toString()
+                                parameter.getName(),
+                                this.methodHandle.toString()
                         ));
                     }
                 }
