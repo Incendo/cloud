@@ -72,6 +72,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     private final ProxyServer proxyServer;
     private final Function<CommandSource, C> commandSenderMapper;
     private final Function<C, CommandSource> backwardsCommandSenderMapper;
+
     /**
      * Create a new command manager instance.
      *

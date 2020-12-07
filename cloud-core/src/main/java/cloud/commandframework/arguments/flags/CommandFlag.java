@@ -170,10 +170,10 @@ public final class CommandFlag<T> {
                 }
                 if (alias.length() > 1) {
                     throw new IllegalArgumentException(
-                           String.format(
-                                   "Alias '%s' has name longer than one character. This is not allowed",
-                                   alias
-                           )
+                            String.format(
+                                    "Alias '%s' has name longer than one character. This is not allowed",
+                                    alias
+                            )
                     );
                 }
                 filteredAliases.add(alias);

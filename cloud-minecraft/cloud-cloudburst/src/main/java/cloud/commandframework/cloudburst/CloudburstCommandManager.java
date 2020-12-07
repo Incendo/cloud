@@ -117,10 +117,12 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
     }
 
     static final class CloudListener implements Listener {
+
         static final CloudListener INSTANCE = new CloudListener();
 
         private CloudListener() {
         }
+
     }
 
 }

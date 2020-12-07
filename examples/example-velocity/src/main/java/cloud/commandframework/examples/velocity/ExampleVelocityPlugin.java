@@ -92,8 +92,8 @@ public final class ExampleVelocityPlugin {
         );
         commandManager.command(
                 commandManager.commandBuilder("example-server")
-                .argument(ServerArgument.of("server"))
-                .handler(context -> {
+                        .argument(ServerArgument.of("server"))
+                        .handler(context -> {
                             final RegisteredServer server = context.get("server");
                             context.getSender().sendMessage(
                                     Identity.nil(),
@@ -103,7 +103,7 @@ public final class ExampleVelocityPlugin {
                                             Component.text(server.getServerInfo().getName(), NamedTextColor.AQUA)
                                     ).build()
                             );
-                })
+                        })
         );
     }
 

@@ -65,11 +65,11 @@ public class ParserRegistryTest {
 
             @Override
             public boolean equals(final Object obj) {
-               if (!(obj instanceof Range)) {
-                   return false;
-               }
-               final Range range = (Range) obj;
-               return this.min().equals(range.min()) && this.max().equals(range.max());
+                if (!(obj instanceof Range)) {
+                    return false;
+                }
+                final Range range = (Range) obj;
+                return this.min().equals(range.min()) && this.max().equals(range.max());
             }
 
             @Override

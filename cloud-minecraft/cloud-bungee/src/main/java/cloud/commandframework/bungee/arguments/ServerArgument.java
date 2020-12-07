@@ -73,8 +73,8 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
     /**
      * Create a new argument builder
      *
-     * @param name        Argument name
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Constructed builder
      */
     public static <C> CommandArgument.@NonNull Builder<C, ServerInfo> newBuilder(
@@ -90,8 +90,8 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
     /**
      * Create a new required server argument
      *
-     * @param name        Argument name
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, ServerInfo> of(
@@ -103,8 +103,8 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
     /**
      * Create a new optional server argument
      *
-     * @param name        Argument name
-     * @param <C>         Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, ServerInfo> optional(

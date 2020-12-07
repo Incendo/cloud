@@ -217,8 +217,10 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Arrays.asList("-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"), suggestions3);
         final String input4 = "numbers -1";
         final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
-                suggestions4);
+        Assertions.assertEquals(
+                Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
+                suggestions4
+        );
         final String input5 = "numberswithmin ";
         final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
         Assertions.assertEquals(Arrays.asList("5", "6", "7", "8", "9"), suggestions5);
@@ -237,8 +239,10 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Arrays.asList("-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"), suggestions3);
         final String input4 = "numberswithfollowingargument -1";
         final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
-                suggestions4);
+        Assertions.assertEquals(
+                Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
+                suggestions4
+        );
     }
 
     @Test

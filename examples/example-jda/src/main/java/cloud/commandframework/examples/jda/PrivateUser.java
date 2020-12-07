@@ -34,7 +34,7 @@ public final class PrivateUser extends CustomUser {
     /**
      * Construct a Private user
      *
-     * @param user User that sent the message
+     * @param user    User that sent the message
      * @param channel Text channel that the message was sent in
      */
     public PrivateUser(final @NonNull User user, final @NonNull PrivateChannel channel) {

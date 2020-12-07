@@ -92,8 +92,10 @@ class StringArgumentTest {
         Assertions.assertEquals("quoted \" string", storage[0]);
         Assertions.assertEquals("unquoted", storage[1]);
         clear();
-        Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(new TestCommandSender(),
-                "'quoted quoted unquoted").join());
+        Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(
+                new TestCommandSender(),
+                "'quoted quoted unquoted"
+        ).join());
     }
 
     @Test
