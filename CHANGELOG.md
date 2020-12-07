@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
  - Argument builders now use generics to preserve their type when using functions from the base class.
 
-## [Unreleased]
+## [1.2.0] - 2020-12-07
 
 ### Added
  - Added access to the CloudBrigadierManager from Brigadier-enabled command managers
@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Fix Bukkit alias command suggestions without Brigadier
  - Fix Bukkit command alias registration when using Brigadier
  - Fixed a bug where providing valid input for an argument caused cloud to no longer make suggestions
+ - Detect and throw an exception for ambiguous nodes in more cases
+ - CloudBrigadierManager no longer forgets the command sender
 
 ## [1.1.0] - 2020-10-24
 
@@ -64,8 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  
 ### Fixed
  - Fix arguments with no required children not being executors (cloud-brigadier)
- - Detect and throw an exception for ambiguous nodes in more cases
- - CloudBrigadierManager no longer forgets the command sender
 
 ## [1.0.2] - 2020-10-18
 
