@@ -34,6 +34,7 @@ import java.lang.annotation.Target;
  * <p>
  * This should only be used on {@code String[]}
  *
+ *
  * @since 1.2.0
  */
 @Target(ElementType.METHOD)
