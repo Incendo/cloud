@@ -376,7 +376,7 @@ public final class AnnotationParser<C> {
             final @NonNull List<@NonNull SyntaxFragment> fragments,
             final @NonNull String argumentName
     ) {
-        for (SyntaxFragment fragment : fragments) {
+        for (final SyntaxFragment fragment : fragments) {
             if (fragment.getArgumentMode() != ArgumentMode.LITERAL
                     && fragment.getMajor().equals(argumentName)) {
                 return fragment;
