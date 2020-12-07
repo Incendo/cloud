@@ -346,7 +346,8 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     inner = inputQueue.remove();
                     if (inner.startsWith("\"") || inner.startsWith("'")) {
                         return ArgumentParseResult.failure(new StringParseException(sj.toString(),
-                                StringMode.QUOTED, commandContext));
+                                StringMode.QUOTED, commandContext
+                        ));
                     }
                 }
 

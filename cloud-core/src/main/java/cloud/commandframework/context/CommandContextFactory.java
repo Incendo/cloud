@@ -45,6 +45,6 @@ public interface CommandContextFactory<C> {
             boolean suggestions,
             @NonNull C sender,
             @NonNull CaptionRegistry<C> captionRegistry
-            );
+    );
 
 }

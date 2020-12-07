@@ -80,8 +80,8 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     /**
      * Create a new argument builder
      *
-     * @param name                 Argument name
-     * @param <C>                  Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Builder instance
      */
     public static <C> @NonNull Builder<C> newBuilder(
@@ -93,8 +93,8 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     /**
      * Create a new required argument
      *
-     * @param name                 Argument name
-     * @param <C>                  Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Constructed argument
      */
     public static <C> @NonNull CommandArgument<C, Location> of(
@@ -108,8 +108,8 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     /**
      * Create a new optional argument
      *
-     * @param name                 Argument name
-     * @param <C>                  Command sender type
+     * @param name Argument name
+     * @param <C>  Command sender type
      * @return Constructed argument
      */
     public static <C> @NonNull CommandArgument<C, Location> optional(

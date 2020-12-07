@@ -97,26 +97,31 @@ class AnnotationParserTest {
         final Method annotatedMethod = annotatedClass.getDeclaredMethod("annotatedMethod");
 
         System.out.println("Looking for @CommandDescription");
-        final CommandDescription commandDescription = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
-                CommandDescription.class);
+        final CommandDescription commandDescription = AnnotationParser.getMethodOrClassAnnotation(
+                annotatedMethod,
+                CommandDescription.class
+        );
         Assertions.assertNotNull(commandDescription);
         Assertions.assertEquals("Hello World!", commandDescription.value());
 
         System.out.println("Looking for @CommandPermission");
-        final CommandPermission commandPermission = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
-                CommandPermission.class);
+        final CommandPermission commandPermission = AnnotationParser.getMethodOrClassAnnotation(
+                annotatedMethod,
+                CommandPermission.class
+        );
         Assertions.assertNotNull(commandPermission);
         Assertions.assertEquals("some.permission", commandPermission.value());
 
         System.out.println("Looking for @CommandMethod");
-        final CommandMethod commandMethod = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod,
-                CommandMethod.class);
+        final CommandMethod commandMethod = AnnotationParser.getMethodOrClassAnnotation(
+                annotatedMethod,
+                CommandMethod.class
+        );
         Assertions.assertNotNull(commandMethod);
         Assertions.assertEquals("method", commandMethod.value());
 
         System.out.println("Looking for @Regex");
-        @SuppressWarnings("unused")
-        final Regex regex = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod, Regex.class);
+        @SuppressWarnings("unused") final Regex regex = AnnotationParser.getMethodOrClassAnnotation(annotatedMethod, Regex.class);
     }
 
     @Test
@@ -162,6 +167,7 @@ class AnnotationParserTest {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     private @interface AnnotatedAnnotation {
+
     }
 
 
@@ -181,6 +187,7 @@ class AnnotationParserTest {
     @Target({ElementType.METHOD, ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     private @interface Bad1 {
+
     }
 
 
@@ -188,6 +195,7 @@ class AnnotationParserTest {
     @Target({ElementType.METHOD, ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     private @interface Bad2 {
+
     }
 
 

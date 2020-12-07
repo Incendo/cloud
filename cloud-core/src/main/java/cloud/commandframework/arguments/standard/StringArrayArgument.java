@@ -62,9 +62,9 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
     /**
      * Create a new required string array argument
      *
-     * @param name Argument name
+     * @param name                Argument name
      * @param suggestionsProvider Suggestions provider
-     * @param <C> Command sender type
+     * @param <C>                 Command sender type
      * @return Created argument
      */
     public static <C> @NonNull StringArrayArgument<C> of(
@@ -81,9 +81,9 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
     /**
      * Create a new optional string array argument
      *
-     * @param name Argument name
+     * @param name                Argument name
      * @param suggestionsProvider Suggestions provider
-     * @param <C> Command sender type
+     * @param <C>                 Command sender type
      * @return Created argument
      */
     public static <C> @NonNull StringArrayArgument<C> optional(
