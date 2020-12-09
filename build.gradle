@@ -42,7 +42,7 @@ allprojects {
     apply plugin: 'com.github.hierynomus.license'
 
     group = 'cloud.commandframework'
-    version = '1.3.0-dev'
+    version = '1.3.0-SNAPSHOT'
     description = 'Command framework and dispatcher for the JVM'
 
     /* Disable checkstyle on tests */
