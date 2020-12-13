@@ -49,6 +49,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -240,6 +241,12 @@ public final class AnnotationParser<C> {
             if (method.getReturnType() != Void.TYPE) {
                 throw new IllegalArgumentException(String.format(
                         "@CommandMethod annotated method '%s' has non-void return type",
+                        method.getName()
+                ));
+            }
+            if (Modifier.isStatic(method.getModifiers())) {
+                throw new IllegalArgumentException(String.format(
+                        "@CommandMethod annotated method '%s' is static! @CommandMethod annotated methods should not be static.",
                         method.getName()
                 ));
             }
