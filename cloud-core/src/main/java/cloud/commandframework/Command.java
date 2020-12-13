@@ -639,7 +639,7 @@ public class Command<C> {
          * Specify a required sender type
          *
          * @param senderType Required sender type
-         * @return New builder instance using the command execution handler
+         * @return New builder instance using the required sender type
          */
         public @NonNull Builder<C> senderType(final @NonNull Class<? extends C> senderType) {
             return new Builder<>(
