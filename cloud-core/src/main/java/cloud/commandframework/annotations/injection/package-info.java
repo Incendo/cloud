@@ -21,39 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.context;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.captions.CaptionRegistry;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-@SuppressWarnings("deprecation")
-public final class StandardCommandContextFactory<C> implements CommandContextFactory<C> {
-
-    @Override
-    public @NonNull CommandContext<C> create(
-            final boolean suggestions,
-            final @NonNull C sender,
-            final @NonNull CaptionRegistry<C> captionRegistry
-    ) {
-        return new CommandContext<>(
-                suggestions,
-                sender,
-                captionRegistry
-        );
-    }
-
-    @Override
-    public @NonNull CommandContext<C> create(
-            final boolean suggestions,
-            final @NonNull C sender,
-            final @NonNull CommandManager<C> commandManager
-    ) {
-        return new CommandContext<C>(
-                suggestions,
-                sender,
-                commandManager
-        );
-    }
-
-}
+/**
+ * Classes related to parameter injection
+ *
+ * This package will be moved in a future release
+ */
+package cloud.commandframework.annotations.injection;

@@ -546,7 +546,7 @@ public final class CloudBrigadierManager<C, S> {
             commandContext = new CommandContext<>(
                     true,
                     cloudSender,
-                    this.commandManager.getCaptionRegistry()
+                    this.commandManager
             );
         }
 
