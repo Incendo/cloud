@@ -308,6 +308,30 @@ public class Command<C> {
         }
 
         /**
+         * Get the required sender type for this builder
+         * <p>
+         * Returns {@code null} when there is not a specific required sender type
+         *
+         * @return required sender type
+         * @since 1.3.0
+         */
+        public @Nullable Class<? extends C> senderType() {
+            return this.senderType;
+        }
+
+        /**
+         * Get the required command permission for this builder
+         * <p>
+         * Will return {@link Permission#empty()} if there is no required permission
+         *
+         * @return required permission
+         * @since 1.3.0
+         */
+        public @NonNull CommandPermission commandPermission() {
+            return this.commandPermission;
+        }
+
+        /**
          * Add command meta to the internal command meta map
          *
          * @param key   Meta key
