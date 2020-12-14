@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.CommandSuggestionEngine;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
@@ -88,6 +89,7 @@ public abstract class CommandManager<C> {
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
     private final ParserRegistry<C> parserRegistry = new StandardParserRegistry<>();
     private final Collection<Command<C>> commands = new LinkedList<>();
+    private final ParameterInjectorRegistry<C> parameterInjectorRegistry = new ParameterInjectorRegistry<>();
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
     private final CommandSuggestionEngine<C> commandSuggestionEngine;
@@ -128,6 +130,11 @@ public abstract class CommandManager<C> {
         }, new AcceptingCommandPostprocessor<>());
         /* Create the caption registry */
         this.captionRegistry = new SimpleCaptionRegistryFactory<C>().create();
+        /* Register default injectors */
+        this.parameterInjectorRegistry().registerInjector(
+                CommandContext.class,
+                (context, annotationAccessor) -> context
+        );
     }
 
     /**
@@ -158,7 +165,7 @@ public abstract class CommandManager<C> {
         final CommandContext<C> context = this.commandContextFactory.create(
                 false,
                 commandSender,
-                this.captionRegistry
+                this
         );
         final LinkedList<String> inputQueue = new CommandInputTokenizer(input).tokenize();
         try {
@@ -191,7 +198,7 @@ public abstract class CommandManager<C> {
         final CommandContext<C> context = this.commandContextFactory.create(
                 true,
                 commandSender,
-                this.captionRegistry
+                this
         );
         return this.commandSuggestionEngine.getSuggestions(context, input);
     }
@@ -669,6 +676,17 @@ public abstract class CommandManager<C> {
     public ParserRegistry<C> getParserRegistry() {
         return this.parserRegistry;
     }
+
+    /**
+     * Get the parameter injector registry instance
+     *
+     * @return Parameter injector registry
+     * @since 1.3.0
+     */
+    public final @NonNull ParameterInjectorRegistry<C> parameterInjectorRegistry() {
+        return this.parameterInjectorRegistry;
+    }
+
 
     /**
      * Get the exception handler for an exception type, if one has been registered

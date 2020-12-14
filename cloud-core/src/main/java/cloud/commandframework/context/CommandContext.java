@@ -23,6 +23,9 @@
 //
 package cloud.commandframework.context;
 
+import cloud.commandframework.CommandManager;
+import cloud.commandframework.annotations.AnnotationAccessor;
+import cloud.commandframework.annotations.injection.ParameterInjector;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.captions.Caption;
@@ -55,6 +58,7 @@ public final class CommandContext<C> {
     private final C commandSender;
     private final boolean suggestions;
     private final CaptionRegistry<C> captionRegistry;
+    private final CommandManager<C> commandManager;
 
     private CommandArgument<C, ?> currentArgument = null;
 
@@ -63,9 +67,22 @@ public final class CommandContext<C> {
      *
      * @param commandSender   Sender of the command
      * @param captionRegistry Caption registry
+     * @deprecated Provide a command manager instead of a caption registry
      */
+    @Deprecated
     public CommandContext(final @NonNull C commandSender, final @NonNull CaptionRegistry<C> captionRegistry) {
         this(false, commandSender, captionRegistry);
+    }
+
+    /**
+     * Create a new command context instance
+     *
+     * @param commandSender  Sender of the command
+     * @param commandManager Command manager
+     * @since 1.3.0
+     */
+    public CommandContext(final @NonNull C commandSender, final @NonNull CommandManager<C> commandManager) {
+        this(false, commandSender, commandManager);
     }
 
     /**
@@ -74,7 +91,9 @@ public final class CommandContext<C> {
      * @param suggestions     Whether or not the context is created for command suggestions
      * @param commandSender   Sender of the command
      * @param captionRegistry Caption registry
+     * @deprecated Provide a command manager instead of a caption registry
      */
+    @Deprecated
     public CommandContext(
             final boolean suggestions,
             final @NonNull C commandSender,
@@ -83,6 +102,26 @@ public final class CommandContext<C> {
         this.commandSender = commandSender;
         this.suggestions = suggestions;
         this.captionRegistry = captionRegistry;
+        this.commandManager = null;
+    }
+
+    /**
+     * Create a new command context instance
+     *
+     * @param suggestions    Whether or not the context is created for command suggestions
+     * @param commandSender  Sender of the command
+     * @param commandManager Command manager
+     * @since 1.3.0
+     */
+    public CommandContext(
+            final boolean suggestions,
+            final @NonNull C commandSender,
+            final @NonNull CommandManager<C> commandManager
+    ) {
+        this.commandSender = commandSender;
+        this.suggestions = suggestions;
+        this.commandManager = commandManager;
+        this.captionRegistry = commandManager.getCaptionRegistry();
     }
 
     /**
@@ -326,6 +365,31 @@ public final class CommandContext<C> {
      */
     public void setCurrentArgument(final @Nullable CommandArgument<C, ?> argument) {
         this.currentArgument = argument;
+    }
+
+    /**
+     * Attempt to retrieve a value that has been registered to the associated command manager's
+     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}
+     *
+     * @param clazz Class of type to inject
+     * @param <T>   Type to inject
+     * @return Optional that may contain the created value
+     * @since 1.3.0
+     */
+    @SuppressWarnings("unchecked")
+    public <@NonNull T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz) {
+        if (this.commandManager == null) {
+            throw new UnsupportedOperationException(
+                    "Cannot retrieve injectable values from a command context that is not associated with a command manager"
+            );
+        }
+        for (final ParameterInjector<C, ?> injector : this.commandManager.parameterInjectorRegistry().injectors(clazz)) {
+            final Object value = injector.create(this, AnnotationAccessor.empty());
+            if (value != null) {
+                return Optional.of((T) value);
+            }
+        }
+        return Optional.empty();
     }
 
 
