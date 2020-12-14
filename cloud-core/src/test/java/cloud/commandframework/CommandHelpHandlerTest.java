@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
@@ -141,17 +140,17 @@ class CommandHelpHandlerTest {
                 .apply(helpTopic.getCommand().getArguments(), null));
         System.out.printf("    ├── Description: %s\n", helpTopic.getDescription());
         System.out.println("    └── Args: ");
-        final Iterator<CommandArgument<TestCommandSender, ?>> iterator = helpTopic.getCommand().getArguments().iterator();
+        final Iterator<CommandComponent<TestCommandSender>> iterator = helpTopic.getCommand().getComponents().iterator();
         while (iterator.hasNext()) {
-            final CommandArgument<TestCommandSender, ?> argument = iterator.next();
+            final CommandComponent<TestCommandSender> component = iterator.next();
 
-            String description = helpTopic.getCommand().getArgumentDescription(argument);
+            String description = component.getDescription().getDescription();
             if (!description.isEmpty()) {
                 description = ": " + description;
             }
 
             System.out.printf("        %s %s%s\n", iterator.hasNext() ? "├──" : "└──", manager.getCommandSyntaxFormatter().apply(
-                    Collections.singletonList(argument), null), description);
+                    Collections.singletonList(component.getArgument()), null), description);
         }
     }
 
