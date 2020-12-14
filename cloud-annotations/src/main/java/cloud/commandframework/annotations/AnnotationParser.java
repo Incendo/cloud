@@ -73,7 +73,6 @@ public final class AnnotationParser<C> {
 
     private final SyntaxParser syntaxParser = new SyntaxParser();
     private final ArgumentExtractor argumentExtractor = new ArgumentExtractor();
-    private final ParameterInjectorRegistry<C> parameterInjectorRegistry = new ParameterInjectorRegistry<>();
 
     private final CommandManager<C> manager;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
@@ -110,10 +109,6 @@ public final class AnnotationParser<C> {
                 annotation.value(),
                 Caption.of(annotation.failureCaption())
         ));
-        this.getParameterInjectorRegistry().registerInjector(
-                CommandContext.class,
-                (context, annotations) -> context
-        );
         this.getParameterInjectorRegistry().registerInjector(
                 String[].class,
                 (context, annotations) -> annotations.annotation(RawArgs.class) == null
@@ -215,7 +210,7 @@ public final class AnnotationParser<C> {
      * @since 1.2.0
      */
     public @NonNull ParameterInjectorRegistry<C> getParameterInjectorRegistry() {
-        return this.parameterInjectorRegistry;
+        return this.manager.parameterInjectorRegistry();
     }
 
     /**
@@ -344,8 +339,12 @@ public final class AnnotationParser<C> {
             }
             try {
                 /* Construct the handler */
-                final CommandExecutionHandler<C> commandExecutionHandler
-                        = new MethodCommandExecutionHandler<>(instance, commandArguments, method, this.parameterInjectorRegistry);
+                final CommandExecutionHandler<C> commandExecutionHandler = new MethodCommandExecutionHandler<>(
+                        instance,
+                        commandArguments,
+                        method,
+                        this.getParameterInjectorRegistry()
+                );
                 builder = builder.handler(commandExecutionHandler);
             } catch (final Exception e) {
                 throw new RuntimeException("Failed to construct command execution handler", e);

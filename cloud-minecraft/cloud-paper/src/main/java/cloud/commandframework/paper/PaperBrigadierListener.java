@@ -51,7 +51,7 @@ class PaperBrigadierListener<C> implements Listener {
                 () -> new CommandContext<>(
                         this.paperCommandManager.getCommandSenderMapper()
                                 .apply(Bukkit.getConsoleSender()),
-                        this.paperCommandManager.getCaptionRegistry()
+                        this.paperCommandManager
                 )
         );
         this.brigadierManager.brigadierSenderMapper(

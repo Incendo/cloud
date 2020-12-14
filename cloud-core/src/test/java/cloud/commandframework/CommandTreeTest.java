@@ -161,7 +161,7 @@ class CommandTreeTest {
                 .parse(
                         new CommandContext<>(
                                 new TestCommandSender(),
-                                manager.getCaptionRegistry()
+                                manager
                         ),
                         new LinkedList<>(
                                 Arrays.asList(
@@ -174,7 +174,7 @@ class CommandTreeTest {
                 .parse(
                         new CommandContext<>(
                                 new TestCommandSender(),
-                                manager.getCaptionRegistry()
+                                manager
                         ),
                         new LinkedList<>(
                                 Arrays.asList("test", "two"))
@@ -182,21 +182,21 @@ class CommandTreeTest {
                 .getSecond().getClass());
         manager.getCommandTree()
                 .parse(
-                        new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                        new CommandContext<>(new TestCommandSender(), manager),
                         new LinkedList<>(Arrays.asList("test", "opt"))
                 )
                 .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(
                 new TestCommandSender(),
-                manager.getCaptionRegistry()
+                manager
         ));
         manager.getCommandTree()
                 .parse(
-                        new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                        new CommandContext<>(new TestCommandSender(), manager),
                         new LinkedList<>(Arrays.asList("test", "opt", "12"))
                 )
                 .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(
                 new TestCommandSender(),
-                manager.getCaptionRegistry()
+                manager
         ));
     }
 
@@ -206,7 +206,7 @@ class CommandTreeTest {
                 .parse(
                         new CommandContext<>(
                                 new TestCommandSender(),
-                                manager.getCaptionRegistry()
+                                manager
                         ),
                         new LinkedList<>(Arrays.asList(
                                 "other",
@@ -216,7 +216,7 @@ class CommandTreeTest {
                 )
                 .getFirst().getCommandExecutionHandler().execute(new CommandContext<>(
                 new TestCommandSender(),
-                manager.getCaptionRegistry()
+                manager
         ));
     }
 
@@ -224,7 +224,7 @@ class CommandTreeTest {
     void getSuggestions() {
         Assertions.assertFalse(
                 manager.getCommandTree().getSuggestions(
-                        new CommandContext<>(new TestCommandSender(), manager.getCaptionRegistry()),
+                        new CommandContext<>(new TestCommandSender(), manager),
                         new LinkedList<>(Collections.singletonList("test "))
                 ).isEmpty());
     }

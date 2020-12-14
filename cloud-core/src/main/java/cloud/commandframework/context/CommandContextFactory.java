@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.context;
 
+import cloud.commandframework.CommandManager;
 import cloud.commandframework.captions.CaptionRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -40,11 +41,28 @@ public interface CommandContextFactory<C> {
      * @param sender          Command sender
      * @param captionRegistry Caption registry
      * @return Command context
+     * @deprecated Provide a command manager instead of a caption registry
      */
+    @Deprecated
     @NonNull CommandContext<C> create(
             boolean suggestions,
             @NonNull C sender,
             @NonNull CaptionRegistry<C> captionRegistry
+    );
+
+    /**
+     * Create a new command context
+     *
+     * @param suggestions    Whether or not the sender is requesting suggestions
+     * @param sender         Command sender
+     * @param commandManager Command manager
+     * @return Command context
+     * @since 1.3.0
+     */
+    @NonNull CommandContext<C> create(
+            boolean suggestions,
+            @NonNull C sender,
+            @NonNull CommandManager<C> commandManager
     );
 
 }

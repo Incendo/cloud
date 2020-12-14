@@ -29,6 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Managed access for {@link java.lang.annotation.Annotation} instances
@@ -36,6 +37,16 @@ import java.util.Collection;
  * @since 1.2.0
  */
 public interface AnnotationAccessor {
+
+    /**
+     * Get a {@link AnnotationAccessor} that cannot access any annotations
+     *
+     * @return Empty annotation accessor
+     * @since 1.3.0
+     */
+    static @NonNull AnnotationAccessor empty() {
+        return new NullAnnotationAccessor();
+    }
 
     /**
      * Get a {@link AnnotationAccessor} instance for a {@link AnnotatedElement}, such as
@@ -66,5 +77,25 @@ public interface AnnotationAccessor {
      * @return Immutable collection of annotations
      */
     @NonNull Collection<@NonNull Annotation> annotations();
+
+
+    /**
+     * Annotation accessor that cannot access any annotations
+     *
+     * @since 1.3.0
+     */
+    final class NullAnnotationAccessor implements AnnotationAccessor {
+
+        @Override
+        public <A extends Annotation> @Nullable A annotation(@NonNull final Class<A> clazz) {
+           return null;
+        }
+
+        @Override
+        public @NonNull Collection<@NonNull Annotation> annotations() {
+            return Collections.emptyList();
+        }
+
+    }
 
 }
