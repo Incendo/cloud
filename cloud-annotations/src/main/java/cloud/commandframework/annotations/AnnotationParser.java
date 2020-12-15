@@ -29,6 +29,8 @@ import cloud.commandframework.Description;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.specifier.Completions;
+import cloud.commandframework.annotations.suggestions.MethodSuggestionsProvider;
+import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -223,6 +225,9 @@ public final class AnnotationParser<C> {
      */
     @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
     public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {
+        /* Start by registering all @Suggestion annotated methods */
+        this.parseSuggestions(instance);
+        /* Then construct commands from @CommandMethod annotated classes */
         final Method[] methods = instance.getClass().getDeclaredMethods();
         final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
         for (final Method method : methods) {
@@ -252,6 +257,38 @@ public final class AnnotationParser<C> {
             ((CommandManager) this.manager).command(command);
         }
         return commands;
+    }
+
+    @SuppressWarnings("deprecation")
+    private <T> void parseSuggestions(final @NonNull T instance) {
+        for (final Method method : instance.getClass().getMethods()) {
+            final Suggestions suggestions = method.getAnnotation(Suggestions.class);
+            if (suggestions == null) {
+                continue;
+            }
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
+            if (method.getParameterCount() != 2
+                || !method.getReturnType().equals(List.class)
+                || !method.getParameters()[0].getType().equals(CommandContext.class)
+                || !method.getParameters()[1].getType().equals(String.class)
+            ) {
+                throw new IllegalArgumentException(String.format(
+                        "@Suggestions annotated method '%s' in class '%s' does not have the correct signature",
+                        method.getName(),
+                        instance.getClass().getCanonicalName()
+                ));
+            }
+            try {
+                this.manager.getParserRegistry().registerSuggestionProvider(
+                        suggestions.value(),
+                        new MethodSuggestionsProvider<>(instance, method)
+                );
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

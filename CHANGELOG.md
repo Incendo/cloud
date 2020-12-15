@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+ - Added `@Suggestions` annotated methods
+
 ### Changed
  - Argument builders now use generics to preserve their type when using functions from the base class.
 
