@@ -172,6 +172,46 @@ public final class CommandContext<C> {
     }
 
     /**
+     * Store or remove a value in the context map. This will overwrite any existing
+     * value stored with the same key.
+     * <p>
+     * If the provided value is {@code null}, any current value stored for the provided key will be removed.
+     *
+     * @param key   Key
+     * @param value Value
+     * @param <T>   Value type
+     * @since 1.3.0
+     */
+    public <T> void set(final @NonNull String key, final @Nullable T value) {
+        if (value != null) {
+            this.store(key, value);
+        } else {
+            this.remove(key);
+        }
+    }
+
+    /**
+     * Check if the context has a value stored for a key
+     *
+     * @param key Key
+     * @return Whether the context has a value for the provided key
+     * @since 1.3.0
+     */
+    public boolean contains(final @NonNull String key) {
+        return this.internalStorage.containsKey(key);
+    }
+
+    /**
+     * Get the current state of this command context as a map of String to context value.
+     *
+     * @return An immutable copy of this command context as a map
+     * @since 1.3.0
+     */
+    public @NonNull Map<@NonNull String, @Nullable ?> asMap() {
+        return Collections.unmodifiableMap(this.internalStorage);
+    }
+
+    /**
      * Get a value from its key. Will return {@link Optional#empty()}
      * if no value is stored with the given key
      *
