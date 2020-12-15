@@ -208,7 +208,7 @@ public final class CommandContext<C> {
      * @since 1.3.0
      */
     public @NonNull Map<@NonNull String, @Nullable ?> asMap() {
-        return Collections.unmodifiableMap(this.internalStorage);
+        return Collections.unmodifiableMap(new HashMap<>(this.internalStorage));
     }
 
     /**
