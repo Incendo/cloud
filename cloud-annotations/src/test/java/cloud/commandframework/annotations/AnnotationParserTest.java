@@ -26,7 +26,9 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.specifier.Range;
+import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionException;
+import java.util.function.BiFunction;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AnnotationParserTest {
@@ -127,6 +130,20 @@ class AnnotationParserTest {
     @Test
     void testParameterInjection() {
         manager.executeCommand(new TestCommandSender(), "inject").join();
+    }
+
+    @Test
+    void testAnnotatedSuggestionsProviders() {
+        final BiFunction<CommandContext<TestCommandSender>, String, List<String>> suggestionsProvider =
+                this.manager.getParserRegistry().getSuggestionProvider("cows").orElse(null);
+        Assertions.assertNotNull(suggestionsProvider);
+        Assertions.assertTrue(suggestionsProvider.apply(new CommandContext<>(new TestCommandSender(), manager), "")
+                .contains("Stella"));
+    }
+
+    @Suggestions("cows")
+    public List<String> cowSuggestions(final CommandContext<TestCommandSender> context, final String input) {
+        return Arrays.asList("Stella", "Bella", "Agda");
     }
 
     @ProxiedBy("proxycommand")
