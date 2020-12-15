@@ -29,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Injector that injects parameters into {@link cloud.commandframework.annotations.CommandMethod} annotated
+ * Injector that injects parameters into CommandMethod annotated
  * methods
  *
  * @param <C> Command sender type
@@ -40,7 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface ParameterInjector<C, T> {
 
     /**
-     * Attempt to create a a value that should then be injected into the {@link cloud.commandframework.annotations.CommandMethod}
+     * Attempt to create a a value that should then be injected into the CommandMethod
      * annotated method. If the injector cannot (or shouldn't) create a value, it is free to return {@code null}.
      *
      * @param context            Command context that is requesting the injection
