@@ -149,4 +149,8 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
         return this.brigadierManager;
     }
 
+    final void registrationCalled() {
+        this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+    }
+
 }
