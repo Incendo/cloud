@@ -43,13 +43,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * A command consists out of a chain of {@link CommandArgument command arguments}.
@@ -58,7 +58,8 @@ import java.util.function.Consumer;
  */
 public class Command<C> {
 
-    private final Map<@NonNull CommandArgument<C, ?>, @NonNull Description> arguments;
+    private final List<@NonNull CommandComponent<C>> components;
+    private final List<@NonNull CommandArgument<C, ?>> arguments;
     private final CommandExecutionHandler<C> commandExecutionHandler;
     private final Class<? extends C> senderType;
     private final CommandPermission commandPermission;
@@ -67,26 +68,27 @@ public class Command<C> {
     /**
      * Construct a new command
      *
-     * @param commandArguments        Command argument and description pairs
+     * @param commandComponents       Command component argument and description
      * @param commandExecutionHandler Execution handler
      * @param senderType              Required sender type. May be {@code null}
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
      */
     public Command(
-            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
+            final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
             final @Nullable Class<? extends C> senderType,
             final @NonNull CommandPermission commandPermission,
             final @NonNull CommandMeta commandMeta
     ) {
-        this.arguments = Objects.requireNonNull(commandArguments, "Command arguments may not be null");
-        if (this.arguments.size() == 0) {
-            throw new IllegalArgumentException("At least one command argument is required");
+        this.components = Objects.requireNonNull(commandComponents, "Command components may not be null");
+        this.arguments = this.components.stream().map(CommandComponent::getArgument).collect(Collectors.toList());
+        if (this.components.isEmpty()) {
+            throw new IllegalArgumentException("At least one command component is required");
         }
         // Enforce ordering of command arguments
         boolean foundOptional = false;
-        for (final CommandArgument<C, ?> argument : this.arguments.keySet()) {
+        for (final CommandArgument<C, ?> argument : this.arguments) {
             if (argument.getName().isEmpty()) {
                 throw new IllegalArgumentException("Argument names may not be empty");
             }
@@ -109,18 +111,77 @@ public class Command<C> {
     /**
      * Construct a new command
      *
-     * @param commandArguments        Command arguments
+     * @param commandComponents       Command components
      * @param commandExecutionHandler Execution handler
      * @param senderType              Required sender type. May be {@code null}
      * @param commandMeta             Command meta instance
      */
+    public Command(
+            final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
+            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
+            final @Nullable Class<? extends C> senderType,
+            final @NonNull CommandMeta commandMeta
+    ) {
+        this(commandComponents, commandExecutionHandler, senderType, Permission.empty(), commandMeta);
+    }
+
+    /**
+     * Construct a new command
+     *
+     * @param commandComponents       Command components
+     * @param commandExecutionHandler Execution handler
+     * @param commandPermission       Command permission
+     * @param commandMeta             Command meta instance
+     */
+    public Command(
+            final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
+            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
+            final @NonNull CommandPermission commandPermission,
+            final @NonNull CommandMeta commandMeta
+    ) {
+        this(commandComponents, commandExecutionHandler, null, commandPermission, commandMeta);
+    }
+
+    /**
+     * Construct a new command
+     *
+     * @param commandArguments        Command argument and description pairs
+     * @param commandExecutionHandler Execution handler
+     * @param senderType              Required sender type. May be {@code null}
+     * @param commandPermission       Command permission
+     * @param commandMeta             Command meta instance
+     * @deprecated Map does not allow for the same literal or variable argument name to repeat
+     * @see #Command(List, CommandExecutionHandler, Class, CommandPermission, CommandMeta)
+     */
+    @Deprecated
+    public Command(
+            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
+            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
+            final @Nullable Class<? extends C> senderType,
+            final @NonNull CommandPermission commandPermission,
+            final @NonNull CommandMeta commandMeta
+    ) {
+        this(mapToComponents(commandArguments), commandExecutionHandler, senderType, commandPermission, commandMeta);
+    }
+
+    /**
+     * Construct a new command
+     *
+     * @param commandArguments        Command arguments
+     * @param commandExecutionHandler Execution handler
+     * @param senderType              Required sender type. May be {@code null}
+     * @param commandMeta             Command meta instance
+     * @deprecated Map does not allow for the same literal or variable argument name to repeat
+     * @see #Command(List, CommandExecutionHandler, Class, CommandMeta)
+     */
+    @Deprecated
     public Command(
             final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
             final @Nullable Class<? extends C> senderType,
             final @NonNull CommandMeta commandMeta
     ) {
-        this(commandArguments, commandExecutionHandler, senderType, Permission.empty(), commandMeta);
+        this(mapToComponents(commandArguments), commandExecutionHandler, senderType, commandMeta);
     }
 
     /**
@@ -130,14 +191,27 @@ public class Command<C> {
      * @param commandExecutionHandler Execution handler
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
+     * @deprecated Map does not allow for the same literal or variable argument name to repeat
+     * @see #Command(List, CommandExecutionHandler, CommandPermission, CommandMeta)
      */
+    @Deprecated
     public Command(
             final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
             final @NonNull CommandPermission commandPermission,
             final @NonNull CommandMeta commandMeta
     ) {
-        this(commandArguments, commandExecutionHandler, null, commandPermission, commandMeta);
+        this(mapToComponents(commandArguments), commandExecutionHandler, commandPermission, commandMeta);
+    }
+
+    // Converts a map of CommandArgument and Description pairs to a List of CommandComponent
+    // Used for backwards-compatibility
+    private static <C> @NonNull List<@NonNull CommandComponent<C>> mapToComponents(
+            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments
+    ) {
+        return commandArguments.entrySet().stream()
+                .map(e -> CommandComponent.of(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -157,13 +231,13 @@ public class Command<C> {
             final @NonNull Description description,
             final @NonNull String... aliases
     ) {
-        final Map<@NonNull CommandArgument<C, ?>, @NonNull Description> map = new LinkedHashMap<>();
-        map.put(StaticArgument.of(commandName, aliases), description);
+        final List<CommandComponent<C>> commands = new ArrayList<>();
+        commands.add(CommandComponent.of(StaticArgument.of(commandName, aliases), description));
         return new Builder<>(
                 null,
                 commandMeta,
                 null,
-                map,
+                commands,
                 new CommandExecutionHandler.NullCommandExecutionHandler<>(),
                 Permission.empty(),
                 Collections.emptyList()
@@ -185,13 +259,13 @@ public class Command<C> {
             final @NonNull CommandMeta commandMeta,
             final @NonNull String... aliases
     ) {
-        final Map<CommandArgument<C, ?>, Description> map = new LinkedHashMap<>();
-        map.put(StaticArgument.of(commandName, aliases), Description.empty());
+        final List<CommandComponent<C>> commands = new ArrayList<>();
+        commands.add(CommandComponent.of(StaticArgument.of(commandName, aliases), Description.empty()));
         return new Builder<>(
                 null,
                 commandMeta,
                 null,
-                map,
+                commands,
                 new CommandExecutionHandler.NullCommandExecutionHandler<>(),
                 Permission.empty(),
                 Collections.emptyList()
@@ -201,10 +275,19 @@ public class Command<C> {
     /**
      * Return a copy of the command argument array
      *
-     * @return Copy of the command argument array
+     * @return Copy of the command argument array.  This List is mutable.
      */
     public @NonNull List<CommandArgument<@NonNull C, @NonNull ?>> getArguments() {
-        return new ArrayList<>(this.arguments.keySet());
+        return new ArrayList<>(this.arguments);
+    }
+
+    /**
+     * Returns a copy of the command component array
+     *
+     * @return Copy of the command component array. This List is mutable.
+     */
+    public @NonNull List<CommandComponent<@NonNull C>> getComponents() {
+        return new ArrayList<>(this.components);
     }
 
     /**
@@ -248,9 +331,18 @@ public class Command<C> {
      *
      * @param argument Argument
      * @return Argument description
+     * @throws IllegalArgumentException If the command argument does not exist
+     * @deprecated More than one matching command argument may exist per command.
+     *             Use {@link #getArguments()} and search in that, instead.
      */
+    @Deprecated
     public @NonNull String getArgumentDescription(final @NonNull CommandArgument<C, ?> argument) {
-        return this.arguments.get(argument).getDescription();
+        for (final CommandComponent<C> component : this.components) {
+            if (component.getArgument().equals(argument)) {
+                return component.getDescription().getDescription();
+            }
+        }
+        throw new IllegalArgumentException("Command argument not found: " + argument);
     }
 
     @Override
@@ -282,7 +374,7 @@ public class Command<C> {
     public static final class Builder<C> {
 
         private final CommandMeta commandMeta;
-        private final Map<CommandArgument<C, ?>, Description> commandArguments;
+        private final List<CommandComponent<C>> commandComponents;
         private final CommandExecutionHandler<C> commandExecutionHandler;
         private final Class<? extends C> senderType;
         private final CommandPermission commandPermission;
@@ -293,14 +385,14 @@ public class Command<C> {
                 final @Nullable CommandManager<C> commandManager,
                 final @NonNull CommandMeta commandMeta,
                 final @Nullable Class<? extends C> senderType,
-                final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
+                final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
                 final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
                 final @NonNull CommandPermission commandPermission,
                 final @NonNull Collection<CommandFlag<?>> flags
         ) {
             this.commandManager = commandManager;
             this.senderType = senderType;
-            this.commandArguments = Objects.requireNonNull(commandArguments, "Arguments may not be null");
+            this.commandComponents = Objects.requireNonNull(commandComponents, "Components may not be null");
             this.commandExecutionHandler = Objects.requireNonNull(commandExecutionHandler, "Execution handler may not be null");
             this.commandPermission = Objects.requireNonNull(commandPermission, "Permission may not be null");
             this.commandMeta = Objects.requireNonNull(commandMeta, "Meta may not be null");
@@ -346,7 +438,7 @@ public class Command<C> {
                     this.commandManager,
                     commandMeta,
                     this.senderType,
-                    this.commandArguments,
+                    this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
                     this.flags
@@ -388,7 +480,7 @@ public class Command<C> {
                     commandManager,
                     this.commandMeta,
                     this.senderType,
-                    this.commandArguments,
+                    this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
                     this.flags
@@ -465,13 +557,13 @@ public class Command<C> {
                         + " Use CommandArgument#copy to create a copy of the argument.");
             }
             argument.setArgumentRegistered();
-            final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
-            commandArgumentMap.put(argument, description);
+            final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
+            commandComponents.add(CommandComponent.of(argument, description));
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
                     this.senderType,
-                    commandArgumentMap,
+                    commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
                     this.flags
@@ -491,13 +583,13 @@ public class Command<C> {
                 final CommandArgument.@NonNull Builder<C, T> builder,
                 final @NonNull Description description
         ) {
-            final Map<CommandArgument<C, ?>, Description> commandArgumentMap = new LinkedHashMap<>(this.commandArguments);
-            commandArgumentMap.put(builder.build(), description);
+            final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
+            commandComponents.add(CommandComponent.of(builder.build(), description));
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
                     this.senderType,
-                    commandArgumentMap,
+                    commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
                     this.flags
@@ -676,7 +768,7 @@ public class Command<C> {
                     this.commandManager,
                     this.commandMeta,
                     this.senderType,
-                    this.commandArguments,
+                    this.commandComponents,
                     commandExecutionHandler,
                     this.commandPermission,
                     this.flags
@@ -694,7 +786,7 @@ public class Command<C> {
                     this.commandManager,
                     this.commandMeta,
                     senderType,
-                    this.commandArguments,
+                    this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
                     this.flags
@@ -712,7 +804,7 @@ public class Command<C> {
                     this.commandManager,
                     this.commandMeta,
                     this.senderType,
-                    this.commandArguments,
+                    this.commandComponents,
                     this.commandExecutionHandler,
                     permission,
                     this.flags
@@ -730,7 +822,7 @@ public class Command<C> {
                     this.commandManager,
                     this.commandMeta,
                     this.senderType,
-                    this.commandArguments,
+                    this.commandComponents,
                     this.commandExecutionHandler,
                     Permission.of(permission),
                     this.flags
@@ -750,12 +842,13 @@ public class Command<C> {
          */
         public @NonNull Builder<C> proxies(final @NonNull Command<C> command) {
             Builder<C> builder = this;
-            for (final CommandArgument<C, ?> argument : command.getArguments()) {
+            for (final CommandComponent<C> component : command.getComponents()) {
+                final CommandArgument<C, ?> argument = component.getArgument();
                 if (argument instanceof StaticArgument) {
                     continue;
                 }
                 final CommandArgument<C, ?> builtArgument = argument.copy();
-                builder = builder.argument(builtArgument, Description.of(command.getArgumentDescription(argument)));
+                builder = builder.argument(builtArgument, component.getDescription());
             }
             if (this.commandPermission.toString().isEmpty()) {
                 builder = builder.permission(command.getCommandPermission());
@@ -787,7 +880,7 @@ public class Command<C> {
                     this.commandManager,
                     this.commandMeta,
                     this.senderType,
-                    this.commandArguments,
+                    this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
                     Collections.unmodifiableList(flags)
@@ -811,14 +904,14 @@ public class Command<C> {
          * @return Built command
          */
         public @NonNull Command<C> build() {
-            final LinkedHashMap<CommandArgument<C, ?>, Description> commandArguments = new LinkedHashMap<>(this.commandArguments);
+            final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
             /* Construct flag node */
             if (!flags.isEmpty()) {
                 final FlagArgument<C> flagArgument = new FlagArgument<>(this.flags);
-                commandArguments.put(flagArgument, Description.of("Command flags"));
+                commandComponents.add(CommandComponent.of(flagArgument, Description.of("Command flags")));
             }
             return new Command<>(
-                    Collections.unmodifiableMap(commandArguments),
+                    Collections.unmodifiableList(commandComponents),
                     this.commandExecutionHandler,
                     this.senderType,
                     this.commandPermission,

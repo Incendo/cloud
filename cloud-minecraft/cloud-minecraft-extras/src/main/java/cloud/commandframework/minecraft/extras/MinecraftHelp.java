@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.minecraft.extras;
 
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
@@ -391,34 +392,35 @@ public final class MinecraftHelp<C> {
                             ))
             );
 
-            final Iterator<CommandArgument<C, ?>> iterator = helpTopic.getCommand().getArguments().iterator();
+            final Iterator<CommandComponent<C>> iterator = helpTopic.getCommand().getComponents().iterator();
             /* Skip the first one because it's the command literal */
             iterator.next();
 
             while (iterator.hasNext()) {
-                final CommandArgument<C, ?> argument = iterator.next();
+                final CommandComponent<C> component = iterator.next();
+                final CommandArgument<C, ?> argument = component.getArgument();
 
                 String syntax = this.commandManager.getCommandSyntaxFormatter()
                         .apply(Collections.singletonList(argument), null);
 
-                final TextComponent.Builder component = Component.text()
+                final TextComponent.Builder textComponent = Component.text()
                         .append(Component.text("       "))
                         .append(iterator.hasNext() ? this.branch() : this.lastBranch())
                         .append(this.highlight(Component.text(" " + syntax, this.colors.highlight)));
                 if (!argument.isRequired()) {
-                    component.append(Component.text(
+                    textComponent.append(Component.text(
                             " (" + this.messageProvider.apply(sender, MESSAGE_OPTIONAL) + ")",
                             this.colors.alternateHighlight
                     ));
                 }
-                final String description = helpTopic.getCommand().getArgumentDescription(argument);
+                final String description = component.getDescription().getDescription();
                 if (!description.isEmpty()) {
-                    component
+                    textComponent
                             .append(Component.text(" - ", this.colors.accent))
                             .append(Component.text(description, this.colors.text));
                 }
 
-                audience.sendMessage(Identity.nil(), component);
+                audience.sendMessage(Identity.nil(), textComponent);
             }
         }
         audience.sendMessage(Identity.nil(), this.footer(sender));
