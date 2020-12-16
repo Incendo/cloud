@@ -32,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.function.Function;
 
 final class SimpleKey<V> implements CommandMeta.Key<V> {
+
     private final @NonNull TypeToken<V> valueType;
     private final @NonNull String name;
     private final @Nullable Function<@NonNull CommandMeta, @Nullable V> derivationFunction;

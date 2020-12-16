@@ -92,7 +92,7 @@ public class SimpleCommandMeta extends CommandMeta {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final @NonNull <V> Optional<V> get(@NonNull final Key<V> key) {
+    public final @NonNull <V> Optional<V> get(final @NonNull Key<V> key) {
         final Object value = this.metaMap.get(key.getName());
         if (value == null) {
             // Attempt to use a fallback legacy type
@@ -111,7 +111,7 @@ public class SimpleCommandMeta extends CommandMeta {
     }
 
     @Override
-    public final <V> @NonNull V getOrDefault(@NonNull final Key<V> key, @NonNull final V defaultValue) {
+    public final <V> @NonNull V getOrDefault(final @NonNull Key<V> key, final @NonNull V defaultValue) {
         return this.get(key).orElse(defaultValue);
     }
 
@@ -179,7 +179,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @param key   Key
          * @param value Value
          * @return Builder instance
-         * @deprecated For removal since 1.2.0, use {@link #with(Key, Object) the typesafe alternative} instead
+         * @deprecated For removal since 1.3.0, use {@link #with(Key, Object) the typesafe alternative} instead
          */
         @Deprecated
         public @NonNull Builder with(
@@ -197,6 +197,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @param key   Key
          * @param value Value
          * @return Builder instance
+         * @since 1.3.0
          */
         public <V> @NonNull Builder with(
                 final @NonNull Key<V> key,

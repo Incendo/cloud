@@ -42,6 +42,7 @@ import static java.util.Objects.requireNonNull;
  * Appropriate use for command meta would be fixed state, such as command descriptions.
  */
 public abstract class CommandMeta {
+
     private static final Key<String> LEGACY_HIDDEN = Key.of(String.class, "hidden");
     public static final Key<String> DESCRIPTION = Key.of(String.class, "description");
     public static final Key<String> LONG_DESCRIPTION = Key.of(String.class, "long-description");
@@ -70,7 +71,7 @@ public abstract class CommandMeta {
      *
      * @param key Key
      * @return Optional that may contain the associated value
-     * @deprecated for removal since 1.2.0, see typesafe variant at {@link #get(Key)} instead
+     * @deprecated for removal since 1.3.0, see typesafe variant at {@link #get(Key)} instead
      */
     @Deprecated
     public abstract @NonNull Optional<String> getValue(@NonNull String key);
@@ -81,7 +82,7 @@ public abstract class CommandMeta {
      * @param key          Key
      * @param defaultValue Default value
      * @return Value, or default value
-     * @deprecated for removal since 1.2.0, see typesafe variant at {@link #getOrDefault(Key, Object)} instead
+     * @deprecated for removal since 1.3.0, see typesafe variant at {@link #getOrDefault(Key, Object)} instead
      */
     @Deprecated
     public abstract @NonNull String getOrDefault(@NonNull String key, @NonNull String defaultValue);
@@ -92,6 +93,7 @@ public abstract class CommandMeta {
      * @param <V> Value type
      * @param key Key
      * @return Optional that may contain the associated value
+     * @since 1.3.0
      */
     public abstract <V> @NonNull Optional<V> get(@NonNull Key<V> key);
 
@@ -102,6 +104,7 @@ public abstract class CommandMeta {
      * @param key          Key
      * @param defaultValue Default value
      * @return Value, or default value
+     * @since 1.3.0
      */
     public abstract <V> @NonNull V getOrDefault(@NonNull Key<V> key, @NonNull V defaultValue);
 
@@ -109,7 +112,7 @@ public abstract class CommandMeta {
      * Get a copy of the meta map
      *
      * @return Copy of meta map
-     * @deprecated for removal since 1.2.0, use {@link #getAllValues()} instead.
+     * @deprecated for removal since 1.3.0, use {@link #getAllValues()} instead.
      */
     @Deprecated
     public abstract @NonNull Map<@NonNull String, @NonNull String> getAll();
@@ -118,6 +121,7 @@ public abstract class CommandMeta {
      * Get a copy of the meta map, without type information.
      *
      * @return Copy of meta map
+     * @since 1.3.0
      */
     public abstract @NonNull Map<@NonNull String, @NonNull ?> getAllValues();
 
@@ -125,6 +129,7 @@ public abstract class CommandMeta {
      * A key into the metadata map.
      *
      * @param <V> value type
+     * @since 1.3.0
      */
     public interface Key<V> {
 

@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Command meta builder with bukkit-specific parameters.
  *
- * @deprecated for removal since 1.2.0, use plain {@link SimpleCommandMeta.Builder} instead.
+ * @deprecated for removal since 1.3.0, use plain {@link SimpleCommandMeta.Builder} instead.
  */
 @Deprecated
 public final class BukkitCommandMetaBuilder {

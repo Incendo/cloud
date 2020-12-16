@@ -29,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Bukkit-specific command metadata holder.
  *
- * @deprecated for removal since 1.2.0. Use the standard {@link SimpleCommandMeta instead}.
+ * @deprecated for removal since 1.3.0. Use the standard {@link SimpleCommandMeta instead}.
  */
 @Deprecated
 public class BukkitCommandMeta extends SimpleCommandMeta {

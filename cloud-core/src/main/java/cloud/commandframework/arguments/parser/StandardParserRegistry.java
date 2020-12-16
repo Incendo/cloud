@@ -232,15 +232,15 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
 
     @Override
     public void registerSuggestionProvider(
-            @NonNull final String name,
-            @NonNull final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
+            final @NonNull String name,
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
     ) {
         this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider);
     }
 
     @Override
     public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
-            @NonNull final String name
+            final @NonNull String name
     ) {
         final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionProvider =
                 this.namedSuggestionProviders.get(name.toLowerCase(Locale.ENGLISH));

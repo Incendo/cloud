@@ -360,6 +360,7 @@ public class Command<C> {
          * @param key   Meta key
          * @param value Meta value
          * @return New builder instance using the inserted meta key-value pair
+         * @since 1.3.0
          */
         public <V> @NonNull Builder<C> meta(final CommandMeta.@NonNull Key<V> key, final @NonNull V value) {
             final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
