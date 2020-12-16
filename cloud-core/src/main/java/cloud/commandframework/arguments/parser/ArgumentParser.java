@@ -45,7 +45,23 @@ public interface ArgumentParser<C, T> {
     int DEFAULT_ARGUMENT_COUNT = 1;
 
     /**
-     * Parse command input into a command result
+     * Parse command input into a command result.
+     * <p>
+     * This method may be called when a command chain is being parsed for execution
+     * (using {@link cloud.commandframework.CommandManager#executeCommand(Object, String)})
+     * or when a command is being parsed to provide context for suggestions
+     * (using {@link cloud.commandframework.CommandManager#suggest(Object, String)}). It is
+     * possible to use {@link CommandContext#isSuggestions()}} to see what the purpose of the
+     * parsing is. Particular care should be taken when parsing for suggestions, as the parsing
+     * method is then likely to be called once for every character written by the command sender.
+     * <p>
+     * This method should never throw any exceptions under normal circumstances. Instead, if the
+     * parsing for some reason cannot be done successfully {@link ArgumentParseResult#failure(Throwable)}
+     * should be returned. This then wraps any exception that should be forwarded to the command sender.
+     * <p>
+     * The parser is assumed to be completely stateless and should not store any information about
+     * the command sender or the command context. Instead, information should be stored in the
+     * {@link CommandContext}.
      *
      * @param commandContext Command context
      * @param inputQueue     The queue of arguments
@@ -58,6 +74,9 @@ public interface ArgumentParser<C, T> {
 
     /**
      * Get a list of suggested arguments that would be correctly parsed by this parser
+     * <p>
+     * This method is likely to be called for every character provided by the sender and
+     * so it may be necessary to cache results locally to prevent unnecessary computations
      *
      * @param commandContext Command context
      * @param input          Input string
