@@ -56,9 +56,9 @@ public class ExampleApplication {
      */
     @Inject
     public ExampleApplication(
-            @NonNull final DiscordApiComponent discordApiComponent,
-            @NonNull final CommandsComponent commandsComponent,
-            @NonNull final ScheduledExecutorService executorService
+            final @NonNull DiscordApiComponent discordApiComponent,
+            final @NonNull CommandsComponent commandsComponent,
+            final @NonNull ScheduledExecutorService executorService
     ) throws
             Exception {
         this.discordApiComponent = discordApiComponent;

@@ -53,7 +53,7 @@ public class CommandsComponent {
      * @param discordApiComponent Instance of the {@link DiscordApiComponent} for registering the command listener
      */
     @Inject
-    public CommandsComponent(@NonNull final DiscordApiComponent discordApiComponent) {
+    public CommandsComponent(final @NonNull DiscordApiComponent discordApiComponent) {
         this.discordApiComponent = discordApiComponent;
     }
 

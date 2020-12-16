@@ -27,6 +27,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
+import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.types.tuples.Pair;
@@ -54,8 +55,27 @@ public class CommandConfirmationManager<C> {
 
     /**
      * Meta data stored for commands that require confirmation
+     *
+     * @deprecated for removal since 1.3.0. Use {@link #META_CONFIRMATION_REQUIRED} instead.
      */
+    @Deprecated
     public static final String CONFIRMATION_REQUIRED_META = "__REQUIRE_CONFIRMATION__";
+
+    private static final CommandMeta.Key<String> LEGACY_CONFIRMATION_META = CommandMeta.Key.of(
+            String.class,
+            CONFIRMATION_REQUIRED_META
+    );
+
+    /**
+     * Meta data stored for commands that require confirmation
+     *
+     * @since 1.3.0
+     */
+    public static final CommandMeta.Key<Boolean> META_CONFIRMATION_REQUIRED = CommandMeta.Key.of(
+            Boolean.class,
+            "cloud:require_confirmation",
+            meta -> meta.get(LEGACY_CONFIRMATION_META).map(Boolean::valueOf).orElse(null)
+    );
     private static final int MAXIMUM_PENDING_SIZE = 100;
 
     private final Consumer<CommandPostprocessingContext<C>> notifier;
@@ -120,7 +140,7 @@ public class CommandConfirmationManager<C> {
      * @return Builder instance
      */
     public SimpleCommandMeta.@NonNull Builder decorate(final SimpleCommandMeta.@NonNull Builder builder) {
-        return builder.with(CONFIRMATION_REQUIRED_META, "true");
+        return builder.with(META_CONFIRMATION_REQUIRED, true);
     }
 
     /**
@@ -158,8 +178,7 @@ public class CommandConfirmationManager<C> {
         public void accept(final @NonNull CommandPostprocessingContext<C> context) {
             if (!context.getCommand()
                     .getCommandMeta()
-                    .getOrDefault(CONFIRMATION_REQUIRED_META, "false")
-                    .equals("true")) {
+                    .getOrDefault(META_CONFIRMATION_REQUIRED, false)) {
                 return;
             }
             /* Add it to the "queue" */

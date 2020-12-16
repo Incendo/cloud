@@ -55,7 +55,7 @@ public class DiscordApiComponent {
      *
      * @param token The Discord Bot token
      */
-    public final void login(@NonNull final String token) {
+    public final void login(final @NonNull String token) {
         LOG.info("Logging in to Discord...");
 
         this.api = this.builder.setToken(token).login().join();

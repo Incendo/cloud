@@ -87,7 +87,7 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
 
     @Override
     public @NonNull ArgumentParseResult<Boolean> apply(
-            @NonNull final CommandContext<C> context, @NonNull final Queue<@NonNull String> strings
+            final @NonNull CommandContext<C> context, final @NonNull Queue<@NonNull String> strings
     ) {
         final String head = strings.peek();
         if (head == null) {

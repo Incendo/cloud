@@ -128,8 +128,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull User> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
             if (input == null) {

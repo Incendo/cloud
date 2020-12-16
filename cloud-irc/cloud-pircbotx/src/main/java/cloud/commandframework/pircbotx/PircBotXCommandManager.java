@@ -119,8 +119,8 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
 
     @Override
     public final boolean hasPermission(
-            @NonNull final C sender,
-            @NonNull final String permission
+            final @NonNull C sender,
+            final @NonNull String permission
     ) {
         return this.permissionFunction.apply(sender, permission);
     }
@@ -140,7 +140,7 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
         return this.commandPrefix;
     }
 
-    @NonNull final Function<User, C> getUserMapper() {
+    final @NonNull Function<User, C> getUserMapper() {
         return this.userMapper;
     }
 
