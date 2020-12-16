@@ -23,16 +23,16 @@
 //
 package cloud.commandframework;
 
-import java.util.Objects;
-
+import cloud.commandframework.arguments.CommandArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import cloud.commandframework.arguments.CommandArgument;
+import java.util.Objects;
 
 /**
  * A single literal or argument component of a command
  *
  * @param <C> Command sender type
+ * @since 1.3.0
  */
 public final class CommandComponent<C> {
     private final CommandArgument<C, ?> argument;
