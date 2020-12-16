@@ -35,6 +35,7 @@ import java.util.Objects;
  * @since 1.3.0
  */
 public final class CommandComponent<C> {
+
     private final CommandArgument<C, ?> argument;
     private final Description description;
 
