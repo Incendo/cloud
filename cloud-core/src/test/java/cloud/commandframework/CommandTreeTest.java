@@ -35,6 +35,8 @@ import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
+import io.leangen.geantyref.TypeToken;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletionException;
 
 class CommandTreeTest {
@@ -221,6 +224,45 @@ class CommandTreeTest {
     }
 
     @Test
+    void getArgumentsAndComponents() {
+        // Create and register a command
+        Command<TestCommandSender> command = manager.commandBuilder("component")
+                .literal("literal", "literalalias")
+                .literal("detail", Description.of("detaildescription"))
+                .argument(CommandArgument.ofType(int.class, "argument"),
+                          Description.of("argumentdescription"))
+                .build();
+        manager.command(command);
+
+        // Verify all the details we have configured are present
+        List<CommandArgument<TestCommandSender, ?>> arguments = command.getArguments();
+        List<CommandComponent<TestCommandSender>> components = command.getComponents();
+        Assertions.assertEquals(arguments.size(), components.size());
+        Assertions.assertEquals(4, components.size());
+
+        // Arguments should exactly match the component getArgument() result, in same order
+        for (int i = 0; i < components.size(); i++) {
+            Assertions.assertEquals(components.get(i).getArgument(), arguments.get(i));
+        }
+
+        // Argument configuration, we know component has the same argument so no need to test those
+        // TODO: Aliases
+        Assertions.assertEquals("component", arguments.get(0).getName());
+        Assertions.assertEquals("literal", arguments.get(1).getName());
+        Assertions.assertEquals("detail", arguments.get(2).getName());
+        Assertions.assertEquals("argument", arguments.get(3).getName());
+
+        // Check argument is indeed a command argument
+        Assertions.assertEquals(TypeToken.get(int.class), arguments.get(3).getValueType());
+
+        // Check description is set for all components, is empty when not specified
+        Assertions.assertEquals("", components.get(0).getDescription().getDescription());
+        Assertions.assertEquals("", components.get(1).getDescription().getDescription());
+        Assertions.assertEquals("detaildescription", components.get(2).getDescription().getDescription());
+        Assertions.assertEquals("argumentdescription", components.get(3).getDescription().getDescription());
+    }
+
+    @Test
     void getSuggestions() {
         Assertions.assertFalse(
                 manager.getCommandTree().getSuggestions(
@@ -317,6 +359,36 @@ class CommandTreeTest {
                 manager.command(manager.commandBuilder("ambiguous")
                         .argument(IntegerArgument.of("integer"))));
         newTree();
+    }
+
+    @Test
+    void testLiteralRepeatingArgument() {
+        // Build a command with a literal repeating
+        Command<TestCommandSender> command = manager.commandBuilder("repeatingargscommand")
+                .literal("repeat")
+                .literal("middle")
+                .literal("repeat")
+                .build();
+
+        // Verify built command has the repeat argument twice
+        List<CommandArgument<TestCommandSender, ?>> args = command.getArguments();
+        Assertions.assertEquals(4, args.size());
+        Assertions.assertEquals("repeatingargscommand", args.get(0).getName());
+        Assertions.assertEquals("repeat", args.get(1).getName());
+        Assertions.assertEquals("middle", args.get(2).getName());
+        Assertions.assertEquals("repeat", args.get(3).getName());
+
+        // Register
+        manager.command(command);
+
+        // If internally it drops repeating arguments, then it would register:
+        // > /repeatingargscommand repeat middle
+        // So check that we can register that exact command without an ambiguity exception
+        manager.command(
+                manager.commandBuilder("repeatingargscommand")
+                       .literal("repeat")
+                       .literal("middle")
+        );
     }
 
     @Test
