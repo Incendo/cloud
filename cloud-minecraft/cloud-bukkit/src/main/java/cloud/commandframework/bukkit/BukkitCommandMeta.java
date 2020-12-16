@@ -26,6 +26,12 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * Bukkit-specific command metadata holder.
+ *
+ * @deprecated for removal since 1.3.0. Use the standard {@link SimpleCommandMeta instead}.
+ */
+@Deprecated
 public class BukkitCommandMeta extends SimpleCommandMeta {
 
     /**
@@ -34,7 +40,7 @@ public class BukkitCommandMeta extends SimpleCommandMeta {
      * @param simpleCommandMeta Simple command meta data instance that gets mirrored
      */
     public BukkitCommandMeta(final @NonNull SimpleCommandMeta simpleCommandMeta) {
-        super(simpleCommandMeta.getAll());
+        super(simpleCommandMeta);
     }
 
 }

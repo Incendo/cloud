@@ -63,8 +63,8 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
 
     @Override
     public @NonNull List<@NonNull String> getSuggestions(
-            @NonNull final CommandContext<C> context,
-            @NonNull final String input
+            final @NonNull CommandContext<C> context,
+            final @NonNull String input
     ) {
         final @NonNull LinkedList<@NonNull String> inputQueue = new CommandInputTokenizer(input).tokenize();
         /* Store a copy of the input queue in the context */

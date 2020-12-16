@@ -25,6 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -43,14 +44,14 @@ class CommandHelpHandlerTest {
     @BeforeAll
     static void setup() {
         manager = new TestCommandManager();
-        final SimpleCommandMeta meta1 = SimpleCommandMeta.builder().with("description", "Command with only literals").build();
+        final SimpleCommandMeta meta1 = SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "Command with only literals").build();
         manager.command(manager.commandBuilder("test", meta1).literal("this").literal("thing").build());
-        final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with("description", "Command with variables").build();
+        final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "Command with variables").build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
                 argument(IntegerArgument.of("int"), Description.of("A number")).build());
 
         manager.command(manager.commandBuilder("vec")
-                .meta("description", "Takes in a vector")
+                .meta(CommandMeta.DESCRIPTION, "Takes in a vector")
                 .argumentPair("vec", Pair.of("x", "y"),
                         Pair.of(Double.class, Double.class), Description.of("Vector")
                 )

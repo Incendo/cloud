@@ -87,7 +87,7 @@ public interface AnnotationAccessor {
     final class NullAnnotationAccessor implements AnnotationAccessor {
 
         @Override
-        public <A extends Annotation> @Nullable A annotation(@NonNull final Class<A> clazz) {
+        public <A extends Annotation> @Nullable A annotation(final @NonNull Class<A> clazz) {
            return null;
         }
 

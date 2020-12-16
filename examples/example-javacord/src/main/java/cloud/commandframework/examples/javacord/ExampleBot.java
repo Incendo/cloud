@@ -50,7 +50,7 @@ public final class ExampleBot {
      *
      * @param args Arguments to start the bot with (NOT used)
      */
-    public static void main(@NonNull final String[] args) {
+    public static void main(final @NonNull String[] args) {
         SimplixInstaller
                 .instance()
                 .register(ExampleBot.class);

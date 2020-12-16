@@ -140,8 +140,8 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
 
     @Override
     public final @NonNull String getCaption(
-            @NonNull final Caption caption,
-            @NonNull final C sender
+            final @NonNull Caption caption,
+            final @NonNull C sender
     ) {
         final BiFunction<Caption, C, String> messageFactory = this.messageFactories.get(caption);
         if (messageFactory == null) {

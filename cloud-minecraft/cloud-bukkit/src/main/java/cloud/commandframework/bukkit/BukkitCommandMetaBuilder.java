@@ -24,8 +24,15 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.meta.SimpleCommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * Command meta builder with bukkit-specific parameters.
+ *
+ * @deprecated for removal since 1.3.0, use plain {@link SimpleCommandMeta.Builder} instead.
+ */
+@Deprecated
 public final class BukkitCommandMetaBuilder {
 
     private BukkitCommandMetaBuilder() {
@@ -73,7 +80,7 @@ public final class BukkitCommandMetaBuilder {
          * @return Meta instance
          */
         public @NonNull BukkitCommandMeta build() {
-            return new BukkitCommandMeta(CommandMeta.simple().with("description", this.description).build());
+            return new BukkitCommandMeta(CommandMeta.simple().with(CommandMeta.DESCRIPTION, this.description).build());
         }
 
     }

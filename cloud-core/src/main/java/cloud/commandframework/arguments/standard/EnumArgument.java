@@ -70,7 +70,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
      * @return Created builder
      */
     public static <C, E extends Enum<E>> EnumArgument.@NonNull Builder<C, E> newBuilder(
-            @NonNull final Class<E> enumClass,
+            final @NonNull Class<E> enumClass,
             final @NonNull String name
     ) {
         return new EnumArgument.Builder<>(name, enumClass);

@@ -137,8 +137,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull Player> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
