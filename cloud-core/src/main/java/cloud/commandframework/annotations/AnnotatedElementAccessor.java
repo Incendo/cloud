@@ -43,7 +43,7 @@ final class AnnotatedElementAccessor implements AnnotationAccessor {
 
     @Override
     public <A extends Annotation> @Nullable A annotation(
-            @NonNull final Class<A> clazz
+            final @NonNull Class<A> clazz
     ) {
         try {
             return element.getAnnotation(clazz);

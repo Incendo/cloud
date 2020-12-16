@@ -137,8 +137,8 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ServerInfo> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
             if (input == null) {

@@ -31,6 +31,7 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.meta.CommandMeta;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
@@ -63,7 +64,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     ) {
         super(
                 label,
-                cloudCommand.getCommandMeta().getOrDefault("description", ""),
+                cloudCommand.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, ""),
                 "",
                 aliases
         );
@@ -163,7 +164,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public String getDescription() {
-        return this.cloudCommand.getCommandMeta().getOrDefault("description", "");
+        return this.cloudCommand.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
     }
 
     @Override

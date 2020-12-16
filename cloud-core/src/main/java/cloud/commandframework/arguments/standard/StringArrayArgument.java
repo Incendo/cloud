@@ -107,8 +107,8 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
 
         @Override
         public @NonNull ArgumentParseResult<String @NonNull []> parse(
-                @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                final @NonNull CommandContext<@NonNull C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
         ) {
             final String[] result = new String[inputQueue.size()];
             for (int i = 0; i < result.length; i++) {

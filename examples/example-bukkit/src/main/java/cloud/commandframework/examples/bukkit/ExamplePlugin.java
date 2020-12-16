@@ -44,7 +44,6 @@ import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.bukkit.BukkitCommandManager;
-import cloud.commandframework.bukkit.BukkitCommandMetaBuilder;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
@@ -178,9 +177,9 @@ public final class ExamplePlugin extends JavaPlugin {
         // @CommandMethod
         //
         final Function<ParserParameters, CommandMeta> commandMetaFunction = p ->
-                BukkitCommandMetaBuilder.builder()
+                CommandMeta.simple()
                         // This will allow you to decorate commands with descriptions
-                        .withDescription(p.get(StandardParameters.DESCRIPTION, "No description"))
+                        .with(CommandMeta.DESCRIPTION, p.get(StandardParameters.DESCRIPTION, "No description"))
                         .build();
         this.annotationParser = new AnnotationParser<>(
                 /* Manager */ this.manager,
