@@ -631,6 +631,14 @@ public final class CommandTree<C> {
         }
     }
 
+    /**
+     * Remove a command from the command tree
+     *
+     * @param command Command to remove
+     */
+    public void removeCommand(final @NonNull Command<C> command) {
+    }
+
     private @Nullable CommandPermission isPermitted(
             final @NonNull C sender,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> node

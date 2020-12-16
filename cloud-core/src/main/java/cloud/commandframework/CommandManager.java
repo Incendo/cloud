@@ -860,6 +860,35 @@ public abstract class CommandManager<C> {
     }
 
     /**
+     * Attempt to remove a command from the internal command tree. This will
+     * then call {@link #removeInternally(Command)}. Not all platforms support
+     * command removal, so this method may end up throwing a {@link UnsupportedOperationException}.
+     *
+     * No matter if the platform supports command removal or not, the command
+     * will still be removed from the associated {@link CommandTree}
+     *
+     * @param command Command to remove
+     * @since 1.3.0
+     */
+    public void removeCommand(final @NonNull Command<C> command) {
+        this.commandTree.removeCommand(command);
+        this.commands.remove(command);
+        this.removeInternally(command);
+    }
+
+    /**
+     * Attempt to remove the command from the internal platform. This method needs
+     * to be implemented for {@link #removeCommand(Command)} to function properly
+     *
+     * @param command Command to remove
+     * @since 1.3.0
+     */
+    protected void removeInternally(final @NonNull Command<C> command) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+
+    /**
      * Configurable command related settings
      *
      * @see CommandManager#setSetting(ManagerSettings, boolean) Set a manager setting
@@ -897,6 +926,7 @@ public abstract class CommandManager<C> {
          */
         OVERRIDE_EXISTING_COMMANDS
     }
+
 
     /**
      * The point in the registration lifecycle for this commands manager
