@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
  - Moved the parser injector registry into CommandManager and added injection to CommandContext
+ - Supporting repeating literals or argument names
 
 ### Deprecated
  - String keyed command meta

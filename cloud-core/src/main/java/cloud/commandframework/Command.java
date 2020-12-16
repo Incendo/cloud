@@ -73,6 +73,7 @@ public class Command<C> {
      * @param senderType              Required sender type. May be {@code null}
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
+     * @since 1.3.0
      */
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
@@ -115,6 +116,7 @@ public class Command<C> {
      * @param commandExecutionHandler Execution handler
      * @param senderType              Required sender type. May be {@code null}
      * @param commandMeta             Command meta instance
+     * @since 1.3.0
      */
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
@@ -132,6 +134,7 @@ public class Command<C> {
      * @param commandExecutionHandler Execution handler
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
+     * @since 1.3.0
      */
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
@@ -284,7 +287,8 @@ public class Command<C> {
     /**
      * Returns a copy of the command component array
      *
-     * @return Copy of the command component array. This List is mutable.
+     * @return Copy of the command component array. This List is mutable
+     * @since 1.3.0
      */
     public @NonNull List<CommandComponent<@NonNull C>> getComponents() {
         return new ArrayList<>(this.components);
@@ -460,7 +464,7 @@ public class Command<C> {
                     this.commandManager,
                     commandMeta,
                     this.senderType,
-                    this.commandArguments,
+                    this.commandComponents,
                     this.commandExecutionHandler,
                     this.commandPermission,
                     this.flags
