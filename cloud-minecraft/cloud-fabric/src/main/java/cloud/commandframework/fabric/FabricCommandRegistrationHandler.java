@@ -50,7 +50,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class FabricCommandRegistrationHandler<C> implements CommandRegistrationHandler {
     private @MonotonicNonNull FabricCommandManager<C> commandManager;
     private final Set<Command<C>> registeredCommands = ConcurrentHashMap.newKeySet();
-    private boolean commandRegistrationCalled;
 
     void initialize(final FabricCommandManager<C> manager) {
         this.commandManager = manager;
@@ -60,16 +59,13 @@ public final class FabricCommandRegistrationHandler<C> implements CommandRegistr
     @Override
     @SuppressWarnings("unchecked")
     public boolean registerCommand(@NonNull final Command<?> command) {
-        if (this.commandRegistrationCalled) {
-            throw new IllegalStateException("too late!");
-        }
         return this.registeredCommands.add((Command<C>) command);
     }
 
     private void registerAllCommands(final CommandDispatcher<ServerCommandSource> dispatcher, final boolean isDedicated) {
-        this.commandRegistrationCalled = true;
+        this.commandManager.registrationCalled();
         for (final Command<C> command : this.registeredCommands) {
-            registerCommand(dispatcher.getRoot(), command);
+            this.registerCommand(dispatcher.getRoot(), command);
         }
     }
 
