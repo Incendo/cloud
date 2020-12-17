@@ -161,7 +161,7 @@ public final class TaskRecipe {
          * @return New task recipe component
          */
         public TaskRecipeComponentVoid<O> asynchronous(final @NonNull TaskConsumer<O> consumer) {
-            addSynchronous(consumer);
+            addAsynchronous(consumer);
             return new TaskRecipeComponentVoid<>(initialInput);
         }
 
