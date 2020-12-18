@@ -207,18 +207,26 @@ public final class CommandHelpHandler<C> {
             } else {
                 if (index < queryFragments.length) {
                     /* We might still be able to match an argument */
+                    CommandTree.Node<CommandArgument<C, ?>> potentialVariable = null;
                     for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
-                        @SuppressWarnings("unchecked") final StaticArgument<C> childArgument = (StaticArgument<C>) child
-                                .getValue();
-                        if (childArgument == null) {
+                        if (!(child.getValue() instanceof StaticArgument)) {
+                            if (child.getValue() != null) {
+                                potentialVariable = child;
+                            }
                             continue;
                         }
+                        @SuppressWarnings("unchecked") final StaticArgument<C> childArgument = (StaticArgument<C>) child
+                                .getValue();
                         for (final String childAlias : childArgument.getAliases()) {
                             if (childAlias.equalsIgnoreCase(queryFragments[index])) {
                                 head = child;
                                 continue outer;
                             }
                         }
+                    }
+                    if (potentialVariable != null) {
+                        head = potentialVariable;
+                        continue;
                     }
                 }
                 final String currentDescription = this.commandManager.getCommandSyntaxFormatter().apply(traversedNodes, null);
