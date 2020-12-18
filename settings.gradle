@@ -6,6 +6,8 @@ include(':cloud-annotations')
 include(':cloud-core')
 include(':cloud-services')
 include(':cloud-tasks')
+// Kotlin
+include(':cloud-kotlin-extensions')
 //
 //Discord Modules
 //
