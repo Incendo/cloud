@@ -82,7 +82,15 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 final Iterator<CommandTree.Node<CommandArgument<C, ?>>> childIterator = tail.getChildren().iterator();
                 while (childIterator.hasNext()) {
                     final CommandTree.Node<CommandArgument<C, ?>> child = childIterator.next();
-                    formattingInstance.appendName(child.getValue().getName());
+
+                    if (child.getValue() instanceof StaticArgument) {
+                        formattingInstance.appendName(child.getValue().getName());
+                    } else if (child.getValue().isRequired()) {
+                        formattingInstance.appendRequired(child.getValue());
+                    } else {
+                        formattingInstance.appendOptional(child.getValue());
+                    }
+
                     if (childIterator.hasNext()) {
                         formattingInstance.appendPipe();
                     }

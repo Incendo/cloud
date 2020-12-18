@@ -99,6 +99,15 @@ public class CommandSuggestionsTest {
                 }))
                 .literal("literal")
                 .build());
+
+        manager.command(manager.commandBuilder("literal_with_variable")
+                .argument(StringArgument.<TestCommandSender>newBuilder("arg").withSuggestionsProvider((context, input) -> {
+                    return Arrays.asList("veni", "vidi");
+                }).build())
+                .literal("now"));
+        manager.command(manager.commandBuilder("literal_with_variable")
+                .literal("vici")
+                .literal("later"));
     }
 
     @Test
@@ -298,6 +307,27 @@ public class CommandSuggestionsTest {
         final String input9 = "partial bonjour ";
         final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
         Assertions.assertEquals(Collections.singletonList("literal"), suggestions9);
+    }
+
+    void testLiteralWithVariable() {
+        final String input = "literal_with_variable ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("vici", "veni", "vidi"), suggestions);
+        final String input2 = "literal_with_variable v";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("vici", "veni", "vidi"), suggestions2);
+        final String input3 = "literal_with_variable vi";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Arrays.asList("vici", "vidi"), suggestions3);
+        final String input4 = "literal_with_variable vidi";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Collections.emptyList(), suggestions4);
+        final String input5 = "literal_with_variable vidi ";
+        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(Collections.singletonList("now"), suggestions5);
+        final String input6 = "literal_with_variable vici ";
+        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(Collections.singletonList("later"), suggestions6);
     }
 
     public enum TestEnum {
