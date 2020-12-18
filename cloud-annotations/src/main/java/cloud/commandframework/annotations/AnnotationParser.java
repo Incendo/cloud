@@ -58,6 +58,7 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -317,7 +318,20 @@ public final class AnnotationParser<C> {
                 ));
             }
             try {
+                final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
+                if (parser.suggestions().isEmpty()) {
+                    suggestionsProvider = (context, input) -> Collections.emptyList();
+                } else {
+                    suggestionsProvider = this.manager.getParserRegistry().getSuggestionProvider(parser.suggestions())
+                            .orElseThrow(() -> new NullPointerException(
+                                    String.format(
+                                            "Cannot find the suggestions provider with name '%s'",
+                                            parser.suggestions()
+                                    )
+                            ));
+                }
                 final MethodArgumentParser<C, ?> methodArgumentParser = new MethodArgumentParser<>(
+                        suggestionsProvider,
                         instance,
                         method
                 );
