@@ -49,13 +49,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Tree containing all commands and command paths.
@@ -268,9 +271,35 @@ public final class CommandTree<C> {
     ) {
         CommandPermission permission;
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
-        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
+
+        // Check whether it matches any of the static arguments
+        // If so, do not attempt parsing as a dynamic argument
+        if (!commandQueue.isEmpty()) {
+            final String literal = commandQueue.peek();
+            final boolean matchesLiteral = children.stream()
+                .filter(n -> n.getValue() instanceof StaticArgument)
+                .map(n -> (StaticArgument<?>) n.getValue())
+                .flatMap(arg -> Stream.concat(Stream.of(arg.getName()), arg.getAliases().stream()))
+                .anyMatch(arg -> arg.equals(literal));
+
+            if (matchesLiteral) {
+                return Pair.of(null, null);
+            }
+        }
+
+        // If it does not match a literal, try to find the one argument node, if it exists
+        // The ambiguity check guarantees that only one will be present
+        final List<Node<CommandArgument<C, ?>>> argumentNodes = children.stream()
+                .filter(n -> (n.getValue() != null && !(n.getValue() instanceof StaticArgument)))
+                .collect(Collectors.toList());
+
+        if (argumentNodes.size() > 1) {
+            throw new IllegalStateException("Unexpected ambiguity detected, number of "
+                    + "dynamic child nodes should not exceed 1");
+        } else if (!argumentNodes.isEmpty()) {
+            final Node<CommandArgument<C, ?>> child = argumentNodes.get(0);
+
             // The value has to be a variable
-            final Node<CommandArgument<C, ?>> child = children.get(0);
             permission = this.isPermitted(commandContext.getSender(), child);
             if (!commandQueue.isEmpty() && permission != null) {
                 return Pair.of(null, new NoPermissionException(
@@ -419,6 +448,7 @@ public final class CommandTree<C> {
                 }
             }
         }
+
         return Pair.of(null, null);
     }
 
@@ -442,20 +472,24 @@ public final class CommandTree<C> {
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> root
     ) {
-
         /* If the sender isn't allowed to access the root node, no suggestions are needed */
         if (this.isPermitted(commandContext.getSender(), root) != null) {
             return Collections.emptyList();
         }
         final List<Node<CommandArgument<C, ?>>> children = root.getChildren();
-        if (children.size() == 1 && !(children.get(0).getValue() instanceof StaticArgument)) {
-            return this.suggestionsForDynamicArgument(commandContext, commandQueue, children.get(0));
-        }
-        /* There are 0 or more static arguments as children. No variable child arguments are present */
-        if (children.isEmpty() || commandQueue.isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            final Iterator<Node<CommandArgument<C, ?>>> childIterator = root.getChildren().iterator();
+
+        /* Calculate a list of arguments that are static literals */
+        final List<Node<CommandArgument<C, ?>>> staticArguments = children.stream()
+                .filter(n -> n.getValue() instanceof StaticArgument)
+                .collect(Collectors.toList());
+
+        /*
+         * Try to see if any of the static literals can be parsed (matches exactly)
+         * If so, enter that node of the command tree for deeper suggestions
+         */
+        if (!staticArguments.isEmpty() && !commandQueue.isEmpty()) {
+            final Queue<String> commandQueueCopy = new LinkedList<String>(commandQueue);
+            final Iterator<Node<CommandArgument<C, ?>>> childIterator = staticArguments.iterator();
             if (childIterator.hasNext()) {
                 while (childIterator.hasNext()) {
                     final Node<CommandArgument<C, ?>> child = childIterator.next();
@@ -466,31 +500,51 @@ public final class CommandTree<C> {
                                 commandQueue
                         );
                         if (result.getParsedValue().isPresent()) {
-                            return this.getSuggestions(commandContext, commandQueue, child);
+                            // If further arguments are specified, dive into this literal
+                            if (!commandQueue.isEmpty()) {
+                                return this.getSuggestions(commandContext, commandQueue, child);
+                            }
+
+                            // We've already matched one exactly, no use looking further
+                            break;
                         }
                     }
                 }
-                if (commandQueue.size() > 1) {
-                    /*
-                     * In this case we were unable to match any of the literals, and so we cannot
-                     * possibly attempt to match any of its children (which is what we want, according
-                     * to the input queue). Because of this, we terminate immediately
-                     */
-                    return Collections.emptyList();
-                }
             }
-            final List<String> suggestions = new LinkedList<>();
-            for (final Node<CommandArgument<C, ?>> argument : root.getChildren()) {
-                if (argument.getValue() == null || this.isPermitted(commandContext.getSender(), argument) != null) {
+
+            // Restore original queue
+            commandQueue.clear();
+            commandQueue.addAll(commandQueueCopy);
+        }
+
+        /* Calculate suggestions for the literal arguments */
+        final List<String> suggestions = new LinkedList<>();
+        if (commandQueue.size() <= 1) {
+            final String literalValue = stringOrEmpty(commandQueue.peek());
+            for (final Node<CommandArgument<C, ?>> argument : staticArguments) {
+                if (this.isPermitted(commandContext.getSender(), argument) != null) {
                     continue;
                 }
                 commandContext.setCurrentArgument(argument.getValue());
                 final List<String> suggestionsToAdd = argument.getValue().getSuggestionsProvider()
-                        .apply(commandContext, stringOrEmpty(commandQueue.peek()));
-                suggestions.addAll(suggestionsToAdd);
+                        .apply(commandContext, literalValue);
+                for (String suggestion : suggestionsToAdd) {
+                    if (suggestion.equals(literalValue) || !suggestion.startsWith(literalValue)) {
+                        continue;
+                    }
+                    suggestions.add(suggestion);
+                }
             }
-            return suggestions;
         }
+
+        /* Calculate suggestions for the variable argument, if one exists */
+        for (final Node<CommandArgument<C, ?>> child : root.getChildren()) {
+            if (child.getValue() != null && !(child.getValue() instanceof StaticArgument)) {
+                suggestions.addAll(this.suggestionsForDynamicArgument(commandContext, commandQueue, child));
+            }
+        }
+
+        return suggestions;
     }
 
     private @NonNull List<@NonNull String> suggestionsForDynamicArgument(
@@ -740,21 +794,52 @@ public final class CommandTree<C> {
         if (node.isLeaf()) {
             return;
         }
-        final int size = node.children.size();
-        for (final Node<CommandArgument<C, ?>> child : node.children) {
-            if (child.getValue() != null
-                    && !(child.getValue() instanceof StaticArgument)
-                    && size > 1) {
-                throw new AmbiguousNodeException(
-                        node.getValue(),
-                        child.getValue(),
-                        node.getChildren()
-                                .stream()
-                                .filter(n -> n.getValue() != null)
-                                .map(Node::getValue).collect(Collectors.toList())
-                );
+
+        // List of child nodes that are not static arguments, but (parsed) variable ones
+        final List<Node<CommandArgument<C, ?>>> childVariableArguments = node.children.stream()
+                .filter(n -> (n.getValue() != null && !(n.getValue() instanceof StaticArgument)))
+                .collect(Collectors.toList());
+
+        // If more than one child node exists with a variable argument, fail
+        if (childVariableArguments.size() > 1) {
+            Node<CommandArgument<C, ?>> child = childVariableArguments.get(0);
+            throw new AmbiguousNodeException(
+                    node.getValue(),
+                    child.getValue(),
+                    node.getChildren()
+                            .stream()
+                            .filter(n -> n.getValue() != null)
+                            .map(Node::getValue).collect(Collectors.toList())
+            );
+        }
+
+        // List of child nodes that are static arguments, with fixed values
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        final List<Node<StaticArgument<?>>> childStaticArguments = node.children.stream()
+                .filter(n -> n.getValue() instanceof StaticArgument)
+                .map(n -> (Node<StaticArgument<?>>) ((Node) n))
+                .collect(Collectors.toList());
+
+        // Check none of the static arguments are equal to another one
+        // This is done by filling a set and checking there are no duplicates
+        final Set<String> checkedLiterals = new HashSet<>();
+        for (final Node<StaticArgument<?>> child : childStaticArguments) {
+            for (final String nameOrAlias : child.getValue().getAliases()) {
+                if (!checkedLiterals.add(nameOrAlias)) {
+                    // Same literal value, ambiguity detected
+                    throw new AmbiguousNodeException(
+                            node.getValue(),
+                            child.getValue(),
+                            node.getChildren()
+                                    .stream()
+                                    .filter(n -> n.getValue() != null)
+                                    .map(Node::getValue).collect(Collectors.toList())
+                    );
+                }
             }
         }
+
+        // Recursively check child nodes as well
         node.children.forEach(this::checkAmbiguity);
     }
 

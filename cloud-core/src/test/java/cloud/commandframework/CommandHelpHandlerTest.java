@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
@@ -48,6 +49,7 @@ class CommandHelpHandlerTest {
         final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "Command with variables").build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
                 argument(IntegerArgument.of("int"), Description.of("A number")).build());
+        manager.command(manager.commandBuilder("test").argument(StringArgument.of("potato")));
 
         manager.command(manager.commandBuilder("vec")
                 .meta(CommandMeta.DESCRIPTION, "Takes in a vector")
@@ -61,16 +63,18 @@ class CommandHelpHandlerTest {
     void testVerboseHelp() {
         final List<CommandHelpHandler.VerboseHelpEntry<TestCommandSender>> syntaxHints
                 = manager.getCommandHelpHandler().getAllCommands();
-        final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry1 = syntaxHints.get(0);
+        final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry0 = syntaxHints.get(0);
+        Assertions.assertEquals("test <potato>", entry0.getSyntaxString());
+        final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry1 = syntaxHints.get(1);
         Assertions.assertEquals("test int <int>", entry1.getSyntaxString());
-        final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry2 = syntaxHints.get(1);
+        final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry2 = syntaxHints.get(2);
         Assertions.assertEquals("test this thing", entry2.getSyntaxString());
     }
 
     @Test
     void testLongestChains() {
         final List<String> longestChains = manager.getCommandHelpHandler().getLongestSharedChains();
-        Assertions.assertEquals(Arrays.asList("test int|this", "vec <<x> <y>>"), longestChains);
+        Assertions.assertEquals(Arrays.asList("test int|this|<potato>", "vec <<x> <y>>"), longestChains);
     }
 
     @Test
