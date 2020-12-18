@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added `@Suggestions` annotated methods
  - Added `@Parser` annotated methods
  - Type safe meta system
+ - Allow interception of command builders based on annotations in AnnotationParser
 
 ### Changed
  - Argument builders now use generics to preserve their type when using functions from the base class.

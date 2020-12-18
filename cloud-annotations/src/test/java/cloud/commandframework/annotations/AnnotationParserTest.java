@@ -30,6 +30,7 @@ import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
+import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.meta.SimpleCommandMeta;
@@ -78,7 +79,11 @@ class AnnotationParserTest {
                 InjectableValue.class,
                 (context, annotations) -> new InjectableValue("Hello World!")
         );
-
+        /* Register a builder modifier */
+        annotationParser.registerBuilderModifier(
+                IntegerArgumentInjector.class,
+                (injector, builder) -> builder.argument(IntegerArgument.of(injector.value()))
+        );
         /* Parse the class. Required for both testMethodConstruction() and testNamedSuggestionProvider() */
         commands = annotationParser.parse(this);
     }
@@ -135,7 +140,7 @@ class AnnotationParserTest {
 
     @Test
     void testParameterInjection() {
-        manager.executeCommand(new TestCommandSender(), "inject").join();
+        manager.executeCommand(new TestCommandSender(), "injected 10").join();
     }
 
     @Test
@@ -167,6 +172,11 @@ class AnnotationParserTest {
         ).contains("Stella"));
     }
 
+    @Test
+    void testInjectedCommand() {
+        manager.executeCommand(new TestCommandSender(), "injected 10").join();
+    }
+
     @Suggestions("cows")
     public List<String> cowSuggestions(final CommandContext<TestCommandSender> context, final String input) {
         return Arrays.asList("Stella", "Bella", "Agda");
@@ -175,6 +185,12 @@ class AnnotationParserTest {
     @Parser(suggestions = "cows")
     public CustomType customTypeParser(final CommandContext<TestCommandSender> context, final Queue<String> input) {
         return new CustomType("yay");
+    }
+
+    @IntegerArgumentInjector
+    @CommandMethod("injected")
+    public void injectedCommand(final CommandContext<TestCommandSender> context) {
+        System.out.printf("Got an integer: %d\n", context.<Integer>get("number"));
     }
 
     @ProxiedBy("proxycommand")
@@ -275,6 +291,20 @@ class AnnotationParserTest {
         public String toString() {
             return this.value;
         }
+
+    }
+
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface IntegerArgumentInjector {
+
+        /**
+         * The name of the integer argument to insert
+         *
+         * @return Integer argument name
+         */
+        String value() default "number";
 
     }
 

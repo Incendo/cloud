@@ -83,6 +83,8 @@ public final class AnnotationParser<C> {
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, BiFunction<@NonNull CommandContext<C>,
             @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>>> preprocessorMappers;
+    private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, Command.Builder<C>, Command.Builder<C>>>
+            builderModifiers;
     private final Class<C> commandSenderClass;
     private final MetaFactory metaFactory;
     private final FlagExtractor flagExtractor;
@@ -107,6 +109,7 @@ public final class AnnotationParser<C> {
         this.metaFactory = new MetaFactory(this, metaMapper);
         this.annotationMappers = new HashMap<>();
         this.preprocessorMappers = new HashMap<>();
+        this.builderModifiers = new HashMap<>();
         this.flagExtractor = new FlagExtractor(manager);
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
@@ -175,6 +178,25 @@ public final class AnnotationParser<C> {
             final @NonNull Class<A> clazz
     ) {
         return getMethodOrClassAnnotation(method, clazz) != null;
+    }
+
+    /**
+     * Register a builder modifier for a specific annotation. The builder modifiers are
+     * allowed to act on a {@link Command.Builder} after all arguments have been added
+     * to the builder. This allows for modifications of the builder instance before
+     * the command is registered to the command manager.
+     *
+     * @param annotation      Annotation (class) that the builder modifier reacts to
+     * @param builderModifier Modifier that acts on the given annotation and the incoming builder. Command builders
+     *                        are immutable, so the modifier should return the instance of the command builder that is
+     *                        returned as a result of any operation on the builder
+     * @param <A>             Annotation type
+     */
+    public <A extends Annotation> void registerBuilderModifier(
+            final @NonNull Class<A> annotation,
+            final @NonNull BiFunction<A, Command.Builder<C>, Command.Builder<C>> builderModifier
+    ) {
+        this.builderModifiers.put(annotation, builderModifier);
     }
 
     /**
@@ -275,9 +297,9 @@ public final class AnnotationParser<C> {
                 method.setAccessible(true);
             }
             if (method.getParameterCount() != 2
-                || !method.getReturnType().equals(List.class)
-                || !method.getParameters()[0].getType().equals(CommandContext.class)
-                || !method.getParameters()[1].getType().equals(String.class)
+                    || !method.getReturnType().equals(List.class)
+                    || !method.getParameters()[0].getType().equals(CommandContext.class)
+                    || !method.getParameters()[1].getType().equals(String.class)
             ) {
                 throw new IllegalArgumentException(String.format(
                         "@Suggestions annotated method '%s' in class '%s' does not have the correct signature",
@@ -456,6 +478,14 @@ public final class AnnotationParser<C> {
             /* Apply flags */
             for (final CommandFlag<?> flag : flags) {
                 builder = builder.flag(flag);
+            }
+            for (final Annotation annotation : method.getDeclaredAnnotations()) {
+                @SuppressWarnings("ALL")
+                final BiFunction builderModifier = this.builderModifiers.get(annotation.annotationType());
+                if (builderModifier == null) {
+                    continue;
+                }
+                builder = (Command.Builder<C>) builderModifier.apply(annotation, builder);
             }
             /* Construct and register the command */
             final Command<C> builtCommand = builder.build();
