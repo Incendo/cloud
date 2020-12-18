@@ -274,7 +274,15 @@ public final class ExamplePlugin extends JavaPlugin {
                                                 player.sendMessage(ChatColor.RED + "No entity matched your query.");
                                             }
                                         }).execute()
-                        ));
+                        ))
+                .command(builder.literal("teleport")
+                        .meta(CommandMeta.DESCRIPTION, "Teleport to a world")
+                        .argument(WorldArgument.of("world"), Description.of("World to teleport to"))
+                        .handler(context -> manager.taskRecipe().begin(context).synchronous(ctx -> {
+                            final Player player = (Player) ctx.getSender();
+                            player.teleport(ctx.<World>get("world").getSpawnLocation());
+                            player.sendMessage(ChatColor.GREEN + "You have been teleported!");
+                        }).execute()));
         manager.command(builder.literal("tasktest")
                 .handler(context -> manager.taskRecipe()
                         .begin(context)
