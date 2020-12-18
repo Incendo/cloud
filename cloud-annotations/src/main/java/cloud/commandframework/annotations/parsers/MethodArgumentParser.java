@@ -21,35 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.suggestions;
+package cloud.commandframework.annotations.parsers;
 
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.function.BiFunction;
+import java.util.Queue;
 
 /**
- * Represents a method annotated with {@link Suggestions}
+ * Represents a method annotated with {@link Parser}
  *
  * @param <C> Command sender type
+ * @param <T> Argument type
  * @since 1.3.0
  */
-public final class MethodSuggestionsProvider<C> implements BiFunction<CommandContext<C>, String, List<String>> {
+public class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
 
     private final MethodHandle methodHandle;
 
     /**
-     * Create a new provider
+     * Create a new parser
      *
      * @param instance Instance that owns the method
      * @param method   The annotated method
      * @throws Exception If the method lookup fails
      */
-    public MethodSuggestionsProvider(
+    public MethodArgumentParser(
             final @NonNull Object instance,
             final @NonNull Method method
     ) throws Exception {
@@ -58,11 +60,16 @@ public final class MethodSuggestionsProvider<C> implements BiFunction<CommandCon
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<String> apply(final CommandContext<C> context, final String s) {
+    public @NonNull ArgumentParseResult<@NonNull T> parse(
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull Queue<@NonNull String> inputQueue
+    ) {
         try {
-            return (List<String>) this.methodHandle.invokeWithArguments(context, s);
+            return ArgumentParseResult.success(
+                    (T) this.methodHandle.invokeWithArguments(commandContext, inputQueue)
+            );
         } catch (final Throwable t) {
-            throw new RuntimeException(t);
+            return ArgumentParseResult.failure(t);
         }
     }
 
