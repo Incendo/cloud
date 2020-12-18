@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added `@Parser` annotated methods
  - Type safe meta system
  - Allow interception of command builders based on annotations in AnnotationParser
+ - Add Kotlin DSL
+ - Make CommandMeta and FlagContext more Kotlin friendly
 
 ### Changed
  - Moved the parser injector registry into CommandManager and added injection to CommandContext
