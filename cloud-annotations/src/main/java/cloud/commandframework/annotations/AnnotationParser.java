@@ -28,6 +28,8 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.Description;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
+import cloud.commandframework.annotations.parsers.MethodArgumentParser;
+import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.suggestions.MethodSuggestionsProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
@@ -227,6 +229,8 @@ public final class AnnotationParser<C> {
     public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {
         /* Start by registering all @Suggestion annotated methods */
         this.parseSuggestions(instance);
+        /* Then register all parsers */
+        this.parseParsers(instance);
         /* Then construct commands from @CommandMethod annotated classes */
         final Method[] methods = instance.getClass().getDeclaredMethods();
         final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
@@ -285,6 +289,51 @@ public final class AnnotationParser<C> {
                         suggestions.value(),
                         new MethodSuggestionsProvider<>(instance, method)
                 );
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private <T> void parseParsers(final @NonNull T instance) {
+        for (final Method method : instance.getClass().getMethods()) {
+            final Parser parser = method.getAnnotation(Parser.class);
+            if (parser == null) {
+                continue;
+            }
+            if (!method.isAccessible()) {
+                method.setAccessible(true);
+            }
+            if (method.getParameterCount() != 2
+                    || method.getReturnType().equals(Void.class)
+                    || !method.getParameters()[0].getType().equals(CommandContext.class)
+                    || !method.getParameters()[1].getType().equals(Queue.class)
+            ) {
+                throw new IllegalArgumentException(String.format(
+                        "@Parser annotated method '%s' in class '%s' does not have the correct signature",
+                        method.getName(),
+                        instance.getClass().getCanonicalName()
+                ));
+            }
+            try {
+                final MethodArgumentParser<C, ?> methodArgumentParser = new MethodArgumentParser<>(
+                        instance,
+                        method
+                );
+                final Function<ParserParameters, ArgumentParser<C, ?>> parserFunction =
+                        parameters -> methodArgumentParser;
+                if (parser.name().isEmpty()) {
+                    this.manager.getParserRegistry().registerParserSupplier(
+                            TypeToken.get(method.getGenericReturnType()),
+                            parserFunction
+                    );
+                } else {
+                    this.manager.getParserRegistry().registerNamedParserSupplier(
+                            parser.name(),
+                            parserFunction
+                    );
+                }
             } catch (final Exception e) {
                 throw new RuntimeException(e);
             }

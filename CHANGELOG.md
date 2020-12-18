@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
  - Added `@Suggestions` annotated methods
+ - Added `@Parser` annotated methods
  - Type safe meta system
 
 ### Changed
@@ -21,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
  - String keyed command meta
+
+### Fixed
+ - Fixed issue with task synchronization
 
 ## [1.2.0] - 2020-12-07
 
