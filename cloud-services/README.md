@@ -15,20 +15,13 @@ Examples of services would be generators and caches.
 
 ## Maven
 
-Rörledning is available from [IntellectualSites](https://intellectualsites.com)' maven repository:
-
-```xml
-<repository>
-    <id>intellectualsites-snapshots</id>
-    <url>https://mvn.intellectualsites.com/content/repositories/snapshots</url>
-</repository>
-```
+Rörledning is available on Maven Central:
 
 ```xml
 <dependency>
     <groupId>cloud.commandframework</groupId>
-    <artifactId>Pipeline</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <artifactId>cloud-services</artifactId>
+    <version>1.3.0</version>
 </dependency>
 ```
 
