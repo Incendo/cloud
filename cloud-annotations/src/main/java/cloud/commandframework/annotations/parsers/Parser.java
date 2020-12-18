@@ -27,6 +27,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.function.BiFunction;
 
 /**
  * This annotation allows you to create annotated methods that behave like argument parsers.
@@ -51,5 +52,19 @@ public @interface Parser {
      * @return Parser name
      */
     String name() default "";
+
+    /**
+     * Name of the suggestions provider to use. If the string is left empty, the default
+     * provider for the {@link cloud.commandframework.annotations.Argument} will be used. Otherwise,
+     * the {@link cloud.commandframework.arguments.parser.ParserRegistry} instance in the
+     * {@link cloud.commandframework.CommandManager} will be queried for a matching suggestion provider.
+     * <p>
+     * For this to work, the suggestion needs to be registered in the parser registry. To do this, use
+     * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, BiFunction)}.
+     * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#getParserRegistry()}.
+     *
+     * @return The name of the suggestion provider, or {@code ""}
+     */
+    String suggestions() default "";
 
 }

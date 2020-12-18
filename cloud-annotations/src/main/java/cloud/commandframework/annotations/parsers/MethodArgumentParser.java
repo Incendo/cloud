@@ -31,7 +31,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
 
 /**
  * Represents a method annotated with {@link Parser}
@@ -42,19 +44,23 @@ import java.util.Queue;
  */
 public class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
 
+    private final BiFunction<CommandContext<C>, String, List<String>> suggestionProvider;
     private final MethodHandle methodHandle;
 
     /**
      * Create a new parser
      *
-     * @param instance Instance that owns the method
-     * @param method   The annotated method
+     * @param suggestionProvider Suggestion provider
+     * @param instance           Instance that owns the method
+     * @param method             The annotated method
      * @throws Exception If the method lookup fails
      */
     public MethodArgumentParser(
+            final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionProvider,
             final @NonNull Object instance,
             final @NonNull Method method
     ) throws Exception {
+        this.suggestionProvider = suggestionProvider;
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
     }
 
@@ -71,6 +77,14 @@ public class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
         } catch (final Throwable t) {
             return ArgumentParseResult.failure(t);
         }
+    }
+
+    @Override
+    public @NonNull List<@NonNull String> suggestions(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull String input
+    ) {
+        return this.suggestionProvider.apply(commandContext, input);
     }
 
 }

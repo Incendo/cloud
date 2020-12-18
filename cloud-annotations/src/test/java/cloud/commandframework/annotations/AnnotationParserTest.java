@@ -153,13 +153,18 @@ class AnnotationParserTest {
                 TypeToken.get(CustomType.class),
                 ParserParameters.empty()
         ).orElseThrow(() -> new NullPointerException("Could not find CustomType parser"));
+        final CommandContext<TestCommandSender> context = new CommandContext<>(
+                new TestCommandSender(),
+                this.manager
+        );
         Assertions.assertEquals("yay", parser.parse(
-                new CommandContext<>(
-                        new TestCommandSender(),
-                        this.manager
-                ),
+                context,
                 new LinkedList<>()
         ).getParsedValue().orElse(new CustomType("")).toString());
+        Assertions.assertTrue(parser.suggestions(
+                context,
+                ""
+        ).contains("Stella"));
     }
 
     @Suggestions("cows")
@@ -167,7 +172,7 @@ class AnnotationParserTest {
         return Arrays.asList("Stella", "Bella", "Agda");
     }
 
-    @Parser
+    @Parser(suggestions = "cows")
     public CustomType customTypeParser(final CommandContext<TestCommandSender> context, final Queue<String> input) {
         return new CustomType("yay");
     }
