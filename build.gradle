@@ -51,7 +51,8 @@ allprojects {
     license {
         header rootProject.file('HEADER')
         mapping 'java', 'DOUBLESLASH_STYLE'
-        includes(["**/*.java"])
+        mapping 'kt', 'DOUBLESLASH_STYLE'
+        includes(["**/*.java", "**/*.kt"])
     }
 
     build.dependsOn(checkstyleMain)
