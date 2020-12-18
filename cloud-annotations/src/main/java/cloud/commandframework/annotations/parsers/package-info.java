@@ -21,33 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.suggestions;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
- * This annotation allows you to create annotated methods that behave like suggestions providers.
- * The method must have this exact signature: <pre>{@code
- * ﹫Suggestions("name")
- * public List<String> methodName(CommandContext<YourSender> sender, String input) {
- * }}</pre>
- *
- * @since 1.3.0
+ * Classes related to {@link cloud.commandframework.annotations.parsers.Parser} annotated methods
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Suggestions {
-
-    /**
-     * Name of the suggestions provider. This should be the same as the name specified in your command arguments
-     *
-     * @return Suggestions provider name
-     */
-    @NonNull String value();
-
-}
+package cloud.commandframework.annotations.parsers;

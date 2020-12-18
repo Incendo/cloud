@@ -31,11 +31,19 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.concurrent.CompletableFuture;
 
-final class BukkitSynchronizer implements TaskSynchronizer {
+/**
+ * {@link TaskSynchronizer} using Bukkit's {@link org.bukkit.scheduler.BukkitScheduler}
+ */
+public final class BukkitSynchronizer implements TaskSynchronizer {
 
     private final Plugin plugin;
 
-    BukkitSynchronizer(final @NonNull Plugin plugin) {
+    /**
+     * Create a new instance of the Bukkit synchronizer
+     *
+     * @param plugin Owning plugin
+     */
+    public BukkitSynchronizer(final @NonNull Plugin plugin) {
         this.plugin = plugin;
     }
 

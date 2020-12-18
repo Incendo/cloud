@@ -25,11 +25,15 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.annotations.suggestions.Suggestions;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import io.leangen.geantyref.TypeToken;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,7 +47,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 
@@ -141,9 +147,29 @@ class AnnotationParserTest {
                 .contains("Stella"));
     }
 
+    @Test
+    void testAnnotatedArgumentParser() {
+        final ArgumentParser<TestCommandSender, CustomType> parser = this.manager.getParserRegistry().createParser(
+                TypeToken.get(CustomType.class),
+                ParserParameters.empty()
+        ).orElseThrow(() -> new NullPointerException("Could not find CustomType parser"));
+        Assertions.assertEquals("yay", parser.parse(
+                new CommandContext<>(
+                        new TestCommandSender(),
+                        this.manager
+                ),
+                new LinkedList<>()
+        ).getParsedValue().orElse(new CustomType("")).toString());
+    }
+
     @Suggestions("cows")
     public List<String> cowSuggestions(final CommandContext<TestCommandSender> context, final String input) {
         return Arrays.asList("Stella", "Bella", "Agda");
+    }
+
+    @Parser
+    public CustomType customTypeParser(final CommandContext<TestCommandSender> context, final Queue<String> input) {
+        return new CustomType("yay");
     }
 
     @ProxiedBy("proxycommand")
@@ -221,6 +247,22 @@ class AnnotationParserTest {
         private final String value;
 
         private InjectableValue(final String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+    }
+
+
+    private static final class CustomType {
+
+        private final String value;
+
+        private CustomType(final String value) {
             this.value = value;
         }
 

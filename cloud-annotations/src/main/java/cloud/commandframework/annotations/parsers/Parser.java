@@ -21,9 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.suggestions;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
+package cloud.commandframework.annotations.parsers;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -31,23 +29,27 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation allows you to create annotated methods that behave like suggestions providers.
+ * This annotation allows you to create annotated methods that behave like argument parsers.
  * The method must have this exact signature: <pre>{@code
- * ﹫Suggestions("name")
- * public List<String> methodName(CommandContext<YourSender> sender, String input) {
+ * ﹫Parser("name") // Name may be left out
+ * public ParsedType methodName(CommandContext<YourSender> sender, Queue<String> input) {
  * }}</pre>
+ * <p>
+ * The method can throw exceptions, and the thrown exceptions will automatically be
+ * wrapped by a {@link cloud.commandframework.arguments.parser.ArgumentParseResult#failure(Throwable)}
  *
  * @since 1.3.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Suggestions {
+public @interface Parser {
 
     /**
-     * Name of the suggestions provider. This should be the same as the name specified in your command arguments
+     * The name of the parser. If this is left empty, the parser will
+     * be registered as a default parser for the return type of the method
      *
-     * @return Suggestions provider name
+     * @return Parser name
      */
-    @NonNull String value();
+    String name() default "";
 
 }
