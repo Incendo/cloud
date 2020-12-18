@@ -480,7 +480,7 @@ public final class AnnotationParser<C> {
                 builder = builder.flag(flag);
             }
             for (final Annotation annotation : method.getDeclaredAnnotations()) {
-                @SuppressWarnings("ALL")
+                @SuppressWarnings("rawtypes")
                 final BiFunction builderModifier = this.builderModifiers.get(annotation.annotationType());
                 if (builderModifier == null) {
                     continue;
