@@ -221,7 +221,7 @@ public final class ExamplePlugin extends JavaPlugin {
         // Add a confirmation command
         //
         this.manager.command(builder.literal("confirm")
-                .meta("description", "Confirm a pending command")
+                .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
                 .handler(this.confirmationManager.createConfirmationExecutionHandler()));
         //
         // Create a world argument
@@ -318,7 +318,7 @@ public final class ExamplePlugin extends JavaPlugin {
         // A command to change the color scheme for the help command
         //
         manager.command(builder
-                .meta("description", "Sets the color scheme for '/example help'")
+                .meta(CommandMeta.DESCRIPTION, "Sets the color scheme for '/example help'")
                 .literal("helpcolors")
                 .argument(
                         TextColorArgument.of("primary"),

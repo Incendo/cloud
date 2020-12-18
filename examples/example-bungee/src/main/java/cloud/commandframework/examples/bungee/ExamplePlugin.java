@@ -33,6 +33,7 @@ import cloud.commandframework.bungee.arguments.ServerArgument;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
+import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.kyori.adventure.text.Component;
@@ -108,7 +109,7 @@ public final class ExamplePlugin extends Plugin {
         // Add a confirmation command
         //
         this.manager.command(builder.literal("confirm")
-                .meta("description", "Confirm a pending command")
+                .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
                 .handler(this.confirmationManager.createConfirmationExecutionHandler()));
 
         final CommandArgument<CommandSender, ProxiedPlayer> playerArgument = PlayerArgument.of("player");
