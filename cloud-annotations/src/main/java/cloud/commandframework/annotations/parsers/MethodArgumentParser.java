@@ -42,7 +42,7 @@ import java.util.function.BiFunction;
  * @param <T> Argument type
  * @since 1.3.0
  */
-public class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
+public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
 
     private final BiFunction<CommandContext<C>, String, List<String>> suggestionProvider;
     private final MethodHandle methodHandle;
