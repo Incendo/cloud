@@ -140,4 +140,31 @@ public final class FlagContext {
         return this.getValue(name).isPresent();
     }
 
+    /**
+     * Check whether a flag is present. This will return {@code true} if the flag
+     * is a presence flag and is present, or if the flag is a value flag and has
+     * a value provided.
+     *
+     * @param name Flag name
+     * @return {@code true} if the flag is present, else {@code false}
+     * @since 1.3.0
+     */
+    public boolean contains(final @NonNull String name) {
+        return this.hasFlag(name);
+    }
+
+    /**
+     * Get a flag value
+     *
+     * @param name         Flag name
+     * @param <T>          Value type
+     * @return Stored value, or the supplied default value
+     * @since 1.3.0
+     */
+    public <T> @Nullable T get(
+            final @NonNull String name
+    ) {
+        return this.<T>getValue(name).orElse(null);
+    }
+
 }
