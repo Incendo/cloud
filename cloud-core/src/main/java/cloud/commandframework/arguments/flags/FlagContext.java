@@ -131,7 +131,7 @@ public final class FlagContext {
      * a value provided.
      *
      * @param name Flag name
-     * @return {@code true} if the flag is present, else {@code false}
+     * @return whether the flag is present
      * @since 1.2.0
      */
     public boolean hasFlag(
@@ -146,7 +146,7 @@ public final class FlagContext {
      * a value provided.
      *
      * @param name Flag name
-     * @return {@code true} if the flag is present, else {@code false}
+     * @return whether the flag is present
      * @since 1.3.0
      */
     public boolean contains(final @NonNull String name) {
@@ -158,9 +158,10 @@ public final class FlagContext {
      *
      * @param name         Flag name
      * @param <T>          Value type
-     * @return Stored value, or the supplied default value
+     * @return Stored value if present, else {@code null}
      * @since 1.3.0
      */
+    @SuppressWarnings("TypeParameterUnusedInFormals")
     public <T> @Nullable T get(
             final @NonNull String name
     ) {
