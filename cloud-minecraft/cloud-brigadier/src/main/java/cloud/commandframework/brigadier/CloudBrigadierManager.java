@@ -63,7 +63,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +72,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Manager used to map cloud {@link Command}
@@ -375,8 +375,8 @@ public final class CloudBrigadierManager<C, S> {
                 .getCommandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
         final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(
                 context,
+                null, /* parent node, null for the literal command node root */
                 node.getValue(),
-                Collections.emptySet(),
                 builder
         );
 
@@ -503,17 +503,6 @@ public final class CloudBrigadierManager<C, S> {
                             )))
                     .executes(executor);
         } else {
-            // Check for sibling literals (StaticArgument)
-            // These are important when providing suggestions
-            final Set<String> siblingLiterals = (root.getParent() == null) ? Collections.emptySet()
-                    : root.getParent().getChildren().stream()
-                        .filter(n -> n.getValue() instanceof StaticArgument)
-                        .map(n -> (StaticArgument<C>) ((CommandArgument) n.getValue()))
-                        .flatMap(s -> s.getAliases().stream())
-                        .sorted()
-                        .distinct()
-                        .collect(Collectors.toSet());
-
             // Register argument
             final Pair<ArgumentType<?>, Boolean> pair = this.getArgument(
                     root.getValue().getValueType(),
@@ -524,8 +513,8 @@ public final class CloudBrigadierManager<C, S> {
                     ? null
                     : (context, builder) -> this.buildSuggestions(
                             context,
+                            root.getParent(),
                             root.getValue(),
-                            siblingLiterals,
                             builder
                     );
             argumentBuilder = RequiredArgumentBuilder
@@ -554,8 +543,8 @@ public final class CloudBrigadierManager<C, S> {
 
     private @NonNull CompletableFuture<Suggestions> buildSuggestions(
             final com.mojang.brigadier.context.@Nullable CommandContext<S> senderContext,
+            final CommandTree.@Nullable Node<CommandArgument<C, ?>> parentNode,
             final @NonNull CommandArgument<C, ?> argument,
-            final @NonNull Set<String> siblingLiterals,
             final @NonNull SuggestionsBuilder builder
     ) {
         final CommandContext<C> commandContext;
@@ -586,9 +575,17 @@ public final class CloudBrigadierManager<C, S> {
                 command
         );
 
-        /* Filter suggetions that are literal arguments to avoid duplicates */
+        /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
         final List<String> suggestions = new ArrayList<>(suggestionsUnfiltered);
-        suggestions.removeIf(siblingLiterals::contains);
+        if (parentNode != null) {
+            final Set<String> siblingLiterals = parentNode.getChildren().stream()
+                    .map(CommandTree.Node::getValue)
+                    .flatMap(arg -> (arg instanceof StaticArgument)
+                            ? ((StaticArgument<C>) arg).getAliases().stream() : Stream.empty())
+                    .collect(Collectors.toSet());
+
+            suggestions.removeIf(siblingLiterals::contains);
+        }
 
         SuggestionsBuilder suggestionsBuilder = builder;
 
