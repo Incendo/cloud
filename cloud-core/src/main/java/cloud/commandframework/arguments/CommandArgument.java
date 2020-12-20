@@ -54,7 +54,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
     /**
      * Pattern for command argument names
      */
-    private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9]+");
+    private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9\\-_]+");
 
     /**
      * Indicates whether or not the argument is required
