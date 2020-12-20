@@ -38,13 +38,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public final class CommandHelpHandler<C> {
 
     private final CommandManager<C> commandManager;
+    private final Predicate<Command<C>> commandPredicate;
 
-    CommandHelpHandler(final @NonNull CommandManager<C> commandManager) {
+    CommandHelpHandler(
+            final @NonNull CommandManager<C> commandManager,
+            final @NonNull Predicate<Command<C>> commandPredicate
+    ) {
         this.commandManager = commandManager;
+        this.commandPredicate = commandPredicate;
     }
 
     /**
@@ -55,6 +61,11 @@ public final class CommandHelpHandler<C> {
     public @NonNull List<@NonNull VerboseHelpEntry<C>> getAllCommands() {
         final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
         for (final Command<C> command : this.commandManager.getCommands()) {
+            /* Check command is not filtered */
+            if (!this.commandPredicate.test(command)) {
+                continue;
+            }
+
             final List<CommandArgument<C, ?>> arguments = command.getArguments();
             final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
             syntaxHints.add(new VerboseHelpEntry<>(
@@ -188,7 +199,7 @@ public final class CommandHelpHandler<C> {
         int index = 0;
 
         outer:
-        while (head != null) {
+        while (head != null && this.isNodeVisible(head)) {
             ++index;
             traversedNodes.add(head.getValue());
 
@@ -233,6 +244,11 @@ public final class CommandHelpHandler<C> {
                 /* Attempt to parse the longest possible description for the children */
                 final List<String> childSuggestions = new LinkedList<>();
                 for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
+                    /* Check filtered by predicate */
+                    if (!this.isNodeVisible(child)) {
+                        continue;
+                    }
+
                     final List<CommandArgument<C, ?>> traversedNodesSub = new LinkedList<>(traversedNodes);
                     if (recipient == null
                             || child.getValue() == null
@@ -250,6 +266,29 @@ public final class CommandHelpHandler<C> {
         }
 
         return new IndexHelpTopic<>(Collections.emptyList());
+    }
+
+    /* Checks using the predicate whether a command node or one of its children is visible */
+    private boolean isNodeVisible(
+            final CommandTree.@NonNull Node<CommandArgument<C, ?>> node
+    ) {
+        /* Check node is itself a command that is visible */
+        final CommandArgument<C, ?> argument = node.getValue();
+        if (argument != null) {
+            final Command<C> owningCommand = argument.getOwningCommand();
+            if (owningCommand != null && this.commandPredicate.test(owningCommand)) {
+                return true;
+            }
+        }
+
+        /* Query the children recursively */
+        for (CommandTree.Node<CommandArgument<C, ?>> childNode : node.getChildren()) {
+            if (this.isNodeVisible(childNode)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
