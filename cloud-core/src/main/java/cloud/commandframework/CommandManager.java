@@ -73,6 +73,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * The manager is responsible for command registration, parsing delegation, etc.
@@ -753,13 +754,30 @@ public abstract class CommandManager<C> {
 
     /**
      * Get a command help handler instance. This can be used to assist in the production
-     * of command help menus, etc.
+     * of command help menus, etc. This command help handler instance will display
+     * all commands registered in this command manager.
      *
      * @return Command help handler. A new instance will be created
      *         each time this method is called.
      */
     public final @NonNull CommandHelpHandler<C> getCommandHelpHandler() {
-        return new CommandHelpHandler<>(this);
+        return new CommandHelpHandler<>(this, cmd -> true);
+    }
+
+    /**
+     * Get a command help handler instance. This can be used to assist in the production
+     * of command help menus, etc. A predicate can be specified to filter what commands
+     * registered in this command manager are visible in the help menu.
+     *
+     * @param commandPredicate Predicate that filters what commands are displayed in
+     *                         the help menu.
+     * @return Command help handler. A new instance will be created
+     *         each time this method is called.
+     */
+    public final @NonNull CommandHelpHandler<C> getCommandHelpHandler(
+            final @NonNull Predicate<Command<C>> commandPredicate
+    ) {
+        return new CommandHelpHandler<>(this, commandPredicate);
     }
 
     /**
