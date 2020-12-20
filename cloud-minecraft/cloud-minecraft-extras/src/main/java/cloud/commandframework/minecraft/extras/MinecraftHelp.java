@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.minecraft.extras;
 
+import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
@@ -44,6 +45,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 /**
  * Opinionated extension of {@link CommandHelpHandler} for Minecraft
@@ -86,6 +88,7 @@ public final class MinecraftHelp<C> {
     private final String commandPrefix;
     private final Map<String, String> messageMap = new HashMap<>();
 
+    private Predicate<Command<C>> commandFilter = c -> true;
     private BiFunction<C, String, String> messageProvider = (sender, key) -> this.messageMap.get(key);
     private HelpColors colors = DEFAULT_HELP_COLORS;
     private int headerFooterLength = DEFAULT_HEADER_FOOTER_LENGTH;
@@ -149,6 +152,17 @@ public final class MinecraftHelp<C> {
      */
     public @NonNull Audience getAudience(final @NonNull C sender) {
         return this.audienceProvider.apply(sender);
+    }
+
+    /**
+     * Sets a filter for what commands are visible inside the help menu.
+     * When the {@link Predicate} tests <i>true</i>, then the command
+     * is included in the listings.
+     *
+     * @param commandPredicate Predicate to filter commands by
+     */
+    public void setCommandFilter(final @NonNull Predicate<Command<C>> commandPredicate) {
+        this.commandFilter = commandPredicate;
     }
 
     /**
@@ -241,7 +255,7 @@ public final class MinecraftHelp<C> {
                 recipient,
                 query,
                 page,
-                this.commandManager.getCommandHelpHandler().queryHelp(recipient, query)
+                this.commandManager.getCommandHelpHandler(this.commandFilter).queryHelp(recipient, query)
         );
     }
 

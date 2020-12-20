@@ -23,6 +23,8 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
@@ -36,6 +38,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 class CommandHelpHandlerTest {
 
@@ -91,6 +95,94 @@ class CommandHelpHandlerTest {
         final CommandHelpHandler.HelpTopic<TestCommandSender> query4 = manager.getCommandHelpHandler().queryHelp("vec");
         Assertions.assertTrue(query4 instanceof CommandHelpHandler.VerboseHelpTopic);
         this.printTopic("vec", query4);
+    }
+
+    @Test
+    void testPredicateFilter() {
+        /*
+         * This predicate only displays the commands starting with /test
+         * The one command ending in 'thing' is excluded as well, for complexity
+         */
+        final Predicate<Command<TestCommandSender>> predicate = (command) -> {
+            return command.toString().startsWith("test ")
+                    && !command.toString().endsWith(" thing");
+        };
+
+        /*
+         * List all commands from root, which should show only:
+         * - /test <potato>
+         * - /test int <int>
+         */
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query1 = manager.getCommandHelpHandler(predicate).queryHelp("");
+        Assertions.assertTrue(query1 instanceof CommandHelpHandler.IndexHelpTopic);
+        Assertions.assertEquals(Arrays.asList("test <potato>", "test int <int>"), getSortedSyntaxStrings(query1));
+
+        /*
+         * List all commands from /test, which should show only:
+         * - /test <potato>
+         * - /test int <int>
+         */
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query2 = manager.getCommandHelpHandler(predicate).queryHelp("test");
+        Assertions.assertTrue(query2 instanceof CommandHelpHandler.MultiHelpTopic);
+        Assertions.assertEquals(Arrays.asList("test <potato>", "test int <int>"), getSortedSyntaxStrings(query2));
+
+        /*
+         * List all commands from /test int, which should show only:
+         * - /test int <int>
+         */
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.getCommandHelpHandler(predicate).queryHelp("test int");
+        Assertions.assertTrue(query3 instanceof CommandHelpHandler.VerboseHelpTopic);
+        Assertions.assertEquals(Arrays.asList("test int <int>"), getSortedSyntaxStrings(query3));
+
+        /*
+         * List all commands from /vec, which should show none
+         */
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query4 = manager.getCommandHelpHandler(predicate).queryHelp("vec");
+        Assertions.assertTrue(query4 instanceof CommandHelpHandler.IndexHelpTopic);
+        Assertions.assertEquals(Collections.emptyList(), getSortedSyntaxStrings(query4));
+    }
+
+    /* Lists all the syntax strings of the commands displayed in a help topic */
+    private List<String> getSortedSyntaxStrings(
+            final CommandHelpHandler.HelpTopic<TestCommandSender> helpTopic
+    ) {
+        if (helpTopic instanceof CommandHelpHandler.IndexHelpTopic) {
+            CommandHelpHandler.IndexHelpTopic<TestCommandSender> index =
+                    (CommandHelpHandler.IndexHelpTopic<TestCommandSender>) helpTopic;
+
+            return index.getEntries().stream()
+                    .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
+                    .sorted()
+                    .collect(Collectors.toList());
+        } else if (helpTopic instanceof CommandHelpHandler.MultiHelpTopic) {
+            CommandHelpHandler.MultiHelpTopic<TestCommandSender> multi =
+                    (CommandHelpHandler.MultiHelpTopic<TestCommandSender>) helpTopic;
+
+            return multi.getChildSuggestions().stream()
+                    .sorted()
+                    .collect(Collectors.toList());
+        } else if (helpTopic instanceof CommandHelpHandler.VerboseHelpTopic) {
+            CommandHelpHandler.VerboseHelpTopic<TestCommandSender> verbose =
+                    (CommandHelpHandler.VerboseHelpTopic<TestCommandSender>) helpTopic;
+
+            //TODO: Use CommandManager syntax for this
+            StringBuilder syntax = new StringBuilder();
+            for (CommandArgument<TestCommandSender, ?> argument : verbose.getCommand().getArguments()) {
+                if (argument instanceof StaticArgument) {
+                    syntax.append(argument.getName());
+                } else if (argument.isRequired()) {
+                    syntax.append('<').append(argument.getName()).append('>');
+                } else {
+                    syntax.append('[').append(argument.getName()).append(']');
+                }
+                syntax.append(' ');
+            }
+            syntax.setLength(syntax.length() - 1);
+            return Collections.singletonList(syntax.toString());
+        }
+
+        /* Dunno */
+        return Collections.emptyList();
     }
 
     private void printTopic(
