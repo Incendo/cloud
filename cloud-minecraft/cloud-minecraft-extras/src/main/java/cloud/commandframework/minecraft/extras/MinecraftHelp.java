@@ -276,24 +276,33 @@ public final class MinecraftHelp<C> {
         }
     }
 
+    private void printNoResults(
+            final @NonNull C sender,
+            final @NonNull String query
+    ) {
+        final Audience audience = this.getAudience(sender);
+        audience.sendMessage(Identity.nil(), this.basicHeader(sender));
+        audience.sendMessage(Identity.nil(), Component.text(
+                this.messageProvider.apply(sender, MESSAGE_NO_RESULTS_FOR_QUERY) + ": \"",
+                this.colors.text
+        )
+                .append(this.highlight(Component.text("/" + query, this.colors.highlight)))
+                .append(Component.text("\"", this.colors.text)));
+        audience.sendMessage(Identity.nil(), this.footer(sender));
+    }
+
     private void printIndexHelpTopic(
             final @NonNull C sender,
             final @NonNull String query,
             final int page,
             final CommandHelpHandler.@NonNull IndexHelpTopic<C> helpTopic
     ) {
-        final Audience audience = this.getAudience(sender);
         if (helpTopic.isEmpty()) {
-            audience.sendMessage(Identity.nil(), this.basicHeader(sender));
-            audience.sendMessage(Identity.nil(), Component.text(
-                    this.messageProvider.apply(sender, MESSAGE_NO_RESULTS_FOR_QUERY) + ": \"",
-                    this.colors.text
-            )
-                    .append(this.highlight(Component.text("/" + query, this.colors.highlight)))
-                    .append(Component.text("\"", this.colors.text)));
-            audience.sendMessage(Identity.nil(), this.footer(sender));
+            this.printNoResults(sender, query);
             return;
         }
+
+        final Audience audience = this.getAudience(sender);
         new Pagination<CommandHelpHandler.VerboseHelpEntry<C>>(
                 (currentPage, maxPages) -> {
                     final List<Component> header = new ArrayList<>();
@@ -335,6 +344,11 @@ public final class MinecraftHelp<C> {
             final int page,
             final CommandHelpHandler.@NonNull MultiHelpTopic<C> helpTopic
     ) {
+        if (helpTopic.getChildSuggestions().isEmpty()) {
+            this.printNoResults(sender, query);
+            return;
+        }
+
         final Audience audience = this.getAudience(sender);
         final int headerIndentation = helpTopic.getLongestPath().length();
         new Pagination<String>(
