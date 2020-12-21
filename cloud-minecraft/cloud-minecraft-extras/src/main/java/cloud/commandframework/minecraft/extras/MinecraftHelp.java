@@ -29,10 +29,9 @@ import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -46,6 +45,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+
+import static net.kyori.adventure.text.Component.space;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.event.ClickEvent.runCommand;
 
 /**
  * Opinionated extension of {@link CommandHelpHandler} for Minecraft
@@ -281,14 +284,13 @@ public final class MinecraftHelp<C> {
             final @NonNull String query
     ) {
         final Audience audience = this.getAudience(sender);
-        audience.sendMessage(Identity.nil(), this.basicHeader(sender));
-        audience.sendMessage(Identity.nil(), Component.text(
-                this.messageProvider.apply(sender, MESSAGE_NO_RESULTS_FOR_QUERY) + ": \"",
-                this.colors.text
-        )
-                .append(this.highlight(Component.text("/" + query, this.colors.highlight)))
-                .append(Component.text("\"", this.colors.text)));
-        audience.sendMessage(Identity.nil(), this.footer(sender));
+        audience.sendMessage(this.basicHeader(sender));
+        audience.sendMessage(LinearComponents.linear(
+                text(this.messageProvider.apply(sender, MESSAGE_NO_RESULTS_FOR_QUERY) + ": \"", this.colors.text),
+                this.highlight(text("/" + query, this.colors.highlight)),
+                text("\"", this.colors.text)
+        ));
+        audience.sendMessage(this.footer(sender));
     }
 
     private void printIndexHelpTopic(
@@ -308,11 +310,14 @@ public final class MinecraftHelp<C> {
                     final List<Component> header = new ArrayList<>();
                     header.add(this.paginatedHeader(sender, currentPage, maxPages));
                     header.add(this.showingResults(sender, query));
-                    header.add(this.lastBranch()
-                            .append(Component.text(
+                    header.add(text()
+                            .append(this.lastBranch())
+                            .append(text(
                                     String.format(" %s:", this.messageProvider.apply(sender, MESSAGE_AVAILABLE_COMMANDS)),
                                     this.colors.text
-                            )));
+                            ))
+                            .build()
+                    );
                     return header;
                 },
                 (helpEntry, isLastOfPage) -> {
@@ -323,19 +328,21 @@ public final class MinecraftHelp<C> {
                     final boolean lastBranch =
                             isLastOfPage || helpTopic.getEntries().indexOf(helpEntry) == helpTopic.getEntries().size() - 1;
 
-                    return Component.text("   ")
+                    return text()
+                            .append(text("   "))
                             .append(lastBranch ? this.lastBranch() : this.branch())
-                            .append(this.highlight(Component.text(
+                            .append(this.highlight(text(
                                     String.format(" /%s", helpEntry.getSyntaxString()),
                                     this.colors.highlight
-                            ))
-                                    .hoverEvent(Component.text(description, this.colors.text))
-                                    .clickEvent(ClickEvent.runCommand(this.commandPrefix + " " + helpEntry.getSyntaxString())));
+                                    ))
+                                            .hoverEvent(text(description, this.colors.text))
+                                            .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.getSyntaxString()))
+                            )
+                            .build();
                 },
                 (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
                 (attemptedPage, maxPages) -> this.pageOutOfRange(sender, attemptedPage, maxPages)
-        ).render(helpTopic.getEntries(), page, this.maxResultsPerPage).forEach(line ->
-                audience.sendMessage(Identity.nil(), line));
+        ).render(helpTopic.getEntries(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
     }
 
     private void printMultiHelpTopic(
@@ -357,26 +364,25 @@ public final class MinecraftHelp<C> {
                     header.add(this.paginatedHeader(sender, currentPage, maxPages));
                     header.add(this.showingResults(sender, query));
                     header.add(this.lastBranch()
-                            .append(this.highlight(Component.text(" /" + helpTopic.getLongestPath(), this.colors.highlight))));
+                            .append(this.highlight(text(" /" + helpTopic.getLongestPath(), this.colors.highlight))));
                     return header;
                 },
                 (suggestion, isLastOfPage) -> {
                     final boolean lastBranch = isLastOfPage
                             || helpTopic.getChildSuggestions().indexOf(suggestion) == helpTopic.getChildSuggestions().size() - 1;
 
-                    return ComponentHelper.repeat(Component.space(), headerIndentation)
+                    return ComponentHelper.repeat(space(), headerIndentation)
                             .append(lastBranch ? this.lastBranch() : this.branch())
-                            .append(this.highlight(Component.text(" /" + suggestion, this.colors.highlight))
-                                    .hoverEvent(Component.text(
+                            .append(this.highlight(text(" /" + suggestion, this.colors.highlight))
+                                    .hoverEvent(text(
                                             this.messageProvider.apply(sender, MESSAGE_CLICK_TO_SHOW_HELP),
                                             this.colors.text
                                     ))
-                                    .clickEvent(ClickEvent.runCommand(this.commandPrefix + " " + suggestion)));
+                                    .clickEvent(runCommand(this.commandPrefix + " " + suggestion)));
                 },
                 (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
                 (attemptedPage, maxPages) -> this.pageOutOfRange(sender, attemptedPage, maxPages)
-        ).render(helpTopic.getChildSuggestions(), page, this.maxResultsPerPage).forEach(line ->
-                audience.sendMessage(Identity.nil(), line));
+        ).render(helpTopic.getChildSuggestions(), page, this.maxResultsPerPage).forEach(audience::sendMessage);
     }
 
     private void printVerboseHelpTopic(
@@ -385,39 +391,30 @@ public final class MinecraftHelp<C> {
             final CommandHelpHandler.@NonNull VerboseHelpTopic<C> helpTopic
     ) {
         final Audience audience = this.getAudience(sender);
-        audience.sendMessage(Identity.nil(), this.basicHeader(sender));
-        audience.sendMessage(Identity.nil(), this.showingResults(sender, query));
+        audience.sendMessage(this.basicHeader(sender));
+        audience.sendMessage(this.showingResults(sender, query));
         final String command = this.commandManager.getCommandSyntaxFormatter()
                 .apply(helpTopic.getCommand().getArguments(), null);
-        audience.sendMessage(
-                Identity.nil(), this.lastBranch()
-                        .append(Component.text(
-                                " " + this.messageProvider.apply(sender, MESSAGE_COMMAND) + ": ",
-                                this.colors.primary
-                        ))
-                        .append(this.highlight(Component.text("/" + command, this.colors.highlight)))
+        audience.sendMessage(text()
+                .append(this.lastBranch())
+                .append(text(" " + this.messageProvider.apply(sender, MESSAGE_COMMAND) + ": ", this.colors.primary))
+                .append(this.highlight(text("/" + command, this.colors.highlight)))
         );
         final String topicDescription = helpTopic.getDescription().isEmpty()
                 ? this.messageProvider.apply(sender, MESSAGE_NO_DESCRIPTION)
                 : helpTopic.getDescription();
         final boolean hasArguments = helpTopic.getCommand().getArguments().size() > 1;
-        audience.sendMessage(
-                Identity.nil(), Component.text("   ")
-                        .append(hasArguments ? this.branch() : this.lastBranch())
-                        .append(Component.text(
-                                " " + this.messageProvider.apply(sender, MESSAGE_DESCRIPTION) + ": ",
-                                this.colors.primary
-                        ))
-                        .append(Component.text(topicDescription, this.colors.text))
+        audience.sendMessage(text()
+                .append(text("   "))
+                .append(hasArguments ? this.branch() : this.lastBranch())
+                .append(text(" " + this.messageProvider.apply(sender, MESSAGE_DESCRIPTION) + ": ", this.colors.primary))
+                .append(text(topicDescription, this.colors.text))
         );
         if (hasArguments) {
-            audience.sendMessage(
-                    Identity.nil(), Component.text("   ")
-                            .append(this.lastBranch())
-                            .append(Component.text(
-                                    " " + this.messageProvider.apply(sender, MESSAGE_ARGUMENTS) + ":",
-                                    this.colors.primary
-                            ))
+            audience.sendMessage(text()
+                    .append(text("   "))
+                    .append(this.lastBranch())
+                    .append(text(" " + this.messageProvider.apply(sender, MESSAGE_ARGUMENTS) + ":", this.colors.primary))
             );
 
             final Iterator<CommandComponent<C>> iterator = helpTopic.getCommand().getComponents().iterator();
@@ -431,36 +428,37 @@ public final class MinecraftHelp<C> {
                 String syntax = this.commandManager.getCommandSyntaxFormatter()
                         .apply(Collections.singletonList(argument), null);
 
-                final TextComponent.Builder textComponent = Component.text()
-                        .append(Component.text("       "))
+                final TextComponent.Builder textComponent = text()
+                        .append(text("       "))
                         .append(iterator.hasNext() ? this.branch() : this.lastBranch())
-                        .append(this.highlight(Component.text(" " + syntax, this.colors.highlight)));
+                        .append(this.highlight(text(" " + syntax, this.colors.highlight)));
                 if (!argument.isRequired()) {
-                    textComponent.append(Component.text(
+                    textComponent.append(text(
                             " (" + this.messageProvider.apply(sender, MESSAGE_OPTIONAL) + ")",
                             this.colors.alternateHighlight
                     ));
                 }
                 final String description = component.getDescription().getDescription();
                 if (!description.isEmpty()) {
-                    textComponent
-                            .append(Component.text(" - ", this.colors.accent))
-                            .append(Component.text(description, this.colors.text));
+                    textComponent.append(text(" - ", this.colors.accent));
+                    textComponent.append(text(description, this.colors.text));
                 }
 
-                audience.sendMessage(Identity.nil(), textComponent);
+                audience.sendMessage(textComponent);
             }
         }
-        audience.sendMessage(Identity.nil(), this.footer(sender));
+        audience.sendMessage(this.footer(sender));
     }
 
     private @NonNull Component showingResults(
             final @NonNull C sender,
             final @NonNull String query
     ) {
-        return Component.text(this.messageProvider.apply(sender, MESSAGE_SHOWING_RESULTS_FOR_QUERY) + ": \"", this.colors.text)
-                .append(this.highlight(Component.text("/" + query, this.colors.highlight)))
-                .append(Component.text("\"", this.colors.text));
+        return text()
+                .append(text(this.messageProvider.apply(sender, MESSAGE_SHOWING_RESULTS_FOR_QUERY) + ": \"", this.colors.text))
+                .append(this.highlight(text("/" + query, this.colors.highlight)))
+                .append(text("\"", this.colors.text))
+                .build();
     }
 
     private @NonNull Component button(
@@ -468,14 +466,14 @@ public final class MinecraftHelp<C> {
             final @NonNull String command,
             final @NonNull String hoverText
     ) {
-        return Component.text()
-                .append(Component.space())
-                .append(Component.text('[', this.colors.accent))
-                .append(Component.text(icon, this.colors.alternateHighlight))
-                .append(Component.text(']', this.colors.accent))
-                .append(Component.space())
-                .clickEvent(ClickEvent.runCommand(command))
-                .hoverEvent(Component.text(hoverText, this.colors.text))
+        return text()
+                .append(space())
+                .append(text('[', this.colors.accent))
+                .append(text(icon, this.colors.alternateHighlight))
+                .append(text(']', this.colors.accent))
+                .append(space())
+                .clickEvent(runCommand(command))
+                .hoverEvent(text(hoverText, this.colors.text))
                 .build();
     }
 
@@ -512,7 +510,7 @@ public final class MinecraftHelp<C> {
             return this.header(sender, previousPageButton);
         }
 
-        final Component buttons = Component.text()
+        final Component buttons = text()
                 .append(previousPageButton)
                 .append(this.line(3))
                 .append(nextPageButton).build();
@@ -524,7 +522,7 @@ public final class MinecraftHelp<C> {
             final @NonNull Component title
     ) {
         final int sideLength = (this.headerFooterLength - ComponentHelper.length(title)) / 2;
-        return Component.text()
+        return text()
                 .append(this.line(sideLength))
                 .append(title)
                 .append(this.line(sideLength))
@@ -532,7 +530,7 @@ public final class MinecraftHelp<C> {
     }
 
     private @NonNull Component basicHeader(final @NonNull C sender) {
-        return this.header(sender, Component.text(
+        return this.header(sender, text(
                 " " + this.messageProvider.apply(sender, MESSAGE_HELP_TITLE) + " ",
                 this.colors.highlight
         ));
@@ -543,34 +541,34 @@ public final class MinecraftHelp<C> {
             final int currentPage,
             final int pages
     ) {
-        return this.header(sender, Component.text()
-                .append(Component.text(
+        return this.header(sender, text()
+                .append(text(
                         " " + this.messageProvider.apply(sender, MESSAGE_HELP_TITLE) + " ",
                         this.colors.highlight
                 ))
-                .append(Component.text("(", this.colors.alternateHighlight))
-                .append(Component.text(currentPage, this.colors.text))
-                .append(Component.text("/", this.colors.alternateHighlight))
-                .append(Component.text(pages, this.colors.text))
-                .append(Component.text(")", this.colors.alternateHighlight))
-                .append(Component.space())
+                .append(text("(", this.colors.alternateHighlight))
+                .append(text(currentPage, this.colors.text))
+                .append(text("/", this.colors.alternateHighlight))
+                .append(text(pages, this.colors.text))
+                .append(text(")", this.colors.alternateHighlight))
+                .append(space())
                 .build()
         );
     }
 
     private @NonNull Component line(final int length) {
         return ComponentHelper.repeat(
-                Component.text("-", this.colors.primary, TextDecoration.STRIKETHROUGH),
+                text("-", this.colors.primary, TextDecoration.STRIKETHROUGH),
                 length
         );
     }
 
     private @NonNull Component branch() {
-        return Component.text("├─", this.colors.accent);
+        return text("├─", this.colors.accent);
     }
 
     private @NonNull Component lastBranch() {
-        return Component.text("└─", this.colors.accent);
+        return text("└─", this.colors.accent);
     }
 
     private @NonNull Component highlight(final @NonNull Component component) {
@@ -582,14 +580,12 @@ public final class MinecraftHelp<C> {
             final int attemptedPage,
             final int maxPages
     ) {
-        return this.highlight(
-                Component.text(
-                        this.messageProvider.apply(sender, MESSAGE_PAGE_OUT_OF_RANGE)
-                                .replace("<page>", String.valueOf(attemptedPage))
-                                .replace("<max_pages>", String.valueOf(maxPages)),
-                        this.colors.text
-                )
-        );
+        return this.highlight(text(
+                this.messageProvider.apply(sender, MESSAGE_PAGE_OUT_OF_RANGE)
+                        .replace("<page>", String.valueOf(attemptedPage))
+                        .replace("<max_pages>", String.valueOf(maxPages)),
+                this.colors.text
+        ));
     }
 
     /**
