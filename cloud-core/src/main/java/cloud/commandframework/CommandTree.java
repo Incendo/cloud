@@ -55,6 +55,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -552,6 +553,11 @@ public final class CommandTree<C> {
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> child
     ) {
+        /* If argument has no value associated, break out early */
+        if (child.getValue() == null) {
+            return Collections.emptyList();
+        }
+
         /* When we get in here, we need to treat compound arguments a little differently */
         if (child.getValue() instanceof CompoundArgument) {
             @SuppressWarnings("unchecked") final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) child
@@ -566,18 +572,27 @@ public final class CommandTree<C> {
                     commandContext.store("__parsing_argument__", i + 2);
                 }
             }
-        } else if (child.getValue() instanceof FlagArgument) {
-            /* Remove all but last */
-            while (commandQueue.size() > 1) {
-                commandContext.store(FlagArgument.FLAG_META, commandQueue.remove());
+        } else if (child.getValue().getParser() instanceof FlagArgument.FlagArgumentParser) {
+
+            /*
+             * Use the flag argument parser to deduce what flag is being suggested right now
+             * If empty, then no flag value is being typed, and the different flag options should
+             * be suggested instead.
+             *
+             * Note: the method parseCurrentFlag() will remove all but the last element from
+             * the queue!
+             */
+            @SuppressWarnings("unchecked")
+            FlagArgument.FlagArgumentParser<C> parser = (FlagArgument.FlagArgumentParser<C>) child.getValue().getParser();
+            Optional<String> lastFlag = parser.parseCurrentFlag(commandContext, commandQueue);
+            if (lastFlag.isPresent()) {
+                commandContext.store(FlagArgument.FLAG_META, lastFlag.get());
             }
-        } else if (child.getValue() != null
-                && GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
+        } else if (GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
             while (commandQueue.size() > 1) {
                 commandQueue.remove();
             }
-        } else if (child.getValue() != null
-                && commandQueue.size() <= child.getValue().getParser().getRequestedArgumentCount()) {
+        } else if (commandQueue.size() <= child.getValue().getParser().getRequestedArgumentCount()) {
             for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1
                     && commandQueue.size() > 1; i++) {
                 commandContext.store(
@@ -587,57 +602,53 @@ public final class CommandTree<C> {
             }
         }
 
-        if (child.getValue() != null) {
-            if (commandQueue.isEmpty()) {
-                return Collections.emptyList();
-            } else if (child.isLeaf() && commandQueue.size() < 2) {
-                commandContext.setCurrentArgument(child.getValue());
-                return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
-            } else if (child.isLeaf()) {
-                if (child.getValue() instanceof CompoundArgument) {
-                    final String last = ((LinkedList<String>) commandQueue).getLast();
-                    commandContext.setCurrentArgument(child.getValue());
-                    return child.getValue().getSuggestionsProvider().apply(commandContext, last);
-                }
-                return Collections.emptyList();
-            } else if (commandQueue.peek().isEmpty()) {
-                commandContext.setCurrentArgument(child.getValue());
-                return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());
-            }
-
-            // Store original input command queue before the parsers below modify it
-            final Queue<String> commandQueueOriginal = new LinkedList<>(commandQueue);
-
-            // START: Preprocessing
-            final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
-                    commandContext,
-                    commandQueue
-            );
-            final boolean preParseSuccess = !preParseResult.getFailure().isPresent()
-                    && preParseResult.getParsedValue().orElse(false);
-            // END: Preprocessing
-
-            if (preParseSuccess) {
-                // START: Parsing
-                commandContext.setCurrentArgument(child.getValue());
-                final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
-                if (result.getParsedValue().isPresent() && !commandQueue.isEmpty()) {
-                    commandContext.store(child.getValue().getName(), result.getParsedValue().get());
-                    return this.getSuggestions(commandContext, commandQueue, child);
-                }
-                // END: Parsing
-            }
-
-            // Restore original command input queue
-            commandQueue.clear();
-            commandQueue.addAll(commandQueueOriginal);
-
-            // Fallback: use suggestion provider of argument
+        if (commandQueue.isEmpty()) {
+            return Collections.emptyList();
+        } else if (child.isLeaf() && commandQueue.size() < 2) {
             commandContext.setCurrentArgument(child.getValue());
-            return child.getValue().getSuggestionsProvider().apply(commandContext, stringOrEmpty(commandQueue.peek()));
+            return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
+        } else if (child.isLeaf()) {
+            if (child.getValue() instanceof CompoundArgument) {
+                final String last = ((LinkedList<String>) commandQueue).getLast();
+                commandContext.setCurrentArgument(child.getValue());
+                return child.getValue().getSuggestionsProvider().apply(commandContext, last);
+            }
+            return Collections.emptyList();
+        } else if (commandQueue.peek().isEmpty()) {
+            commandContext.setCurrentArgument(child.getValue());
+            return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());
         }
 
-        return Collections.emptyList();
+        // Store original input command queue before the parsers below modify it
+        final Queue<String> commandQueueOriginal = new LinkedList<>(commandQueue);
+
+        // START: Preprocessing
+        final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
+                commandContext,
+                commandQueue
+        );
+        final boolean preParseSuccess = !preParseResult.getFailure().isPresent()
+                && preParseResult.getParsedValue().orElse(false);
+        // END: Preprocessing
+
+        if (preParseSuccess) {
+            // START: Parsing
+            commandContext.setCurrentArgument(child.getValue());
+            final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
+            if (result.getParsedValue().isPresent() && !commandQueue.isEmpty()) {
+                commandContext.store(child.getValue().getName(), result.getParsedValue().get());
+                return this.getSuggestions(commandContext, commandQueue, child);
+            }
+            // END: Parsing
+        }
+
+        // Restore original command input queue
+        commandQueue.clear();
+        commandQueue.addAll(commandQueueOriginal);
+
+        // Fallback: use suggestion provider of argument
+        commandContext.setCurrentArgument(child.getValue());
+        return child.getValue().getSuggestionsProvider().apply(commandContext, stringOrEmpty(commandQueue.peek()));
     }
 
     private @NonNull String stringOrEmpty(final @Nullable String string) {
