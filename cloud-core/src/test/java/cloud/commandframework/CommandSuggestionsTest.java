@@ -23,11 +23,14 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.types.tuples.Pair;
+import cloud.commandframework.types.tuples.Triplet;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -86,6 +89,16 @@ public class CommandSuggestionsTest {
                 .flag(manager.flagBuilder("second").withAliases("s"))
                 .flag(manager.flagBuilder("third").withAliases("t"))
                 .build());
+
+        manager.command(manager.commandBuilder("flags3")
+                .flag(manager.flagBuilder("compound")
+                        .withArgument(ArgumentTriplet.of(manager, "triplet",
+                                Triplet.of("x", "y", "z"),
+                                Triplet.of(int.class, int.class, int.class))
+                                .simple()))
+                .flag(manager.flagBuilder("presence").withAliases("p"))
+                .flag(manager.flagBuilder("single")
+                        .withArgument(IntegerArgument.of("value"))));
 
         manager.command(manager.commandBuilder("numbers").argument(IntegerArgument.of("num")));
         manager.command(manager.commandBuilder("numberswithfollowingargument").argument(IntegerArgument.of("num"))
@@ -211,6 +224,55 @@ public class CommandSuggestionsTest {
         final String input6 = "flags2 -f -s";
         final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
         Assertions.assertEquals(Arrays.asList("-st", "-s"), suggestions6);
+
+        /* When an incorrect flag is specified, should resolve to listing flags */
+        final String input7 = "flags2 --invalid ";
+        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        Assertions.assertEquals(Arrays.asList("--first", "--second", "--third", "-f", "-s", "-t"), suggestions7);
+    }
+
+    @Test
+    void testCompoundFlags() {
+        final String input = "flags3 ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("--compound", "--presence", "--single", "-p"), suggestions);
+
+        final String input2 = "flags3 --c";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("--compound"), suggestions2);
+
+        final String input3 = "flags3 --compound ";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions3);
+
+        final String input4 = "flags3 --compound 1";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Arrays.asList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions4);
+
+        final String input5 = "flags3 --compound 22 ";
+        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions5);
+
+        final String input6 = "flags3 --compound 22 1";
+        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(Arrays.asList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions6);
+
+        /* We've typed compound already, so that flag should be omitted from the suggestions */
+        final String input7 = "flags3 --compound 22 33 44 ";
+        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        Assertions.assertEquals(Arrays.asList("--presence", "--single", "-p"), suggestions7);
+
+        final String input8 = "flags3 --compound 22 33 44 --pres";
+        final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
+        Assertions.assertEquals(Arrays.asList("--presence"), suggestions8);
+
+        final String input9 = "flags3 --compound 22 33 44 --presence ";
+        final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        Assertions.assertEquals(Arrays.asList("--single"), suggestions9);
+
+        final String input10 = "flags3 --compound 22 33 44 --single ";
+        final List<String> suggestions10 = manager.suggest(new TestCommandSender(), input10);
+        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions10);
     }
 
     @Test
