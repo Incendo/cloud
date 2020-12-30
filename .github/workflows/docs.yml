@@ -22,5 +22,3 @@ jobs:
       
     - name: asciidoctor-ghpages
       uses: manoelcampos/asciidoctor-ghpages-action@v2
-      with:
-        pdf_build: true
