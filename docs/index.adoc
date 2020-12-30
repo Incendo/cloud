@@ -1,0 +1,170 @@
+= Cloud documentation
+Alexander Söderberg <contact@alexander-soderberg.com>
+v0.1.0, 2020-12-30
+:sectnums:
+:cloud-version: 1.3.0
+:toc:
+:hide-uri-scheme:
+
+== Introduction to Cloud
+
+CAUTION: The Cloud documentation is still a work in progress.
+
+Cloud is a command manager and dispatcher for the JVM. Cloud allows you to define commands in
+several ways, most notably using command builders, or annotations. Cloud has platform implementations
+for many platforms, including Minecraft server software such as Bukkit or Discord bot frameworks
+such as JDA.
+
+Cloud allows you to customize the command execution pipeline by injecting custom behaviour along
+the entire execution path. All of this will be covered in this document.
+
+This document will first introduce different Cloud concepts using the builder pattern API.
+Section 4 will expand upon this by introducing the annotation (declarative) API, which offers
+another way of declaring commands.
+
+== Getting Started
+
+Cloud is available through https://search.maven.org/search?q=cloud.commandframework[Maven Central].
+
+[source,xml,subs="attributes,verbatim"]
+----
+<dependency>
+    <groupId>cloud.commandframework</groupId>
+    <artifactId>cloud-core</artifactId>
+    <version>{cloud-version}</version>
+</dependency>
+----
+
+If you want to use snapshot builds, then they are available via the Sonatype OSS Snapshot repository:
+
+[source,xml]
+----
+<repository>
+ <id>sonatype-snapshots</id>
+ <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+</repository>
+----
+
+=== Modules
+
+cloud-core:: Core Cloud API module.
+
+cloud-annotations:: Cloud annotation API.
+
+cloud-services:: Cloud service API. Included in Core.
+
+cloud-tasks:: Cloud scheduling API.
+
+cloud-kotlin-extensions:: Cloud extensions for Kotlin.
+
+cloud-bukkit:: Cloud implementation for the Bukkit API.
+
+cloud-paper:: Extension of cloud-bukkit for the Paper API.
+
+cloud-velocity:: Cloud implementation for the Velocity (1.1.0+) API.
+
+cloud-brigadier:: Cloud utilities for Mojang's Brigadier API.
+
+cloud-bungee:: Cloud implementation for the BungeeCord API.
+
+cloud-jda:: Cloud implementation for the JDA API.
+
+cloud-javacord:: Cloud implementation for the Javacord API.
+
+cloud-pircbotx:: Cloud implementation for the PircBotX framework.
+
+== Core
+
+=== Command Manager
+
+=== Commands
+
+Commands consist of chains of arguments that are parsed from user input. These arguments
+can be either static literals or variables. Variable arguments are parsed into different
+types using argument parsers. Variable arguments may be either required, or they can be
+optional. Optional arguments may have default values.
+
+[title=Example command structure]
+====
+[source]
+----
+/foo bar one
+/foo bar two <arg>
+/foo <arg> <1>
+----
+<1> When a variable argument is present next to literals, it will be allowed to catch any
+input that isn't caught by the literals. Only one variable may exist at any level, but
+there may be many literals.
+
+This example contains three unique commands.
+====
+
+=== Argument Types
+
+==== Standard
+
+==== literals
+
+===== string
+
+===== byte/short/int/long
+
+===== enums
+
+===== boolean
+
+===== compound arguments
+
+==== Custom
+
+==== Flags
+
+=== Suggestions
+
+=== Injection Points
+
+==== Preprocessing
+
+==== Postprocessing
+
+=== Execution Coordinators
+
+=== Command Proxies
+
+=== Permissions
+
+=== Extra
+
+==== Confirmations
+
+==== Help Generation
+
+== Annotations
+
+== Kotlin DSL
+
+== Platforms
+
+=== Minecraft
+
+==== Bukkit
+
+===== Paper
+
+===== Brigadier
+
+==== Sponge
+
+The Sponge implementation is still a work in progress.
+
+==== Fabric
+
+The Fabric implementation is still a work in progress.
+
+=== Discord
+
+==== JDA
+
+==== Javacord
+
+=== IRC
