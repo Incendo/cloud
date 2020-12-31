@@ -44,15 +44,19 @@ final class CloudBukkitListener<C> implements Listener {
 
     @EventHandler
     void onTabCompletion(final @NonNull TabCompleteEvent event) {
-        if (event.getBuffer().isEmpty() || !event.getBuffer().startsWith("/")) {
+        if (event.getBuffer().isEmpty()) {
             return;
         }
 
-        @SuppressWarnings("unchecked") final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
+        @SuppressWarnings("unchecked")
+        final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
                 (BukkitPluginRegistrationHandler<C>) this.bukkitCommandManager.getCommandRegistrationHandler();
 
-        /* Turn '/plugin:command arg1 arg2 ...' into 'plugin:command' */
-        final String commandLabel = event.getBuffer().substring(1).split(" ")[0];
+        /* Turn '(/)plugin:command arg1 arg2 ...' into 'plugin:command' */
+        final String commandLabel = (event.getBuffer().startsWith("/")
+                ? event.getBuffer().substring(1)
+                : event.getBuffer())
+                .split(" ")[0];
         if (!bukkitPluginRegistrationHandler.isRecognized(commandLabel)) {
             return;
         }
