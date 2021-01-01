@@ -32,6 +32,7 @@ import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 import net.minecraft.server.command.ServerCommandSource;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -65,6 +66,16 @@ public final class FabricCommandRegistrationHandler<C> implements CommandRegistr
     private void registerAllCommands(final CommandDispatcher<ServerCommandSource> dispatcher, final boolean isDedicated) {
         this.commandManager.registrationCalled();
         for (final Command<C> command : this.registeredCommands) {
+            /* Only register commands in the declared environment */
+            final RegistrationEnvironment env = command.getCommandMeta().getOrDefault(
+                FabricCommandManager.META_REGISTRATION_ENVIRONMENT,
+                RegistrationEnvironment.ALL
+            );
+
+            if ((env == RegistrationEnvironment.INTEGRATED && isDedicated)
+                    || (env == RegistrationEnvironment.DEDICATED && !isDedicated)) {
+                continue;
+            }
             this.registerCommand(dispatcher.getRoot(), command);
         }
     }
