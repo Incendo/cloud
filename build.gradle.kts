@@ -3,17 +3,6 @@ import de.marcphilipp.gradle.nexus.NexusPublishPlugin
 import net.ltgt.gradle.errorprone.ErrorPronePlugin
 import net.ltgt.gradle.errorprone.errorprone
 
-buildscript {
-    repositories {
-        mavenCentral()
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
-        jcenter()
-    }
-    dependencies {
-        classpath("com.bmuschko", "gradle-nexus-plugin", "2.3.1")
-    }
-}
-
 plugins {
     `java-library`
     signing
