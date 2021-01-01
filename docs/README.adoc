@@ -173,13 +173,85 @@ class.
 
 ==== Standard
 
+Cloud has built in support for all primitive types, as well as some other commonly
+used argument types.
+
 ===== string
+
+There are three different types of string arguments:
+
+single:: A single string without any blank spaces.
+
+greedy:: Consumes all remaining input.
+
+quoted:: Consumes either a single string, or a string surrounded by `"` or `'`.
+
+String arguments can be constructed using:
+
+* `StringArgument.of(name)`: Required single string argument
+
+* `StringArgument.of(name, mode)`: Required string argument of specified type
+
+* `StringArgument.optional(name)`: Optional single string argument
+
+* `StringArgument.optional(name, mode)`: Optional string argument of specified type
+
+Furthermore, a string argument builder can be constructed using `StringArgument.newBuilder(name)`.
+This allows you to provide a custom suggestion generator, using `StringArgument.Builder#withSuggestionsProvider(BiFunction<CommandContext<C>, List<String>>)`.
 
 ===== byte/short/int/long
 
+There are four different integer argument types:
+
+- byte
+- short
+- int
+- long
+
+All integer types are created the same way, the only difference is the class. These examples will use `IntegerArgument`, but the same
+methods are available in `ByteArgument`, `ShortArgument`, and `LongArgument`.
+
+Integer arguments can be constructed using:
+
+* `IntegerArgument.of(name)`: Required integer argument without a range
+
+* `IntegerArgument.optional(name)`: Optional integer argument without a range
+
+* `IntegerArgument.optional(name, default)`: Optional integer argument without a range, with a default value
+
+Furthermore, an integer argument builder can be constructed using `IntegerArgument.newBuilder(name)`. This allows you to provide a custom suggestion generator, using `IntegerArgument.Builder#withSuggestionsProvider(BiFunction<CommandContext<C>, List<String>>)`, and set minimum and maximum values.
+
+===== float/double
+
+There are two different floating point argument types:
+
+- float
+- double
+
+All floating point types are created the same way, the only difference is the class. These examples will use `FloatArgument`, but the same
+methods are available in `DoubleArgument`.
+
+Floating point arguments can be constructed using:
+
+* `FloatArgument.of(name)`: Required float argument without a range
+
+* `FloatArgument.optional(name)`: Optional float argument without a range
+
+* `FloatArgument.optional(name, default)`: Optional float argument without a range, with a default value
+
+Furthermore, a floating point argument builder can be constructed using `FloatArgument.newBuilder(name)`. This allows you to provide a custom suggestion generator, using `FloatArgument.Builder#withSuggestionsProvider(BiFunction<CommandContext<C>, List<String>>)`, and set minimum and maximum values.
+
 ===== enums
 
+The enum argument type allows you to create a command argument using any enum type. They can be created using `EnumArgument.of`
+and `EnumArgument.optional`. The parser accepts case independent values and suggestions will be created for you.
+
 ===== boolean
+
+The boolean argument type is very simple. It parses boolean-like values from the input. There are two different modes:
+
+liberal:: Accepts truthy values ("true", "yes", "on") and falsy values ("false", "no", off")
+non-liberal:: Accepts only "true" and "false"
 
 ===== compound arguments
 
