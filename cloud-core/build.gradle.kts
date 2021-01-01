@@ -1,0 +1,5 @@
+dependencies {
+    api(project(":cloud-services"))
+    testImplementation("org.openjdk.jmh", "jmh-core", vers["jhm"])
+    testImplementation("org.openjdk.jmh", "jmh-generator-annprocess", vers["jhm"])
+}
