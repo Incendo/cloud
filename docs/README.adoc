@@ -140,6 +140,37 @@ This example contains three unique commands.
 
 ==== Literals
 
+Literals are fixed strings and can be used to create "subcommands". You may use
+however many command literals you want at any level of a command. Command literals
+may have additional aliases that correspond to the same argument.
+
+A literal can be created directly in the command builder:
+
+[source,java]
+----
+builder = builder.literal(
+        "main", <1>
+        "alias1", "alias2", "alias3" <2>
+);
+----
+<1> Any literal must have a main "alias".
+<2> You may also specify additional aliases. These are optional.
+
+You can also attach a description to your node, which is used in the command
+help system:
+
+[source,java]
+----
+builder = builder.literal(
+        "main",
+        Description.of("Your Description")
+);
+----
+
+Literals may also be created using the
+https://javadoc.commandframework.cloud/cloud/commandframework/arguments/StaticArgument.html[StaticArgument]
+class.
+
 ==== Standard
 
 ===== string
@@ -171,6 +202,10 @@ This example contains three unique commands.
 === Permissions
 
 === Exception Handling
+
+=== Command Context
+
+=== Command Handler
 
 === Extra
 
@@ -209,3 +244,24 @@ The Fabric implementation is still a work in progress.
 ==== Javacord
 
 === IRC
+
+[glossary]
+== Glossary
+
+[glossary]
+sender:: A thing that is able to produce input that gets parsed into commands.
+
+argument:: An argument is something that can be parsed from a string.
+
+required argument:: A required argument is an argument that must be supplied by the sender.
+
+optional argument:: An optional argument is an argument that can be omitted by the sender. It
+may have a default value.
+
+literal:: A fixed string.
+
+command:: A command is a chain of arguments combined with a handler that acts
+on the parsed arguments.
+
+command tree:: A structure that contains all recognized commands, and that is used
+when parsing command sender input.
