@@ -4,6 +4,8 @@ v0.1.0, 2020-12-30
 :sectnums:
 :cloud-version: 1.3.0
 :toc: left
+:toclevels: 3
+:icons: font
 :hide-uri-scheme:
 
 == Introduction to Cloud
@@ -75,7 +77,42 @@ cloud-pircbotx:: Cloud implementation for the PircBotX framework.
 
 == Core
 
+The core module contains the majority of the API that you will be interacting with when using
+Cloud.
+
 === Command Manager
+
+The first step to any Cloud project is to create a command manager. Each supported platform has
+its own command manager, but for the most part they look and behave very similarly. It is possible
+to support multiple platforms in the same project.
+
+All command managers have a generic type argument for the command sender type. Most platforms have
+their own "native" command sender type, but Cloud allows you to use whatever sender you want, by
+supplying a mapping function to the command manager. This sender type will be included in the command context,
+which you will be interacting with a lot when using Cloud.
+
+[title="Creating a command manager instance using Bukkit"]
+====
+This particular example uses `cloud-bukkit`, though most concepts transfer over to the other command mangers.
+
+[source,java]
+----
+CommandManager<CommandSender> manager = new BukkitCommandManager<>(
+        /* Owning plugin */ this,
+        AsynchronousCommandExecutionCoordinator.newBuilder().build(), <1>
+        Function.identity(), <2>
+        Function.identity(), <3>
+);
+----
+<1> The execution coordinator handles the coordination of command parsing and execution. You can read more about this
+in section 3.6.
+<2> Function that maps the platform command sender to your command sender.
+<3> Function that maps your command sender to the platform command sender.
+====
+
+The command manager is used to register commands, create builders, change command settings, etc.
+More information can be found in the CommandManager
+https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html[JavaDoc].
 
 === Commands
 
@@ -101,9 +138,9 @@ This example contains three unique commands.
 
 === Argument Types
 
-==== Standard
+==== Literals
 
-==== literals
+==== Standard
 
 ===== string
 
@@ -133,7 +170,11 @@ This example contains three unique commands.
 
 === Permissions
 
+=== Exception Handling
+
 === Extra
+
+==== Translations
 
 ==== Confirmations
 
