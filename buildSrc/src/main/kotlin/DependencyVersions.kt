@@ -24,6 +24,3 @@ val versions = mapOf(
         "jupiter-engine" to "5.7.0",
         "jhm" to "1.25.2"
 )
-
-val vers
-    get() = versions
