@@ -2,8 +2,8 @@ dependencies {
     api(project(":cloud-core"))
     api(project(":cloud-brigadier"))
     api(project(":cloud-tasks"))
-    compileOnly("org.bukkit", "bukkit", vers["bukkit"])
-    compileOnly("me.lucko", "commodore", vers["commodore"])
-    compileOnly("org.jetbrains", "annotations", vers["jb-annotations"])
-    compileOnly("com.google.guava", "guava", vers["guava"])
+    compileOnly("org.bukkit", "bukkit", versions["bukkit"])
+    compileOnly("me.lucko", "commodore", versions["commodore"])
+    compileOnly("org.jetbrains", "annotations", versions["jb-annotations"])
+    compileOnly("com.google.guava", "guava", versions["guava"])
 }
