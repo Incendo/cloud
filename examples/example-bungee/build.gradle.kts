@@ -19,7 +19,7 @@ dependencies {
     implementation(project(":cloud-annotations"))
     implementation(project(":cloud-minecraft-extras"))
     /* Extras */
-    implementation("net.kyori", "adventure-platform-bungeecord", vers["adventure-platform"])
+    implementation("net.kyori", "adventure-platform-bungeecord", versions["adventure-platform"])
     /* Bungee*/
     compileOnly("net.md-5", "bungeecord-api", "1.8-SNAPSHOT")
 }
