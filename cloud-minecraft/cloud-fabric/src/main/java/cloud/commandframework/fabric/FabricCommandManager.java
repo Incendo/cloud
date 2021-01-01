@@ -33,6 +33,7 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
@@ -43,6 +44,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.function.Function;
 
 public class FabricCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+
+    /**
+     * A meta attribute specifying which environments a command should be registered in.
+     *
+     * <p>The default value is {@link RegistrationEnvironment#ALL}.</p>
+     */
+    public static final CommandMeta.Key<RegistrationEnvironment> META_REGISTRATION_ENVIRONMENT = CommandMeta.Key.of(
+            RegistrationEnvironment.class,
+            "cloud:registration-environment"
+    );
+
     private final Function<ServerCommandSource, C> commandSourceMapper;
     private final Function<C, ServerCommandSource> backwardsCommandSourceMapper;
     private final CloudBrigadierManager<C, ServerCommandSource> brigadierManager;
@@ -100,7 +112,7 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
                                 null,
                                 null
                         )),
-                        this.getCaptionRegistry()
+                        this
                 ));
 
         ((FabricCommandRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
@@ -149,6 +161,7 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
         return this.brigadierManager;
     }
 
+    /* transition state to prevent further registration */
     final void registrationCalled() {
         this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
     }
