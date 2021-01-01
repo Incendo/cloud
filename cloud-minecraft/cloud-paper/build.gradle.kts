@@ -1,7 +1,7 @@
 dependencies {
     api(project(":cloud-bukkit"))
-    compileOnly("com.destroystokyo.paper", "paper-api", versions["paper-api"])
-    compileOnly("com.destroystokyo.paper", "paper-mojangapi", versions["paper-api"])
-    compileOnly("org.jetbrains", "annotations", versions["jb-annotations"])
-    compileOnly("com.google.guava", "guava", versions["guava"])
+    compileOnly("com.destroystokyo.paper", "paper-api", Versions.paperApi)
+    compileOnly("com.destroystokyo.paper", "paper-mojangapi", Versions.paperApi)
+    compileOnly("org.jetbrains", "annotations", Versions.jetbrainsAnnotations)
+    compileOnly("com.google.guava", "guava", Versions.guava)
 }

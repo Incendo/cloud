@@ -114,12 +114,12 @@ subprojects {
     }
 
     dependencies {
-        compileOnly("org.checkerframework", "checker-qual", versions["checker-qual"])
-        api("io.leangen.geantyref", "geantyref", versions["geantyref"])
-        testImplementation("org.junit.jupiter", "junit-jupiter-engine", versions["jupiter-engine"])
-        errorprone("com.google.errorprone", "error_prone_core", versions["errorprone"])
-        errorproneJavac("com.google.errorprone", "javac", versions["errorprone_javac"])
-        compileOnly("com.google.errorprone", "error_prone_annotations", versions["errorprone"])
+        compileOnly("org.checkerframework", "checker-qual", Versions.checkerQual)
+        api("io.leangen.geantyref", "geantyref", Versions.geantyref)
+        testImplementation("org.junit.jupiter", "junit-jupiter-engine", Versions.jupiterEngine)
+        errorprone("com.google.errorprone", "error_prone_core", Versions.errorprone)
+        errorproneJavac("com.google.errorprone", "javac", Versions.errorprone_javac)
+        compileOnly("com.google.errorprone", "error_prone_annotations", Versions.errorprone)
     }
 
     nexusPublishing {
