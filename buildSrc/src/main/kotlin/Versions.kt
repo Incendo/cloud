@@ -26,5 +26,5 @@ object Versions {
 
     // TEST DEPENDENCIES
     const val jupiterEngine = "5.7.0"
-    const val jhm = "1.25.2"
+    const val jmh = "1.25.2"
 }
