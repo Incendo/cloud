@@ -1,4 +1,4 @@
 dependencies {
     api(project(":cloud-core"))
-    api("net.kyori", "adventure-api", vers["adventure-api"])
+    api("net.kyori", "adventure-api", versions["adventure-api"])
 }
