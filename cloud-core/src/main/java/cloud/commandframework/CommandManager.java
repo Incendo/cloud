@@ -853,6 +853,21 @@ public abstract class CommandManager<C> {
     }
 
     /**
+     * Transition the command manager from either {@link RegistrationState#BEFORE_REGISTRATION} or
+     * {@link RegistrationState#REGISTERING} to {@link RegistrationState#AFTER_REGISTRATION}.
+     *
+     * @throws IllegalStateException if the manager is not in the expected state
+     * @since 1.4.0
+     */
+    protected final void lockRegistration() {
+        if (this.getRegistrationState() == RegistrationState.BEFORE_REGISTRATION) {
+            this.transitionOrThrow(RegistrationState.BEFORE_REGISTRATION, RegistrationState.AFTER_REGISTRATION);
+            return;
+        }
+        this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+    }
+
+    /**
      * Get the active registration state for this manager.
      * <p>
      * If this state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered
