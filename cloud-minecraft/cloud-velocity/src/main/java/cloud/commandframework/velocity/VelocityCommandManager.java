@@ -139,7 +139,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
         }
 
         this.proxyServer.getEventManager().register(plugin, ServerPreConnectEvent.class, ev -> {
-            this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+            this.lockRegistration();
         });
     }
 

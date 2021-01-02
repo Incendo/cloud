@@ -76,7 +76,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
                 RegistriesClosedEvent.class,
                 CloudListener.INSTANCE,
                 EventPriority.NORMAL,
-                (listener, event) -> this.lock(),
+                (listener, event) -> this.lockRegistration(),
                 this.owningPlugin
         );
     }
@@ -87,10 +87,6 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
             final @NonNull String permission
     ) {
         return this.backwardsCommandSenderMapper.apply(sender).hasPermission(permission);
-    }
-
-    final void lock() {
-        this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
     }
 
     @Override
