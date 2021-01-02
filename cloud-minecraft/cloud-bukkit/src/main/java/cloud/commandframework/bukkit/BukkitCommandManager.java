@@ -375,7 +375,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
     final void lockIfBrigadierCapable() {
         if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
-            this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+            this.lockRegistration();
         }
     }
 
