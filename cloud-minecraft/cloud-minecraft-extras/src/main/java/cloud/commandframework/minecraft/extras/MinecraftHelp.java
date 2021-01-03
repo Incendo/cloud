@@ -647,6 +647,14 @@ public final class MinecraftHelp<C> {
     @FunctionalInterface
     public interface MessageProvider<C> {
 
+        /**
+         * Creates a component from a command sender, key, and arguments
+         *
+         * @param sender command sender
+         * @param key message key (constants in {@link MinecraftHelp}
+         * @param args args
+         * @return component
+         */
         @NonNull Component provide(@NonNull C sender, @NonNull String key, @NonNull String... args);
 
     }
