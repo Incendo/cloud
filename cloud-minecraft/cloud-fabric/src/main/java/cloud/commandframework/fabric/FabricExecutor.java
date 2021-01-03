@@ -33,13 +33,17 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandResult;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.PrintWriter;
@@ -48,6 +52,8 @@ import java.util.concurrent.CompletionException;
 import java.util.function.BiConsumer;
 
 final class FabricExecutor<C> implements Command<ServerCommandSource> {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final Text NEWLINE = new LiteralText("\n");
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
@@ -118,9 +124,18 @@ final class FabricExecutor<C> implements Command<ServerCommandSource> {
                             sender,
                             ArgumentParseException.class,
                             (ArgumentParseException) throwable,
-                            (c, e) -> source.sendError(new LiteralText("Invalid Command Argument: ")
-                                    .append(new LiteralText(finalThrowable.getCause().getMessage())
-                                            .styled(style -> style.withColor(Formatting.GRAY))))
+                            (c, e) -> {
+                                if (finalThrowable.getCause() instanceof CommandSyntaxException) {
+                                    source.sendError(new LiteralText("Invalid Command Argument: ")
+                                        .append(new LiteralText("")
+                                            .append(Texts.toText(((CommandSyntaxException) finalThrowable.getCause()).getRawMessage()))
+                                            .formatted(Formatting.GRAY)));
+                                } else {
+                                    source.sendError(new LiteralText("Invalid Command Argument: ")
+                                        .append(new LiteralText(finalThrowable.getCause().getMessage())
+                                            .formatted(Formatting.GRAY)));
+                                }
+                            }
                     );
                 } else if (throwable instanceof CommandExecutionException) {
                     this.manager.handleException(
@@ -128,21 +143,21 @@ final class FabricExecutor<C> implements Command<ServerCommandSource> {
                             CommandExecutionException.class,
                             (CommandExecutionException) throwable,
                             (c, e) -> {
-                                source.sendError(decorateHoverStacktrace(
+                                source.sendError(this.decorateHoverStacktrace(
                                                 new LiteralText(MESSAGE_INTERNAL_ERROR),
                                                 finalThrowable.getCause(),
                                                 sender
                                         ));
-                                finalThrowable.getCause().printStackTrace();
+                                LOGGER.warn("Error occurred while executing command for user {}:", source.getName(), finalThrowable);
                             }
                     );
                 } else {
-                    source.sendError(decorateHoverStacktrace(
+                    source.sendError(this.decorateHoverStacktrace(
                             new LiteralText(MESSAGE_INTERNAL_ERROR),
                             throwable,
                             sender
                     ));
-                    throwable.printStackTrace();
+                    LOGGER.warn("Error occurred while executing command for user {}:", source.getName(), throwable);
                 }
             }
         };
