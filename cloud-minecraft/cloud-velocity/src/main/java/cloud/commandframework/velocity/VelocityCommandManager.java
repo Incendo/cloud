@@ -175,4 +175,8 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
         return this.commandSenderMapper;
     }
 
+    final @NonNull Function<@NonNull C, @NonNull CommandSource> getBackwardsCommandSenderMapper() {
+        return this.backwardsCommandSenderMapper;
+    }
+
 }
