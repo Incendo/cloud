@@ -39,6 +39,7 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
@@ -92,6 +93,7 @@ public final class CloudBrigadierManager<C, S> {
     private final Supplier<CommandContext<C>> dummyContextProvider;
     private final CommandManager<C> commandManager;
     private Function<S, C> brigadierCommandSenderMapper;
+    private Function<C, S> backwardsBrigadierCommandSenderMapper;
 
     /**
      * Create a new cloud brigadier manager
@@ -108,6 +110,14 @@ public final class CloudBrigadierManager<C, S> {
         this.commandManager = commandManager;
         this.dummyContextProvider = dummyContextProvider;
         this.registerInternalMappings();
+        commandManager.registerCommandPreProcessor(ctx -> {
+            if (this.backwardsBrigadierCommandSenderMapper != null) {
+                ctx.getCommandContext().store(
+                        WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER,
+                        this.backwardsBrigadierCommandSenderMapper.apply(ctx.getCommandContext().getSender())
+                );
+            }
+        });
     }
 
     private void registerInternalMappings() {
@@ -195,6 +205,14 @@ public final class CloudBrigadierManager<C, S> {
         /* Map String[] to a greedy string */
         this.registerMapping(new TypeToken<StringArrayArgument.StringArrayParser<C>>() {
         }, false, argument -> StringArgumentType.greedyString());
+        /* Map wrapped parsers to their native types */
+        this.registerWrapperMapping();
+    }
+
+    private <O> void registerWrapperMapping() {
+        /* a small hack to make type inference work properly... O doesn't behave as a wildcard */
+        this.registerMapping(new TypeToken<WrappedBrigadierParser<C, O>>() {
+        }, true, WrappedBrigadierParser::getNativeArgument);
     }
 
     /**
@@ -217,6 +235,18 @@ public final class CloudBrigadierManager<C, S> {
      */
     public @Nullable Function<@NonNull S, @Nullable C> brigadierSenderMapper() {
         return this.brigadierCommandSenderMapper;
+    }
+
+    /**
+     * Set the backwards mapper from Cloud to Brigadier command senders.
+     *
+     * <p>This is passed to completion requests for mapped argument types.</p>
+     *
+     * @param mapper the reverse brigadier sender mapper
+     * @since 1.4.0
+     */
+    public void backwardsBrigadierSenderMapper(final @NonNull Function<@NonNull C, @Nullable S> mapper) {
+        this.backwardsBrigadierCommandSenderMapper = mapper;
     }
 
     /**
