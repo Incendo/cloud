@@ -26,21 +26,53 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import com.mojang.brigadier.arguments.ArgumentType;
+import io.leangen.geantyref.TypeToken;
+import net.minecraft.command.argument.AngleArgumentType;
+import net.minecraft.command.argument.BlockPredicateArgumentType;
+import net.minecraft.command.argument.ColorArgumentType;
+import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.command.argument.IdentifierArgumentType;
+import net.minecraft.command.argument.ItemEnchantmentArgumentType;
+import net.minecraft.command.argument.ItemStackArgument;
+import net.minecraft.command.argument.ItemStackArgumentType;
+import net.minecraft.command.argument.MessageArgumentType;
+import net.minecraft.command.argument.MobEffectArgumentType;
+import net.minecraft.command.argument.NbtCompoundTagArgumentType;
+import net.minecraft.command.argument.NbtPathArgumentType;
+import net.minecraft.command.argument.NumberRangeArgumentType;
+import net.minecraft.command.argument.ObjectiveCriteriaArgumentType;
+import net.minecraft.command.argument.OperationArgumentType;
+import net.minecraft.command.argument.ParticleArgumentType;
+import net.minecraft.command.argument.SwizzleArgumentType;
+import net.minecraft.command.argument.UuidArgumentType;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.predicate.NumberRange;
+import net.minecraft.scoreboard.ScoreboardCriterion;
 import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.EnumSet;
 import java.util.function.Function;
 
 public class FabricCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
@@ -114,8 +146,66 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
                         )),
                         this
                 ));
+        this.brigadierManager.backwardsBrigadierSenderMapper(this.backwardsCommandSourceMapper);
+        this.registerNativeBrigadierMappings(this.brigadierManager);
 
         ((FabricCommandRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+    }
+
+    private void registerNativeBrigadierMappings(final CloudBrigadierManager<C, ServerCommandSource> brigadier) {
+        /* Cloud-native argument types */
+        brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {}, false, cloud -> UuidArgumentType.uuid());
+
+        /* Wrapped/Constant Brigadier types, native value type */
+        this.registerConstantNativeParserSupplier(Formatting.class, ColorArgumentType.color());
+        this.registerConstantNativeParserSupplier(BlockPredicateArgumentType.BlockPredicate.class,
+                BlockPredicateArgumentType.blockPredicate());
+        this.registerConstantNativeParserSupplier(MessageArgumentType.MessageFormat.class, MessageArgumentType.message());
+        this.registerConstantNativeParserSupplier(CompoundTag.class, NbtCompoundTagArgumentType.nbtCompound());
+        this.registerConstantNativeParserSupplier(NbtPathArgumentType.NbtPath.class, NbtPathArgumentType.nbtPath());
+        this.registerConstantNativeParserSupplier(ScoreboardCriterion.class, ObjectiveCriteriaArgumentType.objectiveCriteria());
+        this.registerConstantNativeParserSupplier(OperationArgumentType.Operation.class, OperationArgumentType.operation());
+        this.registerConstantNativeParserSupplier(ParticleEffect.class, ParticleArgumentType.particle());
+        this.registerConstantNativeParserSupplier(AngleArgumentType.Angle.class, AngleArgumentType.angle());
+        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {}, SwizzleArgumentType.swizzle());
+        this.registerConstantNativeParserSupplier(Identifier.class, IdentifierArgumentType.identifier());
+        this.registerConstantNativeParserSupplier(StatusEffect.class, MobEffectArgumentType.mobEffect());
+        this.registerConstantNativeParserSupplier(EntityAnchorArgumentType.EntityAnchor.class, EntityAnchorArgumentType.entityAnchor());
+        this.registerConstantNativeParserSupplier(NumberRange.IntRange.class, NumberRangeArgumentType.numberRange());
+        this.registerConstantNativeParserSupplier(NumberRange.FloatRange.class, NumberRangeArgumentType.method_30918());
+        this.registerConstantNativeParserSupplier(Enchantment.class, ItemEnchantmentArgumentType.itemEnchantment());
+        // todo: can we add a compound argument -- MC `ItemStackArgument` is just type and tag, and count is separate
+        this.registerConstantNativeParserSupplier(ItemStackArgument.class, ItemStackArgumentType.itemStack());
+
+        /* Wrapped/Constant Brigadier types, mapped value type */
+        /*this.registerConstantNativeParserSupplier(GameProfile.class, GameProfileArgumentType.gameProfile());
+        this.registerConstantNativeParserSupplier(BlockPos.class, BlockPosArgumentType.blockPos());
+        this.registerConstantNativeParserSupplier(ColumnPos.class, ColumnPosArgumentType.columnPos());
+        this.registerConstantNativeParserSupplier(Vec3d.class, Vec3ArgumentType.vec3());
+        this.registerConstantNativeParserSupplier(Vec2f.class, Vec2ArgumentType.vec2());
+        this.registerConstantNativeParserSupplier(BlockState.class, BlockStateArgumentType.blockState());
+        this.registerConstantNativeParserSupplier(ItemPredicate.class, ItemPredicateArgumentType.itemPredicate());
+        this.registerConstantNativeParserSupplier(ScoreboardObjective.class, ObjectiveArgumentType.objective());
+        this.registerConstantNativeParserSupplier(PosArgument.class, RotationArgumentType.rotation()); // todo: different type
+        this.registerConstantNativeParserSupplier(ScoreboardSlotArgumentType.scoreboardSlot());
+        this.registerConstantNativeParserSupplier(Team.class, TeamArgumentType.team());
+        this.registerConstantNativeParserSupplier(/* slot *, ItemSlotArgumentType.itemSlot());
+        this.registerConstantNativeParserSupplier(CommandFunction.class, FunctionArgumentType.function());
+        this.registerConstantNativeParserSupplier(EntityType.class, EntitySummonArgumentType.entitySummon()); // entity summon
+        this.registerConstantNativeParserSupplier(ServerWorld.class, DimensionArgumentType.dimension());
+        this.registerConstantNativeParserSupplier(/* time representation in ticks *, TimeArgumentType.time());*/
+
+        /* Wrapped brigadier requiring parameters */
+        // score holder: single vs multiple
+        // entity argument type: single or multiple, players or any entity -- returns EntitySelector, but do we want that?
+    }
+
+    private <T> void registerConstantNativeParserSupplier(final Class<T> type, final ArgumentType<T> argument) {
+        this.registerConstantNativeParserSupplier(TypeToken.get(type), argument);
+    }
+
+    private <T> void registerConstantNativeParserSupplier(final TypeToken<T> type, final ArgumentType<T> argument) {
+        this.getParserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
     }
 
     /**
