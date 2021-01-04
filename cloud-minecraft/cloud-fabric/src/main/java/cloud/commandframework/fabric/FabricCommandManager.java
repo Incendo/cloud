@@ -50,6 +50,7 @@ import net.minecraft.command.argument.MessageArgumentType;
 import net.minecraft.command.argument.MobEffectArgumentType;
 import net.minecraft.command.argument.NbtCompoundTagArgumentType;
 import net.minecraft.command.argument.NbtPathArgumentType;
+import net.minecraft.command.argument.NbtTagArgumentType;
 import net.minecraft.command.argument.NumberRangeArgumentType;
 import net.minecraft.command.argument.ObjectiveCriteriaArgumentType;
 import net.minecraft.command.argument.OperationArgumentType;
@@ -59,6 +60,7 @@ import net.minecraft.command.argument.UuidArgumentType;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.scoreboard.ScoreboardCriterion;
@@ -84,6 +86,7 @@ import java.util.function.Supplier;
  * @param <C> the manager's sender type
  * @param <S> the platform sender type
  * @see FabricServerCommandManager for server commands
+ * @since 1.4.0
  */
 public abstract class FabricCommandManager<C, S extends CommandSource> extends CommandManager<C> implements BrigadierManagerHolder<C> {
 
@@ -139,10 +142,8 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
 
         /* Wrapped/Constant Brigadier types, native value type */
         this.registerConstantNativeParserSupplier(Formatting.class, ColorArgumentType.color());
-        this.registerConstantNativeParserSupplier(BlockPredicateArgumentType.BlockPredicate.class,
-                BlockPredicateArgumentType.blockPredicate());
-        this.registerConstantNativeParserSupplier(MessageArgumentType.MessageFormat.class, MessageArgumentType.message());
         this.registerConstantNativeParserSupplier(CompoundTag.class, NbtCompoundTagArgumentType.nbtCompound());
+        this.registerConstantNativeParserSupplier(Tag.class, NbtTagArgumentType.nbtTag());
         this.registerConstantNativeParserSupplier(NbtPathArgumentType.NbtPath.class, NbtPathArgumentType.nbtPath());
         this.registerConstantNativeParserSupplier(ScoreboardCriterion.class, ObjectiveCriteriaArgumentType.objectiveCriteria());
         this.registerConstantNativeParserSupplier(OperationArgumentType.Operation.class, OperationArgumentType.operation());
@@ -159,6 +160,9 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         this.registerConstantNativeParserSupplier(ItemStackArgument.class, ItemStackArgumentType.itemStack());
 
         /* Wrapped/Constant Brigadier types, mapped value type */
+        this.registerConstantNativeParserSupplier(BlockPredicateArgumentType.BlockPredicate.class,
+                BlockPredicateArgumentType.blockPredicate());
+        this.registerConstantNativeParserSupplier(MessageArgumentType.MessageFormat.class, MessageArgumentType.message());
         /*this.registerConstantNativeParserSupplier(GameProfile.class, GameProfileArgumentType.gameProfile());
         this.registerConstantNativeParserSupplier(BlockPos.class, BlockPosArgumentType.blockPos());
         this.registerConstantNativeParserSupplier(ColumnPos.class, ColumnPosArgumentType.columnPos());
