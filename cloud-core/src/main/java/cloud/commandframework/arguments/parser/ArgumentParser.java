@@ -29,6 +29,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.BiFunction;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Parser that parses strings into values of a specific type
@@ -87,6 +90,17 @@ public interface ArgumentParser<C, T> {
             final @NonNull String input
     ) {
         return Collections.emptyList();
+    }
+
+    /**
+     * Create a derived argument parser preserving all properties of this parser, but converting the output type.
+     *
+     * @param mapper the mapper to apply
+     * @param <O> the result type
+     * @return a derived parser.
+     */
+    default <O> @NonNull ArgumentParser<C, O> map(final BiFunction<CommandContext<C>, T, ArgumentParseResult<O>> mapper) {
+        return new MappedArgumentParser<>(this, requireNonNull(mapper, "mapper"));
     }
 
     /**
