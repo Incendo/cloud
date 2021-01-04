@@ -29,7 +29,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.fabric.FabricCommandManager;
+import cloud.commandframework.fabric.FabricServerCommandManager;
 import cloud.commandframework.meta.CommandMeta;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
@@ -62,8 +62,8 @@ public final class FabricExample implements ModInitializer {
     public void onInitialize() {
         // Create a commands manager. We'll use native command source types for this.
 
-        final FabricCommandManager<ServerCommandSource> manager =
-                FabricCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
+        final FabricServerCommandManager<ServerCommandSource> manager =
+                FabricServerCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
 
         final Command.Builder<ServerCommandSource> base = manager.commandBuilder("cloudtest");
 
@@ -85,7 +85,7 @@ public final class FabricExample implements ModInitializer {
 
         manager.command(base.literal("dump")
                 .meta(CommandMeta.DESCRIPTION, "Dump the client's Brigadier command tree (integrated server only)")
-                .meta(FabricCommandManager.META_REGISTRATION_ENVIRONMENT, CommandManager.RegistrationEnvironment.INTEGRATED)
+                .meta(FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT, CommandManager.RegistrationEnvironment.INTEGRATED)
         .handler(ctx -> {
             final Path target =
                     FabricLoader.getInstance().getGameDir().resolve(
