@@ -28,6 +28,8 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Arrays;
+
 public class ParserException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -4409795575435072170L;
@@ -54,6 +56,27 @@ public class ParserException extends IllegalArgumentException {
                 this.errorCaption,
                 this.captionVariables
         );
+    }
+
+    /**
+     * Get the error caption for this parser exception
+     *
+     * @return The caption
+     * @since 1.4.0
+     */
+    public @NonNull Caption errorCaption() {
+        return this.errorCaption;
+    }
+
+    /**
+     * Get a copy of the caption variables present in this parser exception.
+     * The returned array may be empty if no variables are present.
+     *
+     * @return The caption variables
+     * @since 1.4.0
+     */
+    public @NonNull CaptionVariable @NonNull [] captionVariables() {
+        return Arrays.copyOf(this.captionVariables, this.captionVariables.length);
     }
 
     /**
