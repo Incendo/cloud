@@ -34,9 +34,10 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * Command Argument for {@link MessageChannel}
@@ -46,11 +47,11 @@ import java.util.Queue;
 @SuppressWarnings("unused")
 public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel> {
 
-    private final List<ParserMode> modes;
+    private final Set<ParserMode> modes;
 
     private ChannelArgument(
             final boolean required, final @NonNull String name,
-            final @NonNull List<ParserMode> modes
+            final @NonNull Set<ParserMode> modes
     ) {
         super(required, name, new MessageParser<>(modes), MessageChannel.class);
         this.modes = modes;
@@ -94,7 +95,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
      *
      * @return List of Modes
      */
-    public @NotNull List<ParserMode> getModes() {
+    public @NotNull Set<ParserMode> getModes() {
         return modes;
     }
 
@@ -108,7 +109,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
     public static final class Builder<C> extends CommandArgument.Builder<C, MessageChannel> {
 
-        private List<ParserMode> modes = new ArrayList<>();
+        private Set<ParserMode> modes = new HashSet<>();
 
         private Builder(final @NonNull String name) {
             super(MessageChannel.class, name);
@@ -120,7 +121,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
          * @param modes List of Modes
          * @return Builder instance
          */
-        public @NonNull Builder<C> withParsers(final @NonNull List<ParserMode> modes) {
+        public @NonNull Builder<C> withParsers(final @NonNull Set<ParserMode> modes) {
             this.modes = modes;
             return this;
         }
@@ -140,9 +141,14 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
     public static final class MessageParser<C> implements ArgumentParser<C, MessageChannel> {
 
-        private final List<ParserMode> modes;
+        private final Set<ParserMode> modes;
 
-        private MessageParser(final @NonNull List<ParserMode> modes) {
+        /**
+         * Construct a new argument parser for {@link MessageChannel}
+         *
+         * @param modes List of parsing modes to use when parsing
+         */
+        public MessageParser(final @NonNull Set<ParserMode> modes) {
             this.modes = modes;
         }
 
