@@ -26,8 +26,10 @@ package cloud.commandframework.minecraft.extras;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 final class ComponentHelper {
@@ -63,7 +65,8 @@ final class ComponentHelper {
         if (component instanceof TextComponent) {
             length += ((TextComponent) component).content().length();
         }
-        for (final Component child : component.children()) {
+        final Component translated = GlobalTranslator.render(component, Locale.getDefault());
+        for (final Component child : translated.children()) {
             length += length(child);
         }
         return length;
