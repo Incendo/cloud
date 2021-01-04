@@ -37,6 +37,7 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.leangen.geantyref.TypeToken;
+import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.AngleArgumentType;
 import net.minecraft.command.argument.BlockPredicateArgumentType;
 import net.minecraft.command.argument.ColorArgumentType;
@@ -61,48 +62,34 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.scoreboard.ScoreboardCriterion;
-import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
-import net.minecraft.server.command.CommandOutput;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.EnumSet;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class FabricCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+/**
+ * A command manager for either the server or client on Fabric.
+ *
+ * <p>Commands registered with managers of this type will be registered into a Brigadier command tree.</p>
+ *
+ * <p>Where possible, Vanilla argument types are made available in a cloud-friendly format. In some cases, these argument
+ * types may only be available for server commands. Mod-provided argument types can be exposed to Cloud as well, by using
+ * {@link WrappedBrigadierParser}.</p>
+ *
+ * @param <C> the manager's sender type
+ * @param <S> the platform sender type
+ * @see FabricServerCommandManager for server commands
+ */
+public abstract class FabricCommandManager<C, S extends CommandSource> extends CommandManager<C> implements BrigadierManagerHolder<C> {
 
-    /**
-     * A meta attribute specifying which environments a command should be registered in.
-     *
-     * <p>The default value is {@link RegistrationEnvironment#ALL}.</p>
-     */
-    public static final CommandMeta.Key<RegistrationEnvironment> META_REGISTRATION_ENVIRONMENT = CommandMeta.Key.of(
-            RegistrationEnvironment.class,
-            "cloud:registration-environment"
-    );
-
-    private final Function<ServerCommandSource, C> commandSourceMapper;
-    private final Function<C, ServerCommandSource> backwardsCommandSourceMapper;
-    private final CloudBrigadierManager<C, ServerCommandSource> brigadierManager;
-
-    /**
-     * Create a command manager using native source types.
-     *
-     * @param execCoordinator Execution coordinator instance.
-     * @return a new command manager
-     * @see #FabricCommandManager(Function, Function, Function) for a more thorough explanation
-     */
-    public static FabricCommandManager<ServerCommandSource> createNative(
-            final Function<CommandTree<ServerCommandSource>, CommandExecutionCoordinator<ServerCommandSource>> execCoordinator
-            ) {
-        return new FabricCommandManager<>(execCoordinator, Function.identity(), Function.identity());
-    }
+    private final Function<S, C> commandSourceMapper;
+    private final Function<C, S> backwardsCommandSourceMapper;
+    private final CloudBrigadierManager<C, S> brigadierManager;
 
 
     /**
@@ -118,14 +105,18 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
      *                                    {@link AsynchronousCommandExecutionCoordinator}
      * @param commandSourceMapper          Function that maps {@link ServerCommandSource} to the command sender type
      * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link ServerCommandSource}
+     * @param registrationHandler the handler accepting command registrations
+     * @param dummyCommandSourceProvider a provider of a dummy command source, for use with brigadier registration
      */
     @SuppressWarnings("unchecked")
-    protected FabricCommandManager(
+    FabricCommandManager(
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final Function<ServerCommandSource, C> commandSourceMapper,
-            final Function<C, ServerCommandSource> backwardsCommandSourceMapper
-    ) {
-        super(commandExecutionCoordinator, new FabricCommandRegistrationHandler<>());
+            final Function<S, C> commandSourceMapper,
+            final Function<C, S> backwardsCommandSourceMapper,
+            final FabricCommandRegistrationHandler<C, S> registrationHandler,
+            final Supplier<S> dummyCommandSourceProvider
+            ) {
+        super(commandExecutionCoordinator, registrationHandler);
         this.commandSourceMapper = commandSourceMapper;
         this.backwardsCommandSourceMapper = backwardsCommandSourceMapper;
 
@@ -133,26 +124,16 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
         this.brigadierManager = new CloudBrigadierManager<>(this, () -> new CommandContext<>(
                 // This looks ugly, but it's what the server does when loading datapack functions in 1.16+
                 // See net.minecraft.server.function.FunctionLoader.reload for reference
-                this.commandSourceMapper.apply(new ServerCommandSource(
-                                CommandOutput.DUMMY,
-                                Vec3d.ZERO,
-                                Vec2f.ZERO,
-                                null,
-                                4,
-                                "",
-                                LiteralText.EMPTY,
-                                null,
-                                null
-                        )),
-                        this
+                this.commandSourceMapper.apply(dummyCommandSourceProvider.get()),
+                this
                 ));
         this.brigadierManager.backwardsBrigadierSenderMapper(this.backwardsCommandSourceMapper);
         this.registerNativeBrigadierMappings(this.brigadierManager);
 
-        ((FabricCommandRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        ((FabricCommandRegistrationHandler<C, S>) this.getCommandRegistrationHandler()).initialize(this);
     }
 
-    private void registerNativeBrigadierMappings(final CloudBrigadierManager<C, ServerCommandSource> brigadier) {
+    private void registerNativeBrigadierMappings(final CloudBrigadierManager<C, S> brigadier) {
         /* Cloud-native argument types */
         brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {}, false, cloud -> UuidArgumentType.uuid());
 
@@ -200,27 +181,26 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
         // entity argument type: single or multiple, players or any entity -- returns EntitySelector, but do we want that?
     }
 
-    private <T> void registerConstantNativeParserSupplier(final Class<T> type, final ArgumentType<T> argument) {
+    /**
+     * Register a parser supplier for a brigadier type that has no options and whose output can be directly used.
+     *
+     * @param type the Java type to map
+     * @param argument the Brigadier parser
+     * @param <T> value type
+     */
+    final <T> void registerConstantNativeParserSupplier(final Class<T> type, final ArgumentType<T> argument) {
         this.registerConstantNativeParserSupplier(TypeToken.get(type), argument);
     }
 
-    private <T> void registerConstantNativeParserSupplier(final TypeToken<T> type, final ArgumentType<T> argument) {
-        this.getParserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
-    }
-
     /**
-     * Check if a sender has a certain permission.
+     * Register a parser supplier for a brigadier type that has no options and whose output can be directly used.
      *
-     * <p>The current implementation checks op level, pending a full Fabric permissions api.</p>
-     *
-     * @param sender     Command sender
-     * @param permission Permission node
-     * @return whether the sender has the specified permission
+     * @param type the Java type to map
+     * @param argument the Brigadier parser
+     * @param <T> value type
      */
-    @Override
-    public boolean hasPermission(@NonNull final C sender, @NonNull final String permission) {
-        final ServerCommandSource source = this.backwardsCommandSourceMapper.apply(sender);
-        return source.hasPermissionLevel(source.getMinecraftServer().getOpPermissionLevel());
+    final <T> void registerConstantNativeParserSupplier(final TypeToken<T> type, final ArgumentType<T> argument) {
+        this.getParserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
     }
 
     @Override
@@ -233,7 +213,7 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
      *
      * @return Command source mapper
      */
-    public final @NonNull Function<@NonNull ServerCommandSource, @NonNull C> getCommandSourceMapper() {
+    public final @NonNull Function<@NonNull S, @NonNull C> getCommandSourceMapper() {
         return this.commandSourceMapper;
     }
 
@@ -242,12 +222,12 @@ public class FabricCommandManager<C> extends CommandManager<C> implements Brigad
      *
      * @return Command source mapper
      */
-    public final @NonNull Function<@NonNull C, @NonNull ServerCommandSource> getBackwardsCommandSourceMapper() {
+    public final @NonNull Function<@NonNull C, @NonNull S> getBackwardsCommandSourceMapper() {
         return this.backwardsCommandSourceMapper;
     }
 
     @Override
-    public final @NonNull CloudBrigadierManager<C, ServerCommandSource> brigadierManager() {
+    public final @NonNull CloudBrigadierManager<C, S> brigadierManager() {
         return this.brigadierManager;
     }
 
