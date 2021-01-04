@@ -748,4 +748,92 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
 
     }
 
+    /**
+     * A variant of builders designed for subclassing, that returns a self type .
+     *
+     * @param <C> sender type
+     * @param <T> argument value type
+     * @param <B> the subclass type
+     * @since 1.4.0
+     */
+    public abstract static class TypedBuilder<C, T, B extends Builder<C, T>> extends Builder<C, T> {
+
+        protected TypedBuilder(
+                final @NonNull TypeToken<T> valueType,
+                final @NonNull String name
+        ) {
+            super(valueType, name);
+        }
+
+        protected TypedBuilder(
+                final @NonNull Class<T> valueType,
+                final @NonNull String name
+        ) {
+            super(valueType, name);
+        }
+
+        @SuppressWarnings("unchecked")
+        protected final B self() {
+            return (B) this;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public @NonNull B manager(final @NonNull CommandManager<C> manager) {
+            super.manager(manager);
+            return this.self();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public @NonNull B asRequired() {
+            super.asRequired();
+            return this.self();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public @NonNull B asOptional() {
+            super.asOptional();
+            return this.self();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public @NonNull B asOptionalWithDefault(final @NonNull String defaultValue) {
+            super.asOptionalWithDefault(defaultValue);
+            return this.self();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public @NonNull B withParser(final @NonNull ArgumentParser<@NonNull C, @NonNull T> parser) {
+            super.withParser(parser);
+            return this.self();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public @NonNull Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
+                final @NonNull BiFunction<@NonNull CommandContext<C>,
+                        @NonNull String, @NonNull List<String>> suggestionsProvider
+        ) {
+            super.withSuggestionsProvider(suggestionsProvider);
+            return this.self();
+        }
+
+    }
+
 }
