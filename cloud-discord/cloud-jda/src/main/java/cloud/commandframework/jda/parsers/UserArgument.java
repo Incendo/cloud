@@ -154,7 +154,12 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
         private final Set<ParserMode> modes;
 
-        private UserParser(final @NonNull Set<ParserMode> modes) {
+        /**
+         * Construct a new argument parser for {@link User}
+         *
+         * @param modes List of parsing modes to use when parsing
+         */
+        public UserParser(final @NonNull Set<ParserMode> modes) {
             this.modes = modes;
         }
 
