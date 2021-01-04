@@ -44,6 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static net.kyori.adventure.text.Component.space;
@@ -92,7 +93,10 @@ public final class MinecraftHelp<C> {
     private final Map<String, String> messageMap = new HashMap<>();
 
     private Predicate<Command<C>> commandFilter = c -> true;
-    private BiFunction<C, String, String> messageProvider = (sender, key) -> this.messageMap.get(key);
+    private BiFunction<C, String, String> stringMessageProvider = (sender, key) -> this.messageMap.get(key);
+    private MessageProvider<C> messageProvider =
+            (sender, key, args) -> text(this.stringMessageProvider.apply(sender, key));
+    private Function<String, Component> descriptionDecorator = Component::text;
     private HelpColors colors = DEFAULT_HELP_COLORS;
     private int headerFooterLength = DEFAULT_HEADER_FOOTER_LENGTH;
     private int maxResultsPerPage = DEFAULT_MAX_RESULTS_PER_PAGE;
@@ -159,13 +163,28 @@ public final class MinecraftHelp<C> {
 
     /**
      * Sets a filter for what commands are visible inside the help menu.
-     * When the {@link Predicate} tests <i>true</i>, then the command
+     * When the {@link Predicate} tests {@code true}, then the command
      * is included in the listings.
+     * <p>
+     * The default filter will return true for all commands.
      *
      * @param commandPredicate Predicate to filter commands by
+     * @since 1.4.0
      */
-    public void setCommandFilter(final @NonNull Predicate<Command<C>> commandPredicate) {
+    public void commandFilter(final @NonNull Predicate<Command<C>> commandPredicate) {
         this.commandFilter = commandPredicate;
+    }
+
+    /**
+     * Set the description decorator which will turn command and argument description strings into components.
+     * <p>
+     * The default decorator simply calls {@link Component#text(String)}
+     *
+     * @param decorator description decorator
+     * @since 1.4.0
+     */
+    public void descriptionDecorator(final @NonNull Function<@NonNull String, @NonNull Component> decorator) {
+        this.descriptionDecorator = decorator;
     }
 
     /**
@@ -189,6 +208,21 @@ public final class MinecraftHelp<C> {
      * @param messageProvider The message provider to use
      */
     public void setMessageProvider(final @NonNull BiFunction<C, String, String> messageProvider) {
+        this.stringMessageProvider = messageProvider;
+    }
+
+    /**
+     * Set a custom message provider function to be used for getting messages from keys.
+     * <p>
+     * The keys are constants in {@link MinecraftHelp}.
+     * <p>
+     * This version of the method which takes a {@link MessageProvider} will have priority over a message provider
+     * registered through {@link #setMessageProvider(BiFunction)}
+     *
+     * @param messageProvider The message provider to use
+     * @since 1.4.0
+     */
+    public void messageProvider(final @NonNull MessageProvider<C> messageProvider) {
         this.messageProvider = messageProvider;
     }
 
@@ -286,7 +320,8 @@ public final class MinecraftHelp<C> {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(this.basicHeader(sender));
         audience.sendMessage(LinearComponents.linear(
-                text(this.messageProvider.apply(sender, MESSAGE_NO_RESULTS_FOR_QUERY) + ": \"", this.colors.text),
+                this.messageProvider.provide(sender, MESSAGE_NO_RESULTS_FOR_QUERY).color(this.colors.text),
+                text(": \"", this.colors.text),
                 this.highlight(text("/" + query, this.colors.highlight)),
                 text("\"", this.colors.text)
         ));
@@ -312,18 +347,22 @@ public final class MinecraftHelp<C> {
                     header.add(this.showingResults(sender, query));
                     header.add(text()
                             .append(this.lastBranch())
-                            .append(text(
-                                    String.format(" %s:", this.messageProvider.apply(sender, MESSAGE_AVAILABLE_COMMANDS)),
-                                    this.colors.text
-                            ))
+                            .append(space())
+                            .append(
+                                    this.messageProvider.provide(
+                                            sender,
+                                            MESSAGE_AVAILABLE_COMMANDS
+                                    ).color(this.colors.text)
+                            )
+                            .append(text(":", this.colors.text))
                             .build()
                     );
                     return header;
                 },
                 (helpEntry, isLastOfPage) -> {
-                    final String description = helpEntry.getDescription().isEmpty()
-                            ? this.messageProvider.apply(sender, MESSAGE_CLICK_TO_SHOW_HELP)
-                            : helpEntry.getDescription();
+                    final Component description = helpEntry.getDescription().isEmpty()
+                            ? this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP)
+                            : this.descriptionDecorator.apply(helpEntry.getDescription());
 
                     final boolean lastBranch =
                             isLastOfPage || helpTopic.getEntries().indexOf(helpEntry) == helpTopic.getEntries().size() - 1;
@@ -335,7 +374,7 @@ public final class MinecraftHelp<C> {
                                     String.format(" /%s", helpEntry.getSyntaxString()),
                                     this.colors.highlight
                                     ))
-                                            .hoverEvent(text(description, this.colors.text))
+                                            .hoverEvent(description.color(this.colors.text))
                                             .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.getSyntaxString()))
                             )
                             .build();
@@ -374,10 +413,8 @@ public final class MinecraftHelp<C> {
                     return ComponentHelper.repeat(space(), headerIndentation)
                             .append(lastBranch ? this.lastBranch() : this.branch())
                             .append(this.highlight(text(" /" + suggestion, this.colors.highlight))
-                                    .hoverEvent(text(
-                                            this.messageProvider.apply(sender, MESSAGE_CLICK_TO_SHOW_HELP),
-                                            this.colors.text
-                                    ))
+                                    .hoverEvent(this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP)
+                                            .color(this.colors.text))
                                     .clickEvent(runCommand(this.commandPrefix + " " + suggestion)));
                 },
                 (currentPage, maxPages) -> this.paginatedFooter(sender, currentPage, maxPages, query),
@@ -397,24 +434,30 @@ public final class MinecraftHelp<C> {
                 .apply(helpTopic.getCommand().getArguments(), null);
         audience.sendMessage(text()
                 .append(this.lastBranch())
-                .append(text(" " + this.messageProvider.apply(sender, MESSAGE_COMMAND) + ": ", this.colors.primary))
+                .append(space())
+                .append(this.messageProvider.provide(sender, MESSAGE_COMMAND).color(this.colors.primary))
+                .append(text(": ", this.colors.primary))
                 .append(this.highlight(text("/" + command, this.colors.highlight)))
         );
-        final String topicDescription = helpTopic.getDescription().isEmpty()
-                ? this.messageProvider.apply(sender, MESSAGE_NO_DESCRIPTION)
-                : helpTopic.getDescription();
+        final Component topicDescription = helpTopic.getDescription().isEmpty()
+                ? this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION)
+                : this.descriptionDecorator.apply(helpTopic.getDescription());
         final boolean hasArguments = helpTopic.getCommand().getArguments().size() > 1;
         audience.sendMessage(text()
                 .append(text("   "))
                 .append(hasArguments ? this.branch() : this.lastBranch())
-                .append(text(" " + this.messageProvider.apply(sender, MESSAGE_DESCRIPTION) + ": ", this.colors.primary))
-                .append(text(topicDescription, this.colors.text))
+                .append(space())
+                .append(this.messageProvider.provide(sender, MESSAGE_DESCRIPTION).color(this.colors.primary))
+                .append(text(": ", this.colors.primary))
+                .append(topicDescription.color(this.colors.text))
         );
         if (hasArguments) {
             audience.sendMessage(text()
                     .append(text("   "))
                     .append(this.lastBranch())
-                    .append(text(" " + this.messageProvider.apply(sender, MESSAGE_ARGUMENTS) + ":", this.colors.primary))
+                    .append(space())
+                    .append(this.messageProvider.provide(sender, MESSAGE_ARGUMENTS).color(this.colors.primary))
+                    .append(text(":", this.colors.primary))
             );
 
             final Iterator<CommandComponent<C>> iterator = helpTopic.getCommand().getComponents().iterator();
@@ -433,15 +476,16 @@ public final class MinecraftHelp<C> {
                         .append(iterator.hasNext() ? this.branch() : this.lastBranch())
                         .append(this.highlight(text(" " + syntax, this.colors.highlight)));
                 if (!argument.isRequired()) {
-                    textComponent.append(text(
-                            " (" + this.messageProvider.apply(sender, MESSAGE_OPTIONAL) + ")",
-                            this.colors.alternateHighlight
-                    ));
+                    textComponent.append(text(" (", this.colors.alternateHighlight));
+                    textComponent.append(
+                            this.messageProvider.provide(sender, MESSAGE_OPTIONAL).color(this.colors.alternateHighlight)
+                    );
+                    textComponent.append(text(")", this.colors.alternateHighlight));
                 }
                 final String description = component.getDescription().getDescription();
                 if (!description.isEmpty()) {
                     textComponent.append(text(" - ", this.colors.accent));
-                    textComponent.append(text(description, this.colors.text));
+                    textComponent.append(this.descriptionDecorator.apply(description).color(this.colors.text));
                 }
 
                 audience.sendMessage(textComponent);
@@ -455,7 +499,8 @@ public final class MinecraftHelp<C> {
             final @NonNull String query
     ) {
         return text()
-                .append(text(this.messageProvider.apply(sender, MESSAGE_SHOWING_RESULTS_FOR_QUERY) + ": \"", this.colors.text))
+                .append(this.messageProvider.provide(sender, MESSAGE_SHOWING_RESULTS_FOR_QUERY).color(this.colors.text))
+                .append(text(": \"", this.colors.text))
                 .append(this.highlight(text("/" + query, this.colors.highlight)))
                 .append(text("\"", this.colors.text))
                 .build();
@@ -464,7 +509,7 @@ public final class MinecraftHelp<C> {
     private @NonNull Component button(
             final char icon,
             final @NonNull String command,
-            final @NonNull String hoverText
+            final @NonNull Component hoverText
     ) {
         return text()
                 .append(space())
@@ -473,7 +518,7 @@ public final class MinecraftHelp<C> {
                 .append(text(']', this.colors.accent))
                 .append(space())
                 .clickEvent(runCommand(command))
-                .hoverEvent(text(hoverText, this.colors.text))
+                .hoverEvent(hoverText)
                 .build();
     }
 
@@ -496,7 +541,7 @@ public final class MinecraftHelp<C> {
 
         final String nextPageCommand = String.format("%s %s %s", this.commandPrefix, query, currentPage + 1);
         final Component nextPageButton = this.button('→', nextPageCommand,
-                this.messageProvider.apply(sender, MESSAGE_CLICK_FOR_NEXT_PAGE)
+                this.messageProvider.provide(sender, MESSAGE_CLICK_FOR_NEXT_PAGE).color(this.colors.text)
         );
         if (firstPage) {
             return this.header(sender, nextPageButton);
@@ -504,7 +549,7 @@ public final class MinecraftHelp<C> {
 
         final String previousPageCommand = String.format("%s %s %s", this.commandPrefix, query, currentPage - 1);
         final Component previousPageButton = this.button('←', previousPageCommand,
-                this.messageProvider.apply(sender, MESSAGE_CLICK_FOR_PREVIOUS_PAGE)
+                this.messageProvider.provide(sender, MESSAGE_CLICK_FOR_PREVIOUS_PAGE).color(this.colors.text)
         );
         if (lastPage) {
             return this.header(sender, previousPageButton);
@@ -530,9 +575,10 @@ public final class MinecraftHelp<C> {
     }
 
     private @NonNull Component basicHeader(final @NonNull C sender) {
-        return this.header(sender, text(
-                " " + this.messageProvider.apply(sender, MESSAGE_HELP_TITLE) + " ",
-                this.colors.highlight
+        return this.header(sender, LinearComponents.linear(
+                space(),
+                this.messageProvider.provide(sender, MESSAGE_HELP_TITLE).color(this.colors.highlight),
+                space()
         ));
     }
 
@@ -542,10 +588,9 @@ public final class MinecraftHelp<C> {
             final int pages
     ) {
         return this.header(sender, text()
-                .append(text(
-                        " " + this.messageProvider.apply(sender, MESSAGE_HELP_TITLE) + " ",
-                        this.colors.highlight
-                ))
+                .append(space())
+                .append(this.messageProvider.provide(sender, MESSAGE_HELP_TITLE).color(this.colors.highlight))
+                .append(space())
                 .append(text("(", this.colors.alternateHighlight))
                 .append(text(currentPage, this.colors.text))
                 .append(text("/", this.colors.alternateHighlight))
@@ -580,12 +625,38 @@ public final class MinecraftHelp<C> {
             final int attemptedPage,
             final int maxPages
     ) {
-        return this.highlight(text(
-                this.messageProvider.apply(sender, MESSAGE_PAGE_OUT_OF_RANGE)
-                        .replace("<page>", String.valueOf(attemptedPage))
-                        .replace("<max_pages>", String.valueOf(maxPages)),
-                this.colors.text
-        ));
+        return this.highlight(
+                this.messageProvider.provide(
+                        sender,
+                        MESSAGE_PAGE_OUT_OF_RANGE,
+                        String.valueOf(attemptedPage),
+                        String.valueOf(maxPages)
+                )
+                        .color(this.colors.text)
+                        .replaceText(config -> {
+                            config.matchLiteral("<page>");
+                            config.replacement(String.valueOf(attemptedPage));
+                        })
+                        .replaceText(config -> {
+                            config.matchLiteral("<max_pages>");
+                            config.replacement(String.valueOf(maxPages));
+                        })
+        );
+    }
+
+    @FunctionalInterface
+    public interface MessageProvider<C> {
+
+        /**
+         * Creates a component from a command sender, key, and arguments
+         *
+         * @param sender command sender
+         * @param key message key (constants in {@link MinecraftHelp}
+         * @param args args
+         * @return component
+         */
+        @NonNull Component provide(@NonNull C sender, @NonNull String key, @NonNull String... args);
+
     }
 
     /**
