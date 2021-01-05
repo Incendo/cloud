@@ -28,6 +28,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.jda.parsers.ChannelArgument;
+import cloud.commandframework.jda.parsers.RoleArgument;
 import cloud.commandframework.jda.parsers.UserArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
@@ -35,6 +36,7 @@ import io.leangen.geantyref.TypeToken;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -110,6 +112,10 @@ public class JDACommandManager<C> extends CommandManager<C> {
         this.getParserRegistry().registerParserSupplier(TypeToken.get(MessageChannel.class), parserParameters ->
                 new ChannelArgument.MessageParser<>(
                         new HashSet<>(Arrays.asList(ChannelArgument.ParserMode.values()))
+                ));
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Role.class), parserParameters ->
+                new RoleArgument.RoleParser<>(
+                        new HashSet<>(Arrays.asList(RoleArgument.ParserMode.values()))
                 ));
     }
 
