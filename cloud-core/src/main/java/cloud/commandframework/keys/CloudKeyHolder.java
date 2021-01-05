@@ -21,35 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.bungee;
+package cloud.commandframework.keys;
 
-import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
- * with Bungee specific objects
+ * Represents any object that holds a {@link CloudKey}
  *
- * @param <C> Command sender type
- * @since 1.1.0
+ * @param <T> The type of the key value.
+ * @since 1.4.0
  */
-final class BungeeCommandPreprocessor<C> implements CommandPreprocessor<C> {
-
-    private final BungeeCommandManager<C> mgr;
+@FunctionalInterface
+public interface CloudKeyHolder<T> {
 
     /**
-     * The Bungee Command Preprocessor for storing Bungee-specific contexts in the command contexts
+     * Get the key that identifies this object.
      *
-     * @param mgr The BungeeCommandManager
+     * @return Identifying key.
      */
-    BungeeCommandPreprocessor(final @NonNull BungeeCommandManager<C> mgr) {
-        this.mgr = mgr;
-    }
-
-    @Override
-    public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store(BungeeContextKeys.PROXY_SERVER_KEY, mgr.getOwningPlugin().getProxy());
-    }
+    @NonNull CloudKey<T> getKey();
 
 }

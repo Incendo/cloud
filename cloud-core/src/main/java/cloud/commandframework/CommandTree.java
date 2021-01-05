@@ -36,10 +36,13 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoCommandInLeafException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -89,6 +92,15 @@ import java.util.stream.Stream;
  * @param <C> Command sender type
  */
 public final class CommandTree<C> {
+
+    /**
+     * Stores the index of the argument that is currently being parsed when parsing
+     * a {@link CompoundArgument}
+     */
+    public static final CloudKey<Integer> PARSING_ARGUMENT_KEY = SimpleCloudKey.of(
+            "__parsing_argument__",
+            TypeToken.get(Integer.class)
+    );
 
     private final Object commandLock = new Object();
 
@@ -569,7 +581,7 @@ public final class CommandTree<C> {
                 /* Attempt to pop as many arguments from the stack as possible */
                 for (int i = 0; i < requiredArguments - 1 && commandQueue.size() > 1; i++) {
                     commandQueue.remove();
-                    commandContext.store("__parsing_argument__", i + 2);
+                    commandContext.store(PARSING_ARGUMENT_KEY, i + 2);
                 }
             }
         } else if (child.getValue().getParser() instanceof FlagArgument.FlagArgumentParser) {
@@ -585,9 +597,7 @@ public final class CommandTree<C> {
             @SuppressWarnings("unchecked")
             FlagArgument.FlagArgumentParser<C> parser = (FlagArgument.FlagArgumentParser<C>) child.getValue().getParser();
             Optional<String> lastFlag = parser.parseCurrentFlag(commandContext, commandQueue);
-            if (lastFlag.isPresent()) {
-                commandContext.store(FlagArgument.FLAG_META, lastFlag.get());
-            }
+            lastFlag.ifPresent(s -> commandContext.store(FlagArgument.FLAG_META_KEY, s));
         } else if (GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
             while (commandQueue.size() > 1) {
                 commandQueue.remove();
