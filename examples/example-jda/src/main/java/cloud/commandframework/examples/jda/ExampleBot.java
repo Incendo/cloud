@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -72,27 +73,30 @@ public final class ExampleBot {
                 (sender, permission) -> permissionRegistry.hasPermission(sender.getUser().getIdLong(), permission),
                 CommandExecutionCoordinator.simpleCoordinator(),
                 sender -> {
+                    MessageReceivedEvent event = sender.getEvent().orElse(null);
+
                     if (sender instanceof JDAPrivateSender) {
                         JDAPrivateSender jdaPrivateSender = (JDAPrivateSender) sender;
-                        return new PrivateUser(jdaPrivateSender.getUser(), jdaPrivateSender.getPrivateChannel());
+                        return new PrivateUser(event, jdaPrivateSender.getUser(), jdaPrivateSender.getPrivateChannel());
                     }
 
                     if (sender instanceof JDAGuildSender) {
                         JDAGuildSender jdaGuildSender = (JDAGuildSender) sender;
-                        return new GuildUser(jdaGuildSender.getMember(), jdaGuildSender.getTextChannel());
+                        return new GuildUser(event, jdaGuildSender.getMember(), jdaGuildSender.getTextChannel());
                     }
 
                     throw new UnsupportedOperationException();
                 },
                 user -> {
+                    MessageReceivedEvent event = user.getEvent().orElse(null);
                     if (user instanceof PrivateUser) {
                         PrivateUser privateUser = (PrivateUser) user;
-                        return new JDAPrivateSender(null, privateUser.getUser(), privateUser.getPrivateChannel());
+                        return new JDAPrivateSender(event, privateUser.getUser(), privateUser.getPrivateChannel());
                     }
 
                     if (user instanceof GuildUser) {
                         GuildUser guildUser = (GuildUser) user;
-                        return new JDAGuildSender(null, guildUser.getMember(), guildUser.getTextChannel());
+                        return new JDAGuildSender(event, guildUser.getMember(), guildUser.getTextChannel());
                     }
 
                     throw new UnsupportedOperationException();
