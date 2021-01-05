@@ -25,6 +25,9 @@ package cloud.commandframework.jda;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -48,11 +51,42 @@ final class JDACommandPreprocessor<C> implements CommandPreprocessor<C> {
     }
 
     /**
-     * Stores the {@link net.dv8tion.jda.api.JDA}
+     * Stores the {@link net.dv8tion.jda.api.JDA} in the context with the key "JDA",
+     * the {@link net.dv8tion.jda.api.events.message.MessageReceivedEvent} with the key "MessageReceivedEvent", and
+     * the {@link net.dv8tion.jda.api.entities.MessageChannel} with the key "MessageChannel".
+     *
+     * If the message was sent in a guild, the {@link net.dv8tion.jda.api.entities.Guild} will be stored in the context with the
+     * key "Guild". If the message was also sent in a text channel, the {@link net.dv8tion.jda.api.entities.TextChannel} will be
+     * stored in the context with the key "TextChannel".
+     *
+     * If the message was sent in a DM instead of in a guild, the {@link net.dv8tion.jda.api.entities.PrivateChannel} will be
+     * stored in the context with the key "PrivateChannel".
      */
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
         context.getCommandContext().store("JDA", this.mgr.getJDA());
+
+        MessageReceivedEvent event;
+        try {
+            event = this.mgr.getBackwardsCommandSenderMapper().apply(context.getCommandContext().getSender());
+        } catch (IllegalStateException e) {
+            // The event could not be resolved from the backwards command sender mapper
+            return;
+        }
+
+        context.getCommandContext().store("MessageReceivedEvent", event);
+        context.getCommandContext().store("MessageChannel", event.getChannel());
+
+        if (event.isFromGuild()) {
+            Guild guild = event.getGuild();
+            context.getCommandContext().store("Guild", guild);
+
+            if (event.isFromType(ChannelType.TEXT)) {
+                context.getCommandContext().store("TextChannel", event.getTextChannel());
+            }
+        } else if (event.isFromType(ChannelType.PRIVATE)) {
+            context.getCommandContext().store("PrivateChannel", event.getPrivateChannel());
+        }
     }
 
 }
