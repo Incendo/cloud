@@ -49,7 +49,10 @@ final class VelocityCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store("ProxyServer", mgr.getProxyServer());
+        context.getCommandContext().store(
+                VelocityContextKeys.PROXY_SERVER_KEY,
+                mgr.getProxyServer()
+        );
     }
 
 }

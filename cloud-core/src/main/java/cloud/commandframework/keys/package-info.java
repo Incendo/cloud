@@ -21,35 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.bungee;
-
-import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
- * with Bungee specific objects
+ * Type-safe named keys.
  *
- * @param <C> Command sender type
- * @since 1.1.0
+ * @since 1.4.0
  */
-final class BungeeCommandPreprocessor<C> implements CommandPreprocessor<C> {
-
-    private final BungeeCommandManager<C> mgr;
-
-    /**
-     * The Bungee Command Preprocessor for storing Bungee-specific contexts in the command contexts
-     *
-     * @param mgr The BungeeCommandManager
-     */
-    BungeeCommandPreprocessor(final @NonNull BungeeCommandManager<C> mgr) {
-        this.mgr = mgr;
-    }
-
-    @Override
-    public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store(BungeeContextKeys.PROXY_SERVER_KEY, mgr.getOwningPlugin().getProxy());
-    }
-
-}
+package cloud.commandframework.keys;
