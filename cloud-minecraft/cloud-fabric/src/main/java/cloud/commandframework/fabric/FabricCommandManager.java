@@ -33,15 +33,21 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.fabric.argument.RegistryEntryArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.serialization.Codec;
+import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.AngleArgumentType;
 import net.minecraft.command.argument.BlockPredicateArgumentType;
 import net.minecraft.command.argument.ColorArgumentType;
+import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.command.argument.EntitySummonArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.argument.ItemEnchantmentArgumentType;
 import net.minecraft.command.argument.ItemStackArgument;
@@ -57,8 +63,7 @@ import net.minecraft.command.argument.OperationArgumentType;
 import net.minecraft.command.argument.ParticleArgumentType;
 import net.minecraft.command.argument.SwizzleArgumentType;
 import net.minecraft.command.argument.UuidArgumentType;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.particle.ParticleEffect;
@@ -68,9 +73,20 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -89,6 +105,8 @@ import java.util.function.Supplier;
  * @since 1.4.0
  */
 public abstract class FabricCommandManager<C, S extends CommandSource> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final int MOD_PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
 
     private final Function<S, C> commandSourceMapper;
     private final Function<C, S> backwardsCommandSourceMapper;
@@ -132,13 +150,16 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
                 ));
         this.brigadierManager.backwardsBrigadierSenderMapper(this.backwardsCommandSourceMapper);
         this.registerNativeBrigadierMappings(this.brigadierManager);
+        this.setCaptionRegistry(new FabricCaptionRegistry<>());
+        this.registerCommandPreProcessor(new FabricCommandPreprocessor<>(this));
 
         ((FabricCommandRegistrationHandler<C, S>) this.getCommandRegistrationHandler()).initialize(this);
     }
 
     private void registerNativeBrigadierMappings(final CloudBrigadierManager<C, S> brigadier) {
         /* Cloud-native argument types */
-        brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {}, false, cloud -> UuidArgumentType.uuid());
+        brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {}, builder -> builder.toConstant(UuidArgumentType.uuid()));
+        this.registerRegistryEntryMappings();
 
         /* Wrapped/Constant Brigadier types, native value type */
         this.registerConstantNativeParserSupplier(Formatting.class, ColorArgumentType.color());
@@ -151,11 +172,9 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         this.registerConstantNativeParserSupplier(AngleArgumentType.Angle.class, AngleArgumentType.angle());
         this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {}, SwizzleArgumentType.swizzle());
         this.registerConstantNativeParserSupplier(Identifier.class, IdentifierArgumentType.identifier());
-        this.registerConstantNativeParserSupplier(StatusEffect.class, MobEffectArgumentType.mobEffect());
         this.registerConstantNativeParserSupplier(EntityAnchorArgumentType.EntityAnchor.class, EntityAnchorArgumentType.entityAnchor());
         this.registerConstantNativeParserSupplier(NumberRange.IntRange.class, NumberRangeArgumentType.numberRange());
         this.registerConstantNativeParserSupplier(NumberRange.FloatRange.class, NumberRangeArgumentType.method_30918());
-        this.registerConstantNativeParserSupplier(Enchantment.class, ItemEnchantmentArgumentType.itemEnchantment());
         // todo: can we add a compound argument -- MC `ItemStackArgument` is just type and tag, and count is separate
         this.registerConstantNativeParserSupplier(ItemStackArgument.class, ItemStackArgumentType.itemStack());
 
@@ -176,13 +195,96 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         this.registerConstantNativeParserSupplier(Team.class, TeamArgumentType.team());
         this.registerConstantNativeParserSupplier(/* slot *, ItemSlotArgumentType.itemSlot());
         this.registerConstantNativeParserSupplier(CommandFunction.class, FunctionArgumentType.function());
-        this.registerConstantNativeParserSupplier(EntityType.class, EntitySummonArgumentType.entitySummon()); // entity summon
-        this.registerConstantNativeParserSupplier(ServerWorld.class, DimensionArgumentType.dimension());
         this.registerConstantNativeParserSupplier(/* time representation in ticks *, TimeArgumentType.time());*/
 
         /* Wrapped brigadier requiring parameters */
         // score holder: single vs multiple
         // entity argument type: single or multiple, players or any entity -- returns EntitySelector, but do we want that?
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void registerRegistryEntryMappings() {
+        this.brigadierManager.registerMapping(new TypeToken<RegistryEntryArgument.RegistryEntryParser<C, ?>>() {},
+                builder -> builder.to(argument -> {
+                            /* several registries have specialized argument types, so let's use those where possible */
+                            final RegistryKey<? extends Registry<?>> registry = argument.getRegistry();
+                            if (registry.equals(Registry.ENTITY_TYPE_KEY)) {
+                                return EntitySummonArgumentType.entitySummon();
+                            } else if (registry.equals(Registry.ENCHANTMENT_KEY)) {
+                                return ItemEnchantmentArgumentType.itemEnchantment();
+                            } else if (registry.equals(Registry.MOB_EFFECT_KEY)) { // yarn wai
+                                return MobEffectArgumentType.mobEffect();
+                            } else if (registry.equals(Registry.DIMENSION)) {
+                                return DimensionArgumentType.dimension();
+                            }
+                            return IdentifierArgumentType.identifier();
+                        }
+                ).suggestedBy((argument, useCloud) -> {
+                    /* A few other registries have client-side suggestion providers but no argument type */
+                    /* Type parameters are messed up here for some reason */
+                    final RegistryKey<? extends Registry<?>> registry = argument.getRegistry();
+                    if (registry.equals(Registry.SOUND_EVENT_KEY)) {
+                        return (SuggestionProvider<S>) SuggestionProviders.AVAILABLE_SOUNDS;
+                    } else if (registry.equals(Registry.BIOME_KEY)) {
+                        return (SuggestionProvider<S>) SuggestionProviders.ALL_BIOMES;
+                    } else if (registry.equals(Registry.ENTITY_TYPE_KEY)
+                            || registry.equals(Registry.ENCHANTMENT_KEY)
+                            || registry.equals(Registry.MOB_EFFECT_KEY)
+                            || registry.equals(Registry.DIMENSION)) {
+                        return null; /* for types with their own argument type, use Brigadier */
+                    }
+                    return useCloud; /* use cloud suggestions for anything else */
+                })
+        );
+
+        /* Find all fields of RegistryKey<? extends Registry<?>> and register those */
+        /* This only works for vanilla registries really, we'll have to do other things for non-vanilla ones */
+        final Set<Class<?>> seenClasses = new HashSet<>();
+        /* Some registries have types that are too generic... we'll skip those for now.
+         * Eventually, these could be resolved by using ParserParameters in some way? */
+        seenClasses.add(Identifier.class);
+        seenClasses.add(Codec.class);
+        for (final Field field : Registry.class.getDeclaredFields()) {
+            if ((field.getModifiers() & MOD_PUBLIC_STATIC_FINAL) != MOD_PUBLIC_STATIC_FINAL) {
+                continue;
+            }
+            if (!field.getType().equals(RegistryKey.class)) {
+                continue;
+            }
+
+            final Type generic = field.getGenericType(); /* RegistryKey<? extends Registry<?>> */
+            if (!(generic instanceof ParameterizedType)) {
+                continue;
+            }
+
+            Type registryType = ((ParameterizedType) generic).getActualTypeArguments()[0];
+            while (registryType instanceof WildcardType) {
+                registryType = ((WildcardType) registryType).getUpperBounds()[0];
+            }
+
+            if (!(registryType instanceof ParameterizedType)) { /* expected: Registry<V> */
+                continue;
+            }
+
+            final RegistryKey<?> key;
+            try {
+                key = (RegistryKey<?>) field.get(null);
+            } catch (final IllegalAccessException ex) {
+                LOGGER.warn("Failed to access value of registry key in field {} of type {}", field.getName(), generic, ex);
+                continue;
+            }
+
+            final Type valueType = ((ParameterizedType) registryType).getActualTypeArguments()[0];
+            if (seenClasses.contains(GenericTypeReflector.erase(valueType))) {
+                LOGGER.debug("Encountered duplicate type in registry {}: type {}", key, valueType);
+                continue;
+            }
+            seenClasses.add(GenericTypeReflector.erase(valueType));
+
+            /* and now, finally, we can register */
+            this.getParserRegistry().registerParserSupplier(TypeToken.get(valueType),
+                    params -> new RegistryEntryArgument.RegistryEntryParser(key));
+        }
     }
 
     /**
