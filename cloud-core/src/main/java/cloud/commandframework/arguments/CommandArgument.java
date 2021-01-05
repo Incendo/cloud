@@ -746,6 +746,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this.defaultDescription;
         }
 
+        protected final @NonNull TypeToken<T> getValueType() {
+            return this.valueType;
+        }
+
     }
 
     /**

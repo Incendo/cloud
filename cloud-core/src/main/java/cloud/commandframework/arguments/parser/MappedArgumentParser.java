@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O> {
+public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O> {
     private final ArgumentParser<C, I> base;
     private final BiFunction<CommandContext<C>, I, ArgumentParseResult<O>> mapper;
 
@@ -42,6 +42,15 @@ final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O> {
     ) {
         this.base = base;
         this.mapper = mapper;
+    }
+
+    /**
+     * Get the parser this one is derived from.
+     *
+     * @return the base parser
+     */
+    public ArgumentParser<C, I> getBaseParser() {
+        return this.base;
     }
 
     @Override
