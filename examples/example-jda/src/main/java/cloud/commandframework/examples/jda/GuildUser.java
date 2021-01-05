@@ -25,7 +25,9 @@ package cloud.commandframework.examples.jda;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class GuildUser extends CustomUser {
 
@@ -35,11 +37,12 @@ public final class GuildUser extends CustomUser {
     /**
      * Construct a Guild user
      *
+     * @param event   The message received event
      * @param member  Guild member that sent the message
      * @param channel Text channel that the message was sent in
      */
-    public GuildUser(final @NonNull Member member, final @NonNull TextChannel channel) {
-        super(member.getUser(), channel);
+    public GuildUser(final @Nullable MessageReceivedEvent event, final @NonNull Member member, final @NonNull TextChannel channel) {
+        super(event, member.getUser(), channel);
         this.member = member;
         this.channel = channel;
     }

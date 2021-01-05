@@ -25,7 +25,9 @@ package cloud.commandframework.examples.jda;
 
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class PrivateUser extends CustomUser {
 
@@ -34,11 +36,12 @@ public final class PrivateUser extends CustomUser {
     /**
      * Construct a Private user
      *
+     * @param event   The message received event
      * @param user    User that sent the message
      * @param channel Text channel that the message was sent in
      */
-    public PrivateUser(final @NonNull User user, final @NonNull PrivateChannel channel) {
-        super(user, channel);
+    public PrivateUser(final @Nullable MessageReceivedEvent event, final @NonNull User user, final @NonNull PrivateChannel channel) {
+        super(event, user, channel);
         this.privateChannel = channel;
     }
 
