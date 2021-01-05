@@ -147,8 +147,13 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
          * Construct a new argument parser for {@link MessageChannel}
          *
          * @param modes List of parsing modes to use when parsing
+         * @throws java.lang.IllegalStateException If no parsing modes were provided
          */
         public MessageParser(final @NonNull Set<ParserMode> modes) {
+            if (modes.isEmpty()) {
+                throw new IllegalArgumentException("At least one parsing mode is required");
+            }
+
             this.modes = modes;
         }
 
@@ -165,11 +170,21 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 ));
             }
 
+            if (!commandContext.contains("MessageReceivedEvent")) {
+                return ArgumentParseResult.failure(new IllegalStateException(
+                        "MessageReceivedEvent was not in the command context."
+                ));
+            }
+
             final MessageReceivedEvent event = commandContext.get("MessageReceivedEvent");
             Exception exception = null;
 
+            if (!event.isFromGuild()) {
+                return ArgumentParseResult.failure(new IllegalArgumentException("Channel arguments can only be parsed in guilds"));
+            }
+
             if (modes.contains(ParserMode.MENTION)) {
-                if (input.startsWith("<#") || modes.size() == 1) {
+                if (input.startsWith("<#") && input.endsWith(">")) {
                     final String id = input.substring(2, input.length() - 1);
 
                     try {
@@ -179,6 +194,10 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                     } catch (final ChannelNotFoundException | NumberFormatException e) {
                         exception = e;
                     }
+                } else {
+                    exception = new IllegalArgumentException(
+                            String.format("Input '%s' is not a channel mention.", input)
+                    );
                 }
             }
 
