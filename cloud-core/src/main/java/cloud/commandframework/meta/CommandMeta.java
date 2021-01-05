@@ -24,6 +24,7 @@
 package cloud.commandframework.meta;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.keys.CloudKey;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -131,7 +132,7 @@ public abstract class CommandMeta {
      * @param <V> value type
      * @since 1.3.0
      */
-    public interface Key<V> {
+    public interface Key<V> extends CloudKey<V> {
 
         /**
          * Create a new metadata key.
@@ -210,6 +211,12 @@ public abstract class CommandMeta {
             );
         }
 
+        @Override
+        @NonNull
+        default TypeToken<@NonNull V> getType() {
+            return this.getValueType();
+        }
+
         /**
          * Get a representation of the type of value this key holds.
          *
@@ -222,7 +229,7 @@ public abstract class CommandMeta {
          *
          * @return the key type
          */
-        @NonNull String getName();
+        @Override @NonNull String getName();
 
         /**
          * Get a function that can be used to compute a fallback based on existing meta.

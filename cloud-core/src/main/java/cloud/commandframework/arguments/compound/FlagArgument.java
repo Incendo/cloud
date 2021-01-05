@@ -32,6 +32,9 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.SimpleCloudKey;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -64,8 +67,15 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
     public static final Object FLAG_PARSE_RESULT_OBJECT = new Object();
     /**
      * Meta data for the last argument that was suggested
+     *
+     * @deprecated Use {@link #FLAG_META_KEY} instead
      */
+    @Deprecated
     public static final String FLAG_META = "__last_flag__";
+    /**
+     * Meta data for the last argument that was suggested
+     */
+    public static final CloudKey<String> FLAG_META_KEY = SimpleCloudKey.of("__last_flag__", TypeToken.get(String.class));
 
     private static final String FLAG_ARGUMENT_NAME = "flags";
 
@@ -174,7 +184,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 final @NonNull String input
         ) {
             /* Check if we have a last flag stored */
-            final String lastArg = commandContext.getOrDefault(FLAG_META, "");
+            final String lastArg = commandContext.getOrDefault(FLAG_META_KEY, "");
             if (lastArg.isEmpty() || !lastArg.startsWith("-")) {
                 final String rawInput = commandContext.getRawInputJoined();
                 /* Collection containing all used flags */
@@ -274,7 +284,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                             .apply(commandContext, input);
                 }
             }
-            commandContext.store(FLAG_META, "");
+            commandContext.store(FLAG_META_KEY, "");
             return suggestions(commandContext, input);
         }
 

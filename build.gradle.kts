@@ -170,10 +170,12 @@ subprojects {
     }
 
     signing {
-        isRequired = project.hasProperty("signing.keyId")
-                && (gradle.taskGraph.hasTask(":publish")
-                || gradle.taskGraph.hasTask(":publishToSonatype")
-                || gradle.taskGraph.hasTask(":publishToMavenLocal"))
+        gradle.taskGraph.whenReady {
+            isRequired = project.hasProperty("signing.keyId")
+                        && (gradle.taskGraph.hasTask(":publish")
+                        || gradle.taskGraph.hasTask(":publishToSonatype")
+                        || gradle.taskGraph.hasTask(":publishToMavenLocal"))
+        }
         sign(publishing.publications["mavenJava"])
     }
 
