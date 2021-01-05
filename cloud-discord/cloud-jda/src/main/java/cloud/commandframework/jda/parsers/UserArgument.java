@@ -158,8 +158,13 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
          * Construct a new argument parser for {@link User}
          *
          * @param modes List of parsing modes to use when parsing
+         * @throws java.lang.IllegalStateException If no parsing modes were provided
          */
         public UserParser(final @NonNull Set<ParserMode> modes) {
+            if (modes.isEmpty()) {
+                throw new IllegalArgumentException("At least one parsing mode is required");
+            }
+
             this.modes = modes;
         }
 
@@ -180,7 +185,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             Exception exception = null;
 
             if (modes.contains(ParserMode.MENTION)) {
-                if (input.endsWith(">") || modes.size() == 1) {
+                if (input.startsWith("<@") && input.endsWith(">")) {
                     final String id;
                     if (input.startsWith("<@!")) {
                         id = input.substring(3, input.length() - 1);
@@ -195,6 +200,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     } catch (final UserNotFoundParseException | NumberFormatException e) {
                         exception = e;
                     }
+                } else {
+                    exception = new IllegalArgumentException(
+                            String.format("Input '%s' is not a user mention.", input)
+                    );
                 }
             }
 
