@@ -33,6 +33,9 @@ import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.captions.SimpleCaptionVariableReplacementHandler;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.CloudKeyHolder;
+import cloud.commandframework.keys.SimpleCloudKey;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -54,7 +57,7 @@ public final class CommandContext<C> {
             new SimpleCaptionVariableReplacementHandler();
     private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = new HashMap<>();
     private final FlagContext flagContext = FlagContext.create();
-    private final Map<String, Object> internalStorage = new HashMap<>();
+    private final Map<CloudKey<?>, Object> internalStorage = new HashMap<>();
     private final C commandSender;
     private final boolean suggestions;
     private final CaptionRegistry<C> captionRegistry;
@@ -168,7 +171,31 @@ public final class CommandContext<C> {
      * @param <T>   Value type
      */
     public <T> void store(final @NonNull String key, final @NonNull T value) {
+        this.internalStorage.put(SimpleCloudKey.of(key), value);
+    }
+
+    /**
+     * Store a value in the context map. This will overwrite any existing
+     * value stored with the same key
+     *
+     * @param key   Key
+     * @param value Value
+     * @param <T>   Value type
+     */
+    public <T> void store(final @NonNull CloudKey<T> key, final @NonNull T value) {
         this.internalStorage.put(key, value);
+    }
+
+    /**
+     * Store a value in the context map. This will overwrite any existing
+     * value stored with the same key
+     *
+     * @param keyHolder Holder of the identifying key
+     * @param value     Value
+     * @param <T>       Value type
+     */
+    public <T> void store(final @NonNull CloudKeyHolder<T> keyHolder, final @NonNull T value) {
+        this.internalStorage.put(keyHolder.getKey(), value);
     }
 
     /**
@@ -191,6 +218,25 @@ public final class CommandContext<C> {
     }
 
     /**
+     * Store or remove a value in the context map. This will overwrite any existing
+     * value stored with the same key.
+     * <p>
+     * If the provided value is {@code null}, any current value stored for the provided key will be removed.
+     *
+     * @param key   Key
+     * @param value Value
+     * @param <T>   Value type
+     * @since 1.4.0
+     */
+    public <T> void set(final @NonNull CloudKey<T> key, final @Nullable T value) {
+        if (value != null) {
+            this.store(key, value);
+        } else {
+            this.remove(key);
+        }
+    }
+
+    /**
      * Check if the context has a value stored for a key
      *
      * @param key Key
@@ -198,6 +244,17 @@ public final class CommandContext<C> {
      * @since 1.3.0
      */
     public boolean contains(final @NonNull String key) {
+        return this.contains(SimpleCloudKey.of(key));
+    }
+
+    /**
+     * Check if the context has a value stored for a key
+     *
+     * @param key Key
+     * @return Whether the context has a value for the provided key
+     * @since 1.4.0
+     */
+    public boolean contains(final @NonNull CloudKey<?> key) {
         return this.internalStorage.containsKey(key);
     }
 
@@ -208,7 +265,9 @@ public final class CommandContext<C> {
      * @since 1.3.0
      */
     public @NonNull Map<@NonNull String, @Nullable ?> asMap() {
-        return Collections.unmodifiableMap(new HashMap<>(this.internalStorage));
+        final Map<String, Object> values = new HashMap<>();
+        this.internalStorage.forEach((key, value) -> values.put(key.getName(), value));
+        return Collections.unmodifiableMap(values);
     }
 
     /**
@@ -220,6 +279,25 @@ public final class CommandContext<C> {
      * @return Value
      */
     public <T> @NonNull Optional<T> getOptional(final @NonNull String key) {
+        final Object value = this.internalStorage.get(SimpleCloudKey.of(key));
+        if (value != null) {
+            @SuppressWarnings("unchecked") final T castedValue = (T) value;
+            return Optional.of(castedValue);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Get a value from its key. Will return {@link Optional#empty()}
+     * if no value is stored with the given key
+     *
+     * @param key Key
+     * @param <T> Value type
+     * @return Value
+     * @since 1.4.0
+     */
+    public <T> @NonNull Optional<T> getOptional(final @NonNull CloudKey<T> key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
@@ -233,13 +311,13 @@ public final class CommandContext<C> {
      * Get a value from its key. Will return {@link Optional#empty()}
      * if no value is stored with the given key
      *
-     * @param argument Argument
-     * @param <T>      Value type
+     * @param keyHolder Holder of the key
+     * @param <T>       Value type
      * @return Value
      */
     @SuppressWarnings("unused")
-    public <T> @NonNull Optional<T> getOptional(final @NonNull CommandArgument<C, T> argument) {
-        final Object value = this.internalStorage.get(argument.getName());
+    public <T> @NonNull Optional<T> getOptional(final @NonNull CloudKeyHolder<T> keyHolder) {
+        final Object value = this.internalStorage.get(keyHolder.getKey());
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
             return Optional.of(castedValue);
@@ -254,6 +332,16 @@ public final class CommandContext<C> {
      * @param key Key to remove
      */
     public void remove(final @NonNull String key) {
+        this.remove(SimpleCloudKey.of(key));
+    }
+
+    /**
+     * Remove a stored value from the context
+     *
+     * @param key Key to remove
+     * @since 1.4.0
+     */
+    public void remove(final @NonNull CloudKey<?> key) {
         this.internalStorage.remove(key);
     }
 
@@ -268,6 +356,25 @@ public final class CommandContext<C> {
      */
     @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
     public <T> @NonNull T get(final @NonNull String key) {
+        final Object value = this.internalStorage.get(SimpleCloudKey.of(key));
+        if (value == null) {
+            throw new NullPointerException("No such object stored in the context: " + key);
+        }
+        return (T) value;
+    }
+
+    /**
+     * Get a required argument from the context. This will thrown an exception
+     * if there's no value associated with the given key
+     *
+     * @param key Argument key
+     * @param <T> Argument type
+     * @return Argument
+     * @throws NullPointerException If no such argument is stored
+     * @since 1.4.0
+     */
+    @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
+    public <T> @NonNull T get(final @NonNull CloudKey<T> key) {
         final Object value = this.internalStorage.get(key);
         if (value == null) {
             throw new NullPointerException("No such object stored in the context: " + key);
@@ -279,13 +386,13 @@ public final class CommandContext<C> {
      * Get a required argument from the context. This will thrown an exception
      * if there's no value associated with the given argument
      *
-     * @param argument The argument
+     * @param keyHolder Holder of the identifying key
      * @param <T>      Argument type
      * @return Stored value
      * @throws NullPointerException If no such value is stored
      */
-    public <T> @NonNull T get(final @NonNull CommandArgument<C, T> argument) {
-        return this.get(argument.getName());
+    public <T> @NonNull T get(final @NonNull CloudKeyHolder<T> keyHolder) {
+        return this.get(keyHolder.getKey());
     }
 
     /**
@@ -319,6 +426,22 @@ public final class CommandContext<C> {
     }
 
     /**
+     * Get a value if it exists, else return the provided default value
+     *
+     * @param key          Argument key
+     * @param defaultValue Default value
+     * @param <T>          Argument type
+     * @return Argument, or supplied default value
+     * @since 1.4.0
+     */
+    public <T> @Nullable T getOrDefault(
+            final @NonNull CloudKey<T> key,
+            final @Nullable T defaultValue
+    ) {
+        return this.getOptional(key).orElse(defaultValue);
+    }
+
+    /**
      * Get a value if it exists, else return the value supplied by the given supplier
      *
      * @param key             Argument key
@@ -332,6 +455,22 @@ public final class CommandContext<C> {
             final @NonNull Supplier<@Nullable T> defaultSupplier
     ) {
         return this.<T>getOptional(key).orElseGet(defaultSupplier);
+    }
+
+    /**
+     * Get a value if it exists, else return the value supplied by the given supplier
+     *
+     * @param key             Argument key
+     * @param defaultSupplier Supplier of default value
+     * @param <T>             Argument type
+     * @return Argument, or supplied default value
+     * @since 1.4.0
+     */
+    public <T> @Nullable T getOrSupplyDefault(
+            final @NonNull CloudKey<T> key,
+            final @NonNull Supplier<@Nullable T> defaultSupplier
+    ) {
+        return this.getOptional(key).orElseGet(defaultSupplier);
     }
 
     /**

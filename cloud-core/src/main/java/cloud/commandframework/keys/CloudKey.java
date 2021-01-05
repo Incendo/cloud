@@ -21,35 +21,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.bungee;
+package cloud.commandframework.keys;
 
-import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
- * with Bungee specific objects
+ * A typed, named key
  *
- * @param <C> Command sender type
- * @since 1.1.0
+ * @param <T> The type of the key
+ * @since 1.4.0
  */
-final class BungeeCommandPreprocessor<C> implements CommandPreprocessor<C> {
-
-    private final BungeeCommandManager<C> mgr;
+public interface CloudKey<T> {
 
     /**
-     * The Bungee Command Preprocessor for storing Bungee-specific contexts in the command contexts
+     * Get the name of the key. The name of the key should be used to
+     * determine key equality. That means that two keys sharing the same
+     * name are equal.
      *
-     * @param mgr The BungeeCommandManager
+     * @return The key name
      */
-    BungeeCommandPreprocessor(final @NonNull BungeeCommandManager<C> mgr) {
-        this.mgr = mgr;
-    }
+    @NonNull String getName();
 
-    @Override
-    public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store(BungeeContextKeys.PROXY_SERVER_KEY, mgr.getOwningPlugin().getProxy());
-    }
+    /**
+     * Get the type of the value that this key holds.
+     *
+     * @return The type of the key value.
+     */
+    @NonNull TypeToken<@NonNull T> getType();
 
 }

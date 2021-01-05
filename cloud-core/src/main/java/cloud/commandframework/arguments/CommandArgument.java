@@ -29,6 +29,9 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.keys.CloudKey;
+import cloud.commandframework.keys.CloudKeyHolder;
+import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -49,13 +52,17 @@ import java.util.regex.Pattern;
  * @param <T> The type that the argument parses into
  */
 @SuppressWarnings("unused")
-public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> {
+public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>, CloudKeyHolder<T> {
 
     /**
      * Pattern for command argument names
      */
     private static final Pattern NAME_PATTERN = Pattern.compile("[A-Za-z0-9\\-_]+");
 
+    /**
+     * A typed key representing this argument
+     */
+    private final CloudKey<T> key;
     /**
      * Indicates whether or not the argument is required
      * or not. All arguments prior to any other required
@@ -132,6 +139,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
                 ? buildDefaultSuggestionsProvider(this)
                 : suggestionsProvider;
         this.argumentPreprocessors = new LinkedList<>(argumentPreprocessors);
+        this.key = SimpleCloudKey.of(this.name, this.valueType);
     }
 
     /**
@@ -229,6 +237,11 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>> 
             final @NonNull String name
     ) {
         return new Builder<>(TypeToken.get(clazz), name);
+    }
+
+    @Override
+    public final @NonNull CloudKey<T> getKey() {
+        return this.key;
     }
 
     /**
