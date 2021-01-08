@@ -30,11 +30,15 @@ public class FabricCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
 
     public static final String ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY = "Could not find key {id} in registry '{registry}'";
 
+    public static final String ARGUMENT_PARSE_FAILURE_TEAM_UNKOWN = "Could not find any team named '{input}'!";
+
     protected FabricCaptionRegistry() {
         super();
 
         this.registerMessageFactory(FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY);
+        this.registerMessageFactory(FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_TEAM_UNKOWN);
     }
 
 
