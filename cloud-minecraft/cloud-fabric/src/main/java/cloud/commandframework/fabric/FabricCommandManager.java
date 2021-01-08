@@ -33,7 +33,10 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.argument.RegistryEntryArgument;
+import cloud.commandframework.fabric.argument.TeamArgument;
+import cloud.commandframework.fabric.data.MinecraftTime;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -62,6 +65,7 @@ import net.minecraft.command.argument.ObjectiveCriteriaArgumentType;
 import net.minecraft.command.argument.OperationArgumentType;
 import net.minecraft.command.argument.ParticleArgumentType;
 import net.minecraft.command.argument.SwizzleArgumentType;
+import net.minecraft.command.argument.TeamArgumentType;
 import net.minecraft.command.argument.UuidArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.nbt.CompoundTag;
@@ -69,6 +73,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.scoreboard.ScoreboardCriterion;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -160,6 +165,8 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         /* Cloud-native argument types */
         brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {}, builder -> builder.toConstant(UuidArgumentType.uuid()));
         this.registerRegistryEntryMappings();
+        brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {}, builder -> builder.toConstant(TeamArgumentType.team()));
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Team.class), params -> new TeamArgument.TeamParser<>());
 
         /* Wrapped/Constant Brigadier types, native value type */
         this.registerConstantNativeParserSupplier(Formatting.class, ColorArgumentType.color());
@@ -194,8 +201,8 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         this.registerConstantNativeParserSupplier(ScoreboardSlotArgumentType.scoreboardSlot());
         this.registerConstantNativeParserSupplier(Team.class, TeamArgumentType.team());
         this.registerConstantNativeParserSupplier(/* slot *, ItemSlotArgumentType.itemSlot());
-        this.registerConstantNativeParserSupplier(CommandFunction.class, FunctionArgumentType.function());
-        this.registerConstantNativeParserSupplier(/* time representation in ticks *, TimeArgumentType.time());*/
+        this.registerConstantNativeParserSupplier(CommandFunction.class, FunctionArgumentType.function()); */
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(MinecraftTime.class), params -> FabricArgumentParsers.time());
 
         /* Wrapped brigadier requiring parameters */
         // score holder: single vs multiple

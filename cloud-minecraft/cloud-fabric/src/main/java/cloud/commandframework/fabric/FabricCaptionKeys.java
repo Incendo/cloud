@@ -42,6 +42,10 @@ public final class FabricCaptionKeys {
             "argument.parse.failure.registry_entry.unknown_entry"
     );
 
+    public static final Caption ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN = of(
+            "argument.parse.failure.team.unknown"
+    );
+
     private static @NonNull Caption of(final @NonNull String key) {
         final Caption caption = Caption.of(key);
         RECOGNIZED_CAPTIONS.add(caption);
