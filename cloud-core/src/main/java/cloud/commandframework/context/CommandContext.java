@@ -194,6 +194,19 @@ public final class CommandContext<C> {
      * @param value     Value
      * @param <T>       Value type
      */
+    public <T> void store(final @NonNull CommandArgument<C, T> keyHolder, final @NonNull T value) {
+        this.store((CloudKeyHolder<T>) keyHolder, value);
+    }
+
+    /**
+     * Store a value in the context map. This will overwrite any existing
+     * value stored with the same key
+     *
+     * @param keyHolder Holder of the identifying key
+     * @param value     Value
+     * @param <T>       Value type
+     * @since 1.4.0
+     */
     public <T> void store(final @NonNull CloudKeyHolder<T> keyHolder, final @NonNull T value) {
         this.internalStorage.put(keyHolder.getKey(), value);
     }
@@ -316,6 +329,20 @@ public final class CommandContext<C> {
      * @return Value
      */
     @SuppressWarnings("unused")
+    public <T> @NonNull Optional<T> getOptional(final @NonNull CommandArgument<C, T> keyHolder) {
+        return this.getOptional((CloudKeyHolder<T>) keyHolder);
+    }
+
+    /**
+     * Get a value from its key. Will return {@link Optional#empty()}
+     * if no value is stored with the given key
+     *
+     * @param keyHolder Holder of the key
+     * @param <T>       Value type
+     * @return Value
+     * @since 1.4.0
+     */
+    @SuppressWarnings("unused")
     public <T> @NonNull Optional<T> getOptional(final @NonNull CloudKeyHolder<T> keyHolder) {
         final Object value = this.internalStorage.get(keyHolder.getKey());
         if (value != null) {
@@ -390,6 +417,20 @@ public final class CommandContext<C> {
      * @param <T>      Argument type
      * @return Stored value
      * @throws NullPointerException If no such value is stored
+     */
+    public <T> @NonNull T get(final @NonNull CommandArgument<C, T> keyHolder) {
+        return this.get(keyHolder.getKey());
+    }
+
+    /**
+     * Get a required argument from the context. This will thrown an exception
+     * if there's no value associated with the given argument
+     *
+     * @param keyHolder Holder of the identifying key
+     * @param <T>      Argument type
+     * @return Stored value
+     * @throws NullPointerException If no such value is stored
+     * @since 1.4.0
      */
     public <T> @NonNull T get(final @NonNull CloudKeyHolder<T> keyHolder) {
         return this.get(keyHolder.getKey());
