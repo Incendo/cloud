@@ -22,7 +22,7 @@
 // SOFTWARE.
 //
 
-package cloud.commandframework.fabric.argument;
+package cloud.commandframework.fabric.argument.server;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -37,6 +37,7 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.leangen.geantyref.TypeToken;
 import net.minecraft.command.CommandSource;
+import net.minecraft.server.function.CommandFunction;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
@@ -57,13 +58,11 @@ import static java.util.Objects.requireNonNull;
  * <p>Both static and dynamic registries are supported.</p>
  *
  * @param <C> the command sender type
- * @param <V> the registry entry type
  * @since 1.4.0
  */
-public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
-    private static final String NAMESPACE_MINECRAFT = "minecraft";
+public class CommandFunctionArgument<C> extends CommandArgument<C, CommandFunction> {
 
-    RegistryEntryArgument(
+    CommandFunctionArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull RegistryKey<? extends Registry<V>> registry,
@@ -84,11 +83,11 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      * @param <V> Registry entry type
      * @return Created builder
      */
-    public static <C, V> RegistryEntryArgument.@NonNull Builder<C, V> newBuilder(
+    public static <C, V> CommandFunctionArgument.@NonNull Builder<C, V> newBuilder(
             final @NonNull String name,
             final @NonNull Class<V> type,
             final @NonNull RegistryKey<? extends Registry<V>> registry) {
-        return new RegistryEntryArgument.Builder<>(registry, type, name);
+        return new CommandFunctionArgument.Builder<>(registry, type, name);
     }
 
     /**
@@ -101,11 +100,11 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      * @param <V> Registry entry type
      * @return Created builder
      */
-    public static <C, V> RegistryEntryArgument.@NonNull Builder<C, V> newBuilder(
+    public static <C, V> CommandFunctionArgument.@NonNull Builder<C, V> newBuilder(
             final @NonNull String name,
             final @NonNull TypeToken<V> type,
             final @NonNull RegistryKey<? extends Registry<V>> registry) {
-        return new RegistryEntryArgument.Builder<>(registry, type, name);
+        return new CommandFunctionArgument.Builder<>(registry, type, name);
     }
 
     /**
@@ -118,12 +117,12 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      * @param <V> Registry entry type
      * @return Created argument
      */
-    public static <C, V> @NonNull RegistryEntryArgument<C, V> of(
+    public static <C, V> @NonNull CommandFunctionArgument<C, V> of(
             final @NonNull String name,
             final @NonNull Class<V> type,
             final @NonNull RegistryKey<? extends Registry<V>> registry
     ) {
-        return RegistryEntryArgument.<C, V>newBuilder(name, type, registry).asRequired().build();
+        return CommandFunctionArgument.<C, V>newBuilder(name, type, registry).asRequired().build();
     }
 
     /**
@@ -136,12 +135,12 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      * @param <V> Registry entry type
      * @return     Created argument
      */
-    public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
+    public static <C, V> @NonNull CommandFunctionArgument<C, V> optional(
             final @NonNull String name,
             final @NonNull Class<V> type,
             final @NonNull RegistryKey<? extends Registry<V>> registry
     ) {
-        return RegistryEntryArgument.<C, V>newBuilder(name, type, registry).asOptional().build();
+        return CommandFunctionArgument.<C, V>newBuilder(name, type, registry).asOptional().build();
     }
 
     /**
@@ -155,13 +154,13 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      * @param <V> Registry entry type
      * @return Created argument
      */
-    public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
+    public static <C, V> @NonNull CommandFunctionArgument<C, V> optional(
             final @NonNull String name,
             final @NonNull Class<V> type,
             final @NonNull RegistryKey<? extends Registry<V>> registry,
             final @NonNull RegistryKey<V> defaultValue
     ) {
-        return RegistryEntryArgument.<C, V>newBuilder(name, type, registry)
+        return CommandFunctionArgument.<C, V>newBuilder(name, type, registry)
                 .asOptionalWithDefault(defaultValue.getValue().toString())
                 .build();
     }
@@ -192,7 +191,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final String possibleIdentifier = inputQueue.peek();
             if (possibleIdentifier == null) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
-                        RegistryEntryArgument.class,
+                        CommandFunctionArgument.class,
                         commandContext
                 ));
             }
@@ -268,33 +267,19 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      * @param <C> The sender type
      * @param <V> The registry value type
      */
-    public static final class Builder<C, V> extends CommandArgument.TypedBuilder<C, V, Builder<C, V>> {
-        private final RegistryKey<? extends Registry<V>> registryIdent;
+    public static final class Builder<C, V> extends TypedBuilder<C, V, Builder<C, V>> {
 
         Builder(
-                final RegistryKey<? extends Registry<V>> key,
-                final @NonNull Class<V> valueType,
                 final @NonNull String name
         ) {
             super(valueType, name);
-            this.registryIdent = key;
-        }
-
-        Builder(
-                final RegistryKey<? extends Registry<V>> key,
-                final @NonNull TypeToken<V> valueType,
-                final @NonNull String name
-        ) {
-            super(valueType, name);
-            this.registryIdent = key;
         }
 
         @Override
-        public @NonNull RegistryEntryArgument<@NonNull C, @NonNull V> build() {
-            return new RegistryEntryArgument<>(
+        public @NonNull CommandFunctionArgument<@NonNull C, @NonNull V> build() {
+            return new CommandFunctionArgument<>(
                     this.isRequired(),
                     this.getName(),
-                    this.registryIdent,
                     this.getDefaultValue(),
                     this.getValueType(),
                     this.getSuggestionsProvider()
@@ -315,7 +300,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                 final RegistryKey<? extends Registry<?>> registry
         ) {
             super(
-                    RegistryEntryArgument.class,
+                    CommandFunctionArgument.class,
                     context,
                     FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY,
                     CaptionVariable.of("id", key.toString()),
