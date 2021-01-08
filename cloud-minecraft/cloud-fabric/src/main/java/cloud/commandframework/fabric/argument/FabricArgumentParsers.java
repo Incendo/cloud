@@ -24,6 +24,44 @@
 
 package cloud.commandframework.fabric.argument;
 
-public class FabricArgumentParsers {
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
+import cloud.commandframework.fabric.FabricCommandContextKeys;
+import cloud.commandframework.fabric.data.MinecraftTime;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.FunctionArgumentType;
+import net.minecraft.command.argument.TimeArgumentType;
+import net.minecraft.server.function.CommandFunction;
+
+/**
+ * Parsers for Vanilla command argument types.
+ *
+ * @since 1.4.0
+ */
+public final class FabricArgumentParsers {
+
+    private FabricArgumentParsers() {
+    }
+
+    /**
+     * A parser for in-game time, in ticks.
+     *
+     * @param <C> sender type
+     * @return a parser instance
+     */
+    public static <C> ArgumentParser<C, MinecraftTime> time() {
+        return new WrappedBrigadierParser<C, Integer>(TimeArgumentType.time())
+                .map((ctx, val) -> ArgumentParseResult.success(MinecraftTime.of(val)));
+    }
+
+    public static <C> ArgumentParser<C, CommandFunction> commandFunction() {
+        // TODO: Should probably write our own parser for this, it's either Identifier or tag.
+        // Server parsers
+        return new WrappedBrigadierParser<C, FunctionArgumentType.FunctionArgument>(FunctionArgumentType.function()).map((ctx, val) -> {
+            final CommandSource source = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+            source.getCompletions()
+        })
+    }
 
 }

@@ -25,9 +25,11 @@
 package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.AngleArgumentType;
+import cloud.commandframework.fabric.data.MinecraftTime;
+import net.minecraft.command.argument.TimeArgumentType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -35,17 +37,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for an angle, specified in degrees.
+ * An argument for in-game time
  *
  * @param <C> the sender type
  * @since 1.4.0
  */
-public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType.Angle> {
+public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
 
-    // todo: This angle is relative to a certain entity
-    // Vanilla only supports this on the server, we should be able to make it work on the client just fine too.
-
-    AngleArgument(
+    TimeArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -54,9 +53,9 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(AngleArgumentType.angle()),
+                FabricArgumentParsers.time(),
                 defaultValue,
-                AngleArgumentType.Angle.class,
+                MinecraftTime.class,
                 suggestionsProvider
         );
     }
@@ -68,8 +67,8 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> AngleArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new AngleArgument.Builder<>(name);
+    public static <C> TimeArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return new TimeArgument.Builder<>(name);
     }
 
     /**
@@ -79,8 +78,8 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull AngleArgument<C> of(final @NonNull String name) {
-        return AngleArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull TimeArgument<C> of(final @NonNull String name) {
+        return TimeArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
@@ -90,40 +89,40 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @param <C>  Command sender type
      * @return     Created argument
      */
-    public static <C> @NonNull AngleArgument<C> optional(final @NonNull String name) {
-        return AngleArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull TimeArgument<C> optional(final @NonNull String name) {
+        return TimeArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
      * Create a new optional command argument with a default value
      *
      * @param name        Argument name
-     * @param defaultAngle  Default angle, in degrees
+     * @param defaultTime  Default time, in ticks
      * @param <C>         Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull AngleArgument<C> optional(
+    public static <C> @NonNull TimeArgument<C> optional(
             final @NonNull String name,
-            final float defaultAngle
+            final MinecraftTime defaultTime
     ) {
-        return AngleArgument.<C>newBuilder(name).asOptionalWithDefault(Float.toString(defaultAngle)).build();
+        return TimeArgument.<C>newBuilder(name).asOptionalWithDefault(defaultTime.toString()).build();
     }
 
 
-    public static final class Builder<C> extends TypedBuilder<C, AngleArgumentType.Angle, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, MinecraftTime, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(AngleArgumentType.Angle.class, name);
+            super(MinecraftTime.class, name);
         }
 
         /**
-         * Build a new angle argument
+         * Build a new time argument
          *
          * @return Constructed argument
          */
         @Override
-        public @NonNull AngleArgument<C> build() {
-            return new AngleArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+        public @NonNull TimeArgument<C> build() {
+            return new TimeArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
         }
 
     }
