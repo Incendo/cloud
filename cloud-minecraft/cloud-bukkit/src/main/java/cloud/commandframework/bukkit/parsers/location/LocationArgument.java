@@ -243,7 +243,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
             );
         }
 
-        static Location toLocalSpace(final @NonNull Location originalLocation, final @NonNull Vector declaredPos) {
+        static @NonNull Location toLocalSpace(final @NonNull Location originalLocation, final @NonNull Vector declaredPos) {
             final double cosYaw = Math.cos(toRadians(originalLocation.getYaw() + 90.0F));
             final double sinYaw = Math.sin(toRadians(originalLocation.getYaw() + 90.0F));
             final double cosPitch = Math.cos(toRadians(-originalLocation.getPitch()));

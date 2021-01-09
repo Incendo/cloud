@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class Location2D extends Location {
 
-    private Location2D(final @Nullable World world, final double x, final double z) {
+    protected Location2D(final @Nullable World world, final double x, final double z) {
         super(world, x, 0, z);
     }
 
