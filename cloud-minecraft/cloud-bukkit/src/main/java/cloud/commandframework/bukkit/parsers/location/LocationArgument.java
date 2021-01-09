@@ -259,6 +259,13 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
+            return LocationArgument.LocationParser.getSuggestions(commandContext, input);
+        }
+
+        public static <C> @NonNull List<@NonNull String> getSuggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             final String workingInput;
             final String prefix;
             if (input.startsWith("~") || input.startsWith("^")) {

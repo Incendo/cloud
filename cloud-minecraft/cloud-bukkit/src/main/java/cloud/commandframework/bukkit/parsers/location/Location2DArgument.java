@@ -26,7 +26,6 @@ package cloud.commandframework.bukkit.parsers.location;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument.LocationParseException;
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
@@ -44,7 +43,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * Argument parser that parses {@link Location2D} from two doubles. This will use the command
@@ -243,20 +241,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            final String workingInput;
-            final String prefix;
-            if (input.startsWith("~") || input.startsWith("^")) {
-                prefix = Character.toString(input.charAt(0));
-                workingInput = input.substring(1);
-            } else {
-                prefix = "";
-                workingInput = input;
-            }
-            return IntegerArgument.IntegerParser.getSuggestions(
-                    Integer.MIN_VALUE,
-                    Integer.MAX_VALUE,
-                    workingInput
-            ).stream().map(string -> prefix + string).collect(Collectors.toList());
+            return LocationArgument.LocationParser.getSuggestions(commandContext, input);
         }
 
         @Override
