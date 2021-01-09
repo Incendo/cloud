@@ -235,14 +235,15 @@ public abstract class CommandManager<C> {
      * @return The command manager instance. This is returned so that these method calls may be chained. This will always
      *         return {@code this}.
      */
-    public @NonNull @This CommandManager<C> command(final @NonNull Command<C> command) {
+    @SuppressWarnings("unchecked") // These are safe casts.
+    public @NonNull @This CommandManager<C> command(final @NonNull Command<? extends C> command) {
         if (!(this.transitionIfPossible(RegistrationState.BEFORE_REGISTRATION, RegistrationState.REGISTERING)
                 || this.isCommandRegistrationAllowed())) {
             throw new IllegalStateException("Unable to register commands because the manager is no longer in a registration "
                     + "state. Your platform may allow unsafe registrations by enabling the appropriate manager setting.");
         }
-        this.commandTree.insertCommand(command);
-        this.commands.add(command);
+        this.commandTree.insertCommand((Command<C>) command);
+        this.commands.add((Command<C>) command);
         return this;
     }
 
@@ -272,8 +273,9 @@ public abstract class CommandManager<C> {
      * @param command Command to register. {@link Command.Builder#build()}} will be invoked.
      * @return The command manager instance
      */
-    public @NonNull CommandManager<C> command(final Command.@NonNull Builder<C> command) {
-        return this.command(command.manager(this).build());
+    @SuppressWarnings("unchecked") // This is a safe cast.
+    public @NonNull CommandManager<C> command(final Command.@NonNull Builder<? extends C> command) {
+        return this.command(((Command.Builder<C>) command).manager(this).build());
     }
 
     /**
