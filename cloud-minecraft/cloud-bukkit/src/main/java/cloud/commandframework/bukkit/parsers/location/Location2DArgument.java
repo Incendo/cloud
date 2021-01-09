@@ -210,23 +210,17 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
             } else if (coordinates[1].getType() == LocationCoordinateType.RELATIVE) {
                 originalLocation.add(0, 0, coordinates[1].getCoordinate());
             } else {
-                final double multiplier = 0.017453292D;
-                final double f = Math.cos((originalLocation.getYaw() + 90.0F) * multiplier);
-                final double f1 = Math.sin((originalLocation.getY() + 90.0F) * multiplier);
-                final double f2 = Math.cos(-originalLocation.getPitch() * multiplier);
-                final double f3 = Math.sin(-originalLocation.getPitch() * multiplier);
-                final double f4 = Math.cos((-originalLocation.getPitch() + 90.0F) * multiplier);
-                final double f5 = Math.sin((-originalLocation.getPitch() + 90.0F) * multiplier);
-                final Vector vec1 = new Vector(f * f2, f3, f1 * f2);
-                final Vector vec2 = new Vector(f * f4, f5, f1 * f4);
-                final Vector vec3 = vec1.crossProduct(vec2).multiply(-1);
-                final Vector vec4 = new Vector(
-                        vec1.getX() * vec2.getX() * coordinates[1].getCoordinate() + vec3.getX() * coordinates[0].getCoordinate(),
+                final Vector declaredPos = new Vector(
+                        coordinates[0].getCoordinate(),
                         0,
-                        vec1.getZ() * coordinates[1].getCoordinate() + vec2.getZ() * coordinates[1].getCoordinate()
-                                + vec3.getZ() * coordinates[0].getCoordinate()
+                        coordinates[1].getCoordinate()
                 );
-                originalLocation.add(vec4);
+                final Location local = LocationArgument.LocationParser.toLocalSpace(originalLocation, declaredPos);
+                return ArgumentParseResult.success(Location2D.from(
+                        originalLocation.getWorld(),
+                        local.getX(),
+                        local.getZ()
+                ));
             }
 
             return ArgumentParseResult.success(Location2D.from(

@@ -228,30 +228,43 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
             } else if (coordinates[2].getType() == LocationCoordinateType.RELATIVE) {
                 originalLocation.add(0, 0, coordinates[2].getCoordinate());
             } else {
-                final double multiplier = 0.017453292D;
-                final double f = Math.cos((originalLocation.getYaw() + 90.0F) * multiplier);
-                final double f1 = Math.sin((originalLocation.getY() + 90.0F) * multiplier);
-                final double f2 = Math.cos(-originalLocation.getPitch() * multiplier);
-                final double f3 = Math.sin(-originalLocation.getPitch() * multiplier);
-                final double f4 = Math.cos((-originalLocation.getPitch() + 90.0F) * multiplier);
-                final double f5 = Math.sin((-originalLocation.getPitch() + 90.0F) * multiplier);
-                final Vector vec1 = new Vector(f * f2, f3, f1 * f2);
-                final Vector vec2 = new Vector(f * f4, f5, f1 * f4);
-                final Vector vec3 = vec1.crossProduct(vec2).multiply(-1);
-                final Vector vec4 = new Vector(
-                        vec1.getX() * coordinates[2].getCoordinate() + vec2.getX() * coordinates[1].getCoordinate()
-                                + vec3.getX() * coordinates[0].getCoordinate(),
-                        vec1.getY() * coordinates[2].getCoordinate() + vec2.getY() * coordinates[1].getCoordinate()
-                                + vec3.getY() * coordinates[0].getCoordinate(),
-                        vec1.getZ() * coordinates[1].getCoordinate() + vec2.getZ() * coordinates[1].getCoordinate()
-                                + vec3.getZ() * coordinates[0].getCoordinate()
+                final Vector declaredPos = new Vector(
+                        coordinates[0].getCoordinate(),
+                        coordinates[1].getCoordinate(),
+                        coordinates[2].getCoordinate()
                 );
-                originalLocation.add(vec4);
+                return ArgumentParseResult.success(
+                        toLocalSpace(originalLocation, declaredPos)
+                );
             }
 
             return ArgumentParseResult.success(
                     originalLocation
             );
+        }
+
+        static Location toLocalSpace(final @NonNull Location originalLocation, final @NonNull Vector declaredPos) {
+            final double cosYaw = Math.cos(toRadians(originalLocation.getYaw() + 90.0F));
+            final double sinYaw = Math.sin(toRadians(originalLocation.getYaw() + 90.0F));
+            final double cosPitch = Math.cos(toRadians(-originalLocation.getPitch()));
+            final double sinPitch = Math.sin(toRadians(-originalLocation.getPitch()));
+            final double cosNegYaw = Math.cos(toRadians(-originalLocation.getPitch() + 90.0F));
+            final double sinNegYaw = Math.sin(toRadians(-originalLocation.getPitch() + 90.0F));
+            final Vector zModifier = new Vector(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch);
+            final Vector yModifier = new Vector(cosYaw * cosNegYaw, sinNegYaw, sinYaw * cosNegYaw);
+            final Vector xModifier = zModifier.crossProduct(yModifier).multiply(-1);
+            final double xOffset = dotProduct(declaredPos, xModifier.getX(), yModifier.getX(), zModifier.getX());
+            final double yOffset = dotProduct(declaredPos, xModifier.getY(), yModifier.getY(), zModifier.getY());
+            final double zOffset = dotProduct(declaredPos, xModifier.getZ(), yModifier.getZ(), zModifier.getZ());
+            return originalLocation.add(xOffset, yOffset, zOffset);
+        }
+
+        private static double dotProduct(final Vector location, final double x, final double y, final double z) {
+            return location.getX() * x + location.getY() * y + location.getZ() * z;
+        }
+
+        private static float toRadians(final float degrees) {
+            return degrees * (float) Math.PI / 180f;
         }
 
         @Override
