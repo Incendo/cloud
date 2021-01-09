@@ -262,7 +262,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
             return LocationArgument.LocationParser.getSuggestions(commandContext, input);
         }
 
-        public static <C> @NonNull List<@NonNull String> getSuggestions(
+        static <C> @NonNull List<@NonNull String> getSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
