@@ -29,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * {@link Location} which defaults the Y position to 0
+ * {@link Location} projected onto the XZ-plane
  *
  * @since 1.4.0
  */
