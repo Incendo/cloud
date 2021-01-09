@@ -28,6 +28,7 @@ import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
+import cloud.commandframework.bukkit.parsers.location.Location2D;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -88,6 +89,8 @@ public final class BukkitBrigadierMapper<C> {
             this.mapComplexNMS(MultiplePlayerSelector.class, this.getEntitySelectorArgument(false, true));
             /* Map Vec3 */
             this.mapComplexNMS(Location.class, this.getArgumentVec3());
+            /* Map Vec2I */
+            this.mapComplexNMS(Location2D.class, this.getArgumentVec2I());
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin()
                     .getLogger()
@@ -100,7 +103,7 @@ public final class BukkitBrigadierMapper<C> {
      * @param playersOnly Whether the selector is for players only (true), or for all entities (false)
      * @return The NMS ArgumentType
      */
-    private Supplier<ArgumentType<?>> getEntitySelectorArgument(
+    private @NonNull Supplier<ArgumentType<?>> getEntitySelectorArgument(
             final boolean single,
             final boolean playersOnly
     ) {
@@ -117,13 +120,25 @@ public final class BukkitBrigadierMapper<C> {
     }
 
     @SuppressWarnings("UnnecessaryLambda")
-    private Supplier<ArgumentType<?>> getArgumentVec3() {
+    private @NonNull Supplier<ArgumentType<?>> getArgumentVec3() {
         return () -> {
             try {
                 return (ArgumentType<?>) this.getNMSArgument("Vec3").getDeclaredConstructor(boolean.class)
                         .newInstance(true);
             } catch (final Exception e) {
-                this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve vector argument", e);
+                this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec3D argument", e);
+                return null;
+            }
+        };
+    }
+
+    @SuppressWarnings("UnnecessaryLambda")
+    private @NonNull Supplier<ArgumentType<?>> getArgumentVec2I() {
+        return () -> {
+            try {
+                return (ArgumentType<?>) this.getNMSArgument("Vec2I").getDeclaredConstructor().newInstance();
+            } catch (final Exception e) {
+                this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2I argument", e);
                 return null;
             }
         };
