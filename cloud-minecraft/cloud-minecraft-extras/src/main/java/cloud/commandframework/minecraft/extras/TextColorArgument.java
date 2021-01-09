@@ -181,6 +181,7 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
                 }
             }
             if (HEX_PREDICATE.matcher(input).matches()) {
+                inputQueue.remove();
                 return ArgumentParseResult.success(
                         TextColor.color(Integer.parseInt(input.startsWith("#") ? input.substring(1) : input, 16))
                 );
