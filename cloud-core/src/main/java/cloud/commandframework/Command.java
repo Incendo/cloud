@@ -1698,6 +1698,7 @@ public class Command<C> {
         /**
          * Specify a required sender type
          *
+         * @param <N> The new sender type or a superclass thereof
          * @param senderType Required sender type
          * @return New builder instance using the required sender type
          */

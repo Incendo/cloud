@@ -235,7 +235,11 @@ public abstract class CommandManager<C> {
      * @return The command manager instance. This is returned so that these method calls may be chained. This will always
      *         return {@code this}.
      */
-    @SuppressWarnings("unchecked") // These are safe casts.
+    // The suppression is intended and alright here. These are safe casts because by the time the command is executed,
+    // the sender type must be checked and ensured to be alright. The type provided must also be assignable to type C,
+    // meaning the type is itself type-checked by the Java compiler (unless the user uses casts to avoid this, in which
+    // case we do not really care, nor could we do anything either way).
+    @SuppressWarnings("unchecked")
     public @NonNull @This CommandManager<C> command(final @NonNull Command<? extends C> command) {
         if (!(this.transitionIfPossible(RegistrationState.BEFORE_REGISTRATION, RegistrationState.REGISTERING)
                 || this.isCommandRegistrationAllowed())) {
@@ -273,7 +277,11 @@ public abstract class CommandManager<C> {
      * @param command Command to register. {@link Command.Builder#build()}} will be invoked.
      * @return The command manager instance
      */
-    @SuppressWarnings("unchecked") // This is a safe cast.
+    // The suppression is intended and alright here. This is a safe cast because by the time the command is executed,
+    // the sender type must be checked and ensured to be alright. The type provided must also be assignable to type C,
+    // meaning the type is itself type-checked by the Java compiler (unless the user uses casts to avoid this, in which
+    // case we do not really care, nor could we do anything either way).
+    @SuppressWarnings("unchecked")
     public @NonNull CommandManager<C> command(final Command.@NonNull Builder<? extends C> command) {
         return this.command(((Command.Builder<C>) command).manager(this).build());
     }
