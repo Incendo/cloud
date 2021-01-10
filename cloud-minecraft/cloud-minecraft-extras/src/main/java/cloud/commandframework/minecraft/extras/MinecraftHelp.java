@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -360,9 +361,16 @@ public final class MinecraftHelp<C> {
                     return header;
                 },
                 (helpEntry, isLastOfPage) -> {
-                    final Component description = helpEntry.getDescription().isEmpty()
-                            ? this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP)
-                            : this.descriptionDecorator.apply(helpEntry.getDescription());
+                    final Optional<Component> richDescription =
+                            helpEntry.getCommand().getCommandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION);
+                    final Component description;
+                    if (richDescription.isPresent()) {
+                        description = richDescription.get();
+                    } else if (helpEntry.getDescription().isEmpty()) {
+                        description = this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP);
+                    } else {
+                        description = this.descriptionDecorator.apply(helpEntry.getDescription());
+                    }
 
                     final boolean lastBranch =
                             isLastOfPage || helpTopic.getEntries().indexOf(helpEntry) == helpTopic.getEntries().size() - 1;
@@ -439,9 +447,21 @@ public final class MinecraftHelp<C> {
                 .append(text(": ", this.colors.primary))
                 .append(this.highlight(text("/" + command, this.colors.highlight)))
         );
-        final Component topicDescription = helpTopic.getDescription().isEmpty()
-                ? this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION)
-                : this.descriptionDecorator.apply(helpTopic.getDescription());
+        /* Topics will use the long description if available, but fall back to the short description. */
+        final Component richDescription =
+                helpTopic.getCommand().getCommandMeta().get(MinecraftExtrasMetaKeys.LONG_DESCRIPTION)
+                        .orElse(helpTopic.getCommand().getCommandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION)
+                                .orElse(null));
+
+        final Component topicDescription;
+        if (richDescription != null) {
+            topicDescription = richDescription;
+        } else if (helpTopic.getDescription().isEmpty()) {
+            topicDescription = this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION);
+        } else {
+            topicDescription = this.descriptionDecorator.apply(helpTopic.getDescription());
+        }
+
         final boolean hasArguments = helpTopic.getCommand().getArguments().size() > 1;
         audience.sendMessage(text()
                 .append(text("   "))
