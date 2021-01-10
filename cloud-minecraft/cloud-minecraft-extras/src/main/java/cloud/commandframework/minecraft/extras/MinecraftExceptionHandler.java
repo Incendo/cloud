@@ -36,6 +36,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.util.ComponentMessageThrowable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.PrintWriter;
@@ -53,31 +54,29 @@ import java.util.function.Function;
  */
 public final class MinecraftExceptionHandler<C> {
 
+    private static final Component NULL = Component.text("null");
+
     /**
      * Default component builder for {@link InvalidSyntaxException}
      */
     public static final Function<Exception, Component> DEFAULT_INVALID_SYNTAX_FUNCTION =
-            e -> Component.text()
-                    .append(Component.text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED))
+            e -> Component.text("Invalid command syntax. Correct command syntax is: ", NamedTextColor.RED)
                     .append(ComponentHelper.highlight(
                             Component.text(
                                     String.format("/%s", ((InvalidSyntaxException) e).getCorrectSyntax()),
                                     NamedTextColor.GRAY
                             ),
                             NamedTextColor.WHITE
-                    ))
-                    .build();
+                    ));
     /**
      * Default component builder for {@link InvalidCommandSenderException}
      */
     public static final Function<Exception, Component> DEFAULT_INVALID_SENDER_FUNCTION =
-            e -> Component.text()
-                    .append(Component.text("Invalid command sender. You must be of type ", NamedTextColor.RED))
+            e -> Component.text("Invalid command sender. You must be of type ", NamedTextColor.RED)
                     .append(Component.text(
                             ((InvalidCommandSenderException) e).getRequiredSender().getSimpleName(),
                             NamedTextColor.GRAY
-                    ))
-                    .build();
+                    ));
     /**
      * Default component builder for {@link NoPermissionException}
      */
@@ -91,10 +90,8 @@ public final class MinecraftExceptionHandler<C> {
      * Default component builder for {@link ArgumentParseException}
      */
     public static final Function<Exception, Component> DEFAULT_ARGUMENT_PARSING_FUNCTION =
-            e -> Component.text()
-                    .append(Component.text("Invalid command argument: ", NamedTextColor.RED))
-                    .append(Component.text(e.getCause().getMessage(), NamedTextColor.GRAY))
-                    .build();
+            e -> Component.text("Invalid command argument: ", NamedTextColor.RED)
+                    .append(getMessage(e.getCause()).colorIfAbsent(NamedTextColor.GRAY));
     /**
      * Default component builder for {@link CommandExecutionException}
      *
@@ -110,6 +107,7 @@ public final class MinecraftExceptionHandler<C> {
                 final String stackTrace = writer.toString().replaceAll("\t", "    ");
                 final HoverEvent<Component> hover = HoverEvent.showText(
                         Component.text()
+                                .append(getMessage(cause))
                                 .append(Component.text(stackTrace))
                                 .append(Component.newline())
                                 .append(Component.text(
@@ -120,10 +118,8 @@ public final class MinecraftExceptionHandler<C> {
                 );
                 final ClickEvent click = ClickEvent.copyToClipboard(stackTrace);
                 return Component.text()
-                        .append(Component.text(
-                                "An internal error occurred while attempting to perform this command.",
-                                NamedTextColor.RED
-                        ))
+                        .content("An internal error occurred while attempting to perform this command.")
+                        .color(NamedTextColor.RED)
                         .hoverEvent(hover)
                         .clickEvent(click)
                         .build();
@@ -251,7 +247,7 @@ public final class MinecraftExceptionHandler<C> {
             final @NonNull CommandManager<C> manager,
             final @NonNull Function<@NonNull C, @NonNull Audience> audienceMapper
     ) {
-        if (componentBuilders.containsKey(ExceptionType.INVALID_SYNTAX)) {
+        if (this.componentBuilders.containsKey(ExceptionType.INVALID_SYNTAX)) {
             manager.registerExceptionHandler(
                     InvalidSyntaxException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
@@ -260,7 +256,7 @@ public final class MinecraftExceptionHandler<C> {
                     )
             );
         }
-        if (componentBuilders.containsKey(ExceptionType.INVALID_SENDER)) {
+        if (this.componentBuilders.containsKey(ExceptionType.INVALID_SENDER)) {
             manager.registerExceptionHandler(
                     InvalidCommandSenderException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
@@ -269,7 +265,7 @@ public final class MinecraftExceptionHandler<C> {
                     )
             );
         }
-        if (componentBuilders.containsKey(ExceptionType.NO_PERMISSION)) {
+        if (this.componentBuilders.containsKey(ExceptionType.NO_PERMISSION)) {
             manager.registerExceptionHandler(
                     NoPermissionException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
@@ -278,7 +274,7 @@ public final class MinecraftExceptionHandler<C> {
                     )
             );
         }
-        if (componentBuilders.containsKey(ExceptionType.ARGUMENT_PARSING)) {
+        if (this.componentBuilders.containsKey(ExceptionType.ARGUMENT_PARSING)) {
             manager.registerExceptionHandler(
                     ArgumentParseException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
@@ -287,7 +283,7 @@ public final class MinecraftExceptionHandler<C> {
                     )
             );
         }
-        if (componentBuilders.containsKey(ExceptionType.COMMAND_EXECUTION)) {
+        if (this.componentBuilders.containsKey(ExceptionType.COMMAND_EXECUTION)) {
             manager.registerExceptionHandler(
                     CommandExecutionException.class,
                     (c, e) -> audienceMapper.apply(c).sendMessage(
@@ -298,6 +294,10 @@ public final class MinecraftExceptionHandler<C> {
         }
     }
 
+    private static Component getMessage(final Throwable throwable) {
+        final Component msg = ComponentMessageThrowable.getOrConvertMessage(throwable);
+        return msg == null ? NULL : msg;
+    }
 
     /**
      * Exception types
