@@ -31,6 +31,7 @@ import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.MappedArgumentParser;
 import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.ByteArgument;
 import cloud.commandframework.arguments.standard.DoubleArgument;
@@ -387,7 +388,12 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull TypeToken<T> argumentType,
             final @NonNull K argument
     ) {
-        final ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
+        /* Unwrap mapped arguments */
+        ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
+        while (commandArgument instanceof MappedArgumentParser<?, ?, ?>) {
+            commandArgument = ((MappedArgumentParser<C, ?, ?>) commandArgument).getBaseParser();
+        }
+
         final BrigadierMapping<C, K, S> mapping = (BrigadierMapping<C, K, S>) this.mappers
                 .get(GenericTypeReflector.erase(argumentType.getType()));
         if (mapping == null || mapping.getMapper() == null) {
