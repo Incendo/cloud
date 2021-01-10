@@ -451,10 +451,10 @@ public final class MinecraftHelp<C> {
         final Component richDescription =
                 helpTopic.getCommand().getCommandMeta().get(MinecraftExtrasMetaKeys.LONG_DESCRIPTION)
                         .orElse(helpTopic.getCommand().getCommandMeta().get(MinecraftExtrasMetaKeys.DESCRIPTION)
-                                .orElse(Component.empty()));
+                                .orElse(null));
 
         final Component topicDescription;
-        if (richDescription != Component.empty()) {
+        if (richDescription != null) {
             topicDescription = richDescription;
         } else if (helpTopic.getDescription().isEmpty()) {
             topicDescription = this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION);

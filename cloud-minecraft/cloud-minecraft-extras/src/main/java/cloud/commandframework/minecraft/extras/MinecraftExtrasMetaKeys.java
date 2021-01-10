@@ -37,7 +37,7 @@ public final class MinecraftExtrasMetaKeys {
     /**
      * A component short description.
      *
-     * <p>This will set the plain-text description, but will be used in place of that meta key in help.</p>
+     * <p>This will not set the plain-text description, but will be used in place of that meta key in help.</p>
      */
     public static final CommandMeta.Key<Component> DESCRIPTION = CommandMeta.Key.of(
             Component.class,
@@ -47,7 +47,7 @@ public final class MinecraftExtrasMetaKeys {
     /**
      * A component long description.
      *
-     * <p>This will set the plain-text description, but will be used in place of that meta key in help.</p>
+     * <p>This will not set the plain-text long description, but will be used in place of that meta key in help.</p>
      */
     public static final CommandMeta.Key<Component> LONG_DESCRIPTION = CommandMeta.Key.of(
             Component.class,

@@ -295,14 +295,9 @@ public final class MinecraftExceptionHandler<C> {
     }
 
     private static Component getMessage(final Throwable throwable) {
-        if (throwable instanceof ComponentMessageThrowable) {
-            final Component msg =  ((ComponentMessageThrowable) throwable).componentMessage();
-            return msg == null ? NULL : msg;
-        } else {
-            return Component.text(throwable.getMessage());
-        }
+        final Component msg = ComponentMessageThrowable.getOrConvertMessage(throwable);
+        return msg == null ? NULL : msg;
     }
-
 
     /**
      * Exception types
