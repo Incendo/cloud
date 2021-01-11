@@ -86,7 +86,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
                 } catch (final CommandExecutionException exception) {
                     resultFuture.completeExceptionally(exception);
                 } catch (final Exception exception) {
-                    resultFuture.completeExceptionally(new CommandExecutionException(exception));
+                    resultFuture.completeExceptionally(new CommandExecutionException(exception, commandContext));
                 }
             }
         };
