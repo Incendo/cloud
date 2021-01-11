@@ -23,8 +23,10 @@
 //
 package cloud.commandframework.exceptions;
 
+import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 
@@ -35,6 +37,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
 
     private static final long serialVersionUID = 7372142477529875598L;
     private final Class<?> requiredSender;
+    private final Command<?> command;
 
     /**
      * Construct a new command parse exception
@@ -48,8 +51,27 @@ public final class InvalidCommandSenderException extends CommandParseException {
             final @NonNull Class<?> requiredSender,
             final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain
     ) {
+        this(commandSender, requiredSender, currentChain, null);
+    }
+
+    /**
+     * Construct a new command parse exception
+     *
+     * @param commandSender  Sender who executed the command
+     * @param requiredSender The sender type that is required
+     * @param currentChain   Chain leading up to the exception
+     * @param command        Command
+     * @since 1.4.0
+     */
+    public InvalidCommandSenderException(
+            final @NonNull Object commandSender,
+            final @NonNull Class<?> requiredSender,
+            final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain,
+            final @Nullable Command<?> command
+    ) {
         super(commandSender, currentChain);
         this.requiredSender = requiredSender;
+        this.command = command;
     }
 
     /**
@@ -68,6 +90,16 @@ public final class InvalidCommandSenderException extends CommandParseException {
                 getCommandSender().getClass().getSimpleName(),
                 requiredSender.getSimpleName()
         );
+    }
+
+    /**
+     * Get the Command which the sender is invalid for
+     *
+     * @return Command
+     * @since 1.4.0
+     */
+    public @Nullable Command<?> getCommand() {
+        return this.command;
     }
 
 }

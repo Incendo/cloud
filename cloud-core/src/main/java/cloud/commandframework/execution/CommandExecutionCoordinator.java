@@ -122,7 +122,7 @@ public abstract class CommandExecutionCoordinator<C> {
                         } catch (final CommandExecutionException exception) {
                             completableFuture.completeExceptionally(exception);
                         } catch (final Exception exception) {
-                            completableFuture.completeExceptionally(new CommandExecutionException(exception));
+                            completableFuture.completeExceptionally(new CommandExecutionException(exception, commandContext));
                         }
                     }
                     completableFuture.complete(new CommandResult<>(commandContext));
