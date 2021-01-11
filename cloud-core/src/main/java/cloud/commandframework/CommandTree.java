@@ -142,13 +142,13 @@ public final class CommandTree<C> {
         if (pair.getFirst() != null) {
             final Command<C> command = pair.getFirst();
             if (command.getSenderType().isPresent() && !command.getSenderType().get()
-                    .isAssignableFrom(commandContext
-                            .getSender()
-                            .getClass())) {
+                    .isAssignableFrom(commandContext.getSender().getClass())
+            ) {
                 return Pair.of(null, new InvalidCommandSenderException(
                         commandContext.getSender(),
                         command.getSenderType().get(),
-                        Collections.emptyList()
+                        new ArrayList<>(command.getArguments()),
+                        command
                 ));
             }
         }

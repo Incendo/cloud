@@ -120,7 +120,7 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
         } catch (final Error e) {
             throw e;
         } catch (final Throwable throwable) {
-            throw new CommandExecutionException(throwable);
+            throw new CommandExecutionException(throwable, commandContext);
         }
     }
 
