@@ -23,7 +23,9 @@
 //
 package cloud.commandframework.exceptions;
 
+import cloud.commandframework.context.CommandContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Exception thrown when there is an exception during execution of a command handler
@@ -33,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class CommandExecutionException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -4785446899438294661L;
+    private final CommandContext<?> commandContext;
 
     /**
      * Exception thrown when there is an exception during execution of a command handler
@@ -40,7 +43,29 @@ public class CommandExecutionException extends IllegalArgumentException {
      * @param cause Exception thrown during the execution of a command handler
      */
     public CommandExecutionException(final @NonNull Throwable cause) {
+        this(cause, null);
+    }
+
+    /**
+     * Exception thrown when there is an exception during execution of a command handler
+     *
+     * @param cause Exception thrown during the execution of a command handler
+     * @param commandContext Command context
+     * @since 1.4.0
+     */
+    public CommandExecutionException(final @NonNull Throwable cause, final @Nullable CommandContext<?> commandContext) {
         super(cause);
+        this.commandContext = commandContext;
+    }
+
+    /**
+     * Get the CommandContext which led to this exception
+     *
+     * @return Command
+     * @since 1.4.0
+     */
+    public @Nullable CommandContext<?> getCommandContext() {
+        return this.commandContext;
     }
 
 }
