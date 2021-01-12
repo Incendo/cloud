@@ -92,6 +92,19 @@ public final class FlagContext {
     }
 
     /**
+     * Check whether a presence flag is present. This will return {@code false}
+     * for all value flags.
+     *
+     * @param flag A presence flag instance
+     * @return {@code true} if the flag is a presence flag and is present,
+     *         else {@code false}
+     * @since 1.4.0
+     */
+    public boolean isPresent(final @NonNull CommandFlag<Void> flag) {
+        return this.isPresent(flag.getName());
+    }
+
+    /**
      * Get a flag value as an optional. Will be empty if the value is not present.
      *
      * @param name Flag name
@@ -111,6 +124,20 @@ public final class FlagContext {
     }
 
     /**
+     * Get a flag value as an optional. Will be empty if the value is not present.
+     *
+     * @param flag Flag type
+     * @param <T>  Value type
+     * @return Optional containing stored value if present
+     * @since 1.4.0
+     */
+    public <T> @NonNull Optional<T> getValue(
+            final @NonNull CommandFlag<T> flag
+    ) {
+        return this.getValue(flag.getName());
+    }
+
+    /**
      * Get a flag value
      *
      * @param name         Flag name
@@ -123,6 +150,22 @@ public final class FlagContext {
             final @Nullable T defaultValue
     ) {
         return this.<T>getValue(name).orElse(defaultValue);
+    }
+
+    /**
+     * Get a flag value
+     *
+     * @param name         Flag value
+     * @param defaultValue Default value
+     * @param <T>          Value type
+     * @return Stored value, or the supplied default value
+     * @since 1.4.0
+     */
+    public <T> @Nullable T getValue(
+            final @NonNull CommandFlag<T> name,
+            final @Nullable T defaultValue
+    ) {
+        return this.getValue(name).orElse(defaultValue);
     }
 
     /**
@@ -145,12 +188,40 @@ public final class FlagContext {
      * is a presence flag and is present, or if the flag is a value flag and has
      * a value provided.
      *
+     * @param flag The flag instance
+     * @return whether the flag is present
+     * @since 1.4.0
+     */
+    public boolean hasFlag(
+            final @NonNull CommandFlag<?> flag
+    ) {
+        return this.getValue(flag).isPresent();
+    }
+
+    /**
+     * Check whether a flag is present. This will return {@code true} if the flag
+     * is a presence flag and is present, or if the flag is a value flag and has
+     * a value provided.
+     *
      * @param name Flag name
      * @return whether the flag is present
      * @since 1.3.0
      */
     public boolean contains(final @NonNull String name) {
         return this.hasFlag(name);
+    }
+
+    /**
+     * Check whether a flag is present. This will return {@code true} if the flag
+     * is a presence flag and is present, or if the flag is a value flag and has
+     * a value provided.
+     *
+     * @param flag Flag instance
+     * @return whether the flag is present
+     * @since 1.4.0
+     */
+    public boolean contains(final @NonNull CommandFlag<?> flag) {
+        return this.hasFlag(flag);
     }
 
     /**
@@ -166,6 +237,20 @@ public final class FlagContext {
             final @NonNull String name
     ) {
         return this.<T>getValue(name).orElse(null);
+    }
+
+    /**
+     * Get a flag value
+     *
+     * @param flag         Flag name
+     * @param <T>          Value type
+     * @return Stored value if present, else {@code null}
+     * @since 1.4.0
+     */
+    public <T> @Nullable T get(
+            final @NonNull CommandFlag<T> flag
+    ) {
+        return this.getValue(flag).orElse(null);
     }
 
 }
