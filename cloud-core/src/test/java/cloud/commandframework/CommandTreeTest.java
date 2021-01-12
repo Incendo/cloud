@@ -25,6 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
@@ -116,6 +117,14 @@ class CommandTreeTest {
                 }));
 
         /* Build command for testing flags */
+        final CommandFlag<Void> test = manager.flagBuilder("test")
+                .withAliases("t")
+                .build();
+
+        final CommandFlag<Integer> num = manager.flagBuilder("num")
+                .withArgument(IntegerArgument.of("num"))
+                .build();
+
         manager.command(manager.commandBuilder("flags")
                 .flag(manager.flagBuilder("test")
                         .withAliases("t")
@@ -123,14 +132,13 @@ class CommandTreeTest {
                 .flag(manager.flagBuilder("test2")
                         .withAliases("f")
                         .build())
-                .flag(manager.flagBuilder("num")
-                        .withArgument(IntegerArgument.of("num")).build())
+                .flag(num)
                 .flag(manager.flagBuilder("enum")
                         .withArgument(EnumArgument.of(FlagEnum.class, "enum")))
                 .handler(c -> {
-                    System.out.println("Flag present? " + c.flags().isPresent("test"));
+                    System.out.println("Flag present? " + c.flags().isPresent(test));
                     System.out.println("Second flag present? " + c.flags().isPresent("test2"));
-                    System.out.println("Numerical flag: " + c.flags().getValue("num", -10));
+                    System.out.println("Numerical flag: " + c.flags().getValue(num, -10));
                     System.out.println("Enum: " + c.flags().getValue("enum", FlagEnum.PROXI));
                 })
                 .build());
