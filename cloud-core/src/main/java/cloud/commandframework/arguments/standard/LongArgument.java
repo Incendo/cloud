@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -49,9 +50,10 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
             final long max,
             final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider
+                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new LongParser<>(min, max), defaultValue, Long.class, suggestionsProvider);
+        super(required, name, new LongParser<>(min, max), defaultValue, Long.class, suggestionsProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -161,7 +163,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         @Override
         public @NonNull LongArgument<C> build() {
             return new LongArgument<>(this.isRequired(), this.getName(), this.min,
-                    this.max, this.getDefaultValue(), this.getSuggestionsProvider()
+                    this.max, this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
 

@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -49,9 +50,10 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
             final float max,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new FloatParser<>(min, max), defaultValue, Float.class, suggestionsProvider);
+        super(required, name, new FloatParser<>(min, max), defaultValue, Float.class, suggestionsProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -161,7 +163,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         @Override
         public @NonNull FloatArgument<C> build() {
             return new FloatArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider()
+                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
 
