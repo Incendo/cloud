@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.bukkit.parsers;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -52,9 +53,10 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new WorldParser<>(), defaultValue, World.class, suggestionsProvider);
+        super(required, name, new WorldParser<>(), defaultValue, World.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -114,7 +116,13 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
 
         @Override
         public @NonNull CommandArgument<C, World> build() {
-            return new WorldArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new WorldArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
+            );
         }
 
     }

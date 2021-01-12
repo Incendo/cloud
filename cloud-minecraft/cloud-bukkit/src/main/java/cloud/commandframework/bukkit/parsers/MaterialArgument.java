@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.bukkit.parsers;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -52,8 +53,9 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider
-    ) {
+                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
+            ) {
         super(required, name, new MaterialParser<>(), defaultValue, Material.class, suggestionsProvider);
     }
 
@@ -117,7 +119,8 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider()
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
 
