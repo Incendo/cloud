@@ -53,10 +53,10 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public constructor(
-            name: String,
-            description: Description = Description.empty(),
-            aliases: Array<String> = emptyArray(),
-            commandManager: CommandManager<C>
+        name: String,
+        description: Description = Description.empty(),
+        aliases: Array<String> = emptyArray(),
+        commandManager: CommandManager<C>
     ) {
         this.commandManager = commandManager
         this.commandBuilder = commandManager.commandBuilder(name, description, *aliases)
@@ -73,18 +73,18 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public constructor(
-            name: String,
-            description: Description = Description.empty(),
-            aliases: Array<String> = emptyArray(),
-            commandManager: CommandManager<C>,
-            lambda: MutableCommandBuilder<C>.() -> Unit
+        name: String,
+        description: Description = Description.empty(),
+        aliases: Array<String> = emptyArray(),
+        commandManager: CommandManager<C>,
+        lambda: MutableCommandBuilder<C>.() -> Unit
     ) : this(name, description, aliases, commandManager) {
         lambda(this)
     }
 
     private constructor(
-            commandManager: CommandManager<C>,
-            commandBuilder: Command.Builder<C>
+        commandManager: CommandManager<C>,
+        commandBuilder: Command.Builder<C>
     ) {
         this.commandManager = commandManager
         this.commandBuilder = commandBuilder
@@ -97,7 +97,7 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun build(): Command<C> =
-            this.commandBuilder.build()
+        this.commandBuilder.build()
 
     /**
      * Invoke the provided receiver lambda on this builder, then build a [Command] from the resulting state
@@ -107,7 +107,7 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun build(
-            lambda: MutableCommandBuilder<C>.() -> Unit
+        lambda: MutableCommandBuilder<C>.() -> Unit
     ): Command<C> {
         lambda(this)
         return this.commandBuilder.build()
@@ -121,14 +121,14 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun mutate(
-            mutator: (Command.Builder<C>) -> Command.Builder<C>
+        mutator: (Command.Builder<C>) -> Command.Builder<C>
     ): MutableCommandBuilder<C> {
         this.commandBuilder = mutator(this.commandBuilder)
         return this
     }
 
     private fun onlyMutate(
-            mutator: (Command.Builder<C>) -> Command.Builder<C>
+        mutator: (Command.Builder<C>) -> Command.Builder<C>
     ): Unit {
         mutate(mutator)
     }
@@ -140,7 +140,7 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun copy(): MutableCommandBuilder<C> =
-            MutableCommandBuilder(this.commandManager, this.commandBuilder)
+        MutableCommandBuilder(this.commandManager, this.commandBuilder)
 
     /**
      * Make a new copy of this [MutableCommandBuilder] and invoke the provided receiver lambda on it
@@ -150,11 +150,11 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun copy(
-            lambda: MutableCommandBuilder<C>.() -> Unit
+        lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> =
-            copy().apply {
-                lambda(this)
-            }
+        copy().apply {
+            lambda(this)
+        }
 
     /**
      * Make a new copy of this [MutableCommandBuilder], append a literal, and invoke the provided receiver lambda on it
@@ -166,14 +166,14 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun copy(
-            literal: String,
-            description: Description,
-            lambda: MutableCommandBuilder<C>.() -> Unit
+        literal: String,
+        description: Description,
+        lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> =
-            copy().apply {
-                literal(literal, description)
-                lambda(this)
-            }
+        copy().apply {
+            literal(literal, description)
+            lambda(this)
+        }
 
     /**
      * Make a new copy of this [MutableCommandBuilder], append a literal, and invoke the provided receiver lambda on it
@@ -184,13 +184,13 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun copy(
-            literal: String,
-            lambda: MutableCommandBuilder<C>.() -> Unit
+        literal: String,
+        lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> =
-            copy().apply {
-                literal(literal)
-                lambda(this)
-            }
+        copy().apply {
+            literal(literal)
+            lambda(this)
+        }
 
     /**
      * Build and register this command with the owning command manager
@@ -200,9 +200,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun register(): MutableCommandBuilder<C> =
-            apply {
-                this.commandManager.command(this)
-            }
+        apply {
+            this.commandManager.command(this)
+        }
 
     /**
      * Create a new copy of this mutable builder, act on it with a receiver lambda, and then register it with the owning
@@ -214,9 +214,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun registerCopy(
-            lambda: MutableCommandBuilder<C>.() -> Unit
+        lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> =
-            copy(lambda).register()
+        copy(lambda).register()
 
     /**
      * Create a new copy of this mutable builder, append a literal, act on it with a receiver lambda, and then register it with
@@ -230,10 +230,10 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun registerCopy(
-            literal: String,
-            lambda: MutableCommandBuilder<C>.() -> Unit
+        literal: String,
+        lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> =
-            copy(literal, lambda).register()
+        copy(literal, lambda).register()
 
     /**
      * Create a new copy of this mutable builder, append a literal, act on it with a receiver lambda, and then register it with
@@ -248,11 +248,11 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun registerCopy(
-            literal: String,
-            description: Description,
-            lambda: MutableCommandBuilder<C>.() -> Unit
+        literal: String,
+        description: Description,
+        lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> =
-            copy(literal, description, lambda).register()
+        copy(literal, description, lambda).register()
 
     /**
      * Set the value for a certain [CommandMeta.Key] in the command meta storage for this builder
@@ -264,10 +264,10 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun <T : Any> meta(
-            key: CommandMeta.Key<T>,
-            value: T
+        key: CommandMeta.Key<T>,
+        value: T
     ): MutableCommandBuilder<C> =
-            mutate { it.meta(key, value) }
+        mutate { it.meta(key, value) }
 
     /**
      * Set the value for a certain [CommandMeta.Key] in the command meta storage for this builder
@@ -278,9 +278,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public infix fun <T : Any> CommandMeta.Key<T>.to(
-            value: T
+        value: T
     ): MutableCommandBuilder<C> =
-            meta(this, value)
+        meta(this, value)
 
     /**
      * Set the [CommandMeta.DESCRIPTION] meta for this command
@@ -290,9 +290,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun commandDescription(
-            description: String
+        description: String
     ): MutableCommandBuilder<C> =
-            meta(CommandMeta.DESCRIPTION, description)
+        meta(CommandMeta.DESCRIPTION, description)
 
     /**
      * Set the [CommandMeta.LONG_DESCRIPTION] meta for this command
@@ -302,9 +302,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun longCommandDescription(
-            description: String
+        description: String
     ): MutableCommandBuilder<C> =
-            meta(CommandMeta.LONG_DESCRIPTION, description)
+        meta(CommandMeta.LONG_DESCRIPTION, description)
 
     /**
      * Set the [CommandMeta.HIDDEN] meta for this command
@@ -314,9 +314,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun hidden(
-            hidden: Boolean = true
+        hidden: Boolean = true
     ): MutableCommandBuilder<C> =
-            meta(CommandMeta.HIDDEN, hidden)
+        meta(CommandMeta.HIDDEN, hidden)
 
     /**
      * Specify a required sender type
@@ -326,7 +326,7 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public inline fun <reified T : C> senderType(): MutableCommandBuilder<C> =
-            mutate { it.senderType(T::class) }
+        mutate { it.senderType(T::class) }
 
     /**
      * Specify a required sender type
@@ -336,9 +336,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun senderType(
-            type: KClass<out C>
+        type: KClass<out C>
     ): MutableCommandBuilder<C> =
-            mutate { it.senderType(type) }
+        mutate { it.senderType(type) }
 
     /**
      * Field to get and set the required sender type for this command builder
@@ -360,9 +360,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun senderType(
-            type: Class<out C>
+        type: Class<out C>
     ): MutableCommandBuilder<C> =
-            mutate { it.senderType(type) }
+        mutate { it.senderType(type) }
 
     /**
      * Specify a permission required to execute this command
@@ -372,9 +372,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun permission(
-            permission: String
+        permission: String
     ): MutableCommandBuilder<C> =
-            mutate { it.permission(permission) }
+        mutate { it.permission(permission) }
 
     /**
      * Specify a permission required to execute this command
@@ -384,9 +384,9 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun permission(
-            permission: CommandPermission
+        permission: CommandPermission
     ): MutableCommandBuilder<C> =
-            mutate { it.permission(permission) }
+        mutate { it.permission(permission) }
 
     /**
      * Field to get and set the required permission for this command builder
@@ -415,10 +415,10 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun argument(
-            argument: CommandArgument<C, *>,
-            description: Description = Description.empty()
+        argument: CommandArgument<C, *>,
+        description: Description = Description.empty()
     ): MutableCommandBuilder<C> =
-            mutate { it.argument(argument, description) }
+        mutate { it.argument(argument, description) }
 
     /**
      * Add a new argument to this command
@@ -429,10 +429,10 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun argument(
-            argument: CommandArgument.Builder<C, *>,
-            description: Description = Description.empty()
+        argument: CommandArgument.Builder<C, *>,
+        description: Description = Description.empty()
     ): MutableCommandBuilder<C> =
-            mutate { it.argument(argument, description) }
+        mutate { it.argument(argument, description) }
 
     /**
      * Add a new argument to this command
@@ -443,10 +443,10 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun argument(
-            description: Description = Description.empty(),
-            argumentSupplier: () -> CommandArgument<C, *>
+        description: Description = Description.empty(),
+        argumentSupplier: () -> CommandArgument<C, *>
     ): MutableCommandBuilder<C> =
-            mutate { it.argument(argumentSupplier(), description) }
+        mutate { it.argument(argumentSupplier(), description) }
 
     /**
      * Add a new literal argument to this command
@@ -458,11 +458,11 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun literal(
-            name: String,
-            description: Description = Description.empty(),
-            vararg aliases: String
+        name: String,
+        description: Description = Description.empty(),
+        vararg aliases: String
     ): MutableCommandBuilder<C> =
-            mutate { it.literal(name, description, *aliases) }
+        mutate { it.literal(name, description, *aliases) }
 
     /**
      * Set the [CommandExecutionHandler] for this builder
@@ -472,7 +472,104 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun handler(
-            handler: CommandExecutionHandler<C>
+        handler: CommandExecutionHandler<C>
     ): MutableCommandBuilder<C> =
-            mutate { it.handler(handler) }
+        mutate { it.handler(handler) }
+
+    /**
+     * Add a new flag argument to this command
+     *
+     * @param name name of the flag
+     * @param aliases flag aliases
+     * @param description description of the flag
+     * @param argumentSupplier argument supplier for the flag
+     * @return this mutable builder
+     * @since 1.4.0
+     */
+    public fun flag(
+        name: String,
+        aliases: Array<String> = emptyArray(),
+        description: Description = Description.empty(),
+        argumentSupplier: () -> CommandArgument<C, *>
+    ): MutableCommandBuilder<C> = mutate {
+        it.flag(
+            this.commandManager.flagBuilder(name)
+                .withAliases(*aliases)
+                .withDescription(description)
+                .withArgument(argumentSupplier())
+                .build()
+        )
+    }
+
+    /**
+     * Add a new flag argument to this command
+     *
+     * @param name name of the flag
+     * @param aliases flag aliases
+     * @param description description of the flag
+     * @param argument argument for the flag
+     * @return this mutable builder
+     * @since 1.4.0
+     */
+    public fun flag(
+        name: String,
+        aliases: Array<String> = emptyArray(),
+        description: Description = Description.empty(),
+        argument: CommandArgument<C, *>
+    ): MutableCommandBuilder<C> = mutate {
+        it.flag(
+            this.commandManager.flagBuilder(name)
+                .withAliases(*aliases)
+                .withDescription(description)
+                .withArgument(argument)
+                .build()
+        )
+    }
+
+    /**
+     * Add a new flag argument to this command
+     *
+     * @param name name of the flag
+     * @param aliases flag aliases
+     * @param description description of the flag
+     * @param argumentBuilder command argument builder for the flag
+     * @return this mutable builder
+     * @since 1.4.0
+     */
+    public fun flag(
+        name: String,
+        aliases: Array<String> = emptyArray(),
+        description: Description = Description.empty(),
+        argumentBuilder: CommandArgument.Builder<C, *>
+    ): MutableCommandBuilder<C> = mutate {
+        it.flag(
+            this.commandManager.flagBuilder(name)
+                .withAliases(*aliases)
+                .withDescription(description)
+                .withArgument(argumentBuilder)
+                .build()
+        )
+    }
+
+    /**
+     * Add a new presence flag argument to this command
+     *
+     * @param name name of the flag
+     * @param aliases flag aliases
+     * @param description description of the flag
+     * @return this mutable builder
+     * @since 1.4.0
+     */
+    public fun flag(
+        name: String,
+        aliases: Array<String> = emptyArray(),
+        description: Description = Description.empty(),
+    ): MutableCommandBuilder<C> = mutate {
+        it.flag(
+            this.commandManager.flagBuilder(name)
+                .withAliases(*aliases)
+                .withDescription(description)
+                .build()
+        )
+    }
 }
