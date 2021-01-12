@@ -28,11 +28,24 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
+import cloud.commandframework.fabric.argument.server.MessageArgument;
+import cloud.commandframework.fabric.data.Message;
 import cloud.commandframework.fabric.data.MinecraftTime;
+import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageFormatAccess;
+import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageSelectorAccess;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.FunctionArgumentType;
+import net.minecraft.command.argument.MessageArgumentType;
 import net.minecraft.command.argument.TimeArgumentType;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.function.CommandFunction;
+import net.minecraft.text.Text;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * Parsers for Vanilla command argument types.
@@ -62,6 +75,67 @@ public final class FabricArgumentParsers {
             final CommandSource source = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
             source.getCompletions()
         })
+    }
+
+    public static <C> ArgumentParser<C, Message> message() {
+        return new WrappedBrigadierParser<C, MessageArgumentType.MessageFormat>(MessageArgumentType.message())
+                .map((ctx, format) -> {
+                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+                    if (!(either instanceof ServerCommandSource)) {
+                        return ArgumentParseResult.failure(new IllegalStateException("This argument is server-only"));
+                    }
+                    try {
+                        return ArgumentParseResult.success(MessageImpl.from(
+                                (ServerCommandSource) either,
+                                format,
+                                true
+                        ));
+                    } catch (final CommandSyntaxException ex) {
+                        return ArgumentParseResult.failure(ex);
+                    }
+                });
+    }
+
+    static final class MessageImpl implements Message {
+        private final Collection<Entity> mentionedEntities;
+        private final Text contents;
+
+        static MessageImpl from(
+                final ServerCommandSource source,
+                final MessageArgumentType.MessageFormat message,
+                final boolean useSelectors
+        ) throws CommandSyntaxException {
+            final Text contents = message.format(source,  useSelectors);
+            final MessageArgumentType.MessageSelector[] selectors =
+                    ((MessageArgumentTypeMessageFormatAccess) message).accessor$selectors();
+            final Collection<Entity> entities;
+            if (!useSelectors || selectors.length == 0) {
+                entities = Collections.emptySet();
+            } else {
+                entities = new HashSet<>();
+                for (final MessageArgumentType.MessageSelector selector : selectors) {
+                    entities.addAll(((MessageArgumentTypeMessageSelectorAccess) selector).accessor$selector().getEntities(source));
+                }
+            }
+
+            return new MessageImpl(entities, contents);
+        }
+
+        MessageImpl(final Collection<Entity> mentionedEntities, final Text contents) {
+            this.mentionedEntities = mentionedEntities;
+            this.contents = contents;
+        }
+
+        @Override
+        public Collection<Entity> getMentionedEntities() {
+            return this.mentionedEntities;
+        }
+
+        @Override
+        public Text getContents() {
+            return this.contents;
+        }
+
     }
 
 }
