@@ -4,7 +4,9 @@
   "required": true,
   "mixins": [
     "CloudStringReaderMixin",
-    "CommandManagerMixin"
+    "CommandManagerMixin",
+    "MessageArgumentTypeMessageFormatAccess",
+    "MessageArgumentTypeMessageSelectorAccess"
   ],
   "injectors": {
     "defaultRequire": 1
