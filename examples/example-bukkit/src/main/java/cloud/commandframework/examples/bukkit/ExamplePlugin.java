@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.examples.bukkit;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.Description;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.annotations.AnnotationParser;
@@ -56,6 +56,7 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.tasks.TaskConsumer;
@@ -63,8 +64,9 @@ import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -86,6 +88,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+
+import static net.kyori.adventure.text.Component.text;
 
 /**
  * Example plugin class
@@ -196,10 +200,10 @@ public final class ExamplePlugin extends JavaPlugin {
                 .withArgumentParsingHandler()
                 .withCommandExecutionHandler()
                 .withDecorator(
-                        component -> Component.text()
-                                .append(Component.text("[", NamedTextColor.DARK_GRAY))
-                                .append(Component.text("Example", NamedTextColor.GOLD))
-                                .append(Component.text("] ", NamedTextColor.DARK_GRAY))
+                        component -> text()
+                                .append(text("[", NamedTextColor.DARK_GRAY))
+                                .append(text("Example", NamedTextColor.GOLD))
+                                .append(text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
                 ).apply(manager, bukkitAudiences::sender);
         //
@@ -234,7 +238,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .literal("me")
                 // Require a player sender
                 .senderType(Player.class)
-                .argument(worldArgument, Description.of("World name"))
+                .argument(worldArgument, ArgumentDescription.of("World name"))
                 .argumentTriplet(
                         "coords",
                         TypeToken.get(Vector.class),
@@ -243,7 +247,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
                                 triplet.getThird()
                         ),
-                        Description.of("Coordinates")
+                        ArgumentDescription.of("Coordinates")
                 )
                 .handler(context -> manager.taskRecipe().begin(context)
                         .synchronous(commandContext -> {
@@ -258,7 +262,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         .senderType(Player.class)
                         .argument(
                                 SingleEntitySelectorArgument.of("entity"),
-                                Description.of("Entity to teleport")
+                                ArgumentDescription.of("Entity to teleport")
                         )
                         .literal("here")
                         .handler(
@@ -277,7 +281,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         ))
                 .command(builder.literal("teleport")
                         .meta(CommandMeta.DESCRIPTION, "Teleport to a world")
-                        .argument(WorldArgument.of("world"), Description.of("World to teleport to"))
+                        .argument(WorldArgument.of("world"), ArgumentDescription.of("World to teleport to"))
                         .handler(context -> manager.taskRecipe().begin(context).synchronous(ctx -> {
                             final Player player = (Player) ctx.getSender();
                             player.teleport(ctx.<World>get("world").getSpawnLocation());
@@ -330,23 +334,23 @@ public final class ExamplePlugin extends JavaPlugin {
                 .literal("helpcolors")
                 .argument(
                         TextColorArgument.of("primary"),
-                        Description.of("The primary color for the color scheme")
+                        RichDescription.of(text("The primary color for the color scheme", Style.style(TextDecoration.ITALIC)))
                 )
                 .argument(
                         TextColorArgument.of("highlight"),
-                        Description.of("The primary color used to highlight commands and queries")
+                        RichDescription.of(text("The primary color used to highlight commands and queries"))
                 )
                 .argument(
                         TextColorArgument.of("alternate_highlight"),
-                        Description.of("The secondary color used to highlight commands and queries")
+                        RichDescription.of(text("The secondary color used to highlight commands and queries"))
                 )
                 .argument(
                         TextColorArgument.of("text"),
-                        Description.of("The color used for description text")
+                        RichDescription.of(text("The color used for description text"))
                 )
                 .argument(
                         TextColorArgument.of("accent"),
-                        Description.of("The color used for accents and symbols")
+                        RichDescription.of(text("The color used for accents and symbols"))
                 )
                 .handler(c -> minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
                         c.get("primary"),
@@ -363,7 +367,7 @@ public final class ExamplePlugin extends JavaPlugin {
         manager.command(
                 manager.commandBuilder(
                         "arraycommand",
-                        Description.of("Bukkit-esque cmmand")
+                        ArgumentDescription.of("Bukkit-esque cmmand")
                 ).argument(
                         StringArrayArgument.optional(
                                 "args",
@@ -375,7 +379,7 @@ public final class ExamplePlugin extends JavaPlugin {
                                     return Collections.emptyList();
                                 }
                         ),
-                        Description.of("Arguments")
+                        ArgumentDescription.of("Arguments")
                 ).handler(context -> {
                     final String[] args = context.getOrDefault("args", new String[0]);
                     context.getSender().sendMessage("You wrote: " + StringUtils.join(args, " "));
@@ -408,7 +412,7 @@ public final class ExamplePlugin extends JavaPlugin {
     private void commandClear(final @NonNull Player player) {
         player.getInventory().clear();
         this.bukkitAudiences.player(player)
-                .sendMessage(Identity.nil(), Component.text("Your inventory has been cleared", NamedTextColor.GOLD));
+                .sendMessage(Identity.nil(), text("Your inventory has been cleared", NamedTextColor.GOLD));
     }
 
     @CommandMethod("example give <material> <amount>")
@@ -452,8 +456,8 @@ public final class ExamplePlugin extends JavaPlugin {
     ) {
         bukkitAudiences.sender(sender).sendMessage(
                 Identity.nil(),
-                Component.text().append(Component.text("You have been given ", NamedTextColor.AQUA))
-                        .append(Component.text(money, NamedTextColor.GOLD))
+                text().append(text("You have been given ", NamedTextColor.AQUA))
+                        .append(text(money, NamedTextColor.GOLD))
         );
     }
 

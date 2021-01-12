@@ -37,7 +37,7 @@ import java.util.Objects;
 public final class CommandComponent<C> {
 
     private final CommandArgument<C, ?> argument;
-    private final Description description;
+    private final ArgumentDescription description;
 
     /**
      * Initializes a new CommandComponent
@@ -47,7 +47,7 @@ public final class CommandComponent<C> {
      */
     private CommandComponent(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull Description commandDescription
+            final @NonNull ArgumentDescription commandDescription
     ) {
         this.argument = commandArgument;
         this.description = commandDescription;
@@ -66,14 +66,30 @@ public final class CommandComponent<C> {
      * Gets the command component description
      *
      * @return command component description
+     * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
      */
+    @Deprecated
     public @NonNull Description getDescription() {
+        if (this.description instanceof Description) {
+            return (Description) this.description;
+        } else {
+            return new Description(this.description.getDescription());
+        }
+    }
+
+    /**
+     * Gets the command component description
+     *
+     * @return command component description
+     * @since 1.4.0
+     */
+    public @NonNull ArgumentDescription getArgumentDescription() {
         return this.description;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getArgument(), getDescription());
+        return Objects.hash(this.getArgument(), this.getArgumentDescription());
     }
 
     @Override
@@ -81,9 +97,9 @@ public final class CommandComponent<C> {
         if (this == o) {
             return true;
         } else if (o instanceof CommandComponent) {
-            CommandComponent<?> that = (CommandComponent<?>) o;
-            return getArgument().equals(that.getArgument())
-                    && getDescription().equals(that.getDescription());
+            final CommandComponent<?> that = (CommandComponent<?>) o;
+            return this.getArgument().equals(that.getArgument())
+                    && this.getArgumentDescription().equals(that.getArgumentDescription());
         } else {
             return false;
         }
@@ -102,10 +118,27 @@ public final class CommandComponent<C> {
      * @param commandArgument Command Component Argument
      * @param commandDescription Command Component Description
      * @return new CommandComponent
+     * @deprecated for removal since 1.4.0. Use {@link #of(CommandArgument, ArgumentDescription)} instead.
      */
+    @Deprecated
     public static <C> @NonNull CommandComponent<C> of(
             final @NonNull CommandArgument<C, ?> commandArgument,
             final @NonNull Description commandDescription
+    ) {
+        return new CommandComponent<C>(commandArgument, commandDescription);
+    }
+
+    /**
+     * Creates a new CommandComponent with the provided argument and description
+     *
+     * @param <C> Command sender type
+     * @param commandArgument Command Component Argument
+     * @param commandDescription Command Component Description
+     * @return new CommandComponent
+     */
+    public static <C> @NonNull CommandComponent<C> of(
+            final @NonNull CommandArgument<C, ?> commandArgument,
+            final @NonNull ArgumentDescription commandDescription
     ) {
         return new CommandComponent<C>(commandArgument, commandDescription);
     }
