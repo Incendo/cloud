@@ -44,7 +44,7 @@ allprojects {
     license {
         header = rootProject.file("HEADER")
         mapping("java", "DOUBLESLASH_STYLE")
-        mapping("kotlin", "DOUBLESLASH_STYLE")
+        mapping("kt", "DOUBLESLASH_STYLE")
         includes(listOf("**/*.java", "**/*.kt"))
     }
 }
@@ -66,7 +66,7 @@ subprojects {
         withType<Test> {
             useJUnitPlatform()
         }
-        withType<JavaCompile>() {
+        withType<JavaCompile> {
             options.encoding = Charsets.UTF_8.name()
             options.compilerArgs.addAll(setOf("-Xlint:all", "-Xlint:-processing", "-Werror"))
             options.errorprone {
@@ -86,6 +86,7 @@ subprojects {
         }
         build {
             dependsOn(checkstyleMain)
+            dependsOn(licenseMain)
         }
     }
 
