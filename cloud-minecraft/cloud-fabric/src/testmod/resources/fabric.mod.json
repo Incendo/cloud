@@ -23,6 +23,6 @@
     "fabricloader": ">=0.7.4",
     "fabric-command-api-v1": "*",
     "minecraft": ">=1.14",
-    "cloud": "*"
+    "cloud-v1": "*"
   }
 }
