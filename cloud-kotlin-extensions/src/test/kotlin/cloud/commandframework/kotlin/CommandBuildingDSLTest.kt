@@ -27,10 +27,7 @@ import cloud.commandframework.CommandManager
 import cloud.commandframework.arguments.standard.StringArgument
 import cloud.commandframework.execution.CommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
-import cloud.commandframework.kotlin.extension.buildAndRegister
-import cloud.commandframework.kotlin.extension.command
-import cloud.commandframework.kotlin.extension.commandBuilder
-import cloud.commandframework.kotlin.extension.description
+import cloud.commandframework.kotlin.extension.*
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.meta.SimpleCommandMeta
 import org.junit.jupiter.api.Assertions
@@ -48,7 +45,7 @@ class CommandBuildingDSLTest {
                     senderType<SpecificCommandSender>()
 
                     literal("dsl")
-                    argument(description("An amazing command argument")) {
+                    argument(argumentDescription("An amazing command argument")) {
                         StringArgument.of("moment")
                     }
                     handler {

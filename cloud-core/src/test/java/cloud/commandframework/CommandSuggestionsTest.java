@@ -66,13 +66,13 @@ public class CommandSuggestionsTest {
 
         manager.command(manager.commandBuilder("com")
                 .argumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
-                        Description.empty()
+                        ArgumentDescription.empty()
                 )
                 .argument(IntegerArgument.of("int")));
 
         manager.command(manager.commandBuilder("com2")
                 .argumentPair("com", Pair.of("x", "enum"),
-                        Pair.of(Integer.class, TestEnum.class), Description.empty()
+                        Pair.of(Integer.class, TestEnum.class), ArgumentDescription.empty()
                 ));
 
         manager.command(manager.commandBuilder("flags")

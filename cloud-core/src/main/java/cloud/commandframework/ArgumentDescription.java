@@ -21,71 +21,60 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * {@link CommandArgument} description
+ * A description for a {@link CommandArgument}
  *
- * @deprecated to become package-private since 1.4.0. Use {@link ArgumentDescription} instead.
+ * @since 1.4.0
  */
-@Deprecated
-public final class Description implements ArgumentDescription {
+public interface ArgumentDescription {
 
     /**
-     * Empty command description
-     */
-    static final Description EMPTY = new Description("");
-
-    private final String description;
-
-    Description(final @NonNull String description) {
-        this.description = description;
-    }
-
-    /**
-     * Get an empty command description
+     * Get an empty command description.
      *
      * @return Command description
-     * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#empty()}
      */
-    @Deprecated
-    public static @NonNull Description empty() {
-        return EMPTY;
+    @SuppressWarnings("deprecation")
+    static @NonNull ArgumentDescription empty() {
+        return Description.EMPTY;
     }
 
     /**
-     * Create a command description instance
+     * Create a command description instance.
      *
      * @param string Command description
      * @return Created command description
-     * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#of(String)}
      */
-    @Deprecated
-    public static @NonNull Description of(final @NonNull String string) {
-        return new Description(string);
+    @SuppressWarnings("deprecation")
+    static @NonNull ArgumentDescription of(final @NonNull String string) {
+        if (requireNonNull(string, "string").isEmpty()) {
+            return Description.EMPTY;
+        } else {
+            return new Description(string);
+        }
     }
 
     /**
-     * Get the command description
+     * Get the plain-text description.
      *
      * @return Command description
      */
-    @Override
-    public @NonNull String getDescription() {
-        return this.description;
-    }
+    @NonNull String getDescription();
 
     /**
-     * Get the command description
+     * Get whether or not this description contains contents.
      *
-     * @return Command description
+     * @return if this description is empty or not
      */
-    @Override
-    public @NonNull String toString() {
-        return this.description;
+    default boolean isEmpty() {
+        return this.getDescription().isEmpty();
     }
 
 }

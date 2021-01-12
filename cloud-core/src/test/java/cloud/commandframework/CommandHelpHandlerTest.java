@@ -52,13 +52,13 @@ class CommandHelpHandlerTest {
         manager.command(manager.commandBuilder("test", meta1).literal("this").literal("thing").build());
         final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "Command with variables").build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
-                argument(IntegerArgument.of("int"), Description.of("A number")).build());
+                argument(IntegerArgument.of("int"), ArgumentDescription.of("A number")).build());
         manager.command(manager.commandBuilder("test").argument(StringArgument.of("potato")));
 
         manager.command(manager.commandBuilder("vec")
                 .meta(CommandMeta.DESCRIPTION, "Takes in a vector")
                 .argumentPair("vec", Pair.of("x", "y"),
-                        Pair.of(Double.class, Double.class), Description.of("Vector")
+                        Pair.of(Double.class, Double.class), ArgumentDescription.of("Vector")
                 )
                 .build());
     }
@@ -241,7 +241,7 @@ class CommandHelpHandlerTest {
         while (iterator.hasNext()) {
             final CommandComponent<TestCommandSender> component = iterator.next();
 
-            String description = component.getDescription().getDescription();
+            String description = component.getArgumentDescription().getDescription();
             if (!description.isEmpty()) {
                 description = ": " + description;
             }

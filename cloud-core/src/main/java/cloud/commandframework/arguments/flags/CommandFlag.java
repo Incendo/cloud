@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.flags;
 
-import cloud.commandframework.Description;
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -46,14 +46,14 @@ public final class CommandFlag<T> {
 
     private final @NonNull String name;
     private final @NonNull String @NonNull [] aliases;
-    private final @NonNull Description description;
+    private final @NonNull ArgumentDescription description;
 
     private final @Nullable CommandArgument<?, T> commandArgument;
 
     private CommandFlag(
             final @NonNull String name,
             final @NonNull String @NonNull [] aliases,
-            final @NonNull Description description,
+            final @NonNull ArgumentDescription description,
             final @Nullable CommandArgument<?, T> commandArgument
     ) {
         this.name = Objects.requireNonNull(name, "name cannot be null");
@@ -95,8 +95,24 @@ public final class CommandFlag<T> {
      * <p>
      *
      * @return Flag description
+     * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
      */
-    public @NonNull Description getDescription() {
+    @Deprecated
+    public cloud.commandframework.@NonNull Description getDescription() {
+        if (this.description instanceof cloud.commandframework.Description) {
+            return ((cloud.commandframework.Description) this.description);
+        } else {
+            return cloud.commandframework.Description.of(this.description.getDescription());
+        }
+    }
+
+    /**
+     * Get the flag description.
+     *
+     * @return Flag description
+     * @since 1.4.0
+     */
+    public @NonNull ArgumentDescription getArgumentDescription() {
         return this.description;
     }
 
@@ -119,16 +135,16 @@ public final class CommandFlag<T> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
         final CommandFlag<?> that = (CommandFlag<?>) o;
-        return getName().equals(that.getName());
+        return this.getName().equals(that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName());
+        return Objects.hash(this.getName());
     }
 
 
@@ -136,13 +152,13 @@ public final class CommandFlag<T> {
 
         private final String name;
         private final String[] aliases;
-        private final Description description;
+        private final ArgumentDescription description;
         private final CommandArgument<?, T> commandArgument;
 
         private Builder(
                 final @NonNull String name,
                 final @NonNull String[] aliases,
-                final @NonNull Description description,
+                final @NonNull ArgumentDescription description,
                 final @Nullable CommandArgument<?, T> commandArgument
         ) {
             this.name = name;
@@ -152,7 +168,7 @@ public final class CommandFlag<T> {
         }
 
         private Builder(final @NonNull String name) {
-            this(name, new String[0], Description.empty(), null);
+            this(name, new String[0], ArgumentDescription.empty(), null);
         }
 
         /**
@@ -191,8 +207,21 @@ public final class CommandFlag<T> {
          *
          * @param description Flag description
          * @return New builder instance
+         * @deprecated for removal since 1.4.0. Use {@link #withDescription(ArgumentDescription)} instead.
          */
-        public Builder<T> withDescription(final @NonNull Description description) {
+        @Deprecated
+        public Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
+            return this.withDescription((ArgumentDescription) description);
+        }
+
+        /**d
+         * Create a new builder instance using the given flag description
+         *
+         * @param description Flag description
+         * @return New builder instance
+         * @since 1.4.0
+         */
+        public Builder<T> withDescription(final @NonNull ArgumentDescription description) {
             return new Builder<>(this.name, this.aliases, description, this.commandArgument);
         }
 
