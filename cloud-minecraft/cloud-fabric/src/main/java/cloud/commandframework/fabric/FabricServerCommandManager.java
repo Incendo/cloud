@@ -27,7 +27,11 @@ package cloud.commandframework.fabric;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.fabric.argument.FabricArgumentParsers;
+import cloud.commandframework.fabric.argument.server.MessageArgument;
+import cloud.commandframework.fabric.data.Message;
 import cloud.commandframework.meta.CommandMeta;
+import io.leangen.geantyref.TypeToken;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandOutput;
@@ -110,6 +114,12 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
                         null
                 )
         );
+
+        this.registerParsers();
+    }
+
+    private void registerParsers() {
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Message.class), params -> FabricArgumentParsers.message());
     }
 
     /**

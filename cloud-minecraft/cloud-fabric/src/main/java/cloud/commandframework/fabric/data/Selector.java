@@ -4,6 +4,7 @@ import net.minecraft.command.EntitySelector;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A selector string to query multiple entity-like values
@@ -41,6 +42,11 @@ public interface Selector<V> {
      * @param <V> the value type
      */
     interface Single<V> extends Selector<V> {
+
+        @Override
+        default Collection<V> get() {
+            return Collections.singletonList(this.getSingle());
+        }
 
         V getSingle();
     }
