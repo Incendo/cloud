@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.velocity.arguments;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -56,6 +57,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
             final boolean required,
             final @NonNull String name,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
@@ -66,6 +68,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                 "",
                 TypeToken.get(RegisteredServer.class),
                 suggestionsProvider,
+                defaultDescription,
                 argumentPreprocessors
         );
     }
@@ -123,6 +126,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                     this.isRequired(),
                     this.getName(),
                     this.getSuggestionsProvider(),
+                    this.getDefaultDescription(),
                     new LinkedList<>()
             );
         }

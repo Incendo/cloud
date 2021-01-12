@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -55,9 +56,10 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider
+                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass, suggestionsProvider);
+        super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -139,7 +141,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         @Override
         public @NonNull CommandArgument<C, E> build() {
             return new EnumArgument<>(this.enumClass, this.isRequired(), this.getName(),
-                    this.getDefaultValue(), this.getSuggestionsProvider()
+                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
 

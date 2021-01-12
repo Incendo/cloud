@@ -573,7 +573,7 @@ public class Command<C> {
          * @return New builder instance with the command argument inserted into the argument list
          */
         public <T> @NonNull Builder<C> argument(final CommandArgument.@NonNull Builder<C, T, ?> builder) {
-            return this.argument(builder.build(), ArgumentDescription.empty());
+            return this.argument(builder.build());
         }
 
         /**
@@ -584,7 +584,7 @@ public class Command<C> {
          * @return New builder instance with the command argument inserted into the argument list
          */
         public <T> @NonNull Builder<C> argument(final @NonNull CommandArgument<C, T> argument) {
-            return this.argument(argument, ArgumentDescription.empty());
+            return this.argument(argument, argument.getDefaultDescription());
         }
 
         /**

@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -46,9 +47,10 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
-    ) {
-        super(required, name, new CharacterParser<>(), defaultValue, Character.class, suggestionsProvider);
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
+        ) {
+        super(required, name, new CharacterParser<>(), defaultValue, Character.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -114,7 +116,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         @Override
         public @NonNull CharArgument<C> build() {
             return new CharArgument<>(this.isRequired(), this.getName(),
-                    this.getDefaultValue(), this.getSuggestionsProvider()
+                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
 

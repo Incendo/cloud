@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.bungee.arguments;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -56,6 +57,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
             final boolean required,
             final @NonNull String name,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionProvider,
+            final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
@@ -66,6 +68,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
                 "",
                 TypeToken.get(ProxiedPlayer.class),
                 suggestionProvider,
+                defaultDescription,
                 argumentPreprocessors
         );
     }
@@ -128,6 +131,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
                     this.isRequired(),
                     this.getName(),
                     this.getSuggestionsProvider(),
+                    this.getDefaultDescription(),
                     new LinkedList<>()
             );
         }

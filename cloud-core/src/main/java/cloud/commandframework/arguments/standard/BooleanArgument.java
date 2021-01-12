@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -50,9 +51,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
             final boolean liberal,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider
+                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription description
     ) {
-        super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class, suggestionsProvider);
+        super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class, suggestionsProvider, description);
         this.liberal = liberal;
     }
 
@@ -110,7 +112,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      * @return Liberal boolean
      */
     public boolean isLiberal() {
-        return liberal;
+        return this.liberal;
     }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Boolean, Builder<C>> {
@@ -144,7 +146,8 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
                     this.getName(),
                     this.liberal,
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider()
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
 
