@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.examples.bungee;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.bungee.BungeeCommandManager;
 import cloud.commandframework.bungee.arguments.PlayerArgument;
@@ -35,8 +35,8 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.minecraft.extras.RichDescription;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -45,6 +45,8 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+
+import static net.kyori.adventure.text.Component.text;
 
 public final class ExamplePlugin extends Plugin {
 
@@ -78,10 +80,10 @@ public final class ExamplePlugin extends Plugin {
                 30L,
                 TimeUnit.SECONDS,
                 context -> bungeeAudiences.sender(context.getCommandContext().getSender()).sendMessage(
-                        Component.text(
+                        text(
                                 "Confirmation required. Confirm using /example confirm.", NamedTextColor.RED)),
                 sender -> bungeeAudiences.sender(sender).sendMessage(
-                        Component.text("You do not have any pending commands.", NamedTextColor.RED))
+                        text("You do not have any pending commands.", NamedTextColor.RED))
         );
 
         this.confirmationManager.registerConfirmationProcessor(manager);
@@ -91,10 +93,10 @@ public final class ExamplePlugin extends Plugin {
                 .withInvalidSenderHandler()
                 .withNoPermissionHandler()
                 .withArgumentParsingHandler()
-                .withDecorator(component -> Component.text()
-                        .append(Component.text("[", NamedTextColor.DARK_GRAY))
-                        .append(Component.text("Example", NamedTextColor.GOLD))
-                        .append(Component.text("] ", NamedTextColor.DARK_GRAY))
+                .withDecorator(component -> text()
+                        .append(text("[", NamedTextColor.DARK_GRAY))
+                        .append(text("Example", NamedTextColor.GOLD))
+                        .append(text("] ", NamedTextColor.DARK_GRAY))
                         .append(component).build()
                 ).apply(manager, bungeeAudiences::sender);
         this.constructCommands();
@@ -121,12 +123,12 @@ public final class ExamplePlugin extends Plugin {
         this.manager.command(
                 manager.commandBuilder("player")
                         .senderType(ProxiedPlayer.class)
-                        .argument(playerArgument, Description.of("Player name"))
+                        .argument(playerArgument, RichDescription.of(text("Player ").append(text("name", NamedTextColor.GOLD))))
                         .handler(context -> {
                             final ProxiedPlayer player = context.get("player");
                             bungeeAudiences.sender(context.getSender()).sendMessage(
-                                    Component.text("Selected ", NamedTextColor.GOLD)
-                                            .append(Component.text(player.getDisplayName(), NamedTextColor.AQUA))
+                                    text("Selected ", NamedTextColor.GOLD)
+                                            .append(text(player.getDisplayName(), NamedTextColor.AQUA))
                             );
                         })
         );
@@ -137,12 +139,12 @@ public final class ExamplePlugin extends Plugin {
         this.manager.command(
                 this.manager.commandBuilder("server")
                         .senderType(ProxiedPlayer.class)
-                        .argument(serverArgument, Description.of("Server name"))
+                        .argument(serverArgument, ArgumentDescription.of("Server name"))
                         .handler(context -> {
                             final ServerInfo server = context.get("server");
                             bungeeAudiences.sender(context.getSender()).sendMessage(
-                                    Component.text("Selected ", NamedTextColor.GOLD)
-                                            .append(Component.text(server.getName(), NamedTextColor.AQUA))
+                                    text("Selected ", NamedTextColor.GOLD)
+                                            .append(text(server.getName(), NamedTextColor.AQUA))
                             );
                         })
         );
