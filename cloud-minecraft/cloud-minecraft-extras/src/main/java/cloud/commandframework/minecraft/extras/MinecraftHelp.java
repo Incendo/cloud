@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.minecraft.extras;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandHelpHandler;
@@ -488,7 +489,7 @@ public final class MinecraftHelp<C> {
                 final CommandComponent<C> component = iterator.next();
                 final CommandArgument<C, ?> argument = component.getArgument();
 
-                String syntax = this.commandManager.getCommandSyntaxFormatter()
+                final String syntax = this.commandManager.getCommandSyntaxFormatter()
                         .apply(Collections.singletonList(argument), null);
 
                 final TextComponent.Builder textComponent = text()
@@ -502,16 +503,24 @@ public final class MinecraftHelp<C> {
                     );
                     textComponent.append(text(")", this.colors.alternateHighlight));
                 }
-                final String description = component.getDescription().getDescription();
+                final ArgumentDescription description = component.getArgumentDescription();
                 if (!description.isEmpty()) {
                     textComponent.append(text(" - ", this.colors.accent));
-                    textComponent.append(this.descriptionDecorator.apply(description).color(this.colors.text));
+                    textComponent.append(this.formatDescription(description).colorIfAbsent(this.colors.text));
                 }
 
                 audience.sendMessage(textComponent);
             }
         }
         audience.sendMessage(this.footer(sender));
+    }
+
+    private Component formatDescription(final ArgumentDescription description) {
+        if (description instanceof RichDescription) {
+            return ((RichDescription) description).getContents();
+        } else {
+            return this.descriptionDecorator.apply(description.getDescription());
+        }
     }
 
     private @NonNull Component showingResults(
