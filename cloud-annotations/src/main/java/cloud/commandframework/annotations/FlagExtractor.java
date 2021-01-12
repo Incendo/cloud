@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.Description;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -60,7 +60,7 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
             final Flag flag = parameter.getAnnotation(Flag.class);
             final CommandFlag.Builder<Void> builder = this.commandManager
                     .flagBuilder(flag.value())
-                    .withDescription(Description.of(flag.description()))
+                    .withDescription(ArgumentDescription.of(flag.description()))
                     .withAliases(flag.aliases());
             if (parameter.getType().equals(boolean.class)) {
                 flags.add(builder.build());

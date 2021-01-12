@@ -209,6 +209,7 @@ public class Command<C> {
 
     // Converts a map of CommandArgument and Description pairs to a List of CommandComponent
     // Used for backwards-compatibility
+    @SuppressWarnings("deprecation")
     private static <C> @NonNull List<@NonNull CommandComponent<C>> mapToComponents(
             final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments
     ) {
@@ -227,11 +228,34 @@ public class Command<C> {
      * @param aliases     Command aliases
      * @param <C>         Command sender type
      * @return Command builder
+     * @deprecated for removal since 1.4.0. Use {@link #newBuilder(String, CommandMeta, ArgumentDescription, String...)} instead.
      */
+    @Deprecated
     public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String commandName,
             final @NonNull CommandMeta commandMeta,
             final @NonNull Description description,
+            final @NonNull String... aliases
+    ) {
+        return newBuilder(commandName, commandMeta, (ArgumentDescription) description, aliases);
+    }
+
+    /**
+     * Create a new command builder. Is recommended to use the builder methods
+     * in {@link CommandManager} rather than invoking this method directly.
+     *
+     * @param commandName Base command argument
+     * @param commandMeta Command meta instance
+     * @param description Command description
+     * @param aliases     Command aliases
+     * @param <C>         Command sender type
+     * @return Command builder
+     * @since 1.4.0
+     */
+    public static <C> @NonNull Builder<C> newBuilder(
+            final @NonNull String commandName,
+            final @NonNull CommandMeta commandMeta,
+            final @NonNull ArgumentDescription description,
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
@@ -263,7 +287,7 @@ public class Command<C> {
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
-        commands.add(CommandComponent.of(StaticArgument.of(commandName, aliases), Description.empty()));
+        commands.add(CommandComponent.of(StaticArgument.of(commandName, aliases), ArgumentDescription.empty()));
         return new Builder<>(
                 null,
                 commandMeta,
@@ -343,7 +367,7 @@ public class Command<C> {
     public @NonNull String getArgumentDescription(final @NonNull CommandArgument<C, ?> argument) {
         for (final CommandComponent<C> component : this.components) {
             if (component.getArgument().equals(argument)) {
-                return component.getDescription().getDescription();
+                return component.getArgumentDescription().getDescription();
             }
         }
         throw new IllegalArgumentException("Command argument not found: " + argument);
@@ -512,10 +536,29 @@ public class Command<C> {
          * @param description Literal description
          * @param aliases     Argument aliases
          * @return New builder instance with the modified command chain
+         * @deprecated for removal since 1.4.0. Use {@link #literal(String, ArgumentDescription, String...)} instead.
          */
+        @Deprecated
         public @NonNull Builder<C> literal(
                 final @NonNull String main,
                 final @NonNull Description description,
+                final @NonNull String... aliases
+        ) {
+            return this.argument(StaticArgument.of(main, aliases), description);
+        }
+
+        /**
+         * Inserts a required {@link StaticArgument} into the command chain
+         *
+         * @param main        Main argument name
+         * @param description Literal description
+         * @param aliases     Argument aliases
+         * @return New builder instance with the modified command chain
+         * @since 1.4.0
+         */
+        public @NonNull Builder<C> literal(
+                final @NonNull String main,
+                final @NonNull ArgumentDescription description,
                 final @NonNull String... aliases
         ) {
             return this.argument(StaticArgument.of(main, aliases), description);
@@ -530,7 +573,7 @@ public class Command<C> {
          * @return New builder instance with the command argument inserted into the argument list
          */
         public <T> @NonNull Builder<C> argument(final CommandArgument.@NonNull Builder<C, T, ?> builder) {
-            return this.argument(builder.build(), Description.empty());
+            return this.argument(builder.build(), ArgumentDescription.empty());
         }
 
         /**
@@ -541,7 +584,7 @@ public class Command<C> {
          * @return New builder instance with the command argument inserted into the argument list
          */
         public <T> @NonNull Builder<C> argument(final @NonNull CommandArgument<C, T> argument) {
-            return this.argument(argument, Description.empty());
+            return this.argument(argument, ArgumentDescription.empty());
         }
 
         /**
@@ -551,10 +594,28 @@ public class Command<C> {
          * @param description Argument description
          * @param <T>         Argument type
          * @return New builder instance with the command argument inserted into the argument list
+         * @deprecated for removal since 1.4.0. Use {@link #argument(CommandArgument, ArgumentDescription)} instead.
          */
+        @Deprecated
         public <T> @NonNull Builder<C> argument(
                 final @NonNull CommandArgument<C, T> argument,
                 final @NonNull Description description
+        ) {
+            return this.argument(argument, (ArgumentDescription) description);
+        }
+
+        /**
+         * Add a new command argument to the command
+         *
+         * @param argument    Argument to add
+         * @param description Argument description
+         * @param <T>         Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 1.4.0
+         */
+        public <T> @NonNull Builder<C> argument(
+                final @NonNull CommandArgument<C, T> argument,
+                final @NonNull ArgumentDescription description
         ) {
             if (argument.isArgumentRegistered()) {
                 throw new IllegalArgumentException("The provided argument has already been associated with a command."
@@ -582,10 +643,29 @@ public class Command<C> {
          * @param description Argument description
          * @param <T>         Argument type
          * @return New builder instance with the command argument inserted into the argument list
+         * @deprecated for removal since 1.4.0. Use {@link #argument(CommandArgument.Builder, ArgumentDescription)} instead.
          */
+        @Deprecated
         public <T> @NonNull Builder<C> argument(
                 final CommandArgument.@NonNull Builder<C, T, ?> builder,
                 final @NonNull Description description
+        ) {
+            return this.argument(builder, (ArgumentDescription) description);
+        }
+
+        /**
+         * Add a new command argument to the command
+         *
+         * @param builder     Argument to add. {@link CommandArgument.Builder#build()} will be invoked
+         *                    and the result will be registered in the command.
+         * @param description Argument description
+         * @param <T>         Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 1.4.0
+         */
+        public <T> @NonNull Builder<C> argument(
+                final CommandArgument.@NonNull Builder<C, T> builder,
+                final @NonNull ArgumentDescription description
         ) {
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
             commandComponents.add(CommandComponent.of(builder.build(), description));
@@ -640,12 +720,41 @@ public class Command<C> {
          * @param <U>         First type
          * @param <V>         Second type
          * @return Builder instance with the argument inserted
+         * @deprecated for removal since 1.4.0. Use {@link #argumentPair(String, Pair, Pair, ArgumentDescription)} instead.
          */
+        @Deprecated
         public <U, V> @NonNull Builder<C> argumentPair(
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
                 final @NonNull Description description
+        ) {
+            return this.argumentPair(name, names, parserPair, (ArgumentDescription) description);
+        }
+
+        /**
+         * Create a new argument pair that maps to {@link Pair}
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @return Builder instance with the argument inserted
+         * @since 1.4.0
+         */
+        public <U, V> @NonNull Builder<C> argumentPair(
+                final @NonNull String name,
+                final @NonNull Pair<@NonNull String, @NonNull String> names,
+                final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
+                final @NonNull ArgumentDescription description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -672,7 +781,10 @@ public class Command<C> {
          * @param <V>         Second type
          * @param <O>         Output type
          * @return Builder instance with the argument inserted
+         * @deprecated for removal since 1.4.0. Use
+         *     {@link #argumentPair(String, TypeToken, Pair, Pair, BiFunction, ArgumentDescription)} instead.
          */
+        @Deprecated
         public <U, V, O> @NonNull Builder<C> argumentPair(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -680,6 +792,38 @@ public class Command<C> {
                 final @NonNull Pair<Class<U>, Class<V>> parserPair,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
                 final @NonNull Description description
+        ) {
+            return this.argumentPair(name, outputType, names, parserPair, mapper, (ArgumentDescription) description);
+        }
+
+        /**
+         * Create a new argument pair that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param outputType  The output type
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param mapper      Mapper that maps from {@link Pair} to the custom type
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @param <O>         Output type
+         * @return Builder instance with the argument inserted
+         * @since 1.4.0
+         */
+        public <U, V, O> @NonNull Builder<C> argumentPair(
+                final @NonNull String name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Pair<String, String> names,
+                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final @NonNull ArgumentDescription description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -707,12 +851,43 @@ public class Command<C> {
          * @param <V>           Second type
          * @param <W>           Third type
          * @return Builder instance with the argument inserted
+         * @deprecated for removal since 1.4.0. Use {@link #argumentTriplet(String, Triplet, Triplet, ArgumentDescription)}
+         *     instead.
          */
+        @Deprecated
         public <U, V, W> @NonNull Builder<C> argumentTriplet(
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull Description description
+        ) {
+            return this.argumentTriplet(name, names, parserTriplet, (ArgumentDescription) description);
+        }
+
+        /**
+         * Create a new argument pair that maps to {@link cloud.commandframework.types.tuples.Triplet}
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name          Name of the argument
+         * @param names         Triplet containing the names of the sub-arguments
+         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry}
+         *                      used by the {@link CommandManager} attached to this command
+         * @param description   Description of the argument
+         * @param <U>           First type
+         * @param <V>           Second type
+         * @param <W>           Third type
+         * @return Builder instance with the argument inserted
+         * @since 1.4.0
+         */
+        public <U, V, W> @NonNull Builder<C> argumentTriplet(
+                final @NonNull String name,
+                final @NonNull Triplet<String, String, String> names,
+                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull ArgumentDescription description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -740,15 +915,57 @@ public class Command<C> {
          * @param <W>           Third type
          * @param <O>           Output type
          * @return Builder instance with the argument inserted
+         * @deprecated for removal since 1.4.0, use
+         *      {@link #argumentTriplet(String, TypeToken, Triplet, Triplet, BiFunction, ArgumentDescription)} instead.
+         */
+        @Deprecated
+        public <U, V, W, O> @NonNull Builder<C> argumentTriplet(
+                final @NonNull String name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Triplet<String, String, String> names,
+                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
+                final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
+                final @NonNull Description description
+        ) {
+            return this.argumentTriplet(
+                    name,
+                    outputType,
+                    names,
+                    parserTriplet,
+                    mapper,
+                    (ArgumentDescription) description
+            );
+        }
+
+        /**
+         * Create a new argument triplet that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name          Name of the argument
+         * @param outputType    The output type
+         * @param names         Triplet containing the names of the sub-arguments
+         * @param parserTriplet Triplet containing the types of the sub-arguments. There must be parsers for these types
+         *                      registered in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by
+         *                      the {@link CommandManager} attached to this command
+         * @param mapper        Mapper that maps from {@link Triplet} to the custom type
+         * @param description   Description of the argument
+         * @param <U>           First type
+         * @param <V>           Second type
+         * @param <W>           Third type
+         * @param <O>           Output type
+         * @return Builder instance with the argument inserted
+         * @since 1.4.0
          */
         public <U, V, W, O> @NonNull Builder<C> argumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
                 final @NonNull Triplet<String, String, String> names,
-                final @NonNull Triplet<Class<U>, Class<V>,
-                        Class<W>> parserTriplet,
+                final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                final @NonNull Description description
+                final @NonNull ArgumentDescription description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -852,7 +1069,7 @@ public class Command<C> {
                     continue;
                 }
                 final CommandArgument<C, ?> builtArgument = argument.copy();
-                builder = builder.argument(builtArgument, component.getDescription());
+                builder = builder.argument(builtArgument, component.getArgumentDescription());
             }
             if (this.commandPermission.toString().isEmpty()) {
                 builder = builder.permission(command.getCommandPermission());
@@ -910,9 +1127,9 @@ public class Command<C> {
         public @NonNull Command<C> build() {
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
             /* Construct flag node */
-            if (!flags.isEmpty()) {
+            if (!this.flags.isEmpty()) {
                 final FlagArgument<C> flagArgument = new FlagArgument<>(this.flags);
-                commandComponents.add(CommandComponent.of(flagArgument, Description.of("Command flags")));
+                commandComponents.add(CommandComponent.of(flagArgument, ArgumentDescription.of("Command flags")));
             }
             return new Command<>(
                     Collections.unmodifiableList(commandComponents),
