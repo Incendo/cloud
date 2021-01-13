@@ -23,9 +23,9 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.Description;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
@@ -434,7 +434,7 @@ public final class AnnotationParser<C> {
                     }
 
                     final String description = argumentDescriptions.getOrDefault(argument, "");
-                    builder = builder.argument(argument, Description.of(description));
+                    builder = builder.argument(argument, ArgumentDescription.of(description));
                 }
             }
             /* Try to find the command sender type */

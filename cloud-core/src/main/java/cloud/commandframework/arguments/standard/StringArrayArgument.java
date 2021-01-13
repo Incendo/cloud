@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -47,7 +48,8 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
     private StringArrayArgument(
             final boolean required,
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 required,
@@ -55,7 +57,8 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
                 new StringArrayParser<>(),
                 "",
                 TypeToken.get(String[].class),
-                suggestionsProvider
+                suggestionsProvider,
+                defaultDescription
         );
     }
 
@@ -74,7 +77,8 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
         return new StringArrayArgument<>(
                 true,
                 name,
-                suggestionsProvider
+                suggestionsProvider,
+                ArgumentDescription.empty()
         );
     }
 
@@ -93,7 +97,8 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
         return new StringArrayArgument<>(
                 false,
                 name,
-                suggestionsProvider
+                suggestionsProvider,
+                ArgumentDescription.empty()
         );
     }
 

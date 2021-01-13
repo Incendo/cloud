@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Added helper methods for command flags to MutableCommandBuilder
  - Added injection services
  - Added a Guice injection service
+ - Add predicate permissions
 
 ### Deprecated
  - Deprecated ParameterInjectorRegistry#injectors
