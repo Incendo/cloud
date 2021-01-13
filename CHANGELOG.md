@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Expose the Command which led to `InvalidCommandSenderException`s
  - Expose the CommandContext which led to `CommandExecutionException`s
  - Added helper methods for command flags to MutableCommandBuilder
+ - Add predicate permissions
 
 ## [1.3.0] - 2020-12-18
 
