@@ -25,7 +25,6 @@ package cloud.commandframework.context;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.annotations.injection.ParameterInjector;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.captions.Caption;
@@ -603,13 +602,7 @@ public final class CommandContext<C> {
                     "Cannot retrieve injectable values from a command context that is not associated with a command manager"
             );
         }
-        for (final ParameterInjector<C, ?> injector : this.commandManager.parameterInjectorRegistry().injectors(clazz)) {
-            final Object value = injector.create(this, AnnotationAccessor.empty());
-            if (value != null) {
-                return Optional.of((T) value);
-            }
-        }
-        return Optional.empty();
+        return this.commandManager.parameterInjectorRegistry().getInjectable(clazz, this, AnnotationAccessor.empty());
     }
 
 
