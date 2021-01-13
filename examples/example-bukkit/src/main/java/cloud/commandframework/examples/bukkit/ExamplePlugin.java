@@ -26,6 +26,7 @@ package cloud.commandframework.examples.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.Description;
+import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.annotations.AnnotationParser;
@@ -58,6 +59,7 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
+import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.tasks.TaskConsumer;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
@@ -68,6 +70,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -82,6 +85,10 @@ import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -209,6 +216,15 @@ public final class ExamplePlugin extends JavaPlugin {
     }
 
     private void constructCommands() {
+        // Add a custom permission checker
+        this.annotationParser.registerBuilderModifier(
+                GameModeRequirement.class,
+                (requirement, builder) -> builder.permission(
+                        PredicatePermission.of(SimpleCloudKey.of("gamemode"), sender ->
+                                !(sender instanceof Player) || ((Player) sender).getGameMode() == requirement.value()
+                        )
+                )
+        );
         //
         // Parse all @CommandMethod-annotated methods
         //
@@ -464,6 +480,23 @@ public final class ExamplePlugin extends JavaPlugin {
     ) {
         this.manager.taskRecipe().begin(location).synchronous((@NonNull TaskConsumer<Location>) sender::teleport)
                 .execute(() -> sender.sendMessage("You have been teleported!"));
+    }
+
+
+    /**
+     * Command must have the given game mode
+     */
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface GameModeRequirement {
+
+        /**
+         * The required game mode
+         *
+         * @return Required game mode
+         */
+        GameMode value();
+
     }
 
 }

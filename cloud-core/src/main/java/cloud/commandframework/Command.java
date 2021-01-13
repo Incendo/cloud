@@ -34,6 +34,7 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
@@ -804,6 +805,24 @@ public class Command<C> {
          * @return New builder instance using the command permission
          */
         public @NonNull Builder<C> permission(final @NonNull CommandPermission permission) {
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    this.commandComponents,
+                    this.commandExecutionHandler,
+                    permission,
+                    this.flags
+            );
+        }
+
+        /**
+         * Specify a command permission
+         *
+         * @param permission Command permission
+         * @return New builder instance using the command permission
+         */
+        public @NonNull Builder<C> permission(final @NonNull PredicatePermission<C> permission) {
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,
