@@ -236,9 +236,9 @@ class CommandTreeTest {
         // Create and register a command
         Command<TestCommandSender> command = manager.commandBuilder("component")
                 .literal("literal", "literalalias")
-                .literal("detail", Description.of("detaildescription"))
+                .literal("detail", ArgumentDescription.of("detaildescription"))
                 .argument(CommandArgument.ofType(int.class, "argument"),
-                          Description.of("argumentdescription"))
+                          ArgumentDescription.of("argumentdescription"))
                 .build();
         manager.command(command);
 
@@ -264,10 +264,10 @@ class CommandTreeTest {
         Assertions.assertEquals(TypeToken.get(int.class), arguments.get(3).getValueType());
 
         // Check description is set for all components, is empty when not specified
-        Assertions.assertEquals("", components.get(0).getDescription().getDescription());
-        Assertions.assertEquals("", components.get(1).getDescription().getDescription());
-        Assertions.assertEquals("detaildescription", components.get(2).getDescription().getDescription());
-        Assertions.assertEquals("argumentdescription", components.get(3).getDescription().getDescription());
+        Assertions.assertEquals("", components.get(0).getArgumentDescription().getDescription());
+        Assertions.assertEquals("", components.get(1).getArgumentDescription().getDescription());
+        Assertions.assertEquals("detaildescription", components.get(2).getArgumentDescription().getDescription());
+        Assertions.assertEquals("argumentdescription", components.get(3).getArgumentDescription().getDescription());
     }
 
     @Test
