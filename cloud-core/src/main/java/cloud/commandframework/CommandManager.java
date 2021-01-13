@@ -55,6 +55,7 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.services.ServicePipeline;
 import cloud.commandframework.services.State;
 import io.leangen.geantyref.TypeToken;
@@ -277,6 +278,7 @@ public abstract class CommandManager<C> {
      * @param permission Permission node
      * @return {@code true} if the sender has the permission, else {@code false}
      */
+    @SuppressWarnings("unchecked")
     public boolean hasPermission(
             final @NonNull C sender,
             final @NonNull CommandPermission permission
@@ -286,6 +288,9 @@ public abstract class CommandManager<C> {
         }
         if (permission instanceof Permission) {
             return hasPermission(sender, permission.toString());
+        }
+        if (permission instanceof PredicatePermission) {
+            return ((PredicatePermission<C>) permission).hasPermission(sender);
         }
         for (final CommandPermission innerPermission : permission.getPermissions()) {
             final boolean hasPermission = this.hasPermission(sender, innerPermission);

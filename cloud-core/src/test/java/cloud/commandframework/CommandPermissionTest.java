@@ -25,13 +25,16 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.permission.PredicatePermission;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class CommandPermissionTest {
 
@@ -61,6 +64,22 @@ class CommandPermissionTest {
         Assertions.assertThrows(
                 CompletionException.class,
                 () -> manager.executeCommand(new TestCommandSender(), "first 10").join()
+        );
+    }
+
+    @Test
+    void testPredicatePermissions() {
+        final AtomicBoolean condition = new AtomicBoolean(true);
+        manager.command(manager.commandBuilder("predicate").permission(PredicatePermission.of(
+                SimpleCloudKey.of("boolean"), $ -> condition.get()
+        )));
+        // First time should succeed
+        manager.executeCommand(new TestCommandSender(), "predicate").join();
+        // Now we force it to fail
+        condition.set(false);
+        Assertions.assertThrows(
+                CompletionException.class,
+                () -> manager.executeCommand(new TestCommandSender(), "predicate").join()
         );
     }
 
