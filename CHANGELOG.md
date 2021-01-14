@@ -10,7 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Expose the Command which led to `InvalidCommandSenderException`s
  - Expose the CommandContext which led to `CommandExecutionException`s
  - Added helper methods for command flags to MutableCommandBuilder
+ - Added injection services
+ - Added a Guice injection service
  - Add predicate permissions
+
+### Deprecated
+ - Deprecated ParameterInjectorRegistry#injectors
 
 ## [1.3.0] - 2020-12-18
 
@@ -28,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
  - String keyed command meta
+ - Deprecated ParameterInjectorRegistry#injectors
 
 ### Fixed
  - Fixed issue with task synchronization

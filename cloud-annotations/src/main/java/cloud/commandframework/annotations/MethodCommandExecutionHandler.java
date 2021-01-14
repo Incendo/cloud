@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.annotations.injection.ParameterInjector;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
@@ -37,9 +36,9 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
 
@@ -90,19 +89,13 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
                 if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
                     arguments.add(commandContext.getSender());
                 } else {
-                    final Collection<ParameterInjector<C, ?>> injectors = this.injectorRegistry.injectors(parameter.getType());
-                    Object value = null;
-                    for (final ParameterInjector<C, ?> injector : injectors) {
-                        value = injector.create(
-                                commandContext,
-                                this.annotationAccessor
-                        );
-                        if (value != null) {
-                            break;
-                        }
-                    }
-                    if (value != null) {
-                        arguments.add(value);
+                    final Optional<?> value = this.injectorRegistry.getInjectable(
+                            parameter.getType(),
+                            commandContext,
+                            this.annotationAccessor
+                    );
+                    if (value.isPresent()) {
+                        arguments.add(value.get());
                     } else {
                         throw new IllegalArgumentException(String.format(
                                 "Unknown command parameter '%s' in method '%s'",
