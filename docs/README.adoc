@@ -239,7 +239,7 @@ Floating point arguments can be constructed using:
 
 * `FloatArgument.optional(name, default)`: Optional float argument without a range, with a default value
 
-Furthermore, a floating point argument builder can be constructed using `FloatArgument.newBuilder(name)`. This allows you to provide a custom suggestion generator, using `FloatArgument.Builder#withSuggestionsProvider(BiFunction<CommandContext<C>, List<String>>)`, and set minimum and maximum values.
+Furthermore, a floating-point argument builder can be constructed using `FloatArgument.newBuilder(name)`. This allows you to provide a custom suggestion generator, using `FloatArgument.Builder#withSuggestionsProvider(BiFunction<CommandContext<C>, List<String>>)`, and set minimum and maximum values.
 
 ===== enums
 
@@ -292,10 +292,10 @@ You first have to create a command confirmation manager:
 [source,java]
 ----
 CommandConfirmationmanager<YourSender> confirmationManager = new CommandConfirmationManager<>(
-        30L, <1>
-        TimeUnit.SECONDS,
-        context -> context.getCommandContext().getSender().sendMessage("Confirmation required!"), <2>
-        sender -> sender.sendMessage("You don't have any pending commands") <3>
+    30L, <1>
+    TimeUnit.SECONDS,
+    context -> context.getCommandContext().getSender().sendMessage("Confirmation required!"), <2>
+    sender -> sender.sendMessage("You don't have any pending commands") <3>
 );
 ----
 <1> The amount (in the selected time unit) before the pending command expires.
@@ -309,9 +309,9 @@ You also need a confirmation command. The recommended way to create this is by d
 [source,java]
 ----
 manager.command(
-        builder.literal("confirm"))
-               .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
-               .handler(confirmationManager.createConfirmationExecutionHandler())
+    builder.literal("confirm"))
+        .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
+        .handler(confirmationManager.createConfirmationExecutionHandler())
 );
 ----
 
@@ -322,6 +322,57 @@ or a `@Confirmation` annotation.
 ==== Help Generation
 
 == Annotations
+
+=== Injections
+
+Command methods may have parameters that are not arguments. A very common example
+would be the command sender object, or the command object. Command method
+parameters that aren't arguments are referred to as _injected values_.
+
+Injected values can be registered in the
+https://javadoc.commandframework.cloud/cloud/commandframework/annotations/injection/ParameterInjectorRegistry.html[ParameterInjectorRegistry],
+which is available in the command manager. You register a parameter injector for a specific
+type (class), which is essentially a function mapping the command context and an annotation accessor to an injectable value.
+
+[title="Example injector"]
+====
+The following is an example from `cloud-annotations` that injects the raw command input
+into string arrays annotated with `@RawArgs`.
+[source,java]
+----
+this.getParameterInjectorRegistry().registerInjector(
+    String[].class, <1>
+    (context, annotations) -> annotations.annotation(RawArgs.class) == null
+        ? null <2>
+        : context.getRawInput().toArray(new String[0])
+);
+----
+<1> Type to inject.
+<2> If no value can be injected, it is fine to return `null`.
+====
+
+By default, the `CommandContext`, `@RawArgs String[]` and the command sender are injectable.
+
+==== Injection services
+
+It is possible to register injection services that delegate injections to a custom, or existing
+dependency injection system. In version 1.4.0, a `GuiceInjectionService` was added which can be
+used to delegate injection requests to a Guice injector.
+
+All you need is to create an injection service:
+[source,java]
+----
+public class YourInjectionService<C> implements InjectionService<C> {
+
+    @Override
+    public Object handle(CommandContext<C> context, Class<?> clazz) {
+        return yourInjectionSystem.injectInstance(clazz);
+    }
+
+}
+----
+and then register it to the parameter injection registry using
+`manager.parameterInjectionRegistry().registerInjectionService(new YourInjectionService<>())`.
 
 == Kotlin DSL
 
