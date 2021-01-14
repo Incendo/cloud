@@ -4,6 +4,9 @@ object Versions {
     const val errorprone = "2.4.0"
     const val errorprone_javac = "9+181-r4173-1"
 
+    // INTEGRATION DEPENDENCIES
+    const val guice = "4.2.3"
+
     // DISCORD DEPENDENCIES
     const val javacord = "3.1.1"
     const val jda = "4.2.0_209"
