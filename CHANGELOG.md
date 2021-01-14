@@ -7,33 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
- - Expose the Command which led to `InvalidCommandSenderException`s
- - Expose the CommandContext which led to `CommandExecutionException`s
- - Added helper methods for command flags to MutableCommandBuilder
- - Added injection services
- - Added a Guice injection service
- - Add predicate permissions
+ - Predicate command filters to the help system ([#187](https://github.com/Incendo/cloud/pull/187))
+ - Allow flags to contain compound arguments ([#192](https://github.com/Incendo/cloud/pull/192))
+ - Allow for components in exceptions and meta data ([#200](https://github.com/Incendo/cloud/pull/200))
+ - Location2DArgument ([#201](https://github.com/Incendo/cloud/pull/201))
+ - Expose the Command which led to `InvalidCommandSenderException`s ([#204](https://github.com/Incendo/cloud/pull/211))
+ - Expose the CommandContext which led to `CommandExecutionException`s ([#204](https://github.com/Incendo/cloud/pull/211))
+ - Helper methods for command flags to MutableCommandBuilder ([#205](https://github.com/Incendo/cloud/pull/205))
+ - CommandFlag accepting getters to FlagContext ([#206](https://github.com/Incendo/cloud/pull/206))
+ - More abstract description concept ([#207](https://github.com/Incendo/cloud/pull/207))
+ - Predicate permissions ([#210](https://github.com/Incendo/cloud/pull/210))
+ - Injection services ([#211](https://github.com/Incendo/cloud/pull/211))
+
+### Changed
+ - Allow command argument names to include `_` and `-` ([#186](https://github.com/Incendo/cloud/pull/186))
+ - Make it easier to use translatable components with MinecraftHelp ([#197](https://github.com/Incendo/cloud/pull/197))
+ - Show "No result for query" when a multi-help topic is empty
 
 ### Deprecated
- - Deprecated ParameterInjectorRegistry#injectors
+ - Description, and everything using Description directly ([#207](https://github.com/Incendo/cloud/pull/207))
+ - ParameterInjectorRegistry#injectors ([#211](https://github.com/Incendo/cloud/pull/211))
+
+### Fixed
+ - Issue where suggestions were shown multiple times when using Brigadier ([#184](https://github.com/Incendo/cloud/pull/184))
+ - Issue where the command manager was in the wrong state if no commands had been registered ([#196](https://github.com/Incendo/cloud/pull/196))
+ - Issues with JDA ([#198](https://github.com/Incendo/cloud/pull/198)) ([#199](https://github.com/Incendo/cloud/pull/199))
+ - Console suggestions for Bukkit
 
 ## [1.3.0] - 2020-12-18
 
 ### Added
- - Added `@Suggestions` annotated methods
- - Added `@Parser` annotated methods
+ - `@Suggestions` annotated methods
+ - `@Parser` annotated methods
  - Type safe meta system
  - Allow interception of command builders based on annotations in AnnotationParser
- - Add Kotlin DSL
- - Make CommandMeta and FlagContext more Kotlin friendly
+ - Kotlin DSL
 
 ### Changed
- - Moved the parser injector registry into CommandManager and added injection to CommandContext
+ - Move the parser injector registry into CommandManager and added injection to CommandContext
  - Supporting repeating literals or argument names
+ - Make CommandMeta and FlagContext more Kotlin friendly
 
 ### Deprecated
  - String keyed command meta
- - Deprecated ParameterInjectorRegistry#injectors
+ - ParameterInjectorRegistry#injectors
 
 ### Fixed
  - Fixed issue with task synchronization
@@ -41,52 +58,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.0] - 2020-12-07
 
 ### Added
- - Added access to the CloudBrigadierManager from Brigadier-enabled command managers
- - Added parameter injectors (cloud-annotations)
+ - Access to the CloudBrigadierManager from Brigadier-enabled command managers
+ - Parameter injectors (cloud-annotations)
  - Store currently parsing command argument in the command context
- - Added a method to CloudBrigadierManager to enable or disable Brigadier native suggestions for specific argument types
- - Added a method to get the failure reason of SelectorParseExceptions
- - Added some methods to FlagContext to work with flag values as optionals
+ - A method to CloudBrigadierManager to enable or disable Brigadier native suggestions for specific argument types
+ - A method to get the failure reason of SelectorParseExceptions
+ - Some methods to FlagContext to work with flag values as optionals
  - Allow for use of named suggestion providers with `@Flag`s (cloud-annotations)
- - Added `CommandExecutionException` which wraps any exception thrown during the execution of command handlers. Should be
+ - `CommandExecutionException` which wraps any exception thrown during the execution of command handlers. Should be
   handled using `CommandManager#registerExceptionHandler`, similar to `NoSuchCommandException`, `ArgumentParseException`, etc.
- - Added registration state to command managers
- - Added ALLOW_UNSAFE_REGISTRATION ManagerSetting to disable state checks when registering commands
- - Added OVERRIDE_EXISTING_COMMANDS ManagerSetting to allow for overriding of existing commands on supported platforms
+ - Registration state to command managers
+ - ALLOW_UNSAFE_REGISTRATION ManagerSetting to disable state checks when registering commands
+ - OVERRIDE_EXISTING_COMMANDS ManagerSetting to allow for overriding of existing commands on supported platforms
  
 ### Changed
  - Allow for use of `@Completions` annotation with argument types other than String
  - Allow for use of a BiFunction<C, E, Component> instead of just a Function<E, Component> in MinecraftExceptionHandler
  
 ### Deprecated
- - Deprecated LockableCommandManager in favor of CommandManager state
+ - LockableCommandManager in favor of CommandManager state
  
 ### Fixed
  - Use the correct default range for Double and Float parsers in the StandardParserRegistry
- - Fix Bukkit alias command suggestions without Brigadier
- - Fix Bukkit command alias registration when using Brigadier
- - Fixed a bug where providing valid input for an argument caused cloud to no longer make suggestions
+ - Bukkit alias command suggestions without Brigadier
+ - Bukkit command alias registration when using Brigadier
+ - A bug where providing valid input for an argument caused cloud to no longer make suggestions
  - Detect and throw an exception for ambiguous nodes in more cases
  - CloudBrigadierManager no longer forgets the command sender
 
 ## [1.1.0] - 2020-10-24
 
 ### Added
- - Added ExampleVelocityPlugin
- - Added CloudInjectionModule to cloud-velocity
- - Added PlayerArgument to cloud-velocity
- - Added TextColorArgument to minecraft-extras
- - Added LocationArgument to cloud-bukkit
- - Added ServerArgument to cloud-velocity
- - Added LockableCommandManager to cloud-core
- - Added VelocityCommandPreprocessor to cloud-velocity
- - Added PlayerArgument to cloud-bungee
- - Added ServerArgument to cloud-bungee
- - Added ExampleBungeePlugin
- - Added CaptionKeys to cloud-bungee
- - Added BungeeCommandPreprocessor to cloud-bungee
- - Added named suggestion providers
- - Added a PircBotX implementation
+ - ExampleVelocityPlugin
+ - CloudInjectionModule to cloud-velocity
+ - PlayerArgument to cloud-velocity
+ - TextColorArgument to minecraft-extras
+ - LocationArgument to cloud-bukkit
+ - ServerArgument to cloud-velocity
+ - LockableCommandManager to cloud-core
+ - VelocityCommandPreprocessor to cloud-velocity
+ - PlayerArgument to cloud-bungee
+ - ServerArgument to cloud-bungee
+ - ExampleBungeePlugin
+ - CaptionKeys to cloud-bungee
+ - BungeeCommandPreprocessor to cloud-bungee
+ - Named suggestion providers
+ - PircBotX implementation
 
 ### Changed
  - Allow for combined presence flags, such that `-a -b -c` is equivalent to `-abc`
@@ -94,21 +111,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Allow for annotated annotations
  
 ### Fixed
- - Fix arguments with no required children not being executors (cloud-brigadier)
+ - Arguments with no required children not being executors (cloud-brigadier)
 
 ## [1.0.2] - 2020-10-18
 
 ### Fixed
- - Fixed quoted parsing in StringArgument
- - Fixed wrong suggestions following invalid literals
- - Fixes chained optionals not allowing the command to be executed when more than one optional is omitted
+ - Quoted parsing in StringArgument
+ - Wrong suggestions following invalid literals
+ - Chained optionals not allowing the command to be executed when more than one optional is omitted
 
 ### Changed
- - Updated adventure-api from 4.0.0 to 4.1.1
- - Updated Velocity module for breaking API changes (sendMessage needs an Identity)
+ - Update adventure-api from 4.0.0 to 4.1.1
+ - Update Velocity module for breaking API changes (sendMessage needs an Identity)
 
 ## [1.0.1] - 2020-10-14
 
 ### Changes
- - Switched from a snapshot to a release version of adventure 4.0.0
- - Added `Identity.nil()` when sending adventure messages
+ - Switch from a snapshot to a release version of adventure 4.0.0
+ - Add `Identity.nil()` when sending adventure messages
