@@ -255,6 +255,35 @@ non-liberal:: Accepts only "true" and "false"
 
 ===== compound arguments
 
+Compound arguments are a special type of arguments that consists of multiple other arguments.
+By default, 2 or 3 arguments may be used in a compound argument.
+
+The methods for creating compounds arguments can be found in CommandManager, or in the
+https://javadoc.commandframework.cloud/cloud/commandframework/arguments/compound/ArgumentPair.html[ArgumentPair]
+or
+https://javadoc.commandframework.cloud/cloud/commandframework/arguments/compound/ArgumentTriplet.html[ArgumentTriplet]
+classes.
+
+In general, they need a tuple of names, and a tuple of argument types. They can also
+take in a mapping function which maps the value to a more user-friendly type.
+
+[title="Argument triplet mapping to a vector"]
+====
+[source,java]
+----
+commandBuilder.argumentTriplet(
+        "coords",
+        TypeToken.get(Vector.class),
+        Triplet.of("x", "y", "z"),
+        Triplet.of(Integer.class, Integer.class, Integer.class),
+        (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
+                triplet.getThird()
+        ),
+        Description.of("Coordinates")
+)
+----
+====
+
 ==== Custom
 
 ==== Flags
