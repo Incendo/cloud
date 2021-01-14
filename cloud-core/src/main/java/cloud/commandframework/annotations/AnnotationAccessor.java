@@ -61,6 +61,18 @@ public interface AnnotationAccessor {
     }
 
     /**
+     * Get a {@link AnnotationAccessor} instance that delegates to multiple {@link AnnotatedElement} instances.
+     * The first accessor that provides a requested annotation will always be used
+     *
+     * @param accessors The accessor to delegate to
+     * @return Annotation accessor that delegates to the given accessors (using their natural ordering)
+     * @since 1.4.0
+     */
+    static @NonNull AnnotationAccessor of(final @NonNull AnnotationAccessor@NonNull... accessors) {
+        return new MultiDelegateAnnotationAccessor(accessors);
+    }
+
+    /**
      * Get an annotation instance, if it's present. If the annotation
      * isn't available, this will return {@code null}
      *

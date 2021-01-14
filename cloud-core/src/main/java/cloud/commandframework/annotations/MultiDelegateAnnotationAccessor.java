@@ -21,33 +21,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.injection;
+package cloud.commandframework.annotations;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.context.CommandContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-/**
- * Injector that injects parameters into CommandMethod annotated
- * methods
- *
- * @param <C> Command sender type
- * @param <T> Type of the value that is injected by this injector
- * @since 1.2.0
- */
-@FunctionalInterface
-public interface ParameterInjector<C, T> {
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-    /**
-     * Attempt to create a a value that should then be injected into the CommandMethod
-     * annotated method. If the injector cannot (or shouldn't) create a value, it is free to return {@code null}.
-     *
-     * @param context            Command context that is requesting the injection
-     * @param annotationAccessor Annotation accessor proxying the method and parameter which the value is being injected into
-     * @return The value, if it could be created. Else {@code null}, in which case no value will be injected
-     *         by this particular injector
-     */
-    @Nullable T create(@NonNull CommandContext<C> context, @NonNull AnnotationAccessor annotationAccessor);
+final class MultiDelegateAnnotationAccessor implements AnnotationAccessor {
+
+    private final AnnotationAccessor[] accessors;
+
+    MultiDelegateAnnotationAccessor(final @NonNull AnnotationAccessor@NonNull... accessors) {
+        this.accessors = accessors;
+    }
+
+    @Override
+    public <A extends Annotation> @Nullable A annotation(@NonNull final Class<A> clazz) {
+        A instance = null;
+        for (final AnnotationAccessor annotationAccessor : accessors) {
+            instance = annotationAccessor.annotation(clazz);
+            if (instance != null) {
+                break;
+            }
+        }
+        return instance;
+    }
+
+    @Override
+    public @NonNull Collection<@NonNull Annotation> annotations() {
+        final List<Annotation> annotationList = new LinkedList<>();
+        for (final AnnotationAccessor annotationAccessor : accessors) {
+            annotationList.addAll(annotationAccessor.annotations());
+        }
+        return Collections.unmodifiableCollection(annotationList);
+    }
 
 }
