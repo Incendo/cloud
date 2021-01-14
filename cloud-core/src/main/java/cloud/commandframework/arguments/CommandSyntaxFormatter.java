@@ -40,9 +40,13 @@ public interface CommandSyntaxFormatter<C> {
     /**
      * Format the command arguments into a syntax string
      *
-     * @param commandArguments Command arguments
-     * @param node             Trailing node
-     * @return Syntax string
+     * @param commandArguments Command arguments that have been unambiguously specified up until this point. This
+     *                         should include the "current" command, if such a command exists.
+     * @param node             The current command node. The children of this node will be appended onto the
+     *                         command syntax string, as long as an unambiguous path can be identified. The node
+     *                         itself will not be appended onto the syntax string. This can be set to {@code null} if
+     *                         no node is relevant at the point of formatting.
+     * @return The formatted syntax string
      */
     @NonNull String apply(
             @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
