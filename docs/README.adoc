@@ -285,6 +285,40 @@ non-liberal:: Accepts only "true" and "false"
 
 ==== Confirmations
 
+Cloud has built in support for commands that require confirmation by the sender. It essentially postpones command execution
+until an additional command has been dispatched.
+
+You first have to create a command confirmation manager:
+[source,java]
+----
+CommandConfirmationmanager<YourSender> confirmationManager = new CommandConfirmationManager<>(
+        30L, <1>
+        TimeUnit.SECONDS,
+        context -> context.getCommandContext().getSender().sendMessage("Confirmation required!"), <2>
+        sender -> sender.sendMessage("You don't have any pending commands") <3>
+);
+----
+<1> The amount (in the selected time unit) before the pending command expires.
+<2> Action to run when the confirmation manager requires action from the sender.
+<3> Action to run when the confirmation command is ran by a sender without any pending commands.
+
+The confirmation manager needs to be registered to the command manager. This is as easy as
+`confirmationManager.registerConfirmationProcessor(manager)`.
+
+You also need a confirmation command. The recommended way to create this is by doing:
+[source,java]
+----
+manager.command(
+        builder.literal("confirm"))
+               .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
+               .handler(confirmationManager.createConfirmationExecutionHandler())
+);
+----
+
+The important part is that the generated execution handler is used in your command. All commands
+that require confirmation needs `.meta(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true)`
+or a `@Confirmation` annotation.
+
 ==== Help Generation
 
 == Annotations
