@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Allow command argument names to include `_` and `-` ([#186](https://github.com/Incendo/cloud/pull/186))
  - Make it easier to use translatable components with MinecraftHelp ([#197](https://github.com/Incendo/cloud/pull/197))
  - Show "No result for query" when a multi-help topic is empty
+ - Use the method+field annotation accessor rather than the method accessor when injecting method parameters
 
 ### Deprecated
  - Description, and everything using Description directly ([#207](https://github.com/Incendo/cloud/pull/207))

@@ -92,7 +92,7 @@ class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
                     final Optional<?> value = this.injectorRegistry.getInjectable(
                             parameter.getType(),
                             commandContext,
-                            this.annotationAccessor
+                            AnnotationAccessor.of(AnnotationAccessor.of(parameter), this.annotationAccessor)
                     );
                     if (value.isPresent()) {
                         arguments.add(value.get());

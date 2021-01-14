@@ -48,7 +48,7 @@ public class ParameterInjectorRegistryTest {
     private Injector injector;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.commandSender = new TestCommandSender();
         this.commandManager = new TestCommandManager();
         this.commandContextFactory = new StandardCommandContextFactory<>();
@@ -63,7 +63,7 @@ public class ParameterInjectorRegistryTest {
     }
 
     @Test
-    public void testSimpleInjection() {
+    void testSimpleInjection() {
         Assertions.assertEquals(INJECTED_INTEGER, parameterInjectorRegistry.getInjectable(
                 Integer.class,
                 this.createContext(),
@@ -72,7 +72,7 @@ public class ParameterInjectorRegistryTest {
     }
 
     @Test
-    public void testGuiceInjection() {
+    void testGuiceInjection() {
         this.parameterInjectorRegistry.registerInjectionService(GuiceInjectionService.create(this.injector));
         Assertions.assertEquals(TestModule.INJECTED_INTEGER, parameterInjectorRegistry.getInjectable(
                 Integer.class,
@@ -82,7 +82,7 @@ public class ParameterInjectorRegistryTest {
     }
 
     @Test
-    public void testNonExistentInjection() {
+    void testNonExistentInjection() {
         Assertions.assertNull(parameterInjectorRegistry.getInjectable(
                 String.class,
                 this.createContext(),
