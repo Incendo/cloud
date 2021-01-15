@@ -28,6 +28,8 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,10 +38,12 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class CommandPermissionTest {
 
     private final static CommandManager<TestCommandSender> manager = new PermissionOutputtingCommandManager();
-    private static boolean acceptOne = false;
 
     @BeforeAll
     static void setup() {
@@ -52,8 +56,7 @@ class CommandPermissionTest {
     @Test
     void testCompoundPermission() {
         Assertions.assertTrue(manager.suggest(new TestCommandSender(), "t").isEmpty());
-        acceptOne = true;
-        Assertions.assertFalse(manager.suggest(new TestCommandSender(), "t").isEmpty());
+        assertFalse(manager.suggest(new TestCommandSender("test.permission.four"), "t").isEmpty());
     }
 
     @Test
@@ -65,6 +68,25 @@ class CommandPermissionTest {
                 CompletionException.class,
                 () -> manager.executeCommand(new TestCommandSender(), "first 10").join()
         );
+    }
+
+    @Test
+    void testAndPermissions() {
+        final CommandPermission test = Permission.of("one").and(Permission.of("two"));
+        final TestCommandSender sender = new TestCommandSender("one");
+        assertFalse(manager.hasPermission(sender, test));
+        assertFalse(manager.hasPermission(new TestCommandSender("two"), test));
+        sender.addPermission("two");
+        assertTrue(manager.hasPermission(sender, test));
+    }
+
+    @Test
+    void testOrPermissions() {
+        final CommandPermission test = Permission.of("one").or(Permission.of("two"));
+        assertFalse(manager.hasPermission(new TestCommandSender(), test));
+        assertTrue(manager.hasPermission(new TestCommandSender("one"), test));
+        assertTrue(manager.hasPermission(new TestCommandSender("two"), test));
+        assertTrue(manager.hasPermission(new TestCommandSender("one", "two"), test));
     }
 
     @Test
@@ -101,7 +123,7 @@ class CommandPermissionTest {
             if (permission.equalsIgnoreCase("second")) {
                 return false;
             }
-            return acceptOne && permission.equalsIgnoreCase("test.permission.four");
+            return sender.hasPermisison(permission);
         }
 
         @Override

@@ -33,13 +33,13 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Accepts as long as at least one of the permissions is accepted
+ * Accepts if every single permission is accepted.
  */
-public final class OrPermission implements CommandPermission {
+public final class AndPermission implements CommandPermission {
 
     private final Set<CommandPermission> permissions;
 
-    OrPermission(final @NonNull Set<CommandPermission> permissions) {
+    AndPermission(final @NonNull Set<CommandPermission> permissions) {
         this.permissions = Collections.unmodifiableSet(permissions);
     }
 
@@ -54,7 +54,7 @@ public final class OrPermission implements CommandPermission {
         for (final CommandPermission permission : permissions) {
             permissionSet.addAll(permission.getPermissions());
         }
-        return new OrPermission(permissionSet);
+        return new AndPermission(permissionSet);
     }
 
     @Override
@@ -70,7 +70,7 @@ public final class OrPermission implements CommandPermission {
             final CommandPermission permission = iterator.next();
             stringBuilder.append('(').append(permission.toString()).append(')');
             if (iterator.hasNext()) {
-                stringBuilder.append('|');
+                stringBuilder.append(" & ");
             }
         }
         return stringBuilder.toString();
@@ -84,7 +84,7 @@ public final class OrPermission implements CommandPermission {
         if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        final OrPermission that = (OrPermission) o;
+        final AndPermission that = (AndPermission) o;
         return this.permissions.equals(that.permissions);
     }
 
