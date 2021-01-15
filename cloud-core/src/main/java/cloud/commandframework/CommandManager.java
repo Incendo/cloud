@@ -52,6 +52,7 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.permission.AndPermission;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
@@ -283,24 +284,30 @@ public abstract class CommandManager<C> {
             final @NonNull C sender,
             final @NonNull CommandPermission permission
     ) {
-        if (permission.toString().isEmpty()) {
-            return true;
-        }
         if (permission instanceof Permission) {
-            return hasPermission(sender, permission.toString());
-        }
-        if (permission instanceof PredicatePermission) {
+            if (permission.toString().isEmpty()) {
+                return true;
+            }
+            return this.hasPermission(sender, permission.toString());
+        } else if (permission instanceof PredicatePermission) {
             return ((PredicatePermission<C>) permission).hasPermission(sender);
-        }
-        for (final CommandPermission innerPermission : permission.getPermissions()) {
-            final boolean hasPermission = this.hasPermission(sender, innerPermission);
-            if (permission instanceof OrPermission) {
-                if (hasPermission) {
+        } else if (permission instanceof OrPermission) {
+            for (final CommandPermission innerPermission : permission.getPermissions()) {
+                if (this.hasPermission(sender, innerPermission)) {
                     return true;
                 }
             }
+            return false;
+        } else if (permission instanceof AndPermission) {
+            for (final CommandPermission innerPermission : permission.getPermissions()) {
+                if (!this.hasPermission(sender, innerPermission)) {
+                    return false;
+                }
+            }
+            return true;
         }
-        return false;
+
+        throw new IllegalArgumentException("Unknown permission type " + permission.getClass());
     }
 
     /**
