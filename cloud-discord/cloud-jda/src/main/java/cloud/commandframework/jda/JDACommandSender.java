@@ -66,7 +66,9 @@ public class JDACommandSender {
      * @return Constructed JDA Command Sender
      */
     public static @NonNull JDACommandSender of(final @NonNull MessageReceivedEvent event) {
-        if (event.isFromType(ChannelType.PRIVATE)) {
+        if (event.isWebhookMessage()) {
+            return new JDACommandSender(event, event.getAuthor(), event.getChannel());
+        } else if (event.isFromType(ChannelType.PRIVATE)) {
             return new JDAPrivateSender(event, event.getAuthor(), event.getPrivateChannel());
         }
 
