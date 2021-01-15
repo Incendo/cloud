@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
  - Issue where suggestions were shown multiple times when using Brigadier ([#184](https://github.com/Incendo/cloud/pull/184))
  - Issue where the command manager was in the wrong state if no commands had been registered ([#196](https://github.com/Incendo/cloud/pull/196))
- - Issues with JDA ([#198](https://github.com/Incendo/cloud/pull/198)) ([#199](https://github.com/Incendo/cloud/pull/199))
+ - Issues with JDA ([#198](https://github.com/Incendo/cloud/pull/198)) ([#199](https://github.com/Incendo/cloud/pull/199)) ([#214](https://github.com/Incendo/cloud/pull/214))
  - Console suggestions for Bukkit
 
 ## [1.3.0] - 2020-12-18
