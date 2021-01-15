@@ -21,6 +21,7 @@ object Versions {
     const val adventurePlatform = "4.0.0-SNAPSHOT"
     const val paperApi = "1.15.2-R0.1-SNAPSHOT"
     const val velocityApi = "1.1.0"
+    const val spongeApi7 = "7.3.0"
     const val jetbrainsAnnotations = "20.1.0"
     const val guava = "21.0-jre"
 
