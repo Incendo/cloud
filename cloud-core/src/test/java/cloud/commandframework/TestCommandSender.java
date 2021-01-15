@@ -23,6 +23,31 @@
 //
 package cloud.commandframework;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class TestCommandSender {
+    private final Set<String> permissions = new HashSet<>();
+
+    public TestCommandSender() {
+    }
+
+    public TestCommandSender(final String... permissions) {
+        this.permissions.addAll(Arrays.asList(permissions));
+    }
+
+    public boolean hasPermisison(final String permission) {
+        return this.permissions.contains(permission);
+    }
+
+
+    public void addPermission(final String permission) {
+        this.permissions.add(permission);
+    }
+
+    public void removePermission(final String permission) {
+        this.permissions.remove(permission);
+    }
 
 }
