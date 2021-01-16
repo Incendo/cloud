@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - More abstract description concept ([#207](https://github.com/Incendo/cloud/pull/207))
  - Predicate permissions ([#210](https://github.com/Incendo/cloud/pull/210))
  - Injection services ([#211](https://github.com/Incendo/cloud/pull/211))
+ - Sponge v7 support ([#212](https://github.com/Incendo/cloud/pull/211))
  - Logical `AND` and `OR` operations for `CommandPermission`s ([#213](https://github.com/Incendo/cloud/pull/213))
 
 ### Changed
