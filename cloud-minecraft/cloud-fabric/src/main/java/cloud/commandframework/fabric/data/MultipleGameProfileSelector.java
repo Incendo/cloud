@@ -6,21 +6,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 
-public class MultipleGameProfileSelector implements Selector<GameProfile> {
-
-    @Override
-    public String getInput() {
-        return null;
-    }
-
-    @Override
-    public @Nullable EntitySelector getSelector() {
-        return null;
-    }
-
-    @Override
-    public Collection<GameProfile> get() {
-        return null;
-    }
+public interface MultipleGameProfileSelector extends Selector<GameProfile> {
 
 }
