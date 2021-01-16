@@ -45,6 +45,7 @@ public interface ConsumerService<Context>
      *
      * @throws PipeBurst Pipe burst
      */
+    @SuppressWarnings("DoNotCallSuggester")
     static void interrupt() throws PipeBurst {
         throw new PipeBurst();
     }
