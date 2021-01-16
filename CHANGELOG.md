@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2021-01-16
+
 ### Added
  - Predicate command filters to the help system ([#187](https://github.com/Incendo/cloud/pull/187))
  - Allow flags to contain compound arguments ([#192](https://github.com/Incendo/cloud/pull/192))
