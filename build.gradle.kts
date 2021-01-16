@@ -35,7 +35,7 @@ allprojects {
     apply<LicenseBasePlugin>()
 
     group = "cloud.commandframework"
-    version = "1.4.0-SNAPSHOT"
+    version = "1.4.0"
     description = "Command framework and dispatcher for the JVM"
 
     /* Disable checkstyle on tests */
