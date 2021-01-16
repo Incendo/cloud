@@ -2,6 +2,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/git,java,eclipse,jetbrains+all,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=git,java,eclipse,jetbrains+all,gradle
 
+### Cloud ###
+
+/examples/*/run/
+
 ### Eclipse ###
 .metadata
 bin/
