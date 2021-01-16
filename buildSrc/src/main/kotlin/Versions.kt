@@ -1,8 +1,7 @@
 object Versions {
-    const val checkerQual = "3.8.0"
+    const val checkerQual = "3.9.1"
     const val geantyref = "1.3.11"
-    const val errorprone = "2.4.0"
-    const val errorprone_javac = "9+181-r4173-1"
+    const val errorprone = "2.5.1"
 
     // INTEGRATION DEPENDENCIES
     const val guice = "4.2.3"
@@ -30,5 +29,5 @@ object Versions {
 
     // TEST DEPENDENCIES
     const val jupiterEngine = "5.7.0"
-    const val jmh = "1.25.2"
+    const val jmh = "1.27"
 }
