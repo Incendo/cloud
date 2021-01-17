@@ -101,7 +101,7 @@ their own "native" command sender type, but Cloud allows you to use whatever sen
 supplying a mapping function to the command manager. This sender type will be included in the command context,
 which you will be interacting with a lot when using Cloud.
 
-[title="Creating a command manager instance using Bukkit"]
+[title=Creating a command manager instance using Bukkit]
 ====
 This particular example uses `cloud-bukkit`, though most concepts transfer over to the other command mangers.
 
@@ -277,7 +277,7 @@ classes.
 In general, they need a tuple of names, and a tuple of argument types. They can also
 take in a mapping function which maps the value to a more user-friendly type.
 
-[title="Argument triplet mapping to a vector"]
+[title=Argument triplet mapping to a vector]
 ====
 [source,java]
 ----
@@ -297,6 +297,64 @@ commandBuilder.argumentTriplet(
 ==== Custom
 
 ==== Flags
+
+Flags are named optional values that can either have an associated argument (value flag) or have the value evaluated by whether the flag is present (presence flag). These flags are registered much the same way as normal arguments, only that you use `.flag` methods in the command builder instead.
+
+Flags are always optional. You cannot have required flags. If you need required values, then they should be part of a deterministic command chain. Flags must also necessarily be placed at the tail of a command chain, and you cannot put any arguments (required, or optional) after the flags. This is enforced by the command builder.
+
+Flags can have aliases alongside their full names. When referring to the full name of a flag, you use `--name` whereas an alias
+uses syntax similar to `-a`. You can chain the aliases of multiple presence flags together, such that `-a -b -c` is equivalent
+to `-abc`.
+
+[title=Example of a presence flag]
+====
+[source,java]
+----
+manager.command(
+    manager.commandBuilder("cp")
+        .argument(StringArgument.of("source"), ArgumentDescription.of("Source path"))
+        .argument(StringArgument.of("destination"), ArgumentDescription.of("Destination path"))
+        .flag(
+            manager.flagBuilder("recursive")
+                .withAliases("r")
+                .withDescription(ArgumentDescription.of("Recursive copy"))
+        ).handler(context -> {
+           boolean recursive = context.flags().isPresent("recursive");
+           // ...
+        })
+);
+----
+====
+
+[title=Example of a value flag]
+====
+In this example the flag is constructed outside the command builder,
+and referenced using the flag object itself. Flag objects are also
+reusable across multiple commands (unlike command arguments).
+
+[source,java]
+----
+final CommandFlag<Float> yawFlag = CommandFlag
+    .newBuilder("yaw")
+    .withArgument(FloatArgument.of("yaw"))
+    .build();
+manager.command(
+    manager.commandBuilder("teleport")
+        .argumentTriplet(
+            "vector",
+            Triplet.of("x", "y", "z"),
+            Triplet.of(Double.class, Double.class, Double.class),
+            ArgumentDescription.of("The position to teleport to")
+        )
+        .flag(yawFlag)
+        .handler(context -> {
+            // ...
+            final float yaw = context.flags().getValue(yawFlag, 0f);
+            // ...
+    })
+);
+----
+====
 
 ==== Argument Preprocessing
 
@@ -371,7 +429,7 @@ registered for the caption will have those variables replaced with values
 specific to the parsing instance. `{input}` is accepted by all parser captions,
 and will be replaced with the argument input that caused the exception to be thrown.
 
-[title="Example caption registry usage"]
+[title=Example caption registry usage]
 ====
 [source,java]
 ----
@@ -463,7 +521,7 @@ structure, using the following syntax:
 - required argument: `<name>`
 - optional argument: `[name]`
 
-[title="Example command syntax"]
+[title=Example command syntax]
 ====
 `@CommandMethod("command <foo> [bar]")` would be equivalent to
 [source,java]
@@ -516,7 +574,7 @@ in order to specify the permission required to use the command.
 the builder method, this annotation creates a proxy of the annotated method.
 rather than making the target a proxy.
 
-[title="Example usage of @ProxiedBy"]
+[title=Example usage of @ProxiedBy]
 ====
 [source,java]
 ----
@@ -536,7 +594,7 @@ functionality.
 `@Regex` can be used on command arguments to apply a regex argument
 pre-processor.
 
-[title="Example usage of @Regex"]
+[title=Example usage of @Regex]
 ====
 [source,java]
 ----
@@ -597,7 +655,7 @@ https://javadoc.commandframework.cloud/cloud/commandframework/annotations/inject
 which is available in the command manager. You register a parameter injector for a specific
 type (class), which is essentially a function mapping the command context and an annotation accessor to an injectable value.
 
-[title="Example injector"]
+[title=Example injector]
 ====
 The following is an example from `cloud-annotations` that injects the raw command input
 into string arrays annotated with `@RawArgs`.
@@ -698,9 +756,167 @@ annotationParser.registerPreprocessorMapper(
 
 ==== Bukkit
 
-===== Paper
+Bukkit mappings for cloud. If commodore is present on the classpath and the server is running at least version 1.13+, Brigadier mappings will be available.
 
-===== Brigadier
+To setup a Bukkit command manager, simply do:
+
+[source,java]
+----
+final BukkitCommandManager<YourSender> bukkitCommandManager = new BukkitCommandManager<>(
+    yourPlugin,
+    yourExecutionCoordinator,
+    forwardMapper, <1>
+    backwardsMapper <2>
+);
+----
+<1> The `forwardMapper` is a function that maps your chosen sender type to Bukkit's
+https://jd.bukkit.org/org/bukkit/command/CommandSender.html[CommandSender].
+<2> The `backwardMapper` does the opposite of the `forwardMapper`.
+
+NOTE: In the case that you don't need a custom sender type, you can simply use `CommandSender` as the generic type and pass
+`Function.identity()` as the forward and backward mappers.
+
+===== Commodore
+
+To use commodore, include it as a dependency:
+
+**maven**:
+[source,xml]
+----
+<dependency>
+    <groupId>me.lucko</groupId>
+    <artifactId>commodore</artifactId>
+    <version>1.9</version>
+</dependency>
+----
+
+**gradle (groovy)**
+[source,groovy]
+----
+dependencies {
+    implementation 'me.lucko:commodore:1.9'
+}
+----
+
+Then initialise the commodore mappings using:
+
+[source,java]
+----
+try {
+  bukkitCommandManager.registerBrigadier();
+} catch (final Exception e) {
+  plugin.getLogger().warning("Failed to initialize Brigadier support: " + e.getMessage());
+}
+----
+
+The mappings will then be created and registered automatically whenever a new command is registered.
+
+NOTE: The mapper must be initialized *before* any commands are registered.
+
+You can check whether the running server supports Brigadier, by using `bukkitCommandManager.queryCapability(...)`. When shading Commodore into your plugin, remember to relocate it's classes.
+
+===== Parser
+
+`cloud-bukkit` has plenty of Bukkit-specific parsers. These are easiest found
+via the JavaDocs:
+
+- https://javadoc.commandframework.cloud/cloud/commandframework/bukkit/parsers/package-summary.html
+- https://javadoc.commandframework.cloud/cloud/commandframework/bukkit/parsers/location/package-summary.html
+- https://javadoc.commandframework.cloud/cloud/commandframework/bukkit/parsers/selector/package-summary.html
+
+Many of these are pre-mapped to serializable Brigadier argument types.
+
+==== Paper
+
+`cloud-paper` works on all Bukkit derivatives and has graceful fallbacks for cases where Paper specific features are missing.
+It is initialized the same way as `cloud-bukkit`, except `PaperCommandManager` is used in place of `BukkitCommandManager`.
+When using Paper 1.15+ Brigadier mappings are available even without commodore present.
+
+An example plugin using the `cloud-paper` API can be found
+https://github.com/Sauilitired/cloud/tree/master/examples/example-bukkit[here].
+
+===== Asynchronous completions
+`cloud-paper` supports asynchronous completions when running on Paper.
+First check if the capability is present, by using `paperCommandManager.queryCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)`
+and then initialize the asynchronous completion listener by using `paperCommandManager.registerAsynchronousCompletions()`.
+
+==== Sponge
+
+The Sponge implementation is still a work in progress.
+
+==== Fabric
+
+The Fabric implementation is still a work in progress.
+
+==== minecraft-extras
+
+The `cloud-minecraft-extras` module contains additional opinionated features for the cloud minecraft platforms, taking advantage of the Kyori https://github.com/KyoriPowered/adventure[adventure] api for sending text components to minecraft users. On platforms like Sponge and Velocity which include `adventure-api` as the standard text and user interface library, minecraft-extras can be used with no additional dependencies. On platforms that do not natively support `adventure`, like Bukkit and BungeeCord for example, a platform adapter must be used. Learn more about adventure platform adapters at the https://docs.adventure.kyori.net/platform/index.html[adventure docs].
+
+===== Pre-built exception handlers
+
+Included in minecraft-extras are prebuilt handlers for `ArgumentParseException`, `InvalidCommandSenderException`, `InvalidSyntaxException`, and `NoPermissionException`. These handlers provide improved aesthetics on exception messages, and allow for custom decoration of the messages, for example with a prefix.
+
+Use these exception handlers by creating a new instance of
+https://javadoc.commandframework.cloud/cloud/commandframework/minecraft/extras/MinecraftExceptionHandler.html[`MinecraftExceptionHandler`],
+applying the handlers and decorator you wish to use, and then applying the handlers to the manager.
+
+[title=Usage of the MinecraftExceptionHandler class]
+====
+[source,java]
+----
+new MinecraftExceptionHandler<CommandSender>()
+    .withArgumentParsingHandler()
+    .withInvalidSenderHandler()
+    .withInvalidSyntaxHandler()
+    .withNoPermissionHandler()
+    .withCommandExecutionHandler()
+    .withDecorator(message -> myPrefixComponent.append(Component.space()).append(message))
+    .apply(commandManager, bukkitAudiences::sender); <1>
+----
+<1> `bukkitAudiences::sender` is simply a method mapping the CommandSender to an Audience
+====
+
+===== Minecraft-specific help menu generation
+minecraft-extras includes a utility for generating attractive help menus for your minecraft projects. These help menus include hover and click elements, pagination of results, and customization of colors and text.
+
+To use the minecraft-extras help menu, first create an instance of
+https://javadoc.commandframework.cloud/cloud/commandframework/minecraft/extras/MinecraftHelp.html[`MinecraftHelp`],
+like so:
+
+[source,java]
+----
+new MinecraftHelp<CommandSender>(
+        "/myplugin help", <1>
+        bukkitAudiences::sender, <2>
+        commandManager
+);
+----
+<1> The command which this help menu will be bound to
+<2> Function mapping your CommandSender type to an adventure Audience
+
+To query help and display the results to a user, use the `MinecraftHelp#queryCommands(String, C)` method in the handler for
+your help command. Continuing with the above example, our help command might look something like this:
+
+[source,java]
+----
+manager.command(
+    manager.commandBuilder("myplugin")
+        .literal("help")
+        .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
+        .handler(context -> {
+            minecraftHelp.queryCommands(context.getOrDefault("query", ""), context.getSender());
+        })
+);
+----
+
+Something developers may find desirable as well is to use a custom suggestion provider for the query argument, and to suggest syntax strings gotten from a blank query to `CommandHelpHandler#queryHelp`
+(see
+https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#getCommandHelpHandler()[CommandManager#getCommandHelpHandler]
+and
+https://javadoc.commandframework.cloud/cloud/commandframework/CommandHelpHandler.html#queryHelp(C,java.lang.String)[CommandHelpHandler#queryHelp]
+).
+
+==== Brigadier
 
 https://github.com/Mojang/Brigadier[Brigadier]
 is Mojang's command parser and dispatcher for Minecraft: Java Edition.
@@ -720,16 +936,8 @@ When using Paper/Spigot, this feature is opt-in (refer to the platform documenta
 
 Cloud will try to hook into the Mojang (`net.minecraft.server`) serilizable types. In most cases this works when using the
 platform specific argument types, such as Location.
-You can also create your own mappings. See the platform adapter JavaDoc
-for more information.
-
-==== Sponge
-
-The Sponge implementation is still a work in progress.
-
-==== Fabric
-
-The Fabric implementation is still a work in progress.
+You can also create your own mappings. See the platform adapter JavaDoc for
+more information.
 
 === Discord
 
