@@ -7,6 +7,9 @@ v0.1.0, 2020-12-30
 :toclevels: 4
 :icons: font
 :hide-uri-scheme:
+:source-highlighter: coderay
+:coderay-linenums-mode: inline
+:coderay-css: class
 
 == Introduction to Cloud
 
