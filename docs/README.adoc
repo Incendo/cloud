@@ -2,9 +2,9 @@
 Alexander Söderberg <contact@alexander-soderberg.com>
 v0.1.0, 2020-12-30
 :sectnums:
-:cloud-version: 1.3.0
+:cloud-version: 1.4.0
 :toc: left
-:toclevels: 3
+:toclevels: 4
 :icons: font
 :hide-uri-scheme:
 
@@ -23,6 +23,11 @@ the entire execution path. All of this will be covered in this document.
 This document will first introduce different Cloud concepts using the builder pattern API.
 Section 4 will expand upon this by introducing the annotation (declarative) API, which offers
 another way of declaring commands.
+
+This document will not cover every specific detail of Cloud. Instead, the purpose of
+this document is to give an introduction to various Cloud concepts and explain how they
+can be used to build useful commands. It is very recommended to read the
+https://javadoc.commandframework.cloud[JavaDocs] and use them as the primary source of information.
 
 == Getting Started
 
@@ -74,6 +79,8 @@ cloud-jda:: Cloud implementation for the JDA API.
 cloud-javacord:: Cloud implementation for the Javacord API.
 
 cloud-pircbotx:: Cloud implementation for the PircBotX framework.
+
+cloud-sponge7:: Cloud implementation for Sponge v7.
 
 == Core
 
@@ -288,6 +295,8 @@ commandBuilder.argumentTriplet(
 
 ==== Flags
 
+==== Argument Preprocessing
+
 === Suggestions
 
 === Injection Points
@@ -300,17 +309,85 @@ commandBuilder.argumentTriplet(
 
 === Command Proxies
 
+Command proxying is a feature that allows you to forward a command chain
+to another command chain. More specifically, a "proxy" of a command is a command
+which has all the same required arguments in the same order as in the
+original command. Essentially, they can be thought of as more powerful
+command aliases.
+
+It is easier understood by an example. Imagine you have a warp command in a game,
+let's call it `/game warp me <warp>` but you feel like it's a little too verbose for common use, you may then choose to introduce a
+`/warpme <warp>` command proxy that gets forwarded to the original command.
+
+To create a command proxy you can use
+https://javadoc.commandframework.cloud/cloud/commandframework/Command.Builder.html#proxies(cloud.commandframework.Command)[Command.Builder#proxies(Command)].
+Please not the documentation of the method, which reads:
+
+> Make the current command be a proxy of the supplied command.
+This means that all of the proxied commands variable command arguments will be inserted into this builder instance,
+in the order they are declared in the proxied command. Furthermore, the proxied commands command handler will be showed by the
+command that is currently being built. If the current command builder does not have a permission node set, this too will be copied.
+
 === Permissions
 
 === Exception Handling
+
+In general, it is up to each platform manager to handle command exceptions.
+Command exceptions are thrown whenever a command cannot be executed normally.
+
+This can be for several reasons, such as:
+
+- The command sender does not have the required permission (NoPermissionException)
+- The command sender is of the wrong type (InvalidCommandSenderException)
+- The requested command does not exist (NoSuchCommandException)
+- The provided command input is invalid (InvalidSyntaxException)
+- The input provided to a command argument cannot be parsed (ArgumentParseException)
+
+Generally, the command managers are highly encouraged to make use of
+https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#handleException(C,java.lang.Class,E,java.util.function.BiConsumer)[CommandManager#handleException],
+in which case you may override the exception handling by using
+https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#registerExceptionHandler(java.lang.Class,java.util.function.BiConsumer)[CommandManager#registerExceptionHandler].
+
+ArgumentParseException is a spacial case which makes use of the internal caption
+system. (Nearly) all argument parsers in cloud will throw
+https://javadoc.commandframework.cloud/cloud/commandframework/exceptions/parsing/ParserException.html[ParserException]
+on
+invalid input, in which case you are able to override the exception message by
+configuring the manager's
+https://javadoc.commandframework.cloud/cloud/commandframework/captions/CaptionRegistry.html[CaptionRegistry].
+By default, cloud uses a
+https://javadoc.commandframework.cloud/cloud/commandframework/captions/FactoryDelegatingCaptionRegistry.html[FactoryDelegatingCaptionRegistry],
+which allows you
+to override the exception handling per caption key. All standard caption keys can
+be found in
+https://javadoc.commandframework.cloud/cloud/commandframework/captions/StandardCaptionKeys.html[StandardCaptionKeys].
+Some platform adapters have their own caption key classes as well.
+
+The caption keys have JavaDoc that list their replacement variables. The message
+registered for the caption will have those variables replaced with values
+specific to the parsing instance. `{input}` is accepted by all parser captions,
+and will be replaced with the argument input that caused the exception to be thrown.
+
+[title="Example caption registry usage"]
+====
+[source,java]
+----
+final CaptionRegistry<YourSenderType> registry = manager.getCaptionRegistry();
+if (registry instanceof FactoryDelegatingCaptionRegistry) {
+  final FactoryDelegatingCaptionRegistry<YourSenderType> factoryRegistry = (FactoryDelegatingCaptionRegistry<YourSenderType>) registry;
+  factoryRegistry.registerMessageFactory(
+    StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_BOOLEAN,
+    (context, key) -> "'{input}' är inte ett tillåtet booelskt värde"
+  );
+}
+----
+====
 
 === Command Context
 
 === Command Handler
 
 === Extra
-
-==== Translations
 
 ==== Confirmations
 
@@ -351,6 +428,160 @@ or a `@Confirmation` annotation.
 ==== Help Generation
 
 == Annotations
+
+Annotations allow for an alternative way of declaring commands in cloud. Instead of constructing commands
+using builders, commands consist of annotated instance methods. Command arguments will be bound to the
+method parameters, instead of being retrieved through the command context.
+
+=== Annotation Parser
+
+In order to work with annotated command methods you need to construct an annotation parser.
+Fortunately this is very easy:
+
+[source,java]
+----
+AnnotationParser<C> annotationParser = new AnnotationParser<>(
+    manager, <1>
+    parameters -> SimpleCommandMeta.empty() <2>
+);
+----
+<1> Your command manager instance. Commands parsed by the parser will be automatically registered to this manager.
+<2> A mapping function that maps parser parameters to a command meta instance.
+
+In order to parse commands in a class, simply call `annotationParser.parse(yourInstance)` where `yourInstance` is
+an instance of the class you wish to parse.
+
+=== @CommandMethod
+
+All command methods must be annotated with `@CommandMethod`. The value of the annotation is the command
+structure, using the following syntax:
+
+- literal: `name`
+- required argument: `<name>`
+- optional argument: `[name]`
+
+[title="Example command syntax"]
+====
+`@CommandMethod("command <foo> [bar]")` would be equivalent to
+[source,java]
+----
+builder.literal("command")
+    .argument(SomeArgument.of("foo"))
+    .argument(SomeArgument.optional("bar"));
+----
+====
+
+`@CommandMethod` cannot be put on static methods.
+
+=== @Argument
+
+In order to map command arguments to command parameters you need to annotate your parameters with
+`@Argument`. The value of the annotation is the name of the argument, and should correspond to
+the name used in the command syntax in `@CommandMethod`.
+
+Ordering of the methods arguments does not matter,
+instead Cloud will match arguments based on the names supplied to the annotation. This also means that
+Cloud doesn't care about the names of the method parameters.
+
+You may also specify a named argument parser, named suggestions provider, default value
+and description using the `@Argument` annotation.
+
+=== @Flag
+
+Flags can be used in annotated command methods by decorating the method parameter with
+`@Flag`. Similarly to `@Argument`, this annotation can be used to specify suggestion
+providers, parsers, etc.
+
+If a boolean is annotated with `@Flag`, the flag will become a presence flag. Otherwise
+it will become a value flag, with the parameter type as the type of the flag value.
+
+WARNING: `@Flag` should NOT be used together with `@Argument`. Nor should flags be included
+in the `@CommandMethod` syntax string.
+
+=== @CommandDescription
+
+`@CommandDescription` can be put on command methods to specify the description of the command.
+
+=== @CommandPermission
+
+`@CommandPermission` can be put on either a command method or a class containing command methods
+in order to specify the permission required to use the command.
+
+=== @ProxiedBy
+
+`@ProxiedBy` lets you define command proxies on top of command methods. Unlike
+the builder method, this annotation creates a proxy of the annotated method.
+rather than making the target a proxy.
+
+[title="Example usage of @ProxiedBy"]
+====
+[source,java]
+----
+@ProxiedBy("warpme")
+@CommandMethod("game warp me <warp>")
+public void warpMe(final @NonNull GamePlayer player, final @NonNull @Argument("warp") Warp warp) {
+    player.teleport(warp);
+}
+----
+
+This method will generate two commands: `/game warp me <warp>` and `/warpme`, with identical
+functionality.
+====
+
+=== @Regex
+
+`@Regex` can be used on command arguments to apply a regex argument
+pre-processor.
+
+[title="Example usage of @Regex"]
+====
+[source,java]
+----
+@Argument("money") @Regex(
+    value = "(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$",
+    failureCaption = "regex.money"
+) String money
+----
+====
+
+=== @Parser
+
+`@Parser` can be used to create argument parsers from instance methods.
+The annotation value is the name of the parser. If no name is supplied,
+the parser will be registered as the default parser for the method's
+return type.
+
+The signature of the method should be:
+[source,java]
+----
+@Parser("name")
+public ParsedType methodName(CommandContext<YourSender> sender, Queue<String> input) {
+}
+----
+
+The method can throw exceptions, and the thrown exceptions will automatically
+be wrapped in an argument parse result.
+
+It is also possibly to specify the suggestions provider that should be used by
+default by the generated parser. This is done by specifying a name in the annotation,
+such as `@Parser(suggestions="yourSuggestionsProvider")`. For this to work
+the suggestion provider must be registered in the parser registry.
+
+=== @Suggestions
+
+`@Suggestions` can be used to create suggestion provider from instance methods.
+The annotation value is the name of the suggestions provider.
+
+The signature of the method should be:
+[source,java]
+----
+@Suggestions("name")
+public List<String> methodName(CommandContext<YourSender> sender, String input) {
+}
+----
+
+`@Suggestions`
+generated suggestion providers will be automatically registered to the parser registry.
 
 === Injections
 
@@ -403,6 +634,59 @@ public class YourInjectionService<C> implements InjectionService<C> {
 and then register it to the parameter injection registry using
 `manager.parameterInjectionRegistry().registerInjectionService(new YourInjectionService<>())`.
 
+=== Builder Modifiers
+
+Builder modifiers allow you to register annotations that can effect how a
+`@CommandMethod` based command is generated.
+
+Builder modifiers are allowed to
+act on command builders after all arguments have been added to the builder.
+This allows for modifications to the builder instance before the command is
+registered to the command manager.
+
+Builder modifiers are registered to the annotation parser:
+[source,java]
+----
+annotationParser.registerBuilderModifier(
+    YourAnnotation.class, <1>
+    (yourAnnotation, builder) -> builder.meta("key", "value") <2>
+);
+----
+<1> The modifier receives the instance of the method annotation.
+<2> The modifier method must necessarily return the modified builder. Command
+builders immutable, so the modifier should return the instance of the command
+builder that is returned as the result of any operations on the builder.
+
+=== Annotation Mappers
+
+Annotation mappers allow you to register custom annotations that will
+modify the parser parameters for a command argument. This allows you to
+modify how the command parser is generated for a command based on the
+annotation.
+
+Annotation mappers are registered to the annotation parser:
+[source,java]
+----
+annotationParser.registerAnnotationMapper(
+    YourAnnotation.class,
+    (yourAnnotation) -> ParserParameters.single(StandardParameters.RANGE_MIN, 10)
+);
+----
+
+=== Pre-processor Mappers
+
+It is possible to register annotations that will bind a given argument pre-processor
+to the annotated argument.
+
+Pre-processor mappers are registered to the annotation parser:
+[source,java]
+----
+annotationParser.registerPreprocessorMapper(
+    YourAnnotation.class,
+    annotation -> yourPreProcessor
+);
+----
+
 == Kotlin DSL
 
 == Platforms
@@ -414,6 +698,27 @@ and then register it to the parameter injection registry using
 ===== Paper
 
 ===== Brigadier
+
+https://github.com/Mojang/Brigadier[Brigadier]
+is Mojang's command parser and dispatcher for Minecraft: Java Edition.
+It was released in version 1.13, and is available in notchain
+servers and clients released since. The most notable feature of Brigadier
+is the real-time argument parsing and feedback system, which allows you
+to see whether your argument is valid, while writing it. This feature
+works for the primitive Java types, and some serializable types in the
+Minecraft: Java Edition client.
+
+Cloud has Brigadier hooks for: Velocity 1.10+, Paper 1.15+ (1.13+ using
+https://github.com/lucko/commodore[commodore]),
+Spigot 1.13 using
+https://github.com/lucko/commodore[commodore],
+and Sponge v8+.
+When using Paper/Spigot, this feature is opt-in (refer to the platform documentation for more information).
+
+Cloud will try to hook into the Mojang (`net.minecraft.server`) serilizable types. In most cases this works when using the
+platform specific argument types, such as Location.
+You can also create your own mappings. See the platform adapter JavaDoc
+for more information.
 
 ==== Sponge
 
