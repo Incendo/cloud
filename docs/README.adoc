@@ -296,6 +296,108 @@ commandBuilder.argumentTriplet(
 
 ==== Custom
 
+Cloud allows you to create custom argument parsers. The easiest way to achieve this
+is by extending `CommandArgument<C, YourType>`. This is recommended if you are creating
+arguments that will be exposed in some kind of library. For inspiration on how
+to achieve this, it is recommended to check out the standard Cloud arguments.
+
+If you don't need to expose your parser as a part of an API, you may simply
+implement `ArgumentParser<C, YourType>`. The method you will be working with
+looks like:
+
+[source,java]
+----
+public @NonNull ArgumentParseResult<YourType> parse(
+            @NonNull CommandContext<@NonNull C> commandContext,
+            @NonNull Queue<@NonNull String> inputQueue <1>
+) {
+    // ...
+}
+----
+<1> Queue containing (remaining) user input.
+
+When reading an argument you should do the following:
+
+1. Peek the queue.
+2. Attempt to parse your object.
+    * If the object could not be parsed, return `ArgumentParseResult.failure(exception)`
+3. If the object was parsed successfully, pop a string from the queue.
+4. Return `ArgumentParseResult.success(object)`.
+
+WARNING: If the read string(s) isn't popped from the queue, then the command engine will assume that the syntax is wrong and
+send an error message to the command sender.
+
+It is highly recommended to make use of
+https://javadoc.commandframework.cloud/cloud/commandframework/exceptions/parsing/ParserException.html[ParserException]
+when returning a failed result. This allows for integration with the Cloud caption system (refer to the section on Exception
+Handling for more information).
+
+You should - in most cases - register your parser to the
+https://javadoc.commandframework.cloud/cloud/commandframework/arguments/parser/ParserRegistry.html[ParserRegistry]
+which you can access using
+https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#getParserRegistry()[CommandManager#getParserRegistry()].
+If you are registering a parser that shouldn't be the default for the
+argument type, then it is recommended to register a named parser.
+If your parser is not registered to the parser registry, it will
+not be usable in annotated command methods.
+
+When registering a command parser, you're actually registering a
+function that will generate a parser based on parser parameters.
+These parameters can be used together with the annotation system
+to differentiate between different parsers and also change parser
+settings. In order to create these parameters you can create
+an annotation mapper using
+https://javadoc.commandframework.cloud/cloud/commandframework/arguments/parser/ParserRegistry.html#registerAnnotationMapper(java.lang.Class,java.util.function.BiFunction)[ParserRegistry#registerAnnotationMapper].
+
+Here's an example of how a UUID parser can be created and registered:
+
+[title=Example UUID parser]
+====
+This example is taken from
+https://github.com/Incendo/cloud/blob/master/cloud-core/src/main/java/cloud/commandframework/arguments/standard/UUIDArgument.java[UUIDArgument.java]
+, which also includes a custom exception and argument builder.
+It's a good reference class for custom arguments, as it does
+not contain any complicated logic.
+
+[source,java]
+----
+public final class UUIDParser<C> implements ArgumentParser<C, UUID> {
+
+    @Override
+    public @NonNull ArgumentParseResult<UUID> parse(
+            final String input = inputQueue.peek();
+            if (input == null) {
+                return ArgumentParseResult.failure(new  NoInputProvidedException(
+                        UUIDParser.class,
+                        commandContext
+                ));
+            }
+
+            try {
+                UUID uuid = UUID.fromString(input);
+                inputQueue.remove();
+                return ArgumentParseResult.success(uuid);
+            } catch(final IllegalArgumentException e) {
+                return ArgumentParseResult.failure(new UUIDParseException(input, commandContext));
+            }
+    )
+
+}
+----
+
+It is then registered to the parser registry using
+[source,java]
+----
+parserRegistry.registerParserSupplier(
+    TypeToken.get(UUID.class),
+    options -> new UUIDParser<>()
+);
+----
+in
+https://github.com/Incendo/cloud/blob/master/cloud-core/src/main/java/cloud/commandframework/arguments/parser/StandardParserRegistry.java[StandardParserRegistry.java].
+
+====
+
 ==== Flags
 
 Flags are named optional values that can either have an associated argument (value flag) or have the value evaluated by whether the flag is present (presence flag). These flags are registered much the same way as normal arguments, only that you use `.flag` methods in the command builder instead.
@@ -358,15 +460,117 @@ manager.command(
 
 ==== Argument Preprocessing
 
+An argument preprocessor is a function that gets to act on command
+input before it's given to a command. This allows you to inject
+custom verification behaviour into existing parsers, or register
+annotations that add extra verification to your custom annotations.
+
+https://github.com/Incendo/cloud/blob/master/cloud-core/src/main/java/cloud/commandframework/arguments/preprocessor/RegexPreprocessor.java[RegexPreprocessor.java]
+is a good example of a preprocessor that allows you to add regular
+expression checking to your arguments.
+
+Argument preprocessors can be applied to created arguments using
+https://javadoc.commandframework.cloud/cloud/commandframework/arguments/CommandArgument.html#addPreprocessor(java.util.function.BiFunction)[CommandArgument#addPreprocessor].
+
 === Suggestions
+
+Many platforms support command suggestions. You can add command suggestions to your command parser, by overriding the suggestion
+method:
+
+[source,java]
+----
+@Override
+public @NonNull List<@NonNull String> suggestions(
+        final @NonNull CommandContext<C> commandContext,
+        final @NonNull String input
+) {
+    final List<String> completions = new ArrayList<>();
+    for (Material value : Material.values()) {
+        completions.add(value.name().toLowerCase());
+    }
+    return completions;
+}
+----
+
+or by specifying a suggestion function in a command argument builder
+using
+https://javadoc.commandframework.cloud/cloud/commandframework/arguments/CommandArgument.Builder.html#withSuggestionsProvider(java.util.function.BiFunction)[CommandArgument.Builder#withSuggestionProvider].
+
+You also register a standalone suggestions to the parser registry,
+using
+https://javadoc.commandframework.cloud/cloud/commandframework/arguments/parser/ParserRegistry.html#registerSuggestionProvider(java.lang.String,java.util.function.BiFunction)[ParserRegistry#registerSuggestionProvider].
+Registering a named suggestion provider allows it to be used in
+annotated command methods, or retrieved using `ParserRegistry#getSuggestionProvider`.
 
 === Injection Points
 
+image::image-2021-01-18-16-23-02-480.png[Execution Pipeline]
+
+When a command is entered by a command sender, it goes through
+the following stages:
+
+1. It is turned into string tokens. This is used to create the input queue.
+2. A command context is created for the input queue combined with the command sender.
+3. The command is passed to the preprocessors, which may alter the input queue or write to the context.
+    * If a preprocessor causes an interrupt using `ConsumerService.interrupt()` then the context will be filtered out and the
+command will not be parsed.
+    * If no preprocessor filters out the context, the context and input will be ready to be parsed into an executable command.
+4. The input is parsed into a command chain and components are written
+to the context.
+    * If the command does not fit any existing command chains, the sender is notified and the parsing is cancelled.
+    * If the command is valid, it will be sent to the postprocessors.
+5. The command postprocessors get to act on the command can alter the command context. they may now postpone command execution,
+such is the case with the command confirmation postprocessor.
+    * If a postprocessor causes an interrupt using `ConsumerService.interupt()` the command will not be executed.
+    * If no postprocessor interrupts during the post-processing stage, the command will be sent to the executor.
+6. The command is executed using the command executor.
+
 ==== Preprocessing
+
+Command preprocessing happens before the input has been pasted to the command tree for parsing. To register a preprocessor, implement `cloud.commandframework.execution.preprocessor.CommandPreProcessor`:
+
+[source,java]
+----
+public class YourPreProcessor<C> implements CommandPreprocessor<C> {
+
+    @Override
+    public void accept(final CommandPreprocessingContext<C> context) {
+        /* Act on the context */
+        if (yourCondition) {
+            /* Filter out the context so that it is never passed to the parser */
+            ConsumerService.interrupt();
+        }
+    }
+
+}
+----
+
+Then register the preprocessor using `CommandManager#registerCommandPreProcessor(CommandPreprocessor<C>)`.
 
 ==== Postprocessing
 
+Command postprocessing happen after the input has been parsed into a command chain, but before the command is executed. To register a postprocessor, implement `cloud.commandframework.execution.postprocessor.CommandPostProcessor`:
+
+[source,java]
+----
+public class YourPostprocessor<C> implements CommandPostprocessor<C> {
+
+    @Override
+    public void accept(final CommandPostprocessingContext<C> context) {
+        /* Act on the context */
+        if (yourCondition) {
+            /* Filter out the context so that it is never passed to the executor */
+            ConsumerService.interrupt();
+        }
+    }
+
+}
+----
+
+Then register the postprocessor using `CommandManager#registerCommandPostProcessor(CommandPostprocessor<C>)`.
+
 === Execution Coordinators
+TODO
 
 === Command Proxies
 
@@ -390,6 +594,7 @@ in the order they are declared in the proxied command. Furthermore, the proxied 
 command that is currently being built. If the current command builder does not have a permission node set, this too will be copied.
 
 === Permissions
+TODO
 
 === Exception Handling
 
@@ -444,10 +649,6 @@ if (registry instanceof FactoryDelegatingCaptionRegistry) {
 ----
 ====
 
-=== Command Context
-
-=== Command Handler
-
 === Extra
 
 ==== Confirmations
@@ -487,6 +688,7 @@ that require confirmation needs `.meta(CommandConfirmationManager.META_CONFIRMAT
 or a `@Confirmation` annotation.
 
 ==== Help Generation
+TODO
 
 == Annotations
 
@@ -749,6 +951,7 @@ annotationParser.registerPreprocessorMapper(
 ----
 
 == Kotlin DSL
+TODO
 
 == Platforms
 
@@ -842,7 +1045,7 @@ and then initialize the asynchronous completion listener by using `paperCommandM
 
 ==== Sponge
 
-The Sponge implementation is still a work in progress.
+TODO
 
 ==== Fabric
 
@@ -940,12 +1143,16 @@ You can also create your own mappings. See the platform adapter JavaDoc for
 more information.
 
 === Discord
+TODO
 
 ==== JDA
+TODO
 
 ==== Javacord
+TODO
 
 === IRC
+TODO
 
 [glossary]
 == Glossary
