@@ -23,16 +23,12 @@
 //
 package cloud.commandframework.bukkit;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.server.TabCompleteEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
 
 final class CloudBukkitListener<C> implements Listener {
 
