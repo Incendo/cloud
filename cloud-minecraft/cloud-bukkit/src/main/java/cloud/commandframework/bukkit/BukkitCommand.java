@@ -77,6 +77,22 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     @Override
+    public List<String> tabComplete(
+            final @NonNull CommandSender sender,
+            final @NonNull String alias,
+            final @NonNull String @NonNull [] args
+    ) throws IllegalArgumentException {
+        final StringBuilder builder = new StringBuilder(this.command.getName());
+        for (final String string : args) {
+            builder.append(" ").append(string);
+        }
+        return this.manager.suggest(
+                this.manager.getCommandSenderMapper().apply(sender),
+                builder.toString()
+        );
+    }
+
+    @Override
     public boolean execute(
             final @NonNull CommandSender commandSender,
             final @NonNull String s,
