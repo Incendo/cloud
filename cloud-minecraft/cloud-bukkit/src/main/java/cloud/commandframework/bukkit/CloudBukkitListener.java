@@ -42,37 +42,6 @@ final class CloudBukkitListener<C> implements Listener {
         this.bukkitCommandManager = bukkitCommandManager;
     }
 
-    @EventHandler
-    void onTabCompletion(final @NonNull TabCompleteEvent event) {
-        if (event.getBuffer().isEmpty()) {
-            return;
-        }
-
-        @SuppressWarnings("unchecked")
-        final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
-                (BukkitPluginRegistrationHandler<C>) this.bukkitCommandManager.getCommandRegistrationHandler();
-
-        /* Turn '(/)plugin:command arg1 arg2 ...' into 'plugin:command' */
-        final String commandLabel = (event.getBuffer().startsWith("/")
-                ? event.getBuffer().substring(1)
-                : event.getBuffer())
-                .split(" ")[0];
-        if (!bukkitPluginRegistrationHandler.isRecognized(commandLabel)) {
-            return;
-        }
-
-        final CommandSender sender = event.getSender();
-        final C cloudSender = this.bukkitCommandManager.getCommandSenderMapper().apply(sender);
-        final String inputBuffer = this.bukkitCommandManager.stripNamespace(event.getBuffer());
-
-        final List<String> suggestions = new ArrayList<>(this.bukkitCommandManager.suggest(
-                cloudSender,
-                inputBuffer
-        ));
-
-        event.setCompletions(suggestions);
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     void onPlayerLogin(final @NonNull PlayerLoginEvent event) {
         /* If the server is brigadier-capable, any registration after players
