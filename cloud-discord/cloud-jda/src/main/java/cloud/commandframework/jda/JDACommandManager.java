@@ -108,7 +108,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
         this.getParserRegistry().registerParserSupplier(TypeToken.get(User.class), parserParameters ->
                 new UserArgument.UserParser<>(
                         new HashSet<>(Arrays.asList(UserArgument.ParserMode.values())),
-                        UserArgument.Isolation.GUILD
+                        UserArgument.Isolation.GLOBAL
                 ));
         this.getParserRegistry().registerParserSupplier(TypeToken.get(MessageChannel.class), parserParameters ->
                 new ChannelArgument.MessageParser<>(
