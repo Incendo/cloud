@@ -182,6 +182,18 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
          * Construct a new argument parser for {@link User}
          *
          * @param modes List of parsing modes to use when parsing
+         * @throws java.lang.IllegalArgumentException If no parsing modes were provided
+         * @deprecated Use {@link #UserParser(Set, Isolation)} instead.
+         */
+        @Deprecated
+        public UserParser(final @NonNull Set<ParserMode> modes) {
+            this(modes, Isolation.GLOBAL);
+        }
+
+        /**
+         * Construct a new argument parser for {@link User}
+         *
+         * @param modes          List of parsing modes to use when parsing
          * @param isolationLevel Level of isolation to maintain when parsing
          * @throws java.lang.IllegalArgumentException If no parsing modes were provided
          */
