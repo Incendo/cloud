@@ -121,7 +121,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     public static final class Builder<C> extends CommandArgument.Builder<C, User> {
 
         private Set<ParserMode> modes = new HashSet<>();
-        private Isolation isolationLevel = Isolation.GUILD;
+        private Isolation isolationLevel = Isolation.GLOBAL;
 
         private Builder(final @NonNull String name) {
             super(User.class, name);
