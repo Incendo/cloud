@@ -28,15 +28,18 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Command Argument for {@link User}
@@ -48,13 +51,16 @@ import java.util.Set;
 public final class UserArgument<C> extends CommandArgument<C, User> {
 
     private final Set<ParserMode> modes;
+    private final Isolation isolationLevel;
 
     private UserArgument(
             final boolean required, final @NonNull String name,
-            final @NonNull Set<ParserMode> modes
+            final @NonNull Set<ParserMode> modes,
+            final @NonNull Isolation isolationLevel
     ) {
-        super(required, name, new UserParser<>(modes), User.class);
+        super(required, name, new UserParser<>(modes, isolationLevel), User.class);
         this.modes = modes;
+        this.isolationLevel = isolationLevel;
     }
 
     /**
@@ -106,10 +112,16 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         NAME
     }
 
+    public enum Isolation {
+        GLOBAL,
+        GUILD
+    }
+
 
     public static final class Builder<C> extends CommandArgument.Builder<C, User> {
 
         private Set<ParserMode> modes = new HashSet<>();
+        private Isolation isolationLevel = Isolation.GUILD;
 
         private Builder(final @NonNull String name) {
             super(User.class, name);
@@ -138,13 +150,24 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         }
 
         /**
+         * Set the isolation level of the parser
+         *
+         * @param isolation Isolation level
+         * @return Builder instance
+         */
+        public @NonNull Builder<C> withIsolationLevel(final @NonNull Isolation isolation) {
+            this.isolationLevel = isolation;
+            return this;
+        }
+
+        /**
          * Builder a new example component
          *
          * @return Constructed component
          */
         @Override
         public @NonNull UserArgument<C> build() {
-            return new UserArgument<>(this.isRequired(), this.getName(), modes);
+            return new UserArgument<>(this.isRequired(), this.getName(), modes, isolationLevel);
         }
 
     }
@@ -153,19 +176,22 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     public static final class UserParser<C> implements ArgumentParser<C, User> {
 
         private final Set<ParserMode> modes;
+        private final Isolation isolationLevel;
 
         /**
          * Construct a new argument parser for {@link User}
          *
          * @param modes List of parsing modes to use when parsing
-         * @throws java.lang.IllegalStateException If no parsing modes were provided
+         * @param isolationLevel Level of isolation to maintain when parsing
+         * @throws java.lang.IllegalArgumentException If no parsing modes were provided
          */
-        public UserParser(final @NonNull Set<ParserMode> modes) {
+        public UserParser(final @NonNull Set<ParserMode> modes, final @NonNull Isolation isolationLevel) {
             if (modes.isEmpty()) {
                 throw new IllegalArgumentException("At least one parsing mode is required");
             }
 
             this.modes = modes;
+            this.isolationLevel = isolationLevel;
         }
 
         @Override
@@ -181,7 +207,13 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 ));
             }
 
-            final JDA jda = commandContext.get("JDA");
+            if (!commandContext.contains("MessageReceivedEvent")) {
+                return ArgumentParseResult.failure(new IllegalStateException(
+                        "MessageReceivedEvent was not in the command context."
+                ));
+            }
+
+            final MessageReceivedEvent event = commandContext.get("MessageReceivedEvent");
             Exception exception = null;
 
             if (modes.contains(ParserMode.MENTION)) {
@@ -194,7 +226,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     }
 
                     try {
-                        final ArgumentParseResult<User> result = this.userFromId(jda, input, id);
+                        final ArgumentParseResult<User> result = this.userFromId(event, input, id);
                         inputQueue.remove();
                         return result;
                     } catch (final UserNotFoundParseException | NumberFormatException e) {
@@ -209,7 +241,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
             if (modes.contains(ParserMode.ID)) {
                 try {
-                    final ArgumentParseResult<User> result = this.userFromId(jda, input, input);
+                    final ArgumentParseResult<User> result = this.userFromId(event, input, input);
                     inputQueue.remove();
                     return result;
                 } catch (final UserNotFoundParseException | NumberFormatException e) {
@@ -218,7 +250,19 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             }
 
             if (modes.contains(ParserMode.NAME)) {
-                final List<User> users = jda.getUsersByName(input, true);
+                final List<User> users;
+
+                if (isolationLevel == Isolation.GLOBAL) {
+                    users = event.getJDA().getUsersByName(input, true);
+                } else if (event.isFromGuild()) {
+                    users = event.getGuild().getMembersByEffectiveName(input, true)
+                            .stream().map(Member::getUser)
+                            .collect(Collectors.toList());
+                } else if (event.getAuthor().getName().equalsIgnoreCase(input)) {
+                    users = Collections.singletonList(event.getAuthor());
+                } else {
+                    users = Collections.emptyList();
+                }
 
                 if (users.size() == 0) {
                     exception = new UserNotFoundParseException(input);
@@ -240,11 +284,23 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         }
 
         private @NonNull ArgumentParseResult<User> userFromId(
-                final @NonNull JDA jda, final @NonNull String input,
+                final @NonNull MessageReceivedEvent event,
+                final @NonNull String input,
                 final @NonNull String id
         )
                 throws UserNotFoundParseException, NumberFormatException {
-            final User user = jda.getUserById(id);
+            final User user;
+            if (isolationLevel == Isolation.GLOBAL) {
+                user = event.getJDA().getUserById(id);
+            } else if (event.isFromGuild()) {
+                Member member = event.getGuild().getMemberById(id);
+
+                user = member != null ? member.getUser() : null;
+            } else if (event.getAuthor().getId().equalsIgnoreCase(id)) {
+                user = event.getAuthor();
+            } else {
+                user = null;
+            }
 
             if (user == null) {
                 throw new UserNotFoundParseException(input);
