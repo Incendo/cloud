@@ -6,8 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+ - JDA Role argument parser
+
 ### Changed
  - Use Command instead of TabCompleteEvent on Bukkit
+ - Add isolation system to JDA user argument
+
+### Deprecated
+ - Deprecated old JDA UserParser that did not take an isolation parameter 
 
 ## [1.4.0] - 2021-01-16
 
