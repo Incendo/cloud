@@ -182,9 +182,9 @@ public class CommandConfirmationManager<C> {
                 return;
             }
             /* Add it to the "queue" */
-            addPending(context);
+            CommandConfirmationManager.this.addPending(context);
             /* Notify the consumer that a confirmation is required */
-            notifyConsumer(context);
+            CommandConfirmationManager.this.notifyConsumer(context);
             /* Interrupt */
             ConsumerService.interrupt();
         }

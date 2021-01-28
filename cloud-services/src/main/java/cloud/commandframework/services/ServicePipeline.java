@@ -76,7 +76,7 @@ public final class ServicePipeline {
             final @NonNull Service<@NonNull Context, @NonNull Result> defaultImplementation
     ) {
         synchronized (this.lock) {
-            if (repositories.containsKey(type.getType())) {
+            if (this.repositories.containsKey(type.getType())) {
                 throw new IllegalArgumentException(String
                         .format(
                                 "Service of type '%s' has already been registered",
@@ -151,7 +151,7 @@ public final class ServicePipeline {
             final @NonNull Collection<Predicate<Context>> filters
     ) {
         synchronized (this.lock) {
-            final ServiceRepository<Context, Result> repository = getRepository(type);
+            final ServiceRepository<Context, Result> repository = this.getRepository(type);
             repository.registerImplementation(implementation, filters);
         }
         return this;
@@ -175,7 +175,7 @@ public final class ServicePipeline {
             final @NonNull Service<Context, Result> implementation,
             final @NonNull Collection<Predicate<Context>> filters
     ) {
-        return registerServiceImplementation(TypeToken.get(type), implementation, filters);
+        return this.registerServiceImplementation(TypeToken.get(type), implementation, filters);
     }
 
     /**
@@ -229,7 +229,7 @@ public final class ServicePipeline {
     public <Context, Result, S extends Service<Context, Result>> Collection<TypeToken<? extends S>> getImplementations(
             final @NonNull TypeToken<S> type
     ) {
-        ServiceRepository<Context, Result> repository = getRepository(type);
+        ServiceRepository<Context, Result> repository = this.getRepository(type);
         List<TypeToken<? extends S>> collection = new LinkedList<>();
         final LinkedList<? extends ServiceRepository<Context, Result>.ServiceWrapper<? extends Service<Context, Result>>>
                 queue = repository.getQueue();

@@ -488,7 +488,7 @@ public final class CloudBrigadierManager<C, S> {
 
             for (final CommandTree.Node<CommandArgument<C, ?>> node : root.getChildren()) {
                 argumentBuilders[parsers.length - 1]
-                        .then(constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
+                        .then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
             }
 
             return argumentBuilders[0];
@@ -536,7 +536,7 @@ public final class CloudBrigadierManager<C, S> {
             argumentBuilder.executes(executor);
         }
         for (final CommandTree.Node<CommandArgument<C, ?>> node : root.getChildren()) {
-            argumentBuilder.then(constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
+            argumentBuilder.then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
         }
         return argumentBuilder;
     }

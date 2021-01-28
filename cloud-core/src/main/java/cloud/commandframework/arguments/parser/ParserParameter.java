@@ -79,13 +79,13 @@ public class ParserParameter<T> {
             return false;
         }
         final ParserParameter<?> that = (ParserParameter<?>) o;
-        return Objects.equals(key, that.key)
-                && Objects.equals(expectedType, that.expectedType);
+        return Objects.equals(this.key, that.key)
+                && Objects.equals(this.expectedType, that.expectedType);
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(key, expectedType);
+        return Objects.hash(this.key, this.expectedType);
     }
 
 }

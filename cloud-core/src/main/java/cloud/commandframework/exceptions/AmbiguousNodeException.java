@@ -92,9 +92,9 @@ public final class AmbiguousNodeException extends IllegalStateException {
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder("Ambiguous Node: ")
-                .append(ambiguousNode.getName())
+                .append(this.ambiguousNode.getName())
                 .append(" cannot be added as a child to ")
-                .append(parentNode == null ? "<root>" : parentNode.getName())
+                .append(this.parentNode == null ? "<root>" : this.parentNode.getName())
                 .append(" (All children: ");
         final Iterator<CommandArgument<?, ?>> childIterator = this.children.iterator();
         while (childIterator.hasNext()) {

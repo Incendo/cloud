@@ -132,7 +132,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
                                     CommandExecutionException.class,
                                     (CommandExecutionException) throwable, (c, e) -> {
                                         commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
-                                        manager.getOwningPlugin().getLogger().error(
+                                        this.manager.getOwningPlugin().getLogger().error(
                                                 "Exception executing command handler",
                                                 finalThrowable.getCause()
                                         );
@@ -140,7 +140,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
                             );
                         } else {
                             commandSender.sendMessage(MESSAGE_INTERNAL_ERROR);
-                            manager.getOwningPlugin().getLogger().error(
+                            this.manager.getOwningPlugin().getLogger().error(
                                     "An unhandled exception was thrown during command execution",
                                     throwable
                             );
