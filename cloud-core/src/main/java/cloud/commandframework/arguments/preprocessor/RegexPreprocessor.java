@@ -96,7 +96,7 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
                     context
             ));
         }
-        if (predicate.test(head)) {
+        if (this.predicate.test(head)) {
             return ArgumentParseResult.success(true);
         }
         return ArgumentParseResult.failure(

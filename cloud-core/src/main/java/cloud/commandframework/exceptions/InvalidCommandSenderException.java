@@ -88,7 +88,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
         return String.format(
                 "%s is not allowed to execute that command. Must be of type %s",
                 getCommandSender().getClass().getSimpleName(),
-                requiredSender.getSimpleName()
+                this.requiredSender.getSimpleName()
         );
     }
 

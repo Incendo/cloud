@@ -49,7 +49,7 @@ final class BungeeCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store(BungeeContextKeys.PROXY_SERVER_KEY, mgr.getOwningPlugin().getProxy());
+        context.getCommandContext().store(BungeeContextKeys.PROXY_SERVER_KEY, this.mgr.getOwningPlugin().getProxy());
     }
 
 }

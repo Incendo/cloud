@@ -96,7 +96,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
      * @return List of Modes
      */
     public @NotNull Set<ParserMode> getModes() {
-        return modes;
+        return this.modes;
     }
 
 
@@ -133,7 +133,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
          */
         @Override
         public @NonNull RoleArgument<C> build() {
-            return new RoleArgument<>(this.isRequired(), this.getName(), modes);
+            return new RoleArgument<>(this.isRequired(), this.getName(), this.modes);
         }
 
     }
@@ -183,7 +183,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                 return ArgumentParseResult.failure(new IllegalArgumentException("Role arguments can only be parsed in guilds"));
             }
 
-            if (modes.contains(ParserMode.MENTION)) {
+            if (this.modes.contains(ParserMode.MENTION)) {
                 if (input.startsWith("<@&") && input.endsWith(">")) {
                     final String id = input.substring(3, input.length() - 1);
 
@@ -201,7 +201,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                 }
             }
 
-            if (modes.contains(ParserMode.ID)) {
+            if (this.modes.contains(ParserMode.ID)) {
                 try {
                     final ArgumentParseResult<Role> result = this.roleFromId(event, input, input);
                     inputQueue.remove();
@@ -211,7 +211,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                 }
             }
 
-            if (modes.contains(ParserMode.NAME)) {
+            if (this.modes.contains(ParserMode.NAME)) {
                 final List<Role> roles = event.getGuild().getRolesByName(input, true);
 
                 if (roles.size() == 0) {
@@ -271,7 +271,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
          * @return users input
          */
         public final @NonNull String getInput() {
-            return input;
+            return this.input;
         }
 
     }

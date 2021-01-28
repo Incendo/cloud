@@ -54,7 +54,7 @@ final class CloudListenerAdapter<C> extends ListenerAdapter {
             return;
         }
         final C sender = this.manager.getUserMapper().apply(event.getUser());
-        manager.executeCommand(sender, message.substring(this.manager.getCommandPrefix().length()))
+        this.manager.executeCommand(sender, message.substring(this.manager.getCommandPrefix().length()))
                 .whenComplete((commandResult, throwable) -> {
                     if (throwable == null) {
                         return;

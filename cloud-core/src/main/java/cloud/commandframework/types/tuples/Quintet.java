@@ -137,16 +137,16 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
             return false;
         }
         final Quintet<?, ?, ?, ?, ?> quintet = (Quintet<?, ?, ?, ?, ?>) o;
-        return Objects.equals(getFirst(), quintet.getFirst())
-                && Objects.equals(getSecond(), quintet.getSecond())
-                && Objects.equals(getThird(), quintet.getThird())
-                && Objects.equals(getFourth(), quintet.getFourth())
-                && Objects.equals(getFifth(), quintet.getFifth());
+        return Objects.equals(this.getFirst(), quintet.getFirst())
+                && Objects.equals(this.getSecond(), quintet.getSecond())
+                && Objects.equals(this.getThird(), quintet.getThird())
+                && Objects.equals(this.getFourth(), quintet.getFourth())
+                && Objects.equals(this.getFifth(), quintet.getFifth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getFirst(), getSecond(), getThird(), getFourth(), getFifth());
+        return Objects.hash(this.getFirst(), this.getSecond(), this.getThird(), this.getFourth(), this.getFifth());
     }
 
     @Override

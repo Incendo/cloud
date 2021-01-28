@@ -462,12 +462,12 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return false;
         }
         final CommandArgument<?, ?> that = (CommandArgument<?, ?>) o;
-        return isRequired() == that.isRequired() && Objects.equals(getName(), that.getName());
+        return this.isRequired() == that.isRequired() && Objects.equals(this.getName(), that.getName());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(isRequired(), getName());
+        return Objects.hash(this.isRequired(), this.getName());
     }
 
     @Override
@@ -693,7 +693,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          */
         public @NonNull CommandArgument<@NonNull C, @NonNull T> build() {
             if (this.parser == null && this.manager != null) {
-                this.parser = this.manager.getParserRegistry().createParser(valueType, ParserParameters.empty())
+                this.parser = this.manager.getParserRegistry().createParser(this.valueType, ParserParameters.empty())
                         .orElse(null);
             }
             if (this.parser == null) {

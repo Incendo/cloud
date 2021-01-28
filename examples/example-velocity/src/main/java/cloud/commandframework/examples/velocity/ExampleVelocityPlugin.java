@@ -62,7 +62,7 @@ public final class ExampleVelocityPlugin {
      */
     @Subscribe
     public void onProxyInitialization(final @NonNull ProxyInitializeEvent event) {
-        final Injector childInjector = injector.createChildInjector(
+        final Injector childInjector = this.injector.createChildInjector(
                 new CloudInjectionModule<>(
                         CommandSource.class,
                         CommandExecutionCoordinator.simpleCoordinator(),

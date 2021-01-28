@@ -190,7 +190,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
          * @return String value
          */
         public String getInput() {
-            return input;
+            return this.input;
         }
 
     }

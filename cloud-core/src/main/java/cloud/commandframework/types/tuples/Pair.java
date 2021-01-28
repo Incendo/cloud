@@ -89,13 +89,13 @@ public class Pair<U, V> implements Tuple {
             return false;
         }
         final Pair<?, ?> pair = (Pair<?, ?>) o;
-        return Objects.equals(getFirst(), pair.getFirst())
-                && Objects.equals(getSecond(), pair.getSecond());
+        return Objects.equals(this.getFirst(), pair.getFirst())
+                && Objects.equals(this.getSecond(), pair.getSecond());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getFirst(), getSecond());
+        return Objects.hash(this.getFirst(), this.getSecond());
     }
 
     @Override

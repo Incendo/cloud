@@ -96,7 +96,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
      * @return List of Modes
      */
     public @NotNull Set<ParserMode> getModes() {
-        return modes;
+        return this.modes;
     }
 
 
@@ -133,7 +133,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
          */
         @Override
         public @NonNull ChannelArgument<C> build() {
-            return new ChannelArgument<>(this.isRequired(), this.getName(), modes);
+            return new ChannelArgument<>(this.isRequired(), this.getName(), this.modes);
         }
 
     }
@@ -183,7 +183,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 return ArgumentParseResult.failure(new IllegalArgumentException("Channel arguments can only be parsed in guilds"));
             }
 
-            if (modes.contains(ParserMode.MENTION)) {
+            if (this.modes.contains(ParserMode.MENTION)) {
                 if (input.startsWith("<#") && input.endsWith(">")) {
                     final String id = input.substring(2, input.length() - 1);
 
@@ -201,7 +201,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 }
             }
 
-            if (modes.contains(ParserMode.ID)) {
+            if (this.modes.contains(ParserMode.ID)) {
                 try {
                     final ArgumentParseResult<MessageChannel> result = this.channelFromId(event, input, input);
                     inputQueue.remove();
@@ -211,7 +211,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 }
             }
 
-            if (modes.contains(ParserMode.NAME)) {
+            if (this.modes.contains(ParserMode.NAME)) {
                 final List<TextChannel> channels = event.getGuild().getTextChannelsByName(input, true);
 
                 if (channels.size() == 0) {
@@ -271,7 +271,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
          * @return users input
          */
         public final @NonNull String getInput() {
-            return input;
+            return this.input;
         }
 
     }
