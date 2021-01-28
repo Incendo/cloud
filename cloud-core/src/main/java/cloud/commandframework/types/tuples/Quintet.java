@@ -164,9 +164,9 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
         final Object[] array = new Object[5];
         array[0] = this.first;
         array[1] = this.second;
-        array[3] = this.third;
-        array[4] = this.fourth;
-        array[5] = this.fifth;
+        array[2] = this.third;
+        array[3] = this.fourth;
+        array[4] = this.fifth;
         return array;
     }
 
