@@ -123,7 +123,7 @@ public abstract class CommandManager<C> {
             final @NonNull CommandRegistrationHandler commandRegistrationHandler
     ) {
         this.commandTree = CommandTree.newTree(this);
-        this.commandExecutionCoordinator = commandExecutionCoordinator.apply(commandTree);
+        this.commandExecutionCoordinator = commandExecutionCoordinator.apply(this.commandTree);
         this.commandRegistrationHandler = commandRegistrationHandler;
         this.commandSuggestionEngine = new DelegatingCommandSuggestionEngineFactory<>(this).create();
         /* Register service types */
@@ -374,7 +374,7 @@ public abstract class CommandManager<C> {
             final @NonNull Description description,
             final @NonNull CommandMeta meta
     ) {
-        return commandBuilder(name, aliases, (ArgumentDescription) description, meta);
+        return this.commandBuilder(name, aliases, (ArgumentDescription) description, meta);
     }
 
     /**

@@ -84,12 +84,12 @@ public abstract class BukkitCommandSender {
             return false;
         }
         final BukkitCommandSender that = (BukkitCommandSender) o;
-        return Objects.equal(internalSender, that.internalSender);
+        return Objects.equal(this.internalSender, that.internalSender);
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(internalSender);
+        return Objects.hashCode(this.internalSender);
     }
 
     /**

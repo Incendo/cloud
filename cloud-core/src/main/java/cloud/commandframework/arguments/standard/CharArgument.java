@@ -183,7 +183,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
          * @return Input value
          */
         public @NonNull String getInput() {
-            return input;
+            return this.input;
         }
 
     }

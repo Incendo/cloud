@@ -104,7 +104,7 @@ public class JavacordCommandSender {
      */
     @NonNull
     public CompletableFuture<Message> sendErrorMessage(final @Nullable String message) {
-        return sendMessage(":x: " + message);
+        return this.sendMessage(":x: " + message);
     }
 
     /**
@@ -115,7 +115,7 @@ public class JavacordCommandSender {
      */
     @NonNull
     public CompletableFuture<Message> sendSuccessMessage(final @Nullable String message) {
-        return sendMessage(":white_check_mark: " + message);
+        return this.sendMessage(":white_check_mark: " + message);
     }
 
 }

@@ -126,7 +126,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      * @return JDA instance
      */
     public final @NonNull JDA getJDA() {
-        return jda;
+        return this.jda;
     }
 
     /**

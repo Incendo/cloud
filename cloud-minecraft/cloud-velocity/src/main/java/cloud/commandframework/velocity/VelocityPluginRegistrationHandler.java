@@ -71,7 +71,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                                 p
                         ),
                         true,
-                        new VelocityExecutor<>(manager)
+                        new VelocityExecutor<>(this.manager)
                 )
         );
         final CommandMeta commandMeta = this.manager.getProxyServer().getCommandManager()

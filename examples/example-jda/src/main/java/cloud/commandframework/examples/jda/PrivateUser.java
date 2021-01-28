@@ -51,7 +51,7 @@ public final class PrivateUser extends CustomUser {
      * @return Private channel
      */
     public @NonNull PrivateChannel getPrivateChannel() {
-        return privateChannel;
+        return this.privateChannel;
     }
 
 }

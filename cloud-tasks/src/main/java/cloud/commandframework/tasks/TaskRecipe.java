@@ -127,7 +127,7 @@ public final class TaskRecipe {
          * @return New task recipe component
          */
         public <T> TaskRecipeComponentOutputting<O, T> synchronous(final @NonNull TaskFunction<O, T> function) {
-            addSynchronous(function);
+            TaskRecipe.this.addSynchronous(function);
             return new TaskRecipeComponentOutputting<>(this.initialInput);
         }
 
@@ -139,7 +139,7 @@ public final class TaskRecipe {
          * @return New task recipe component
          */
         public <T> TaskRecipeComponentOutputting<O, T> asynchronous(final @NonNull TaskFunction<O, T> function) {
-            addAsynchronous(function);
+            TaskRecipe.this.addAsynchronous(function);
             return new TaskRecipeComponentOutputting<>(this.initialInput);
         }
 
@@ -150,8 +150,8 @@ public final class TaskRecipe {
          * @return New task recipe component
          */
         public TaskRecipeComponentVoid<O> synchronous(final @NonNull TaskConsumer<O> consumer) {
-            addSynchronous(consumer);
-            return new TaskRecipeComponentVoid<>(initialInput);
+            TaskRecipe.this.addSynchronous(consumer);
+            return new TaskRecipeComponentVoid<>(this.initialInput);
         }
 
         /**
@@ -161,8 +161,8 @@ public final class TaskRecipe {
          * @return New task recipe component
          */
         public TaskRecipeComponentVoid<O> asynchronous(final @NonNull TaskConsumer<O> consumer) {
-            addAsynchronous(consumer);
-            return new TaskRecipeComponentVoid<>(initialInput);
+            TaskRecipe.this.addAsynchronous(consumer);
+            return new TaskRecipeComponentVoid<>(this.initialInput);
         }
 
         /**
@@ -171,7 +171,7 @@ public final class TaskRecipe {
          * @param callback Callback function
          */
         public void execute(final @NonNull Runnable callback) {
-            TaskRecipe.this.execute(initialInput, callback);
+            TaskRecipe.this.execute(this.initialInput, callback);
         }
 
         /**
@@ -204,8 +204,8 @@ public final class TaskRecipe {
          * @return New task recipe component
          */
         public TaskRecipeComponentVoid<I> synchronous(final @NonNull TaskConsumer<I> consumer) {
-            addSynchronous(consumer);
-            return new TaskRecipeComponentVoid<>(initialInput);
+            TaskRecipe.this.addSynchronous(consumer);
+            return new TaskRecipeComponentVoid<>(this.initialInput);
         }
 
         /**
@@ -215,8 +215,8 @@ public final class TaskRecipe {
          * @return New task recipe component
          */
         public TaskRecipeComponentVoid<I> asynchronous(final @NonNull TaskConsumer<I> consumer) {
-            addSynchronous(consumer);
-            return new TaskRecipeComponentVoid<>(initialInput);
+            TaskRecipe.this.addSynchronous(consumer);
+            return new TaskRecipeComponentVoid<>(this.initialInput);
         }
 
         /**
@@ -225,7 +225,7 @@ public final class TaskRecipe {
          * @param callback Callback function
          */
         public void execute(final @NonNull Runnable callback) {
-            TaskRecipe.this.execute(initialInput, callback);
+            TaskRecipe.this.execute(this.initialInput, callback);
         }
 
         /**

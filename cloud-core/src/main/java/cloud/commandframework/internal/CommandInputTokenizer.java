@@ -56,12 +56,12 @@ public final class CommandInputTokenizer {
      * @return Linked list containing the tokenized input
      */
     public @NonNull LinkedList<@NonNull String> tokenize() {
-        final StringTokenizer stringTokenizer = stringTokenizerFactory.createStringTokenizer();
+        final StringTokenizer stringTokenizer = this.stringTokenizerFactory.createStringTokenizer();
         final LinkedList<String> tokens = new LinkedList<>();
         while (stringTokenizer.hasMoreElements()) {
             tokens.add(stringTokenizer.nextToken());
         }
-        if (input.endsWith(DELIMITER)) {
+        if (this.input.endsWith(DELIMITER)) {
             tokens.add(EMPTY);
         }
         return tokens;
@@ -74,7 +74,7 @@ public final class CommandInputTokenizer {
     private final class StringTokenizerFactory {
 
         private @NonNull StringTokenizer createStringTokenizer() {
-            return new StringTokenizer(input, DELIMITER);
+            return new StringTokenizer(CommandInputTokenizer.this.input, DELIMITER);
         }
 
     }

@@ -133,7 +133,7 @@ public final class ServiceSpigot<Context, Result> {
      */
     public void getResult(final @NonNull BiConsumer<Result, Throwable> consumer) {
         try {
-            consumer.accept(getResult(), null);
+            consumer.accept(this.getResult(), null);
         } catch (final PipelineException pipelineException) {
             consumer.accept(null, pipelineException.getCause());
         } catch (final Exception e) {
@@ -167,7 +167,7 @@ public final class ServiceSpigot<Context, Result> {
      * @return New pump, for the result of this request
      */
     public @NonNull CompletableFuture<ServicePump<Result>> forwardAsynchronously() {
-        return this.getResultAsynchronously().thenApply(pipeline::pump);
+        return this.getResultAsynchronously().thenApply(this.pipeline::pump);
     }
 
 }

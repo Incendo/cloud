@@ -219,7 +219,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
          * @return String value
          */
         public @NonNull String getInput() {
-            return input;
+            return this.input;
         }
 
     }

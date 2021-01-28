@@ -57,7 +57,7 @@ final class Pagination<T> {
     ) {
         final int pages = (int) Math.ceil(content.size() / (itemsPerPage * 1.00));
         if (page < 1 || page > pages) {
-            return Collections.singletonList(outOfRangeRenderer.apply(page, pages));
+            return Collections.singletonList(this.outOfRangeRenderer.apply(page, pages));
         }
 
         final List<Component> renderedContent = new ArrayList<>(this.headerRenderer.apply(page, pages));

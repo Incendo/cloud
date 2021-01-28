@@ -105,14 +105,14 @@ public class Triplet<U, V, W> implements Tuple {
             return false;
         }
         final Triplet<?, ?, ?> triplet = (Triplet<?, ?, ?>) o;
-        return Objects.equals(getFirst(), triplet.getFirst())
-                && Objects.equals(getSecond(), triplet.getSecond())
-                && Objects.equals(getThird(), triplet.getThird());
+        return Objects.equals(this.getFirst(), triplet.getFirst())
+                && Objects.equals(this.getSecond(), triplet.getSecond())
+                && Objects.equals(this.getThird(), triplet.getThird());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getFirst(), getSecond(), getThird());
+        return Objects.hash(this.getFirst(), this.getSecond(), this.getThird());
     }
 
     @Override

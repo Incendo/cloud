@@ -57,7 +57,7 @@ public final class Caption {
             return false;
         }
         final Caption caption = (Caption) o;
-        return Objects.equals(key, caption.key);
+        return Objects.equals(this.key, caption.key);
     }
 
     /**
@@ -71,7 +71,7 @@ public final class Caption {
 
     @Override
     public int hashCode() {
-        return Objects.hash(key);
+        return Objects.hash(this.key);
     }
 
     @Override
