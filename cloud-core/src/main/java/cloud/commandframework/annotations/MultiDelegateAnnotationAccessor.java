@@ -43,7 +43,7 @@ final class MultiDelegateAnnotationAccessor implements AnnotationAccessor {
     @Override
     public <A extends Annotation> @Nullable A annotation(@NonNull final Class<A> clazz) {
         A instance = null;
-        for (final AnnotationAccessor annotationAccessor : accessors) {
+        for (final AnnotationAccessor annotationAccessor : this.accessors) {
             instance = annotationAccessor.annotation(clazz);
             if (instance != null) {
                 break;
@@ -55,7 +55,7 @@ final class MultiDelegateAnnotationAccessor implements AnnotationAccessor {
     @Override
     public @NonNull Collection<@NonNull Annotation> annotations() {
         final List<Annotation> annotationList = new LinkedList<>();
-        for (final AnnotationAccessor annotationAccessor : accessors) {
+        for (final AnnotationAccessor annotationAccessor : this.accessors) {
             annotationList.addAll(annotationAccessor.annotations());
         }
         return Collections.unmodifiableCollection(annotationList);

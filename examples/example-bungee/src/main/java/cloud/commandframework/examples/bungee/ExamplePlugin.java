@@ -70,7 +70,7 @@ public final class ExamplePlugin extends Plugin {
                     mapperFunction
             );
         } catch (final Exception e) {
-            this.getLogger().severe("Failed to initialize the command manager");
+            this.getLogger().severe("Failed to initialize the command this.manager");
             return;
         }
 
@@ -79,14 +79,14 @@ public final class ExamplePlugin extends Plugin {
         this.confirmationManager = new CommandConfirmationManager<>(
                 30L,
                 TimeUnit.SECONDS,
-                context -> bungeeAudiences.sender(context.getCommandContext().getSender()).sendMessage(
+                context -> this.bungeeAudiences.sender(context.getCommandContext().getSender()).sendMessage(
                         text(
                                 "Confirmation required. Confirm using /example confirm.", NamedTextColor.RED)),
-                sender -> bungeeAudiences.sender(sender).sendMessage(
+                sender -> this.bungeeAudiences.sender(sender).sendMessage(
                         text("You do not have any pending commands.", NamedTextColor.RED))
         );
 
-        this.confirmationManager.registerConfirmationProcessor(manager);
+        this.confirmationManager.registerConfirmationProcessor(this.manager);
 
         new MinecraftExceptionHandler<CommandSender>()
                 .withInvalidSyntaxHandler()
@@ -98,7 +98,7 @@ public final class ExamplePlugin extends Plugin {
                         .append(text("Example", NamedTextColor.GOLD))
                         .append(text("] ", NamedTextColor.DARK_GRAY))
                         .append(component).build()
-                ).apply(manager, bungeeAudiences::sender);
+                ).apply(this.manager, this.bungeeAudiences::sender);
         this.constructCommands();
     }
 
@@ -121,12 +121,12 @@ public final class ExamplePlugin extends Plugin {
         // Create a player command
         //
         this.manager.command(
-                manager.commandBuilder("player")
+                this.manager.commandBuilder("player")
                         .senderType(ProxiedPlayer.class)
                         .argument(playerArgument, RichDescription.of(text("Player ").append(text("name", NamedTextColor.GOLD))))
                         .handler(context -> {
                             final ProxiedPlayer player = context.get("player");
-                            bungeeAudiences.sender(context.getSender()).sendMessage(
+                            this.bungeeAudiences.sender(context.getSender()).sendMessage(
                                     text("Selected ", NamedTextColor.GOLD)
                                             .append(text(player.getDisplayName(), NamedTextColor.AQUA))
                             );
@@ -142,7 +142,7 @@ public final class ExamplePlugin extends Plugin {
                         .argument(serverArgument, ArgumentDescription.of("Server name"))
                         .handler(context -> {
                             final ServerInfo server = context.get("server");
-                            bungeeAudiences.sender(context.getSender()).sendMessage(
+                            this.bungeeAudiences.sender(context.getSender()).sendMessage(
                                     text("Selected ", NamedTextColor.GOLD)
                                             .append(text(server.getName(), NamedTextColor.AQUA))
                             );

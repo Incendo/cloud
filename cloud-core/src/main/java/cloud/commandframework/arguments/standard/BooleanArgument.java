@@ -184,7 +184,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
             }
             inputQueue.remove();
 
-            if (!liberal) {
+            if (!this.liberal) {
                 if (input.equalsIgnoreCase("true")) {
                     return ArgumentParseResult.success(true);
                 }
@@ -214,7 +214,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            if (!liberal) {
+            if (!this.liberal) {
                 return Arrays.asList("TRUE", "FALSE");
             }
 
@@ -267,7 +267,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          * @return String value
          */
         public String getInput() {
-            return input;
+            return this.input;
         }
 
         /**
@@ -276,7 +276,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          * @return Liberal value
          */
         public boolean isLiberal() {
-            return liberal;
+            return this.liberal;
         }
 
     }

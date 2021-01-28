@@ -57,7 +57,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * Create a new parameter injector registry
      */
     public ParameterInjectorRegistry() {
-        servicePipeline.registerServiceType(new TypeToken<InjectionService<C>>() {
+        this.servicePipeline.registerServiceType(new TypeToken<InjectionService<C>>() {
         }, this);
     }
 

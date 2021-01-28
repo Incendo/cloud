@@ -72,7 +72,7 @@ public final class BukkitBrigadierMapper<C> {
         /* Detect Minecraft Version Metadata */
         final String version = Bukkit.getServer().getClass().getPackage().getName();
         this.nmsVersion = version.substring(version.lastIndexOf(".") + 1);
-        final int majorMinecraftVersion = Integer.parseInt(nmsVersion.split("_")[1]);
+        final int majorMinecraftVersion = Integer.parseInt(this.nmsVersion.split("_")[1]);
 
         try {
             /* UUID nms argument is a 1.16+ feature */
