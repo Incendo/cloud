@@ -211,7 +211,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
          * @return String value
          */
         public @NonNull String getInput() {
-            return input;
+            return this.input;
         }
 
     }

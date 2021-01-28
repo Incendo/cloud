@@ -240,8 +240,8 @@ public final class CommandTree<C> {
             if (root.equals(this.internalTree)) {
                 return Pair.of(null, new NoSuchCommandException(
                         commandContext.getSender(),
-                        getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
-                        stringOrEmpty(commandQueue.peek())
+                        this.getChain(root).stream().map(Node::getValue).collect(Collectors.toList()),
+                        this.stringOrEmpty(commandQueue.peek())
                 ));
             }
             /* If we couldn't match a child, check if there's a command attached and execute it */
@@ -476,7 +476,7 @@ public final class CommandTree<C> {
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<@NonNull String> commandQueue
     ) {
-        return getSuggestions(context, commandQueue, this.internalTree);
+        return this.getSuggestions(context, commandQueue, this.internalTree);
     }
 
     @SuppressWarnings("MixedMutabilityReturnType")
@@ -533,7 +533,7 @@ public final class CommandTree<C> {
         /* Calculate suggestions for the literal arguments */
         final List<String> suggestions = new LinkedList<>();
         if (commandQueue.size() <= 1) {
-            final String literalValue = stringOrEmpty(commandQueue.peek());
+            final String literalValue = this.stringOrEmpty(commandQueue.peek());
             for (final Node<CommandArgument<C, ?>> argument : staticArguments) {
                 if (this.isPermitted(commandContext.getSender(), argument) != null) {
                     continue;
@@ -658,7 +658,7 @@ public final class CommandTree<C> {
 
         // Fallback: use suggestion provider of argument
         commandContext.setCurrentArgument(child.getValue());
-        return child.getValue().getSuggestionsProvider().apply(commandContext, stringOrEmpty(commandQueue.peek()));
+        return child.getValue().getSuggestionsProvider().apply(commandContext, this.stringOrEmpty(commandQueue.peek()));
     }
 
     private @NonNull String stringOrEmpty(final @Nullable String string) {
@@ -873,7 +873,7 @@ public final class CommandTree<C> {
                 leaves.add(node);
             }
         } else {
-            node.children.forEach(child -> leaves.addAll(getLeavesRaw(child)));
+            node.children.forEach(child -> leaves.addAll(this.getLeavesRaw(child)));
         }
         return leaves;
     }
@@ -887,7 +887,7 @@ public final class CommandTree<C> {
                 leaves.add(node.getValue());
             }
         } else {
-            node.children.forEach(child -> leaves.addAll(getLeaves(child)));
+            node.children.forEach(child -> leaves.addAll(this.getLeaves(child)));
         }
         return leaves;
     }
@@ -1024,12 +1024,12 @@ public final class CommandTree<C> {
                 return false;
             }
             final Node<?> node = (Node<?>) o;
-            return Objects.equals(getValue(), node.getValue());
+            return Objects.equals(this.getValue(), node.getValue());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(getValue());
+            return Objects.hash(this.getValue());
         }
 
         /**
@@ -1052,7 +1052,7 @@ public final class CommandTree<C> {
 
         @Override
         public String toString() {
-            return "Node{value=" + value + '}';
+            return "Node{value=" + this.value + '}';
         }
 
     }

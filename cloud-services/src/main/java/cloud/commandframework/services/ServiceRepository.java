@@ -107,7 +107,7 @@ public final class ServiceRepository<Context, Response> {
                 final @NonNull T implementation,
                 final @NonNull Collection<Predicate<Context>> filters
         ) {
-            this.defaultImplementation = implementations.isEmpty();
+            this.defaultImplementation = ServiceRepository.this.implementations.isEmpty();
             this.implementation = implementation;
             this.filters = filters;
             ExecutionOrder executionOrder = implementation.order();
@@ -139,8 +139,8 @@ public final class ServiceRepository<Context, Response> {
         @Override
         public String toString() {
             return String
-                    .format("ServiceWrapper{type=%s,implementation=%s}", serviceType.toString(),
-                            TypeToken.get(implementation.getClass()).toString()
+                    .format("ServiceWrapper{type=%s,implementation=%s}", ServiceRepository.this.serviceType.toString(),
+                            TypeToken.get(this.implementation.getClass()).toString()
                     );
         }
 

@@ -76,7 +76,7 @@ public final class SimpleCloudKey<@NonNull T> implements CloudKey<T> {
 
     @Override
     public @NonNull String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -93,12 +93,12 @@ public final class SimpleCloudKey<@NonNull T> implements CloudKey<T> {
             return false;
         }
         final SimpleCloudKey<?> key = (SimpleCloudKey<?>) o;
-        return name.equals(key.name);
+        return this.name.equals(key.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(this.name);
     }
 
     @Override

@@ -26,7 +26,6 @@ package cloud.commandframework.examples.bukkit;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.Description;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
@@ -138,7 +137,7 @@ public final class ExamplePlugin extends JavaPlugin {
                     /* C -> Command Sender */ mapperFunction
             );
         } catch (final Exception e) {
-            this.getLogger().severe("Failed to initialize the command manager");
+            this.getLogger().severe("Failed to initialize the command this.manager");
             /* Disable the plugin */
             this.getServer().getPluginManager().disablePlugin(this);
             return;
@@ -159,17 +158,17 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // Register Brigadier mappings
         //
-        if (manager.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
-            manager.registerBrigadier();
+        if (this.manager.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+            this.manager.registerBrigadier();
         }
         //
         // Register asynchronous completions
         //
-        if (manager.queryCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
+        if (this.manager.queryCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             ((PaperCommandManager<CommandSender>) this.manager).registerAsynchronousCompletions();
         }
         //
-        // Create the confirmation manager. This allows us to require certain commands to be
+        // Create the confirmation this.manager. This allows us to require certain commands to be
         // confirmed before they can be executed
         //
         this.confirmationManager = new CommandConfirmationManager<>(
@@ -183,7 +182,7 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // Register the confirmation processor. This will enable confirmations for commands that require it
         //
-        this.confirmationManager.registerConfirmationProcessor(manager);
+        this.confirmationManager.registerConfirmationProcessor(this.manager);
         //
         // Create the annotation parser. This allows you to define commands using methods annotated with
         // @CommandMethod
@@ -213,7 +212,7 @@ public final class ExamplePlugin extends JavaPlugin {
                                 .append(text("Example", NamedTextColor.GOLD))
                                 .append(text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
-                ).apply(manager, bukkitAudiences::sender);
+                ).apply(this.manager, this.bukkitAudiences::sender);
         //
         // Create the commands
         //
@@ -266,7 +265,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         ),
                         ArgumentDescription.of("Coordinates")
                 )
-                .handler(context -> manager.taskRecipe().begin(context)
+                .handler(context -> this.manager.taskRecipe().begin(context)
                         .synchronous(commandContext -> {
                             final Player player = (Player) commandContext.getSender();
                             final World world = commandContext.get(worldArgument);
@@ -283,7 +282,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         )
                         .literal("here")
                         .handler(
-                                context -> manager.taskRecipe().begin(context)
+                                context -> this.manager.taskRecipe().begin(context)
                                         .synchronous(commandContext -> {
                                             final Player player = (Player) commandContext.getSender();
                                             final SingleEntitySelector singleEntitySelector = commandContext
@@ -299,13 +298,13 @@ public final class ExamplePlugin extends JavaPlugin {
                 .command(builder.literal("teleport")
                         .meta(CommandMeta.DESCRIPTION, "Teleport to a world")
                         .argument(WorldArgument.of("world"), ArgumentDescription.of("World to teleport to"))
-                        .handler(context -> manager.taskRecipe().begin(context).synchronous(ctx -> {
+                        .handler(context -> this.manager.taskRecipe().begin(context).synchronous(ctx -> {
                             final Player player = (Player) ctx.getSender();
                             player.teleport(ctx.<World>get("world").getSpawnLocation());
                             player.sendMessage(ChatColor.GREEN + "You have been teleported!");
                         }).execute()));
-        manager.command(builder.literal("tasktest")
-                .handler(context -> manager.taskRecipe()
+        this.manager.command(builder.literal("tasktest")
+                .handler(context -> this.manager.taskRecipe()
                         .begin(context)
                         .asynchronous(c -> {
                             c.getSender().sendMessage("ASYNC: " + !Bukkit.isPrimaryThread());
@@ -316,7 +315,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         })
                         .execute(() -> context.getSender().sendMessage("DONE!"))
                 ));
-        manager.command(manager.commandBuilder("give")
+        this.manager.command(this.manager.commandBuilder("give")
                 .senderType(Player.class)
                 .argument(MaterialArgument.of("material"))
                 .argument(IntegerArgument.of("amount"))
@@ -327,18 +326,18 @@ public final class ExamplePlugin extends JavaPlugin {
                     ((Player) c.getSender()).getInventory().addItem(itemStack);
                     c.getSender().sendMessage("You've been given stuff, bro.");
                 }));
-        manager.command(builder.literal("summon")
+        this.manager.command(builder.literal("summon")
                 .senderType(Player.class)
                 .argument(EnumArgument.of(EntityType.class, "type"))
-                .handler(c -> manager.taskRecipe().begin(c).synchronous(ctx -> {
+                .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Location loc = ((Player) ctx.getSender()).getLocation();
                     loc.getWorld().spawnEntity(loc, ctx.get("type"));
                 }).execute()));
-        manager.command(builder.literal("enchant")
+        this.manager.command(builder.literal("enchant")
                 .senderType(Player.class)
                 .argument(EnchantmentArgument.of("enchant"))
                 .argument(IntegerArgument.of("level"))
-                .handler(c -> manager.taskRecipe().begin(c).synchronous(ctx -> {
+                .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Player player = ((Player) ctx.getSender());
                     player.getInventory().getItemInHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));
                 }).execute()));
@@ -346,7 +345,7 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // A command to change the color scheme for the help command
         //
-        manager.command(builder
+        this.manager.command(builder
                 .meta(CommandMeta.DESCRIPTION, "Sets the color scheme for '/example help'")
                 .literal("helpcolors")
                 .argument(
@@ -369,7 +368,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         TextColorArgument.of("accent"),
                         RichDescription.of(text("The color used for accents and symbols"))
                 )
-                .handler(c -> minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
+                .handler(c -> this.minecraftHelp.setHelpColors(MinecraftHelp.HelpColors.of(
                         c.get("primary"),
                         c.get("highlight"),
                         c.get("alternate_highlight"),
@@ -381,8 +380,8 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // Create a Bukkit-like command
         //
-        manager.command(
-                manager.commandBuilder(
+        this.manager.command(
+                this.manager.commandBuilder(
                         "arraycommand",
                         ArgumentDescription.of("Bukkit-esque cmmand")
                 ).argument(
@@ -405,8 +404,8 @@ public final class ExamplePlugin extends JavaPlugin {
 
         /* Register a custom regex caption */
         final Caption moneyCaption = Caption.of("regex.money");
-        if (manager.getCaptionRegistry() instanceof SimpleCaptionRegistry) {
-            ((SimpleCaptionRegistry<CommandSender>) manager.getCaptionRegistry()).registerMessageFactory(
+        if (this.manager.getCaptionRegistry() instanceof SimpleCaptionRegistry) {
+            ((SimpleCaptionRegistry<CommandSender>) this.manager.getCaptionRegistry()).registerMessageFactory(
                     moneyCaption,
                     (sender, key) -> "'{input}' is not very cash money of you"
             );
@@ -471,7 +470,7 @@ public final class ExamplePlugin extends JavaPlugin {
             final @Argument("money") @Regex(value = "(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$",
                     failureCaption = "regex.money") String money
     ) {
-        bukkitAudiences.sender(sender).sendMessage(
+        this.bukkitAudiences.sender(sender).sendMessage(
                 Identity.nil(),
                 text().append(text("You have been given ", NamedTextColor.AQUA))
                         .append(text(money, NamedTextColor.GOLD))

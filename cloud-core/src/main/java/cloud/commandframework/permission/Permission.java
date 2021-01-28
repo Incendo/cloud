@@ -97,12 +97,12 @@ public final class Permission implements CommandPermission {
             return false;
         }
         final Permission that = (Permission) o;
-        return Objects.equals(getPermission(), that.getPermission());
+        return Objects.equals(this.getPermission(), that.getPermission());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPermission());
+        return Objects.hash(this.getPermission());
     }
 
 }

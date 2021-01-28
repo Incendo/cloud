@@ -102,7 +102,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @return List of Modes
      */
     public @NotNull Set<ParserMode> getModes() {
-        return modes;
+        return this.modes;
     }
 
 
@@ -167,7 +167,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
          */
         @Override
         public @NonNull UserArgument<C> build() {
-            return new UserArgument<>(this.isRequired(), this.getName(), modes, isolationLevel);
+            return new UserArgument<>(this.isRequired(), this.getName(), this.modes, this.isolationLevel);
         }
 
     }
@@ -228,7 +228,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             final MessageReceivedEvent event = commandContext.get("MessageReceivedEvent");
             Exception exception = null;
 
-            if (modes.contains(ParserMode.MENTION)) {
+            if (this.modes.contains(ParserMode.MENTION)) {
                 if (input.startsWith("<@") && input.endsWith(">")) {
                     final String id;
                     if (input.startsWith("<@!")) {
@@ -251,7 +251,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 }
             }
 
-            if (modes.contains(ParserMode.ID)) {
+            if (this.modes.contains(ParserMode.ID)) {
                 try {
                     final ArgumentParseResult<User> result = this.userFromId(event, input, input);
                     inputQueue.remove();
@@ -261,10 +261,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 }
             }
 
-            if (modes.contains(ParserMode.NAME)) {
+            if (this.modes.contains(ParserMode.NAME)) {
                 final List<User> users;
 
-                if (isolationLevel == Isolation.GLOBAL) {
+                if (this.isolationLevel == Isolation.GLOBAL) {
                     users = event.getJDA().getUsersByName(input, true);
                 } else if (event.isFromGuild()) {
                     users = event.getGuild().getMembersByEffectiveName(input, true)
@@ -302,7 +302,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         )
                 throws UserNotFoundParseException, NumberFormatException {
             final User user;
-            if (isolationLevel == Isolation.GLOBAL) {
+            if (this.isolationLevel == Isolation.GLOBAL) {
                 user = event.getJDA().getUserById(id);
             } else if (event.isFromGuild()) {
                 Member member = event.getGuild().getMemberById(id);
@@ -344,7 +344,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
          * @return Users input
          */
         public final @NonNull String getInput() {
-            return input;
+            return this.input;
         }
 
     }

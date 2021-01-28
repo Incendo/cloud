@@ -69,7 +69,7 @@ public abstract class CustomUser {
      * @return Sending user
      */
     public final @NonNull User getUser() {
-        return user;
+        return this.user;
     }
 
     /**
@@ -78,7 +78,7 @@ public abstract class CustomUser {
      * @return Message channel
      */
     public final @NonNull MessageChannel getChannel() {
-        return channel;
+        return this.channel;
     }
 
 }

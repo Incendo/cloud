@@ -69,7 +69,7 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
         } catch (final Throwable throwable) {
             new IllegalStateException(String
                     .format("Failed to call method service implementation '%s' in class '%s'",
-                            method.getName(), instance.getClass().getCanonicalName()
+                            this.method.getName(), this.instance.getClass().getCanonicalName()
                     ), throwable)
                     .printStackTrace();
         }

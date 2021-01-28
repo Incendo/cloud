@@ -121,15 +121,15 @@ public class Quartet<U, V, W, X> implements Tuple {
             return false;
         }
         final Quartet<?, ?, ?, ?> quartet = (Quartet<?, ?, ?, ?>) o;
-        return Objects.equals(getFirst(), quartet.getFirst())
-                && Objects.equals(getSecond(), quartet.getSecond())
-                && Objects.equals(getThird(), quartet.getThird())
-                && Objects.equals(getFourth(), quartet.getFourth());
+        return Objects.equals(this.getFirst(), quartet.getFirst())
+                && Objects.equals(this.getSecond(), quartet.getSecond())
+                && Objects.equals(this.getThird(), quartet.getThird())
+                && Objects.equals(this.getFourth(), quartet.getFourth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getFirst(), getSecond(), getThird(), getFourth());
+        return Objects.hash(this.getFirst(), this.getSecond(), this.getThird(), this.getFourth());
     }
 
     @Override

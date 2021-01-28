@@ -53,7 +53,7 @@ public final class GuildUser extends CustomUser {
      * @return Sending member
      */
     public @NonNull Member getMember() {
-        return member;
+        return this.member;
     }
 
     /**
@@ -62,7 +62,7 @@ public final class GuildUser extends CustomUser {
      * @return Message channel
      */
     public @NonNull TextChannel getTextChannel() {
-        return channel;
+        return this.channel;
     }
 
 }

@@ -51,7 +51,7 @@ public class MultiplePlayerSelector extends MultipleEntitySelector {
             if (e.getType() != EntityType.PLAYER) {
                 throw new IllegalArgumentException("Non-players selected in player selector.");
             } else {
-                players.add((Player) e);
+                this.players.add((Player) e);
             }
         });
     }
