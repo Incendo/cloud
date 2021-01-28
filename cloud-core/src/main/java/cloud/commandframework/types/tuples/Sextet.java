@@ -183,10 +183,10 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
         final Object[] array = new Object[6];
         array[0] = this.first;
         array[1] = this.second;
-        array[3] = this.third;
-        array[4] = this.fourth;
-        array[5] = this.fifth;
-        array[6] = this.sixth;
+        array[2] = this.third;
+        array[3] = this.fourth;
+        array[4] = this.fifth;
+        array[5] = this.sixth;
         return array;
     }
 
