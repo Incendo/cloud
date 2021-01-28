@@ -147,8 +147,8 @@ public class Quartet<U, V, W, X> implements Tuple {
         final Object[] array = new Object[4];
         array[0] = this.first;
         array[1] = this.second;
-        array[3] = this.third;
-        array[4] = this.fourth;
+        array[2] = this.third;
+        array[3] = this.fourth;
         return array;
     }
 

@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
  - Deprecated old JDA UserParser that did not take an isolation parameter 
+ 
+### Fixed
+ - Tuple implementations now do not throw an error when using the toArray method
 
 ## [1.4.0] - 2021-01-16
 
