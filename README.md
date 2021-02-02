@@ -132,8 +132,8 @@ Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot reposi
 ```xml
 <!-- For snapshot builds -->
 <repository>
- <id>sonatype-snapshots</id>
- <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+ <id>incendo-snapshots</id>
+ <url>https://repo.incendo.org/content/repositories/snapshots</url>
 </repository>
 ```
 
@@ -177,16 +177,16 @@ with conflicting dependencies:
 ```
 
 **gradle**:
-```groovy
+```kotlin
 repositories {
-    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
+    maven("https://repo.incendo.org/content/repositories/snapshots") // For snapshot builds
 }
 ```
 
-```groovy
+```kotlin
 dependencies {
-    implementation 'cloud.commandframework:cloud-PLATFORM:1.5.0-SNAPSHOT'
+    implementation("cloud.commandframework", "cloud-PLATFORM", "1.5.0-SNAPSHOT")
 }
 ```
 
