@@ -11,6 +11,7 @@ v0.1.0, 2020-12-30
 :coderay-linenums-mode: inline
 :coderay-css: class
 
+image::CloudNew.png[Logo]
 == Introduction to Cloud
 
 CAUTION: The Cloud documentation is still a work in progress.
