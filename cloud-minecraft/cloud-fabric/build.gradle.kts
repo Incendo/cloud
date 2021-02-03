@@ -1,7 +1,7 @@
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
-    id("fabric-loom") version "0.5-SNAPSHOT"
+    id("fabric-loom") version "0.6-SNAPSHOT"
 }
 
 /* set up a testmod source set */
@@ -51,10 +51,10 @@ dependencies {
     modImplementation(fabricApi.module("fabric-command-api-v1", Versions.fabricApi))
 
     api(include(project(":cloud-core"))!!)
-    implementation(include(project(":cloud-brigadier"))!!)
+    api(include(project(":cloud-brigadier"))!!)
+    api(include(project(":cloud-services"))!!)
 
-    include(project(":cloud-services"))
-    include("io.leangen.geantyref", "geantyref", Versions.geantyref)
+    api(include("io.leangen.geantyref", "geantyref", Versions.geantyref))
 }
 
 indra {
@@ -73,7 +73,7 @@ indra {
         pom {
             withXml {
                 val dependencies = asNode().appendNode("dependencies")
-                sequenceOf("brigadier", "core").forEach {
+                sequenceOf("brigadier", "core", "services").forEach {
                     val depNode = dependencies.appendNode("dependency")
                     depNode.appendNode("groupId", project.group)
                     depNode.appendNode("artifactId", "cloud-$it")
