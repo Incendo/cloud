@@ -32,6 +32,7 @@ import cloud.commandframework.fabric.argument.server.MessageArgument;
 import cloud.commandframework.fabric.data.Message;
 import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandOutput;
@@ -134,7 +135,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
     @Override
     public boolean hasPermission(@NonNull final C sender, @NonNull final String permission) {
         final ServerCommandSource source = this.getBackwardsCommandSourceMapper().apply(sender);
-        return source.hasPermissionLevel(source.getMinecraftServer().getOpPermissionLevel());
+        return Permissions.check(source, permission, source.getMinecraftServer().getOpPermissionLevel());
     }
 
 }

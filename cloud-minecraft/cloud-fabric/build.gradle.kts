@@ -50,6 +50,8 @@ dependencies {
     modImplementation("net.fabricmc", "fabric-loader", Versions.fabricLoader)
     modImplementation(fabricApi.module("fabric-command-api-v1", Versions.fabricApi))
 
+    modImplementation(include("me.lucko", "fabric-permissions-api", "0.1-SNAPSHOT"))
+
     api(include(project(":cloud-core"))!!)
     api(include(project(":cloud-brigadier"))!!)
     api(include(project(":cloud-services"))!!)
