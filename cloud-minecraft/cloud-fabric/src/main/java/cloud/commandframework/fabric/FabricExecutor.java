@@ -79,9 +79,7 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
     @Override
     public int run(final @NonNull CommandContext<S> ctx) {
         final S source = ctx.getSource();
-        final String input = ctx.getInput().startsWith("/")
-                ? ctx.getInput().substring(1)
-                : ctx.getInput();
+        final String input = ctx.getInput().substring(ctx.getLastChild().getNodes().get(0).getRange().getStart());
         final C sender = this.manager.getCommandSourceMapper().apply(source);
         this.manager.executeCommand(sender, input).whenComplete(this.getResultConsumer(source, sender));
         return com.mojang.brigadier.Command.SINGLE_SUCCESS;
