@@ -617,8 +617,12 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull SuggestionsBuilder builder
     ) {
         final CommandContext<C> commandContext;
+        String command = builder.getInput();
         if (this.brigadierCommandSenderMapper == null || senderContext == null) {
             commandContext = this.dummyContextProvider.get();
+            if (command.startsWith("/") /* Minecraft specific */) {
+                command = command.substring(1);
+            }
         } else {
             final C cloudSender = this.brigadierCommandSenderMapper.apply(senderContext.getSource());
             commandContext = new CommandContext<>(
@@ -626,11 +630,7 @@ public final class CloudBrigadierManager<C, S> {
                     cloudSender,
                     this.commandManager
             );
-        }
-
-        String command = builder.getInput();
-        if (command.startsWith("/") /* Minecraft specific */) {
-            command = command.substring(1);
+            command = command.substring(senderContext.getLastChild().getNodes().get(0).getRange().getStart());
         }
 
         /* Remove namespace */
