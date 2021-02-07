@@ -28,11 +28,12 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
 import net.minecraft.server.command.ServerCommandSource;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -108,8 +109,42 @@ abstract class FabricCommandRegistrationHandler<C, S extends CommandSource> impl
             dispatcher.addChild(baseNode);
 
             for (final String alias : first.getAlternativeAliases()) {
-                dispatcher.addChild(CommandManager.literal(alias).redirect(baseNode).build());
+                dispatcher.addChild(buildRedirect(alias, baseNode));
             }
+        }
+
+        /**
+         * Returns a literal node that redirects its execution to
+         * the given destination node.
+         *
+         * <p>This method is taken from MIT licensed code in the Velocity project, see
+         * <a href="https://github.com/VelocityPowered/Velocity/blob/b88c573eb11839a95bea1af947b0c59a5956368b/proxy/src/main/java/com/velocitypowered/proxy/util/BrigadierUtils.java#L33">
+         * Velocity's BrigadierUtils class</a></p>
+         *
+         * @param alias       the command alias
+         * @param destination the destination node
+         * @return the built node
+         */
+        private static <S> LiteralCommandNode<S> buildRedirect(
+                final @NonNull String alias,
+                final @NonNull CommandNode<S> destination
+        ) {
+            // Redirects only work for nodes with children, but break the top argument-less command.
+            // Manually adding the root command after setting the redirect doesn't fix it.
+            // (See https://github.com/Mojang/brigadier/issues/46) Manually clone the node instead.
+            LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder
+                    .<S>literal(alias)
+                    .requires(destination.getRequirement())
+                    .forward(
+                            destination.getRedirect(),
+                            destination.getRedirectModifier(),
+                            destination.isFork()
+                    )
+                    .executes(destination.getCommand());
+            for (final CommandNode<S> child : destination.getChildren()) {
+                builder.then(child);
+            }
+            return builder.build();
         }
 
     }
