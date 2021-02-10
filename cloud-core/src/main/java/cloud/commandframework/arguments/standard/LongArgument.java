@@ -169,12 +169,18 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
 
     }
 
-    private static final class LongParser<C> implements ArgumentParser<C, Long> {
+    public static final class LongParser<C> implements ArgumentParser<C, Long> {
 
         private final long min;
         private final long max;
 
-        private LongParser(final long min, final long max) {
+        /**
+         * Construct a new long parser
+         *
+         * @param min Minimum acceptable value
+         * @param max Maximum acceptable value
+         */
+        public LongParser(final long min, final long max) {
             this.min = min;
             this.max = max;
         }
