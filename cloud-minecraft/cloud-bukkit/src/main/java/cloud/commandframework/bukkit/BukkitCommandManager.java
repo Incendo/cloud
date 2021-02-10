@@ -27,6 +27,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.bukkit.arguments.Time;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
@@ -35,6 +36,7 @@ import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
+import cloud.commandframework.bukkit.parsers.TimeArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument;
@@ -176,6 +178,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new LocationArgument.LocationParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
                 new Location2DArgument.Location2DParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Time.class), parserParameters ->
+                new TimeArgument.TimeParser<>());
         /* Register Entity Selector Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());

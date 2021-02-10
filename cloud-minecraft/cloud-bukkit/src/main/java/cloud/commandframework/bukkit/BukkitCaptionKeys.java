@@ -44,6 +44,10 @@ public final class BukkitCaptionKeys {
     /**
      * Variables: {input}
      */
+    public static final Caption ARGUMENT_PARSE_FAILURE_TIME = of("argument.parse.failure.time");
+    /**
+     * Variables: {input}
+     */
     public static final Caption ARGUMENT_PARSE_FAILURE_MATERIAL = of("argument.parse.failure.material");
     /**
      * Variables: {input}

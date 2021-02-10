@@ -37,6 +37,10 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_ENCHANTMENT = "'{input}' is not a valid enchantment";
     /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_TIME}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_TIME = "Time '{input}' is invalid";
+    /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_MATERIAL}
      */
     public static final String ARGUMENT_PARSE_FAILURE_MATERIAL = "'{input}' is not a valid material name";
@@ -89,6 +93,10 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
         this.registerMessageFactory(
                 BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_ENCHANTMENT,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_ENCHANTMENT
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_TIME,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_TIME
         );
         this.registerMessageFactory(
                 BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_MATERIAL,

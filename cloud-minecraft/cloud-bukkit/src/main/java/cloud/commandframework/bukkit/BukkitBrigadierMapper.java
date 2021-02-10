@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.bukkit.arguments.Time;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
@@ -91,6 +92,8 @@ public final class BukkitBrigadierMapper<C> {
             this.mapComplexNMS(Location.class, this.getArgumentVec3());
             /* Map Vec2I */
             this.mapComplexNMS(Location2D.class, this.getArgumentVec2I());
+            /* Map time */
+            this.mapSimpleNMS(Time.class, this.getNMSArgument("Time").getConstructor());
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin()
                     .getLogger()
