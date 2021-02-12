@@ -129,7 +129,8 @@ class VersionedItemParserTo12 implements VersionedItemParser {
             Method asBukkitCopyMethod = craftItemStackClass.getDeclaredMethod("asBukkitCopy", itemStackClass);
             asBukkitCopyMethod.setAccessible(true);
             return ItemStackParseResult.success((ItemStack) asBukkitCopyMethod.invoke(null, itemStackObject));
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchFieldException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException |
+                InvocationTargetException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
     }

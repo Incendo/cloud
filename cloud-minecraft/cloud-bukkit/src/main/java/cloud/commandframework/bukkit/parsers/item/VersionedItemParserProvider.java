@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.bukkit.parsers.item;
 
-class VersionedItemParserProvider {
+final class VersionedItemParserProvider {
 
     private static VersionedItemParser itemParser;
 
