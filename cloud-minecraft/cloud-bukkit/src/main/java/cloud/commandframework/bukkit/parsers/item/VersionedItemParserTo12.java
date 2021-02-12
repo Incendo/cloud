@@ -45,7 +45,7 @@ class VersionedItemParserTo12 implements VersionedItemParser {
 
     @Override
     @NonNull
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public ItemStackParseResult parseItemStack(
             final @NonNull CommandContext<?> context,
             final @NonNull String input
@@ -54,18 +54,11 @@ class VersionedItemParserTo12 implements VersionedItemParser {
         if (!input.startsWith("minecraft:")) {
             modInput = "minecraft:" + input;
         }
-        String key;
+        String key = modInput;
         String nbt = "";
-        if (modInput.contains("[")) {
-            key = modInput.substring(0, modInput.indexOf("["));
+        if (modInput.contains("{")) {
+            key = modInput.substring(0, modInput.indexOf("{"));
             nbt = modInput.replace(key, "");
-        } else {
-            if (modInput.contains("{")) {
-                key = modInput.substring(0, modInput.indexOf("{"));
-                nbt = modInput.replace(key, "");
-            } else {
-                key = modInput;
-            }
         }
         try {
             // construct a MinecraftKey
@@ -79,12 +72,14 @@ class VersionedItemParserTo12 implements VersionedItemParser {
             registryField.setAccessible(true);
 
             Object registryMaterials = registryField.get(null);
-            Class<?> registryMaterialsClass = registryMaterials.getClass();
-            Method itemGet = registryMaterialsClass.getDeclaredMethod("get", minecraftKeyClass);
-            itemGet.setAccessible(true);
+            // this is a workaround since reflection doesn't want to recognize get(MinecraftKey)
+            Class<?> registrySimpleClass = getNMSClass("RegistrySimple");
+            Field registryMapField = registrySimpleClass.getDeclaredField("c");
+            registryMapField.setAccessible(true);
+            Map<Object, Object> map = (Map<Object, Object>) registryMapField.get(registryMaterials);
 
             // get an item object
-            Object itemObject = itemGet.invoke(registryMaterials, minecraftKey);
+            Object itemObject = map.get(minecraftKey);
             if (itemObject == null) {
                 // invalid item :(
                 return ItemStackParseResult.failure(
@@ -116,7 +111,7 @@ class VersionedItemParserTo12 implements VersionedItemParser {
                 } catch (Exception e) { // MojangsonParseException but we can't reference it here
                     return ItemStackParseResult.failure(
                             new ItemStackArgument.ItemStackParseException(
-                                    key,
+                                    nbt,
                                     context,
                                     BukkitCaptionKeys.ARGUMENT_PARSE_INVALID_NBT
                             )
@@ -129,8 +124,11 @@ class VersionedItemParserTo12 implements VersionedItemParser {
             Method asBukkitCopyMethod = craftItemStackClass.getDeclaredMethod("asBukkitCopy", itemStackClass);
             asBukkitCopyMethod.setAccessible(true);
             return ItemStackParseResult.success((ItemStack) asBukkitCopyMethod.invoke(null, itemStackObject));
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException |
-                InvocationTargetException | NoSuchFieldException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
+                |
+                InvocationTargetException
+                |
+                NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
     }
@@ -149,11 +147,10 @@ class VersionedItemParserTo12 implements VersionedItemParser {
             registryField.setAccessible(true);
 
             Object registry = registryField.get(null);
-            Class<?> registryClass = registry.getClass();
-
-            Field mapField = registryClass.getDeclaredField("b");
-            mapField.setAccessible(true);
-            Map<Object, Object> map = (Map<Object, Object>) mapField.get(registry);
+            Class<?> registrySimpleClass = getNMSClass("RegistrySimple");
+            Field registryMapField = registrySimpleClass.getDeclaredField("c");
+            registryMapField.setAccessible(true);
+            Map<Object, Object> map = (Map<Object, Object>) registryMapField.get(registry);
             for (Object keyObject : map.keySet()) {
                 String namespacedKey = keyObject.toString();
                 ret.add(namespacedKey);

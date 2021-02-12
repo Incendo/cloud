@@ -72,7 +72,7 @@ public final class ItemStackParser<C> implements ArgumentParser<C, ItemStack> {
     ) {
         return itemParser.allItemNames()
                 .stream()
-                .filter(input::startsWith)
+                .filter(candidate -> candidate.startsWith(input))
                 .collect(Collectors.toList());
     }
 
