@@ -27,6 +27,9 @@ class VersionedItemParserProvider {
 
     private static VersionedItemParser itemParser;
 
+    private VersionedItemParserProvider() {
+    }
+
     public static VersionedItemParser provide() {
         if (itemParser != null) {
             return itemParser;
@@ -37,7 +40,7 @@ class VersionedItemParserProvider {
             case 10:
             case 11:
             case 12:
-                itemParser = new VersionedItemParserUpTo1_12();
+                itemParser = new VersionedItemParserTo12();
                 break;
             case 13:
             case 14:
@@ -46,7 +49,10 @@ class VersionedItemParserProvider {
                 // todo
                 // it's the same for 13 - 16
                 break;
+            default:
+                // wha???
         }
         return itemParser;
     }
+
 }

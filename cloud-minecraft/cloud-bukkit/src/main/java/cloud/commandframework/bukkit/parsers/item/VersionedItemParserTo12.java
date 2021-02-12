@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * ItemStack parser for 1.8 - 1.12
  */
-class VersionedItemParserUpTo1_12 implements VersionedItemParser {
+class VersionedItemParserTo12 implements VersionedItemParser {
 
     private List<String> allItemNames = null;
 
@@ -48,22 +48,23 @@ class VersionedItemParserUpTo1_12 implements VersionedItemParser {
     @SuppressWarnings("rawtypes")
     public ItemStackParseResult parseItemStack(
             final @NonNull CommandContext<?> context,
-            @NonNull String input
+            final @NonNull String input
     ) {
+        String modInput = input;
         if (!input.startsWith("minecraft:")) {
-            input = "minecraft:" + input;
+            modInput = "minecraft:" + input;
         }
         String key;
         String nbt = "";
-        if (input.contains("[")) {
-            key = input.substring(0, input.indexOf("["));
-            nbt = input.replace(key, "");
+        if (modInput.contains("[")) {
+            key = modInput.substring(0, modInput.indexOf("["));
+            nbt = modInput.replace(key, "");
         } else {
-            if (input.contains("{")) {
-                key = input.substring(0, input.indexOf("{"));
-                nbt = input.replace(key, "");
+            if (modInput.contains("{")) {
+                key = modInput.substring(0, modInput.indexOf("{"));
+                nbt = modInput.replace(key, "");
             } else {
-                key = input;
+                key = modInput;
             }
         }
         try {
@@ -128,14 +129,7 @@ class VersionedItemParserUpTo1_12 implements VersionedItemParser {
             Method asBukkitCopyMethod = craftItemStackClass.getDeclaredMethod("asBukkitCopy", itemStackClass);
             asBukkitCopyMethod.setAccessible(true);
             return ItemStackParseResult.success((ItemStack) asBukkitCopyMethod.invoke(null, itemStackObject));
-        } catch (
-                ClassNotFoundException |
-                        NoSuchMethodException |
-                        IllegalAccessException |
-                        InstantiationException |
-                        InvocationTargetException |
-                        NoSuchFieldException e
-        ) {
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
     }

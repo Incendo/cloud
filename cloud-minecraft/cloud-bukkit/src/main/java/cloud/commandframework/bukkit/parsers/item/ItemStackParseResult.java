@@ -28,24 +28,24 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Optional;
 
-class ItemStackParseResult {
+final class ItemStackParseResult {
 
-    static ItemStackParseResult success(@NonNull ItemStack item) {
+    static ItemStackParseResult success(@NonNull final ItemStack item) {
         return new ItemStackParseResult(item);
     }
 
-    static ItemStackParseResult failure(ItemStackArgument.ItemStackParseException exception) {
+    static ItemStackParseResult failure(final ItemStackArgument.ItemStackParseException exception) {
         return new ItemStackParseResult(exception);
     }
 
     private final Optional<ItemStack> result;
     private ItemStackArgument.ItemStackParseException exception;
 
-    private ItemStackParseResult(@NonNull ItemStack result) {
+    private ItemStackParseResult(@NonNull final ItemStack result) {
         this.result = Optional.of(result);
     }
 
-    private ItemStackParseResult(ItemStackArgument.ItemStackParseException exception) {
+    private ItemStackParseResult(final ItemStackArgument.ItemStackParseException exception) {
         this.exception = exception;
         this.result = Optional.empty();
     }
