@@ -45,6 +45,7 @@ class VersionedItemParserUpTo1_12 implements VersionedItemParser {
 
     @Override
     @NonNull
+    @SuppressWarnings("rawtypes")
     public ItemStackParseResult parseItemStack(
             final @NonNull CommandContext<?> context,
             @NonNull String input
@@ -141,6 +142,7 @@ class VersionedItemParserUpTo1_12 implements VersionedItemParser {
 
     @Override
     @NonNull
+    @SuppressWarnings("unchecked")
     public List<@NonNull String> allItemNames() {
         if (allItemNames != null) {
             return allItemNames;
