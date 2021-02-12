@@ -46,11 +46,15 @@ final class VersionedItemParserProvider {
             case 14:
             case 15:
             case 16:
-                // todo
-                // it's the same for 13 - 16
+                itemParser = new VersionedItemParser13Up();
                 break;
             default:
-                // wha???
+                throw new UnsupportedOperationException(
+                        "Unsupported version "
+                                + ItemStackParser.NMS_VERSION
+                                + " ( " + ItemStackParser.MAJOR_MINOR_VERSION
+                                + " )"
+                );
         }
         return itemParser;
     }
