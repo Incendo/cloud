@@ -49,18 +49,36 @@ public final class ItemStackParser<C> implements ArgumentParser<C, ItemStack> {
             @NonNull final CommandContext<@NonNull C> commandContext,
             @NonNull final Queue<@NonNull String> inputQueue
     ) {
-        // todo: make it possible to have `minecraft:diamond{display:{Name:{"text":{"The diamond award"}}}}
-        // currently it is possible to have NBT after the item specified but it is not possible to have a multi
-        // word message. I don't know how to so please someone who is more experienced than me in creating
-        // cloud arguments please tell me how to.
-        String input = inputQueue.peek();
-        if (input == null) {
+        String start = inputQueue.peek();
+        if (start == null) {
             return ArgumentParseResult.failure(new NoInputProvidedException(
                     ItemStackParser.class,
                     commandContext
             ));
         }
         inputQueue.remove();
+        StringBuilder inputBuilder = new StringBuilder(start);
+        int queueSize = inputQueue.size();
+        if (queueSize != 0 && start.indexOf('{') != -1) {
+            for (int i = 0; i < queueSize; i++) {
+                String peek = inputQueue.peek();
+                if (peek == null) {
+                    inputQueue.remove();
+                    continue;
+                }
+                if (i == 0) {
+                    inputBuilder.append(' ').append(peek).append(' ');
+                } else {
+                    inputBuilder.append(peek).append(' ');
+                }
+                inputQueue.remove();
+                int last = peek.lastIndexOf('}');
+                if (last != -1 && ((last + 1) == peek.length())) {
+                    break;
+                }
+            }
+        }
+        String input = inputBuilder.toString().trim();
 
         ItemStackParseResult parseResult = itemParser.parseItemStack(commandContext, input);
         return parseResult.getResult()
