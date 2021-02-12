@@ -33,17 +33,16 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 /**
- * cloud argument type that parser time
+ * cloud argument type that wraps minecraft's time argument
  *
  * @param <C> Command sender type
  */
@@ -102,21 +101,6 @@ public class TimeArgument<C> extends CommandArgument<C, Time> {
         return TimeArgument.<C>newBuilder(name).asOptional().build();
     }
 
-    /**
-     * Create a new optional argument with a default value
-     *
-     * @param name Argument name
-     * @param time Default value
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Time> optional(
-            final @NonNull String name,
-            final @NonNull Integer time
-    ) {
-        return TimeArgument.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(time)).build();
-    }
-
     public static final class Builder<C> extends CommandArgument.Builder<C, Time> {
 
         private Builder(final @NonNull String name) {
@@ -150,6 +134,7 @@ public class TimeArgument<C> extends CommandArgument<C, Time> {
                         commandContext
                 ));
             }
+            inputQueue.remove();
 
             int multiplier = 1;
             String modInput = input;

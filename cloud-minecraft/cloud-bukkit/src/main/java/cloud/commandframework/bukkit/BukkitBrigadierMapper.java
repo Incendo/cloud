@@ -34,6 +34,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Constructor;
@@ -94,6 +95,8 @@ public final class BukkitBrigadierMapper<C> {
             this.mapComplexNMS(Location2D.class, this.getArgumentVec2I());
             /* Map time */
             this.mapSimpleNMS(Time.class, this.getNMSArgument("Time").getConstructor());
+            /* Map ItemStack */
+            this.mapSimpleNMS(ItemStack.class, this.getNMSArgument("ItemStack").getConstructor());
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin()
                     .getLogger()

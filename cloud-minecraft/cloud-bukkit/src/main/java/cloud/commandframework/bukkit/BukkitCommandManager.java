@@ -38,6 +38,7 @@ import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.bukkit.parsers.TimeArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
+import cloud.commandframework.bukkit.parsers.item.ItemStackParser;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument;
 import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
@@ -57,6 +58,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -180,6 +182,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new Location2DArgument.Location2DParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Time.class), parserParameters ->
                 new TimeArgument.TimeParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(ItemStack.class), parserParameters ->
+                new ItemStackParser<>());
         /* Register Entity Selector Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());

@@ -41,6 +41,14 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_TIME = "Time '{input}' is invalid";
     /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_ITEM_UNKNOWN}
+     */
+    public static final String ARGUMENT_PARSE_ITEM_UNKNOWN = "Item '{input}' cannot be found";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_INVALID_NBT}
+     */
+    public static final String ARGUMENT_PARSE_INVALID_NBT = "'{input}' is an invalid NBT for an item.";
+    /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_MATERIAL}
      */
     public static final String ARGUMENT_PARSE_FAILURE_MATERIAL = "'{input}' is not a valid material name";
@@ -97,6 +105,14 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
         this.registerMessageFactory(
                 BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_TIME,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_TIME
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_ITEM_UNKNOWN,
+                (caption, sender) -> ARGUMENT_PARSE_ITEM_UNKNOWN
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_INVALID_NBT,
+                (caption, sender) -> ARGUMENT_PARSE_INVALID_NBT
         );
         this.registerMessageFactory(
                 BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_MATERIAL,

@@ -48,6 +48,14 @@ public final class BukkitCaptionKeys {
     /**
      * Variables: {input}
      */
+    public static final Caption ARGUMENT_PARSE_ITEM_UNKNOWN = of("argument.parse.item.unknown");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_INVALID_NBT = of("argument.parse.invalid.nbt");
+    /**
+     * Variables: {input}
+     */
     public static final Caption ARGUMENT_PARSE_FAILURE_MATERIAL = of("argument.parse.failure.material");
     /**
      * Variables: {input}
