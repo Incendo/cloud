@@ -176,7 +176,6 @@ public class TimeArgument<C> extends CommandArgument<C, Time> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            // todo: fix this
             List<String> ret = new ArrayList<>();
             for (String suffix : SUGGESTION_SUFFIXES) {
                 if (input.endsWith(suffix)) {

@@ -27,15 +27,13 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-
-import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 public final class ItemStackParser<C> implements ArgumentParser<C, ItemStack> {
 
