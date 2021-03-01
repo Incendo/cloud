@@ -43,7 +43,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
 
     @EventHandler
     void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
-        if (event.getBuffer().isEmpty()) {
+        if (event.getBuffer().trim().isEmpty()) {
             return;
         }
 

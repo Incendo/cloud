@@ -44,7 +44,7 @@ final class CloudBukkitListener<C> implements Listener {
 
     @EventHandler
     void onTabCompletion(final @NonNull TabCompleteEvent event) {
-        if (event.getBuffer().isEmpty()) {
+        if (event.getBuffer().trim().isEmpty()) {
             return;
         }
 
