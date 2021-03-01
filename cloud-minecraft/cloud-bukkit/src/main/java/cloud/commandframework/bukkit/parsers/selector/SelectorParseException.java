@@ -69,7 +69,7 @@ public final class SelectorParseException extends ParserException {
      * @return String value
      */
     public @NonNull String getInput() {
-        return input;
+        return this.input;
     }
 
     /**

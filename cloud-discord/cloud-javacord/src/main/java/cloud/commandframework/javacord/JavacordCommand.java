@@ -75,24 +75,24 @@ public class JavacordCommand<C> implements MessageCreateListener {
             commandSender = new JavacordCommandSender(event);
         }
 
-        C sender = manager.getCommandSenderMapper().apply(commandSender);
+        C sender = this.manager.getCommandSenderMapper().apply(commandSender);
 
         String messageContent = event.getMessageContent();
-        String commandPrefix = manager.getCommandPrefix(sender);
+        String commandPrefix = this.manager.getCommandPrefix(sender);
         if (!messageContent.startsWith(commandPrefix)) {
             return;
         }
         messageContent = messageContent.replaceFirst(commandPrefix, "");
 
         final String finalContent = messageContent;
-        if (((StaticArgument<C>) command).getAliases()
+        if (((StaticArgument<C>) this.command).getAliases()
                 .stream()
                 .map(String::toLowerCase)
                 .noneMatch(commandAlias -> finalContent.toLowerCase().startsWith(commandAlias))) {
             return;
         }
 
-        manager.executeCommand(sender, finalContent)
+        this.manager.executeCommand(sender, finalContent)
                 .whenComplete((commandResult, throwable) -> {
                     if (throwable == null) {
                         return;
@@ -109,7 +109,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
                     }
 
                     if (throwable instanceof InvalidSyntaxException) {
-                        manager.handleException(
+                        this.manager.handleException(
                                 sender,
                                 InvalidSyntaxException.class,
                                 (InvalidSyntaxException) throwable,
@@ -123,7 +123,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
                     }
 
                     if (throwable instanceof InvalidCommandSenderException) {
-                        manager.handleException(
+                        this.manager.handleException(
                                 sender,
                                 InvalidCommandSenderException.class,
                                 (InvalidCommandSenderException) throwable,
@@ -134,7 +134,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
                     }
 
                     if (throwable instanceof NoPermissionException) {
-                        manager.handleException(
+                        this.manager.handleException(
                                 sender,
                                 NoPermissionException.class,
                                 (NoPermissionException) throwable,
@@ -145,7 +145,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
                     }
 
                     if (throwable instanceof ArgumentParseException) {
-                        manager.handleException(
+                        this.manager.handleException(
                                 sender,
                                 ArgumentParseException.class,
                                 (ArgumentParseException) throwable,
@@ -157,7 +157,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
                     }
 
                     if (throwable instanceof CommandExecutionException) {
-                        manager.handleException(
+                        this.manager.handleException(
                                 sender,
                                 CommandExecutionException.class,
                                 (CommandExecutionException) throwable,

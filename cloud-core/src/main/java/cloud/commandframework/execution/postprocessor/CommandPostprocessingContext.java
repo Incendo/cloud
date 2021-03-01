@@ -80,7 +80,7 @@ public final class CommandPostprocessingContext<C> {
             return false;
         }
         final CommandPostprocessingContext<?> that = (CommandPostprocessingContext<?>) o;
-        return Objects.equals(getCommandContext(), that.getCommandContext())
+        return Objects.equals(this.getCommandContext(), that.getCommandContext())
                 && Objects.equals(this.getCommand(), that.getCommand());
     }
 

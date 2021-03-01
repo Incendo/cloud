@@ -81,13 +81,13 @@ public final class CommandPreprocessingContext<C> {
             return false;
         }
         final CommandPreprocessingContext<?> that = (CommandPreprocessingContext<?>) o;
-        return Objects.equals(getCommandContext(), that.getCommandContext())
-                && Objects.equals(getInputQueue(), that.getInputQueue());
+        return Objects.equals(this.getCommandContext(), that.getCommandContext())
+                && Objects.equals(this.getInputQueue(), that.getInputQueue());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCommandContext(), getInputQueue());
+        return Objects.hash(this.getCommandContext(), this.getInputQueue());
     }
 
 }

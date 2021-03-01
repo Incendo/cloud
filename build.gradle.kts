@@ -1,5 +1,6 @@
 import com.hierynomus.gradle.license.LicenseBasePlugin
 import com.hierynomus.gradle.license.tasks.LicenseCheck
+import de.marcphilipp.gradle.nexus.NexusPublishExtension
 import net.kyori.indra.IndraExtension
 import net.kyori.indra.sonatypeSnapshots
 import net.ltgt.gradle.errorprone.ErrorPronePlugin
@@ -31,7 +32,7 @@ gradle.taskGraph.whenReady {
 }
 
 group = "cloud.commandframework"
-version = "1.4.0"
+version = "1.5.0-SNAPSHOT"
 description = "Command framework and dispatcher for the JVM"
 
 subprojects {
@@ -70,6 +71,14 @@ subprojects {
                     }
                 }
             }
+        }
+    }
+
+    extensions.configure<NexusPublishExtension> {
+        repositories.create("incendoSnapshots") {
+            snapshotRepositoryUrl.set(uri("https://repo.incendo.org/content/repositories/snapshots/"))
+            username.set(System.getenv("SNAPSHOT_PUBLISHING_USERNAME"))
+            password.set(System.getenv("SNAPSHOT_PUBLISHING_PASSWORD"))
         }
     }
 

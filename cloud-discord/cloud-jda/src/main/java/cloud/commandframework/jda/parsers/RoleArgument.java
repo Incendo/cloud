@@ -28,8 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -40,20 +39,21 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- * Command Argument for {@link MessageChannel}
+ * Command Argument for {@link net.dv8tion.jda.api.entities.Role}
  *
  * @param <C> Command sender type
  */
 @SuppressWarnings("unused")
-public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel> {
+public final class RoleArgument<C> extends CommandArgument<C, Role> {
 
     private final Set<ParserMode> modes;
 
-    private ChannelArgument(
-            final boolean required, final @NonNull String name,
+    private RoleArgument(
+            final boolean required,
+            final @NonNull String name,
             final @NonNull Set<ParserMode> modes
     ) {
-        super(required, name, new MessageParser<>(modes), MessageChannel.class);
+        super(required, name, new RoleParser<>(modes), Role.class);
         this.modes = modes;
     }
 
@@ -75,8 +75,8 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, MessageChannel> of(final @NonNull String name) {
-        return ChannelArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull CommandArgument<C, Role> of(final @NonNull String name) {
+        return RoleArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
@@ -86,8 +86,8 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
      * @param <C>  Command sender type
      * @return Created component
      */
-    public static <C> @NonNull CommandArgument<C, MessageChannel> optional(final @NonNull String name) {
-        return ChannelArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull CommandArgument<C, Role> optional(final @NonNull String name) {
+        return RoleArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
@@ -107,12 +107,12 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, MessageChannel> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Role> {
 
         private Set<ParserMode> modes = new HashSet<>();
 
         private Builder(final @NonNull String name) {
-            super(MessageChannel.class, name);
+            super(Role.class, name);
         }
 
         /**
@@ -132,24 +132,24 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
          * @return Constructed component
          */
         @Override
-        public @NonNull ChannelArgument<C> build() {
-            return new ChannelArgument<>(this.isRequired(), this.getName(), this.modes);
+        public @NonNull RoleArgument<C> build() {
+            return new RoleArgument<>(this.isRequired(), this.getName(), this.modes);
         }
 
     }
 
 
-    public static final class MessageParser<C> implements ArgumentParser<C, MessageChannel> {
+    public static final class RoleParser<C> implements ArgumentParser<C, Role> {
 
         private final Set<ParserMode> modes;
 
         /**
-         * Construct a new argument parser for {@link MessageChannel}
+         * Construct a new argument parser for {@link Role}
          *
          * @param modes List of parsing modes to use when parsing
-         * @throws java.lang.IllegalStateException If no parsing modes were provided
+         * @throws IllegalStateException If no parsing modes were provided
          */
-        public MessageParser(final @NonNull Set<ParserMode> modes) {
+        public RoleParser(final @NonNull Set<ParserMode> modes) {
             if (modes.isEmpty()) {
                 throw new IllegalArgumentException("At least one parsing mode is required");
             }
@@ -158,14 +158,14 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
         }
 
         @Override
-        public @NonNull ArgumentParseResult<MessageChannel> parse(
+        public @NonNull ArgumentParseResult<Role> parse(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
-                        MessageParser.class,
+                        RoleParser.class,
                         commandContext
                 ));
             }
@@ -180,47 +180,47 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
             Exception exception = null;
 
             if (!event.isFromGuild()) {
-                return ArgumentParseResult.failure(new IllegalArgumentException("Channel arguments can only be parsed in guilds"));
+                return ArgumentParseResult.failure(new IllegalArgumentException("Role arguments can only be parsed in guilds"));
             }
 
             if (this.modes.contains(ParserMode.MENTION)) {
-                if (input.startsWith("<#") && input.endsWith(">")) {
-                    final String id = input.substring(2, input.length() - 1);
+                if (input.startsWith("<@&") && input.endsWith(">")) {
+                    final String id = input.substring(3, input.length() - 1);
 
                     try {
-                        final ArgumentParseResult<MessageChannel> channel = this.channelFromId(event, input, id);
+                        final ArgumentParseResult<Role> role = this.roleFromId(event, input, id);
                         inputQueue.remove();
-                        return channel;
-                    } catch (final ChannelNotFoundException | NumberFormatException e) {
+                        return role;
+                    } catch (final RoleNotFoundException | NumberFormatException e) {
                         exception = e;
                     }
                 } else {
                     exception = new IllegalArgumentException(
-                            String.format("Input '%s' is not a channel mention.", input)
+                            String.format("Input '%s' is not a role mention.", input)
                     );
                 }
             }
 
             if (this.modes.contains(ParserMode.ID)) {
                 try {
-                    final ArgumentParseResult<MessageChannel> result = this.channelFromId(event, input, input);
+                    final ArgumentParseResult<Role> result = this.roleFromId(event, input, input);
                     inputQueue.remove();
                     return result;
-                } catch (final ChannelNotFoundException | NumberFormatException e) {
+                } catch (final RoleNotFoundException | NumberFormatException e) {
                     exception = e;
                 }
             }
 
             if (this.modes.contains(ParserMode.NAME)) {
-                final List<TextChannel> channels = event.getGuild().getTextChannelsByName(input, true);
+                final List<Role> roles = event.getGuild().getRolesByName(input, true);
 
-                if (channels.size() == 0) {
-                    exception = new ChannelNotFoundException(input);
-                } else if (channels.size() > 1) {
-                    exception = new TooManyChannelsFoundParseException(input);
+                if (roles.size() == 0) {
+                    exception = new RoleNotFoundException(input);
+                } else if (roles.size() > 1) {
+                    exception = new TooManyRolesFoundParseException(input);
                 } else {
                     inputQueue.remove();
-                    return ArgumentParseResult.success(channels.get(0));
+                    return ArgumentParseResult.success(roles.get(0));
                 }
             }
 
@@ -233,35 +233,35 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
             return true;
         }
 
-        private @NonNull ArgumentParseResult<MessageChannel> channelFromId(
+        private @NonNull ArgumentParseResult<Role> roleFromId(
                 final @NonNull MessageReceivedEvent event,
                 final @NonNull String input,
                 final @NonNull String id
         )
-                throws ChannelNotFoundException, NumberFormatException {
-            final MessageChannel channel = event.getGuild().getTextChannelById(id);
+                throws RoleNotFoundException, NumberFormatException {
+            final Role role = event.getGuild().getRoleById(id);
 
-            if (channel == null) {
-                throw new ChannelNotFoundException(input);
+            if (role == null) {
+                throw new RoleNotFoundException(input);
             }
 
-            return ArgumentParseResult.success(channel);
+            return ArgumentParseResult.success(role);
         }
 
     }
 
 
-    public static class ChannelParseException extends IllegalArgumentException {
+    public static class RoleParseException extends IllegalArgumentException {
 
-        private static final long serialVersionUID = 2724288304060572202L;
+        private static final long serialVersionUID = -2451548379508062135L;
         private final String input;
 
         /**
-         * Construct a new channel parse exception
+         * Construct a new role parse exception
          *
          * @param input String input
          */
-        public ChannelParseException(final @NonNull String input) {
+        public RoleParseException(final @NonNull String input) {
             this.input = input;
         }
 
@@ -277,43 +277,43 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
     }
 
 
-    public static final class TooManyChannelsFoundParseException extends ChannelParseException {
+    public static final class TooManyRolesFoundParseException extends RoleParseException {
 
-        private static final long serialVersionUID = -507783063742841507L;
+        private static final long serialVersionUID = -8604082973199995006L;
 
         /**
-         * Construct a new channel parse exception
+         * Construct a new role parse exception
          *
          * @param input String input
          */
-        public TooManyChannelsFoundParseException(final @NonNull String input) {
+        public TooManyRolesFoundParseException(final @NonNull String input) {
             super(input);
         }
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("Too many channels found for '%s'.", getInput());
+            return String.format("Too many roles found for '%s'.", getInput());
         }
 
     }
 
 
-    public static final class ChannelNotFoundException extends ChannelParseException {
+    public static final class RoleNotFoundException extends RoleParseException {
 
-        private static final long serialVersionUID = -8299458048947528494L;
+        private static final long serialVersionUID = 7931804739792920510L;
 
         /**
-         * Construct a new channel parse exception
+         * Construct a new role parse exception
          *
          * @param input String input
          */
-        public ChannelNotFoundException(final @NonNull String input) {
+        public RoleNotFoundException(final @NonNull String input) {
             super(input);
         }
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("Channel not found for '%s'.", getInput());
+            return String.format("Role not found for '%s'.", getInput());
         }
 
     }

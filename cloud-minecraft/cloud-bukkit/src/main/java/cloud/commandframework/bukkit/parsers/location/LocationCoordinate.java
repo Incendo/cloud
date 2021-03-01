@@ -86,13 +86,13 @@ public final class LocationCoordinate {
             return false;
         }
         final LocationCoordinate that = (LocationCoordinate) o;
-        return Double.compare(that.coordinate, coordinate) == 0
-                && type == that.type;
+        return Double.compare(that.coordinate, this.coordinate) == 0
+                && this.type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, coordinate);
+        return Objects.hash(this.type, this.coordinate);
     }
 
     @Override

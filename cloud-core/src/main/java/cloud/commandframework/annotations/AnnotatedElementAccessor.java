@@ -46,7 +46,7 @@ final class AnnotatedElementAccessor implements AnnotationAccessor {
             final @NonNull Class<A> clazz
     ) {
         try {
-            return element.getAnnotation(clazz);
+            return this.element.getAnnotation(clazz);
         } catch (final NullPointerException exception) {
             return null;
         }

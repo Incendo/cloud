@@ -285,7 +285,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 }
             }
             commandContext.store(FLAG_META_KEY, "");
-            return suggestions(commandContext, input);
+            return this.suggestions(commandContext, input);
         }
 
         /**
@@ -486,7 +486,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
          * @return String value
          */
         public String getInput() {
-            return input;
+            return this.input;
         }
 
     }

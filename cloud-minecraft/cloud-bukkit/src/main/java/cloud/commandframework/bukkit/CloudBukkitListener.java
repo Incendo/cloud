@@ -23,16 +23,12 @@
 //
 package cloud.commandframework.bukkit;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.server.TabCompleteEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
 
 final class CloudBukkitListener<C> implements Listener {
 
@@ -40,37 +36,6 @@ final class CloudBukkitListener<C> implements Listener {
 
     CloudBukkitListener(final @NonNull BukkitCommandManager<C> bukkitCommandManager) {
         this.bukkitCommandManager = bukkitCommandManager;
-    }
-
-    @EventHandler
-    void onTabCompletion(final @NonNull TabCompleteEvent event) {
-        if (event.getBuffer().trim().isEmpty()) {
-            return;
-        }
-
-        @SuppressWarnings("unchecked")
-        final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
-                (BukkitPluginRegistrationHandler<C>) this.bukkitCommandManager.getCommandRegistrationHandler();
-
-        /* Turn '(/)plugin:command arg1 arg2 ...' into 'plugin:command' */
-        final String commandLabel = (event.getBuffer().startsWith("/")
-                ? event.getBuffer().substring(1)
-                : event.getBuffer())
-                .split(" ")[0];
-        if (!bukkitPluginRegistrationHandler.isRecognized(commandLabel)) {
-            return;
-        }
-
-        final CommandSender sender = event.getSender();
-        final C cloudSender = this.bukkitCommandManager.getCommandSenderMapper().apply(sender);
-        final String inputBuffer = this.bukkitCommandManager.stripNamespace(event.getBuffer());
-
-        final List<String> suggestions = new ArrayList<>(this.bukkitCommandManager.suggest(
-                cloudSender,
-                inputBuffer
-        ));
-
-        event.setCompletions(suggestions);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

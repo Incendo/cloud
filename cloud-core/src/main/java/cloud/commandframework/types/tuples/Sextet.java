@@ -153,17 +153,17 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
             return false;
         }
         final Sextet<?, ?, ?, ?, ?, ?> sextet = (Sextet<?, ?, ?, ?, ?, ?>) o;
-        return Objects.equals(getFirst(), sextet.getFirst())
-                && Objects.equals(getSecond(), sextet.getSecond())
-                && Objects.equals(getThird(), sextet.getThird())
-                && Objects.equals(getFourth(), sextet.getFourth())
-                && Objects.equals(getFifth(), sextet.getFifth())
-                && Objects.equals(getSixth(), sextet.getSixth());
+        return Objects.equals(this.getFirst(), sextet.getFirst())
+                && Objects.equals(this.getSecond(), sextet.getSecond())
+                && Objects.equals(this.getThird(), sextet.getThird())
+                && Objects.equals(this.getFourth(), sextet.getFourth())
+                && Objects.equals(this.getFifth(), sextet.getFifth())
+                && Objects.equals(this.getSixth(), sextet.getSixth());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getFirst(), getSecond(), getThird(), getFourth(), getFifth(), getSixth());
+        return Objects.hash(this.getFirst(), this.getSecond(), this.getThird(), this.getFourth(), this.getFifth(), this.getSixth());
     }
 
     @Override
@@ -183,10 +183,10 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
         final Object[] array = new Object[6];
         array[0] = this.first;
         array[1] = this.second;
-        array[3] = this.third;
-        array[4] = this.fourth;
-        array[5] = this.fifth;
-        array[6] = this.sixth;
+        array[2] = this.third;
+        array[3] = this.fourth;
+        array[4] = this.fifth;
+        array[5] = this.sixth;
         return array;
     }
 

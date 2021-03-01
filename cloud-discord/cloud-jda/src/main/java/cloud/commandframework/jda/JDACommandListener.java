@@ -77,7 +77,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
 
         content = content.substring(prefix.length());
 
-        commandManager.executeCommand(sender, content)
+        this.commandManager.executeCommand(sender, content)
                 .whenComplete((commandResult, throwable) -> {
                     if (throwable == null) {
                         return;

@@ -116,7 +116,7 @@ Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot reposi
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-PLATFORM</artifactId>
- <version>1.4.0</version>
+ <version>1.5.0-SNAPSHOT</version>
 </dependency>
 <!-- 
 ~    Optional: Allows you to use annotated methods
@@ -125,15 +125,15 @@ Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot reposi
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-annotations</artifactId>
- <version>1.4.0</version>
+ <version>1.5.0-SNAPSHOT</version>
 </dependency>
 ``` 
 
 ```xml
 <!-- For snapshot builds -->
 <repository>
- <id>sonatype-snapshots</id>
- <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+ <id>incendo-snapshots</id>
+ <url>https://repo.incendo.org/content/repositories/snapshots</url>
 </repository>
 ```
 
@@ -177,16 +177,16 @@ with conflicting dependencies:
 ```
 
 **gradle**:
-```groovy
+```kotlin
 repositories {
-    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
+    maven("https://repo.incendo.org/content/repositories/snapshots") // For snapshot builds
 }
 ```
 
-```groovy
+```kotlin
 dependencies {
-    implementation 'cloud.commandframework:cloud-PLATFORM:1.4.0'
+    implementation("cloud.commandframework", "cloud-PLATFORM", "1.5.0-SNAPSHOT")
 }
 ```
 
