@@ -110,7 +110,7 @@ This particular example uses `cloud-bukkit`, though most concepts transfer over 
 ----
 CommandManager<CommandSender> manager = new BukkitCommandManager<>(
         /* Owning plugin */ this,
-        AsynchronousCommandExecutionCoordinator.newBuilder().build(), <1>
+        CommandExecutionCoordinator.simpleCoordinator(), <1>
         Function.identity(), <2>
         Function.identity(), <3>
 );
