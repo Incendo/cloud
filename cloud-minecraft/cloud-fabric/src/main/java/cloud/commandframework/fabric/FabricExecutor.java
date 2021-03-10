@@ -104,7 +104,7 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
                                     this.sendError.accept(
                                             source,
                                             new LiteralText("Invalid Command Syntax. Correct command syntax is: ")
-                                                    .append(new LiteralText(e.getCorrectSyntax())
+                                                    .append(new LiteralText(String.format("/%s", e.getCorrectSyntax()))
                                                             .styled(style -> style.withColor(Formatting.GRAY))))
                     );
                 } else if (throwable instanceof InvalidCommandSenderException) {

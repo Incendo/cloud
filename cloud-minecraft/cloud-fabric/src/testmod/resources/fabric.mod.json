@@ -16,6 +16,9 @@
   "entrypoints": {
     "main": [
       "cloud.commandframework.fabric.testmod.FabricExample"
+    ],
+    "client": [
+      "cloud.commandframework.fabric.testmod.FabricClientExample"
     ]
   },
 
