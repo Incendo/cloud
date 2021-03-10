@@ -39,7 +39,7 @@ import java.util.function.BiFunction;
  * An argument parsing an identifier, or "resource location".
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> {
 

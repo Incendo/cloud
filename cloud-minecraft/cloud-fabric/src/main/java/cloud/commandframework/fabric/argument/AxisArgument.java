@@ -42,7 +42,7 @@ import java.util.function.BiFunction;
  * An argument for a set of axes, described in Vanilla as a "swizzle".
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.Axis>> {
     private static final TypeToken<EnumSet<Direction.Axis>> TYPE = new TypeToken<EnumSet<Direction.Axis>>() {};

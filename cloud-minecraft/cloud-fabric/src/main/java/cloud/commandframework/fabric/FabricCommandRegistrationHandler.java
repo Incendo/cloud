@@ -32,6 +32,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
@@ -59,6 +61,80 @@ abstract class FabricCommandRegistrationHandler<C, S extends CommandSource> impl
 
     FabricCommandManager<C, S> getCommandManager() {
         return this.commandManager;
+    }
+
+    /**
+     * Returns a literal node that redirects its execution to
+     * the given destination node.
+     *
+     * <p>This method is taken from MIT licensed code in the Velocity project, see
+     * <a href="https://github.com/VelocityPowered/Velocity/blob/b88c573eb11839a95bea1af947b0c59a5956368b/proxy/src/main/java/com/velocitypowered/proxy/util/BrigadierUtils.java#L33">
+     * Velocity's BrigadierUtils class</a></p>
+     *
+     * @param alias       the command alias
+     * @param destination the destination node
+     * @param <S> brig sender type
+     * @return the built node
+     */
+    private static <S> LiteralCommandNode<S> buildRedirect(
+            final @NonNull String alias,
+            final @NonNull CommandNode<S> destination
+    ) {
+        // Redirects only work for nodes with children, but break the top argument-less command.
+        // Manually adding the root command after setting the redirect doesn't fix it.
+        // (See https://github.com/Mojang/brigadier/issues/46) Manually clone the node instead.
+        LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder
+                .<S>literal(alias)
+                .requires(destination.getRequirement())
+                .forward(
+                        destination.getRedirect(),
+                        destination.getRedirectModifier(),
+                        destination.isFork()
+                )
+                .executes(destination.getCommand());
+        for (final CommandNode<S> child : destination.getChildren()) {
+            builder.then(child);
+        }
+        return builder.build();
+    }
+
+    static class Client<C> extends FabricCommandRegistrationHandler<C, FabricClientCommandSource> {
+        @Override
+        void initialize(final FabricCommandManager<C, FabricClientCommandSource> manager) {
+            super.initialize(manager);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public boolean registerCommand(final @NonNull Command<?> cmd) {
+            final Command<C> command = (Command<C>) cmd;
+            final RootCommandNode<FabricClientCommandSource> rootNode = ClientCommandManager.DISPATCHER.getRoot();
+            final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
+            final CommandNode<FabricClientCommandSource> baseNode = this
+                    .getCommandManager()
+                    .brigadierManager()
+                    .createLiteralCommandNode(
+                            first.getName(),
+                            command,
+                            (src, perm) -> this.getCommandManager().hasPermission(
+                                    this.getCommandManager().getCommandSourceMapper().apply(src),
+                                    perm
+                            ),
+                            true,
+                            new FabricExecutor<>(
+                                    this.getCommandManager(),
+                                    source -> source.getPlayer().getName().asString(),
+                                    FabricClientCommandSource::sendError
+                            )
+                    );
+
+            rootNode.addChild(baseNode);
+
+            for (final String alias : first.getAlternativeAliases()) {
+                rootNode.addChild(buildRedirect(alias, baseNode));
+            }
+            return true;
+        }
     }
 
     static class Server<C> extends FabricCommandRegistrationHandler<C, ServerCommandSource> {
@@ -112,40 +188,5 @@ abstract class FabricCommandRegistrationHandler<C, S extends CommandSource> impl
                 dispatcher.addChild(buildRedirect(alias, baseNode));
             }
         }
-
-        /**
-         * Returns a literal node that redirects its execution to
-         * the given destination node.
-         *
-         * <p>This method is taken from MIT licensed code in the Velocity project, see
-         * <a href="https://github.com/VelocityPowered/Velocity/blob/b88c573eb11839a95bea1af947b0c59a5956368b/proxy/src/main/java/com/velocitypowered/proxy/util/BrigadierUtils.java#L33">
-         * Velocity's BrigadierUtils class</a></p>
-         *
-         * @param alias       the command alias
-         * @param destination the destination node
-         * @return the built node
-         */
-        private static <S> LiteralCommandNode<S> buildRedirect(
-                final @NonNull String alias,
-                final @NonNull CommandNode<S> destination
-        ) {
-            // Redirects only work for nodes with children, but break the top argument-less command.
-            // Manually adding the root command after setting the redirect doesn't fix it.
-            // (See https://github.com/Mojang/brigadier/issues/46) Manually clone the node instead.
-            LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder
-                    .<S>literal(alias)
-                    .requires(destination.getRequirement())
-                    .forward(
-                            destination.getRedirect(),
-                            destination.getRedirectModifier(),
-                            destination.isFork()
-                    )
-                    .executes(destination.getCommand());
-            for (final CommandNode<S> child : destination.getChildren()) {
-                builder.then(child);
-            }
-            return builder.build();
-        }
-
     }
 }

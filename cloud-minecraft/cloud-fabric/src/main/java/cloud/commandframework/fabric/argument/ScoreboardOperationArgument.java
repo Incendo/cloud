@@ -41,7 +41,7 @@ import java.util.function.BiFunction;
  * <p>These operations can be used to compare scores on a {@link net.minecraft.scoreboard.Scoreboard}.</p>
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Operation> {
 
