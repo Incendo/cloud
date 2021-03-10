@@ -58,7 +58,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <C> the command sender type
  * @param <V> the registry entry type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     private static final String NAMESPACE_MINECRAFT = "minecraft";

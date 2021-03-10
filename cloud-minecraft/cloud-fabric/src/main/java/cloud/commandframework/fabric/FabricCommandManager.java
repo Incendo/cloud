@@ -74,7 +74,6 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.predicate.NumberRange;
 import net.minecraft.scoreboard.ScoreboardCriterion;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -107,7 +106,7 @@ import java.util.function.Supplier;
  * @param <C> the manager's sender type
  * @param <S> the platform sender type
  * @see FabricServerCommandManager for server commands
- * @since 1.4.0
+ * @since 1.5.0
  */
 public abstract class FabricCommandManager<C, S extends CommandSource> extends CommandManager<C> implements BrigadierManagerHolder<C> {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -129,8 +128,8 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
      *                                    use a synchronous execution coordinator. In most cases you will want to pick between
      *                                    {@link CommandExecutionCoordinator#simpleCoordinator()} and
      *                                    {@link AsynchronousCommandExecutionCoordinator}
-     * @param commandSourceMapper          Function that maps {@link ServerCommandSource} to the command sender type
-     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link ServerCommandSource}
+     * @param commandSourceMapper          Function that maps {@link CommandSource} to the command sender type
+     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link CommandSource}
      * @param registrationHandler the handler accepting command registrations
      * @param dummyCommandSourceProvider a provider of a dummy command source, for use with brigadier registration
      */
@@ -323,7 +322,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     }
 
     /**
-     * Gets the mapper from a game {@link ServerCommandSource} to the manager's {@code C} type.
+     * Gets the mapper from a game {@link CommandSource} to the manager's {@code C} type.
      *
      * @return Command source mapper
      */
@@ -332,7 +331,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     }
 
     /**
-     * Gets the mapper from the manager's {@code C} type to a game {@link ServerCommandSource}.
+     * Gets the mapper from the manager's {@code C} type to a game {@link CommandSource}.
      *
      * @return Command source mapper
      */
