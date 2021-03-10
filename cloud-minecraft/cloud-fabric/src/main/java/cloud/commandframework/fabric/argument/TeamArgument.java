@@ -49,7 +49,7 @@ import java.util.function.BiFunction;
  * An argument parsing an entity anchor.
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class TeamArgument<C> extends CommandArgument<C, Team> {
 
@@ -182,6 +182,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
     }
 
     public static final class UnknownTeamException extends ParserException {
+        private static final long serialVersionUID = 4249139487412603424L;
 
         UnknownTeamException(
                 final @NonNull CommandContext<?> context,

@@ -40,7 +40,7 @@ import java.util.function.BiFunction;
  * An argument parsing a status effect from the {@link net.minecraft.util.registry.Registry#STATUS_EFFECT status effect registry}
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffect> {
 

@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
  *
  * <p>The basic unit is 1 <em>tick</em>, which aims to be {@code 50ms}</p>
  *
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class MinecraftTime {
     private static final MinecraftTime ZERO = new MinecraftTime(0);
