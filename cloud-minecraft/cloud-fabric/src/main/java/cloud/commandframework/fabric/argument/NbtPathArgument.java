@@ -38,7 +38,7 @@ import java.util.function.BiFunction;
  * An argument for NBT paths to locations within {@link net.minecraft.nbt.Tag Tags}.
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgumentType.NbtPath> {
 

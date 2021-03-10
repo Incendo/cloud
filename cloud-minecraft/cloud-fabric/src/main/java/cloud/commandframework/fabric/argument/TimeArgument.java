@@ -40,7 +40,7 @@ import java.util.function.BiFunction;
  * An argument for in-game time
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
 

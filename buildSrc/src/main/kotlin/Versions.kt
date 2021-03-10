@@ -26,7 +26,7 @@ object Versions {
     const val fabricLoader = "0.11.1"
     const val fabricMc = "1.16.5"
     const val fabricYarn = "1"
-    const val fabricApi = "0.29.3+1.16"
+    const val fabricApi = "0.31.0+1.16"
 
     // IRC DEPENDENCIES
     const val pircbotx = "83a4c22e80"

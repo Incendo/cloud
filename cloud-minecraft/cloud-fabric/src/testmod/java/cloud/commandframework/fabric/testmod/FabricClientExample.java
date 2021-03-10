@@ -21,10 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+package cloud.commandframework.fabric.testmod;
 
-/**
- * Command arguments that can only be used on the logical server.
- *
- * @since 1.5.0
- */
-package cloud.commandframework.fabric.argument.server;
+import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.fabric.FabricClientCommandManager;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
+import net.minecraft.text.Text;
+
+public class FabricClientExample implements ClientModInitializer {
+    @Override
+    public void onInitializeClient() {
+        final FabricClientCommandManager<FabricClientCommandSource> commandManager =
+                FabricClientCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
+
+        commandManager.command(
+                commandManager.commandBuilder("cloud_client")
+                        .literal("say")
+                        .argument(StringArgument.greedy("message"))
+                        .handler(ctx -> ctx.getSender().sendFeedback(
+                                Text.of("Cloud client commands says: " + ctx.get("message"))
+                        ))
+        );
+    }
+}

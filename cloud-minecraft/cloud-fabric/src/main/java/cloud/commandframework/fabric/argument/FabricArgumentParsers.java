@@ -50,7 +50,7 @@ import java.util.HashSet;
 /**
  * Parsers for Vanilla command argument types.
  *
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class FabricArgumentParsers {
 
@@ -68,6 +68,7 @@ public final class FabricArgumentParsers {
                 .map((ctx, val) -> ArgumentParseResult.success(MinecraftTime.of(val)));
     }
 
+    /*
     public static <C> ArgumentParser<C, CommandFunction> commandFunction() {
         // TODO: Should probably write our own parser for this, it's either Identifier or tag.
         // Server parsers
@@ -76,6 +77,7 @@ public final class FabricArgumentParsers {
             source.getCompletions()
         })
     }
+    */
 
     public static <C> ArgumentParser<C, Message> message() {
         return new WrappedBrigadierParser<C, MessageArgumentType.MessageFormat>(MessageArgumentType.message())

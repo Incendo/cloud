@@ -108,6 +108,7 @@ public final class MinecraftExceptionHandler<C> {
                 final HoverEvent<Component> hover = HoverEvent.showText(
                         Component.text()
                                 .append(getMessage(cause))
+                                .append(Component.newline())
                                 .append(Component.text(stackTrace))
                                 .append(Component.newline())
                                 .append(Component.text(

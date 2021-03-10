@@ -40,7 +40,7 @@ import java.util.function.BiFunction;
  * optional.
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.FloatRange> {
 

@@ -52,7 +52,7 @@ import java.util.function.BiFunction;
  * An argument similar to a greedy string, but one that resolves selectors.
  *
  * @param <C> the sender type
- * @since 1.4.0
+ * @since 1.5.0
  */
 public final class MessageArgument<C> extends CommandArgument<C, Message> {
 
