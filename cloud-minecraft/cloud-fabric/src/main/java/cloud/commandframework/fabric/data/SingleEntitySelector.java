@@ -21,28 +21,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.fabric.testmod;
+package cloud.commandframework.fabric.data;
 
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.fabric.FabricClientCommandManager;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.text.LiteralText;
+import net.minecraft.command.EntitySelector;
+import net.minecraft.entity.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class FabricClientExample implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        final FabricClientCommandManager<FabricClientCommandSource> commandManager =
-                FabricClientCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
+public final class SingleEntitySelector implements Selector.Single<Entity> {
 
-        commandManager.command(
-                commandManager.commandBuilder("cloud_client")
-                        .literal("say")
-                        .argument(StringArgument.greedy("message"))
-                        .handler(ctx -> ctx.getSender().sendFeedback(
-                                new LiteralText("Cloud client commands says: " + ctx.get("message"))
-                        ))
-        );
+    private final String inputString;
+    private final EntitySelector entitySelector;
+    private final Entity selectedEntity;
+
+    public SingleEntitySelector(
+            final @NonNull String inputString,
+            final @NonNull EntitySelector entitySelector,
+            final @NonNull Entity selectedEntity
+    ) {
+        this.inputString = inputString;
+        this.entitySelector = entitySelector;
+        this.selectedEntity = selectedEntity;
     }
+
+    @Override
+    public @NonNull String getInput() {
+        return this.inputString;
+    }
+
+    @Override
+    public @NonNull EntitySelector getSelector() {
+        return this.entitySelector;
+    }
+
+    @Override
+    public @NonNull Entity getSingle() {
+        return this.selectedEntity;
+    }
+
 }

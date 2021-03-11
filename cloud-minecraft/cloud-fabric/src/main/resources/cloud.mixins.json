@@ -5,6 +5,8 @@
   "mixins": [
     "CloudStringReaderMixin",
     "CommandManagerMixin",
+    "EntitySelectorMixin",
+    "EntitySelectorReaderMixin",
     "MessageArgumentTypeMessageFormatAccess",
     "MessageArgumentTypeMessageSelectorAccess"
   ],
