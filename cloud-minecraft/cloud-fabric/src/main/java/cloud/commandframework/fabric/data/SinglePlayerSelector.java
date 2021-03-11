@@ -27,12 +27,22 @@ import net.minecraft.command.EntitySelector;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * A selector for a single player.
+ */
 public final class SinglePlayerSelector implements Selector.Single<ServerPlayerEntity> {
 
     private final String inputString;
     private final EntitySelector entitySelector;
     private final ServerPlayerEntity selectedPlayer;
 
+    /**
+     * Create a new SinglePlayerSelector.
+     *
+     * @param inputString    input string
+     * @param entitySelector entity selector
+     * @param selectedPlayer selected player
+     */
     public SinglePlayerSelector(
             final @NonNull String inputString,
             final @NonNull EntitySelector entitySelector,
