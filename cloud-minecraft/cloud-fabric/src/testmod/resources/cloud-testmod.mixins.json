@@ -1,0 +1,11 @@
+{
+  "package": "cloud.commandframework.fabric.testmod.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "required": true,
+  "mixins": [
+    "GiveCommandAccess"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

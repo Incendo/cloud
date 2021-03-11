@@ -5,7 +5,7 @@
 
   "name": "Cloud Test mod",
   "description": "Command framework and dispatcher for the JVM",
-  "authors": [ "Citomonstret", "zml" ],
+  "authors": [ "Citymonstret", "zml" ],
   "contact": {
     "homepage": "https://commandframework.cloud/",
     "sources": "https://github.com/Incendo/cloud"
@@ -21,6 +21,10 @@
       "cloud.commandframework.fabric.testmod.FabricClientExample"
     ]
   },
+
+  "mixins": [
+    "cloud-testmod.mixins.json"
+  ],
 
   "depends": {
     "fabricloader": ">=0.7.4",
