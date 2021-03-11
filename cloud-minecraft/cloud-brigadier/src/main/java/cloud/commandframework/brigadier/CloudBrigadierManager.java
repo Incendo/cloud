@@ -385,23 +385,22 @@ public final class CloudBrigadierManager<C, S> {
     @SuppressWarnings("all")
     private <T, K extends ArgumentParser<C, ?>> @Nullable Pair<@NonNull ArgumentType<?>, @Nullable SuggestionProvider<S>> getArgument(
             final @NonNull TypeToken<?> valueType,
-            final @NonNull TypeToken<T> argumentType,
-            final @NonNull K argument
+            final @NonNull K argumentParser
     ) {
         /* Unwrap mapped arguments */
-        ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argument;
+        ArgumentParser<C, ?> commandArgument = (ArgumentParser<C, ?>) argumentParser;
         while (commandArgument instanceof MappedArgumentParser<?, ?, ?>) {
             commandArgument = ((MappedArgumentParser<C, ?, ?>) commandArgument).getBaseParser();
         }
 
         final BrigadierMapping<C, K, S> mapping = (BrigadierMapping<C, K, S>) this.mappers
-                .get(GenericTypeReflector.erase(argumentType.getType()));
+                .get(commandArgument.getClass());
         if (mapping == null || mapping.getMapper() == null) {
             return this.createDefaultMapper(valueType);
         }
         return Pair.of(
                 (ArgumentType<?>) ((Function) mapping.getMapper()).apply(commandArgument),
-                mapping.makeSuggestionProvider(argument)
+                mapping.makeSuggestionProvider(argumentParser)
         );
     }
 
@@ -527,7 +526,6 @@ public final class CloudBrigadierManager<C, S> {
                 @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) parsers[i];
                 final Pair<ArgumentType<?>, SuggestionProvider<S>> pair = this.getArgument(
                         TypeToken.get((Class<?>) types[i]),
-                        TypeToken.get(parser.getClass()),
                         parser
                 );
                 final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions() ? suggestionProvider
@@ -576,7 +574,6 @@ public final class CloudBrigadierManager<C, S> {
             // Register argument
             final Pair<ArgumentType<?>, SuggestionProvider<S>> pair = this.getArgument(
                     root.getValue().getValueType(),
-                    TypeToken.get(root.getValue().getParser().getClass()),
                     root.getValue().getParser()
             );
             final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions()
