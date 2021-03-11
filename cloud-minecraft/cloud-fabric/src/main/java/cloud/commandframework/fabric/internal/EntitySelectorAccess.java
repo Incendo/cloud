@@ -21,28 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.fabric.testmod;
+package cloud.commandframework.fabric.internal;
 
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.fabric.FabricClientCommandManager;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.text.LiteralText;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class FabricClientExample implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        final FabricClientCommandManager<FabricClientCommandSource> commandManager =
-                FabricClientCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
+public interface EntitySelectorAccess {
 
-        commandManager.command(
-                commandManager.commandBuilder("cloud_client")
-                        .literal("say")
-                        .argument(StringArgument.greedy("message"))
-                        .handler(ctx -> ctx.getSender().sendFeedback(
-                                new LiteralText("Cloud client commands says: " + ctx.get("message"))
-                        ))
-        );
-    }
+    @NonNull String inputString();
+
+    void inputString(@NonNull String inputString);
+
 }
