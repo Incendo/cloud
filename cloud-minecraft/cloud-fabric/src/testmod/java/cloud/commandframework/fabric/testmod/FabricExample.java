@@ -30,6 +30,8 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
+import cloud.commandframework.fabric.argument.MultiplePlayerSelectorArgument;
+import cloud.commandframework.fabric.data.MultiplePlayerSelector;
 import cloud.commandframework.meta.CommandMeta;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
@@ -40,23 +42,29 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.ArgumentTypes;
+import net.minecraft.network.MessageType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TextColor;
+import net.minecraft.util.Util;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Collection;
 
 public final class FabricExample implements ModInitializer {
     private static final CommandArgument<ServerCommandSource, String> NAME = StringArgument.of("name");
     private static final CommandArgument<ServerCommandSource, Integer> HUGS = IntegerArgument.<ServerCommandSource>newBuilder("hugs")
                     .asOptionalWithDefault("1")
                     .build();
+    private static final CommandArgument<ServerCommandSource, MultiplePlayerSelector> PLAYER_SELECTOR =
+            MultiplePlayerSelectorArgument.of("players");
 
     @Override
     public void onInitialize() {
@@ -112,7 +120,17 @@ public final class FabricExample implements ModInitializer {
             }
         }));
 
-
+        manager.command(base.literal("wave")
+                .argument(PLAYER_SELECTOR)
+                .handler(ctx -> {
+                    final MultiplePlayerSelector selector = ctx.get(PLAYER_SELECTOR);
+                    final Collection<ServerPlayerEntity> selected = selector.get();
+                    selected.forEach(selectedPlayer ->
+                            selectedPlayer.sendMessage(new LiteralText("Wave"), MessageType.SYSTEM, Util.NIL_UUID));
+                    ctx.getSender().sendFeedback(new LiteralText(String.format("Waved at %d players (%s)", selected.size(),
+                            selector.getInput())),
+                            false);
+                }));
 
     }
 
