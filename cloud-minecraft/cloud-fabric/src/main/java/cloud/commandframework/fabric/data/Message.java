@@ -26,6 +26,7 @@ package cloud.commandframework.fabric.data;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 
@@ -34,8 +35,18 @@ import java.util.Collection;
  */
 public interface Message {
 
-    Collection<Entity> getMentionedEntities();
+    /**
+     * Get the collection of entities mentioned in this message.
+     *
+     * @return the mentioned entities
+     */
+    @NonNull Collection<Entity> getMentionedEntities();
 
-    Text getContents();
+    /**
+     * Get the parsed text contents of this message.
+     *
+     * @return the parsed text
+     */
+    @NonNull Text getContents();
 
 }
