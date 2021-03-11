@@ -25,26 +25,12 @@
 package cloud.commandframework.fabric.argument.server;
 
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.fabric.FabricCommandContextKeys;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.Message;
-import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageFormatAccess;
-import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageSelectorAccess;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.MessageArgumentType;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -99,7 +85,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
      */
     public static <C> @NonNull MessageArgument<C> optional(final @NonNull String name) {
         return MessageArgument.<C>newBuilder(name).asOptional().build();
@@ -108,9 +94,9 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
     /**
      * Create a new optional command argument with a default value
      *
-     * @param name        Argument name
+     * @param name         Argument name
      * @param defaultValue Default value
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created argument
      */
     public static <C> @NonNull MessageArgument<C> optional(
@@ -134,7 +120,12 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
          */
         @Override
         public @NonNull MessageArgument<C> build() {
-            return new MessageArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new MessageArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
         }
 
     }

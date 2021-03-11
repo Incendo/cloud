@@ -30,7 +30,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.text.LiteralText;
 
-public class FabricClientExample implements ClientModInitializer {
+public final class FabricClientExample implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         final FabricClientCommandManager<FabricClientCommandSource> commandManager =

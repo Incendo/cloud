@@ -25,11 +25,8 @@
 package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.data.MinecraftTime;
-import net.minecraft.command.argument.TimeArgumentType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -87,7 +84,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
      */
     public static <C> @NonNull TimeArgument<C> optional(final @NonNull String name) {
         return TimeArgument.<C>newBuilder(name).asOptional().build();
@@ -97,7 +94,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
      * Create a new optional command argument with a default value
      *
      * @param name        Argument name
-     * @param defaultTime  Default time, in ticks
+     * @param defaultTime Default time, in ticks
      * @param <C>         Command sender type
      * @return Created argument
      */

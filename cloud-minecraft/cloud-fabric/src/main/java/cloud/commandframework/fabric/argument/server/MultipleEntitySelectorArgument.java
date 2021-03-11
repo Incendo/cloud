@@ -21,11 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.fabric.argument;
+package cloud.commandframework.fabric.argument.server;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.fabric.data.SinglePlayerSelector;
+import cloud.commandframework.fabric.argument.FabricArgumentParsers;
+import cloud.commandframework.fabric.data.MultipleEntitySelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -33,14 +34,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for selecting a single player
+ * An argument for selecting multiple entities
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, SinglePlayerSelector> {
+public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
 
-    SinglePlayerSelectorArgument(
+    MultipleEntitySelectorArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -49,9 +50,9 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         super(
                 required,
                 name,
-                FabricArgumentParsers.singlePlayerSelector(),
+                FabricArgumentParsers.multipleEntitySelector(),
                 defaultValue,
-                SinglePlayerSelector.class,
+                MultipleEntitySelector.class,
                 suggestionsProvider
         );
     }
@@ -63,8 +64,8 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> SinglePlayerSelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new SinglePlayerSelectorArgument.Builder<>(name);
+    public static <C> MultipleEntitySelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return new MultipleEntitySelectorArgument.Builder<>(name);
     }
 
     /**
@@ -74,8 +75,8 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull SinglePlayerSelectorArgument<C> of(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull MultipleEntitySelectorArgument<C> of(final @NonNull String name) {
+        return MultipleEntitySelectorArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
@@ -83,26 +84,31 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
      */
-    public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull MultipleEntitySelectorArgument<C> optional(final @NonNull String name) {
+        return MultipleEntitySelectorArgument.<C>newBuilder(name).asOptional().build();
     }
 
-    public static final class Builder<C> extends TypedBuilder<C, SinglePlayerSelector, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, MultipleEntitySelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(SinglePlayerSelector.class, name);
+            super(MultipleEntitySelector.class, name);
         }
 
         /**
-         * Build a single player selector argument
+         * Build a multiple entity selector argument
          *
          * @return Constructed argument
          */
         @Override
-        public @NonNull SinglePlayerSelectorArgument<C> build() {
-            return new SinglePlayerSelectorArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+        public @NonNull MultipleEntitySelectorArgument<C> build() {
+            return new MultipleEntitySelectorArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
         }
 
     }
