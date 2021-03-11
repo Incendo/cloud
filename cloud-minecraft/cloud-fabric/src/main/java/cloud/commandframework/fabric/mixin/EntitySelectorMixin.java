@@ -21,28 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.fabric.testmod;
+package cloud.commandframework.fabric.mixin;
 
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.fabric.FabricClientCommandManager;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.text.LiteralText;
+import cloud.commandframework.fabric.internal.EntitySelectorAccess;
+import net.minecraft.command.EntitySelector;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.asm.mixin.Implements;
+import org.spongepowered.asm.mixin.Interface;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
-public class FabricClientExample implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        final FabricClientCommandManager<FabricClientCommandSource> commandManager =
-                FabricClientCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
+@Mixin(EntitySelector.class)
+@Implements({@Interface(iface = EntitySelectorAccess.class, prefix = "cloud$", unique = true)})
+abstract class EntitySelectorMixin {
 
-        commandManager.command(
-                commandManager.commandBuilder("cloud_client")
-                        .literal("say")
-                        .argument(StringArgument.greedy("message"))
-                        .handler(ctx -> ctx.getSender().sendFeedback(
-                                new LiteralText("Cloud client commands says: " + ctx.get("message"))
-                        ))
-        );
+    @Unique
+    private String inputString;
+
+    public @NonNull String cloud$inputString() {
+        return this.inputString;
     }
+
+    public void cloud$inputString(final @NonNull String inputString) {
+        this.inputString = inputString;
+    }
+
 }

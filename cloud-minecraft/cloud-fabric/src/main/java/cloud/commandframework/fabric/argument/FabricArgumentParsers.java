@@ -28,20 +28,25 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
-import cloud.commandframework.fabric.argument.server.MessageArgument;
 import cloud.commandframework.fabric.data.Message;
 import cloud.commandframework.fabric.data.MinecraftTime;
+import cloud.commandframework.fabric.data.MultipleEntitySelector;
+import cloud.commandframework.fabric.data.MultiplePlayerSelector;
+import cloud.commandframework.fabric.data.SingleEntitySelector;
+import cloud.commandframework.fabric.data.SinglePlayerSelector;
+import cloud.commandframework.fabric.internal.EntitySelectorAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageFormatAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageSelectorAccess;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.FunctionArgumentType;
+import net.minecraft.command.EntitySelector;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.MessageArgumentType;
 import net.minecraft.command.argument.TimeArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.function.CommandFunction;
 import net.minecraft.text.Text;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -79,12 +84,88 @@ public final class FabricArgumentParsers {
     }
     */
 
+    public static <C> ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
+        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.player())
+                .map((ctx, entitySelector) -> {
+                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+                    if (!(either instanceof ServerCommandSource)) {
+                        return ArgumentParseResult.failure(serverOnly());
+                    }
+                    try {
+                        return ArgumentParseResult.success(new SinglePlayerSelector(
+                                ((EntitySelectorAccess) entitySelector).inputString(),
+                                entitySelector,
+                                entitySelector.getPlayer((ServerCommandSource) either)
+                        ));
+                    } catch (final CommandSyntaxException ex) {
+                        return ArgumentParseResult.failure(ex);
+                    }
+                });
+    }
+
+    public static <C> ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
+        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.players())
+                .map((ctx, entitySelector) -> {
+                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+                    if (!(either instanceof ServerCommandSource)) {
+                        return ArgumentParseResult.failure(serverOnly());
+                    }
+                    try {
+                        return ArgumentParseResult.success(new MultiplePlayerSelector(
+                                ((EntitySelectorAccess) entitySelector).inputString(),
+                                entitySelector,
+                                entitySelector.getPlayers((ServerCommandSource) either)
+                        ));
+                    } catch (final CommandSyntaxException ex) {
+                        return ArgumentParseResult.failure(ex);
+                    }
+                });
+    }
+
+    public static <C> ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
+        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entity())
+                .map((ctx, entitySelector) -> {
+                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+                    if (!(either instanceof ServerCommandSource)) {
+                        return ArgumentParseResult.failure(serverOnly());
+                    }
+                    try {
+                        return ArgumentParseResult.success(new SingleEntitySelector(
+                                ((EntitySelectorAccess) entitySelector).inputString(),
+                                entitySelector,
+                                entitySelector.getEntity((ServerCommandSource) either)
+                        ));
+                    } catch (final CommandSyntaxException ex) {
+                        return ArgumentParseResult.failure(ex);
+                    }
+                });
+    }
+
+    public static <C> ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
+        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entities())
+                .map((ctx, entitySelector) -> {
+                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+                    if (!(either instanceof ServerCommandSource)) {
+                        return ArgumentParseResult.failure(serverOnly());
+                    }
+                    try {
+                        return ArgumentParseResult.success(new MultipleEntitySelector(
+                                ((EntitySelectorAccess) entitySelector).inputString(),
+                                entitySelector,
+                                Collections.unmodifiableCollection(entitySelector.getEntities((ServerCommandSource) either))
+                        ));
+                    } catch (final CommandSyntaxException ex) {
+                        return ArgumentParseResult.failure(ex);
+                    }
+                });
+    }
+
     public static <C> ArgumentParser<C, Message> message() {
         return new WrappedBrigadierParser<C, MessageArgumentType.MessageFormat>(MessageArgumentType.message())
                 .map((ctx, format) -> {
                     final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
                     if (!(either instanceof ServerCommandSource)) {
-                        return ArgumentParseResult.failure(new IllegalStateException("This argument is server-only"));
+                        return ArgumentParseResult.failure(serverOnly());
                     }
                     try {
                         return ArgumentParseResult.success(MessageImpl.from(
@@ -96,6 +177,10 @@ public final class FabricArgumentParsers {
                         return ArgumentParseResult.failure(ex);
                     }
                 });
+    }
+
+    private static @NonNull IllegalStateException serverOnly() {
+        return new IllegalStateException("This argument is server-only");
     }
 
     static final class MessageImpl implements Message {
