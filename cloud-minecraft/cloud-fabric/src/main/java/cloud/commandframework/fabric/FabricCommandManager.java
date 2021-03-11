@@ -206,7 +206,6 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
 
         /* Wrapped brigadier requiring parameters */
         // score holder: single vs multiple
-        // entity argument type: single or multiple, players or any entity -- returns EntitySelector, but do we want that?
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

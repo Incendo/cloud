@@ -73,17 +73,12 @@ public final class FabricArgumentParsers {
                 .map((ctx, val) -> ArgumentParseResult.success(MinecraftTime.of(val)));
     }
 
-    /*
-    public static <C> ArgumentParser<C, CommandFunction> commandFunction() {
-        // TODO: Should probably write our own parser for this, it's either Identifier or tag.
-        // Server parsers
-        return new WrappedBrigadierParser<C, FunctionArgumentType.FunctionArgument>(FunctionArgumentType.function()).map((ctx, val) -> {
-            final CommandSource source = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-            source.getCompletions()
-        })
-    }
-    */
-
+    /**
+     * A parser for {@link SinglePlayerSelector}.
+     *
+     * @param <C> sender type
+     * @return a parser instance
+     */
     public static <C> ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.player())
                 .map((ctx, entitySelector) -> {
@@ -103,6 +98,12 @@ public final class FabricArgumentParsers {
                 });
     }
 
+    /**
+     * A parser for {@link MultiplePlayerSelector}.
+     *
+     * @param <C> sender type
+     * @return a parser instance
+     */
     public static <C> ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.players())
                 .map((ctx, entitySelector) -> {
@@ -122,6 +123,12 @@ public final class FabricArgumentParsers {
                 });
     }
 
+    /**
+     * A parser for {@link SingleEntitySelector}.
+     *
+     * @param <C> sender type
+     * @return a parser instance
+     */
     public static <C> ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entity())
                 .map((ctx, entitySelector) -> {
@@ -141,6 +148,12 @@ public final class FabricArgumentParsers {
                 });
     }
 
+    /**
+     * A parser for {@link MultipleEntitySelector}.
+     *
+     * @param <C> sender type
+     * @return a parser instance
+     */
     public static <C> ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entities())
                 .map((ctx, entitySelector) -> {
@@ -160,6 +173,12 @@ public final class FabricArgumentParsers {
                 });
     }
 
+    /**
+     * A parser for {@link Message}.
+     *
+     * @param <C> sender type
+     * @return a parser instance
+     */
     public static <C> ArgumentParser<C, Message> message() {
         return new WrappedBrigadierParser<C, MessageArgumentType.MessageFormat>(MessageArgumentType.message())
                 .map((ctx, format) -> {
@@ -214,12 +233,12 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public Collection<Entity> getMentionedEntities() {
+        public @NonNull Collection<Entity> getMentionedEntities() {
             return this.mentionedEntities;
         }
 
         @Override
-        public Text getContents() {
+        public @NonNull Text getContents() {
             return this.contents;
         }
 

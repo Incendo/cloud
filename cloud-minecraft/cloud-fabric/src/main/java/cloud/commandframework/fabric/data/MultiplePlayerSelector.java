@@ -29,12 +29,22 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 
+/**
+ * A selector for multiple players.
+ */
 public final class MultiplePlayerSelector implements Selector<ServerPlayerEntity> {
 
     private final String inputString;
     private final EntitySelector entitySelector;
     private final Collection<ServerPlayerEntity> selectedPlayers;
 
+    /**
+     * Create a new MultiplePlayerSelector.
+     *
+     * @param inputString     input string
+     * @param entitySelector  entity selector
+     * @param selectedPlayers selected players
+     */
     public MultiplePlayerSelector(
             final @NonNull String inputString,
             final @NonNull EntitySelector entitySelector,

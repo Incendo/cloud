@@ -29,12 +29,22 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 
+/**
+ * A selector for multiple entities.
+ */
 public final class MultipleEntitySelector implements Selector<Entity> {
 
     private final String inputString;
     private final net.minecraft.command.EntitySelector entitySelector;
     private final Collection<Entity> selectedEntities;
 
+    /**
+     * Create a new MultipleEntitySelector.
+     *
+     * @param inputString      input string
+     * @param entitySelector   entity selector
+     * @param selectedEntities selected entities
+     */
     public MultipleEntitySelector(
             final @NonNull String inputString,
             final @NonNull EntitySelector entitySelector,

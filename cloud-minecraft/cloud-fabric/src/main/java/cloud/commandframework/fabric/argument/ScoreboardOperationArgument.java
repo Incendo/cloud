@@ -94,21 +94,6 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
         return ScoreboardOperationArgument.<C>newBuilder(name).asOptional().build();
     }
 
-    /* (todo: there's no way to get a parseable form from an unknown Operation)
-     * Create a new optional command argument with a default value
-     *
-     * @param name        Argument name
-     * @param defaultTag  Default tag value
-     * @param <C>         Command sender type
-     * @return Created argument
-     *
-    public static <C> @NonNull ScoreboardOperationArgument<C> optional(
-            final @NonNull String name,
-            final Operation defaultTag
-    ) {
-        return ScoreboardOperationArgument.<C>newBuilder(name).asOptionalWithDefault(defaultTag.toString()).build();
-    }*/
-
     public static final class Builder<C> extends TypedBuilder<C, Operation, Builder<C>> {
 
         Builder(final @NonNull String name) {

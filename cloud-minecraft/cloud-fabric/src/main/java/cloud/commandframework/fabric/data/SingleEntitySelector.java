@@ -27,12 +27,22 @@ import net.minecraft.command.EntitySelector;
 import net.minecraft.entity.Entity;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * A selector for a single entity.
+ */
 public final class SingleEntitySelector implements Selector.Single<Entity> {
 
     private final String inputString;
     private final EntitySelector entitySelector;
     private final Entity selectedEntity;
 
+    /**
+     * Create a new SingleEntitySelector.
+     *
+     * @param inputString    input string
+     * @param entitySelector entity selector
+     * @param selectedEntity selected entity
+     */
     public SingleEntitySelector(
             final @NonNull String inputString,
             final @NonNull EntitySelector entitySelector,

@@ -30,7 +30,7 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
-import cloud.commandframework.fabric.argument.MultiplePlayerSelectorArgument;
+import cloud.commandframework.fabric.argument.server.MultiplePlayerSelectorArgument;
 import cloud.commandframework.fabric.data.MultiplePlayerSelector;
 import cloud.commandframework.meta.CommandMeta;
 import com.google.gson.JsonObject;
