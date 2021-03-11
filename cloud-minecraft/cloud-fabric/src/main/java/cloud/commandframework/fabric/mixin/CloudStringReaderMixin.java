@@ -45,7 +45,7 @@ public class CloudStringReaderMixin implements StringReaderAsQueue {
     private @Nullable String cloud$nextWord;
 
     /* Next whitespace index starting at startIdx, or -1 if none is found */
-    static int cloud$nextWhitespace(final String input, final int startIdx) {
+    private static int cloud$nextWhitespace(final String input, final int startIdx) {
         for (int i = startIdx, length = input.length(); i < length; ++i) {
             if (Character.isWhitespace(input.charAt(i))) {
                 return i;

@@ -28,8 +28,11 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
-import cloud.commandframework.fabric.argument.server.MessageArgument;
 import cloud.commandframework.fabric.data.Message;
+import cloud.commandframework.fabric.data.MultipleEntitySelector;
+import cloud.commandframework.fabric.data.MultiplePlayerSelector;
+import cloud.commandframework.fabric.data.SingleEntitySelector;
+import cloud.commandframework.fabric.data.SinglePlayerSelector;
 import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
 import me.lucko.fabric.api.permissions.v0.Permissions;
@@ -121,6 +124,24 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
 
     private void registerParsers() {
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Message.class), params -> FabricArgumentParsers.message());
+
+        // Entity selectors
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(SinglePlayerSelector.class),
+                params -> FabricArgumentParsers.singlePlayerSelector()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(MultiplePlayerSelector.class),
+                params -> FabricArgumentParsers.multiplePlayerSelector()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(SingleEntitySelector.class),
+                params -> FabricArgumentParsers.singleEntitySelector()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(MultipleEntitySelector.class),
+                params -> FabricArgumentParsers.multipleEntitySelector()
+        );
     }
 
     /**
