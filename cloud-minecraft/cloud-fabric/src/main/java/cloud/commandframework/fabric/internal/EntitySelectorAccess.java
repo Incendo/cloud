@@ -27,8 +27,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public interface EntitySelectorAccess {
 
+    /**
+     * Get the last parsed input string
+     *
+     * @return input string
+     */
     @NonNull String inputString();
 
+    /**
+     * Set the last parsed input string
+     *
+     * @param inputString input string
+     */
     void inputString(@NonNull String inputString);
 
 }
