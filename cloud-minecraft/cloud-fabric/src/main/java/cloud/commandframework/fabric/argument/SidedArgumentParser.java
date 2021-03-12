@@ -65,7 +65,7 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
         });
     }
 
-    protected abstract ArgumentParseResult<I> parseIntermediate(
+    protected abstract @NonNull ArgumentParseResult<@NonNull I> parseIntermediate(
             @NonNull CommandContext<@NonNull C> commandContext,
             @NonNull Queue<@NonNull String> inputQueue
     );
@@ -79,7 +79,11 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      * @return a resolved value
      * @since 1.5.0
      */
-    protected abstract ArgumentParseResult<R> resolveClient(CommandContext<C> context, CommandSource source, I value);
+    protected abstract @NonNull ArgumentParseResult<@NonNull R> resolveClient(
+            @NonNull CommandContext<@NonNull C> context,
+            @NonNull CommandSource source,
+            @NonNull I value
+    );
 
     /**
      * Resolve the final value for this argument when running on the server.
@@ -90,6 +94,10 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      * @return a resolved value
      * @since 1.5.0
      */
-    protected abstract ArgumentParseResult<R> resolveServer(CommandContext<C> context, CommandSource source, I value);
+    protected abstract @NonNull ArgumentParseResult<@NonNull R> resolveServer(
+            @NonNull CommandContext<@NonNull C> context,
+            @NonNull CommandSource source,
+            @NonNull I value
+    );
 
 }
