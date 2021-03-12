@@ -67,6 +67,7 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> AngleArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new AngleArgument.Builder<>(name);
@@ -78,29 +79,32 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull AngleArgument<C> of(final @NonNull String name) {
         return AngleArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull AngleArgument<C> optional(final @NonNull String name) {
         return AngleArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
-     * @param defaultAngle  Default angle, in degrees
-     * @param <C>         Command sender type
+     * @param name         Argument name
+     * @param defaultAngle Default angle, in degrees
+     * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull AngleArgument<C> optional(
             final @NonNull String name,
@@ -110,6 +114,12 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
     }
 
 
+    /**
+     * Builder for {@link AngleArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, AngleArgumentType.Angle, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -117,9 +127,10 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
         }
 
         /**
-         * Build a new angle argument
+         * Build a new angle argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull AngleArgument<C> build() {

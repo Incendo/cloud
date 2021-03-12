@@ -49,6 +49,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <C> the sender type
  * @param <T> the value type of the argument
+ * @since 1.5.0
  */
 public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";

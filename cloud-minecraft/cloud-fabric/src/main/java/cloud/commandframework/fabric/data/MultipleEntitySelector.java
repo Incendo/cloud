@@ -31,6 +31,8 @@ import java.util.Collection;
 
 /**
  * A selector for multiple entities.
+ *
+ * @since 1.5.0
  */
 public final class MultipleEntitySelector implements Selector<Entity> {
 
@@ -44,6 +46,7 @@ public final class MultipleEntitySelector implements Selector<Entity> {
      * @param inputString      input string
      * @param entitySelector   entity selector
      * @param selectedEntities selected entities
+     * @since 1.5.0
      */
     public MultipleEntitySelector(
             final @NonNull String inputString,

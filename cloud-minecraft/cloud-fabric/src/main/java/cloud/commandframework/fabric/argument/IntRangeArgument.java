@@ -66,6 +66,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> IntRangeArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new IntRangeArgument.Builder<>(name);
@@ -77,29 +78,32 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull IntRangeArgument<C> of(final @NonNull String name) {
         return IntRangeArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull IntRangeArgument<C> optional(final @NonNull String name) {
         return IntRangeArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
+     * @param name         Argument name
      * @param defaultValue Default value
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull IntRangeArgument<C> optional(
             final @NonNull String name,
@@ -118,6 +122,12 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
     }
 
 
+    /**
+     * Builder for {@link IntRangeArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, NumberRange.IntRange, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -125,13 +135,19 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new int range argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull IntRangeArgument<C> build() {
-            return new IntRangeArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new IntRangeArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
         }
 
     }

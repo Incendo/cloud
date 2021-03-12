@@ -53,6 +53,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @param execCoordinator Execution coordinator instance.
      * @return a new command manager
      * @see #FabricClientCommandManager(Function, Function, Function) for a more thorough explanation
+     * @since 1.5.0
      */
     public static FabricClientCommandManager<FabricClientCommandSource> createNative(
             final Function<CommandTree<FabricClientCommandSource>, CommandExecutionCoordinator<FabricClientCommandSource>> execCoordinator
@@ -73,6 +74,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *                                     {@link AsynchronousCommandExecutionCoordinator}
      * @param commandSourceMapper          Function that maps {@link FabricClientCommandSource} to the command sender type
      * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link FabricClientCommandSource}
+     * @since 1.5.0
      */
     @SuppressWarnings("unchecked")
     public FabricClientCommandManager(
@@ -105,6 +107,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @param sender     Command sender
      * @param permission Permission node
      * @return whether the sender has the specified permission
+     * @since 1.5.0
      */
     @Override
     public boolean hasPermission(@NonNull final C sender, @NonNull final String permission) {

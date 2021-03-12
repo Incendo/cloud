@@ -67,6 +67,7 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> ScoreboardOperationArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new ScoreboardOperationArgument.Builder<>(name);
@@ -78,22 +79,30 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull ScoreboardOperationArgument<C> of(final @NonNull String name) {
         return ScoreboardOperationArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull ScoreboardOperationArgument<C> optional(final @NonNull String name) {
         return ScoreboardOperationArgument.<C>newBuilder(name).asOptional().build();
     }
 
+    /**
+     * Builder for {@link ScoreboardOperationArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, Operation, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -101,9 +110,10 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new operation argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull ScoreboardOperationArgument<C> build() {

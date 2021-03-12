@@ -75,6 +75,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> TeamArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new TeamArgument.Builder<>(name);
@@ -86,29 +87,32 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull TeamArgument<C> of(final @NonNull String name) {
         return TeamArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull TeamArgument<C> optional(final @NonNull String name) {
         return TeamArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
+     * @param name         Argument name
      * @param defaultValue Default value
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull TeamArgument<C> optional(
             final @NonNull String name,
@@ -117,6 +121,12 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         return TeamArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue.name()).build();
     }
 
+    /**
+     * Argument parser for {@link Team}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class TeamParser<C> extends SidedArgumentParser<C, String, Team> {
 
         @Override
@@ -140,9 +150,11 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         @Override
-        protected ArgumentParseResult<Team> resolveClient(final CommandContext<C> context,
-                                                          final CommandSource source,
-                                                          final String value) {
+        protected ArgumentParseResult<Team> resolveClient(
+                final @NonNull CommandContext<C> context,
+                final @NonNull CommandSource source,
+                final @NonNull String value
+        ) {
             final Team result = MinecraftClient.getInstance().getNetworkHandler().getWorld().getScoreboard().getTeam(value);
             if (result == null) {
                 return ArgumentParseResult.failure(new UnknownTeamException(context, value));
@@ -151,9 +163,11 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         @Override
-        protected ArgumentParseResult<Team> resolveServer(final CommandContext<C> context,
-                                                          final CommandSource source,
-                                                          final String value) {
+        protected ArgumentParseResult<Team> resolveServer(
+                final @NonNull CommandContext<C> context,
+                final @NonNull CommandSource source,
+                final @NonNull String value
+        ) {
             final Team result = ((ServerCommandSource) source).getWorld().getScoreboard().getTeam(value);
             if (result == null) {
                 return ArgumentParseResult.failure(new UnknownTeamException(context, value));
@@ -163,6 +177,12 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
 
     }
 
+    /**
+     * Builder for {@link TeamArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, Team, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -170,9 +190,10 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new team argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull TeamArgument<C> build() {
@@ -181,7 +202,13 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
 
     }
 
+    /**
+     * Exception for when a team cannot be found for supplied input.
+     *
+     * @since 1.5.0
+     */
     public static final class UnknownTeamException extends ParserException {
+
         private static final long serialVersionUID = 4249139487412603424L;
 
         UnknownTeamException(
