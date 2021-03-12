@@ -63,6 +63,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> SinglePlayerSelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new SinglePlayerSelectorArgument.Builder<>(name);
@@ -74,22 +75,30 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull SinglePlayerSelectorArgument<C> of(final @NonNull String name) {
         return SinglePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(final @NonNull String name) {
         return SinglePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
     }
 
+    /**
+     * Builder for {@link SinglePlayerSelectorArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, SinglePlayerSelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -97,9 +106,10 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         }
 
         /**
-         * Build a single player selector argument
+         * Build a single player selector argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull SinglePlayerSelectorArgument<C> build() {

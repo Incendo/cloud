@@ -64,6 +64,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> MessageArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new MessageArgument.Builder<>(name);
@@ -75,6 +76,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull MessageArgument<C> of(final @NonNull String name) {
         return MessageArgument.<C>newBuilder(name).asRequired().build();
@@ -86,6 +88,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull MessageArgument<C> optional(final @NonNull String name) {
         return MessageArgument.<C>newBuilder(name).asOptional().build();
@@ -98,15 +101,22 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
      * @param defaultValue Default value
      * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull MessageArgument<C> optional(
             final @NonNull String name,
-            final String defaultValue
+            final @NonNull String defaultValue
     ) {
         return MessageArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
+    /**
+     * Builder for {@link MessageArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, Message, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -114,9 +124,10 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new message argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull MessageArgument<C> build() {

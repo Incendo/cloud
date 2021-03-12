@@ -63,6 +63,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> MultiplePlayerSelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new MultiplePlayerSelectorArgument.Builder<>(name);
@@ -74,22 +75,30 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull MultiplePlayerSelectorArgument<C> of(final @NonNull String name) {
         return MultiplePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(final @NonNull String name) {
         return MultiplePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
     }
 
+    /**
+     * Builder for {@link MultiplePlayerSelectorArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, MultiplePlayerSelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -97,9 +106,10 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         }
 
         /**
-         * Build a multiple player selector argument
+         * Build a multiple player selector argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull MultiplePlayerSelectorArgument<C> build() {

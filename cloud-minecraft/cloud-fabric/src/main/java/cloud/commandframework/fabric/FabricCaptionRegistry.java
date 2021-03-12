@@ -26,19 +26,38 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.captions.SimpleCaptionRegistry;
 
+/**
+ * Caption registry that uses bi-functions to produce messages
+ *
+ * @param <C> Command sender type
+ * @since 1.5.0
+ */
 public class FabricCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
 
+    /**
+     * Default caption for {@link FabricCaptionKeys#ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY}
+     *
+     * @since 1.5.0
+     */
     public static final String ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY = "Could not find key {id} in registry '{registry}'";
-
-    public static final String ARGUMENT_PARSE_FAILURE_TEAM_UNKOWN = "Could not find any team named '{input}'!";
+    /**
+     * Default caption for {@link FabricCaptionKeys#ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN}
+     *
+     * @since 1.5.0
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN = "Could not find any team named '{input}'!";
 
     protected FabricCaptionRegistry() {
         super();
 
-        this.registerMessageFactory(FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY);
-        this.registerMessageFactory(FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN,
-                (caption, sender) -> ARGUMENT_PARSE_FAILURE_TEAM_UNKOWN);
+        this.registerMessageFactory(
+                FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY
+        );
+        this.registerMessageFactory(
+                FabricCaptionKeys.ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN
+        );
     }
 
 

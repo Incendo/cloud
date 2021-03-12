@@ -31,6 +31,8 @@ import java.util.Collection;
 
 /**
  * A selector for multiple players.
+ *
+ * @since 1.5.0
  */
 public final class MultiplePlayerSelector implements Selector<ServerPlayerEntity> {
 
@@ -44,6 +46,7 @@ public final class MultiplePlayerSelector implements Selector<ServerPlayerEntity
      * @param inputString     input string
      * @param entitySelector  entity selector
      * @param selectedPlayers selected players
+     * @since 1.5.0
      */
     public MultiplePlayerSelector(
             final @NonNull String inputString,

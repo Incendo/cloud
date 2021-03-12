@@ -34,6 +34,7 @@ import java.util.Collections;
  * A selector string to query multiple entity-like values
  *
  * @param <V> Value type
+ * @since 1.5.0
  */
 public interface Selector<V> {
 
@@ -41,6 +42,7 @@ public interface Selector<V> {
      * Get the raw string associated with the selector.
      *
      * @return the input
+     * @since 1.5.0
      */
     String getInput();
 
@@ -48,6 +50,7 @@ public interface Selector<V> {
      * If this value came from a parsed selector, this will provide the details of that selector.
      *
      * @return the selector
+     * @since 1.5.0
      */
     @Nullable EntitySelector getSelector();
 
@@ -57,6 +60,7 @@ public interface Selector<V> {
      * <p>A successfully parsed selector must match one or more values</p>
      *
      * @return all matched entities
+     * @since 1.5.0
      */
     Collection<V> get();
 
@@ -64,6 +68,7 @@ public interface Selector<V> {
      * A specialized selector that can only return one value.
      *
      * @param <V> the value type
+     * @since 1.5.0
      */
     interface Single<V> extends Selector<V> {
 
@@ -72,7 +77,14 @@ public interface Selector<V> {
             return Collections.singletonList(this.getSingle());
         }
 
+        /**
+         * Get the single value from this selector.
+         *
+         * @return the value
+         * @since 1.5.0
+         */
         V getSingle();
+
     }
 
 }

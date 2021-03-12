@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for in-game time
+ * An argument for in-game time.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -63,6 +63,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> TimeArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new TimeArgument.Builder<>(name);
@@ -74,29 +75,32 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull TimeArgument<C> of(final @NonNull String name) {
         return TimeArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull TimeArgument<C> optional(final @NonNull String name) {
         return TimeArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
      * @param name        Argument name
      * @param defaultTime Default time, in ticks
      * @param <C>         Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull TimeArgument<C> optional(
             final @NonNull String name,
@@ -106,6 +110,12 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
     }
 
 
+    /**
+     * Builder for {@link TimeArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, MinecraftTime, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -113,9 +123,10 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
         }
 
         /**
-         * Build a new time argument
+         * Build a new time argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull TimeArgument<C> build() {
