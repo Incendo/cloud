@@ -104,7 +104,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
      */
     public static <C> @NonNull TimeArgument<C> optional(
             final @NonNull String name,
-            final MinecraftTime defaultTime
+            final @NonNull MinecraftTime defaultTime
     ) {
         return TimeArgument.<C>newBuilder(name).asOptionalWithDefault(defaultTime.toString()).build();
     }

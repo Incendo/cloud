@@ -25,6 +25,7 @@
 package cloud.commandframework.fabric.data;
 
 import net.minecraft.command.EntitySelector;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
@@ -44,7 +45,7 @@ public interface Selector<V> {
      * @return the input
      * @since 1.5.0
      */
-    String getInput();
+    @NonNull String getInput();
 
     /**
      * If this value came from a parsed selector, this will provide the details of that selector.
@@ -62,7 +63,7 @@ public interface Selector<V> {
      * @return all matched entities
      * @since 1.5.0
      */
-    Collection<V> get();
+    @NonNull Collection<V> get();
 
     /**
      * A specialized selector that can only return one value.
@@ -73,7 +74,7 @@ public interface Selector<V> {
     interface Single<V> extends Selector<V> {
 
         @Override
-        default Collection<V> get() {
+        default @NonNull Collection<V> get() {
             return Collections.singletonList(this.getSingle());
         }
 
@@ -83,7 +84,7 @@ public interface Selector<V> {
          * @return the value
          * @since 1.5.0
          */
-        V getSingle();
+        @NonNull V getSingle();
 
     }
 

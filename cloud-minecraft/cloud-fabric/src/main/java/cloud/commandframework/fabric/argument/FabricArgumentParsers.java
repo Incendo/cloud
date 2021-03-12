@@ -69,7 +69,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      * @since 1.5.0
      */
-    public static <C> ArgumentParser<C, MinecraftTime> time() {
+    public static <C> @NonNull ArgumentParser<C, MinecraftTime> time() {
         return new WrappedBrigadierParser<C, Integer>(TimeArgumentType.time())
                 .map((ctx, val) -> ArgumentParseResult.success(MinecraftTime.of(val)));
     }
@@ -81,7 +81,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      * @since 1.5.0
      */
-    public static <C> ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
+    public static <C> @NonNull ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.player())
                 .map((ctx, entitySelector) -> {
                     final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
@@ -107,7 +107,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      * @since 1.5.0
      */
-    public static <C> ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
+    public static <C> @NonNull ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.players())
                 .map((ctx, entitySelector) -> {
                     final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
@@ -133,7 +133,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      * @since 1.5.0
      */
-    public static <C> ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
+    public static <C> @NonNull ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entity())
                 .map((ctx, entitySelector) -> {
                     final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
@@ -159,7 +159,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      * @since 1.5.0
      */
-    public static <C> ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
+    public static <C> @NonNull ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entities())
                 .map((ctx, entitySelector) -> {
                     final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
@@ -185,7 +185,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      * @since 1.5.0
      */
-    public static <C> ArgumentParser<C, Message> message() {
+    public static <C> @NonNull ArgumentParser<C, Message> message() {
         return new WrappedBrigadierParser<C, MessageArgumentType.MessageFormat>(MessageArgumentType.message())
                 .map((ctx, format) -> {
                     final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
@@ -213,8 +213,8 @@ public final class FabricArgumentParsers {
         private final Text contents;
 
         static MessageImpl from(
-                final ServerCommandSource source,
-                final MessageArgumentType.MessageFormat message,
+                final @NonNull ServerCommandSource source,
+                final MessageArgumentType.@NonNull MessageFormat message,
                 final boolean useSelectors
         ) throws CommandSyntaxException {
             final Text contents = message.format(source,  useSelectors);
