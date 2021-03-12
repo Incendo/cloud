@@ -106,7 +106,7 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
      */
     public static <C> @NonNull ScoreboardCriterionArgument<C> optional(
             final @NonNull String name,
-            final ScoreboardCriterion defaultCriterion
+            final @NonNull ScoreboardCriterion defaultCriterion
     ) {
         return ScoreboardCriterionArgument.<C>newBuilder(name).asOptionalWithDefault(defaultCriterion.getName()).build();
     }

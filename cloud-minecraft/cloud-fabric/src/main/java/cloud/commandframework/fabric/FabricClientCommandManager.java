@@ -55,8 +55,9 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @see #FabricClientCommandManager(Function, Function, Function) for a more thorough explanation
      * @since 1.5.0
      */
-    public static FabricClientCommandManager<FabricClientCommandSource> createNative(
-            final Function<CommandTree<FabricClientCommandSource>, CommandExecutionCoordinator<FabricClientCommandSource>> execCoordinator
+    public static @NonNull FabricClientCommandManager<@NonNull FabricClientCommandSource> createNative(
+            final @NonNull Function<@NonNull CommandTree<@NonNull FabricClientCommandSource>,
+                    @NonNull CommandExecutionCoordinator<@NonNull FabricClientCommandSource>> execCoordinator
     ) {
         return new FabricClientCommandManager<>(execCoordinator, Function.identity(), Function.identity());
     }
@@ -76,11 +77,11 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link FabricClientCommandSource}
      * @since 1.5.0
      */
-    @SuppressWarnings("unchecked")
     public FabricClientCommandManager(
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final Function<FabricClientCommandSource, C> commandSourceMapper,
-            final Function<C, FabricClientCommandSource> backwardsCommandSourceMapper
+            final @NonNull Function<@NonNull CommandTree<@NonNull C>,
+                    @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull FabricClientCommandSource, @NonNull C> commandSourceMapper,
+            final @NonNull Function<@NonNull C, @NonNull FabricClientCommandSource> backwardsCommandSourceMapper
     ) {
         super(
                 commandExecutionCoordinator,
@@ -110,7 +111,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     @Override
-    public boolean hasPermission(@NonNull final C sender, @NonNull final String permission) {
+    public boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         return true;
     }
 

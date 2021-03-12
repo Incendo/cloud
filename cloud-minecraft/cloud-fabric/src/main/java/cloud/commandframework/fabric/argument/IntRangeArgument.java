@@ -107,7 +107,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
      */
     public static <C> @NonNull IntRangeArgument<C> optional(
             final @NonNull String name,
-            final NumberRange.IntRange defaultValue
+            final NumberRange.@NonNull IntRange defaultValue
     ) {
         final StringBuilder value = new StringBuilder(6);
         if (defaultValue.getMin() != null) {
