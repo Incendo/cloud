@@ -32,12 +32,19 @@ import net.minecraft.command.CommandSource;
 
 /**
  * Keys used in {@link CommandContext}s available within a {@link FabricCommandManager}
+ *
+ * @since 1.5.0
  */
 public final class FabricCommandContextKeys {
 
     private FabricCommandContextKeys() {
     }
 
+    /**
+     * Key used to store the native {@link CommandSource} in the command context.
+     *
+     * @since 1.5.0
+     */
     public static final CloudKey<CommandSource> NATIVE_COMMAND_SOURCE = SimpleCloudKey.of(
             "cloud:fabric_command_source",
             TypeToken.get(CommandSource.class)

@@ -42,6 +42,7 @@ import java.util.Queue;
  * @param <C> command sender type
  * @param <I> intermediate type to resolve
  * @param <R> resolved type
+ * @since 1.5.0
  */
 abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
 
@@ -73,9 +74,10 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      * Resolve the final value for this argument when running on the client.
      *
      * @param context Command context
-     * @param source The command source
-     * @param value parsed intermediate value
+     * @param source  The command source
+     * @param value   parsed intermediate value
      * @return a resolved value
+     * @since 1.5.0
      */
     protected abstract ArgumentParseResult<R> resolveClient(CommandContext<C> context, CommandSource source, I value);
 
@@ -83,9 +85,10 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      * Resolve the final value for this argument when running on the server.
      *
      * @param context Command context
-     * @param source The command source
-     * @param value Parsed intermediate value
+     * @param source  The command source
+     * @param value   Parsed intermediate value
      * @return a resolved value
+     * @since 1.5.0
      */
     protected abstract ArgumentParseResult<R> resolveServer(CommandContext<C> context, CommandSource source, I value);
 

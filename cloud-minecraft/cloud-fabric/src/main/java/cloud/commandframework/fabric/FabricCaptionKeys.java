@@ -31,20 +31,34 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+/**
+ * {@link Caption} instances for messages in cloud-fabric
+ *
+ * @since 1.5.0
+ */
 public final class FabricCaptionKeys {
-
-    private FabricCaptionKeys() {
-    }
 
     private static final Collection<Caption> RECOGNIZED_CAPTIONS = new HashSet<>();
 
+    /**
+     * Variables: {id}, {registry}
+     *
+     * @since 1.5.0
+     */
     public static final Caption ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY = of(
             "argument.parse.failure.registry_entry.unknown_entry"
     );
-
+    /**
+     * Variables: {input}
+     *
+     * @since 1.5.0
+     */
     public static final Caption ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN = of(
             "argument.parse.failure.team.unknown"
     );
+
+    private FabricCaptionKeys() {
+    }
 
     private static @NonNull Caption of(final @NonNull String key) {
         final Caption caption = Caption.of(key);
@@ -56,6 +70,7 @@ public final class FabricCaptionKeys {
      * Get an immutable collection containing all standard caption keys
      *
      * @return Immutable collection of keys
+     * @since 1.5.0
      */
     public static @NonNull Collection<@NonNull Caption> getFabricCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);

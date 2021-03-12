@@ -66,6 +66,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> FloatRangeArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new FloatRangeArgument.Builder<>(name);
@@ -77,33 +78,36 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull FloatRangeArgument<C> of(final @NonNull String name) {
         return FloatRangeArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull FloatRangeArgument<C> optional(final @NonNull String name) {
         return FloatRangeArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
+     * @param name         Argument name
      * @param defaultValue Default value
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull FloatRangeArgument<C> optional(
             final @NonNull String name,
-            final NumberRange.FloatRange defaultValue
+            final NumberRange.@NonNull FloatRange defaultValue
     ) {
         final StringBuilder value = new StringBuilder(6);
         if (defaultValue.getMin() != null) {
@@ -118,6 +122,12 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
     }
 
 
+    /**
+     * Builder for {@link FloatRangeArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, NumberRange.FloatRange, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -125,13 +135,19 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new float range argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull FloatRangeArgument<C> build() {
-            return new FloatRangeArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new FloatRangeArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
         }
 
     }

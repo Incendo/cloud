@@ -64,6 +64,7 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> EntityAnchorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new EntityAnchorArgument.Builder<>(name);
@@ -75,29 +76,32 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull EntityAnchorArgument<C> of(final @NonNull String name) {
         return EntityAnchorArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull EntityAnchorArgument<C> optional(final @NonNull String name) {
         return EntityAnchorArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
+     * @param name         Argument name
      * @param defaultValue Default value
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull EntityAnchorArgument<C> optional(
             final @NonNull String name,
@@ -107,6 +111,12 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
     }
 
 
+    /**
+     * Builder for {@link EntityAnchorArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, EntityAnchorArgumentType.EntityAnchor, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -114,13 +124,19 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new entity anchor argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull EntityAnchorArgument<C> build() {
-            return new EntityAnchorArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new EntityAnchorArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
         }
 
     }
