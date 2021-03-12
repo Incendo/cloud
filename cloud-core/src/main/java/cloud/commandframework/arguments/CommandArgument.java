@@ -751,7 +751,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param <C> sender type
      * @param <T> argument value type
      * @param <B> the subclass type
-     * @since 1.4.0
+     * @since 1.5.0
      */
     public abstract static class TypedBuilder<C, T, B extends Builder<C, T>> extends Builder<C, T> {
 
