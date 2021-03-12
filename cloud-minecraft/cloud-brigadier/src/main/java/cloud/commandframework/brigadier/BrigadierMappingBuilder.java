@@ -48,6 +48,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      *
      * @param constant the argument type
      * @return this builder
+     * @since 1.5.0
      */
     BrigadierMappingBuilder<K, S> toConstant(ArgumentType<?> constant);
 
@@ -56,6 +57,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      *
      * @param mapper the mapper
      * @return this builder
+     * @since 1.5.0
      */
     BrigadierMappingBuilder<K, S> to(Function<K, ? extends ArgumentType<?>> mapper);
 
@@ -65,6 +67,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      * <p>This is the default option if a mapped type is specified.</p>
      *
      * @return this builder
+     * @since 1.5.0
      */
     BrigadierMappingBuilder<K, S> nativeSuggestions();
 
@@ -76,6 +79,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      * <p>Any previously set suggestion provider suppliers will not be used.</p>
      *
      * @return this builder
+     * @since 1.5.0
      */
     BrigadierMappingBuilder<K, S> cloudSuggestions();
 
@@ -84,6 +88,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      *
      * @param provider the suggestions provider
      * @return this builder
+     * @since 1.5.0
      */
     default BrigadierMappingBuilder<K, S> suggestedByConstant(final SuggestionProvider<S> provider) {
         requireNonNull(provider, "provider");
@@ -95,17 +100,20 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
      *
      * @param provider the suggestions provider
      * @return this builder
+     * @since 1.5.0
      */
     BrigadierMappingBuilder<K, S> suggestedBy(SuggestionProviderSupplier<K, S> provider);
 
     @FunctionalInterface
     interface SuggestionProviderSupplier<K extends ArgumentParser<?, ?>, S> {
+
         /**
          * Create a new suggestion provider based on the provided argument.
          *
          * @param argument Argument to create a specialized provider for
          * @param useCloud A provider that can be returned to ask the server to use cloud suggestions
          * @return A new provider, or {@code null} to use the default value for the mapped argument type
+         * @since 1.5.0
          */
         @Nullable SuggestionProvider<? super S> provide(@NonNull K argument, SuggestionProvider<S> useCloud);
 

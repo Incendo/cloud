@@ -52,6 +52,7 @@ import static java.util.Objects.requireNonNull;
  * @since 1.5.0
  */
 public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> {
+
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";
 
     private final ArgumentType<T> nativeType;
@@ -61,6 +62,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
      * Create an argument parser based on a brigadier command.
      *
      * @param nativeType the native command type
+     * @since 1.5.0
      */
     public WrappedBrigadierParser(final ArgumentType<T> nativeType) {
         this(nativeType, DEFAULT_ARGUMENT_COUNT);
@@ -69,8 +71,9 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
     /**
      * Create an argument parser based on a brigadier command.
      *
-     * @param nativeType the native command type
+     * @param nativeType            the native command type
      * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
+     * @since 1.5.0
      */
     public WrappedBrigadierParser(
             final ArgumentType<T> nativeType,
@@ -84,6 +87,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
      * Get the backing Brigadier {@link ArgumentType} for this parser.
      *
      * @return the argument type
+     * @since 1.5.0
      */
     public ArgumentType<T> getNativeArgument() {
         return this.nativeType;
@@ -140,8 +144,10 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
                 false
         );
 
-        final CompletableFuture<Suggestions> result = this.nativeType.listSuggestions(reverseMappedContext,
-                new SuggestionsBuilder(input, 0));
+        final CompletableFuture<Suggestions> result = this.nativeType.listSuggestions(
+                reverseMappedContext,
+                new SuggestionsBuilder(input, 0)
+        );
 
         /* again, avert your eyes */
         final List<Suggestion> suggestions = result.join().getList();
