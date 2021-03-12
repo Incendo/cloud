@@ -38,8 +38,6 @@ import java.util.function.BiFunction;
 /**
  * An argument for any {@link net.minecraft.particle.ParticleEffect}
  *
- * <p>These operations can be used to compare scores on a {@link net.minecraft.scoreboard.Scoreboard}.</p>
- *
  * @param <C> the sender type
  * @since 1.5.0
  */

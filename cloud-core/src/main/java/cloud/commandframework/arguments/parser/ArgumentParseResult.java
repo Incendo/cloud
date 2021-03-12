@@ -73,7 +73,7 @@ public abstract class ArgumentParseResult<T> {
      * @param mapper the transformation
      * @param <U> the result type
      * @return a new result if successful, otherwise a failure
-     * @since 1.4.0
+     * @since 1.5.0
      */
     public abstract <U> @NonNull ArgumentParseResult<U> mapParsedValue(Function<T, U> mapper);
 
@@ -83,7 +83,7 @@ public abstract class ArgumentParseResult<T> {
      * @param mapper the transformation
      * @param <U> the result type
      * @return a new result if successful, otherwise a failure
-     * @since 1.4.0
+     * @since 1.5.0
      */
     public abstract <U> @NonNull ArgumentParseResult<U> flatMapParsedValue(Function<T, ArgumentParseResult<U>> mapper);
 
@@ -99,7 +99,7 @@ public abstract class ArgumentParseResult<T> {
      *
      * @param mapper the exception transformation
      * @return if this is a failure, a transformed result, otherwise this
-     * @since 1.4.0
+     * @since 1.5.0
      */
     public abstract @NonNull ArgumentParseResult<T> mapFailure(Function<Throwable, Throwable> mapper);
 

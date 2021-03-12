@@ -252,7 +252,7 @@ public final class CloudBrigadierManager<C, S> {
      * <p>This is passed to completion requests for mapped argument types.</p>
      *
      * @param mapper the reverse brigadier sender mapper
-     * @since 1.4.0
+     * @since 1.5.0
      */
     public void backwardsBrigadierSenderMapper(final @NonNull Function<@NonNull C, @Nullable S> mapper) {
         this.backwardsBrigadierCommandSenderMapper = mapper;
@@ -335,7 +335,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param <T>               cloud argument value type
      * @param <K>               cloud argument type
      * @param <O>               Brigadier argument type value
-     * @deprecated for removal since 1.4.0, use {@link #registerMapping(TypeToken, Consumer)} instead.
+     * @deprecated for removal since 1.5.0, use {@link #registerMapping(TypeToken, Consumer)} instead.
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -359,7 +359,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param parserType The cloud argument parser type
      * @param configurer a callback that will configure the mapping attributes
      * @param <K> cloud argument parser type
-     * @since 1.4.0
+     * @since 1.5.0
      */
     public <K extends ArgumentParser<C, ?>> void registerMapping(final @NonNull TypeToken<K> parserType,
                                                                  final Consumer<BrigadierMappingBuilder<K, S>> configurer) {
