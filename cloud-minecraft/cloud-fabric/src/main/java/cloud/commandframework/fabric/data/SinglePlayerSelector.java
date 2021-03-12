@@ -29,6 +29,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A selector for a single player.
+ *
+ * @since 1.5.0
  */
 public final class SinglePlayerSelector implements Selector.Single<ServerPlayerEntity> {
 
@@ -42,6 +44,7 @@ public final class SinglePlayerSelector implements Selector.Single<ServerPlayerE
      * @param inputString    input string
      * @param entitySelector entity selector
      * @param selectedPlayer selected player
+     * @since 1.5.0
      */
     public SinglePlayerSelector(
             final @NonNull String inputString,

@@ -29,6 +29,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A selector for a single entity.
+ *
+ * @since 1.5.0
  */
 public final class SingleEntitySelector implements Selector.Single<Entity> {
 
@@ -42,6 +44,7 @@ public final class SingleEntitySelector implements Selector.Single<Entity> {
      * @param inputString    input string
      * @param entitySelector entity selector
      * @param selectedEntity selected entity
+     * @since 1.5.0
      */
     public SingleEntitySelector(
             final @NonNull String inputString,

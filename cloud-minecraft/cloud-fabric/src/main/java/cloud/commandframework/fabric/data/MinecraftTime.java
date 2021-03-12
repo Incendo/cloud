@@ -38,6 +38,7 @@ import static java.util.Objects.requireNonNull;
  * @since 1.5.0
  */
 public final class MinecraftTime {
+
     private static final MinecraftTime ZERO = new MinecraftTime(0);
 
     private final long ticks;
@@ -47,6 +48,7 @@ public final class MinecraftTime {
      *
      * @param ticks the number of ticks
      * @return a time holder
+     * @since 1.5.0
      */
     public static MinecraftTime of(final long ticks) {
         return ticks == 0 ? ZERO : new MinecraftTime(ticks);
@@ -56,8 +58,9 @@ public final class MinecraftTime {
      * Given an amount of time in another unit, create a game time holding the number of ticks expected to pass in that time.
      *
      * @param amount the amount of time
-     * @param unit the unit
+     * @param unit   the unit
      * @return a time holder
+     * @since 1.5.0
      */
     public static MinecraftTime of(final long amount, final TemporalUnit unit) {
         requireNonNull(unit, "unit");
@@ -68,8 +71,9 @@ public final class MinecraftTime {
      * Given an amount of time in another unit, create a game time holding the number of ticks expected to pass in that time.
      *
      * @param amount the amount of time
-     * @param unit the unit
+     * @param unit   the unit
      * @return a time holder
+     * @since 1.5.0
      */
     public static MinecraftTime of(final long amount, final TimeUnit unit) {
         requireNonNull(unit, "unit");
@@ -87,6 +91,7 @@ public final class MinecraftTime {
      * See {@link #getLongTicks()} for the full contents.</p>
      *
      * @return the time in ticks
+     * @since 1.5.0
      */
     public int getTicks() {
         return (int) this.ticks;
@@ -96,6 +101,7 @@ public final class MinecraftTime {
      * Get the number of in-game ticks represented by this time.
      *
      * @return the time in ticks
+     * @since 1.5.0
      */
     public long getLongTicks() {
         return this.ticks;
@@ -106,6 +112,7 @@ public final class MinecraftTime {
      *
      * @param unit the target unit
      * @return the target duration, as represented by the provided unit
+     * @since 1.5.0
      */
     public long convertTo(final TemporalUnit unit) {
         return this.ticks * 50 / unit.getDuration().toMillis();
@@ -116,6 +123,7 @@ public final class MinecraftTime {
      *
      * @param unit the target unit
      * @return the target duration, as represented by the provided unit
+     * @since 1.5.0
      */
     public long convertTo(final TimeUnit unit) {
         return unit.convert(this.ticks * 50, TimeUnit.MILLISECONDS);

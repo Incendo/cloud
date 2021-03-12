@@ -32,6 +32,14 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * An argument parser which wraps another argument parser, converting the output type.
+ *
+ * @param <C> sender type
+ * @param <I> base output type
+ * @param <O> mapped output type
+ * @since 1.5.0
+ */
 public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O> {
     private final ArgumentParser<C, I> base;
     private final BiFunction<CommandContext<C>, I, ArgumentParseResult<O>> mapper;
