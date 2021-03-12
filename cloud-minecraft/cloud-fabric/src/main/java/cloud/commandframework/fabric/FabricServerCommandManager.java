@@ -79,8 +79,9 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      * @see #FabricServerCommandManager(Function, Function, Function) for a more thorough explanation
      * @since 1.5.0
      */
-    public static FabricServerCommandManager<ServerCommandSource> createNative(
-            final Function<CommandTree<ServerCommandSource>, CommandExecutionCoordinator<ServerCommandSource>> execCoordinator
+    public static @NonNull FabricServerCommandManager<@NonNull ServerCommandSource> createNative(
+            final @NonNull Function<@NonNull CommandTree<@NonNull ServerCommandSource>,
+                    @NonNull CommandExecutionCoordinator<@NonNull ServerCommandSource>> execCoordinator
     ) {
         return new FabricServerCommandManager<>(execCoordinator, Function.identity(), Function.identity());
     }
@@ -101,9 +102,10 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public FabricServerCommandManager(
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final Function<ServerCommandSource, C> commandSourceMapper,
-            final Function<C, ServerCommandSource> backwardsCommandSourceMapper
+            final @NonNull Function<@NonNull CommandTree<@NonNull C>,
+                    @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull ServerCommandSource, @NonNull C> commandSourceMapper,
+            final @NonNull Function<@NonNull C, @NonNull ServerCommandSource> backwardsCommandSourceMapper
     ) {
         super(
                 commandExecutionCoordinator,
@@ -159,7 +161,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     @Override
-    public boolean hasPermission(@NonNull final C sender, @NonNull final String permission) {
+    public boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         final ServerCommandSource source = this.getBackwardsCommandSourceMapper().apply(sender);
         return Permissions.check(source, permission, source.getMinecraftServer().getOpPermissionLevel());
     }

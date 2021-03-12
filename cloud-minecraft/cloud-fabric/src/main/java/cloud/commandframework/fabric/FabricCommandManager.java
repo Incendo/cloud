@@ -139,10 +139,10 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     @SuppressWarnings("unchecked")
     FabricCommandManager(
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final Function<S, C> commandSourceMapper,
-            final Function<C, S> backwardsCommandSourceMapper,
-            final FabricCommandRegistrationHandler<C, S> registrationHandler,
-            final Supplier<S> dummyCommandSourceProvider
+            final @NonNull Function<S, C> commandSourceMapper,
+            final @NonNull Function<C, S> backwardsCommandSourceMapper,
+            final @NonNull FabricCommandRegistrationHandler<C, S> registrationHandler,
+            final @NonNull Supplier<S> dummyCommandSourceProvider
     ) {
         super(commandExecutionCoordinator, registrationHandler);
         this.commandSourceMapper = commandSourceMapper;
@@ -164,11 +164,13 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         ((FabricCommandRegistrationHandler<C, S>) this.getCommandRegistrationHandler()).initialize(this);
     }
 
-    private void registerNativeBrigadierMappings(final CloudBrigadierManager<C, S> brigadier) {
+    private void registerNativeBrigadierMappings(final @NonNull CloudBrigadierManager<C, S> brigadier) {
         /* Cloud-native argument types */
-        brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {}, builder -> builder.toConstant(UuidArgumentType.uuid()));
+        brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {
+        }, builder -> builder.toConstant(UuidArgumentType.uuid()));
         this.registerRegistryEntryMappings();
-        brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {}, builder -> builder.toConstant(TeamArgumentType.team()));
+        brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {
+        }, builder -> builder.toConstant(TeamArgumentType.team()));
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Team.class), params -> new TeamArgument.TeamParser<>());
 
         /* Wrapped/Constant Brigadier types, native value type */
@@ -180,9 +182,13 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         this.registerConstantNativeParserSupplier(OperationArgumentType.Operation.class, OperationArgumentType.operation());
         this.registerConstantNativeParserSupplier(ParticleEffect.class, ParticleArgumentType.particle());
         this.registerConstantNativeParserSupplier(AngleArgumentType.Angle.class, AngleArgumentType.angle());
-        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {}, SwizzleArgumentType.swizzle());
+        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {
+        }, SwizzleArgumentType.swizzle());
         this.registerConstantNativeParserSupplier(Identifier.class, IdentifierArgumentType.identifier());
-        this.registerConstantNativeParserSupplier(EntityAnchorArgumentType.EntityAnchor.class, EntityAnchorArgumentType.entityAnchor());
+        this.registerConstantNativeParserSupplier(
+                EntityAnchorArgumentType.EntityAnchor.class,
+                EntityAnchorArgumentType.entityAnchor()
+        );
         this.registerConstantNativeParserSupplier(NumberRange.IntRange.class, NumberRangeArgumentType.numberRange());
         this.registerConstantNativeParserSupplier(NumberRange.FloatRange.class, NumberRangeArgumentType.method_30918());
         // todo: can we add a compound argument -- MC `ItemStackArgument` is just type and tag, and count is separate
@@ -207,7 +213,10 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         this.registerConstantNativeParserSupplier(Team.class, TeamArgumentType.team());
         this.registerConstantNativeParserSupplier(/* slot *, ItemSlotArgumentType.itemSlot());
         this.registerConstantNativeParserSupplier(CommandFunction.class, FunctionArgumentType.function()); */
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(MinecraftTime.class), params -> FabricArgumentParsers.time());
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(MinecraftTime.class),
+                params -> FabricArgumentParsers.time()
+        );
 
         /* Wrapped brigadier requiring parameters */
         // score holder: single vs multiple
@@ -310,7 +319,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
      * @param <T>      value type
      * @since 1.5.0
      */
-    final <T> void registerConstantNativeParserSupplier(final Class<T> type, final ArgumentType<T> argument) {
+    final <T> void registerConstantNativeParserSupplier(final @NonNull Class<T> type, final @NonNull ArgumentType<T> argument) {
         this.registerConstantNativeParserSupplier(TypeToken.get(type), argument);
     }
 
@@ -322,7 +331,10 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
      * @param <T>      value type
      * @since 1.5.0
      */
-    final <T> void registerConstantNativeParserSupplier(final TypeToken<T> type, final ArgumentType<T> argument) {
+    final <T> void registerConstantNativeParserSupplier(
+            final @NonNull TypeToken<T> type,
+            final @NonNull ArgumentType<T> argument
+    ) {
         this.getParserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
     }
 

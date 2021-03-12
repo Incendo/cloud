@@ -138,7 +138,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         @Override
-        protected ArgumentParseResult<String> parseIntermediate(
+        protected @NonNull ArgumentParseResult<String> parseIntermediate(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
@@ -150,7 +150,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         @Override
-        protected ArgumentParseResult<Team> resolveClient(
+        protected @NonNull ArgumentParseResult<Team> resolveClient(
                 final @NonNull CommandContext<C> context,
                 final @NonNull CommandSource source,
                 final @NonNull String value
@@ -163,7 +163,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         @Override
-        protected ArgumentParseResult<Team> resolveServer(
+        protected @NonNull ArgumentParseResult<Team> resolveServer(
                 final @NonNull CommandContext<C> context,
                 final @NonNull CommandSource source,
                 final @NonNull String value

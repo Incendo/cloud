@@ -24,6 +24,8 @@
 
 package cloud.commandframework.fabric.data;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.time.temporal.TemporalUnit;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +52,7 @@ public final class MinecraftTime {
      * @return a time holder
      * @since 1.5.0
      */
-    public static MinecraftTime of(final long ticks) {
+    public static @NonNull MinecraftTime of(final long ticks) {
         return ticks == 0 ? ZERO : new MinecraftTime(ticks);
     }
 
@@ -62,7 +64,7 @@ public final class MinecraftTime {
      * @return a time holder
      * @since 1.5.0
      */
-    public static MinecraftTime of(final long amount, final TemporalUnit unit) {
+    public static @NonNull MinecraftTime of(final long amount, final @NonNull TemporalUnit unit) {
         requireNonNull(unit, "unit");
         return new MinecraftTime(Math.round(amount / 50d * unit.getDuration().toMillis()));
     }
@@ -75,7 +77,7 @@ public final class MinecraftTime {
      * @return a time holder
      * @since 1.5.0
      */
-    public static MinecraftTime of(final long amount, final TimeUnit unit) {
+    public static @NonNull MinecraftTime of(final long amount, final @NonNull TimeUnit unit) {
         requireNonNull(unit, "unit");
         return amount == 0 ? ZERO : new MinecraftTime(TimeUnit.MILLISECONDS.convert(amount, unit) / 50);
     }
@@ -114,7 +116,7 @@ public final class MinecraftTime {
      * @return the target duration, as represented by the provided unit
      * @since 1.5.0
      */
-    public long convertTo(final TemporalUnit unit) {
+    public long convertTo(final @NonNull TemporalUnit unit) {
         return this.ticks * 50 / unit.getDuration().toMillis();
     }
 
@@ -125,7 +127,7 @@ public final class MinecraftTime {
      * @return the target duration, as represented by the provided unit
      * @since 1.5.0
      */
-    public long convertTo(final TimeUnit unit) {
+    public long convertTo(final @NonNull TimeUnit unit) {
         return unit.convert(this.ticks * 50, TimeUnit.MILLISECONDS);
     }
 
