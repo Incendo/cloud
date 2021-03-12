@@ -98,6 +98,7 @@ public interface ArgumentParser<C, T> {
      * @param mapper the mapper to apply
      * @param <O> the result type
      * @return a derived parser.
+     * @since 1.5.0
      */
     default <O> @NonNull ArgumentParser<C, O> map(final BiFunction<CommandContext<C>, T, ArgumentParseResult<O>> mapper) {
         return new MappedArgumentParser<>(this, requireNonNull(mapper, "mapper"));
