@@ -45,7 +45,9 @@ import java.util.function.BiFunction;
  * @since 1.5.0
  */
 public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.Axis>> {
-    private static final TypeToken<EnumSet<Direction.Axis>> TYPE = new TypeToken<EnumSet<Direction.Axis>>() {};
+
+    private static final TypeToken<EnumSet<Direction.Axis>> TYPE = new TypeToken<EnumSet<Direction.Axis>>() {
+    };
 
     AxisArgument(
             final boolean required,
@@ -69,6 +71,7 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> AxisArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new AxisArgument.Builder<>(name);
@@ -80,29 +83,32 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull AxisArgument<C> of(final @NonNull String name) {
         return AxisArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull AxisArgument<C> optional(final @NonNull String name) {
         return AxisArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
+     * @param name          Argument name
      * @param defaultValues Default axes to include
-     * @param <C>         Command sender type
+     * @param <C>           Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull AxisArgument<C> optional(
             final @NonNull String name,
@@ -116,6 +122,12 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
     }
 
 
+    /**
+     * Builder for {@link AxisArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, EnumSet<Direction.Axis>, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -123,9 +135,10 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new axis argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull AxisArgument<C> build() {

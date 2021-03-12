@@ -63,6 +63,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> MultipleEntitySelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new MultipleEntitySelectorArgument.Builder<>(name);
@@ -74,6 +75,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull MultipleEntitySelectorArgument<C> of(final @NonNull String name) {
         return MultipleEntitySelectorArgument.<C>newBuilder(name).asRequired().build();
@@ -85,11 +87,18 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull MultipleEntitySelectorArgument<C> optional(final @NonNull String name) {
         return MultipleEntitySelectorArgument.<C>newBuilder(name).asOptional().build();
     }
 
+    /**
+     * Builder for {@link MultipleEntitySelectorArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, MultipleEntitySelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -97,9 +106,10 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
         }
 
         /**
-         * Build a multiple entity selector argument
+         * Build a multiple entity selector argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull MultipleEntitySelectorArgument<C> build() {

@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an item identifier and optional NBT data
+ * An argument parsing an item identifier and optional NBT data.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -67,6 +67,7 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> ItemDataArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new ItemDataArgument.Builder<>(name);
@@ -78,33 +79,36 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull ItemDataArgument<C> of(final @NonNull String name) {
         return ItemDataArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull ItemDataArgument<C> optional(final @NonNull String name) {
         return ItemDataArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
+     * @param name         Argument name
      * @param defaultValue Default value
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull ItemDataArgument<C> optional(
             final @NonNull String name,
-            final ItemStack defaultValue
+            final @NonNull ItemStack defaultValue
     ) {
         final String serializedDefault;
         if (defaultValue.hasTag()) {
@@ -116,6 +120,11 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
 
     }
 
+    /**
+     * Builder for {@link ItemDataArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, ItemStackArgument, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -123,13 +132,19 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new item data argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull ItemDataArgument<C> build() {
-            return new ItemDataArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new ItemDataArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
         }
 
     }

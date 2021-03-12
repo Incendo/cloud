@@ -65,6 +65,7 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> IdentifierArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new IdentifierArgument.Builder<>(name);
@@ -76,29 +77,32 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull IdentifierArgument<C> of(final @NonNull String name) {
         return IdentifierArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull IdentifierArgument<C> optional(final @NonNull String name) {
         return IdentifierArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
+     * @param name         Argument name
      * @param defaultValue Default value
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull IdentifierArgument<C> optional(
             final @NonNull String name,
@@ -108,6 +112,12 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
     }
 
 
+    /**
+     * Builder for {@link IdentifierArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, Identifier, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -115,13 +125,19 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new identifier argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull IdentifierArgument<C> build() {
-            return new IdentifierArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new IdentifierArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
         }
 
     }

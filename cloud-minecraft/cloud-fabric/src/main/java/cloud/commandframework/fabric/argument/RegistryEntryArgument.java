@@ -61,6 +61,7 @@ import static java.util.Objects.requireNonNull;
  * @since 1.5.0
  */
 public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
+
     private static final String NAMESPACE_MINECRAFT = "minecraft";
 
     RegistryEntryArgument(
@@ -77,46 +78,51 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     /**
      * Create a new builder.
      *
-     * @param name Name of the argument
-     * @param type The type of registry entry
+     * @param name     Name of the argument
+     * @param type     The type of registry entry
      * @param registry A key for the registry to get values from
-     * @param <C>  Command sender type
-     * @param <V> Registry entry type
+     * @param <C>      Command sender type
+     * @param <V>      Registry entry type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C, V> RegistryEntryArgument.@NonNull Builder<C, V> newBuilder(
             final @NonNull String name,
             final @NonNull Class<V> type,
-            final @NonNull RegistryKey<? extends Registry<V>> registry) {
+            final @NonNull RegistryKey<? extends Registry<V>> registry
+    ) {
         return new RegistryEntryArgument.Builder<>(registry, type, name);
     }
 
     /**
      * Create a new builder.
      *
-     * @param name Name of the argument
-     * @param type The type of registry entry
+     * @param name     Name of the argument
+     * @param type     The type of registry entry
      * @param registry A key for the registry to get values from
-     * @param <C>  Command sender type
-     * @param <V> Registry entry type
+     * @param <C>      Command sender type
+     * @param <V>      Registry entry type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C, V> RegistryEntryArgument.@NonNull Builder<C, V> newBuilder(
             final @NonNull String name,
             final @NonNull TypeToken<V> type,
-            final @NonNull RegistryKey<? extends Registry<V>> registry) {
+            final @NonNull RegistryKey<? extends Registry<V>> registry
+    ) {
         return new RegistryEntryArgument.Builder<>(registry, type, name);
     }
 
     /**
      * Create a new required command argument.
      *
-     * @param name Argument name
-     * @param type The type of registry entry
+     * @param name     Argument name
+     * @param type     The type of registry entry
      * @param registry A key for the registry to get values from
-     * @param <C>  Command sender type
-     * @param <V> Registry entry type
+     * @param <C>      Command sender type
+     * @param <V>      Registry entry type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> of(
             final @NonNull String name,
@@ -127,14 +133,15 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
-     * @param name Argument name
-     * @param type The type of registry entry
+     * @param name     Argument name
+     * @param type     The type of registry entry
      * @param registry A key for the registry to get values from
-     * @param <C>  Command sender type
-     * @param <V> Registry entry type
-     * @return     Created argument
+     * @param <C>      Command sender type
+     * @param <V>      Registry entry type
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
             final @NonNull String name,
@@ -145,15 +152,16 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
-     * @param type The type of registry entry
-     * @param registry A key for the registry to get values from
+     * @param name         Argument name
+     * @param type         The type of registry entry
+     * @param registry     A key for the registry to get values from
      * @param defaultValue Default value
-     * @param <C>         Command sender type
-     * @param <V> Registry entry type
+     * @param <C>          Command sender type
+     * @param <V>          Registry entry type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
             final @NonNull String name,
@@ -167,18 +175,21 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * A parser for values stored in a {@link Registry}
+     * A parser for values stored in a {@link Registry}.
      *
      * @param <C> Command sender type
      * @param <V> Registry entry type
+     * @since 1.5.0
      */
     public static final class RegistryEntryParser<C, V> implements ArgumentParser<C, V> {
+
         private final RegistryKey<? extends Registry<V>> registryIdent;
 
         /**
          * Create a new parser for registry entries.
          *
          * @param registryIdent the registry identifier
+         * @since 1.5.0
          */
         public RegistryEntryParser(final RegistryKey<? extends Registry<V>> registryIdent) {
             this.registryIdent = requireNonNull(registryIdent, "registryIdent");
@@ -253,8 +264,10 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         }
 
         /**
-         * Get the registry associated with this parser
+         * Get the registry associated with this parser.
+         *
          * @return the registry
+         * @since 1.5.0
          */
         public RegistryKey<? extends Registry<?>> getRegistry() {
             return this.registryIdent;
@@ -267,8 +280,10 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      *
      * @param <C> The sender type
      * @param <V> The registry value type
+     * @since 1.5.0
      */
     public static final class Builder<C, V> extends CommandArgument.TypedBuilder<C, V, Builder<C, V>> {
+
         private final RegistryKey<? extends Registry<V>> registryIdent;
 
         Builder(
@@ -300,10 +315,13 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                     this.getSuggestionsProvider()
             );
         }
+
     }
 
     /**
      * An exception thrown when an entry in a registry could not be found.
+     *
+     * @since 1.5.0
      */
     private static final class UnknownEntryException extends ParserException {
 

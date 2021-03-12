@@ -108,7 +108,9 @@ import java.util.function.Supplier;
  * @see FabricServerCommandManager for server commands
  * @since 1.5.0
  */
-public abstract class FabricCommandManager<C, S extends CommandSource> extends CommandManager<C> implements BrigadierManagerHolder<C> {
+public abstract class FabricCommandManager<C, S extends CommandSource> extends CommandManager<C> implements
+        BrigadierManagerHolder<C> {
+
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int MOD_PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
 
@@ -120,18 +122,19 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     /**
      * Create a new command manager instance.
      *
-     * @param commandExecutionCoordinator Execution coordinator instance. The coordinator is in charge of executing incoming
-     *                                    commands. Some considerations must be made when picking a suitable execution coordinator
-     *                                    for your platform. For example, an entirely asynchronous coordinator is not suitable
-     *                                    when the parsers used in that particular platform are not thread safe. If you have
-     *                                    commands that perform blocking operations, however, it might not be a good idea to
-     *                                    use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                    {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                    {@link AsynchronousCommandExecutionCoordinator}
+     * @param commandExecutionCoordinator  Execution coordinator instance. The coordinator is in charge of executing incoming
+     *                                     commands. Some considerations must be made when picking a suitable execution coordinator
+     *                                     for your platform. For example, an entirely asynchronous coordinator is not suitable
+     *                                     when the parsers used in that particular platform are not thread safe. If you have
+     *                                     commands that perform blocking operations, however, it might not be a good idea to
+     *                                     use a synchronous execution coordinator. In most cases you will want to pick between
+     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link AsynchronousCommandExecutionCoordinator}
      * @param commandSourceMapper          Function that maps {@link CommandSource} to the command sender type
      * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link CommandSource}
-     * @param registrationHandler the handler accepting command registrations
-     * @param dummyCommandSourceProvider a provider of a dummy command source, for use with brigadier registration
+     * @param registrationHandler          the handler accepting command registrations
+     * @param dummyCommandSourceProvider   a provider of a dummy command source, for use with brigadier registration
+     * @since 1.5.0
      */
     @SuppressWarnings("unchecked")
     FabricCommandManager(
@@ -140,7 +143,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
             final Function<C, S> backwardsCommandSourceMapper,
             final FabricCommandRegistrationHandler<C, S> registrationHandler,
             final Supplier<S> dummyCommandSourceProvider
-            ) {
+    ) {
         super(commandExecutionCoordinator, registrationHandler);
         this.commandSourceMapper = commandSourceMapper;
         this.backwardsCommandSourceMapper = backwardsCommandSourceMapper;
@@ -151,7 +154,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
                 // See net.minecraft.server.function.FunctionLoader.reload for reference
                 this.commandSourceMapper.apply(dummyCommandSourceProvider.get()),
                 this
-                ));
+        ));
         this.brigadierManager.backwardsBrigadierSenderMapper(this.backwardsCommandSourceMapper);
         this.brigadierManager.brigadierSenderMapper(this.commandSourceMapper);
         this.registerNativeBrigadierMappings(this.brigadierManager);
@@ -186,8 +189,10 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         this.registerConstantNativeParserSupplier(ItemStackArgument.class, ItemStackArgumentType.itemStack());
 
         /* Wrapped/Constant Brigadier types, mapped value type */
-        this.registerConstantNativeParserSupplier(BlockPredicateArgumentType.BlockPredicate.class,
-                BlockPredicateArgumentType.blockPredicate());
+        this.registerConstantNativeParserSupplier(
+                BlockPredicateArgumentType.BlockPredicate.class,
+                BlockPredicateArgumentType.blockPredicate()
+        );
         this.registerConstantNativeParserSupplier(MessageArgumentType.MessageFormat.class, MessageArgumentType.message());
         /*this.registerConstantNativeParserSupplier(GameProfile.class, GameProfileArgumentType.gameProfile());
         this.registerConstantNativeParserSupplier(BlockPos.class, BlockPosArgumentType.blockPos());
@@ -210,7 +215,9 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void registerRegistryEntryMappings() {
-        this.brigadierManager.registerMapping(new TypeToken<RegistryEntryArgument.RegistryEntryParser<C, ?>>() {},
+        this.brigadierManager.registerMapping(
+                new TypeToken<RegistryEntryArgument.RegistryEntryParser<C, ?>>() {
+                },
                 builder -> builder.to(argument -> {
                             /* several registries have specialized argument types, so let's use those where possible */
                             final RegistryKey<? extends Registry<?>> registry = argument.getRegistry();
@@ -288,17 +295,20 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
             seenClasses.add(GenericTypeReflector.erase(valueType));
 
             /* and now, finally, we can register */
-            this.getParserRegistry().registerParserSupplier(TypeToken.get(valueType),
-                    params -> new RegistryEntryArgument.RegistryEntryParser(key));
+            this.getParserRegistry().registerParserSupplier(
+                    TypeToken.get(valueType),
+                    params -> new RegistryEntryArgument.RegistryEntryParser(key)
+            );
         }
     }
 
     /**
      * Register a parser supplier for a brigadier type that has no options and whose output can be directly used.
      *
-     * @param type the Java type to map
+     * @param type     the Java type to map
      * @param argument the Brigadier parser
-     * @param <T> value type
+     * @param <T>      value type
+     * @since 1.5.0
      */
     final <T> void registerConstantNativeParserSupplier(final Class<T> type, final ArgumentType<T> argument) {
         this.registerConstantNativeParserSupplier(TypeToken.get(type), argument);
@@ -307,9 +317,10 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     /**
      * Register a parser supplier for a brigadier type that has no options and whose output can be directly used.
      *
-     * @param type the Java type to map
+     * @param type     the Java type to map
      * @param argument the Brigadier parser
-     * @param <T> value type
+     * @param <T>      value type
+     * @since 1.5.0
      */
     final <T> void registerConstantNativeParserSupplier(final TypeToken<T> type, final ArgumentType<T> argument) {
         this.getParserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
@@ -324,6 +335,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
      * Gets the mapper from a game {@link CommandSource} to the manager's {@code C} type.
      *
      * @return Command source mapper
+     * @since 1.5.0
      */
     public final @NonNull Function<@NonNull S, @NonNull C> getCommandSourceMapper() {
         return this.commandSourceMapper;
@@ -333,6 +345,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
      * Gets the mapper from the manager's {@code C} type to a game {@link CommandSource}.
      *
      * @return Command source mapper
+     * @since 1.5.0
      */
     public final @NonNull Function<@NonNull C, @NonNull S> getBackwardsCommandSourceMapper() {
         return this.backwardsCommandSourceMapper;

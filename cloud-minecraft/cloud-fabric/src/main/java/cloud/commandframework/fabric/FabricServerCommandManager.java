@@ -63,6 +63,8 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      * A meta attribute specifying which environments a command should be registered in.
      *
      * <p>The default value is {@link CommandManager.RegistrationEnvironment#ALL}.</p>
+     *
+     * @since 1.5.0
      */
     public static final CommandMeta.Key<CommandManager.RegistrationEnvironment> META_REGISTRATION_ENVIRONMENT = CommandMeta.Key.of(
             CommandManager.RegistrationEnvironment.class,
@@ -75,6 +77,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      * @param execCoordinator Execution coordinator instance.
      * @return a new command manager
      * @see #FabricServerCommandManager(Function, Function, Function) for a more thorough explanation
+     * @since 1.5.0
      */
     public static FabricServerCommandManager<ServerCommandSource> createNative(
             final Function<CommandTree<ServerCommandSource>, CommandExecutionCoordinator<ServerCommandSource>> execCoordinator
@@ -95,6 +98,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      *                                     {@link AsynchronousCommandExecutionCoordinator}
      * @param commandSourceMapper          Function that maps {@link ServerCommandSource} to the command sender type
      * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link ServerCommandSource}
+     * @since 1.5.0
      */
     public FabricServerCommandManager(
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
@@ -152,6 +156,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      * @param sender     Command sender
      * @param permission Permission node
      * @return whether the sender has the specified permission
+     * @since 1.5.0
      */
     @Override
     public boolean hasPermission(@NonNull final C sender, @NonNull final String permission) {

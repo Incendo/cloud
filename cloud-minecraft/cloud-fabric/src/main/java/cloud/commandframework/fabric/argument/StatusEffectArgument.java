@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing a status effect from the {@link net.minecraft.util.registry.Registry#STATUS_EFFECT status effect registry}
+ * An argument parsing a status effect from the {@link net.minecraft.util.registry.Registry#STATUS_EFFECT status effect registry}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -66,6 +66,7 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> StatusEffectArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new StatusEffectArgument.Builder<>(name);
@@ -77,29 +78,32 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull StatusEffectArgument<C> of(final @NonNull String name) {
         return StatusEffectArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull StatusEffectArgument<C> optional(final @NonNull String name) {
         return StatusEffectArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Argument name
+     * @param name         Argument name
      * @param defaultValue Default value
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull StatusEffectArgument<C> optional(
             final @NonNull String name,
@@ -111,6 +115,12 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
     }
 
 
+    /**
+     * Builder for {@link StatusEffectArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, StatusEffect, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -118,9 +128,10 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
         }
 
         /**
-         * Build a new criterion argument
+         * Build a new status effect argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull StatusEffectArgument<C> build() {

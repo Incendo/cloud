@@ -50,49 +50,54 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
     ) {
         super(required, name, new WrappedBrigadierParser<>(ColorArgumentType.color()), defaultValue, Formatting.class,
-                suggestionsProvider);
+                suggestionsProvider
+        );
     }
 
     /**
-     * Create a new builder
+     * Create a new builder.
      *
      * @param name Name of the component
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> ColorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new ColorArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command component
+     * Create a new required command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created component
+     * @since 1.5.0
      */
     public static <C> @NonNull ColorArgument<C> of(final @NonNull String name) {
         return ColorArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created component
+     * @since 1.5.0
      */
     public static <C> @NonNull ColorArgument<C> optional(final @NonNull String name) {
         return ColorArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Component name
+     * @param name         Component name
      * @param defaultColor Default colour, must be {@link Formatting#isColor() a color}
-     * @param <C>         Command sender type
+     * @param <C>          Command sender type
      * @return Created component
+     * @since 1.5.0
      */
     public static <C> @NonNull ColorArgument<C> optional(
             final @NonNull String name,
@@ -105,6 +110,12 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
     }
 
 
+    /**
+     * Builder for {@link ColorArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Formatting, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -112,9 +123,10 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
         }
 
         /**
-         * Build a new argument
+         * Build a new color argument.
          *
          * @return Constructed argument
+         * @since 1.5.0
          */
         @Override
         public @NonNull ColorArgument<C> build() {

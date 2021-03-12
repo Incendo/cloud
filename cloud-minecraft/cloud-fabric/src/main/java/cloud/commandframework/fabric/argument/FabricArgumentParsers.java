@@ -67,6 +67,7 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
+     * @since 1.5.0
      */
     public static <C> ArgumentParser<C, MinecraftTime> time() {
         return new WrappedBrigadierParser<C, Integer>(TimeArgumentType.time())
@@ -78,6 +79,7 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
+     * @since 1.5.0
      */
     public static <C> ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.player())
@@ -103,6 +105,7 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
+     * @since 1.5.0
      */
     public static <C> ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.players())
@@ -128,6 +131,7 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
+     * @since 1.5.0
      */
     public static <C> ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entity())
@@ -153,6 +157,7 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
+     * @since 1.5.0
      */
     public static <C> ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entities())
@@ -178,6 +183,7 @@ public final class FabricArgumentParsers {
      *
      * @param <C> sender type
      * @return a parser instance
+     * @since 1.5.0
      */
     public static <C> ArgumentParser<C, Message> message() {
         return new WrappedBrigadierParser<C, MessageArgumentType.MessageFormat>(MessageArgumentType.message())
@@ -199,7 +205,7 @@ public final class FabricArgumentParsers {
     }
 
     private static @NonNull IllegalStateException serverOnly() {
-        return new IllegalStateException("This argument is server-only");
+        return new IllegalStateException("This command argument type is server-only.");
     }
 
     static final class MessageImpl implements Message {

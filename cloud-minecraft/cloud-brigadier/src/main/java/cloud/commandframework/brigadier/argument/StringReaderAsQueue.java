@@ -39,6 +39,8 @@ import java.util.Queue;
  *
  * <p>This can be implemented either by wrapping an existing {@link StringReader} instance, or extending {@link StringReader}
  * at its creation time to implement this interface.</p>
+ *
+ * @since 1.5.0
  */
 public interface StringReaderAsQueue extends Queue<String> {
 

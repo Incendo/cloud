@@ -32,6 +32,8 @@ import java.util.Collection;
 
 /**
  * A parsed message.
+ *
+ * @since 1.5.0
  */
 public interface Message {
 
@@ -39,6 +41,7 @@ public interface Message {
      * Get the collection of entities mentioned in this message.
      *
      * @return the mentioned entities
+     * @since 1.5.0
      */
     @NonNull Collection<Entity> getMentionedEntities();
 
@@ -46,6 +49,7 @@ public interface Message {
      * Get the parsed text contents of this message.
      *
      * @return the parsed text
+     * @since 1.5.0
      */
     @NonNull Text getContents();
 

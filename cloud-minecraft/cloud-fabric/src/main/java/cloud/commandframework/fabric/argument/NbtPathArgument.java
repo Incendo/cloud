@@ -59,45 +59,49 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
     }
 
     /**
-     * Create a new builder
+     * Create a new builder.
      *
      * @param name Name of the component
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.5.0
      */
     public static <C> NbtPathArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new NbtPathArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command argument
+     * Create a new required command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull NbtPathArgument<C> of(final @NonNull String name) {
         return NbtPathArgument.<C>newBuilder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional command argument.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return     Created argument
+     * @return Created argument
+     * @since 1.5.0
      */
     public static <C> @NonNull NbtPathArgument<C> optional(final @NonNull String name) {
         return NbtPathArgument.<C>newBuilder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional command argument with a default value.
      *
-     * @param name        Component name
-     * @param defaultTag  Default tag value
-     * @param <C>         Command sender type
+     * @param name       Component name
+     * @param defaultTag Default tag value
+     * @param <C>        Command sender type
      * @return Created component
+     * @since 1.5.0
      */
     public static <C> @NonNull NbtPathArgument<C> optional(
             final @NonNull String name,
@@ -107,6 +111,12 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
     }
 
 
+    /**
+     * Builder for {@link NbtPathArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.5.0
+     */
     public static final class Builder<C> extends TypedBuilder<C, NbtPathArgumentType.NbtPath, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -114,13 +124,19 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
         }
 
         /**
-         * Builder a new example component
+         * Build a new nbt path argument.
          *
          * @return Constructed component
+         * @since 1.5.0
          */
         @Override
         public @NonNull NbtPathArgument<C> build() {
-            return new NbtPathArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new NbtPathArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider()
+            );
         }
 
     }

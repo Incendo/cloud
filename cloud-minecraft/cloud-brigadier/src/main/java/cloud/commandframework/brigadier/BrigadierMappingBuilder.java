@@ -39,6 +39,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <K> the Cloud argument parser type
  * @param <S> the brigadier-native sender type
+ * @since 1.5.0
  */
 public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
 
