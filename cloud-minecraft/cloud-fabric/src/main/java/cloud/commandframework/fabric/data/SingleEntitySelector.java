@@ -23,52 +23,13 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.command.EntitySelector;
 import net.minecraft.entity.Entity;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A selector for a single entity.
  *
  * @since 1.5.0
  */
-public final class SingleEntitySelector implements Selector.Single<Entity> {
-
-    private final String inputString;
-    private final EntitySelector entitySelector;
-    private final Entity selectedEntity;
-
-    /**
-     * Create a new SingleEntitySelector.
-     *
-     * @param inputString    input string
-     * @param entitySelector entity selector
-     * @param selectedEntity selected entity
-     * @since 1.5.0
-     */
-    public SingleEntitySelector(
-            final @NonNull String inputString,
-            final @NonNull EntitySelector entitySelector,
-            final @NonNull Entity selectedEntity
-    ) {
-        this.inputString = inputString;
-        this.entitySelector = entitySelector;
-        this.selectedEntity = selectedEntity;
-    }
-
-    @Override
-    public @NonNull String getInput() {
-        return this.inputString;
-    }
-
-    @Override
-    public @NonNull EntitySelector getSelector() {
-        return this.entitySelector;
-    }
-
-    @Override
-    public @NonNull Entity getSingle() {
-        return this.selectedEntity;
-    }
+public interface SingleEntitySelector extends Selector.Single<Entity> {
 
 }

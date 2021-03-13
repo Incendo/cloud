@@ -23,52 +23,13 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.command.EntitySelector;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A selector for a single player.
  *
  * @since 1.5.0
  */
-public final class SinglePlayerSelector implements Selector.Single<ServerPlayerEntity> {
-
-    private final String inputString;
-    private final EntitySelector entitySelector;
-    private final ServerPlayerEntity selectedPlayer;
-
-    /**
-     * Create a new SinglePlayerSelector.
-     *
-     * @param inputString    input string
-     * @param entitySelector entity selector
-     * @param selectedPlayer selected player
-     * @since 1.5.0
-     */
-    public SinglePlayerSelector(
-            final @NonNull String inputString,
-            final @NonNull EntitySelector entitySelector,
-            final @NonNull ServerPlayerEntity selectedPlayer
-    ) {
-        this.inputString = inputString;
-        this.entitySelector = entitySelector;
-        this.selectedPlayer = selectedPlayer;
-    }
-
-    @Override
-    public @NonNull String getInput() {
-        return this.inputString;
-    }
-
-    @Override
-    public @NonNull EntitySelector getSelector() {
-        return this.entitySelector;
-    }
-
-    @Override
-    public @NonNull ServerPlayerEntity getSingle() {
-        return this.selectedPlayer;
-    }
+public interface SinglePlayerSelector extends Selector.Single<ServerPlayerEntity> {
 
 }
