@@ -121,6 +121,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *
      * @param <C> sender type
      * @return a predicate permission
+     * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> integratedServerRunning() {
         return sender -> MinecraftClient.getInstance().isIntegratedServerRunning();
@@ -131,6 +132,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *
      * @param <C> sender type
      * @return a predicate permission
+     * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> integratedServerNotRunning() {
         return sender -> !MinecraftClient.getInstance().isIntegratedServerRunning();
@@ -143,6 +145,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *
      * @param <C> sender type
      * @return a predicate permission
+     * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> cheatsAllowed() {
         return cheatsAllowed(true);
@@ -157,6 +160,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @param allowOnMultiplayer whether the predicate should pass on multiplayer servers
      * @param <C>                sender type
      * @return a predicate permission
+     * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> cheatsAllowed(final boolean allowOnMultiplayer) {
         return sender -> {
@@ -174,6 +178,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      *
      * @param <C> sender type
      * @return a predicate permission
+     * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> cheatsDisallowed() {
         return cheatsDisallowed(true);
@@ -188,6 +193,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @param allowOnMultiplayer whether the predicate should pass on multiplayer servers
      * @param <C>                sender type
      * @return a predicate permission
+     * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> cheatsDisallowed(final boolean allowOnMultiplayer) {
         return sender -> {
