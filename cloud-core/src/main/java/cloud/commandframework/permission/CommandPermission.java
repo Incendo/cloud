@@ -59,7 +59,7 @@ public interface CommandPermission {
      * @return a new {@code or} permission
      * @since 1.4.0
      */
-    default CommandPermission or(final CommandPermission other) {
+    default @NonNull CommandPermission or(final @NonNull CommandPermission other) {
         requireNonNull(other, "other");
         final Set<CommandPermission> permission = new HashSet<>(2);
         permission.add(this);
@@ -74,7 +74,7 @@ public interface CommandPermission {
      * @return a new {@code or} permission
      * @since 1.4.0
      */
-    default CommandPermission or(final CommandPermission... other) {
+    default @NonNull CommandPermission or(final @NonNull CommandPermission @NonNull ... other) {
         requireNonNull(other, "other");
         final Set<CommandPermission> permission = new HashSet<>(other.length + 1);
         permission.add(this);
@@ -89,7 +89,7 @@ public interface CommandPermission {
      * @return a new {@code and} permission
      * @since 1.4.0
      */
-    default CommandPermission and(final CommandPermission other) {
+    default @NonNull CommandPermission and(final @NonNull CommandPermission other) {
         requireNonNull(other, "other");
         final Set<CommandPermission> permission = new HashSet<>(2);
         permission.add(this);
@@ -104,7 +104,7 @@ public interface CommandPermission {
      * @return a new {@code and} permission
      * @since 1.4.0
      */
-    default CommandPermission and(final CommandPermission... other) {
+    default @NonNull CommandPermission and(final @NonNull CommandPermission @NonNull ... other) {
         requireNonNull(other, "other");
         final Set<CommandPermission> permission = new HashSet<>(other.length + 1);
         permission.add(this);
