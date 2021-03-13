@@ -39,6 +39,7 @@ import cloud.commandframework.fabric.argument.TeamArgument;
 import cloud.commandframework.fabric.data.MinecraftTime;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.permission.PredicatePermission;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.serialization.Codec;
@@ -371,6 +372,18 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     /* transition state to prevent further registration */
     final void registrationCalled() {
         this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+    }
+
+    /**
+     * Get a permission predicate which passes when the sender has the specified permission level.
+     *
+     * @param permissionLevel permission level to require
+     * @return a permission predicate
+     */
+    public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
+        return sender -> this.getBackwardsCommandSourceMapper()
+                .apply(sender)
+                .hasPermissionLevel(permissionLevel);
     }
 
 }

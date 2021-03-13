@@ -27,6 +27,7 @@ package cloud.commandframework.fabric;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.permission.PredicatePermission;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
@@ -113,6 +114,88 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
     @Override
     public boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         return true;
+    }
+
+    /**
+     * Get a permission predicate which passes when the integrated server is running.
+     *
+     * @param <C> sender type
+     * @return a predicate permission
+     */
+    public static <C> @NonNull PredicatePermission<C> integratedServerRunning() {
+        return sender -> MinecraftClient.getInstance().isIntegratedServerRunning();
+    }
+
+    /**
+     * Get a permission predicate which passes when the integrated server is not running.
+     *
+     * @param <C> sender type
+     * @return a predicate permission
+     */
+    public static <C> @NonNull PredicatePermission<C> integratedServerNotRunning() {
+        return sender -> !MinecraftClient.getInstance().isIntegratedServerRunning();
+    }
+
+    /**
+     * Get a permission predicate which passes when cheats are enabled on the currently running integrated server.
+     *
+     * <p>This predicate will always pass if there is no integrated server running, i.e. when connected to a multiplayer server.</p>
+     *
+     * @param <C> sender type
+     * @return a predicate permission
+     */
+    public static <C> @NonNull PredicatePermission<C> cheatsAllowed() {
+        return cheatsAllowed(true);
+    }
+
+    /**
+     * Get a permission predicate which passes when cheats are enabled on the currently running integrated server.
+     *
+     * <p>When there is no integrated server running, i.e. when connected to a multiplayer server, the predicate will
+     * fall back to the provided boolean argument.</p>
+     *
+     * @param allowOnMultiplayer whether the predicate should pass on multiplayer servers
+     * @param <C>                sender type
+     * @return a predicate permission
+     */
+    public static <C> @NonNull PredicatePermission<C> cheatsAllowed(final boolean allowOnMultiplayer) {
+        return sender -> {
+            if (!MinecraftClient.getInstance().isIntegratedServerRunning()) {
+                return allowOnMultiplayer;
+            }
+            return MinecraftClient.getInstance().getServer().getPlayerManager().areCheatsAllowed();
+        };
+    }
+
+    /**
+     * Get a permission predicate which passes when cheats are disabled on the currently running integrated server.
+     *
+     * <p>This predicate will always pass if there is no integrated server running, i.e. when connected to a multiplayer server.</p>
+     *
+     * @param <C> sender type
+     * @return a predicate permission
+     */
+    public static <C> @NonNull PredicatePermission<C> cheatsDisallowed() {
+        return cheatsDisallowed(true);
+    }
+
+    /**
+     * Get a permission predicate which passes when cheats are disabled on the currently running integrated server.
+     *
+     * <p>When there is no integrated server running, i.e. when connected to a multiplayer server, the predicate will
+     * fall back to the provided boolean argument.</p>
+     *
+     * @param allowOnMultiplayer whether the predicate should pass on multiplayer servers
+     * @param <C>                sender type
+     * @return a predicate permission
+     */
+    public static <C> @NonNull PredicatePermission<C> cheatsDisallowed(final boolean allowOnMultiplayer) {
+        return sender -> {
+            if (!MinecraftClient.getInstance().isIntegratedServerRunning()) {
+                return allowOnMultiplayer;
+            }
+            return !MinecraftClient.getInstance().getServer().getPlayerManager().areCheatsAllowed();
+        };
     }
 
 }
