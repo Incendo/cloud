@@ -26,8 +26,11 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
+import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
+import cloud.commandframework.fabric.data.Coordinates;
 import cloud.commandframework.fabric.data.Message;
 import cloud.commandframework.fabric.data.MinecraftTime;
 import cloud.commandframework.fabric.data.MultipleEntitySelector;
@@ -38,19 +41,28 @@ import cloud.commandframework.fabric.internal.EntitySelectorAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageFormatAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageSelectorAccess;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.leangen.geantyref.TypeToken;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.EntitySelector;
+import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.command.argument.ColumnPosArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.MessageArgumentType;
+import net.minecraft.command.argument.PosArgument;
 import net.minecraft.command.argument.TimeArgumentType;
+import net.minecraft.command.argument.Vec2ArgumentType;
+import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.function.Function;
 
 /**
  * Parsers for Vanilla command argument types.
@@ -75,6 +87,67 @@ public final class FabricArgumentParsers {
     }
 
     /**
+     * A parser for block coordinates.
+     *
+     * @param <C> sender type
+     * @return a parser instance
+     */
+    public static <C> @NonNull ArgumentParser<C, Coordinates.BlockCoordinates> blockPos() {
+        return new WrappedBrigadierParser<C, PosArgument>(BlockPosArgumentType.blockPos())
+                .map(FabricArgumentParsers::mapToCoordinates);
+    }
+
+    /**
+     * A parser for column coordinates.
+     *
+     * @param <C> sender type
+     * @return a parser instance
+     */
+    public static <C> @NonNull ArgumentParser<C, Coordinates.ColumnCoordinates> columnPos() {
+        return new WrappedBrigadierParser<C, PosArgument>(ColumnPosArgumentType.columnPos())
+                .map(FabricArgumentParsers::mapToCoordinates);
+    }
+
+    /**
+     * A parser for coordinates, relative or absolute, from 2 doubles for x and z,
+     * with y always defaulting to 0.
+     *
+     * @param centerIntegers whether to center integers at x.5
+     * @param <C>            sender type
+     * @return a parser instance
+     */
+    public static <C> @NonNull ArgumentParser<C, Coordinates.CoordinatesXZ> vec2(final boolean centerIntegers) {
+        return new WrappedBrigadierParser<C, PosArgument>(new Vec2ArgumentType(centerIntegers))
+                .map(FabricArgumentParsers::mapToCoordinates);
+    }
+
+    /**
+     * A parser for coordinates, relative or absolute, from 3 doubles.
+     *
+     * @param centerIntegers whether to center integers at x.5
+     * @param <C>            sender type
+     * @return a parser instance
+     */
+    public static <C> @NonNull ArgumentParser<C, Coordinates> vec3(final boolean centerIntegers) {
+        return new WrappedBrigadierParser<C, PosArgument>(Vec3ArgumentType.vec3(centerIntegers))
+                .map(FabricArgumentParsers::mapToCoordinates);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <C, O extends Coordinates> @NonNull ArgumentParseResult<@NonNull O> mapToCoordinates(
+            final @NonNull CommandContext<C> ctx,
+            final @NonNull PosArgument posArgument
+    ) {
+        return requireServerCommandSource(
+                ctx,
+                serverCommandSource -> ArgumentParseResult.success((O) new CoordinatesImpl(
+                        serverCommandSource,
+                        posArgument
+                ))
+        );
+    }
+
+    /**
      * A parser for {@link SinglePlayerSelector}.
      *
      * @param <C> sender type
@@ -83,21 +156,16 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.player())
-                .map((ctx, entitySelector) -> {
-                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-                    if (!(either instanceof ServerCommandSource)) {
-                        return ArgumentParseResult.failure(serverOnly());
-                    }
-                    try {
-                        return ArgumentParseResult.success(new SinglePlayerSelector(
-                                ((EntitySelectorAccess) entitySelector).inputString(),
-                                entitySelector,
-                                entitySelector.getPlayer((ServerCommandSource) either)
-                        ));
-                    } catch (final CommandSyntaxException ex) {
-                        return ArgumentParseResult.failure(ex);
-                    }
-                });
+                .map((ctx, entitySelector) -> requireServerCommandSource(
+                        ctx,
+                        serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
+                                () -> ArgumentParseResult.success(new SinglePlayerSelector(
+                                        ((EntitySelectorAccess) entitySelector).inputString(),
+                                        entitySelector,
+                                        entitySelector.getPlayer(serverCommandSource)
+                                ))
+                        )
+                ));
     }
 
     /**
@@ -109,21 +177,16 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.players())
-                .map((ctx, entitySelector) -> {
-                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-                    if (!(either instanceof ServerCommandSource)) {
-                        return ArgumentParseResult.failure(serverOnly());
-                    }
-                    try {
-                        return ArgumentParseResult.success(new MultiplePlayerSelector(
-                                ((EntitySelectorAccess) entitySelector).inputString(),
-                                entitySelector,
-                                entitySelector.getPlayers((ServerCommandSource) either)
-                        ));
-                    } catch (final CommandSyntaxException ex) {
-                        return ArgumentParseResult.failure(ex);
-                    }
-                });
+                .map((ctx, entitySelector) -> requireServerCommandSource(
+                        ctx,
+                        serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
+                                () -> ArgumentParseResult.success(new MultiplePlayerSelector(
+                                        ((EntitySelectorAccess) entitySelector).inputString(),
+                                        entitySelector,
+                                        entitySelector.getPlayers(serverCommandSource)
+                                ))
+                        )
+                ));
     }
 
     /**
@@ -135,21 +198,16 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entity())
-                .map((ctx, entitySelector) -> {
-                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-                    if (!(either instanceof ServerCommandSource)) {
-                        return ArgumentParseResult.failure(serverOnly());
-                    }
-                    try {
-                        return ArgumentParseResult.success(new SingleEntitySelector(
-                                ((EntitySelectorAccess) entitySelector).inputString(),
-                                entitySelector,
-                                entitySelector.getEntity((ServerCommandSource) either)
-                        ));
-                    } catch (final CommandSyntaxException ex) {
-                        return ArgumentParseResult.failure(ex);
-                    }
-                });
+                .map((ctx, entitySelector) -> requireServerCommandSource(
+                        ctx,
+                        serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
+                                () -> ArgumentParseResult.success(new SingleEntitySelector(
+                                        ((EntitySelectorAccess) entitySelector).inputString(),
+                                        entitySelector,
+                                        entitySelector.getEntity(serverCommandSource)
+                                ))
+                        )
+                ));
     }
 
     /**
@@ -161,21 +219,16 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entities())
-                .map((ctx, entitySelector) -> {
-                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-                    if (!(either instanceof ServerCommandSource)) {
-                        return ArgumentParseResult.failure(serverOnly());
-                    }
-                    try {
-                        return ArgumentParseResult.success(new MultipleEntitySelector(
-                                ((EntitySelectorAccess) entitySelector).inputString(),
-                                entitySelector,
-                                Collections.unmodifiableCollection(entitySelector.getEntities((ServerCommandSource) either))
-                        ));
-                    } catch (final CommandSyntaxException ex) {
-                        return ArgumentParseResult.failure(ex);
-                    }
-                });
+                .map((ctx, entitySelector) -> requireServerCommandSource(
+                        ctx,
+                        serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
+                                () -> ArgumentParseResult.success(new MultipleEntitySelector(
+                                        ((EntitySelectorAccess) entitySelector).inputString(),
+                                        entitySelector,
+                                        Collections.unmodifiableCollection(entitySelector.getEntities(serverCommandSource))
+                                ))
+                        )
+                ));
     }
 
     /**
@@ -187,28 +240,75 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, Message> message() {
         return new WrappedBrigadierParser<C, MessageArgumentType.MessageFormat>(MessageArgumentType.message())
-                .map((ctx, format) -> {
-                    final CommandSource either = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-                    if (!(either instanceof ServerCommandSource)) {
-                        return ArgumentParseResult.failure(serverOnly());
-                    }
-                    try {
-                        return ArgumentParseResult.success(MessageImpl.from(
-                                (ServerCommandSource) either,
-                                format,
-                                true
-                        ));
-                    } catch (final CommandSyntaxException ex) {
-                        return ArgumentParseResult.failure(ex);
-                    }
-                });
+                .map((ctx, format) -> requireServerCommandSource(
+                        ctx,
+                        serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
+                                () -> ArgumentParseResult.success(MessageImpl.from(
+                                        serverCommandSource,
+                                        format,
+                                        true
+                                ))
+                        )
+                ));
+    }
+
+    @FunctionalInterface
+    private interface CommandSyntaxExceptionThrowingParseResultSupplier<O> {
+
+        @NonNull ArgumentParseResult<O> result() throws CommandSyntaxException;
+
+    }
+
+    private static <O> @NonNull ArgumentParseResult<O> handleCommandSyntaxExceptionAsFailure(
+            final @NonNull CommandSyntaxExceptionThrowingParseResultSupplier<O> resultSupplier
+    ) {
+        try {
+            return resultSupplier.result();
+        } catch (final CommandSyntaxException ex) {
+            return ArgumentParseResult.failure(ex);
+        }
     }
 
     private static @NonNull IllegalStateException serverOnly() {
         return new IllegalStateException("This command argument type is server-only.");
     }
 
+    private static <C, O> @NonNull ArgumentParseResult<O> requireServerCommandSource(
+            final @NonNull CommandContext<C> context,
+            final @NonNull Function<ServerCommandSource, ArgumentParseResult<O>> resultFunction
+    ) {
+        final CommandSource nativeSource = context.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+        if (!(nativeSource instanceof ServerCommandSource)) {
+            return ArgumentParseResult.failure(serverOnly());
+        }
+        return resultFunction.apply((ServerCommandSource) nativeSource);
+    }
+
+    /**
+     * {@link ParserParameter} keys for cloud-fabric.
+     *
+     * @since 1.5.0
+     */
+    public static final class FabricParserParameters {
+
+        /**
+         * Indicates that positions should be centered on the middle of blocks, i.e. x.5.
+         *
+         * @since 1.5.0
+         */
+        public static final ParserParameter<Boolean> CENTER_INTEGERS = create("center_integers", TypeToken.get(Boolean.class));
+
+        private static <T> @NonNull ParserParameter<T> create(
+                final @NonNull String key,
+                final @NonNull TypeToken<T> expectedType
+        ) {
+            return new ParserParameter<>(key, expectedType);
+        }
+
+    }
+
     static final class MessageImpl implements Message {
+
         private final Collection<Entity> mentionedEntities;
         private final Text contents;
 
@@ -217,7 +317,7 @@ public final class FabricArgumentParsers {
                 final MessageArgumentType.@NonNull MessageFormat message,
                 final boolean useSelectors
         ) throws CommandSyntaxException {
-            final Text contents = message.format(source,  useSelectors);
+            final Text contents = message.format(source, useSelectors);
             final MessageArgumentType.MessageSelector[] selectors =
                     ((MessageArgumentTypeMessageFormatAccess) message).accessor$selectors();
             final Collection<Entity> entities;
@@ -226,7 +326,9 @@ public final class FabricArgumentParsers {
             } else {
                 entities = new HashSet<>();
                 for (final MessageArgumentType.MessageSelector selector : selectors) {
-                    entities.addAll(((MessageArgumentTypeMessageSelectorAccess) selector).accessor$selector().getEntities(source));
+                    entities.addAll(((MessageArgumentTypeMessageSelectorAccess) selector)
+                            .accessor$selector()
+                            .getEntities(source));
                 }
             }
 
@@ -246,6 +348,51 @@ public final class FabricArgumentParsers {
         @Override
         public @NonNull Text getContents() {
             return this.contents;
+        }
+
+    }
+
+    static final class CoordinatesImpl implements Coordinates,
+            Coordinates.CoordinatesXZ,
+            Coordinates.BlockCoordinates,
+            Coordinates.ColumnCoordinates {
+
+        private final ServerCommandSource source;
+        private final PosArgument posArgument;
+
+        private CoordinatesImpl(final @NonNull ServerCommandSource source, final @NonNull PosArgument posArgument) {
+            this.source = source;
+            this.posArgument = posArgument;
+        }
+
+        @Override
+        public @NonNull Vec3d position() {
+            return this.posArgument.toAbsolutePos(this.source);
+        }
+
+        @Override
+        public @NonNull BlockPos blockPos() {
+            return new BlockPos(this.position());
+        }
+
+        @Override
+        public boolean isXRelative() {
+            return this.posArgument.isXRelative();
+        }
+
+        @Override
+        public boolean isYRelative() {
+            return this.posArgument.isYRelative();
+        }
+
+        @Override
+        public boolean isZRelative() {
+            return this.posArgument.isZRelative();
+        }
+
+        @Override
+        public @NonNull PosArgument getWrappedCoordinates() {
+            return this.posArgument;
         }
 
     }
