@@ -379,6 +379,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
      *
      * @param permissionLevel permission level to require
      * @return a permission predicate
+     * @since 1.5.0
      */
     public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
         return sender -> this.getBackwardsCommandSourceMapper()
