@@ -26,7 +26,6 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
@@ -41,7 +40,6 @@ import cloud.commandframework.fabric.internal.EntitySelectorAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageFormatAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageSelectorAccess;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import io.leangen.geantyref.TypeToken;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.EntitySelector;
 import net.minecraft.command.argument.BlockPosArgumentType;
@@ -283,29 +281,6 @@ public final class FabricArgumentParsers {
             return ArgumentParseResult.failure(serverOnly());
         }
         return resultFunction.apply((ServerCommandSource) nativeSource);
-    }
-
-    /**
-     * {@link ParserParameter} keys for cloud-fabric.
-     *
-     * @since 1.5.0
-     */
-    public static final class FabricParserParameters {
-
-        /**
-         * Indicates that positions should be centered on the middle of blocks, i.e. x.5.
-         *
-         * @since 1.5.0
-         */
-        public static final ParserParameter<Boolean> CENTER_INTEGERS = create("center_integers", TypeToken.get(Boolean.class));
-
-        private static <T> @NonNull ParserParameter<T> create(
-                final @NonNull String key,
-                final @NonNull TypeToken<T> expectedType
-        ) {
-            return new ParserParameter<>(key, expectedType);
-        }
-
     }
 
     static final class MessageImpl implements Message {
