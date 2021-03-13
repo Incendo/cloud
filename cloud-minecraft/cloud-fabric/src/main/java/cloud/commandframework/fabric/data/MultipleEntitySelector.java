@@ -23,54 +23,13 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.command.EntitySelector;
 import net.minecraft.entity.Entity;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collection;
 
 /**
  * A selector for multiple entities.
  *
  * @since 1.5.0
  */
-public final class MultipleEntitySelector implements Selector<Entity> {
-
-    private final String inputString;
-    private final net.minecraft.command.EntitySelector entitySelector;
-    private final Collection<Entity> selectedEntities;
-
-    /**
-     * Create a new MultipleEntitySelector.
-     *
-     * @param inputString      input string
-     * @param entitySelector   entity selector
-     * @param selectedEntities selected entities
-     * @since 1.5.0
-     */
-    public MultipleEntitySelector(
-            final @NonNull String inputString,
-            final @NonNull EntitySelector entitySelector,
-            final @NonNull Collection<Entity> selectedEntities
-    ) {
-        this.inputString = inputString;
-        this.entitySelector = entitySelector;
-        this.selectedEntities = selectedEntities;
-    }
-
-    @Override
-    public @NonNull String getInput() {
-        return this.inputString;
-    }
-
-    @Override
-    public @NonNull EntitySelector getSelector() {
-        return this.entitySelector;
-    }
-
-    @Override
-    public @NonNull Collection<Entity> get() {
-        return this.selectedEntities;
-    }
+public interface MultipleEntitySelector extends Selector<Entity> {
 
 }

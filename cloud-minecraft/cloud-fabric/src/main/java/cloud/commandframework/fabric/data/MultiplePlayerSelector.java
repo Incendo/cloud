@@ -23,54 +23,13 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.command.EntitySelector;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collection;
 
 /**
  * A selector for multiple players.
  *
  * @since 1.5.0
  */
-public final class MultiplePlayerSelector implements Selector<ServerPlayerEntity> {
-
-    private final String inputString;
-    private final EntitySelector entitySelector;
-    private final Collection<ServerPlayerEntity> selectedPlayers;
-
-    /**
-     * Create a new MultiplePlayerSelector.
-     *
-     * @param inputString     input string
-     * @param entitySelector  entity selector
-     * @param selectedPlayers selected players
-     * @since 1.5.0
-     */
-    public MultiplePlayerSelector(
-            final @NonNull String inputString,
-            final @NonNull EntitySelector entitySelector,
-            final @NonNull Collection<ServerPlayerEntity> selectedPlayers
-    ) {
-        this.inputString = inputString;
-        this.entitySelector = entitySelector;
-        this.selectedPlayers = selectedPlayers;
-    }
-
-    @Override
-    public @NonNull String getInput() {
-        return this.inputString;
-    }
-
-    @Override
-    public @NonNull EntitySelector getSelector() {
-        return this.entitySelector;
-    }
-
-    @Override
-    public @NonNull Collection<ServerPlayerEntity> get() {
-        return this.selectedPlayers;
-    }
+public interface MultiplePlayerSelector extends Selector<ServerPlayerEntity> {
 
 }
