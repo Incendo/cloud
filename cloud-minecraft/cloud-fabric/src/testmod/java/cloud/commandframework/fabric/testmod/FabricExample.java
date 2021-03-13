@@ -33,9 +33,16 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
 import cloud.commandframework.fabric.argument.ColorArgument;
 import cloud.commandframework.fabric.argument.ItemDataArgument;
+import cloud.commandframework.fabric.argument.server.ColumnPosArgument;
+import cloud.commandframework.fabric.argument.server.MultipleEntitySelectorArgument;
 import cloud.commandframework.fabric.argument.server.MultiplePlayerSelectorArgument;
+import cloud.commandframework.fabric.argument.server.Vec3Argument;
+import cloud.commandframework.fabric.data.Coordinates;
+import cloud.commandframework.fabric.data.Coordinates.ColumnCoordinates;
+import cloud.commandframework.fabric.data.MultipleEntitySelector;
 import cloud.commandframework.fabric.data.MultiplePlayerSelector;
 import cloud.commandframework.fabric.testmod.mixin.GiveCommandAccess;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -52,6 +59,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -216,6 +225,33 @@ public final class FabricExample implements ModInitializer {
                             text,
                             false
                     );
+                }));
+
+        manager.command(base.literal("teleport")
+                .permission("cloud.teleport")
+                .argument(MultipleEntitySelectorArgument.of("targets"))
+                .argument(Vec3Argument.of("location"))
+                .handler(ctx -> {
+                    final MultipleEntitySelector selector = ctx.get("targets");
+                    final Vec3d location = ctx.<Coordinates>get("location").position();
+                    selector.get().forEach(target ->
+                            target.requestTeleport(location.getX(), location.getY(), location.getZ()));
+                }));
+
+        manager.command(base.literal("gotochunk")
+                .permission("cloud.gotochunk")
+                .argument(ColumnPosArgument.of("chunk_position"))
+                .handler(ctx -> {
+                    final ServerPlayerEntity player;
+                    try {
+                        player = ctx.getSender().getPlayer();
+                    } catch (final CommandSyntaxException e) {
+                        ctx.getSender().sendFeedback(new LiteralText("Must be a player to use this command"), false);
+                        return;
+                    }
+                    final Vec3d vec = ctx.<ColumnCoordinates>get("chunk_position").position();
+                    final ChunkPos pos = new ChunkPos((int) vec.getX(), (int) vec.getZ());
+                    player.requestTeleport(pos.getStartX(), 128, pos.getStartZ());
                 }));
     }
 
