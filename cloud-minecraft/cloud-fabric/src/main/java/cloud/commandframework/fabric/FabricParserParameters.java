@@ -34,6 +34,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class FabricParserParameters {
 
+    private FabricParserParameters() {
+    }
+
     /**
      * Indicates that positions should be centered on the middle of blocks, i.e. x.5.
      *
