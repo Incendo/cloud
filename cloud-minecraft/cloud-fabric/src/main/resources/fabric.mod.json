@@ -5,7 +5,7 @@
 
   "name": "Cloud",
   "description": "Command framework and dispatcher for the JVM",
-  "authors": [ "Citymonstret", "zml" ],
+  "authors": [ "Citymonstret", "zml", "jmp" ],
   "contact": {
     "homepage": "https://commandframework.cloud/",
     "sources": "https://github.com/Incendo/cloud"
