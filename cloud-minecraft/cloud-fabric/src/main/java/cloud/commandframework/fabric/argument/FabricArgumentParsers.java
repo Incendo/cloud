@@ -54,6 +54,7 @@ import net.minecraft.command.argument.Vec2ArgumentType;
 import net.minecraft.command.argument.Vec3ArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -159,7 +160,7 @@ public final class FabricArgumentParsers {
                 .map((ctx, entitySelector) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
-                                () -> ArgumentParseResult.success(new SinglePlayerSelector(
+                                () -> ArgumentParseResult.success(new SinglePlayerSelectorImpl(
                                         ((EntitySelectorAccess) entitySelector).inputString(),
                                         entitySelector,
                                         entitySelector.getPlayer(serverCommandSource)
@@ -180,7 +181,7 @@ public final class FabricArgumentParsers {
                 .map((ctx, entitySelector) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
-                                () -> ArgumentParseResult.success(new MultiplePlayerSelector(
+                                () -> ArgumentParseResult.success(new MultiplePlayerSelectorImpl(
                                         ((EntitySelectorAccess) entitySelector).inputString(),
                                         entitySelector,
                                         entitySelector.getPlayers(serverCommandSource)
@@ -201,7 +202,7 @@ public final class FabricArgumentParsers {
                 .map((ctx, entitySelector) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
-                                () -> ArgumentParseResult.success(new SingleEntitySelector(
+                                () -> ArgumentParseResult.success(new SingleEntitySelectorImpl(
                                         ((EntitySelectorAccess) entitySelector).inputString(),
                                         entitySelector,
                                         entitySelector.getEntity(serverCommandSource)
@@ -222,7 +223,7 @@ public final class FabricArgumentParsers {
                 .map((ctx, entitySelector) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
-                                () -> ArgumentParseResult.success(new MultipleEntitySelector(
+                                () -> ArgumentParseResult.success(new MultipleEntitySelectorImpl(
                                         ((EntitySelectorAccess) entitySelector).inputString(),
                                         entitySelector,
                                         Collections.unmodifiableCollection(entitySelector.getEntities(serverCommandSource))
@@ -360,7 +361,7 @@ public final class FabricArgumentParsers {
         private final ServerCommandSource source;
         private final PosArgument posArgument;
 
-        private CoordinatesImpl(final @NonNull ServerCommandSource source, final @NonNull PosArgument posArgument) {
+        CoordinatesImpl(final @NonNull ServerCommandSource source, final @NonNull PosArgument posArgument) {
             this.source = source;
             this.posArgument = posArgument;
         }
@@ -393,6 +394,138 @@ public final class FabricArgumentParsers {
         @Override
         public @NonNull PosArgument getWrappedCoordinates() {
             return this.posArgument;
+        }
+
+    }
+
+    static final class SingleEntitySelectorImpl implements SingleEntitySelector {
+
+        private final String inputString;
+        private final EntitySelector entitySelector;
+        private final Entity selectedEntity;
+
+        SingleEntitySelectorImpl(
+                final @NonNull String inputString,
+                final @NonNull EntitySelector entitySelector,
+                final @NonNull Entity selectedEntity
+        ) {
+            this.inputString = inputString;
+            this.entitySelector = entitySelector;
+            this.selectedEntity = selectedEntity;
+        }
+
+        @Override
+        public @NonNull String getInput() {
+            return this.inputString;
+        }
+
+        @Override
+        public @NonNull EntitySelector getSelector() {
+            return this.entitySelector;
+        }
+
+        @Override
+        public @NonNull Entity getSingle() {
+            return this.selectedEntity;
+        }
+
+    }
+
+    static final class MultipleEntitySelectorImpl implements MultipleEntitySelector {
+
+        private final String inputString;
+        private final EntitySelector entitySelector;
+        private final Collection<Entity> selectedEntities;
+
+        MultipleEntitySelectorImpl(
+                final @NonNull String inputString,
+                final @NonNull EntitySelector entitySelector,
+                final @NonNull Collection<Entity> selectedEntities
+        ) {
+            this.inputString = inputString;
+            this.entitySelector = entitySelector;
+            this.selectedEntities = selectedEntities;
+        }
+
+        @Override
+        public @NonNull String getInput() {
+            return this.inputString;
+        }
+
+        @Override
+        public @NonNull EntitySelector getSelector() {
+            return this.entitySelector;
+        }
+
+        @Override
+        public @NonNull Collection<Entity> get() {
+            return this.selectedEntities;
+        }
+
+    }
+
+    static final class SinglePlayerSelectorImpl implements SinglePlayerSelector {
+
+        private final String inputString;
+        private final EntitySelector entitySelector;
+        private final ServerPlayerEntity selectedPlayer;
+
+        SinglePlayerSelectorImpl(
+                final @NonNull String inputString,
+                final @NonNull EntitySelector entitySelector,
+                final @NonNull ServerPlayerEntity selectedPlayer
+        ) {
+            this.inputString = inputString;
+            this.entitySelector = entitySelector;
+            this.selectedPlayer = selectedPlayer;
+        }
+
+        @Override
+        public @NonNull String getInput() {
+            return this.inputString;
+        }
+
+        @Override
+        public @NonNull EntitySelector getSelector() {
+            return this.entitySelector;
+        }
+
+        @Override
+        public @NonNull ServerPlayerEntity getSingle() {
+            return this.selectedPlayer;
+        }
+
+    }
+
+    static final class MultiplePlayerSelectorImpl implements MultiplePlayerSelector {
+
+        private final String inputString;
+        private final EntitySelector entitySelector;
+        private final Collection<ServerPlayerEntity> selectedPlayers;
+
+        MultiplePlayerSelectorImpl(
+                final @NonNull String inputString,
+                final @NonNull EntitySelector entitySelector,
+                final @NonNull Collection<ServerPlayerEntity> selectedPlayers
+        ) {
+            this.inputString = inputString;
+            this.entitySelector = entitySelector;
+            this.selectedPlayers = selectedPlayers;
+        }
+
+        @Override
+        public @NonNull String getInput() {
+            return this.inputString;
+        }
+
+        @Override
+        public @NonNull EntitySelector getSelector() {
+            return this.entitySelector;
+        }
+
+        @Override
+        public @NonNull Collection<ServerPlayerEntity> get() {
+            return this.selectedPlayers;
         }
 
     }
