@@ -106,6 +106,10 @@ public final class FabricClientExample implements ClientModInitializer {
 
         commandManager.command(base.literal("disconnect")
                 .handler(ctx -> disconnectClient(MinecraftClient.getInstance())));
+
+        commandManager.command(base.literal("requires_cheats")
+                .permission(FabricClientCommandManager.cheatsAllowed(false))
+                .handler(ctx -> ctx.getSender().sendFeedback(new LiteralText("Cheats are enabled!"))));
     }
 
     private static void disconnectClient(final @NonNull MinecraftClient client) {
