@@ -46,14 +46,14 @@ public final class CommandFlag<T> {
 
     private final @NonNull String name;
     private final @NonNull String @NonNull [] aliases;
-    private final @NonNull ArgumentDescription description;
+    private final @NonNull ArgumentDescription<?> description;
 
     private final @Nullable CommandArgument<?, T> commandArgument;
 
     private CommandFlag(
             final @NonNull String name,
             final @NonNull String @NonNull [] aliases,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<?> description,
             final @Nullable CommandArgument<?, T> commandArgument
     ) {
         this.name = Objects.requireNonNull(name, "name cannot be null");
@@ -94,15 +94,17 @@ public final class CommandFlag<T> {
      * Get the flag description
      * <p>
      *
+     * @param sender Command sender
      * @return Flag description
      * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
      */
     @Deprecated
-    public cloud.commandframework.@NonNull Description getDescription() {
+    @SuppressWarnings("unchecked")
+    public cloud.commandframework.@NonNull Description<?> getDescription(final Object sender) {
         if (this.description instanceof cloud.commandframework.Description) {
-            return ((cloud.commandframework.Description) this.description);
+            return ((cloud.commandframework.Description<?>) this.description);
         } else {
-            return cloud.commandframework.Description.of(this.description.getDescription());
+            return cloud.commandframework.Description.of(((ArgumentDescription<Object>) this.description).getDescription(sender));
         }
     }
 
@@ -112,7 +114,7 @@ public final class CommandFlag<T> {
      * @return Flag description
      * @since 1.4.0
      */
-    public @NonNull ArgumentDescription getArgumentDescription() {
+    public @NonNull ArgumentDescription<?> getArgumentDescription() {
         return this.description;
     }
 
@@ -152,13 +154,13 @@ public final class CommandFlag<T> {
 
         private final String name;
         private final String[] aliases;
-        private final ArgumentDescription description;
+        private final ArgumentDescription<?> description;
         private final CommandArgument<?, T> commandArgument;
 
         private Builder(
                 final @NonNull String name,
                 final @NonNull String[] aliases,
-                final @NonNull ArgumentDescription description,
+                final @NonNull ArgumentDescription<?> description,
                 final @Nullable CommandArgument<?, T> commandArgument
         ) {
             this.name = name;
@@ -210,8 +212,8 @@ public final class CommandFlag<T> {
          * @deprecated for removal since 1.4.0. Use {@link #withDescription(ArgumentDescription)} instead.
          */
         @Deprecated
-        public Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
-            return this.withDescription((ArgumentDescription) description);
+        public Builder<T> withDescription(final cloud.commandframework.@NonNull Description<?> description) {
+            return this.withDescription((ArgumentDescription<?>) description);
         }
 
         /**d
@@ -221,7 +223,7 @@ public final class CommandFlag<T> {
          * @return New builder instance
          * @since 1.4.0
          */
-        public Builder<T> withDescription(final @NonNull ArgumentDescription description) {
+        public Builder<T> withDescription(final @NonNull ArgumentDescription<?> description) {
             return new Builder<>(this.name, this.aliases, description, this.commandArgument);
         }
 

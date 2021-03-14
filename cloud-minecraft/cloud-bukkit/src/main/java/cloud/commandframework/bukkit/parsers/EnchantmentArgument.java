@@ -55,7 +55,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
             ) {
         super(required, name, new EnchantmentParser<>(), defaultValue, Enchantment.class, suggestionsProvider, defaultDescription);
     }

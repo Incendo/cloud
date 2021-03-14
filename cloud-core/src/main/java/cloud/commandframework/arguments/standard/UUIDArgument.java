@@ -49,7 +49,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(required, name, new UUIDParser<>(), defaultValue, UUID.class, suggestionsProvider, defaultDescription);
     }

@@ -37,7 +37,7 @@ import java.util.Objects;
 public final class CommandComponent<C> {
 
     private final CommandArgument<C, ?> argument;
-    private final ArgumentDescription description;
+    private final ArgumentDescription<C> description;
 
     /**
      * Initializes a new CommandComponent
@@ -47,7 +47,7 @@ public final class CommandComponent<C> {
      */
     private CommandComponent(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
+            final @NonNull ArgumentDescription<C> commandDescription
     ) {
         this.argument = commandArgument;
         this.description = commandDescription;
@@ -65,15 +65,16 @@ public final class CommandComponent<C> {
     /**
      * Gets the command component description
      *
+     * @param sender Command sender
      * @return command component description
      * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
      */
     @Deprecated
-    public @NonNull Description getDescription() {
+    public @NonNull Description<C> getDescription(final C sender) {
         if (this.description instanceof Description) {
-            return (Description) this.description;
+            return (Description<C>) this.description;
         } else {
-            return new Description(this.description.getDescription());
+            return new Description<>(this.description.getDescription(sender));
         }
     }
 
@@ -83,7 +84,7 @@ public final class CommandComponent<C> {
      * @return command component description
      * @since 1.4.0
      */
-    public @NonNull ArgumentDescription getArgumentDescription() {
+    public @NonNull ArgumentDescription<C> getArgumentDescription() {
         return this.description;
     }
 
@@ -123,7 +124,7 @@ public final class CommandComponent<C> {
     @Deprecated
     public static <C> @NonNull CommandComponent<C> of(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull Description commandDescription
+            final @NonNull Description<C> commandDescription
     ) {
         return new CommandComponent<C>(commandArgument, commandDescription);
     }
@@ -138,7 +139,7 @@ public final class CommandComponent<C> {
      */
     public static <C> @NonNull CommandComponent<C> of(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
+            final @NonNull ArgumentDescription<C> commandDescription
     ) {
         return new CommandComponent<C>(commandArgument, commandDescription);
     }

@@ -104,7 +104,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     /**
      * A description that will be used when registering this argument if no override is provided.
      */
-    private final ArgumentDescription defaultDescription;
+    private final ArgumentDescription<C> defaultDescription;
 
     /**
      * Whether or not the argument has been used before
@@ -133,7 +133,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull String defaultValue,
             final @NonNull TypeToken<T> valueType,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
@@ -226,7 +226,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull String defaultValue,
             final @NonNull TypeToken<T> valueType,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         this(required, name, parser, defaultValue, valueType, suggestionsProvider, defaultDescription, Collections.emptyList());
     }
@@ -273,7 +273,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull Class<T> valueType,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         this(required, name, parser, defaultValue, TypeToken.get(valueType), suggestionsProvider, defaultDescription);
     }
@@ -449,7 +449,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      *
      * @return the default description
      */
-    public final @NonNull ArgumentDescription getDefaultDescription() {
+    public final @NonNull ArgumentDescription<C> getDefaultDescription() {
         return this.defaultDescription;
     }
 
@@ -569,7 +569,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         private ArgumentParser<C, T> parser;
         private String defaultValue = "";
         private BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider;
-        private @NonNull ArgumentDescription defaultDescription = ArgumentDescription.empty();
+        private @NonNull ArgumentDescription<C> defaultDescription = ArgumentDescription.empty();
 
         private final Collection<BiFunction<@NonNull CommandContext<C>,
                 @NonNull String, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors = new LinkedList<>();
@@ -680,7 +680,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @since 1.4.0
          */
         public @NonNull Builder<@NonNull C, @NonNull T> withDefaultDescription(
-                final @NonNull ArgumentDescription defaultDescription
+                final @NonNull ArgumentDescription<C> defaultDescription
         ) {
             this.defaultDescription = Objects.requireNonNull(defaultDescription, "Default description may not be null");
             return this;
@@ -735,7 +735,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this.suggestionsProvider;
         }
 
-        protected final @NonNull ArgumentDescription getDefaultDescription() {
+        protected final @NonNull ArgumentDescription<C> getDefaultDescription() {
             return this.defaultDescription;
         }
 

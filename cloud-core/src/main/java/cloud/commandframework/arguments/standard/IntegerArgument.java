@@ -58,7 +58,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
             final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(required, name, new IntegerParser<>(min, max), defaultValue, Integer.class, suggestionsProvider, defaultDescription);
         this.min = min;

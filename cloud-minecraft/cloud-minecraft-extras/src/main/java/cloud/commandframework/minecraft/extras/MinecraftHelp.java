@@ -503,10 +503,10 @@ public final class MinecraftHelp<C> {
                     );
                     textComponent.append(text(")", this.colors.alternateHighlight));
                 }
-                final ArgumentDescription description = component.getArgumentDescription();
-                if (!description.isEmpty()) {
+                final ArgumentDescription<C> description = component.getArgumentDescription();
+                if (!description.isEmpty(sender)) {
                     textComponent.append(text(" - ", this.colors.accent));
-                    textComponent.append(this.formatDescription(description).colorIfAbsent(this.colors.text));
+                    textComponent.append(this.formatDescription(sender, description).colorIfAbsent(this.colors.text));
                 }
 
                 audience.sendMessage(textComponent);
@@ -515,11 +515,11 @@ public final class MinecraftHelp<C> {
         audience.sendMessage(this.footer(sender));
     }
 
-    private Component formatDescription(final ArgumentDescription description) {
+    private Component formatDescription(final C sender, final ArgumentDescription<C> description) {
         if (description instanceof RichDescription) {
-            return ((RichDescription) description).getContents();
+            return ((RichDescription<C>) description).getContents();
         } else {
-            return this.descriptionDecorator.apply(description.getDescription());
+            return this.descriptionDecorator.apply(description.getDescription(sender));
         }
     }
 

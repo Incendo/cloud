@@ -241,7 +241,7 @@ class CommandHelpHandlerTest {
         while (iterator.hasNext()) {
             final CommandComponent<TestCommandSender> component = iterator.next();
 
-            String description = component.getArgumentDescription().getDescription();
+            String description = component.getArgumentDescription().getDescription(new TestCommandSender());
             if (!description.isEmpty()) {
                 description = ": " + description;
             }

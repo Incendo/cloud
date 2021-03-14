@@ -58,7 +58,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             final @NonNull String defaultValue,
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(required, name, new StringParser<>(stringMode, suggestionsProvider),
                 defaultValue, String.class, suggestionsProvider, defaultDescription

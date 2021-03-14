@@ -29,15 +29,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * {@link CommandArgument} description
  *
+ * @param <C> Command sender type
  * @deprecated to become package-private since 1.4.0. Use {@link ArgumentDescription} instead.
  */
 @Deprecated
-public final class Description implements ArgumentDescription {
-
-    /**
-     * Empty command description
-     */
-    static final Description EMPTY = new Description("");
+public final class Description<C> implements ArgumentDescription<C> {
 
     private final String description;
 
@@ -48,33 +44,36 @@ public final class Description implements ArgumentDescription {
     /**
      * Get an empty command description
      *
+     * @param <C> Command sender type
      * @return Command description
      * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#empty()}
      */
     @Deprecated
-    public static @NonNull Description empty() {
-        return EMPTY;
+    public static <C> @NonNull Description<C> empty() {
+        return new Description<>("");
     }
 
     /**
      * Create a command description instance
      *
+     * @param <C> Command sender type
      * @param string Command description
      * @return Created command description
      * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#of(String)}
      */
     @Deprecated
-    public static @NonNull Description of(final @NonNull String string) {
-        return new Description(string);
+    public static <C> @NonNull Description<C> of(final @NonNull String string) {
+        return new Description<>(string);
     }
 
     /**
      * Get the command description
      *
+     * @param sender Command sender
      * @return Command description
      */
     @Override
-    public @NonNull String getDescription() {
+    public @NonNull String getDescription(final C sender) {
         return this.description;
     }
 

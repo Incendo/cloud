@@ -52,7 +52,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription description
+            final @NonNull ArgumentDescription<C> description
     ) {
         super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class, suggestionsProvider, description);
         this.liberal = liberal;

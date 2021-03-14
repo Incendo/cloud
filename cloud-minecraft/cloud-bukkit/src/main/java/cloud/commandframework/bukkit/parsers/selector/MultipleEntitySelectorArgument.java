@@ -49,7 +49,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(required, name, new MultipleEntitySelectorParser<>(), defaultValue, MultipleEntitySelector.class,
                 suggestionsProvider, defaultDescription

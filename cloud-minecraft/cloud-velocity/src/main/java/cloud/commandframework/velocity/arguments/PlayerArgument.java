@@ -57,7 +57,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
             final boolean required,
             final @NonNull String name,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {

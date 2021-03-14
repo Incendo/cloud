@@ -48,7 +48,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
         ) {
         super(required, name, new CharacterParser<>(), defaultValue, Character.class, suggestionsProvider, defaultDescription);
     }

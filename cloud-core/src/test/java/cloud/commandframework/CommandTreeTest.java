@@ -264,10 +264,10 @@ class CommandTreeTest {
         Assertions.assertEquals(TypeToken.get(int.class), arguments.get(3).getValueType());
 
         // Check description is set for all components, is empty when not specified
-        Assertions.assertEquals("", components.get(0).getArgumentDescription().getDescription());
-        Assertions.assertEquals("", components.get(1).getArgumentDescription().getDescription());
-        Assertions.assertEquals("detaildescription", components.get(2).getArgumentDescription().getDescription());
-        Assertions.assertEquals("argumentdescription", components.get(3).getArgumentDescription().getDescription());
+        Assertions.assertEquals("", components.get(0).getArgumentDescription().getDescription(new TestCommandSender()));
+        Assertions.assertEquals("", components.get(1).getArgumentDescription().getDescription(new TestCommandSender()));
+        Assertions.assertEquals("detaildescription", components.get(2).getArgumentDescription().getDescription(new TestCommandSender()));
+        Assertions.assertEquals("argumentdescription", components.get(3).getArgumentDescription().getDescription(new TestCommandSender()));
     }
 
     @Test

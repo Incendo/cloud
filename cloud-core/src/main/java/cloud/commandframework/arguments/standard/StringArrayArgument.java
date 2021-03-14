@@ -49,7 +49,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
             final boolean required,
             final @NonNull String name,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 required,

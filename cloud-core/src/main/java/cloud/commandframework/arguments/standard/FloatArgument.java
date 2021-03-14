@@ -51,7 +51,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(required, name, new FloatParser<>(min, max), defaultValue, Float.class, suggestionsProvider, defaultDescription);
         this.min = min;

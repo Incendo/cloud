@@ -43,7 +43,7 @@ import kotlin.reflect.KClass
 @Deprecated(message = "ArgumentDescription should be used over Description", level = DeprecationLevel.HIDDEN)
 public fun <C : Any> CommandManager<C>.commandBuilder(
         name: String,
-        description: Description = Description.empty(),
+        description: Description<C> = Description.empty(),
         aliases: Array<String> = emptyArray(),
         lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> =
@@ -60,7 +60,7 @@ public fun <C : Any> CommandManager<C>.commandBuilder(
  */
 public fun <C : Any> CommandManager<C>.commandBuilder(
         name: String,
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         aliases: Array<String> = emptyArray(),
         lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> =
@@ -80,7 +80,7 @@ public fun <C : Any> CommandManager<C>.commandBuilder(
 @Deprecated(message = "ArgumentDescription should be used over Description", level = DeprecationLevel.HIDDEN)
 public fun <C : Any> CommandManager<C>.buildAndRegister(
         name: String,
-        description: Description = Description.empty(),
+        description: Description<C> = Description.empty(),
         aliases: Array<String> = emptyArray(),
         lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> =
@@ -98,7 +98,7 @@ public fun <C : Any> CommandManager<C>.buildAndRegister(
  */
 public fun <C : Any> CommandManager<C>.buildAndRegister(
         name: String,
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         aliases: Array<String> = emptyArray(),
         lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> =
@@ -143,9 +143,9 @@ public fun <C : Any> Command.Builder<C>.senderType(type: KClass<out C>): Command
         message = "Use interface variant that allows for rich text",
         replaceWith = ReplaceWith("argumentDescription(description)")
 )
-public fun description(
+public fun <C : Any> description(
         description: String = ""
-): Description =
+): Description<C> =
         if (description.isEmpty()) Description.empty() else Description.of(description)
 
 /**
@@ -155,7 +155,7 @@ public fun description(
  * @return the description
  * @since 1.4.0
  */
-public fun argumentDescription(
+public fun <C : Any> argumentDescription(
         description: String = ""
-): ArgumentDescription =
+): ArgumentDescription<C> =
         if (description.isEmpty()) ArgumentDescription.empty() else ArgumentDescription.of(description)
