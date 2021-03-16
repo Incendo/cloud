@@ -31,7 +31,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -46,7 +45,6 @@ abstract class EntitySelectorReaderMixin {
     @Final
     private StringReader reader;
 
-    @Unique
     @Inject(method = "read", at = @At("RETURN"))
     public void setInputString(final @NonNull CallbackInfoReturnable<EntitySelector> cir) {
         final EntitySelector selector = cir.getReturnValue();
