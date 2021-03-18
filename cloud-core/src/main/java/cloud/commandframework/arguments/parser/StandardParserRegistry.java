@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.parser;
 
 import cloud.commandframework.annotations.specifier.Greedy;
+import cloud.commandframework.annotations.specifier.Quoted;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.ByteArgument;
@@ -93,6 +94,10 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         /* Register standard mappers */
         this.<Range, Number>registerAnnotationMapper(Range.class, new RangeMapper<>());
         this.<Greedy, String>registerAnnotationMapper(Greedy.class, new GreedyMapper());
+        this.<Quoted, String>registerAnnotationMapper(
+                Quoted.class,
+                (quoted, typeToken) -> ParserParameters.single(StandardParameters.QUOTED, true)
+        );
 
         /* Register standard types */
         this.registerParserSupplier(TypeToken.get(Byte.class), options ->
@@ -130,9 +135,15 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         /* Make this one less awful */
         this.registerParserSupplier(TypeToken.get(String.class), options -> {
             final boolean greedy = options.get(StandardParameters.GREEDY, false);
-            final StringArgument.StringMode stringMode = greedy
-                    ? StringArgument.StringMode.GREEDY
-                    : StringArgument.StringMode.SINGLE;
+            final boolean quoted = options.get(StandardParameters.QUOTED, false);
+            final StringArgument.StringMode stringMode;
+            if (greedy) {
+                stringMode = StringArgument.StringMode.GREEDY;
+            } else if (quoted) {
+                stringMode = StringArgument.StringMode.QUOTED;
+            } else {
+                stringMode = StringArgument.StringMode.SINGLE;
+            }
             return new StringArgument.StringParser<>(
                     stringMode,
                     (context, s) -> Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))
