@@ -136,6 +136,11 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         this.registerParserSupplier(TypeToken.get(String.class), options -> {
             final boolean greedy = options.get(StandardParameters.GREEDY, false);
             final boolean quoted = options.get(StandardParameters.QUOTED, false);
+            if (greedy && quoted) {
+                throw new IllegalArgumentException(
+                        "Don't know whether to create GREEDY or QUOTED StringArgument.StringParser, both specified."
+                );
+            }
             final StringArgument.StringMode stringMode;
             if (greedy) {
                 stringMode = StringArgument.StringMode.GREEDY;
