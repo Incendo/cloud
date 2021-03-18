@@ -59,6 +59,12 @@ public final class StandardParameters {
      * Indicates that a string argument should be greedy
      */
     public static final ParserParameter<Boolean> GREEDY = create("greedy", TypeToken.get(Boolean.class));
+    /**
+     * Indicates that a string argument should be quoted.
+     *
+     * @since 1.5.0
+     */
+    public static final ParserParameter<Boolean> QUOTED = create("quoted", TypeToken.get(Boolean.class));
 
     private StandardParameters() {
     }
