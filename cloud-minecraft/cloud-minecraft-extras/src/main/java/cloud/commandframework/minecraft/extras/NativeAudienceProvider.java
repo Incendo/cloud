@@ -26,35 +26,16 @@ package cloud.commandframework.minecraft.extras;
 import net.kyori.adventure.audience.Audience;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.function.Function;
+final class NativeAudienceProvider<C extends Audience> implements AudienceProvider<C> {
 
-/**
- * Function that maps the command sender type to an adventure {@link net.kyori.adventure.audience.Audience}
- *
- * @param <C> Command sender type
- */
-@FunctionalInterface
-public interface AudienceProvider<C> extends Function<@NonNull C, @NonNull Audience> {
+    static final NativeAudienceProvider<?> INSTANCE = new NativeAudienceProvider<>();
 
-    /**
-     * Convert a command sender to an {@link Audience}
-     *
-     * @param sender Command sender
-     * @return Mapped audience
-     */
+    private NativeAudienceProvider() {
+    }
+
     @Override
-    @NonNull Audience apply(@NonNull C sender);
-
-    /**
-     * Get an audience provider for sender types which are already an {@link Audience}.
-     *
-     * @param <C> sender type
-     * @return native audience provider
-     * @since 1.5.0
-     */
-    @SuppressWarnings("unchecked")
-    static <C extends Audience> AudienceProvider<C> nativeAudience() {
-        return (AudienceProvider<C>) NativeAudienceProvider.INSTANCE;
+    public @NonNull Audience apply(@NonNull final C sender) {
+        return sender;
     }
 
 }

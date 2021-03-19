@@ -103,8 +103,29 @@ public final class MinecraftHelp<C> {
     private int headerFooterLength = DEFAULT_HEADER_FOOTER_LENGTH;
     private int maxResultsPerPage = DEFAULT_MAX_RESULTS_PER_PAGE;
 
+
     /**
-     * Construct a new Minecraft help instance
+     * Construct a new Minecraft help instance for a sender type which is an {@link Audience}.
+     *
+     * @param commandPrefix  Command that was used to trigger the help menu. Used to help insertion generation
+     * @param commandManager command manager
+     * @param <C>            sender type extending {@link Audience}
+     * @return new MinecraftHelp instance
+     * @since 1.5.0
+     */
+    public static <C extends Audience> MinecraftHelp<C> createNative(
+            final @NonNull String commandPrefix,
+            final @NonNull CommandManager<C> commandManager
+    ) {
+        return new MinecraftHelp<>(
+                commandPrefix,
+                AudienceProvider.nativeAudience(),
+                commandManager
+        );
+    }
+
+    /**
+     * Construct a new Minecraft help instance.
      *
      * @param commandPrefix    Command that was used to trigger the help menu. Used to help insertion generation
      * @param audienceProvider Provider that maps the command sender type to {@link Audience}
@@ -680,8 +701,8 @@ public final class MinecraftHelp<C> {
          * Creates a component from a command sender, key, and arguments
          *
          * @param sender command sender
-         * @param key message key (constants in {@link MinecraftHelp}
-         * @param args args
+         * @param key    message key (constants in {@link MinecraftHelp}
+         * @param args   args
          * @return component
          */
         @NonNull Component provide(@NonNull C sender, @NonNull String key, @NonNull String... args);
