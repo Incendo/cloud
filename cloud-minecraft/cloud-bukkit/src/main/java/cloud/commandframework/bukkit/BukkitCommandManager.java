@@ -37,8 +37,8 @@ import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.bukkit.parsers.location.Location2D;
-import cloud.commandframework.bukkit.parsers.location.LocationArgument;
 import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
+import cloud.commandframework.bukkit.parsers.location.LocationArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
@@ -62,6 +62,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,8 +118,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     @SuppressWarnings("unchecked")
     public BukkitCommandManager(
             final @NonNull Plugin owningPlugin,
-            final @NonNull Function<@NonNull CommandTree<C>,
-                    @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull CommandTree<@NonNull C>,
+                    @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSender, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
     )
@@ -193,6 +194,29 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         );
 
         this.setCaptionRegistry(new BukkitCaptionRegistryFactory<C>().create());
+    }
+
+    /**
+     * Create a command manager using Bukkit's {@link CommandSender} as the sender type.
+     *
+     * @param owningPlugin                plugin owning the command manager
+     * @param commandExecutionCoordinator execution coordinator instance
+     * @return a new command manager
+     * @throws Exception If the construction of the manager fails
+     * @see #BukkitCommandManager(Plugin, Function, Function, Function) for a more thorough explanation
+     * @since 1.5.0
+     */
+    public static @NonNull BukkitCommandManager<@NonNull CommandSender> createNative(
+            final @NonNull Plugin owningPlugin,
+            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSender>,
+                    @NonNull CommandExecutionCoordinator<@NonNull CommandSender>> commandExecutionCoordinator
+    ) throws Exception {
+        return new BukkitCommandManager<>(
+                owningPlugin,
+                commandExecutionCoordinator,
+                UnaryOperator.identity(),
+                UnaryOperator.identity()
+        );
     }
 
     /**
