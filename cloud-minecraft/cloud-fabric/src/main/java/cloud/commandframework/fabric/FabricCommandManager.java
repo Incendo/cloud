@@ -192,7 +192,6 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         );
         this.registerConstantNativeParserSupplier(NumberRange.IntRange.class, NumberRangeArgumentType.numberRange());
         this.registerConstantNativeParserSupplier(NumberRange.FloatRange.class, NumberRangeArgumentType.method_30918());
-        // todo: can we add a compound argument -- MC `ItemStackArgument` is just type and tag, and count is separate
         this.registerConstantNativeParserSupplier(ItemStackArgument.class, ItemStackArgumentType.itemStack());
 
         /* Wrapped/Constant Brigadier types, mapped value type */
@@ -201,26 +200,10 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
                 BlockPredicateArgumentType.blockPredicate()
         );
         this.registerConstantNativeParserSupplier(MessageArgumentType.MessageFormat.class, MessageArgumentType.message());
-        /*this.registerConstantNativeParserSupplier(GameProfile.class, GameProfileArgumentType.gameProfile());
-        this.registerConstantNativeParserSupplier(BlockPos.class, BlockPosArgumentType.blockPos());
-        this.registerConstantNativeParserSupplier(ColumnPos.class, ColumnPosArgumentType.columnPos());
-        this.registerConstantNativeParserSupplier(Vec3d.class, Vec3ArgumentType.vec3());
-        this.registerConstantNativeParserSupplier(Vec2f.class, Vec2ArgumentType.vec2());
-        this.registerConstantNativeParserSupplier(BlockState.class, BlockStateArgumentType.blockState());
-        this.registerConstantNativeParserSupplier(ItemPredicate.class, ItemPredicateArgumentType.itemPredicate());
-        this.registerConstantNativeParserSupplier(ScoreboardObjective.class, ObjectiveArgumentType.objective());
-        this.registerConstantNativeParserSupplier(PosArgument.class, RotationArgumentType.rotation()); // todo: different type
-        this.registerConstantNativeParserSupplier(ScoreboardSlotArgumentType.scoreboardSlot());
-        this.registerConstantNativeParserSupplier(Team.class, TeamArgumentType.team());
-        this.registerConstantNativeParserSupplier(/* slot *, ItemSlotArgumentType.itemSlot());
-        this.registerConstantNativeParserSupplier(CommandFunction.class, FunctionArgumentType.function()); */
         this.getParserRegistry().registerParserSupplier(
                 TypeToken.get(MinecraftTime.class),
                 params -> FabricArgumentParsers.time()
         );
-
-        /* Wrapped brigadier requiring parameters */
-        // score holder: single vs multiple
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
