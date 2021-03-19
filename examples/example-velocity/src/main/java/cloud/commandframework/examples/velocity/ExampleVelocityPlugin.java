@@ -24,6 +24,8 @@
 package cloud.commandframework.examples.velocity;
 
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.minecraft.extras.AudienceProvider;
+import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.velocity.CloudInjectionModule;
 import cloud.commandframework.velocity.VelocityCommandManager;
 import cloud.commandframework.velocity.arguments.PlayerArgument;
@@ -41,6 +43,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Function;
@@ -74,6 +77,15 @@ public final class ExampleVelocityPlugin {
                 Key.get(new TypeLiteral<VelocityCommandManager<CommandSource>>() {
                 })
         );
+        new MinecraftExceptionHandler<CommandSource>()
+                .withDefaultHandlers()
+                .withDecorator(component -> Component.text()
+                        .color(NamedTextColor.WHITE)
+                        .append(Component.text('['))
+                        .append(Component.text("cloud-velocity-example", TextColor.color(0x1CBAE0)))
+                        .append(Component.text(']'))
+                        .build())
+                .apply(commandManager, AudienceProvider.nativeAudience());
         commandManager.command(
                 commandManager.commandBuilder("example")
                         .argument(PlayerArgument.of("player"))
