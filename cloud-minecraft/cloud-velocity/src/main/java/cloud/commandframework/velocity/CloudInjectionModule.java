@@ -33,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Injection module that allows for {@link VelocityCommandManager} to be injectable
@@ -65,6 +66,25 @@ public final class CloudInjectionModule<C> extends AbstractModule {
         this.commandExecutionCoordinator = commandExecutionCoordinator;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+    }
+
+    /**
+     * Create a new child injection module using Velocity's {@link CommandSource} as the sender type.
+     *
+     * @param commandExecutionCoordinator Command execution coordinator
+     * @return new injection module
+     * @since 1.5.0
+     */
+    public static @NonNull CloudInjectionModule<@NonNull CommandSource> createNative(
+            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSource>,
+                    @NonNull CommandExecutionCoordinator<@NonNull CommandSource>> commandExecutionCoordinator
+    ) {
+        return new CloudInjectionModule<>(
+                CommandSource.class,
+                commandExecutionCoordinator,
+                UnaryOperator.identity(),
+                UnaryOperator.identity()
+        );
     }
 
     @Override

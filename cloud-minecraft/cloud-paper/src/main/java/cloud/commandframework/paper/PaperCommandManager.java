@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Paper command manager that extends {@link BukkitCommandManager}
@@ -86,6 +87,29 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
             final @NonNull Function<C, CommandSender> backwardsCommandSenderMapper
     ) throws Exception {
         super(owningPlugin, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
+    }
+
+    /**
+     * Create a command manager using Bukkit's {@link CommandSender} as the sender type.
+     *
+     * @param owningPlugin                plugin owning the command manager
+     * @param commandExecutionCoordinator execution coordinator instance
+     * @return a new command manager
+     * @throws Exception If the construction of the manager fails
+     * @see #PaperCommandManager(Plugin, Function, Function, Function) for a more thorough explanation
+     * @since 1.5.0
+     */
+    public static @NonNull PaperCommandManager<@NonNull CommandSender> createNative(
+            final @NonNull Plugin owningPlugin,
+            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSender>,
+                    @NonNull CommandExecutionCoordinator<@NonNull CommandSender>> commandExecutionCoordinator
+    ) throws Exception {
+        return new PaperCommandManager<>(
+                owningPlugin,
+                commandExecutionCoordinator,
+                UnaryOperator.identity(),
+                UnaryOperator.identity()
+        );
     }
 
     /**
