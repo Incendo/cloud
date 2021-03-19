@@ -42,9 +42,6 @@ import java.util.function.BiFunction;
  */
 public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType.Angle> {
 
-    // todo: This angle is relative to a certain entity
-    // Vanilla only supports this on the server, we should be able to make it work on the client just fine too.
-
     AngleArgument(
             final boolean required,
             final @NonNull String name,
