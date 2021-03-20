@@ -10,10 +10,12 @@ tasks {
     withType<DokkaTask>().configureEach {
         dokkaSourceSets.getByName("main") {
             includes.from(layout.projectDirectory.file("src/main/descriptions.md").toString())
+            /*
             externalDocumentationLink {
                 url.set(URL("https://javadoc.commandframework.cloud/")) //todo fix KDoc linking to JavaDoc
                 packageListUrl.set(URL("https://javadoc.commandframework.cloud/allpackages-index.html"))
             }
+             */
         }
     }
     javadocJar {
