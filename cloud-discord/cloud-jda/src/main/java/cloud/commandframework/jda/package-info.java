@@ -23,6 +23,6 @@
 //
 
 /**
- * cloud implementation for Bukkit 1.8-1.16
+ * cloud implementation for JDA4
  */
 package cloud.commandframework.jda;
