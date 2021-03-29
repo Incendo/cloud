@@ -1,3 +1,4 @@
+import net.fabricmc.loom.task.AbstractRunTask
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
@@ -41,6 +42,19 @@ tasks {
             links("https://maven.fabricmc.net/docs/yarn-${Versions.fabricMc}+build.${Versions.fabricYarn}/")
         }
     }
+
+    withType(AbstractRunTask::class).configureEach {
+        standardInput = System.`in`
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            if (System.getProperty("idea.active")?.toBoolean() == true || // IntelliJ
+                    System.getenv("TERM") != null || // linux terminals
+                    System.getenv("WT_SESSION") != null) { // Windows terminal
+                listOf("-Dfabric.log.disableAnsi=false")
+            } else {
+                listOf()
+            }
+        }
+    }
 }
 
 
@@ -49,6 +63,7 @@ dependencies {
     mappings("net.fabricmc", "yarn", "${Versions.fabricMc}+build.${Versions.fabricYarn}", classifier = "v2")
     modImplementation("net.fabricmc", "fabric-loader", Versions.fabricLoader)
     modImplementation(fabricApi.module("fabric-command-api-v1", Versions.fabricApi))
+    modImplementation(fabricApi.module("fabric-lifecycle-events-v1", Versions.fabricApi))
 
     modApi(include("me.lucko", "fabric-permissions-api", "0.1-SNAPSHOT"))
 
