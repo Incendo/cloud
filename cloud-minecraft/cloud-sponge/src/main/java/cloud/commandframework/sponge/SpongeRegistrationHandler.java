@@ -67,7 +67,7 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
                     Boolean.class
             );
             method.setAccessible(true);
-            commandRegistrationMethodHandle = MethodHandles.lookup().unreflect(method);
+            this.commandRegistrationMethodHandle = MethodHandles.lookup().unreflect(method);
         } catch (final Exception e) {
             /* Ugly */
             throw new RuntimeException(e);
@@ -79,13 +79,13 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
             final @NonNull SystemSubject subject
             ) {
         this.commandManager = commandManager;
-        brigadierManager = new CloudBrigadierManager<>(
+        this.brigadierManager = new CloudBrigadierManager<>(
                 commandManager,
                 () -> new CommandContext<>(
                         commandManager.getBackwardsSubjectMapper().apply(
                                 CommandCause.create() /* This is bad, fix! */
                         ),
-                        commandManager.getCaptionRegistry()
+                        commandManager
                 )
         );
     }

@@ -119,7 +119,7 @@ subprojects {
             mavenContent { releasesOnly() }
         }
         /* The current Sponge repository */
-        maven("https://repo-new.spongepowered.org/repository/maven-public/")
+        maven("https://repo.spongepowered.org/repository/maven-public/")
         /* The Spigot repository, used for cloud-bukkit */
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
             mavenContent { snapshotsOnly() }
