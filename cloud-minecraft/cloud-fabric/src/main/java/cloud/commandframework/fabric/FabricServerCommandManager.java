@@ -36,6 +36,7 @@ import cloud.commandframework.fabric.data.MultipleEntitySelector;
 import cloud.commandframework.fabric.data.MultiplePlayerSelector;
 import cloud.commandframework.fabric.data.SingleEntitySelector;
 import cloud.commandframework.fabric.data.SinglePlayerSelector;
+import cloud.commandframework.fabric.internal.LateRegistrationCatcher;
 import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
 import me.lucko.fabric.api.permissions.v0.Permissions;
@@ -127,6 +128,11 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
                         null
                 )
         );
+
+        if (LateRegistrationCatcher.hasServerAlreadyStarted()) {
+            throw new IllegalStateException("FabricServerCommandManager was created too late! Because command registration "
+                    + "occurs before the server instance is created, commands should be registered in mod initializers.");
+        }
 
         this.registerParsers();
     }
