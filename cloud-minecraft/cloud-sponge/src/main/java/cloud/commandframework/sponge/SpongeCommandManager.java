@@ -71,11 +71,12 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
             final @NonNull Function<@NonNull C, @NonNull Subject> subjectMapper,
             final @NonNull Function<@NonNull CommandCause, @NonNull C> backwardsSubjectMapper
     ) {
-        super(commandExecutionCoordinator, new SpongeRegistrationHandler());
+        super(commandExecutionCoordinator, new SpongeRegistrationHandler<C>());
+        ((SpongeRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this, Sponge.systemSubject());
         this.pluginContainer = pluginContainer;
         this.subjectMapper = subjectMapper;
         this.backwardsSubjectMapper = backwardsSubjectMapper;
-        Sponge.getEventManager().registerListeners(this.pluginContainer, this);
+        Sponge.eventManager().registerListeners(this.pluginContainer, this);
     }
 
     @Override
