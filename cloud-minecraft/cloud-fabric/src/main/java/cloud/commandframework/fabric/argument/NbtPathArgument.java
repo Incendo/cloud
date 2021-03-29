@@ -117,7 +117,7 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, NbtPathArgumentType.NbtPath, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, NbtPathArgumentType.NbtPath, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(NbtPathArgumentType.NbtPath.class, name);

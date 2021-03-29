@@ -184,7 +184,7 @@ public final class Vec2Argument<C> extends CommandArgument<C, Coordinates.Coordi
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Coordinates.CoordinatesXZ, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Coordinates.CoordinatesXZ, Builder<C>> {
 
         private boolean centerIntegers = false;
 

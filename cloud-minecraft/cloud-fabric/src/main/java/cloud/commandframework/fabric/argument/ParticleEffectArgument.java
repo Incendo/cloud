@@ -118,7 +118,7 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, ParticleEffect, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, ParticleEffect, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(ParticleEffect.class, name);

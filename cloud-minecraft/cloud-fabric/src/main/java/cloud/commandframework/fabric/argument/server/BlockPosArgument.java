@@ -124,7 +124,7 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, BlockCoordinates, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, BlockCoordinates, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(BlockCoordinates.class, name);

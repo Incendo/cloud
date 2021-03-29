@@ -128,7 +128,7 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, EnumSet<Direction.Axis>, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, EnumSet<Direction.Axis>, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(TYPE, name);

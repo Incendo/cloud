@@ -103,7 +103,7 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Operation, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Operation, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(Operation.class, name);

@@ -665,7 +665,7 @@ public class Command<C> {
          * @since 1.4.0
          */
         public <T> @NonNull Builder<C> argument(
-                final CommandArgument.@NonNull Builder<C, T> builder,
+                final CommandArgument.@NonNull Builder<C, T, ?> builder,
                 final @NonNull ArgumentDescription description
         ) {
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);

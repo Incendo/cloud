@@ -99,7 +99,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, SingleEntitySelector, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, SingleEntitySelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(SingleEntitySelector.class, name);

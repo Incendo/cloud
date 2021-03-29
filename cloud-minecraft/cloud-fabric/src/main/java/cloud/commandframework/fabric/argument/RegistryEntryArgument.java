@@ -282,7 +282,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      * @param <V> The registry value type
      * @since 1.5.0
      */
-    public static final class Builder<C, V> extends CommandArgument.TypedBuilder<C, V, Builder<C, V>> {
+    public static final class Builder<C, V> extends CommandArgument.Builder<C, V, Builder<C, V>> {
 
         private final RegistryKey<? extends Registry<V>> registryIdent;
 

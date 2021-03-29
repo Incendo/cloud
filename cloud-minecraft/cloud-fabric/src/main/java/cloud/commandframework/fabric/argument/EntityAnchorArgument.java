@@ -117,7 +117,7 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, EntityAnchorArgumentType.EntityAnchor, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, EntityAnchorArgumentType.EntityAnchor, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(EntityAnchorArgumentType.EntityAnchor.class, name);

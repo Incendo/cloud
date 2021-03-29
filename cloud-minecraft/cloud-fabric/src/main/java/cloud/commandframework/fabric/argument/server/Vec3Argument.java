@@ -185,7 +185,7 @@ public final class Vec3Argument<C> extends CommandArgument<C, Coordinates> {
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Coordinates, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Coordinates, Builder<C>> {
 
         private boolean centerIntegers = false;
 

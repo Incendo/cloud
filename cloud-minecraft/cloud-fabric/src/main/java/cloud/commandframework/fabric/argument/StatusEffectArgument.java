@@ -121,7 +121,7 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, StatusEffect, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, StatusEffect, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(StatusEffect.class, name);

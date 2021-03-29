@@ -533,7 +533,7 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(message = "ArgumentDescription should be used over Description", level = DeprecationLevel.HIDDEN)
     public fun argument(
-        argument: CommandArgument.Builder<C, *>,
+        argument: CommandArgument.Builder<C, *, *>,
         description: Description = Description.empty()
     ): MutableCommandBuilder<C> =
         mutate { it.argument(argument, description) }
@@ -547,7 +547,7 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.4.0
      */
     public fun argument(
-            argument: CommandArgument.Builder<C, *>,
+            argument: CommandArgument.Builder<C, *, *>,
             description: ArgumentDescription = ArgumentDescription.empty()
     ): MutableCommandBuilder<C> =
             mutate { it.argument(argument, description) }
@@ -692,7 +692,7 @@ public class MutableCommandBuilder<C : Any> {
         name: String,
         aliases: Array<String> = emptyArray(),
         description: ArgumentDescription = ArgumentDescription.empty(),
-        argumentBuilder: CommandArgument.Builder<C, *>
+        argumentBuilder: CommandArgument.Builder<C, *, *>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
             this.commandManager.flagBuilder(name)

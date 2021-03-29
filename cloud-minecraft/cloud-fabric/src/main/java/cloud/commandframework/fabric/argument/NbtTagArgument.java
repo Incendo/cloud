@@ -118,7 +118,7 @@ public final class NbtTagArgument<C> extends CommandArgument<C, Tag> {
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Tag, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Tag, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(Tag.class, name);

@@ -118,7 +118,7 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Identifier, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Identifier, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(Identifier.class, name);

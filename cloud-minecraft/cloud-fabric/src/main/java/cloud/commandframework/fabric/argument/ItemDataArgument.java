@@ -125,7 +125,7 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
      *
      * @param <C> sender type
      */
-    public static final class Builder<C> extends TypedBuilder<C, ItemStackArgument, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, ItemStackArgument, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(ItemStackArgument.class, name);

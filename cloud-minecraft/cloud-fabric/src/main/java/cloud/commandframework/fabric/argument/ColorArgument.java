@@ -116,7 +116,7 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Formatting, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Formatting, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(Formatting.class, name);

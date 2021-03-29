@@ -117,7 +117,7 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, AngleArgumentType.Angle, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, AngleArgumentType.Angle, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(AngleArgumentType.Angle.class, name);

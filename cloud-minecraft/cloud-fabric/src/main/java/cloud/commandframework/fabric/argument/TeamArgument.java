@@ -183,7 +183,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Team, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, Team, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(Team.class, name);

@@ -128,7 +128,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, NumberRange.IntRange, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, NumberRange.IntRange, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(NumberRange.IntRange.class, name);

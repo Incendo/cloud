@@ -32,7 +32,7 @@ gradle.taskGraph.whenReady {
 }
 
 group = "cloud.commandframework"
-version = "1.5.0-SNAPSHOT"
+version = "2.0.0-SNAPSHOT"
 description = "Command framework and dispatcher for the JVM"
 
 subprojects {

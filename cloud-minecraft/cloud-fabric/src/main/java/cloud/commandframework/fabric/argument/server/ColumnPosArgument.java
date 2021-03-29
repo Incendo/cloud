@@ -123,7 +123,7 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, ColumnCoordinates, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, ColumnCoordinates, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(ColumnCoordinates.class, name);

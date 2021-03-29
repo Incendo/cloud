@@ -118,7 +118,7 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, CompoundTag, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, CompoundTag, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(CompoundTag.class, name);

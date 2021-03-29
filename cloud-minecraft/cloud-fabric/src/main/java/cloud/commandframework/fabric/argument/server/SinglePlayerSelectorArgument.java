@@ -99,7 +99,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, SinglePlayerSelector, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, SinglePlayerSelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(SinglePlayerSelector.class, name);

@@ -118,7 +118,7 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, ScoreboardCriterion, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, ScoreboardCriterion, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(ScoreboardCriterion.class, name);

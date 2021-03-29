@@ -116,7 +116,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, MinecraftTime, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, MinecraftTime, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(MinecraftTime.class, name);

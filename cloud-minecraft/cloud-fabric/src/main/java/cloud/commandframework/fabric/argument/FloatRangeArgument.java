@@ -128,7 +128,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, NumberRange.FloatRange, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, NumberRange.FloatRange, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(NumberRange.FloatRange.class, name);

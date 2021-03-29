@@ -99,7 +99,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, MultiplePlayerSelector, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.Builder<C, MultiplePlayerSelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(MultiplePlayerSelector.class, name);
