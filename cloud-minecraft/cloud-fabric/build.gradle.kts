@@ -2,7 +2,7 @@ import net.fabricmc.loom.task.AbstractRunTask
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
-    id("fabric-loom") version "0.6-SNAPSHOT"
+    id("fabric-loom") version "0.7-SNAPSHOT"
 }
 
 /* set up a testmod source set */
