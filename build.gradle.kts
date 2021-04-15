@@ -105,7 +105,6 @@ subprojects {
     repositories {
         mavenCentral()
         sonatypeSnapshots()
-        jcenter()
         /* Velocity, used for cloud-velocity */
         maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-release/") {
             mavenContent { releasesOnly() }
