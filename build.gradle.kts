@@ -1,19 +1,20 @@
-import com.hierynomus.gradle.license.LicenseBasePlugin
-import com.hierynomus.gradle.license.tasks.LicenseCheck
 import de.marcphilipp.gradle.nexus.NexusPublishExtension
 import net.kyori.indra.IndraExtension
 import net.kyori.indra.sonatypeSnapshots
 import net.ltgt.gradle.errorprone.ErrorPronePlugin
 import net.ltgt.gradle.errorprone.errorprone
-import nl.javadude.gradle.plugins.license.LicenseExtension
-import org.gradle.api.plugins.JavaPlugin.*
+import org.cadixdev.gradle.licenser.LicenseExtension
+import org.cadixdev.gradle.licenser.header.HeaderStyle
+import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME
 
 plugins {
-    val indraVersion = "1.2.1"
+    val indraVersion = "1.3.1"
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion apply false
-    id("com.github.hierynomus.license") version "0.15.0" apply false
+    id("net.kyori.indra.license-header") version indraVersion apply false
+    id ("org.cadixdev.licenser") version "0.6.0-SNAPSHOT" apply false
     id("com.github.johnrengelman.shadow") version "6.1.0" apply false
     id("net.ltgt.errorprone") version "1.3.0" apply false
     id("com.github.ben-manes.versions") version "0.36.0"
@@ -39,15 +40,8 @@ subprojects {
     plugins.apply("net.kyori.indra")
     plugins.apply("net.kyori.indra.checkstyle")
     plugins.apply("net.kyori.indra.publishing.sonatype")
+    plugins.apply("net.kyori.indra.license-header")
     apply<ErrorPronePlugin>()
-    apply<LicenseBasePlugin>()
-
-    extensions.configure(LicenseExtension::class) {
-        header = rootProject.file("HEADER")
-        mapping("java", "DOUBLESLASH_STYLE")
-        mapping("kt", "DOUBLESLASH_STYLE")
-        includes(listOf("**/*.java", "**/*.kt"))
-    }
 
     extensions.configure(IndraExtension::class) {
         github("Incendo", "cloud") {
@@ -100,10 +94,12 @@ subprojects {
             }
             options.compilerArgs.addAll(listOf("-Xlint:-processing", "-Werror"))
         }
+    }
 
-        named("check") {
-            dependsOn(withType(LicenseCheck::class))
-        }
+    extensions.configure<LicenseExtension> {
+        header = rootProject.file("HEADER")
+        style["java"] = HeaderStyle.DOUBLE_SLASH.format
+        style["kt"] = HeaderStyle.DOUBLE_SLASH.format
     }
 
     repositories {
