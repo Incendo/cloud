@@ -129,6 +129,8 @@ subprojects {
         maven("https://jitpack.io") {
             content { includeGroupByRegex("com\\.github\\..*") }
         }
+        /* JDA's maven repository for cloud-jda */
+        maven("https://m2.dv8tion.net/releases")
     }
 
     dependencies {
