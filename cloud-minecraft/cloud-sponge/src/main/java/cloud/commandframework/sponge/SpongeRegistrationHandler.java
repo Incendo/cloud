@@ -48,6 +48,7 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
 
     //@Listener
     public void handleRegistrationEvent(final RegisterCommandEvent<Command.Raw> event) {
+        this.commandManager.registrationCalled();
         this.registeredCommands.stream()
                 .collect(groupingBy(command -> command.getArguments().get(0).getName()))
                 .forEach((label, commands) ->

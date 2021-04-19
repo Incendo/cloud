@@ -106,4 +106,8 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
         return this.backwardsCauseMapper;
     }
 
+    void registrationCalled() {
+        this.lockRegistration();
+    }
+
 }
