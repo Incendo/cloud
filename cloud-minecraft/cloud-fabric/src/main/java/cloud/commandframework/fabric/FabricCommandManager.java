@@ -354,7 +354,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
 
     /* transition state to prevent further registration */
     final void registrationCalled() {
-        this.transitionOrThrow(RegistrationState.REGISTERING, RegistrationState.AFTER_REGISTRATION);
+        this.lockRegistration();
     }
 
     /**
