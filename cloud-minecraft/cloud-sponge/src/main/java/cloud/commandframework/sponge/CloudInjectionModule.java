@@ -34,6 +34,7 @@ import org.spongepowered.api.service.permission.Subject;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Injection module that allows for {@link SpongeCommandManager} to be injectable.
@@ -65,6 +66,24 @@ public final class CloudInjectionModule<C> extends AbstractModule {
         this.commandExecutionCoordinator = commandExecutionCoordinator;
         this.causeMapper = causeMapper;
         this.backwardsCauseMapper = backwardsCauseMapper;
+    }
+
+    /**
+     * Create a new child injection module using Sponge's {@link CommandCause} as the sender type.
+     *
+     * @param commandExecutionCoordinator Command execution coordinator
+     * @return new injection module
+     */
+    public static @NonNull CloudInjectionModule<@NonNull CommandCause> createNative(
+            final @NonNull Function<@NonNull CommandTree<@NonNull CommandCause>,
+                    @NonNull CommandExecutionCoordinator<@NonNull CommandCause>> commandExecutionCoordinator
+    ) {
+        return new CloudInjectionModule<>(
+                CommandCause.class,
+                commandExecutionCoordinator,
+                UnaryOperator.identity(),
+                UnaryOperator.identity()
+        );
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
