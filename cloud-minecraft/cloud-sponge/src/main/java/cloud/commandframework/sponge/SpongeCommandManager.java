@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,19 +30,15 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import com.google.inject.Inject;
 import com.google.inject.Module;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.function.Function;
 
 /**
- * Command manager for Sponge v8.
+ * Command manager for Sponge API v8.
  * <p>
  * The manager supports Guice injection
  * as long as the {@link CloudInjectionModule} is present in the injector.
@@ -50,45 +46,46 @@ import java.util.function.Function;
  *
  * @param <C> Command sender type
  */
-public class SpongeCommandManager<C> extends CommandManager<C> {
+public final class SpongeCommandManager<C> extends CommandManager<C> {
 
     private final PluginContainer pluginContainer;
-    private final Function<C, Subject> subjectMapper;
-    private final Function<CommandCause, C> backwardsSubjectMapper;
+    private final Function<C, CommandCause> causeMapper;
+    private final Function<CommandCause, C> backwardsCauseMapper;
 
     /**
      * Create a new command manager instance
      *
      * @param pluginContainer             Owning plugin
      * @param commandExecutionCoordinator Execution coordinator instance
-     * @param subjectMapper               Function mapping the custom command sender type to a Sponge subject
-     * @param backwardsSubjectMapper      Function mapping Sponge subjects to the custom command sender type
+     * @param causeMapper                 Function mapping the custom command sender type to a Sponge subject
+     * @param backwardsCauseMapper        Function mapping Sponge subjects to the custom command sender type
      */
+    @SuppressWarnings("unchecked")
     @Inject
     public SpongeCommandManager(
             final @NonNull PluginContainer pluginContainer,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull C, @NonNull Subject> subjectMapper,
-            final @NonNull Function<@NonNull CommandCause, @NonNull C> backwardsSubjectMapper
+            final @NonNull Function<@NonNull C, @NonNull CommandCause> causeMapper,
+            final @NonNull Function<@NonNull CommandCause, @NonNull C> backwardsCauseMapper
     ) {
         super(commandExecutionCoordinator, new SpongeRegistrationHandler<C>());
-        ((SpongeRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this, Sponge.systemSubject());
         this.pluginContainer = pluginContainer;
-        this.subjectMapper = subjectMapper;
-        this.backwardsSubjectMapper = backwardsSubjectMapper;
-        Sponge.eventManager().registerListeners(this.pluginContainer, this);
+        ((SpongeRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this, Sponge.systemSubject());
+        this.causeMapper = causeMapper;
+        this.backwardsCauseMapper = backwardsCauseMapper;
+        Sponge.eventManager().registerListeners(this.pluginContainer, this.getCommandRegistrationHandler());
     }
 
     @Override
-    public final boolean hasPermission(
+    public boolean hasPermission(
             @NonNull final C sender,
             @NonNull final String permission
     ) {
-        return this.subjectMapper.apply(sender).hasPermission(permission);
+        return this.causeMapper.apply(sender).hasPermission(permission);
     }
 
     @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
+    public @NonNull CommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
 
@@ -97,17 +94,16 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
      *
      * @return Owning plugin
      */
-    public final @NonNull PluginContainer getOwningPlugin() {
+    public @NonNull PluginContainer getOwningPlugin() {
         return this.pluginContainer;
     }
 
-    @NonNull
-    final Function<@NonNull CommandCause, @NonNull C> getBackwardsSubjectMapper() {
-        return this.backwardsSubjectMapper;
+    @NonNull Function<@NonNull C, @NonNull CommandCause> causeMapper() {
+        return this.causeMapper;
     }
 
-    @Listener
-    private void onRegistryEvent(final RegisterCommandEvent<LiteralArgumentBuilder> event) {
+    @NonNull Function<@NonNull CommandCause, @NonNull C> backwardsCauseMapper() {
+        return this.backwardsCauseMapper;
     }
 
 }

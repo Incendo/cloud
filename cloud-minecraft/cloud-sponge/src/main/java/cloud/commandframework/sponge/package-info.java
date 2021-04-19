@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,6 @@
 //
 
 /**
- * Cloud for sponge v8
+ * Cloud for Sponge API v8
  */
 package cloud.commandframework.sponge;

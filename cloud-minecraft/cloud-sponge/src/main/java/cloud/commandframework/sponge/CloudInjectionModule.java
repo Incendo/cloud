@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ import java.lang.reflect.Type;
 import java.util.function.Function;
 
 /**
- * Injection module that allows for {@link SpongeCommandManager} to be injectable
+ * Injection module that allows for {@link SpongeCommandManager} to be injectable.
  *
  * @param <C> Command sender type
  */
@@ -44,46 +44,52 @@ public final class CloudInjectionModule<C> extends AbstractModule {
 
     private final Class<C> commandSenderType;
     private final Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator;
-    private final Function<@NonNull C, @NonNull Subject> subjectMapper;
-    private final Function<@NonNull CommandCause, @NonNull C> backwardsSubjectMapper;
+    private final Function<@NonNull C, @NonNull CommandCause> causeMapper;
+    private final Function<@NonNull CommandCause, @NonNull C> backwardsCauseMapper;
 
     /**
      * Create a new child injection module
      *
-     * @param commandSenderType            Your command sender type
-     * @param commandExecutionCoordinator  Command execution coordinator
-     * @param subjectMapper                Mapper to command source from the custom command sender type
-     * @param backwardsSubjectMapper       Mapper from the custom command sender type to a velocity command source
+     * @param commandSenderType           Your command sender type
+     * @param commandExecutionCoordinator Command execution coordinator
+     * @param causeMapper                 Mapper to command source from the custom command sender type
+     * @param backwardsCauseMapper        Mapper from the custom command sender type to a velocity command source
      */
     public CloudInjectionModule(
             final @NonNull Class<C> commandSenderType,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull C, @NonNull Subject> subjectMapper,
-            final @NonNull Function<@NonNull CommandCause, @NonNull C> backwardsSubjectMapper
+            final @NonNull Function<@NonNull C, @NonNull CommandCause> causeMapper,
+            final @NonNull Function<@NonNull CommandCause, @NonNull C> backwardsCauseMapper
     ) {
         this.commandSenderType = commandSenderType;
         this.commandExecutionCoordinator = commandExecutionCoordinator;
-        this.subjectMapper = subjectMapper;
-        this.backwardsSubjectMapper = backwardsSubjectMapper;
+        this.causeMapper = causeMapper;
+        this.backwardsCauseMapper = backwardsCauseMapper;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     protected void configure() {
         final Type commandTreeType = Types.newParameterizedType(CommandTree.class, this.commandSenderType);
-        final Type commandExecutionCoordinatorType = Types.newParameterizedType(CommandExecutionCoordinator.class,
-                this.commandSenderType);
+        final Type commandExecutionCoordinatorType = Types.newParameterizedType(
+                CommandExecutionCoordinator.class,
+                this.commandSenderType
+        );
         final Type executorFunction = Types.newParameterizedType(Function.class, commandTreeType,
-                commandExecutionCoordinatorType);
+                commandExecutionCoordinatorType
+        );
         final Key executorFunctionKey = Key.get(executorFunction);
         this.bind(executorFunctionKey).toInstance(this.commandExecutionCoordinator);
         final Type commandSenderMapperFunction = Types.newParameterizedType(Function.class,
-                this.commandSenderType, Subject.class);
+                this.commandSenderType, Subject.class
+        );
         final Key commandSenderMapperFunctionKey = Key.get(commandSenderMapperFunction);
-        this.bind(commandSenderMapperFunctionKey).toInstance(this.subjectMapper);
+        this.bind(commandSenderMapperFunctionKey).toInstance(this.causeMapper);
         final Type backwardsCommandSenderMapperFunction = Types.newParameterizedType(Function.class, CommandCause.class,
-                this.commandSenderType);
+                this.commandSenderType
+        );
         final Key backwardsCommandSenderMapperFunctionKey = Key.get(backwardsCommandSenderMapperFunction);
-        this.bind(backwardsCommandSenderMapperFunctionKey).toInstance(this.backwardsSubjectMapper);
+        this.bind(backwardsCommandSenderMapperFunctionKey).toInstance(this.backwardsCauseMapper);
     }
 
 }

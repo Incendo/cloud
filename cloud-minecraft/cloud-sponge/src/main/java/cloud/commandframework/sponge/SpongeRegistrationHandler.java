@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2020 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,108 +23,68 @@
 //
 package cloud.commandframework.sponge;
 
-import cloud.commandframework.Command;
 import cloud.commandframework.arguments.StaticArgument;
-import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.permission.CommandPermission;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
-import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.util.function.BiPredicate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.stream.Collectors.groupingBy;
 
 final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
 
-    private final MethodHandle commandRegistrationMethodHandle;
-    private CloudBrigadierManager<C, ?> brigadierManager;
     private SpongeCommandManager<C> commandManager;
+    private final Set<cloud.commandframework.Command<C>> registeredCommands = new HashSet<>();
 
     SpongeRegistrationHandler() {
-        try {
-            final Class<?> brigadierCommandRegistrar =
-                    Class.forName("org.spongepowered.common.command.registrar.BrigadierCommandRegistrar");
-            /*
-            The reason we're using the private method here is because we need to allow for duplicates, whereas
-            the public register method doesn't. This way we can indicate whether or not we do actually allow duplicates.
+    }
 
-            The reason we need to allow for duplicates is because the same command is registered every time
-            a subcommand is added to it.
-             */
-            final Method method = brigadierCommandRegistrar.getMethod(
-                    "registerInternal",
-                    PluginContainer.class,
-                    LiteralArgumentBuilder.class,
-                    String.class,
-                    String[].class,
-                    Boolean.class
-            );
-            method.setAccessible(true);
-            this.commandRegistrationMethodHandle = MethodHandles.lookup().unreflect(method);
-        } catch (final Exception e) {
-            /* Ugly */
-            throw new RuntimeException(e);
-        }
+    //@Listener
+    public void handleRegistrationEvent(final RegisterCommandEvent<Command.Raw> event) {
+        this.registeredCommands.stream()
+                .collect(groupingBy(command -> command.getArguments().get(0).getName()))
+                .forEach((label, commands) ->
+                        this.registerCommand(event, label, commands));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void registerCommand(
+            final RegisterCommandEvent<Command.Raw> event,
+            final String label,
+            final List<cloud.commandframework.Command<C>> commands
+    ) {
+        event.register(
+                this.commandManager.getOwningPlugin(),
+                new CloudSpongeCommand<>(label, this.commandManager),
+                label,
+                ((StaticArgument<C>) commands.get(0).getArguments().get(0)).getAlternativeAliases().toArray(new String[0])
+        );
     }
 
     void initialize(
             final @NonNull SpongeCommandManager<C> commandManager,
             final @NonNull SystemSubject subject
-            ) {
+    ) {
         this.commandManager = commandManager;
-        this.brigadierManager = new CloudBrigadierManager<>(
-                commandManager,
-                () -> new CommandContext<>(
-                        commandManager.getBackwardsSubjectMapper().apply(
-                                CommandCause.create() /* This is bad, fix! */
-                        ),
-                        commandManager
-                )
+        Sponge.eventManager().registerListener(
+                this.commandManager.getOwningPlugin(),
+                new TypeToken<RegisterCommandEvent<Command.Raw>>() {
+                },
+                this::handleRegistrationEvent
         );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public boolean registerCommand(@NonNull final Command<?> command) {
-        final StaticArgument<?> staticArgument = (StaticArgument<?>) command.getArguments().get(0);
-        final String primaryAlias = staticArgument.getName();
-        final String[] aliases = staticArgument.getAlternativeAliases().toArray(new String[0]);
-        @SuppressWarnings("all")
-        final LiteralCommandNode<?> literalCommandNode = this.brigadierManager.createLiteralCommandNode(
-                command.getArguments().get(0).getName(),
-                (Command<C>) command,
-                (BiPredicate) (o, permission) -> commandManager.hasPermission(
-                        commandManager.getBackwardsSubjectMapper().apply((CommandCause) o),
-                        (CommandPermission) permission
-                ),
-                false,
-                (com.mojang.brigadier.Command) context -> {
-                    commandManager.executeCommand(
-                            commandManager.getBackwardsSubjectMapper().apply((CommandCause) context.getSource()),
-                            context.getInput()
-                    ).whenComplete(((result, throwable) -> {
-
-                    }));
-                    return com.mojang.brigadier.Command.SINGLE_SUCCESS;
-                }
-        );
-        try {
-            this.commandRegistrationMethodHandle.invokeWithArguments(
-                    this.commandManager.getOwningPlugin(),
-                    literalCommandNode.createBuilder(),
-                    primaryAlias,
-                    aliases,
-                    true
-            );
-        } catch (final Throwable throwable) {
-            throwable.printStackTrace();
-        }
+    public boolean registerCommand(final cloud.commandframework.@NonNull Command<?> command) {
+        this.registeredCommands.add((cloud.commandframework.Command<C>) command);
         return true;
     }
 
