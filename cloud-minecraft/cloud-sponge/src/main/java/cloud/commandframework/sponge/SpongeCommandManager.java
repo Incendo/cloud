@@ -28,11 +28,18 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.sponge.argument.EnchantmentTypeArgument;
+import cloud.commandframework.sponge.argument.NamedTextColorArgument;
+import cloud.commandframework.sponge.argument.OperatorArgument;
 import com.google.inject.Inject;
 import com.google.inject.Module;
+import io.leangen.geantyref.TypeToken;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.parameter.managed.operator.Operator;
+import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.function.Function;
@@ -51,14 +58,15 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
     private final PluginContainer pluginContainer;
     private final Function<C, CommandCause> causeMapper;
     private final Function<CommandCause, C> backwardsCauseMapper;
+    private final SpongeParserMapper<C> parserMapper;
 
     /**
      * Create a new command manager instance
      *
      * @param pluginContainer             Owning plugin
      * @param commandExecutionCoordinator Execution coordinator instance
-     * @param causeMapper                 Function mapping the custom command sender type to a Sponge subject
-     * @param backwardsCauseMapper        Function mapping Sponge subjects to the custom command sender type
+     * @param causeMapper                 Function mapping the custom command sender type to a Sponge CommandCause
+     * @param backwardsCauseMapper        Function mapping Sponge CommandCause to the custom command sender type
      */
     @SuppressWarnings("unchecked")
     @Inject
@@ -74,6 +82,23 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
         this.causeMapper = causeMapper;
         this.backwardsCauseMapper = backwardsCauseMapper;
         Sponge.eventManager().registerListeners(this.pluginContainer, this.getCommandRegistrationHandler());
+        this.registerParsers();
+        this.parserMapper = new SpongeParserMapper<>();
+    }
+
+    private void registerParsers() {
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(EnchantmentType.class),
+                params -> new EnchantmentTypeArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(NamedTextColor.class),
+                params -> new NamedTextColorArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(Operator.class),
+                params -> new OperatorArgument.Parser<>()
+        );
     }
 
     @Override
@@ -96,6 +121,10 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
      */
     public @NonNull PluginContainer getOwningPlugin() {
         return this.pluginContainer;
+    }
+
+    @NonNull SpongeParserMapper<C> parserMapper() {
+        return this.parserMapper;
     }
 
     @NonNull Function<@NonNull C, @NonNull CommandCause> causeMapper() {

@@ -21,7 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-/**
- * Cloud for Sponge API v8
- */
 package cloud.commandframework.sponge;
+
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+
+/**
+ * An {@link ArgumentParser} which also supplies a special {@link CommandTreeNode.Argument}.
+ *
+ * @param <C> sender type
+ * @param <T> value type
+ */
+public interface NodeSupplyingArgumentParser<C, T> extends ArgumentParser<C, T> {
+
+    /**
+     * Get the node for this parser.
+     *
+     * @return argument node
+     */
+    CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node();
+
+}

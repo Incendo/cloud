@@ -49,12 +49,12 @@ public final class CloudInjectionModule<C> extends AbstractModule {
     private final Function<@NonNull CommandCause, @NonNull C> backwardsCauseMapper;
 
     /**
-     * Create a new child injection module
+     * Create a new injection module.
      *
      * @param commandSenderType           Your command sender type
      * @param commandExecutionCoordinator Command execution coordinator
-     * @param causeMapper                 Mapper to command source from the custom command sender type
-     * @param backwardsCauseMapper        Mapper from the custom command sender type to a velocity command source
+     * @param causeMapper                 Function mapping the custom command sender type to a Sponge CommandCause
+     * @param backwardsCauseMapper        Function mapping Sponge CommandCause to the custom command sender type
      */
     public CloudInjectionModule(
             final @NonNull Class<C> commandSenderType,
@@ -69,7 +69,7 @@ public final class CloudInjectionModule<C> extends AbstractModule {
     }
 
     /**
-     * Create a new child injection module using Sponge's {@link CommandCause} as the sender type.
+     * Create a new injection module using Sponge's {@link CommandCause} as the sender type.
      *
      * @param commandExecutionCoordinator Command execution coordinator
      * @return new injection module
