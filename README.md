@@ -86,7 +86,7 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 - **cloud-minecraft/cloud-bungee**: BungeeCord 1.8.8+ implementation of Cloud
 - **cloud-minecraft/cloud-velocity**: Velocity v1.1.0 implementation of cloud
 - **cloud-minecraft/cloud-cloudburst**: Cloudburst v1.0.0+ implementation of cloud
-- **cloud-minecraft/cloud-fabric**: Fabric implementation of Cloud
+- **cloud-minecraft/cloud-quilt**: Quilt/Fabric implementation of Cloud
 - **cloud-minecraft/cloud-minecraft-extras**: Opinionated Extra Features for cloud-minecraft
 - **cloud-discord/cloud-jda**: JDA v4.2.0_209+ implementation of cloud
 - **cloud-discord/cloud-javacord**: Javacord v3.1.1+ implementation of cloud

@@ -25,7 +25,7 @@ setupDiscordModule("cloud-jda")
 // Minecraft Modules
 setupMinecraftModule("cloud-brigadier")
 setupMinecraftModule("cloud-bukkit")
-setupMinecraftModule("cloud-fabric")
+setupMinecraftModule("cloud-quilt")
 setupMinecraftModule("cloud-paper")
 setupMinecraftModule("cloud-velocity")
 setupMinecraftModule("cloud-sponge")

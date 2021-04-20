@@ -1,0 +1,16 @@
+{
+  "package": "cloud.commandframework.quilt.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "required": true,
+  "mixins": [
+    "CloudStringReaderMixin",
+    "CommandManagerMixin",
+    "EntitySelectorMixin",
+    "EntitySelectorReaderMixin",
+    "MessageArgumentTypeMessageFormatAccess",
+    "MessageArgumentTypeMessageSelectorAccess"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

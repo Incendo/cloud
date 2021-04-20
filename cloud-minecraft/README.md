@@ -9,7 +9,7 @@ This directory hosts Minecraft specific implementations of cloud. Their features
 | `cloud-bungee` | BungeeCord | 1.8+ | No |
 | `cloud-velocity` | Velocity 1.1.0 | 1.7+ | Yes |
 | `cloud-cloudburst` | CloudBurst 1.0.0 | Bedrock 1.16.20+ | No |
-| `cloud-fabric` |  Minecraft, via Fabric | 1.16+ | Yes |
+| `cloud-quilt` |  Minecraft, via Quilt/Fabric | 1.16+ | Yes |
 
 
 There is also a `cloud-minecraft-extras` module that contains a few extra minecraft related features
@@ -203,22 +203,22 @@ The `forwardMapper` is a function that maps your chosen sender type to Cloudburs
 the generic type and pass `Function.identity()` as the forward and backward mappers.
 
 
-## cloud-fabric
+## cloud-quilt
 
-cloud mappings for the Fabric mod loader for Minecraft 1.16+
+cloud mappings for the Quilt mod loader (and Fabric for now) for Minecraft 1.16+
 
 ### dependency
 
 **gradle**:
 ```groovy
 dependencies {
-    modImplementation 'cloud.commandframework:cloud-fabric:1.3.0-SNAPSHOT'
+    modImplementation 'cloud.commandframework:cloud-quilt:1.3.0-SNAPSHOT'
 }
 ```
 
 Simply do:
 ```java
-final FabricCommandManager<YourSender> fabricCommandManager = new FabricCommandManager<>(
+final QuiltCommandManager<YourSender> quiltCommandManager = new QuiltCommandManager<>(
   yourExecutionCoordinator, forwarMapper, backwardsMapper);
 ```
 
@@ -227,5 +227,5 @@ The `forwardMapper` is a function that maps your chosen sender type to Minecraft
 and the `backwardsMapper` does the opposite. 
 
 In the case that you don't need a custom sender type, you can use the helper method 
-`FabricCommandManager.createNative(yourExecutionCoordinator)` instead, which will create a command manager that works directly
+`QuiltCommandManager.createNative(yourExecutionCoordinator)` instead, which will create a command manager that works directly
  with `ServerCommandSource`s.
