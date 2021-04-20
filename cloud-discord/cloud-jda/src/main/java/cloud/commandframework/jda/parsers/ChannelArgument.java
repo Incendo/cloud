@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.jda.parsers;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -32,12 +33,14 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * Command Argument for {@link MessageChannel}
@@ -50,10 +53,23 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
     private final Set<ParserMode> modes;
 
     private ChannelArgument(
-            final boolean required, final @NonNull String name,
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
-        super(required, name, new MessageParser<>(modes), MessageChannel.class);
+        super(
+                required,
+                name,
+                new MessageParser<>(modes),
+                defaultValue,
+                MessageChannel.class,
+                suggestionsProvider,
+                defaultDescription
+        );
         this.modes = modes;
     }
 
@@ -133,7 +149,14 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
          */
         @Override
         public @NonNull ChannelArgument<C> build() {
-            return new ChannelArgument<>(this.isRequired(), this.getName(), this.modes);
+            return new ChannelArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription(),
+                    this.modes
+            );
         }
 
     }
