@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.jda.parsers;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -32,6 +33,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -39,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -54,11 +57,24 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     private final Isolation isolationLevel;
 
     private UserArgument(
-            final boolean required, final @NonNull String name,
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes,
             final @NonNull Isolation isolationLevel
     ) {
-        super(required, name, new UserParser<>(modes, isolationLevel), User.class);
+        super(
+                required,
+                name,
+                new UserParser<>(modes, isolationLevel),
+                defaultValue,
+                User.class,
+                suggestionsProvider,
+                defaultDescription
+        );
         this.modes = modes;
         this.isolationLevel = isolationLevel;
     }
@@ -167,7 +183,15 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
          */
         @Override
         public @NonNull UserArgument<C> build() {
-            return new UserArgument<>(this.isRequired(), this.getName(), this.modes, this.isolationLevel);
+            return new UserArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription(),
+                    this.modes,
+                    this.isolationLevel
+            );
         }
 
     }

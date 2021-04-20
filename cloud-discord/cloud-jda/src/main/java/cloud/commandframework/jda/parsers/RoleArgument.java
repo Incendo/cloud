@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.jda.parsers;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -31,12 +32,14 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * Command Argument for {@link net.dv8tion.jda.api.entities.Role}
@@ -51,9 +54,13 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
     private RoleArgument(
             final boolean required,
             final @NonNull String name,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
-        super(required, name, new RoleParser<>(modes), Role.class);
+        super(required, name, new RoleParser<>(modes), defaultValue, Role.class, suggestionsProvider, defaultDescription);
         this.modes = modes;
     }
 
@@ -133,7 +140,14 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
          */
         @Override
         public @NonNull RoleArgument<C> build() {
-            return new RoleArgument<>(this.isRequired(), this.getName(), this.modes);
+            return new RoleArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription(),
+                    this.modes
+            );
         }
 
     }

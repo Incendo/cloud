@@ -56,6 +56,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     private PlayerArgument(
             final boolean required,
             final @NonNull String name,
+            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
@@ -65,7 +66,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
                 required,
                 name,
                 new PlayerParser<>(),
-                "",
+                defaultValue,
                 TypeToken.get(Player.class),
                 suggestionsProvider,
                 defaultDescription,
@@ -128,6 +129,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
             return new PlayerArgument<>(
                     this.isRequired(),
                     this.getName(),
+                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()

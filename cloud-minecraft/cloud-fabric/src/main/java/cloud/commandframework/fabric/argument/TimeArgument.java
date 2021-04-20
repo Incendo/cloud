@@ -24,6 +24,7 @@
 
 package cloud.commandframework.fabric.argument;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.data.MinecraftTime;
@@ -45,7 +46,8 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 required,
@@ -53,7 +55,8 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
                 FabricArgumentParsers.time(),
                 defaultValue,
                 MinecraftTime.class,
-                suggestionsProvider
+                suggestionsProvider,
+                defaultDescription
         );
     }
 
@@ -130,7 +133,13 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
          */
         @Override
         public @NonNull TimeArgument<C> build() {
-            return new TimeArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new TimeArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
+            );
         }
 
     }
