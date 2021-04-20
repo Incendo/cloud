@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.pircbotx.arguments;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -37,8 +38,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.exception.DaoException;
-
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -54,16 +53,19 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     private UserArgument(
             final boolean required,
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 required,
                 name,
                 new UserArgumentParser<>(),
-                "",
+                defaultValue,
                 TypeToken.get(User.class),
                 suggestionsProvider,
-                new LinkedList<>()
+                defaultDescription
         );
     }
 
@@ -117,7 +119,9 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             return new UserArgument<>(
                     this.isRequired(),
                     this.getName(),
-                    this.getSuggestionsProvider()
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
 
