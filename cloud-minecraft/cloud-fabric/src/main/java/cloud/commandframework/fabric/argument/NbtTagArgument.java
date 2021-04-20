@@ -24,6 +24,7 @@
 
 package cloud.commandframework.fabric.argument;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
@@ -47,7 +48,8 @@ public final class NbtTagArgument<C> extends CommandArgument<C, Tag> {
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 required,
@@ -55,7 +57,8 @@ public final class NbtTagArgument<C> extends CommandArgument<C, Tag> {
                 new WrappedBrigadierParser<>(NbtTagArgumentType.nbtTag()),
                 defaultValue,
                 Tag.class,
-                suggestionsProvider
+                suggestionsProvider,
+                defaultDescription
         );
     }
 
@@ -132,7 +135,13 @@ public final class NbtTagArgument<C> extends CommandArgument<C, Tag> {
          */
         @Override
         public @NonNull NbtTagArgument<C> build() {
-            return new NbtTagArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider());
+            return new NbtTagArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
+            );
         }
 
     }

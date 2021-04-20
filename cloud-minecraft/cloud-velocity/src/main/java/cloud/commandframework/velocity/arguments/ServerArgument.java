@@ -56,6 +56,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
     private ServerArgument(
             final boolean required,
             final @NonNull String name,
+            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
@@ -65,7 +66,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                 required,
                 name,
                 new ServerParser<>(),
-                "",
+                defaultValue,
                 TypeToken.get(RegisteredServer.class),
                 suggestionsProvider,
                 defaultDescription,
@@ -125,6 +126,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
             return new ServerArgument<>(
                     this.isRequired(),
                     this.getName(),
+                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()
