@@ -418,7 +418,7 @@ public final class CloudBrigadierManager<C, S> {
         if (defaultType != null) {
             return Pair.of(argumentTypeSupplier.get(), null);
         }
-        return Pair.of(StringArgumentType.string(), delegateSuggestions());
+        return Pair.of(StringArgumentType.word(), delegateSuggestions());
     }
 
     /**
