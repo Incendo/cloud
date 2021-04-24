@@ -28,24 +28,24 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
+import cloud.commandframework.sponge.SpongeCommandContextKeys;
+import cloud.commandframework.sponge.data.MultipleEntitySelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
-import org.spongepowered.api.item.enchantment.EnchantmentType;
-import org.spongepowered.api.registry.RegistryEntry;
-import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.command.selector.Selector;
+import org.spongepowered.api.entity.Entity;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-public final class EnchantmentTypeArgument<C> extends CommandArgument<C, EnchantmentType> {
+public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
 
-    private EnchantmentTypeArgument(
+    private MultipleEntitySelectorArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -57,79 +57,106 @@ public final class EnchantmentTypeArgument<C> extends CommandArgument<C, Enchant
                 name,
                 new Parser<>(),
                 defaultValue,
-                EnchantmentType.class,
+                MultipleEntitySelector.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
-    public static <C> @NonNull EnchantmentTypeArgument<C> optional(final @NonNull String name) {
-        return EnchantmentTypeArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull MultipleEntitySelectorArgument<C> optional(final @NonNull String name) {
+        return MultipleEntitySelectorArgument.<C>builder(name).asOptional().build();
     }
 
-    public static <C> @NonNull EnchantmentTypeArgument<C> of(final @NonNull String name) {
-        return EnchantmentTypeArgument.<C>builder(name).build();
+    public static <C> @NonNull MultipleEntitySelectorArgument<C> of(final @NonNull String name) {
+        return MultipleEntitySelectorArgument.<C>builder(name).build();
     }
 
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, EnchantmentType> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, MultipleEntitySelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull EnchantmentType> parse(
+        public @NonNull ArgumentParseResult<@NonNull MultipleEntitySelector> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
-            final ResourceKey key = resourceKey(input);
-            if (key == null) {
-                // todo
-                return ArgumentParseResult.failure(new IllegalArgumentException("invalid key!"));
+            final Selector selector;
+            try {
+                selector = Selector.parse(input);
+            } catch (final IllegalArgumentException ex) {
+                return ArgumentParseResult.failure(ex); // todo
             }
-            final Optional<RegistryEntry<EnchantmentType>> entry = Sponge.game()
-                    .registries()
-                    .registry(RegistryTypes.ENCHANTMENT_TYPE)
-                    .findEntry(key);
-            if (entry.isPresent()) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(entry.get().value());
+            final CommandCause cause = commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY);
+            final Collection<Entity> result = selector.select(cause);
+            if (result.isEmpty()) {
+                return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
             }
-            // todo
-            return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
+            inputQueue.remove();
+            return ArgumentParseResult.success(new MultipleEntitySelectorImpl(
+                    selector,
+                    input,
+                    result
+            ));
         }
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.ITEM_ENCHANTMENT.get().createNode();
+            return ClientCompletionKeys.ENTITY.get().createNode();
         }
 
     }
 
-    static @Nullable ResourceKey resourceKey(final @NonNull String input) {
-        try {
-            return ResourceKey.resolve(input);
-        } catch (final IllegalStateException ex) {
-            return null;
-        }
-    }
-
-    public static final class Builder<C> extends TypedBuilder<C, EnchantmentType, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, MultipleEntitySelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(EnchantmentType.class, name);
+            super(MultipleEntitySelector.class, name);
         }
 
         @Override
-        public @NonNull EnchantmentTypeArgument<C> build() {
-            return new EnchantmentTypeArgument<>(
+        public @NonNull MultipleEntitySelectorArgument<C> build() {
+            return new MultipleEntitySelectorArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+    }
+
+    private static final class MultipleEntitySelectorImpl implements MultipleEntitySelector {
+
+        private final Selector selector;
+        private final String inputString;
+        private final Collection<Entity> result;
+
+        private MultipleEntitySelectorImpl(
+                final Selector selector,
+                final String inputString,
+                final Collection<Entity> result
+        ) {
+            this.selector = selector;
+            this.inputString = inputString;
+            this.result = result;
+        }
+
+        @Override
+        public @NonNull Selector selector() {
+            return this.selector;
+        }
+
+        @Override
+        public @NonNull String inputString() {
+            return this.inputString;
+        }
+
+        @Override
+        public @NonNull Collection<Entity> get() {
+            return this.result;
         }
 
     }

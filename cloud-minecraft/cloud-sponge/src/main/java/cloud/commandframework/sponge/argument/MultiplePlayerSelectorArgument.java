@@ -28,21 +28,25 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
+import cloud.commandframework.sponge.SpongeCommandContextKeys;
+import cloud.commandframework.sponge.data.MultiplePlayerSelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.parameter.managed.operator.Operator;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
-import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.command.selector.Selector;
+import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
-public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
+public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, MultiplePlayerSelector> {
 
-    private OperatorArgument(
+    private MultiplePlayerSelectorArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -54,65 +58,110 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
                 name,
                 new Parser<>(),
                 defaultValue,
-                Operator.class,
+                MultiplePlayerSelector.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
-    public static <C> @NonNull OperatorArgument<C> optional(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(final @NonNull String name) {
+        return MultiplePlayerSelectorArgument.<C>builder(name).asOptional().build();
     }
 
-    public static <C> @NonNull OperatorArgument<C> of(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).build();
+    public static <C> @NonNull MultiplePlayerSelectorArgument<C> of(final @NonNull String name) {
+        return MultiplePlayerSelectorArgument.<C>builder(name).build();
     }
 
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Operator> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, MultiplePlayerSelector> {
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull Operator> parse(
+        public @NonNull ArgumentParseResult<@NonNull MultiplePlayerSelector> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
-            final Optional<Operator> operator = RegistryTypes.OPERATOR.get().stream()
-                    .filter(op -> op.asString().equals(input))
-                    .findFirst();
-            if (!operator.isPresent()) {
-                // todo
+            final Selector selector;
+            try {
+                selector = Selector.parse(input);
+            } catch (final IllegalArgumentException ex) {
+                return ArgumentParseResult.failure(ex); // todo
+            }
+            if (!selector.playersOnly()) {
+                return ArgumentParseResult.failure(new IllegalArgumentException("sadge")); // todo
+            }
+            final CommandCause cause = commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY);
+            final Collection<Player> result = selector.select(cause).stream()
+                    .map(e -> (Player) e).collect(Collectors.toList());
+            if (result.isEmpty()) {
                 return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
             }
             inputQueue.remove();
-            return ArgumentParseResult.success(operator.get());
+            return ArgumentParseResult.success(new MultiplePlayerSelectorImpl(
+                    selector,
+                    input,
+                    result
+            ));
         }
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.OPERATION.get().createNode();
+            return ClientCompletionKeys.ENTITY.get().createNode().playersOnly();
         }
 
     }
 
-    public static final class Builder<C> extends TypedBuilder<C, Operator, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, MultiplePlayerSelector, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(Operator.class, name);
+            super(MultiplePlayerSelector.class, name);
         }
 
         @Override
-        public @NonNull OperatorArgument<C> build() {
-            return new OperatorArgument<>(
+        public @NonNull MultiplePlayerSelectorArgument<C> build() {
+            return new MultiplePlayerSelectorArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+    }
+
+    private static final class MultiplePlayerSelectorImpl implements MultiplePlayerSelector {
+
+        private final Selector selector;
+        private final String inputString;
+        private final Collection<Player> result;
+
+        private MultiplePlayerSelectorImpl(
+                final Selector selector,
+                final String inputString,
+                final Collection<Player> result
+        ) {
+            this.selector = selector;
+            this.inputString = inputString;
+            this.result = result;
+        }
+
+        @Override
+        public @NonNull Selector selector() {
+            return this.selector;
+        }
+
+        @Override
+        public @NonNull String inputString() {
+            return this.inputString;
+        }
+
+        @Override
+        public @NonNull Collection<Player> get() {
+            return this.result;
         }
 
     }

@@ -43,6 +43,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
@@ -76,13 +77,7 @@ final class CloudSpongeCommand<C> implements Command.Raw {
     public CommandResult process(final @NonNull CommandCause cause, final ArgumentReader.@NonNull Mutable arguments) {
         final C cloudSender = this.commandManager.backwardsCauseMapper().apply(cause);
         final Audience audience = cause.audience();
-        final String args = arguments.input();
-        final String input;
-        if (args.isEmpty()) {
-            input = this.label;
-        } else {
-            input = this.label + " " + args;
-        }
+        final String input = this.formatCommand(arguments.input());
         this.commandManager.executeCommand(cloudSender, input).whenComplete((result, throwable) -> {
             if (throwable == null) {
                 return;
@@ -90,62 +85,69 @@ final class CloudSpongeCommand<C> implements Command.Raw {
             if (throwable instanceof CompletionException) {
                 throwable = throwable.getCause();
             }
-            final Throwable finalThrowable = throwable;
-            if (throwable instanceof InvalidSyntaxException) {
-                this.commandManager.handleException(cloudSender,
-                        InvalidSyntaxException.class,
-                        (InvalidSyntaxException) throwable, (c, e) -> audience.sendMessage(TextComponent.ofChildren(
-                                text("Invalid Command Syntax. Correct command syntax is: ", RED),
-                                text("/" + ((InvalidSyntaxException) finalThrowable).getCorrectSyntax(), GRAY)
-                        ))
-                );
-            } else if (throwable instanceof InvalidCommandSenderException) {
-                this.commandManager.handleException(cloudSender,
-                        InvalidCommandSenderException.class,
-                        (InvalidCommandSenderException) throwable, (c, e) ->
-                                audience.sendMessage(text(finalThrowable.getMessage(), RED))
-                );
-            } else if (throwable instanceof NoPermissionException) {
-                this.commandManager.handleException(cloudSender,
-                        NoPermissionException.class,
-                        (NoPermissionException) throwable, (c, e) ->
-                                audience.sendMessage(MESSAGE_NO_PERMS)
-                );
-            } else if (throwable instanceof NoSuchCommandException) {
-                this.commandManager.handleException(cloudSender,
-                        NoSuchCommandException.class,
-                        (NoSuchCommandException) throwable, (c, e) ->
-                                audience.sendMessage(MESSAGE_UNKNOWN_COMMAND)
-                );
-            } else if (throwable instanceof ArgumentParseException) {
-                this.commandManager.handleException(cloudSender,
-                        ArgumentParseException.class,
-                        (ArgumentParseException) throwable, (c, e) ->
-                                audience.sendMessage(TextComponent.ofChildren(
-                                        text("Invalid Command Argument: ", RED),
-                                        getMessage(finalThrowable.getCause()).colorIfAbsent(GRAY)
-                                ))
-                );
-            } else if (throwable instanceof CommandExecutionException) {
-                this.commandManager.handleException(cloudSender,
-                        CommandExecutionException.class,
-                        (CommandExecutionException) throwable, (c, e) -> {
-                            audience.sendMessage(MESSAGE_INTERNAL_ERROR);
-                            this.commandManager.getOwningPlugin().getLogger().error(
-                                    "Exception executing command handler",
-                                    finalThrowable.getCause()
-                            );
-                        }
-                );
-            } else {
-                audience.sendMessage(MESSAGE_INTERNAL_ERROR);
-                this.commandManager.getOwningPlugin().getLogger().error(
-                        "An unhandled exception was thrown during command execution",
-                        throwable
-                );
-            }
+            this.handleCommandException(cloudSender, audience, throwable);
         });
         return CommandResult.success();
+    }
+
+    private void handleCommandException(final C cloudSender, final Audience audience, final Throwable throwable) {
+        if (throwable instanceof InvalidSyntaxException) {
+            this.commandManager.handleException(
+                    cloudSender,
+                    InvalidSyntaxException.class,
+                    (InvalidSyntaxException) throwable,
+                    (c, e) -> audience.sendMessage(TextComponent.ofChildren(
+                            text("Invalid Command Syntax. Correct command syntax is: ", RED),
+                            text("/" + e.getCorrectSyntax(), GRAY)
+                    ))
+            );
+        } else if (throwable instanceof InvalidCommandSenderException) {
+            this.commandManager.handleException(
+                    cloudSender,
+                    InvalidCommandSenderException.class,
+                    (InvalidCommandSenderException) throwable,
+                    (c, e) -> audience.sendMessage(text(throwable.getMessage(), RED))
+            );
+        } else if (throwable instanceof NoPermissionException) {
+            this.commandManager.handleException(
+                    cloudSender,
+                    NoPermissionException.class,
+                    (NoPermissionException) throwable,
+                    (c, e) -> audience.sendMessage(MESSAGE_NO_PERMS)
+            );
+        } else if (throwable instanceof NoSuchCommandException) {
+            this.commandManager.handleException(
+                    cloudSender,
+                    NoSuchCommandException.class,
+                    (NoSuchCommandException) throwable,
+                    (c, e) -> audience.sendMessage(MESSAGE_UNKNOWN_COMMAND)
+            );
+        } else if (throwable instanceof ArgumentParseException) {
+            this.commandManager.handleException(
+                    cloudSender,
+                    ArgumentParseException.class,
+                    (ArgumentParseException) throwable,
+                    (c, e) -> audience.sendMessage(TextComponent.ofChildren(
+                            text("Invalid Command Argument: ", RED),
+                            getMessage(throwable.getCause()).colorIfAbsent(GRAY)
+                    ))
+            );
+        } else if (throwable instanceof CommandExecutionException) {
+            this.commandManager.handleException(
+                    cloudSender,
+                    CommandExecutionException.class,
+                    (CommandExecutionException) throwable,
+                    (c, e) -> {
+                        audience.sendMessage(MESSAGE_INTERNAL_ERROR);
+                        this.commandManager.owningPluginContainer().getLogger()
+                                .error("Exception executing command handler", throwable.getCause());
+                    }
+            );
+        } else {
+            audience.sendMessage(MESSAGE_INTERNAL_ERROR);
+            this.commandManager.owningPluginContainer().getLogger()
+                    .error("An unhandled exception was thrown during command execution", throwable);
+        }
     }
 
     private static Component getMessage(final Throwable throwable) {
@@ -157,33 +159,40 @@ final class CloudSpongeCommand<C> implements Command.Raw {
     public List<String> suggestions(final @NonNull CommandCause cause, final ArgumentReader.@NonNull Mutable arguments) {
         return this.commandManager.suggest(
                 this.commandManager.backwardsCauseMapper().apply(cause),
-                this.label + " " + arguments.input()
+                this.formatCommand(arguments.input())
         );
     }
 
     @Override
     public boolean canExecute(final @NonNull CommandCause cause) {
+        // todo: check if there are any nodes we can execute
         return true;
     }
 
     @Override
     public Optional<Component> shortDescription(final CommandCause cause) {
+        // todo
         return Optional.of(text("short desc!"));
     }
 
     @Override
     public Optional<Component> extendedDescription(final CommandCause cause) {
+        // todo
         return Optional.of(text("long desc!"));
     }
 
     @Override
     public Optional<Component> help(final @NonNull CommandCause cause) {
+        // todo
         return Raw.super.help(cause);
     }
 
     @Override
     public Component usage(final CommandCause cause) {
-        return text("usage!");
+        return text(this.commandManager.getCommandSyntaxFormatter().apply(
+                Collections.emptyList(),
+                this.commandManager.getCommandTree().getNamedNode(this.label)
+        ));
     }
 
     @Override
@@ -210,6 +219,14 @@ final class CloudSpongeCommand<C> implements Command.Raw {
             }
             this.addChildren(treeNode, child);
             node.child(value.getName(), treeNode.executable());
+        }
+    }
+
+    private String formatCommand(final @NonNull String arguments) {
+        if (arguments.isEmpty()) {
+            return this.label;
+        } else {
+            return this.label + " " + arguments;
         }
     }
 

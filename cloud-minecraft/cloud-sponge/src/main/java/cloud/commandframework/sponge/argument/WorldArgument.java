@@ -26,23 +26,23 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.parameter.managed.operator.Operator;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
-import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
-import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
-public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
+public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
 
-    private OperatorArgument(
+    private WorldArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -54,59 +54,70 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
                 name,
                 new Parser<>(),
                 defaultValue,
-                Operator.class,
+                ServerWorld.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
-    public static <C> @NonNull OperatorArgument<C> optional(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull WorldArgument<C> optional(final @NonNull String name) {
+        return WorldArgument.<C>builder(name).asOptional().build();
     }
 
-    public static <C> @NonNull OperatorArgument<C> of(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).build();
+    public static <C> @NonNull WorldArgument<C> of(final @NonNull String name) {
+        return WorldArgument.<C>builder(name).build();
     }
 
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Operator> {
+    public static final class Parser<C> implements ArgumentParser<C, ServerWorld> {
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull Operator> parse(
+        public @NonNull ArgumentParseResult<@NonNull ServerWorld> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
-            final Optional<Operator> operator = RegistryTypes.OPERATOR.get().stream()
-                    .filter(op -> op.asString().equals(input))
-                    .findFirst();
-            if (!operator.isPresent()) {
+            final ResourceKey key = RegistryEntryArgument.resourceKey(input);
+            if (key == null) {
                 // todo
-                return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
+                return ArgumentParseResult.failure(new IllegalArgumentException("invalid key!"));
             }
-            inputQueue.remove();
-            return ArgumentParseResult.success(operator.get());
+            final Optional<ServerWorld> entry = Sponge.server().worldManager().world(key);
+            if (entry.isPresent()) {
+                inputQueue.remove();
+                return ArgumentParseResult.success(entry.get());
+            }
+            // todo
+            return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
         }
 
         @Override
-        public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.OPERATION.get().createNode();
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return Sponge.server().worldManager().worlds().stream().map(world -> {
+                if (world.key().namespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
+                    return world.key().value();
+                }
+                return world.key().asString();
+            }).collect(Collectors.toList());
         }
 
     }
 
-    public static final class Builder<C> extends TypedBuilder<C, Operator, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, ServerWorld, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(Operator.class, name);
+            super(ServerWorld.class, name);
         }
 
         @Override
-        public @NonNull OperatorArgument<C> build() {
-            return new OperatorArgument<>(
+        public @NonNull WorldArgument<C> build() {
+            return new WorldArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),

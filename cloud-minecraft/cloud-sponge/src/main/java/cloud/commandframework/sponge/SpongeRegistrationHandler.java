@@ -23,20 +23,20 @@
 //
 package cloud.commandframework.sponge;
 
+import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import static java.util.stream.Collectors.groupingBy;
+import static java.util.Objects.requireNonNull;
 
 final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
 
@@ -46,36 +46,31 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
     SpongeRegistrationHandler() {
     }
 
+    @SuppressWarnings("unchecked")
     //@Listener
     public void handleRegistrationEvent(final RegisterCommandEvent<Command.Raw> event) {
         this.commandManager.registrationCalled();
-        this.registeredCommands.stream()
-                .collect(groupingBy(command -> command.getArguments().get(0).getName()))
-                .forEach((label, commands) ->
-                        this.registerCommand(event, label, commands));
+        for (final CommandTree.Node<CommandArgument<C, ?>> node : this.commandManager.getCommandTree().getRootNodes()) {
+            final StaticArgument<C> value = requireNonNull((StaticArgument<C>) node.getValue());
+            this.registerCommand(event, value);
+        }
     }
 
-    @SuppressWarnings("unchecked")
-    private void registerCommand(
-            final RegisterCommandEvent<Command.Raw> event,
-            final String label,
-            final List<cloud.commandframework.Command<C>> commands
-    ) {
+    private void registerCommand(final RegisterCommandEvent<Command.Raw> event, final StaticArgument<C> rootLiteral) {
+        final String label = rootLiteral.getName();
         event.register(
-                this.commandManager.getOwningPlugin(),
+                this.commandManager.owningPluginContainer(),
                 new CloudSpongeCommand<>(label, this.commandManager),
                 label,
-                ((StaticArgument<C>) commands.get(0).getArguments().get(0)).getAlternativeAliases().toArray(new String[0])
+                rootLiteral.getAlternativeAliases().toArray(new String[0])
         );
     }
 
-    void initialize(
-            final @NonNull SpongeCommandManager<C> commandManager,
-            final @NonNull SystemSubject subject
-    ) {
+    void initialize(final @NonNull SpongeCommandManager<C> commandManager) {
         this.commandManager = commandManager;
+        // todo: https://github.com/SpongePowered/Sponge/issues/3367
         Sponge.eventManager().registerListener(
-                this.commandManager.getOwningPlugin(),
+                this.commandManager.owningPluginContainer(),
                 new TypeToken<RegisterCommandEvent<Command.Raw>>() {
                 },
                 this::handleRegistrationEvent
