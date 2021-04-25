@@ -75,21 +75,19 @@ public final class SpongeParserMapper<C> {
     CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> toSponge(final CommandArgument<C, ?> value) {
         final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> result;
         final ArgumentParser<C, ?> parser = value.getParser();
-        if (parser instanceof NodeSupplyingArgumentParser) {
+        final Mapping<C, ?> mapper = this.mappers.get(parser.getClass());
+        if (mapper != null) {
+            final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> apply =
+                    (CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>>) ((Function) mapper.mapper).apply(parser);
+            if (mapper.cloudSuggestions) {
+                apply.customSuggestions();
+                return apply;
+            }
+            result = apply;
+        } else if (parser instanceof NodeSupplyingArgumentParser) {
             result = ((NodeSupplyingArgumentParser<C, ?>) parser).node();
         } else {
-            final Mapping<C, ?> mapper = this.mappers.get(parser.getClass());
-            if (mapper != null) {
-                final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> apply =
-                        (CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>>) ((Function) mapper.mapper).apply(parser);
-                if (mapper.cloudSuggestions) {
-                    apply.customSuggestions();
-                    return apply;
-                }
-                result = apply;
-            } else {
-                result = ClientCompletionKeys.STRING.get().createNode().word();
-            }
+            result = ClientCompletionKeys.STRING.get().createNode().word();
         }
         final boolean customSuggestionsProvider = !DELEGATING_SUGGESTIONS_PROVIDER.isInstance(value.getSuggestionsProvider());
         if (customSuggestionsProvider) {
@@ -184,10 +182,9 @@ public final class SpongeParserMapper<C> {
      *
      * @param cloudType  cloud argument parser type
      * @param configurer builder configurer
-     * @param <T>        argument value type
      * @param <A>        cloud argument parser type
      */
-    public <T, A extends ArgumentParser<C, ? extends T>> void registerMapping(
+    public <A extends ArgumentParser<C, ?>> void registerMapping(
             final @NonNull TypeToken<A> cloudType,
             final @NonNull Consumer<MappingBuilder<C, A>> configurer
     ) {
