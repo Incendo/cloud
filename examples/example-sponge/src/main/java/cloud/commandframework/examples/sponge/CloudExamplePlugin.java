@@ -360,6 +360,7 @@ public final class CloudExamplePlugin {
                     ctx.getSender().audience().sendMessage(text(ctx.<DataContainer>get("data").toString()));
                 }));
         this.commandManager.command(cloud.literal("setblock")
+                .permission("cloud.setblock")
                 .argument(Vector3iArgument.of("position"))
                 .argument(BlockStateArgument.of("blockstate"))
                 .handler(ctx -> {

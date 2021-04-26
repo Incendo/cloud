@@ -32,6 +32,8 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -47,6 +49,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
@@ -165,8 +169,51 @@ final class CloudSpongeCommand<C> implements Command.Raw {
 
     @Override
     public boolean canExecute(final @NonNull CommandCause cause) {
-        // todo: check if there are any nodes we can execute
-        return true;
+        final C sender = this.commandManager.backwardsCauseMapper().apply(cause);
+        // check whether there are any commands we can execute
+        final AtomicBoolean result = new AtomicBoolean(false);
+        visit(this.commandManager.getCommandTree().getNamedNode(this.label), node -> {
+            if (node.getValue().getOwningCommand() == null) {
+                return VisitAction.CONTINUE;
+            }
+            final boolean permitted = this.commandManager.hasPermission(
+                    sender,
+                    node.getValue().getOwningCommand().getCommandPermission()
+            );
+            if (permitted) {
+                result.set(true);
+                return VisitAction.END;
+            }
+            return VisitAction.CONTINUE;
+        });
+        return result.get();
+    }
+
+    private static <C> void visit(
+            final CommandTree.Node<CommandArgument<C, ?>> node,
+            final Function<CommandTree.Node<CommandArgument<C, ?>>, VisitAction> visitor
+    ) {
+        visitImpl(node, visitor);
+    }
+
+    private static <C> VisitAction visitImpl(
+            final CommandTree.Node<CommandArgument<C, ?>> node,
+            final Function<CommandTree.Node<CommandArgument<C, ?>>, VisitAction> visitor
+    ) {
+        if (visitor.apply(node) == VisitAction.END) {
+            return VisitAction.END;
+        }
+        for (final CommandTree.Node<CommandArgument<C, ?>> child : node.getChildren()) {
+            if (visitImpl(child, visitor) == VisitAction.END) {
+                break;
+            }
+        }
+        return VisitAction.END;
+    }
+
+    private enum VisitAction {
+        CONTINUE,
+        END
     }
 
     @Override
@@ -205,20 +252,40 @@ final class CloudSpongeCommand<C> implements Command.Raw {
 
         this.addChildren(root, cloud);
 
-        return root.executable();
+        if (cloud.isLeaf() || cloud.getValue().getOwningCommand() != null) {
+            root.executable();
+        }
+
+        return (CommandTreeNode.Root) root;
     }
 
     private void addChildren(final CommandTreeNode<?> node, final CommandTree.Node<CommandArgument<C, ?>> cloud) {
         for (final CommandTree.Node<CommandArgument<C, ?>> child : cloud.getChildren()) {
             final CommandArgument<C, ?> value = child.getValue();
-            final CommandTreeNode<? extends CommandTreeNode.Argument<?>> treeNode;
+            final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> treeNode;
             if (value instanceof StaticArgument) {
-                treeNode = CommandTreeNode.literal();
+                treeNode = (CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>>) CommandTreeNode.literal();
             } else {
                 treeNode = this.commandManager.parserMapper().toSponge(value);
             }
+            final CommandPermission permission = (CommandPermission) child.getNodeMeta().getOrDefault(
+                    "permission",
+                    Permission.empty()
+            );
+            if (permission != Permission.empty()) {
+                treeNode.requires(cause -> this.commandManager.hasPermission(
+                        this.commandManager.backwardsCauseMapper().apply(cause),
+                        permission
+                ));
+            }
+            if (child.isLeaf()
+                    || !child.getValue().isRequired()
+                    || child.getValue().getOwningCommand() != null
+                    || child.getChildren().stream().noneMatch(c -> c.getValue().isRequired())) {
+                treeNode.executable();
+            }
             this.addChildren(treeNode, child);
-            node.child(value.getName(), treeNode.executable());
+            node.child(value.getName(), treeNode);
         }
     }
 
