@@ -48,6 +48,7 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { // todo: should we return a RegistryEntry<V>?
 
@@ -184,6 +185,7 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
 
     public static final class Parser<C, V> implements NodeSupplyingArgumentParser<C, V> {
 
+
         private final Function<CommandContext<C>, RegistryHolder> holderSupplier;
         private final RegistryType<V> registryType;
 
@@ -209,18 +211,16 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
-            final ResourceKey key = resourceKey(input);
+            final ResourceKey key = ResourceKeyUtil.resourceKey(input);
             if (key == null) {
-                // todo
-                return ArgumentParseResult.failure(new IllegalArgumentException("invalid key!"));
+                return ResourceKeyUtil.invalidResourceKey();
             }
             final Optional<RegistryEntry<V>> entry = this.registry(commandContext).findEntry(key);
             if (entry.isPresent()) {
                 inputQueue.remove();
                 return ArgumentParseResult.success(entry.get().value());
             }
-            // todo
-            return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
+            return ArgumentParseResult.failure(new IllegalArgumentException("no such entry in registry")); // todo
         }
 
         @Override
@@ -228,11 +228,11 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return this.registry(commandContext).streamEntries().map(entry -> {
+            return this.registry(commandContext).streamEntries().flatMap(entry -> {
                 if (entry.key().namespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
-                    return entry.key().value();
+                    return Stream.of(entry.key().value(), entry.key().asString());
                 }
-                return entry.key().asString();
+                return Stream.of(entry.key().asString());
             }).collect(Collectors.toList());
         }
 
@@ -258,14 +258,6 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
             return ClientCompletionKeys.RESOURCE_LOCATION.get().createNode().customSuggestions();
         }
 
-    }
-
-    static @Nullable ResourceKey resourceKey(final @NonNull String input) {
-        try {
-            return ResourceKey.resolve(input);
-        } catch (final IllegalStateException ex) {
-            return null;
-        }
     }
 
     public static final class Builder<C, V> extends TypedBuilder<C, V, Builder<C, V>> {

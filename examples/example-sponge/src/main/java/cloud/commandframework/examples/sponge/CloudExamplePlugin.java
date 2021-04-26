@@ -32,10 +32,12 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.sponge.CloudInjectionModule;
 import cloud.commandframework.sponge.SpongeCommandManager;
+import cloud.commandframework.sponge.argument.ItemStackSnapshotArgument;
 import cloud.commandframework.sponge.argument.NamedTextColorArgument;
 import cloud.commandframework.sponge.argument.OperatorArgument;
 import cloud.commandframework.sponge.argument.RegistryEntryArgument;
 import cloud.commandframework.sponge.argument.SinglePlayerSelectorArgument;
+import cloud.commandframework.sponge.argument.Vector3dArgument;
 import cloud.commandframework.sponge.argument.WorldArgument;
 import cloud.commandframework.sponge.data.SinglePlayerSelector;
 import com.google.common.collect.ImmutableList;
@@ -54,13 +56,17 @@ import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.command.parameter.managed.operator.Operators;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.type.ProfessionType;
+import org.spongepowered.api.data.type.VillagerType;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.entity.living.trader.Villager;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
@@ -68,7 +74,9 @@ import org.spongepowered.api.registry.RegistryHolder;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.world.biome.Biome;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.jvm.Plugin;
 
 import java.util.function.Function;
@@ -78,6 +86,7 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.AQUA;
 import static net.kyori.adventure.text.format.NamedTextColor.BLUE;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
+import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 import static net.kyori.adventure.text.format.NamedTextColor.RED;
 import static net.kyori.adventure.text.format.TextColor.color;
 
@@ -122,34 +131,34 @@ public final class CloudExamplePlugin {
     }
 
     private void registerCommands() {
-        this.commandManager.command(this.commandManager.commandBuilder("cloud_test")
-                .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
         this.commandManager.command(this.commandManager.commandBuilder("cloud_test1")
+                .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
+        this.commandManager.command(this.commandManager.commandBuilder("cloud_test2")
                 .literal("test")
                 .literal("test1")
                 .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
-        final Command.Builder<CommandCause> cloudTest2 = this.commandManager.commandBuilder("cloud_test2");
-        this.commandManager.command(cloudTest2.literal("test")
-                .argument(StringArgument.single("string_arg"))
+        final Command.Builder<CommandCause> cloudTest3 = this.commandManager.commandBuilder("cloud_test3");
+        final Command.Builder<CommandCause> test = cloudTest3.literal("test");
+        this.commandManager.command(test.argument(StringArgument.single("string_arg"))
                 .literal("test2")
                 .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
-        this.commandManager.command(cloudTest2.literal("test")
-                .literal("literal_arg")
+        this.commandManager.command(test.literal("literal_arg")
                 .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
-        this.commandManager.command(cloudTest2.literal("another_test")
+        this.commandManager.command(cloudTest3.literal("another_test")
                 .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
-        this.commandManager.command(this.commandManager.commandBuilder("string_test")
+        final Command.Builder<CommandCause> cloudSponge = this.commandManager.commandBuilder("cloud_sponge");
+        this.commandManager.command(cloudSponge.literal("string_test")
                 .argument(StringArgument.single("single"))
                 .argument(StringArgument.quoted("quoted"))
                 .argument(StringArgument.greedy("greedy"))
                 .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
-        this.commandManager.command(this.commandManager.commandBuilder("int_test")
+        this.commandManager.command(cloudSponge.literal("int_test")
                 .argument(IntegerArgument.of("any"))
                 .argument(IntegerArgument.<CommandCause>newBuilder("gt0").withMin(1))
                 .argument(IntegerArgument.<CommandCause>newBuilder("lt100").withMax(99))
                 .argument(IntegerArgument.<CommandCause>newBuilder("5to20").withMin(5).withMax(20))
                 .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
-        this.commandManager.command(this.commandManager.commandBuilder("enchantment_type_test")
+        this.commandManager.command(cloudSponge.literal("enchantment_type_test")
                 .argument(RegistryEntryArgument.of("enchantment_type", EnchantmentType.class, RegistryTypes.ENCHANTMENT_TYPE))
                 .argument(IntegerArgument.optional("level", 1))
                 .handler(ctx -> {
@@ -178,7 +187,7 @@ public final class CloudExamplePlugin {
                             .build();
                     slot.set(modified);
                 }));
-        this.commandManager.command(this.commandManager.commandBuilder("color_test")
+        this.commandManager.command(cloudSponge.literal("color_test")
                 .argument(NamedTextColorArgument.of("color"))
                 .argument(StringArgument.greedy("message"))
                 .handler(ctx -> {
@@ -186,7 +195,7 @@ public final class CloudExamplePlugin {
                             text(ctx.get("message"), ctx.<NamedTextColor>get("color"))
                     );
                 }));
-        this.commandManager.command(this.commandManager.commandBuilder("operator_test")
+        this.commandManager.command(cloudSponge.literal("operator_test")
                 .argument(IntegerArgument.of("first"))
                 .argument(OperatorArgument.of("operator"))
                 .argument(IntegerArgument.of("second"))
@@ -213,7 +222,7 @@ public final class CloudExamplePlugin {
                             .append(text(((Operator.Simple) operator).apply(first, second)))
                     );
                 }));
-        this.commandManager.command(this.commandManager.commandBuilder("modifylevel")
+        this.commandManager.command(cloudSponge.literal("modifylevel")
                 .argument(OperatorArgument.of("operator"))
                 .argument(DoubleArgument.of("value"))
                 .handler(ctx -> {
@@ -238,7 +247,7 @@ public final class CloudExamplePlugin {
                     final int currentXp = player.get(Keys.EXPERIENCE).get();
                     player.offer(Keys.EXPERIENCE, (int) ((Operator.Simple) operator).apply(currentXp, value));
                 }));
-        this.commandManager.command(this.commandManager.commandBuilder("selectplayer")
+        this.commandManager.command(cloudSponge.literal("selectplayer")
                 .argument(SinglePlayerSelectorArgument.of("player"))
                 .handler(ctx -> {
                     final Player player = ctx.<SinglePlayerSelector>get("player").getSingle();
@@ -247,19 +256,19 @@ public final class CloudExamplePlugin {
                             player.displayName().get()
                     ));
                 }));
-        this.commandManager.command(this.commandManager.commandBuilder("world_test")
+        this.commandManager.command(cloudSponge.literal("world_test")
                 .argument(WorldArgument.of("world"))
                 .handler(ctx -> {
                     ctx.getSender().audience().sendMessage(text(ctx.<ServerWorld>get("world").key().asString()));
                 }));
-        this.commandManager.command(this.commandManager.commandBuilder("give_item")
+        this.commandManager.command(cloudSponge.literal("give_item")
                 .argument(SinglePlayerSelectorArgument.of("player"))
-                .argument(RegistryEntryArgument.of("type", ItemType.class, RegistryTypes.ITEM_TYPE))
+                .argument(ItemStackSnapshotArgument.of("item"))
                 .handler(ctx -> {
                     final Player player = ctx.<SinglePlayerSelector>get("player").getSingle();
-                    player.inventory().offer(ItemStack.of(ctx.<ItemType>get("type")));
+                    player.inventory().offer(ctx.<ItemStackSnapshot>get("item").createStack());
                 }));
-        this.commandManager.command(this.commandManager.commandBuilder("test_entity_type")
+        this.commandManager.command(cloudSponge.literal("test_entity_type")
                 .argument(RegistryEntryArgument.of("type", new TypeToken<EntityType<?>>() {
                 }, RegistryTypes.ENTITY_TYPE))
                 .handler(ctx -> {
@@ -270,7 +279,7 @@ public final class CloudExamplePlugin {
                 .orElse(Sponge.server().worldManager().defaultWorld().location(0, 0, 0))
                 .world()
                 .registries();
-        this.commandManager.command(this.commandManager.commandBuilder("test_biomes")
+        this.commandManager.command(cloudSponge.literal("test_biomes")
                 .argument(RegistryEntryArgument.of("biome", Biome.class, holderFunction, RegistryTypes.BIOME))
                 .handler(ctx -> {
                     final ResourceKey biomeKey = holderFunction.apply(ctx)
@@ -279,10 +288,38 @@ public final class CloudExamplePlugin {
                             .orElseThrow(IllegalStateException::new);
                     ctx.getSender().audience().sendMessage(text(biomeKey.asString()));
                 }));
-        this.commandManager.command(this.commandManager.commandBuilder("test_sounds")
+        this.commandManager.command(cloudSponge.literal("test_sounds")
                 .argument(RegistryEntryArgument.of("type", SoundType.class, RegistryTypes.SOUND_TYPE))
                 .handler(ctx -> {
                     ctx.getSender().audience().sendMessage(text(ctx.<SoundType>get("type").key().asString()));
+                }));
+        this.commandManager.command(cloudSponge.literal("summon_villager")
+                .argument(RegistryEntryArgument.of("type", VillagerType.class, RegistryTypes.VILLAGER_TYPE))
+                .argument(RegistryEntryArgument.of("profession", ProfessionType.class, RegistryTypes.PROFESSION_TYPE))
+                .handler(ctx -> {
+                    final ServerLocation loc = ctx.getSender().location().orElse(null);
+                    if (loc == null) {
+                        ctx.getSender().audience().sendMessage(text("No location!"));
+                        return;
+                    }
+                    final ServerWorld world = loc.world();
+                    final Villager villager = world.createEntity(EntityTypes.VILLAGER, loc.position());
+                    villager.offer(Keys.VILLAGER_TYPE, ctx.get("type"));
+                    villager.offer(Keys.PROFESSION_TYPE, ctx.get("profession"));
+                    if (world.spawnEntity(villager)) {
+                        ctx.getSender().audience().sendMessage(text()
+                                .append(text("Spawned entity!", GREEN))
+                                .append(space())
+                                .append(villager.displayName().get())
+                                .hoverEvent(villager));
+                    } else {
+                        ctx.getSender().audience().sendMessage(text("failed to spawn :("));
+                    }
+                }));
+        this.commandManager.command(cloudSponge.literal("vec3d")
+                .argument(Vector3dArgument.of("vec3d"))
+                .handler(ctx -> {
+                    ctx.getSender().audience().sendMessage(text(ctx.<Vector3d>get("vec3d").toString()));
                 }));
     }
 

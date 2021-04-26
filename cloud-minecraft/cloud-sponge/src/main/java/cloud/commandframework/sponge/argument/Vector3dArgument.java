@@ -26,25 +26,28 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.minecraft.commands.arguments.OperationArgument;
+import cloud.commandframework.sponge.SpongeCommandContextKeys;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.coordinates.Coordinates;
+import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
-import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.common.util.VecHelper;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
+public final class Vector3dArgument<C> extends CommandArgument<C, Vector3d> {
 
-    private OperatorArgument(
+    private Vector3dArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -56,70 +59,57 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
                 name,
                 new Parser<>(),
                 defaultValue,
-                Operator.class,
+                Vector3d.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
-    public static <C> @NonNull OperatorArgument<C> optional(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull Vector3dArgument<C> optional(final @NonNull String name) {
+        return Vector3dArgument.<C>builder(name).asOptional().build();
     }
 
-    public static <C> @NonNull OperatorArgument<C> of(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).build();
+    public static <C> @NonNull Vector3dArgument<C> of(final @NonNull String name) {
+        return Vector3dArgument.<C>builder(name).build();
     }
 
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Operator> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Vector3d> {
 
-        private static final SimpleCommandExceptionType ERROR_INVALID_OPERATION;
-
-        static {
-            try {
-                // todo: use an accessor (Sponge has one but we don't have a way of using it)
-                ERROR_INVALID_OPERATION = (SimpleCommandExceptionType) OperationArgument.class
-                        .getDeclaredField("ERROR_INVALID_OPERATION").get(null);
-            } catch (final ReflectiveOperationException ex) {
-                throw new RuntimeException("Couldn't access ERROR_INVALID_OPERATION command exception type.", ex);
-            }
-        }
+        private final ArgumentParser<C, Vector3d> mappedParser =
+                new WrappedBrigadierParser<C, Coordinates>(Vec3Argument.vec3()).map((ctx, coordinates) -> {
+                    return ArgumentParseResult.success(VecHelper.toVector3d(
+                            coordinates.getPosition((CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY))
+                    ));
+                });
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull Operator> parse(
+        public @NonNull ArgumentParseResult<@NonNull Vector3d> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
-            final String input = inputQueue.peek();
-            final Optional<Operator> operator = RegistryTypes.OPERATOR.get().stream()
-                    .filter(op -> op.asString().equals(input))
-                    .findFirst();
-            if (!operator.isPresent()) {
-                return ArgumentParseResult.failure(ERROR_INVALID_OPERATION.create());
-            }
-            inputQueue.remove();
-            return ArgumentParseResult.success(operator.get());
+            return this.mappedParser.parse(commandContext, inputQueue);
         }
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.OPERATION.get().createNode();
+            return ClientCompletionKeys.VEC3.get().createNode();
         }
 
     }
 
-    public static final class Builder<C> extends TypedBuilder<C, Operator, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, Vector3d, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(Operator.class, name);
+            super(Vector3d.class, name);
         }
 
         @Override
-        public @NonNull OperatorArgument<C> build() {
-            return new OperatorArgument<>(
+        public @NonNull Vector3dArgument<C> build() {
+            return new Vector3dArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),

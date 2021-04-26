@@ -86,13 +86,13 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
             try {
                 selector = Selector.parse(input);
             } catch (final IllegalArgumentException ex) {
-                return ArgumentParseResult.failure(ex); // todo
+                return SelectorUtil.selectorParseFailure(ex);
             }
             if (!selector.playersOnly()) {
-                return ArgumentParseResult.failure(new IllegalArgumentException("sadge")); // todo
+                return SelectorUtil.onlyPlayersAllowed();
             }
             if (selector.limit() != 1) {
-                return ArgumentParseResult.failure(new IllegalArgumentException("sadge")); // todo
+                return SelectorUtil.notSinglePlayer();
             }
             final CommandCause cause = commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY);
             return selector.select(cause)
@@ -104,7 +104,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                                 (SinglePlayerSelector) new SinglePlayerSelectorImpl(selector, input, player)
                         );
                     })
-                    .orElse(ArgumentParseResult.failure(new IllegalArgumentException("sadge"))); // todo
+                    .orElse(SelectorUtil.noPlayersFound());
         }
 
         @Override

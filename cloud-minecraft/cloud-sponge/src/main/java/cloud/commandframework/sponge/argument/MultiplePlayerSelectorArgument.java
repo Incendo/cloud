@@ -88,16 +88,16 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             try {
                 selector = Selector.parse(input);
             } catch (final IllegalArgumentException ex) {
-                return ArgumentParseResult.failure(ex); // todo
+                return SelectorUtil.selectorParseFailure(ex);
             }
             if (!selector.playersOnly()) {
-                return ArgumentParseResult.failure(new IllegalArgumentException("sadge")); // todo
+                return SelectorUtil.onlyPlayersAllowed();
             }
             final CommandCause cause = commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY);
             final Collection<Player> result = selector.select(cause).stream()
                     .map(e -> (Player) e).collect(Collectors.toList());
             if (result.isEmpty()) {
-                return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
+                return SelectorUtil.noPlayersFound();
             }
             inputQueue.remove();
             return ArgumentParseResult.success(new MultiplePlayerSelectorImpl(

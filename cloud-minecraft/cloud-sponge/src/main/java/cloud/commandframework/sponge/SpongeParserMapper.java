@@ -34,6 +34,7 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.standard.UUIDArgument;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -87,7 +88,7 @@ public final class SpongeParserMapper<C> {
         } else if (parser instanceof NodeSupplyingArgumentParser) {
             result = ((NodeSupplyingArgumentParser<C, ?>) parser).node();
         } else {
-            result = ClientCompletionKeys.STRING.get().createNode().word();
+            result = ClientCompletionKeys.STRING.get().createNode().customSuggestions().word();
         }
         final boolean customSuggestionsProvider = !DELEGATING_SUGGESTIONS_PROVIDER.isInstance(value.getSuggestionsProvider());
         if (customSuggestionsProvider) {
@@ -101,11 +102,11 @@ public final class SpongeParserMapper<C> {
         }, builder -> builder.to(stringParser -> {
             final StringArgument.StringMode mode = stringParser.getStringMode();
             if (mode == StringArgument.StringMode.SINGLE) {
-                return ClientCompletionKeys.STRING.get().createNode().word();
+                return ClientCompletionKeys.STRING.get().createNode().customSuggestions().word();
             } else if (mode == StringArgument.StringMode.QUOTED) {
-                return ClientCompletionKeys.STRING.get().createNode();
+                return ClientCompletionKeys.STRING.get().createNode().customSuggestions();
             } else if (mode == StringArgument.StringMode.GREEDY) {
-                return ClientCompletionKeys.STRING.get().createNode().greedy();
+                return ClientCompletionKeys.STRING.get().createNode().customSuggestions().greedy();
             }
             throw new IllegalArgumentException("Unknown string mode '" + mode + "'!");
         }));
@@ -168,11 +169,15 @@ public final class SpongeParserMapper<C> {
         }));
         this.registerMapping(new TypeToken<FlagArgument.FlagArgumentParser<C>>() {
         }, builder -> builder.to(flagArgumentParser -> {
-            return ClientCompletionKeys.STRING.get().createNode().greedy();
+            return ClientCompletionKeys.STRING.get().createNode().customSuggestions().greedy();
         }));
         this.registerMapping(new TypeToken<StringArrayArgument.StringArrayParser<C>>() {
         }, builder -> builder.to(stringArrayParser -> {
-            return ClientCompletionKeys.STRING.get().createNode().greedy();
+            return ClientCompletionKeys.STRING.get().createNode().customSuggestions().greedy();
+        }));
+        this.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {
+        }, builder -> builder.to(uuidParser -> {
+            return ClientCompletionKeys.UUID.get().createNode();
         }));
     }
 

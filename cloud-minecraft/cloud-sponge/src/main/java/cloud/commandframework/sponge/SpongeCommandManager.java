@@ -28,6 +28,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.sponge.argument.ItemStackSnapshotArgument;
 import cloud.commandframework.sponge.argument.MultipleEntitySelectorArgument;
 import cloud.commandframework.sponge.argument.MultiplePlayerSelectorArgument;
 import cloud.commandframework.sponge.argument.NamedTextColorArgument;
@@ -35,6 +36,7 @@ import cloud.commandframework.sponge.argument.OperatorArgument;
 import cloud.commandframework.sponge.argument.RegistryEntryArgument;
 import cloud.commandframework.sponge.argument.SingleEntitySelectorArgument;
 import cloud.commandframework.sponge.argument.SinglePlayerSelectorArgument;
+import cloud.commandframework.sponge.argument.Vector3dArgument;
 import cloud.commandframework.sponge.argument.WorldArgument;
 import cloud.commandframework.sponge.data.MultipleEntitySelector;
 import cloud.commandframework.sponge.data.MultiplePlayerSelector;
@@ -49,10 +51,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.registry.DefaultedRegistryType;
 import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.lang.reflect.Field;
@@ -117,6 +121,14 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
                 TypeToken.get(ServerWorld.class),
                 params -> new WorldArgument.Parser<>()
         );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(ItemStackSnapshot.class),
+                params -> new ItemStackSnapshotArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(Vector3d.class),
+                params -> new Vector3dArgument.Parser<>()
+        );
 
         // Entity selectors
         this.getParserRegistry().registerParserSupplier(
@@ -149,21 +161,21 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
                 continue;
             }
 
-            final RegistryType<?> key;
+            final RegistryType<?> registryType;
             try {
-                key = (RegistryType<?>) field.get(null);
+                registryType = (RegistryType<?>) field.get(null);
             } catch (final IllegalAccessException ex) {
                 throw new RuntimeException("Failed to access RegistryTypes." + field.getName(), ex);
             }
-            if (ignoredRegistryTypes.contains(key) || !(key instanceof DefaultedRegistryType)) {
+            if (ignoredRegistryTypes.contains(registryType) || !(registryType instanceof DefaultedRegistryType)) {
                 continue;
             }
-            final DefaultedRegistryType<?> registryType = (DefaultedRegistryType<?>) key;
+            final DefaultedRegistryType<?> defaultedRegistryType = (DefaultedRegistryType<?>) registryType;
             final Type valueType = ((ParameterizedType) generic).getActualTypeArguments()[0];
 
             this.getParserRegistry().registerParserSupplier(
                     TypeToken.get(valueType),
-                    params -> new RegistryEntryArgument.Parser<>(registryType)
+                    params -> new RegistryEntryArgument.Parser<>(defaultedRegistryType)
             );
         }
     }

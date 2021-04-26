@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
 
@@ -80,18 +81,16 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
-            final ResourceKey key = RegistryEntryArgument.resourceKey(input);
+            final ResourceKey key = ResourceKeyUtil.resourceKey(input);
             if (key == null) {
-                // todo
-                return ArgumentParseResult.failure(new IllegalArgumentException("invalid key!"));
+                return ResourceKeyUtil.invalidResourceKey();
             }
             final Optional<ServerWorld> entry = Sponge.server().worldManager().world(key);
             if (entry.isPresent()) {
                 inputQueue.remove();
                 return ArgumentParseResult.success(entry.get());
             }
-            // todo
-            return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
+            return ArgumentParseResult.failure(new IllegalArgumentException("no such world")); // todo
         }
 
         @Override
@@ -99,11 +98,11 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return Sponge.server().worldManager().worlds().stream().map(world -> {
+            return Sponge.server().worldManager().worlds().stream().flatMap(world -> {
                 if (world.key().namespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
-                    return world.key().value();
+                    return Stream.of(world.key().value(), world.key().asString());
                 }
-                return world.key().asString();
+                return Stream.of(world.key().asString());
             }).collect(Collectors.toList());
         }
 

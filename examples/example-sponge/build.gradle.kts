@@ -32,3 +32,9 @@ tasks {
         dependsOn(shadowJar)
     }
 }
+
+configurations {
+    spongeRuntime {
+        resolutionStrategy.cacheChangingModulesFor(1, "MINUTES")
+    }
+}

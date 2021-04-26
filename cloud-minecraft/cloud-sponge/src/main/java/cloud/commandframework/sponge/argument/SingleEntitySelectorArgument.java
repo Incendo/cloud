@@ -86,10 +86,10 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
             try {
                 selector = Selector.parse(input);
             } catch (final IllegalArgumentException ex) {
-                return ArgumentParseResult.failure(ex); // todo
+                return SelectorUtil.selectorParseFailure(ex);
             }
             if (selector.limit() != 1) {
-                return ArgumentParseResult.failure(new IllegalArgumentException("sadge")); // todo
+                return SelectorUtil.notSingleEntity();
             }
             final CommandCause cause = commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY);
             return selector.select(cause)
@@ -101,7 +101,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
                                 (SingleEntitySelector) new SingleEntitySelectorImpl(selector, input, entity)
                         );
                     })
-                    .orElse(ArgumentParseResult.failure(new IllegalArgumentException("sadge"))); // todo
+                    .orElse(SelectorUtil.noEntitiesFound());
         }
 
         @Override

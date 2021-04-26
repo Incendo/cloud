@@ -77,7 +77,7 @@ final class CloudSpongeCommand<C> implements Command.Raw {
     public CommandResult process(final @NonNull CommandCause cause, final ArgumentReader.@NonNull Mutable arguments) {
         final C cloudSender = this.commandManager.backwardsCauseMapper().apply(cause);
         final Audience audience = cause.audience();
-        final String input = this.formatCommand(arguments.input());
+        final String input = this.formatCommandForParsing(arguments.input());
         this.commandManager.executeCommand(cloudSender, input).whenComplete((result, throwable) -> {
             if (throwable == null) {
                 return;
@@ -159,7 +159,7 @@ final class CloudSpongeCommand<C> implements Command.Raw {
     public List<String> suggestions(final @NonNull CommandCause cause, final ArgumentReader.@NonNull Mutable arguments) {
         return this.commandManager.suggest(
                 this.commandManager.backwardsCauseMapper().apply(cause),
-                this.formatCommand(arguments.input())
+                this.formatCommandForSuggestions(arguments.input())
         );
     }
 
@@ -222,12 +222,16 @@ final class CloudSpongeCommand<C> implements Command.Raw {
         }
     }
 
-    private String formatCommand(final @NonNull String arguments) {
+    private String formatCommandForParsing(final @NonNull String arguments) {
         if (arguments.isEmpty()) {
             return this.label;
         } else {
             return this.label + " " + arguments;
         }
+    }
+
+    private String formatCommandForSuggestions(final @NonNull String arguments) {
+        return this.label + " " + arguments;
     }
 
 }

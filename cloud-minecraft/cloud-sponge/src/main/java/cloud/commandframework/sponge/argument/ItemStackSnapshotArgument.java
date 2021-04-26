@@ -26,25 +26,27 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.minecraft.commands.arguments.OperationArgument;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.arguments.item.ItemArgument;
+import net.minecraft.commands.arguments.item.ItemInput;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
-import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
+public final class ItemStackSnapshotArgument<C> extends CommandArgument<C, ItemStackSnapshot> {
 
-    private OperatorArgument(
+    private ItemStackSnapshotArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -56,70 +58,61 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
                 name,
                 new Parser<>(),
                 defaultValue,
-                Operator.class,
+                ItemStackSnapshot.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
-    public static <C> @NonNull OperatorArgument<C> optional(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull ItemStackSnapshotArgument<C> optional(final @NonNull String name) {
+        return ItemStackSnapshotArgument.<C>builder(name).asOptional().build();
     }
 
-    public static <C> @NonNull OperatorArgument<C> of(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).build();
+    public static <C> @NonNull ItemStackSnapshotArgument<C> of(final @NonNull String name) {
+        return ItemStackSnapshotArgument.<C>builder(name).build();
     }
 
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Operator> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, ItemStackSnapshot> {
 
-        private static final SimpleCommandExceptionType ERROR_INVALID_OPERATION;
-
-        static {
-            try {
-                // todo: use an accessor (Sponge has one but we don't have a way of using it)
-                ERROR_INVALID_OPERATION = (SimpleCommandExceptionType) OperationArgument.class
-                        .getDeclaredField("ERROR_INVALID_OPERATION").get(null);
-            } catch (final ReflectiveOperationException ex) {
-                throw new RuntimeException("Couldn't access ERROR_INVALID_OPERATION command exception type.", ex);
-            }
-        }
+        private final ArgumentParser<C, ItemStackSnapshot> mappedParser =
+                new WrappedBrigadierParser<C, ItemInput>(ItemArgument.item()).map((ctx, itemInput) -> {
+                    try {
+                        return ArgumentParseResult.success(
+                                ((ItemStack) (Object) itemInput.createItemStack(1, true)).createSnapshot()
+                        );
+                    } catch (final CommandSyntaxException ex) {
+                        return ArgumentParseResult.failure(ex);
+                    }
+                });
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull Operator> parse(
+        public @NonNull ArgumentParseResult<@NonNull ItemStackSnapshot> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
-            final String input = inputQueue.peek();
-            final Optional<Operator> operator = RegistryTypes.OPERATOR.get().stream()
-                    .filter(op -> op.asString().equals(input))
-                    .findFirst();
-            if (!operator.isPresent()) {
-                return ArgumentParseResult.failure(ERROR_INVALID_OPERATION.create());
-            }
-            inputQueue.remove();
-            return ArgumentParseResult.success(operator.get());
+            return this.mappedParser.parse(commandContext, inputQueue);
         }
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.OPERATION.get().createNode();
+            return ClientCompletionKeys.ITEM_STACK.get().createNode();
         }
 
     }
 
-    public static final class Builder<C> extends TypedBuilder<C, Operator, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, ItemStackSnapshot, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(Operator.class, name);
+            super(ItemStackSnapshot.class, name);
         }
 
         @Override
-        public @NonNull OperatorArgument<C> build() {
-            return new OperatorArgument<>(
+        public @NonNull ItemStackSnapshotArgument<C> build() {
+            return new ItemStackSnapshotArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),

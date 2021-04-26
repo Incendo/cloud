@@ -15,6 +15,11 @@ pluginManagement {
             name = "jmpSnapshots"
             mavenContent { snapshotsOnly() }
         }
+        // For VanillaGradle Snapshots
+        maven("https://repo.spongepowered.org/repository/maven-public/") {
+            name = "sponge"
+            mavenContent { snapshotsOnly() }
+        }
     }
     includeBuild("build-logic")
 }

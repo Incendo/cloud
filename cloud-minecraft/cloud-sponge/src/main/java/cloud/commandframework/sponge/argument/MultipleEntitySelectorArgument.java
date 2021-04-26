@@ -87,12 +87,12 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
             try {
                 selector = Selector.parse(input);
             } catch (final IllegalArgumentException ex) {
-                return ArgumentParseResult.failure(ex); // todo
+                return SelectorUtil.selectorParseFailure(ex);
             }
             final CommandCause cause = commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY);
             final Collection<Entity> result = selector.select(cause);
             if (result.isEmpty()) {
-                return ArgumentParseResult.failure(new IllegalArgumentException("sadge"));
+                return SelectorUtil.noEntitiesFound();
             }
             inputQueue.remove();
             return ArgumentParseResult.success(new MultipleEntitySelectorImpl(
