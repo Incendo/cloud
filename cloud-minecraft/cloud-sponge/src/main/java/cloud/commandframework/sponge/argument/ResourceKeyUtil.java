@@ -30,6 +30,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 
+import java.lang.reflect.Field;
+
 /**
  * Shared utilities for ResourceKey based arguments. Not API.
  */
@@ -43,8 +45,9 @@ final class ResourceKeyUtil {
     static {
         try {
             // todo: use an accessor
-            ERROR_INVALID_RESOURCE_LOCATION = (SimpleCommandExceptionType) ResourceLocation.class
-                    .getDeclaredField("ERROR_INVALID").get(null);
+            final Field errorInvalidResourceLocationField = ResourceLocation.class.getDeclaredField("ERROR_INVALID");
+            errorInvalidResourceLocationField.setAccessible(true);
+            ERROR_INVALID_RESOURCE_LOCATION = (SimpleCommandExceptionType) errorInvalidResourceLocationField.get(null);
         } catch (final ReflectiveOperationException ex) {
             throw new RuntimeException("Couldn't access ERROR_INVALID command exception type.", ex);
         }

@@ -37,6 +37,7 @@ import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.registry.RegistryTypes;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -81,8 +82,10 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
         static {
             try {
                 // todo: use an accessor (Sponge has one but we don't have a way of using it)
-                ERROR_INVALID_OPERATION = (SimpleCommandExceptionType) OperationArgument.class
-                        .getDeclaredField("ERROR_INVALID_OPERATION").get(null);
+                final Field errorInvalidOperationField = OperationArgument.class
+                        .getDeclaredField("ERROR_INVALID_OPERATION");
+                errorInvalidOperationField.setAccessible(true);
+                ERROR_INVALID_OPERATION = (SimpleCommandExceptionType) errorInvalidOperationField.get(null);
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException("Couldn't access ERROR_INVALID_OPERATION command exception type.", ex);
             }
