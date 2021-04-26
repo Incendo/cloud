@@ -145,6 +145,7 @@ public final class CloudExamplePlugin {
 
     private void registerCommands() {
         this.commandManager.command(this.commandManager.commandBuilder("cloud_test1")
+                .permission("cloud.test1")
                 .handler(ctx -> ctx.getSender().audience().sendMessage(text("success"))));
         this.commandManager.command(this.commandManager.commandBuilder("cloud_test2")
                 .literal("test")

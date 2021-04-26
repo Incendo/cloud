@@ -250,12 +250,13 @@ final class CloudSpongeCommand<C> implements Command.Raw {
                 .getCommandTree()
                 .getNamedNode(this.label);
 
-        this.addChildren(root, cloud);
-
         if (cloud.isLeaf() || cloud.getValue().getOwningCommand() != null) {
             root.executable();
         }
 
+        this.addRequirement(cloud, root);
+
+        this.addChildren(root, cloud);
         return (CommandTreeNode.Root) root;
     }
 
@@ -268,16 +269,7 @@ final class CloudSpongeCommand<C> implements Command.Raw {
             } else {
                 treeNode = this.commandManager.parserMapper().toSponge(value);
             }
-            final CommandPermission permission = (CommandPermission) child.getNodeMeta().getOrDefault(
-                    "permission",
-                    Permission.empty()
-            );
-            if (permission != Permission.empty()) {
-                treeNode.requires(cause -> this.commandManager.hasPermission(
-                        this.commandManager.backwardsCauseMapper().apply(cause),
-                        permission
-                ));
-            }
+            this.addRequirement(child, treeNode);
             if (child.isLeaf()
                     || !child.getValue().isRequired()
                     || child.getValue().getOwningCommand() != null
@@ -286,6 +278,22 @@ final class CloudSpongeCommand<C> implements Command.Raw {
             }
             this.addChildren(treeNode, child);
             node.child(value.getName(), treeNode);
+        }
+    }
+
+    private void addRequirement(
+            final CommandTree.@NonNull Node<CommandArgument<C, ?>> cloud,
+            final @NonNull CommandTreeNode<? extends CommandTreeNode<?>> node
+    ) {
+        final CommandPermission permission = (CommandPermission) cloud.getNodeMeta().getOrDefault(
+                "permission",
+                Permission.empty()
+        );
+        if (permission != Permission.empty()) {
+            node.requires(cause -> this.commandManager.hasPermission(
+                    this.commandManager.backwardsCauseMapper().apply(cause),
+                    permission
+            ));
         }
     }
 
