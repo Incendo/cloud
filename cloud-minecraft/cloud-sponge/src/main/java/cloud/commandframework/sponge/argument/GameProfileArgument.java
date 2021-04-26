@@ -92,7 +92,7 @@ public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile
                         return ArgumentParseResult.failure(ex);
                     }
                     if (profiles.size() > 1) {
-                        return ArgumentParseResult.failure(new IllegalArgumentException("too many profiles"));
+                        return ArgumentParseResult.failure(new IllegalArgumentException("too many profiles")); // todo
                     }
                     final GameProfile profile = SpongeGameProfile.of(profiles.iterator().next());
                     return ArgumentParseResult.success(profile);

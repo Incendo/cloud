@@ -38,6 +38,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument for parsing {@link ResourceKey ResourceKeys}.
+ *
+ * @param <C> sender type
+ */
 public final class ResourceKeyArgument<C> extends CommandArgument<C, ResourceKey> {
 
     private ResourceKeyArgument(
@@ -58,18 +63,59 @@ public final class ResourceKeyArgument<C> extends CommandArgument<C, ResourceKey
         );
     }
 
+    /**
+     * Create a new optional {@link ResourceKeyArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link ResourceKeyArgument}
+     */
     public static <C> @NonNull ResourceKeyArgument<C> optional(final @NonNull String name) {
         return ResourceKeyArgument.<C>builder(name).asOptional().build();
     }
 
+    /**
+     * Create a new optional {@link ResourceKeyArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link ResourceKeyArgument}
+     */
+    public static <C> @NonNull ResourceKeyArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull ResourceKey defaultValue
+    ) {
+        return ResourceKeyArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new required {@link ResourceKeyArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link ResourceKeyArgument}
+     */
     public static <C> @NonNull ResourceKeyArgument<C> of(final @NonNull String name) {
         return ResourceKeyArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Argument parser for {@link ResourceKey ResourceKey}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, ResourceKey> {
 
         @Override
@@ -93,6 +139,11 @@ public final class ResourceKeyArgument<C> extends CommandArgument<C, ResourceKey
 
     }
 
+    /**
+     * Builder for {@link ResourceKeyArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, ResourceKey, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -108,6 +159,17 @@ public final class ResourceKeyArgument<C> extends CommandArgument<C, ResourceKey
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the provided default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ResourceKey defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.asString());
         }
 
     }

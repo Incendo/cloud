@@ -42,6 +42,7 @@ import org.spongepowered.api.registry.DefaultedRegistryType;
 import org.spongepowered.api.registry.Registry;
 import org.spongepowered.api.registry.RegistryEntry;
 import org.spongepowered.api.registry.RegistryHolder;
+import org.spongepowered.api.registry.RegistryReference;
 import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 
@@ -53,6 +54,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * An argument for retrieving values from any of Sponge's {@link Registry Registries}.
+ *
+ * @param <C> sender type
+ * @param <V> value type
+ */
 public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { // todo: should we return a RegistryEntry<V>?
 
     private RegistryEntryArgument(
@@ -78,6 +85,16 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
 
     // Start DefaultedRegistryType methods
 
+    /**
+     * Create a new required {@link RegistryEntryArgument} for a {@link DefaultedRegistryType}.
+     *
+     * @param name         argument name
+     * @param valueType    value type
+     * @param registryType registry type
+     * @param <C>          sender type
+     * @param <V>          value type
+     * @return a new {@link RegistryEntryArgument}
+     */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> of(
             final @NonNull String name,
             final @NonNull TypeToken<V> valueType,
@@ -86,6 +103,16 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return RegistryEntryArgument.<C, V>builder(name, valueType, registryType).build();
     }
 
+    /**
+     * Create a new required {@link RegistryEntryArgument} for a {@link DefaultedRegistryType}.
+     *
+     * @param name         argument name
+     * @param valueType    value type
+     * @param registryType registry type
+     * @param <C>          sender type
+     * @param <V>          value type
+     * @return a new {@link RegistryEntryArgument}
+     */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> of(
             final @NonNull String name,
             final @NonNull Class<V> valueType,
@@ -94,6 +121,16 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return of(name, TypeToken.get(valueType), registryType);
     }
 
+    /**
+     * Create a new optional {@link RegistryEntryArgument} for a {@link DefaultedRegistryType}.
+     *
+     * @param name         argument name
+     * @param valueType    value type
+     * @param registryType registry type
+     * @param <C>          sender type
+     * @param <V>          value type
+     * @return a new {@link RegistryEntryArgument}
+     */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
             final @NonNull String name,
             final @NonNull TypeToken<V> valueType,
@@ -102,6 +139,16 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return RegistryEntryArgument.<C, V>builder(name, valueType, registryType).asOptional().build();
     }
 
+    /**
+     * Create a new optional {@link RegistryEntryArgument} for a {@link DefaultedRegistryType}.
+     *
+     * @param name         argument name
+     * @param valueType    value type
+     * @param registryType registry type
+     * @param <C>          sender type
+     * @param <V>          value type
+     * @return a new {@link RegistryEntryArgument}
+     */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
             final @NonNull String name,
             final @NonNull Class<V> valueType,
@@ -110,6 +157,59 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return optional(name, TypeToken.get(valueType), registryType);
     }
 
+    /**
+     * Create a new optional {@link RegistryEntryArgument} for a {@link DefaultedRegistryType},
+     * with the specified default value.
+     *
+     * @param name         argument name
+     * @param valueType    value type
+     * @param registryType registry type
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @param <V>          value type
+     * @return a new {@link RegistryEntryArgument}
+     */
+    public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
+            final @NonNull String name,
+            final @NonNull TypeToken<V> valueType,
+            final @NonNull DefaultedRegistryType<V> registryType,
+            final @NonNull RegistryReference<V> defaultValue
+    ) {
+        return RegistryEntryArgument.<C, V>builder(name, valueType, registryType)
+                .asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new optional {@link RegistryEntryArgument} for a {@link DefaultedRegistryType},
+     * with the specified default value.
+     *
+     * @param name         argument name
+     * @param valueType    value type
+     * @param registryType registry type
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @param <V>          value type
+     * @return a new {@link RegistryEntryArgument}
+     */
+    public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
+            final @NonNull String name,
+            final @NonNull Class<V> valueType,
+            final @NonNull DefaultedRegistryType<V> registryType,
+            final @NonNull RegistryReference<V> defaultValue
+    ) {
+        return optional(name, TypeToken.get(valueType), registryType, defaultValue);
+    }
+
+    /**
+     * Create a new {@link Builder} for a {@link DefaultedRegistryType}.
+     *
+     * @param name         argument name
+     * @param valueType    value type
+     * @param registryType registry type
+     * @param <C>          sender type
+     * @param <V>          value type
+     * @return a new {@link Builder}
+     */
     public static <C, V> @NonNull Builder<C, V> builder(
             final @NonNull String name,
             final @NonNull TypeToken<V> valueType,
@@ -118,6 +218,16 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return new Builder<>(name, valueType, ctx -> registryType.defaultHolder().get(), registryType);
     }
 
+    /**
+     * Create a new {@link Builder} for a {@link DefaultedRegistryType}.
+     *
+     * @param name         argument name
+     * @param valueType    value type
+     * @param registryType registry type
+     * @param <C>          sender type
+     * @param <V>          value type
+     * @return a new {@link Builder}
+     */
     public static <C, V> @NonNull Builder<C, V> builder(
             final @NonNull String name,
             final @NonNull Class<V> valueType,
@@ -130,6 +240,21 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
 
     // Start RegistryType methods
 
+    /**
+     * Create a new required {@link RegistryEntryArgument} for a {@link RegistryType}
+     * using the specified {@link RegistryHolder} function.
+     *
+     * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+     * it is suggested to instead use {@link #of(String, TypeToken, DefaultedRegistryType)}.</p>
+     *
+     * @param name           argument name
+     * @param valueType      value type
+     * @param holderSupplier registry holder function
+     * @param registryType   registry type
+     * @param <C>            sender type
+     * @param <V>            value type
+     * @return a new {@link RegistryEntryArgument}
+     */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> of(
             final @NonNull String name,
             final @NonNull TypeToken<V> valueType,
@@ -139,6 +264,21 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return RegistryEntryArgument.<C, V>builder(name, valueType, holderSupplier, registryType).build();
     }
 
+    /**
+     * Create a new required {@link RegistryEntryArgument} for a {@link RegistryType}
+     * using the specified {@link RegistryHolder} function.
+     *
+     * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+     * it is suggested to instead use {@link #of(String, Class, DefaultedRegistryType)}.</p>
+     *
+     * @param name           argument name
+     * @param valueType      value type
+     * @param holderSupplier registry holder function
+     * @param registryType   registry type
+     * @param <C>            sender type
+     * @param <V>            value type
+     * @return a new {@link RegistryEntryArgument}
+     */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> of(
             final @NonNull String name,
             final @NonNull Class<V> valueType,
@@ -148,6 +288,21 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return of(name, TypeToken.get(valueType), holderSupplier, registryType);
     }
 
+    /**
+     * Create a new optional {@link RegistryEntryArgument} for a {@link RegistryType}
+     * using the specified {@link RegistryHolder} function.
+     *
+     * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+     * it is suggested to instead use {@link #optional(String, TypeToken, DefaultedRegistryType)}.</p>
+     *
+     * @param name           argument name
+     * @param valueType      value type
+     * @param holderSupplier registry holder function
+     * @param registryType   registry type
+     * @param <C>            sender type
+     * @param <V>            value type
+     * @return a new {@link RegistryEntryArgument}
+     */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
             final @NonNull String name,
             final @NonNull TypeToken<V> valueType,
@@ -157,6 +312,21 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return builder(name, valueType, holderSupplier, registryType).asOptional().build();
     }
 
+    /**
+     * Create a new optional {@link RegistryEntryArgument} for a {@link RegistryType}
+     * using the specified {@link RegistryHolder} function.
+     *
+     * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+     * it is suggested to instead use {@link #optional(String, Class, DefaultedRegistryType)}.</p>
+     *
+     * @param name           argument name
+     * @param valueType      value type
+     * @param holderSupplier registry holder function
+     * @param registryType   registry type
+     * @param <C>            sender type
+     * @param <V>            value type
+     * @return a new {@link RegistryEntryArgument}
+     */
     public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
             final @NonNull String name,
             final @NonNull Class<V> valueType,
@@ -166,6 +336,72 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return optional(name, TypeToken.get(valueType), holderSupplier, registryType);
     }
 
+    /**
+     * Create a new optional {@link RegistryEntryArgument} for a {@link RegistryType}
+     * using the specified {@link RegistryHolder} function and default value.
+     *
+     * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+     * it is suggested to instead use {@link #optional(String, Class, DefaultedRegistryType, RegistryReference)}.</p>
+     *
+     * @param name           argument name
+     * @param valueType      value type
+     * @param holderSupplier registry holder function
+     * @param registryType   registry type
+     * @param defaultValue   default value
+     * @param <C>            sender type
+     * @param <V>            value type
+     * @return a new {@link RegistryEntryArgument}
+     */
+    public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
+            final @NonNull String name,
+            final @NonNull Class<V> valueType,
+            final @NonNull Function<CommandContext<C>, RegistryHolder> holderSupplier,
+            final @NonNull RegistryType<V> registryType,
+            final @NonNull RegistryReference<V> defaultValue
+    ) {
+        return optional(name, TypeToken.get(valueType), holderSupplier, registryType, defaultValue);
+    }
+
+    /**
+     * Create a new optional {@link RegistryEntryArgument} for a {@link RegistryType}
+     * using the specified {@link RegistryHolder} function and default value.
+     *
+     * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+     * it is suggested to instead use {@link #optional(String, TypeToken, DefaultedRegistryType, RegistryReference)}.</p>
+     *
+     * @param name           argument name
+     * @param valueType      value type
+     * @param holderSupplier registry holder function
+     * @param registryType   registry type
+     * @param defaultValue   default value
+     * @param <C>            sender type
+     * @param <V>            value type
+     * @return a new {@link RegistryEntryArgument}
+     */
+    public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
+            final @NonNull String name,
+            final @NonNull TypeToken<V> valueType,
+            final @NonNull Function<CommandContext<C>, RegistryHolder> holderSupplier,
+            final @NonNull RegistryType<V> registryType,
+            final @NonNull RegistryReference<V> defaultValue
+    ) {
+        return builder(name, valueType, holderSupplier, registryType).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new {@link Builder} using the specified {@link RegistryHolder} function.
+     *
+     * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+     * it is suggested to instead use {@link #builder(String, TypeToken, DefaultedRegistryType)}.</p>
+     *
+     * @param name           argument name
+     * @param valueType      value type
+     * @param holderSupplier registry holder function
+     * @param registryType   registry type
+     * @param <C>            sender type
+     * @param <V>            value type
+     * @return a new {@link Builder}
+     */
     public static <C, V> @NonNull Builder<C, V> builder(
             final @NonNull String name,
             final @NonNull TypeToken<V> valueType,
@@ -175,6 +411,20 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         return new Builder<>(name, valueType, holderSupplier, registryType);
     }
 
+    /**
+     * Create a new {@link Builder} using the specified {@link RegistryHolder} function.
+     *
+     * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+     * it is suggested to instead use {@link #builder(String, Class, DefaultedRegistryType)}.</p>
+     *
+     * @param name           argument name
+     * @param valueType      value type
+     * @param holderSupplier registry holder function
+     * @param registryType   registry type
+     * @param <C>            sender type
+     * @param <V>            value type
+     * @return a new {@link Builder}
+     */
     public static <C, V> @NonNull Builder<C, V> builder(
             final @NonNull String name,
             final @NonNull Class<V> valueType,
@@ -186,12 +436,26 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
 
     // End RegistryType methods
 
+    /**
+     * An argument parser for values in a {@link Registry}.
+     *
+     * @param <C> sender type
+     * @param <V> value type
+     */
     public static final class Parser<C, V> implements NodeSupplyingArgumentParser<C, V> {
-
 
         private final Function<CommandContext<C>, RegistryHolder> holderSupplier;
         private final RegistryType<V> registryType;
 
+        /**
+         * Create a new {@link Parser} using the specified {@link RegistryHolder} function.
+         *
+         * <p>For {@link RegistryType RegistryTypes} which are {@link DefaultedRegistryType DefaultedRegistryTypes},
+         * it is suggested to instead use {@link #Parser(DefaultedRegistryType)}.</p>
+         *
+         * @param holderSupplier registry holder function
+         * @param registryType   registry type
+         */
         public Parser(
                 final @NonNull Function<CommandContext<C>, RegistryHolder> holderSupplier,
                 final @NonNull RegistryType<V> registryType
@@ -200,6 +464,11 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
             this.registryType = registryType;
         }
 
+        /**
+         * Create a new {@link Parser}.
+         *
+         * @param registryType defaulted registry type
+         */
         public Parser(final @NonNull DefaultedRegistryType<V> registryType) {
             this(ctx -> registryType.defaultHolder().get(), registryType);
         }
@@ -297,6 +566,28 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the provided default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C, V> asOptionalWithDefault(final @NonNull ResourceKey defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.asString());
+        }
+
+        /**
+         * Sets the command argument to be optional, with the provided default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C, V> asOptionalWithDefault(final @NonNull RegistryReference<V> defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.location());
         }
 
     }

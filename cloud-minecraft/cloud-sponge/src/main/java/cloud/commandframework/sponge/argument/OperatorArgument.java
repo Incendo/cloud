@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.registry.DefaultedRegistryReference;
 import org.spongepowered.api.registry.RegistryTypes;
 
 import java.lang.reflect.Field;
@@ -43,6 +44,11 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * An argument for parsing {@link Operator Operators}.
+ *
+ * @param <C> sender type
+ */
 public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
 
     private OperatorArgument(
@@ -63,18 +69,71 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
         );
     }
 
-    public static <C> @NonNull OperatorArgument<C> optional(final @NonNull String name) {
-        return OperatorArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link OperatorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link OperatorArgument}
+     */
     public static <C> @NonNull OperatorArgument<C> of(final @NonNull String name) {
         return OperatorArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link OperatorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link OperatorArgument}
+     */
+    public static <C> @NonNull OperatorArgument<C> optional(final @NonNull String name) {
+        return OperatorArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new optional {@link OperatorArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link OperatorArgument}
+     */
+    public static <C> @NonNull OperatorArgument<C> optional(final @NonNull String name, final @NonNull Operator defaultValue) {
+        return OperatorArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new optional {@link OperatorArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param <C>          sender type
+     * @param defaultValue default value
+     * @return a new {@link OperatorArgument}
+     */
+    public static <C> @NonNull OperatorArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull DefaultedRegistryReference<Operator> defaultValue
+    ) {
+        return OperatorArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Argument parser for {@link Operator Operators}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Operator> {
 
         private static final SimpleCommandExceptionType ERROR_INVALID_OPERATION;
@@ -114,6 +173,11 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
 
     }
 
+    /**
+     * Builder for {@link OperatorArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, Operator, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -129,6 +193,28 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the provided default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Operator defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.asString());
+        }
+
+        /**
+         * Sets the command argument to be optional, with the provided default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull DefaultedRegistryReference<Operator> defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.get().asString());
         }
 
     }

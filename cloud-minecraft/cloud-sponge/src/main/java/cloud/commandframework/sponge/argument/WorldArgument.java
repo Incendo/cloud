@@ -149,6 +149,17 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
             );
         }
 
+        /**
+         * Sets the command argument to be optional, with the provided default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ResourceKey defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.asString());
+        }
+
     }
 
 }
