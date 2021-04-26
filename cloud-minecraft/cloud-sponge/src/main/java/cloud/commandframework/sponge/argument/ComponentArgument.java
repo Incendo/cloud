@@ -26,25 +26,24 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.commands.arguments.ColorArgument;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.common.adventure.SpongeAdventure;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTextColor> {
+public final class ComponentArgument<C> extends CommandArgument<C, Component> {
 
-    private NamedTextColorArgument(
+    private ComponentArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -56,59 +55,56 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
                 name,
                 new Parser<>(),
                 defaultValue,
-                NamedTextColor.class,
+                Component.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
-    public static <C> @NonNull NamedTextColorArgument<C> optional(final @NonNull String name) {
-        return NamedTextColorArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull ComponentArgument<C> optional(final @NonNull String name) {
+        return ComponentArgument.<C>builder(name).asOptional().build();
     }
 
-    public static <C> @NonNull NamedTextColorArgument<C> of(final @NonNull String name) {
-        return NamedTextColorArgument.<C>builder(name).build();
+    public static <C> @NonNull ComponentArgument<C> of(final @NonNull String name) {
+        return ComponentArgument.<C>builder(name).build();
     }
 
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, NamedTextColor> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Component> {
+
+        private final ArgumentParser<C, Component> mappedParser =
+                new WrappedBrigadierParser<C, net.minecraft.network.chat.Component>(
+                        net.minecraft.commands.arguments.ComponentArgument.textComponent()
+                ).map((ctx, component) ->
+                        ArgumentParseResult.success(SpongeAdventure.asAdventure(component)));
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull NamedTextColor> parse(
+        public @NonNull ArgumentParseResult<@NonNull Component> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
-            final String input = inputQueue.peek().toLowerCase(Locale.ROOT);
-            final Optional<NamedTextColor> color = Sponge.registry()
-                    .adventureRegistry()
-                    .namedColors()
-                    .value(input);
-            if (color.isPresent()) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(color.get());
-            }
-            return ArgumentParseResult.failure(ColorArgument.ERROR_INVALID_VALUE.create(input));
+            return this.mappedParser.parse(commandContext, inputQueue);
         }
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.COLOR.get().createNode();
+            return ClientCompletionKeys.COMPONENT.get().createNode();
         }
 
     }
 
-    public static final class Builder<C> extends TypedBuilder<C, NamedTextColor, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, Component, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(NamedTextColor.class, name);
+            super(Component.class, name);
         }
 
         @Override
-        public @NonNull NamedTextColorArgument<C> build() {
-            return new NamedTextColorArgument<>(
+        public @NonNull ComponentArgument<C> build() {
+            return new ComponentArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),

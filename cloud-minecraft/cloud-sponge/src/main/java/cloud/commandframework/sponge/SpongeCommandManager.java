@@ -25,19 +25,32 @@ package cloud.commandframework.sponge;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.sponge.annotations.specifier.Center;
+import cloud.commandframework.sponge.argument.BlockStateArgument;
+import cloud.commandframework.sponge.argument.ComponentArgument;
+import cloud.commandframework.sponge.argument.DataContainerArgument;
+import cloud.commandframework.sponge.argument.GameProfileArgument;
+import cloud.commandframework.sponge.argument.GameProfileCollectionArgument;
 import cloud.commandframework.sponge.argument.ItemStackSnapshotArgument;
 import cloud.commandframework.sponge.argument.MultipleEntitySelectorArgument;
 import cloud.commandframework.sponge.argument.MultiplePlayerSelectorArgument;
 import cloud.commandframework.sponge.argument.NamedTextColorArgument;
 import cloud.commandframework.sponge.argument.OperatorArgument;
 import cloud.commandframework.sponge.argument.RegistryEntryArgument;
+import cloud.commandframework.sponge.argument.ResourceKeyArgument;
 import cloud.commandframework.sponge.argument.SingleEntitySelectorArgument;
 import cloud.commandframework.sponge.argument.SinglePlayerSelectorArgument;
+import cloud.commandframework.sponge.argument.UserArgument;
+import cloud.commandframework.sponge.argument.Vector2dArgument;
+import cloud.commandframework.sponge.argument.Vector2iArgument;
 import cloud.commandframework.sponge.argument.Vector3dArgument;
+import cloud.commandframework.sponge.argument.Vector3iArgument;
 import cloud.commandframework.sponge.argument.WorldArgument;
+import cloud.commandframework.sponge.data.GameProfileCollection;
 import cloud.commandframework.sponge.data.MultipleEntitySelector;
 import cloud.commandframework.sponge.data.MultiplePlayerSelector;
 import cloud.commandframework.sponge.data.SingleEntitySelector;
@@ -48,15 +61,22 @@ import com.google.inject.Module;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.registry.DefaultedRegistryType;
 import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector2d;
+import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.lang.reflect.Field;
@@ -105,10 +125,15 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
         this.parserMapper = new SpongeParserMapper<>();
         this.registerCommandPreProcessor(new SpongeCommandPreprocessor<>(this));
         this.registerParsers();
+        this.setCaptionRegistry(new SpongeCaptionRegistry<>());
         Sponge.eventManager().registerListeners(this.pluginContainer, this.getCommandRegistrationHandler());
     }
 
     private void registerParsers() {
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(ComponentArgument.class),
+                params -> new ComponentArgument.Parser<>()
+        );
         this.getParserRegistry().registerParserSupplier(
                 TypeToken.get(NamedTextColor.class),
                 params -> new NamedTextColorArgument.Parser<>()
@@ -126,8 +151,50 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
                 params -> new ItemStackSnapshotArgument.Parser<>()
         );
         this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(ResourceKey.class),
+                params -> new ResourceKeyArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(GameProfile.class),
+                params -> new GameProfileArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(GameProfileCollection.class),
+                params -> new GameProfileCollectionArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(BlockStateArgument.class),
+                params -> new BlockStateArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(User.class),
+                params -> new UserArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(DataContainer.class),
+                params -> new DataContainerArgument.Parser<>()
+        );
+
+        // Position arguments
+        this.getParserRegistry().registerAnnotationMapper(
+                Center.class,
+                (annotation, type) -> ParserParameters.single(SpongeParserParameters.CENTER_INTEGERS, true)
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(Vector2d.class),
+                params -> new Vector2dArgument.Parser<>(params.get(SpongeParserParameters.CENTER_INTEGERS, false))
+        );
+        this.getParserRegistry().registerParserSupplier(
                 TypeToken.get(Vector3d.class),
-                params -> new Vector3dArgument.Parser<>()
+                params -> new Vector3dArgument.Parser<>(params.get(SpongeParserParameters.CENTER_INTEGERS, false))
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(Vector2i.class),
+                params -> new Vector2iArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(Vector3i.class),
+                params -> new Vector3iArgument.Parser<>()
         );
 
         // Entity selectors

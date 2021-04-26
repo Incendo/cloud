@@ -26,13 +26,18 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import cloud.commandframework.sponge.data.MultipleEntitySelector;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.selector.EntitySelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.selector.Selector;
@@ -42,6 +47,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
 
@@ -77,29 +83,31 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
 
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, MultipleEntitySelector> {
 
+        final ArgumentParser<C, EntitySelector> nativeParser = new WrappedBrigadierParser<>(EntityArgument.entities());
+
         @Override
         public @NonNull ArgumentParseResult<@NonNull MultipleEntitySelector> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
-            final String input = inputQueue.peek();
-            final Selector selector;
+            final String originalInput = String.join(" ", inputQueue);
+            final ArgumentParseResult<EntitySelector> result = this.nativeParser.parse(commandContext, inputQueue);
+            if (result.getFailure().isPresent()) {
+                return ArgumentParseResult.failure(result.getFailure().get());
+            }
+            final String consumedInput = String.join(" ", inputQueue);
+            final EntitySelector parsed = result.getParsedValue().get();
+            final List<Entity> entities;
             try {
-                selector = Selector.parse(input);
-            } catch (final IllegalArgumentException ex) {
-                return SelectorUtil.selectorParseFailure(ex);
+                entities = parsed.findEntities(
+                        (CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                ).stream().map(e -> (Entity) e).collect(Collectors.toList());
+            } catch (final CommandSyntaxException ex) {
+                return ArgumentParseResult.failure(ex);
             }
-            final CommandCause cause = commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY);
-            final Collection<Entity> result = selector.select(cause);
-            if (result.isEmpty()) {
-                return SelectorUtil.noEntitiesFound();
-            }
-            inputQueue.remove();
-            return ArgumentParseResult.success(new MultipleEntitySelectorImpl(
-                    selector,
-                    input,
-                    result
-            ));
+            final int consumedChars = originalInput.length() - consumedInput.length();
+            final String input = originalInput.substring(0, consumedChars);
+            return ArgumentParseResult.success(new MultipleEntitySelectorImpl((Selector) parsed, input, entities));
         }
 
         @Override

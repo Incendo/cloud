@@ -26,25 +26,24 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.commands.arguments.ColorArgument;
+import net.minecraft.commands.arguments.blocks.BlockInput;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTextColor> {
+public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> {
 
-    private NamedTextColorArgument(
+    private BlockStateArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -56,59 +55,54 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
                 name,
                 new Parser<>(),
                 defaultValue,
-                NamedTextColor.class,
+                BlockState.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
-    public static <C> @NonNull NamedTextColorArgument<C> optional(final @NonNull String name) {
-        return NamedTextColorArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull BlockStateArgument<C> optional(final @NonNull String name) {
+        return BlockStateArgument.<C>builder(name).asOptional().build();
     }
 
-    public static <C> @NonNull NamedTextColorArgument<C> of(final @NonNull String name) {
-        return NamedTextColorArgument.<C>builder(name).build();
+    public static <C> @NonNull BlockStateArgument<C> of(final @NonNull String name) {
+        return BlockStateArgument.<C>builder(name).build();
     }
 
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, NamedTextColor> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, BlockState> {
+
+        private final ArgumentParser<C, BlockState> mappedParser =
+                new WrappedBrigadierParser<C, BlockInput>(net.minecraft.commands.arguments.blocks.BlockStateArgument.block())
+                        .map((ctx, blockInput) -> ArgumentParseResult.success((BlockState) blockInput.getState()));
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull NamedTextColor> parse(
+        public @NonNull ArgumentParseResult<@NonNull BlockState> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
-            final String input = inputQueue.peek().toLowerCase(Locale.ROOT);
-            final Optional<NamedTextColor> color = Sponge.registry()
-                    .adventureRegistry()
-                    .namedColors()
-                    .value(input);
-            if (color.isPresent()) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(color.get());
-            }
-            return ArgumentParseResult.failure(ColorArgument.ERROR_INVALID_VALUE.create(input));
+            return this.mappedParser.parse(commandContext, inputQueue);
         }
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.COLOR.get().createNode();
+            return ClientCompletionKeys.BLOCK_STATE.get().createNode();
         }
 
     }
 
-    public static final class Builder<C> extends TypedBuilder<C, NamedTextColor, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, BlockState, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(NamedTextColor.class, name);
+            super(BlockState.class, name);
         }
 
         @Override
-        public @NonNull NamedTextColorArgument<C> build() {
-            return new NamedTextColorArgument<>(
+        public @NonNull BlockStateArgument<C> build() {
+            return new BlockStateArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),

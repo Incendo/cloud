@@ -26,13 +26,18 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import cloud.commandframework.sponge.data.SinglePlayerSelector;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.selector.EntitySelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.selector.Selector;
@@ -76,35 +81,31 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
 
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, SinglePlayerSelector> {
 
+        final ArgumentParser<C, EntitySelector> nativeParser = new WrappedBrigadierParser<>(EntityArgument.player());
+
         @Override
         public @NonNull ArgumentParseResult<@NonNull SinglePlayerSelector> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
-            final String input = inputQueue.peek();
-            final Selector selector;
+            final String originalInput = String.join(" ", inputQueue);
+            final ArgumentParseResult<EntitySelector> result = this.nativeParser.parse(commandContext, inputQueue);
+            if (result.getFailure().isPresent()) {
+                return ArgumentParseResult.failure(result.getFailure().get());
+            }
+            final String consumedInput = String.join(" ", inputQueue);
+            final EntitySelector parsed = result.getParsedValue().get();
+            final Player player;
             try {
-                selector = Selector.parse(input);
-            } catch (final IllegalArgumentException ex) {
-                return SelectorUtil.selectorParseFailure(ex);
+                player = (Player) parsed.findSinglePlayer(
+                        (CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                );
+            } catch (final CommandSyntaxException ex) {
+                return ArgumentParseResult.failure(ex);
             }
-            if (!selector.playersOnly()) {
-                return SelectorUtil.onlyPlayersAllowed();
-            }
-            if (selector.limit() != 1) {
-                return SelectorUtil.notSinglePlayer();
-            }
-            final CommandCause cause = commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY);
-            return selector.select(cause)
-                    .stream().map(it -> (Player) it)
-                    .findFirst()
-                    .map(player -> {
-                        inputQueue.remove();
-                        return ArgumentParseResult.success(
-                                (SinglePlayerSelector) new SinglePlayerSelectorImpl(selector, input, player)
-                        );
-                    })
-                    .orElse(SelectorUtil.noPlayersFound());
+            final int consumedChars = originalInput.length() - consumedInput.length();
+            final String input = originalInput.substring(0, consumedChars);
+            return ArgumentParseResult.success(new SinglePlayerSelectorImpl((Selector) parsed, input, player));
         }
 
         @Override

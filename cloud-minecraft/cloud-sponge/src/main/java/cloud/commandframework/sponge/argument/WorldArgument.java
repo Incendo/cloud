@@ -26,14 +26,19 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import net.minecraft.commands.arguments.DimensionArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.world.server.ServerWorld;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -73,7 +78,21 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements ArgumentParser<C, ServerWorld> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, ServerWorld> {
+
+        private static final DynamicCommandExceptionType ERROR_INVALID_VALUE;
+
+        static {
+            try {
+                // todo: use an accessor
+                final Field errorInvalidValueField = DimensionArgument.class
+                        .getDeclaredField("ERROR_INVALID_VALUE");
+                errorInvalidValueField.setAccessible(true);
+                ERROR_INVALID_VALUE = (DynamicCommandExceptionType) errorInvalidValueField.get(null);
+            } catch (final ReflectiveOperationException ex) {
+                throw new RuntimeException("Couldn't access ERROR_INVALID_VALUE command exception type.", ex);
+            }
+        }
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull ServerWorld> parse(
@@ -90,7 +109,7 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
                 inputQueue.remove();
                 return ArgumentParseResult.success(entry.get());
             }
-            return ArgumentParseResult.failure(new IllegalArgumentException("no such world")); // todo
+            return ArgumentParseResult.failure(ERROR_INVALID_VALUE.create(key));
         }
 
         @Override
@@ -104,6 +123,11 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
                 }
                 return Stream.of(world.key().asString());
             }).collect(Collectors.toList());
+        }
+
+        @Override
+        public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
+            return ClientCompletionKeys.RESOURCE_LOCATION.get().createNode().customSuggestions();
         }
 
     }

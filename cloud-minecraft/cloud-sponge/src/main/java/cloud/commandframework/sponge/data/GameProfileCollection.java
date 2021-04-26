@@ -24,60 +24,22 @@
 package cloud.commandframework.sponge.data;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.command.selector.Selector;
+import org.spongepowered.api.profile.GameProfile;
 
 import java.util.Collection;
-import java.util.Collections;
 
 /**
- * Cloud wrapper for parsed {@link org.spongepowered.api.command.selector.Selector Selectors} and their results.
- *
- * @param <R> result type
+ * Cloud wrapper for a {@link Collection} of {@link GameProfile GameProfiles}.
  */
-public interface SelectorWrapper<R> {
+public interface GameProfileCollection {
 
     /**
-     * Get the raw string associated with the selector.
+     * Get the wrapped {@link Collection} of {@link GameProfile GameProfiles}.
      *
-     * @return the input
+     * <p>A successfully parsed result will always contain at least {@code 1} element.</p>
+     *
+     * @return a {@link Collection} of {@link GameProfile GameProfiles}
      */
-    @NonNull String inputString();
-
-    /**
-     * Get the wrapped {@link Selector}.
-     *
-     * @return the selector
-     */
-    @NonNull Selector selector();
-
-    /**
-     * Resolve the value of this selector.
-     *
-     * <p>A successfully parsed selector must match one or more values</p>
-     *
-     * @return all matched entities
-     */
-    @NonNull Collection<R> get();
-
-    /**
-     * A specialized selector that can only return one value.
-     *
-     * @param <R> the value type
-     */
-    interface Single<R> extends SelectorWrapper<R> {
-
-        @Override
-        default @NonNull Collection<R> get() {
-            return Collections.singletonList(this.getSingle());
-        }
-
-        /**
-         * Get the single value from this selector.
-         *
-         * @return the value
-         */
-        @NonNull R getSingle();
-
-    }
+    @NonNull Collection<@NonNull GameProfile> gameProfiles();
 
 }

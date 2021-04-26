@@ -28,23 +28,19 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.commands.arguments.ColorArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTextColor> {
+public final class ResourceKeyArgument<C> extends CommandArgument<C, ResourceKey> {
 
-    private NamedTextColorArgument(
+    private ResourceKeyArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -56,59 +52,56 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
                 name,
                 new Parser<>(),
                 defaultValue,
-                NamedTextColor.class,
+                ResourceKey.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
-    public static <C> @NonNull NamedTextColorArgument<C> optional(final @NonNull String name) {
-        return NamedTextColorArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull ResourceKeyArgument<C> optional(final @NonNull String name) {
+        return ResourceKeyArgument.<C>builder(name).asOptional().build();
     }
 
-    public static <C> @NonNull NamedTextColorArgument<C> of(final @NonNull String name) {
-        return NamedTextColorArgument.<C>builder(name).build();
+    public static <C> @NonNull ResourceKeyArgument<C> of(final @NonNull String name) {
+        return ResourceKeyArgument.<C>builder(name).build();
     }
 
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, NamedTextColor> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, ResourceKey> {
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull NamedTextColor> parse(
+        public @NonNull ArgumentParseResult<@NonNull ResourceKey> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
-            final String input = inputQueue.peek().toLowerCase(Locale.ROOT);
-            final Optional<NamedTextColor> color = Sponge.registry()
-                    .adventureRegistry()
-                    .namedColors()
-                    .value(input);
-            if (color.isPresent()) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(color.get());
+            final String input = inputQueue.peek();
+            final ResourceKey key = ResourceKeyUtil.resourceKey(input);
+            if (key == null) {
+                return ResourceKeyUtil.invalidResourceKey();
             }
-            return ArgumentParseResult.failure(ColorArgument.ERROR_INVALID_VALUE.create(input));
+            inputQueue.remove();
+            return ArgumentParseResult.success(key);
         }
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.COLOR.get().createNode();
+            return ClientCompletionKeys.RESOURCE_LOCATION.get().createNode();
         }
 
     }
 
-    public static final class Builder<C> extends TypedBuilder<C, NamedTextColor, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, ResourceKey, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(NamedTextColor.class, name);
+            super(ResourceKey.class, name);
         }
 
         @Override
-        public @NonNull NamedTextColorArgument<C> build() {
-            return new NamedTextColorArgument<>(
+        public @NonNull ResourceKeyArgument<C> build() {
+            return new ResourceKeyArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),

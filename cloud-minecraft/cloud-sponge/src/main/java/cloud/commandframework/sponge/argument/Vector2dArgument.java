@@ -32,21 +32,21 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.Coordinates;
-import net.minecraft.commands.arguments.coordinates.Vec3Argument;
+import net.minecraft.commands.arguments.coordinates.Vec2Argument;
+import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
-import org.spongepowered.common.util.VecHelper;
-import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector2d;
 
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
-public final class Vector3dArgument<C> extends VectorArgument<C, Vector3d> {
+public final class Vector2dArgument<C> extends VectorArgument<C, Vector2d> {
 
-    private Vector3dArgument(
+    private Vector2dArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -59,7 +59,7 @@ public final class Vector3dArgument<C> extends VectorArgument<C, Vector3d> {
                 name,
                 new Parser<>(centerIntegers),
                 defaultValue,
-                Vector3d.class,
+                Vector2d.class,
                 centerIntegers,
                 suggestionsProvider,
                 defaultDescription
@@ -67,49 +67,25 @@ public final class Vector3dArgument<C> extends VectorArgument<C, Vector3d> {
     }
 
     /**
-     * Create a new optional {@link Vector3dArgument}.
+     * Create a new optional {@link Vector2dArgument}.
      *
      * @param name argument name
      * @param <C>  sender type
-     * @return a new {@link Vector3dArgument}
+     * @return a new {@link Vector2dArgument}
      */
-    public static <C> @NonNull Vector3dArgument<C> optional(final @NonNull String name) {
-        return Vector3dArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull Vector2dArgument<C> optional(final @NonNull String name) {
+        return Vector2dArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new required {@link Vector3dArgument}.
+     * Create a new required {@link Vector2dArgument}.
      *
      * @param name argument name
      * @param <C>  sender type
-     * @return a new {@link Vector3dArgument}
+     * @return a new {@link Vector2dArgument}
      */
-    public static <C> @NonNull Vector3dArgument<C> of(final @NonNull String name) {
-        return Vector3dArgument.<C>builder(name).build();
-    }
-
-    /**
-     * Create a new optional {@link Vector3dArgument}.
-     *
-     * @param name           argument name
-     * @param centerIntegers whether to center integers to x.5
-     * @param <C>            sender type
-     * @return a new {@link Vector3dArgument}
-     */
-    public static <C> @NonNull Vector3dArgument<C> optional(final @NonNull String name, final boolean centerIntegers) {
-        return Vector3dArgument.<C>builder(name).asOptional().centerIntegers(centerIntegers).build();
-    }
-
-    /**
-     * Create a new required {@link Vector3dArgument}.
-     *
-     * @param name           argument name
-     * @param centerIntegers whether to center integers to x.5
-     * @param <C>            sender type
-     * @return a new {@link Vector3dArgument}
-     */
-    public static <C> @NonNull Vector3dArgument<C> of(final @NonNull String name, final boolean centerIntegers) {
-        return Vector3dArgument.<C>builder(name).centerIntegers(centerIntegers).build();
+    public static <C> @NonNull Vector2dArgument<C> of(final @NonNull String name) {
+        return Vector2dArgument.<C>builder(name).build();
     }
 
     /**
@@ -123,21 +99,22 @@ public final class Vector3dArgument<C> extends VectorArgument<C, Vector3d> {
         return new Builder<>(name);
     }
 
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Vector3d> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Vector2d> {
 
-        private final ArgumentParser<C, Vector3d> mappedParser;
+        private final ArgumentParser<C, Vector2d> mappedParser;
 
         public Parser(final boolean centerIntegers) {
-            this.mappedParser = new WrappedBrigadierParser<C, Coordinates>(new Vec3Argument(centerIntegers))
+            this.mappedParser = new WrappedBrigadierParser<C, Coordinates>(new Vec2Argument(centerIntegers))
                     .map((ctx, coordinates) -> {
-                        return ArgumentParseResult.success(VecHelper.toVector3d(
-                                coordinates.getPosition((CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY))
-                        ));
+                        final Vec3 position = coordinates.getPosition(
+                                (CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                        );
+                        return ArgumentParseResult.success(new Vector2d(position.x, position.z));
                     });
         }
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull Vector3d> parse(
+        public @NonNull ArgumentParseResult<@NonNull Vector2d> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
@@ -146,20 +123,20 @@ public final class Vector3dArgument<C> extends VectorArgument<C, Vector3d> {
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.VEC3.get().createNode();
+            return ClientCompletionKeys.VEC2.get().createNode();
         }
 
     }
 
-    public static final class Builder<C> extends VectorArgumentBuilder<C, Vector3d, Builder<C>> {
+    public static final class Builder<C> extends VectorArgumentBuilder<C, Vector2d, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(Vector3d.class, name);
+            super(Vector2d.class, name);
         }
 
         @Override
-        public @NonNull Vector3dArgument<C> build() {
-            return new Vector3dArgument<>(
+        public @NonNull Vector2dArgument<C> build() {
+            return new Vector2dArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),

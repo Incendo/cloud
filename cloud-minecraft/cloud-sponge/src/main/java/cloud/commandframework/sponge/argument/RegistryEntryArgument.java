@@ -26,8 +26,11 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
+import cloud.commandframework.sponge.SpongeCaptionKeys;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -220,7 +223,7 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
                 inputQueue.remove();
                 return ArgumentParseResult.success(entry.get().value());
             }
-            return ArgumentParseResult.failure(new IllegalArgumentException("no such entry in registry")); // todo
+            return ArgumentParseResult.failure(new NoSuchEntryException(commandContext, key, this.registryType));
         }
 
         @Override
@@ -260,6 +263,12 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
 
     }
 
+    /**
+     * Builder for {@link RegistryEntryArgument}.
+     *
+     * @param <C> sender type
+     * @param <V> value type
+     */
     public static final class Builder<C, V> extends TypedBuilder<C, V, Builder<C, V>> {
 
         private final RegistryType<V> registryType;
@@ -287,6 +296,29 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
                     this.registryType,
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
+            );
+        }
+
+    }
+
+    /**
+     * An exception thrown when there is no entry for the provided {@link ResourceKey} in the resolved registry.
+     */
+    private static final class NoSuchEntryException extends ParserException {
+
+        private static final long serialVersionUID = 4472876671109079272L;
+
+        NoSuchEntryException(
+                final CommandContext<?> context,
+                final ResourceKey key,
+                final RegistryType<?> registryType
+        ) {
+            super(
+                    Parser.class,
+                    context,
+                    SpongeCaptionKeys.ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY,
+                    CaptionVariable.of("id", key.asString()),
+                    CaptionVariable.of("registry", registryType.location().asString())
             );
         }
 

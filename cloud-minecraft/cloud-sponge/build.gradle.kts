@@ -13,5 +13,5 @@ dependencies {
 
 minecraft {
     version("1.16.5")
-    platform(MinecraftPlatform.SERVER)
+    platform(MinecraftPlatform.JOINED)
 }
