@@ -29,7 +29,9 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
+import cloud.commandframework.sponge.SpongeCaptionKeys;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
@@ -37,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.common.profile.SpongeGameProfile;
 
@@ -45,6 +48,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument for parsing a single {@link GameProfile} from a {@link Selector}.
+ *
+ * @param <C> sender type
+ */
 public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile> {
 
     private GameProfileArgument(
@@ -65,18 +73,44 @@ public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile
         );
     }
 
-    public static <C> @NonNull GameProfileArgument<C> optional(final @NonNull String name) {
-        return GameProfileArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link GameProfileArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link GameProfileArgument}
+     */
     public static <C> @NonNull GameProfileArgument<C> of(final @NonNull String name) {
         return GameProfileArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link GameProfileArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link GameProfileArgument}
+     */
+    public static <C> @NonNull GameProfileArgument<C> optional(final @NonNull String name) {
+        return GameProfileArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Create a new parser for a single {@link GameProfile}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, GameProfile> {
 
         private final ArgumentParser<C, GameProfile> mappedParser =
@@ -92,7 +126,7 @@ public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile
                         return ArgumentParseResult.failure(ex);
                     }
                     if (profiles.size() > 1) {
-                        return ArgumentParseResult.failure(new IllegalArgumentException("too many profiles")); // todo
+                        return ArgumentParseResult.failure(new TooManyGameProfilesSelectedException(ctx));
                     }
                     final GameProfile profile = SpongeGameProfile.of(profiles.iterator().next());
                     return ArgumentParseResult.success(profile);
@@ -113,6 +147,11 @@ public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile
 
     }
 
+    /**
+     * Builder for {@link GameProfileArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, GameProfile, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -127,6 +166,23 @@ public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile
                     this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
+            );
+        }
+
+    }
+
+    /**
+     * Exception thrown when too many game profiles are selected.
+     */
+    private static final class TooManyGameProfilesSelectedException extends ParserException {
+
+        private static final long serialVersionUID = -2931411139985042222L;
+
+        TooManyGameProfilesSelectedException(final @NonNull CommandContext<?> context) {
+            super(
+                    Parser.class,
+                    context,
+                    SpongeCaptionKeys.ARGUMENT_PARSE_FAILURE_GAME_PROFILE_TOO_MANY_SELECTED
             );
         }
 

@@ -57,6 +57,12 @@ public class SpongeCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
     public static final String ARGUMENT_PARSE_FAILURE_USER_INVALID_INPUT =
             "Input '{input}' is not a valid UUID or username.";
 
+    /**
+     * Default caption for {@link SpongeCaptionKeys#ARGUMENT_PARSE_FAILURE_GAME_PROFILE_TOO_MANY_SELECTED}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_GAME_PROFILE_TOO_MANY_SELECTED =
+            "The provided selector matched multiple game profiles, but only one is allowed.";
+
     protected SpongeCaptionRegistry() {
         super();
 
@@ -75,6 +81,10 @@ public class SpongeCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
         this.registerMessageFactory(
                 SpongeCaptionKeys.ARGUMENT_PARSE_FAILURE_USER_INVALID_INPUT,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_USER_INVALID_INPUT
+        );
+        this.registerMessageFactory(
+                SpongeCaptionKeys.ARGUMENT_PARSE_FAILURE_GAME_PROFILE_TOO_MANY_SELECTED,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_GAME_PROFILE_TOO_MANY_SELECTED
         );
     }
 

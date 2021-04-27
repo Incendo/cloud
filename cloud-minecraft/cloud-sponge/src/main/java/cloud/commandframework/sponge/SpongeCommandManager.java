@@ -67,9 +67,11 @@ import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.registry.DefaultedRegistryType;
+import org.spongepowered.api.registry.Registry;
 import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -82,7 +84,9 @@ import org.spongepowered.plugin.PluginContainer;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -299,7 +303,34 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
     }
 
     void registrationCalled() {
-        this.lockRegistration();
+        if (!this.registrationCallbackListeners.isEmpty()) {
+            this.registrationCallbackListeners.forEach(listener -> listener.accept(this));
+            this.registrationCallbackListeners.clear();
+        }
+        if (this.getRegistrationState() != RegistrationState.AFTER_REGISTRATION) {
+            this.lockRegistration();
+        }
+    }
+
+    private final Set<Consumer<SpongeCommandManager<C>>> registrationCallbackListeners = new HashSet<>();
+
+    /**
+     * Add a listener to the command registration callback.
+     *
+     * <p>These listeners will be called just before command registration is finalized
+     * (during the first invocation of Cloud's internal {@link RegisterCommandEvent} listener).</p>
+     *
+     * <p>This allows for registering commands at the latest possible point in the plugin
+     * lifecycle, which may be necessary for certain {@link Registry Registries} to have
+     * initialized.</p>
+     *
+     * @param listener listener
+     */
+    public void addRegistrationCallbackListener(final @NonNull Consumer<@NonNull SpongeCommandManager<C>> listener) {
+        if (this.getRegistrationState() == RegistrationState.AFTER_REGISTRATION) {
+            throw new IllegalStateException("The SpongeCommandManager is in the AFTER_REGISTRATION state!");
+        }
+        this.registrationCallbackListeners.add(listener);
     }
 
 }

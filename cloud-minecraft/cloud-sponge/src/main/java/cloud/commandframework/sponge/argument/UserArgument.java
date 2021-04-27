@@ -44,8 +44,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.user.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +58,12 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+/**
+ * Argument for parsing {@link User Users} in the {@link UserManager} from
+ * a {@link Selector}, last known username, or {@link UUID}.
+ *
+ * @param <C> sender type
+ */
 public final class UserArgument<C> extends CommandArgument<C, User> {
 
     private UserArgument(
@@ -76,21 +84,49 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         );
     }
 
-    public static <C> @NonNull UserArgument<C> optional(final @NonNull String name) {
-        return UserArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link UserArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link UserArgument}
+     */
     public static <C> @NonNull UserArgument<C> of(final @NonNull String name) {
         return UserArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link UserArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link UserArgument}
+     */
+    public static <C> @NonNull UserArgument<C> optional(final @NonNull String name) {
+        return UserArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link User Users} in the {@link UserManager} by
+     * {@link Selector}, last known username, or {@link UUID}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, User> {
 
-        final ArgumentParser<C, EntitySelector> singlePlayerSelectorParser = new WrappedBrigadierParser<>(EntityArgument.player());
+        private final ArgumentParser<C, EntitySelector> singlePlayerSelectorParser =
+                new WrappedBrigadierParser<>(EntityArgument.player());
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull User> parse(
@@ -180,6 +216,11 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     }
 
+    /**
+     * Builder for {@link UserArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, User, Builder<C>> {
 
         Builder(final @NonNull String name) {

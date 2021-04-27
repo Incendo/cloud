@@ -66,6 +66,13 @@ public final class SpongeCaptionKeys {
             "argument.parse.failure.user.invalid_input"
     );
 
+    /**
+     * Variables: None
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_GAME_PROFILE_TOO_MANY_SELECTED = of(
+            "argument.parse.failure.game_profile.too_many_selected"
+    );
+
     private SpongeCaptionKeys() {
     }
 

@@ -49,6 +49,11 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+/**
+ * Argument for selecting one or more {@link Player Players} using a {@link Selector}.
+ *
+ * @param <C> sender type
+ */
 public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, MultiplePlayerSelector> {
 
     private MultiplePlayerSelectorArgument(
@@ -69,21 +74,47 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         );
     }
 
-    public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(final @NonNull String name) {
-        return MultiplePlayerSelectorArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link MultiplePlayerSelectorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a bew {@link MultiplePlayerSelectorArgument}
+     */
     public static <C> @NonNull MultiplePlayerSelectorArgument<C> of(final @NonNull String name) {
         return MultiplePlayerSelectorArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link MultiplePlayerSelectorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a bew {@link MultiplePlayerSelectorArgument}
+     */
+    public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(final @NonNull String name) {
+        return MultiplePlayerSelectorArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link MultiplePlayerSelector}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, MultiplePlayerSelector> {
 
-        final ArgumentParser<C, EntitySelector> nativeParser = new WrappedBrigadierParser<>(EntityArgument.players());
+        private final ArgumentParser<C, EntitySelector> nativeParser = new WrappedBrigadierParser<>(EntityArgument.players());
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull MultiplePlayerSelector> parse(
@@ -117,6 +148,11 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
 
     }
 
+    /**
+     * Builder for {@link MultiplePlayerSelectorArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, MultiplePlayerSelector, Builder<C>> {
 
         Builder(final @NonNull String name) {

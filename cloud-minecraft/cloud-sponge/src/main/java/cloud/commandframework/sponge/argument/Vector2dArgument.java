@@ -24,6 +24,7 @@
 package cloud.commandframework.sponge.argument;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
@@ -44,6 +45,18 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument for parsing {@link Vector2d} from relative, absolute, or local coordinates.
+ *
+ * <p>Example input strings:</p>
+ * <ul>
+ *     <li>{@code ~ ~}</li>
+ *     <li>{@code 0.1 -0.5}</li>
+ *     <li>{@code ~1 ~-2}</li>
+ * </ul>
+ *
+ * @param <C> sender type
+ */
 public final class Vector2dArgument<C> extends VectorArgument<C, Vector2d> {
 
     private Vector2dArgument(
@@ -78,6 +91,47 @@ public final class Vector2dArgument<C> extends VectorArgument<C, Vector2d> {
     }
 
     /**
+     * Create a new optional {@link Vector2dArgument}.
+     *
+     * @param name           argument name
+     * @param centerIntegers whether to center integers to x.5
+     * @param <C>            sender type
+     * @return a new {@link Vector2dArgument}
+     */
+    public static <C> @NonNull Vector2dArgument<C> optional(final @NonNull String name, final boolean centerIntegers) {
+        return Vector2dArgument.<C>builder(name).centerIntegers(centerIntegers).asOptional().build();
+    }
+
+    /**
+     * Create a new optional {@link Vector2dArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link Vector2dArgument}
+     */
+    public static <C> @NonNull Vector2dArgument<C> optional(final @NonNull String name, final @NonNull Vector2d defaultValue) {
+        return Vector2dArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new optional {@link Vector2dArgument} with the specified default value.
+     *
+     * @param name           argument name
+     * @param centerIntegers whether to center integers to x.5
+     * @param defaultValue   default value
+     * @param <C>            sender type
+     * @return a new {@link Vector2dArgument}
+     */
+    public static <C> @NonNull Vector2dArgument<C> optional(
+            final @NonNull String name,
+            final boolean centerIntegers,
+            final @NonNull Vector2d defaultValue
+    ) {
+        return Vector2dArgument.<C>builder(name).centerIntegers(centerIntegers).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
      * Create a new required {@link Vector2dArgument}.
      *
      * @param name argument name
@@ -86,6 +140,18 @@ public final class Vector2dArgument<C> extends VectorArgument<C, Vector2d> {
      */
     public static <C> @NonNull Vector2dArgument<C> of(final @NonNull String name) {
         return Vector2dArgument.<C>builder(name).build();
+    }
+
+    /**
+     * Create a new required {@link Vector2dArgument}.
+     *
+     * @param name           argument name
+     * @param centerIntegers whether to center integers to x.5
+     * @param <C>            sender type
+     * @return a new {@link Vector2dArgument}
+     */
+    public static <C> @NonNull Vector2dArgument<C> of(final @NonNull String name, final boolean centerIntegers) {
+        return Vector2dArgument.<C>builder(name).centerIntegers(centerIntegers).build();
     }
 
     /**
@@ -99,10 +165,20 @@ public final class Vector2dArgument<C> extends VectorArgument<C, Vector2d> {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link Vector2d}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Vector2d> {
 
         private final ArgumentParser<C, Vector2d> mappedParser;
 
+        /**
+         * Create a new {@link Parser}.
+         *
+         * @param centerIntegers whether to center integers to x.5
+         */
         public Parser(final boolean centerIntegers) {
             this.mappedParser = new WrappedBrigadierParser<C, Coordinates>(new Vec2Argument(centerIntegers))
                     .map((ctx, coordinates) -> {
@@ -128,6 +204,11 @@ public final class Vector2dArgument<C> extends VectorArgument<C, Vector2d> {
 
     }
 
+    /**
+     * Builder for {@link Vector2dArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends VectorArgumentBuilder<C, Vector2d, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -144,6 +225,17 @@ public final class Vector2dArgument<C> extends VectorArgument<C, Vector2d> {
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vector2d defaultValue) {
+            return this.asOptionalWithDefault(String.format("%.10f %.10f", defaultValue.getX(), defaultValue.getY()));
         }
 
     }

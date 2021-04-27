@@ -22,6 +22,6 @@
 // SOFTWARE.
 //
 /**
- * Data holders for sponge.
+ * Data holders for cloud-sponge.
  */
 package cloud.commandframework.sponge.data;

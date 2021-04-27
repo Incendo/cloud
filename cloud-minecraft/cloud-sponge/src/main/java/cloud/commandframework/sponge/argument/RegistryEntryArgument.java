@@ -569,7 +569,7 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         }
 
         /**
-         * Sets the command argument to be optional, with the provided default value.
+         * Sets the command argument to be optional, with the specified default value.
          *
          * @param defaultValue default value
          * @return this builder
@@ -580,7 +580,7 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         }
 
         /**
-         * Sets the command argument to be optional, with the provided default value.
+         * Sets the command argument to be optional, with the specified default value.
          *
          * @param defaultValue default value
          * @return this builder

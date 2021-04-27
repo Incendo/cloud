@@ -38,10 +38,16 @@ import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * An argument for parsing {@link NamedTextColor NamedTextColors}.
+ *
+ * @param <C> sender type
+ */
 public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTextColor> {
 
     private NamedTextColorArgument(
@@ -62,18 +68,59 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
         );
     }
 
-    public static <C> @NonNull NamedTextColorArgument<C> optional(final @NonNull String name) {
-        return NamedTextColorArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link NamedTextColorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link NamedTextColorArgument}
+     */
     public static <C> @NonNull NamedTextColorArgument<C> of(final @NonNull String name) {
         return NamedTextColorArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link NamedTextColorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link NamedTextColorArgument}
+     */
+    public static <C> @NonNull NamedTextColorArgument<C> optional(final @NonNull String name) {
+        return NamedTextColorArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new optional {@link NamedTextColorArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link NamedTextColorArgument}
+     */
+    public static <C> @NonNull NamedTextColorArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull NamedTextColor defaultValue
+    ) {
+        return NamedTextColorArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C> sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link NamedTextColor}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, NamedTextColor> {
 
         @Override
@@ -100,6 +147,11 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
 
     }
 
+    /**
+     * Builder for {@link NamedTextColorArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, NamedTextColor, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -115,6 +167,17 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull NamedTextColor defaultValue) {
+            return this.asOptionalWithDefault(Objects.requireNonNull(NamedTextColor.NAMES.key(defaultValue)));
         }
 
     }

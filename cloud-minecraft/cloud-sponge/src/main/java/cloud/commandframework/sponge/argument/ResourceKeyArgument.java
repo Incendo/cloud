@@ -162,7 +162,7 @@ public final class ResourceKeyArgument<C> extends CommandArgument<C, ResourceKey
         }
 
         /**
-         * Sets the command argument to be optional, with the provided default value.
+         * Sets the command argument to be optional, with the specified default value.
          *
          * @param defaultValue default value
          * @return this builder

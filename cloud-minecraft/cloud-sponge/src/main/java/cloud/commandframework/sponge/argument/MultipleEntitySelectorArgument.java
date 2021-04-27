@@ -49,6 +49,11 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+/**
+ * Argument for selecting one or more {@link Entity Entities} using a {@link Selector}.
+ *
+ * @param <C> sender type
+ */
 public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
 
     private MultipleEntitySelectorArgument(
@@ -69,21 +74,47 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
         );
     }
 
-    public static <C> @NonNull MultipleEntitySelectorArgument<C> optional(final @NonNull String name) {
-        return MultipleEntitySelectorArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link MultipleEntitySelectorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link MultipleEntitySelectorArgument}
+     */
     public static <C> @NonNull MultipleEntitySelectorArgument<C> of(final @NonNull String name) {
         return MultipleEntitySelectorArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link MultipleEntitySelectorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link MultipleEntitySelectorArgument}
+     */
+    public static <C> @NonNull MultipleEntitySelectorArgument<C> optional(final @NonNull String name) {
+        return MultipleEntitySelectorArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link MultipleEntitySelector}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, MultipleEntitySelector> {
 
-        final ArgumentParser<C, EntitySelector> nativeParser = new WrappedBrigadierParser<>(EntityArgument.entities());
+        private final ArgumentParser<C, EntitySelector> nativeParser = new WrappedBrigadierParser<>(EntityArgument.entities());
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull MultipleEntitySelector> parse(
@@ -117,6 +148,11 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
 
     }
 
+    /**
+     * Builder for {@link MultipleEntitySelectorArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, MultipleEntitySelector, Builder<C>> {
 
         Builder(final @NonNull String name) {

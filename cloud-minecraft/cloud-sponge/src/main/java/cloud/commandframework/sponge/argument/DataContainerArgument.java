@@ -43,6 +43,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument for parsing {@link DataContainer DataContainers} from
+ * <a href="https://minecraft.fandom.com/wiki/NBT_format">SNBT</a> strings.
+ *
+ * @param <C> sender type
+ */
 public final class DataContainerArgument<C> extends CommandArgument<C, DataContainer> {
 
     private DataContainerArgument(
@@ -63,18 +69,59 @@ public final class DataContainerArgument<C> extends CommandArgument<C, DataConta
         );
     }
 
-    public static <C> @NonNull DataContainerArgument<C> optional(final @NonNull String name) {
-        return DataContainerArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link DataContainerArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link DataContainerArgument}
+     */
     public static <C> @NonNull DataContainerArgument<C> of(final @NonNull String name) {
         return DataContainerArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link DataContainerArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link DataContainerArgument}
+     */
+    public static <C> @NonNull DataContainerArgument<C> optional(final @NonNull String name) {
+        return DataContainerArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new optional {@link DataContainerArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link DataContainerArgument}
+     */
+    public static <C> @NonNull DataContainerArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull DataContainer defaultValue
+    ) {
+        return DataContainerArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link DataContainer DataContainers} from SNBT.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, DataContainer> {
 
         private final ArgumentParser<C, DataContainer> mappedParser =
@@ -97,6 +144,11 @@ public final class DataContainerArgument<C> extends CommandArgument<C, DataConta
 
     }
 
+    /**
+     * Builder for {@link DataContainerArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, DataContainer, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -112,6 +164,17 @@ public final class DataContainerArgument<C> extends CommandArgument<C, DataConta
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull DataContainer defaultValue) {
+            return this.asOptionalWithDefault(NBTTranslator.INSTANCE.translate(defaultValue).toString());
         }
 
     }

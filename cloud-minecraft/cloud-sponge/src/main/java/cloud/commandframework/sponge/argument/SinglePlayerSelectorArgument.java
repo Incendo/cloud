@@ -47,6 +47,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument for selecting a single {@link Player} using a {@link Selector}.
+ *
+ * @param <C> sender type
+ */
 public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, SinglePlayerSelector> {
 
     private SinglePlayerSelectorArgument(
@@ -67,21 +72,47 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         );
     }
 
-    public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link SinglePlayerSelectorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link SinglePlayerSelectorArgument}
+     */
     public static <C> @NonNull SinglePlayerSelectorArgument<C> of(final @NonNull String name) {
         return SinglePlayerSelectorArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link SinglePlayerSelectorArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link SinglePlayerSelectorArgument}
+     */
+    public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(final @NonNull String name) {
+        return SinglePlayerSelectorArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link SinglePlayerSelector}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, SinglePlayerSelector> {
 
-        final ArgumentParser<C, EntitySelector> nativeParser = new WrappedBrigadierParser<>(EntityArgument.player());
+        private final ArgumentParser<C, EntitySelector> nativeParser = new WrappedBrigadierParser<>(EntityArgument.player());
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull SinglePlayerSelector> parse(
@@ -115,6 +146,11 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
 
     }
 
+    /**
+     * Builder for {@link SinglePlayerSelectorArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, SinglePlayerSelector, Builder<C>> {
 
         Builder(final @NonNull String name) {

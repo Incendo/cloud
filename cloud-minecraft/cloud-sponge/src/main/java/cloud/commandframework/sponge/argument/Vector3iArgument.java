@@ -45,6 +45,19 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument for parsing {@link Vector3i} from relative, absolute, or local coordinates.
+ *
+ * <p>Example input strings:</p>
+ * <ul>
+ *     <li>{@code ~ ~ ~}</li>
+ *     <li>{@code 1 1 1}</li>
+ *     <li>{@code ~0.5 ~-2 ~10}</li>
+ *     <li>{@code ^1 ^ ^-5}</li>
+ * </ul>
+ *
+ * @param <C> sender type
+ */
 public final class Vector3iArgument<C> extends CommandArgument<C, Vector3i> {
 
     private Vector3iArgument(
@@ -66,6 +79,17 @@ public final class Vector3iArgument<C> extends CommandArgument<C, Vector3i> {
     }
 
     /**
+     * Create a new required {@link Vector3iArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Vector3iArgument}
+     */
+    public static <C> @NonNull Vector3iArgument<C> of(final @NonNull String name) {
+        return Vector3iArgument.<C>builder(name).build();
+    }
+
+    /**
      * Create a new optional {@link Vector3iArgument}.
      *
      * @param name argument name
@@ -77,14 +101,15 @@ public final class Vector3iArgument<C> extends CommandArgument<C, Vector3i> {
     }
 
     /**
-     * Create a new required {@link Vector3iArgument}.
+     * Create a new optional {@link Vector3iArgument} with the specified default value.
      *
-     * @param name argument name
-     * @param <C>  sender type
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
      * @return a new {@link Vector3iArgument}
      */
-    public static <C> @NonNull Vector3iArgument<C> of(final @NonNull String name) {
-        return Vector3iArgument.<C>builder(name).build();
+    public static <C> @NonNull Vector3iArgument<C> optional(final @NonNull String name, final @NonNull Vector3i defaultValue) {
+        return Vector3iArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
@@ -98,6 +123,11 @@ public final class Vector3iArgument<C> extends CommandArgument<C, Vector3i> {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link Vector3i}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Vector3i> {
 
         private final ArgumentParser<C, Vector3i> mappedParser =
@@ -123,6 +153,11 @@ public final class Vector3iArgument<C> extends CommandArgument<C, Vector3i> {
 
     }
 
+    /**
+     * Builder for {@link Vector3iArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, Vector3i, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -137,6 +172,19 @@ public final class Vector3iArgument<C> extends CommandArgument<C, Vector3i> {
                     this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
+            );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vector3i defaultValue) {
+            return this.asOptionalWithDefault(
+                    String.format("%s %s %s", defaultValue.getX(), defaultValue.getY(), defaultValue.getZ())
             );
         }
 

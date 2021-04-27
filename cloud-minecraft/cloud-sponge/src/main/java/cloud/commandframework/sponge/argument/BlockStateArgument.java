@@ -34,13 +34,30 @@ import net.minecraft.commands.arguments.blocks.BlockInput;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.registry.DefaultedRegistryReference;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.schematic.PaletteTypes;
 
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * An argument for parsing {@link BlockState BlockStates} from a {@link BlockType} identifier
+ * and optional extra properties.
+ *
+ * <p>Example input strings:</p>
+ * <ul>
+ *     <li>{@code stone}</li>
+ *     <li>{@code minecraft:stone}</li>
+ *     <li>{@code andesite_stairs[waterlogged=true,facing=east]}</li>
+ * </ul>
+ *
+ * @param <C> sender type
+ */
 public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> {
 
     private BlockStateArgument(
@@ -61,18 +78,89 @@ public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> 
         );
     }
 
-    public static <C> @NonNull BlockStateArgument<C> optional(final @NonNull String name) {
-        return BlockStateArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link BlockStateArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link BlockStateArgument}
+     */
     public static <C> @NonNull BlockStateArgument<C> of(final @NonNull String name) {
         return BlockStateArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link BlockStateArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link BlockStateArgument}
+     */
+    public static <C> @NonNull BlockStateArgument<C> optional(final @NonNull String name) {
+        return BlockStateArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new optional {@link BlockStateArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link BlockStateArgument}
+     */
+    public static <C> @NonNull BlockStateArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull BlockState defaultValue
+    ) {
+        return BlockStateArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new optional {@link BlockStateArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link BlockStateArgument}
+     */
+    public static <C> @NonNull BlockStateArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull BlockType defaultValue
+    ) {
+        return BlockStateArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new optional {@link BlockStateArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link BlockStateArgument}
+     */
+    public static <C> @NonNull BlockStateArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull DefaultedRegistryReference<BlockType> defaultValue
+    ) {
+        return BlockStateArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link BlockState BlockStates}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, BlockState> {
 
         private final ArgumentParser<C, BlockState> mappedParser =
@@ -94,6 +182,11 @@ public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> 
 
     }
 
+    /**
+     * Builder for {@link BlockStateArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, BlockState, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -109,6 +202,40 @@ public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> 
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull BlockState defaultValue) {
+            return this.asOptionalWithDefault(PaletteTypes.BLOCK_STATE_PALETTE.get().stringifier()
+                    .apply(RegistryTypes.BLOCK_TYPE.get(), defaultValue));
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull BlockType defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.defaultState());
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull DefaultedRegistryReference<BlockType> defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.get());
         }
 
     }

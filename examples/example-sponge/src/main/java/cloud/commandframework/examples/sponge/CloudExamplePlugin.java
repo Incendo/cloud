@@ -83,6 +83,7 @@ import org.spongepowered.api.registry.RegistryHolder;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.world.biome.Biome;
+import org.spongepowered.api.world.schematic.PaletteTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
@@ -374,6 +375,15 @@ public final class CloudExamplePlugin {
                     } else {
                         ctx.getSender().audience().sendMessage(text("no location!"));
                     }
+                }));
+        this.commandManager.command(cloud.literal("blockstate")
+                .argument(BlockStateArgument.of("blockstate"))
+                .handler(ctx -> {
+                    final BlockState blockState = ctx.get("blockstate");
+                    ctx.getSender().audience().sendMessage(text(
+                            PaletteTypes.BLOCK_STATE_PALETTE.get().stringifier()
+                                    .apply(RegistryTypes.BLOCK_TYPE.get(), blockState)
+                    ));
                 }));
     }
 

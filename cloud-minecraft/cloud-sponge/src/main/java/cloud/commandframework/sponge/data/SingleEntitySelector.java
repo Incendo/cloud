@@ -26,8 +26,8 @@ package cloud.commandframework.sponge.data;
 import org.spongepowered.api.entity.Entity;
 
 /**
- * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may select {@code 1} or {@code 0}
- * {@link Entity Entities}.
+ * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which
+ * may select a single {@link Entity}.
  */
 public interface SingleEntitySelector extends SelectorWrapper.Single<Entity> {
 

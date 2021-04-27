@@ -26,8 +26,7 @@ package cloud.commandframework.sponge.data;
 import org.spongepowered.api.entity.living.player.Player;
 
 /**
- * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may select {@code 1} or {@code 0}
- * {@link Player Players}.
+ * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may select a single {@link Player}.
  */
 public interface SinglePlayerSelector extends SelectorWrapper.Single<Player> {
 

@@ -37,6 +37,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.WorldManager;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -46,6 +47,11 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Argument for retrieving {@link ServerWorld ServerWorlds} from the {@link WorldManager} by their {@link ResourceKey}.
+ *
+ * @param <C> sender type
+ */
 public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
 
     private WorldArgument(
@@ -66,18 +72,56 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
         );
     }
 
-    public static <C> @NonNull WorldArgument<C> optional(final @NonNull String name) {
-        return WorldArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link WorldArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link WorldArgument}
+     */
     public static <C> @NonNull WorldArgument<C> of(final @NonNull String name) {
         return WorldArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link WorldArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link WorldArgument}
+     */
+    public static <C> @NonNull WorldArgument<C> optional(final @NonNull String name) {
+        return WorldArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new optional {@link WorldArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link WorldArgument}
+     */
+    public static <C> @NonNull WorldArgument<C> optional(final @NonNull String name, final @NonNull ResourceKey defaultValue) {
+        return WorldArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link ServerWorld ServerWorlds} in the {@link WorldManager}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, ServerWorld> {
 
         private static final DynamicCommandExceptionType ERROR_INVALID_VALUE;
@@ -132,6 +176,11 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
 
     }
 
+    /**
+     * Builder for {@link WorldArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, ServerWorld, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -150,7 +199,7 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
         }
 
         /**
-         * Sets the command argument to be optional, with the provided default value.
+         * Sets the command argument to be optional, with the specified default value.
          *
          * @param defaultValue default value
          * @return this builder

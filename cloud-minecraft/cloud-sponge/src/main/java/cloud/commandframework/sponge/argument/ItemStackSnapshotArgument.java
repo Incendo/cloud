@@ -37,13 +37,30 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.registry.DefaultedRegistryReference;
 
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * An argument for parsing {@link ItemStackSnapshot ItemStackSnapshots} from a {@link ItemType} identifier
+ * and optional NBT data.
+ *
+ * <p>Resulting snapshots will always have a stack size of {@code 1}.</p>
+ *
+ * <p>Example input strings:</p>
+ * <ul>
+ *     <li>{@code apple}</li>
+ *     <li>{@code minecraft:apple}</li>
+ *     <li>{@code diamond_sword{Enchantments:[{id:sharpness,lvl:5}]}}</li>
+ * </ul>
+ *
+ * @param <C> sender type
+ */
 public final class ItemStackSnapshotArgument<C> extends CommandArgument<C, ItemStackSnapshot> {
 
     private ItemStackSnapshotArgument(
@@ -64,18 +81,105 @@ public final class ItemStackSnapshotArgument<C> extends CommandArgument<C, ItemS
         );
     }
 
-    public static <C> @NonNull ItemStackSnapshotArgument<C> optional(final @NonNull String name) {
-        return ItemStackSnapshotArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link ItemStackSnapshotArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link ItemStackSnapshotArgument}
+     */
     public static <C> @NonNull ItemStackSnapshotArgument<C> of(final @NonNull String name) {
         return ItemStackSnapshotArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link ItemStackSnapshotArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link ItemStackSnapshotArgument}
+     */
+    public static <C> @NonNull ItemStackSnapshotArgument<C> optional(final @NonNull String name) {
+        return ItemStackSnapshotArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new optional {@link ItemStackSnapshotArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link ItemStackSnapshotArgument}
+     */
+    public static <C> @NonNull ItemStackSnapshotArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull ItemStackSnapshot defaultValue
+    ) {
+        return ItemStackSnapshotArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new optional {@link ItemStackSnapshotArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link ItemStackSnapshotArgument}
+     */
+    public static <C> @NonNull ItemStackSnapshotArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull ItemStack defaultValue
+    ) {
+        return ItemStackSnapshotArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new optional {@link ItemStackSnapshotArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link ItemStackSnapshotArgument}
+     */
+    public static <C> @NonNull ItemStackSnapshotArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull ItemType defaultValue
+    ) {
+        return ItemStackSnapshotArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new optional {@link ItemStackSnapshotArgument} with the specified default value.
+     *
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
+     * @return a new {@link ItemStackSnapshotArgument}
+     */
+    public static <C> @NonNull ItemStackSnapshotArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull DefaultedRegistryReference<ItemType> defaultValue
+    ) {
+        return ItemStackSnapshotArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link ItemStackSnapshot ItemStackSnapshots} from an {@link ItemType} identifier and
+     * optional NBT data. The stack size of the resulting snapshot will always be {@code 1}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, ItemStackSnapshot> {
 
         private final ArgumentParser<C, ItemStackSnapshot> mappedParser =
@@ -104,6 +208,11 @@ public final class ItemStackSnapshotArgument<C> extends CommandArgument<C, ItemS
 
     }
 
+    /**
+     * Builder for {@link ItemStackSnapshotArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, ItemStackSnapshot, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -119,6 +228,52 @@ public final class ItemStackSnapshotArgument<C> extends CommandArgument<C, ItemS
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ItemType defaultValue) {
+            return this.asOptionalWithDefault(ItemStack.of(defaultValue));
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull DefaultedRegistryReference<ItemType> defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.get());
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ItemStackSnapshot defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.createStack());
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        @SuppressWarnings("ConstantConditions")
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ItemStack defaultValue) {
+            final net.minecraft.world.item.ItemStack stack = (net.minecraft.world.item.ItemStack) (Object) defaultValue;
+            return this.asOptionalWithDefault(new ItemInput(stack.getItem(), stack.getTag()).serialize());
         }
 
     }

@@ -69,7 +69,7 @@ public abstract class VectorArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * Parent class for Vector argument type builders.
+     * Parent of {@link Vector3dArgument.Builder} and {@link Vector2dArgument.Builder}.
      *
      * <p>Not for extension by API users.</p>
      *

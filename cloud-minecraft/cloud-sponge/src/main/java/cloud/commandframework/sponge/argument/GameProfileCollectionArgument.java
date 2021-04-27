@@ -38,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.common.profile.SpongeGameProfile;
 
@@ -48,6 +49,12 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+/**
+ * Argument for parsing a {@link Collection} of {@link GameProfile GameProfiles} from a
+ * {@link Selector}. A successfully parsed result will contain at least one element.
+ *
+ * @param <C> sender type
+ */
 public final class GameProfileCollectionArgument<C> extends CommandArgument<C, GameProfileCollection> {
 
     private GameProfileCollectionArgument(
@@ -68,18 +75,45 @@ public final class GameProfileCollectionArgument<C> extends CommandArgument<C, G
         );
     }
 
-    public static <C> @NonNull GameProfileCollectionArgument<C> optional(final @NonNull String name) {
-        return GameProfileCollectionArgument.<C>builder(name).asOptional().build();
-    }
-
+    /**
+     * Create a new required {@link GameProfileArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link GameProfileArgument}
+     */
     public static <C> @NonNull GameProfileCollectionArgument<C> of(final @NonNull String name) {
         return GameProfileCollectionArgument.<C>builder(name).build();
     }
 
+    /**
+     * Create a new optional {@link GameProfileArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link GameProfileArgument}
+     */
+    public static <C> @NonNull GameProfileCollectionArgument<C> optional(final @NonNull String name) {
+        return GameProfileCollectionArgument.<C>builder(name).asOptional().build();
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Builder}
+     */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for a {@link Collection} of {@link GameProfile GameProfiles}. A successfully parsed result will
+     * contain at least one element.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, GameProfileCollection> {
 
         private final ArgumentParser<C, GameProfileCollection> mappedParser =
@@ -119,6 +153,11 @@ public final class GameProfileCollectionArgument<C> extends CommandArgument<C, G
 
     }
 
+    /**
+     * Builder for {@link GameProfileCollectionArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, GameProfileCollection, Builder<C>> {
 
         Builder(final @NonNull String name) {

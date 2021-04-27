@@ -26,7 +26,7 @@ package cloud.commandframework.sponge.data;
 import org.spongepowered.api.entity.Entity;
 
 /**
- * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may only select any number of
+ * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may select one or more
  * {@link org.spongepowered.api.entity.Entity Entities}.
  */
 public interface MultipleEntitySelector extends SelectorWrapper<Entity> {

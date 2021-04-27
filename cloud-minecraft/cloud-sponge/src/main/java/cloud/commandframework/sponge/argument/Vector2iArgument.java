@@ -45,6 +45,20 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
+/**
+ * Argument for parsing {@link Vector2i} from relative, absolute, or local coordinates.
+ *
+ * <p>Example input strings:</p>
+ * <ul>
+ *     <li>{@code ~ ~}</li>
+ *     <li>{@code 12 -7}</li>
+ *     <li>{@code ^-1 ^0}</li>
+ *     <li>{@code ~-1 ~5}</li>
+ *     <li>{@code ^ ^}</li>
+ * </ul>
+ *
+ * @param <C> sender type
+ */
 public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
 
     private Vector2iArgument(
@@ -66,6 +80,17 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
     }
 
     /**
+     * Create a new required {@link Vector2iArgument}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return a new {@link Vector2iArgument}
+     */
+    public static <C> @NonNull Vector2iArgument<C> of(final @NonNull String name) {
+        return Vector2iArgument.<C>builder(name).build();
+    }
+
+    /**
      * Create a new optional {@link Vector2iArgument}.
      *
      * @param name argument name
@@ -77,14 +102,15 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
     }
 
     /**
-     * Create a new required {@link Vector2iArgument}.
+     * Create a new optional {@link Vector2iArgument} with the specified default value.
      *
-     * @param name argument name
-     * @param <C>  sender type
+     * @param name         argument name
+     * @param defaultValue default value
+     * @param <C>          sender type
      * @return a new {@link Vector2iArgument}
      */
-    public static <C> @NonNull Vector2iArgument<C> of(final @NonNull String name) {
-        return Vector2iArgument.<C>builder(name).build();
+    public static <C> @NonNull Vector2iArgument<C> optional(final @NonNull String name, final @NonNull Vector2i defaultValue) {
+        return Vector2iArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
@@ -98,6 +124,11 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
         return new Builder<>(name);
     }
 
+    /**
+     * Parser for {@link Vector2i}.
+     *
+     * @param <C> sender type
+     */
     public static final class Parser<C> implements NodeSupplyingArgumentParser<C, Vector2i> {
 
         private final ArgumentParser<C, Vector2i> mappedParser =
@@ -124,6 +155,11 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
 
     }
 
+    /**
+     * Builder for {@link Vector2iArgument}.
+     *
+     * @param <C> sender type
+     */
     public static final class Builder<C> extends TypedBuilder<C, Vector2i, Builder<C>> {
 
         Builder(final @NonNull String name) {
@@ -138,6 +174,19 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
                     this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
+            );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vector2i defaultValue) {
+            return this.asOptionalWithDefault(
+                    String.format("%s %s", defaultValue.getX(), defaultValue.getY())
             );
         }
 

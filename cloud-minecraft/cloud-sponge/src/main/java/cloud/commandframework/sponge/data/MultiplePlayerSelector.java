@@ -26,7 +26,8 @@ package cloud.commandframework.sponge.data;
 import org.spongepowered.api.entity.living.player.Player;
 
 /**
- * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may only select {@link Player Players}.
+ * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may
+ * select one or more {@link Player Players}.
  */
 public interface MultiplePlayerSelector extends SelectorWrapper<Player> {
 
