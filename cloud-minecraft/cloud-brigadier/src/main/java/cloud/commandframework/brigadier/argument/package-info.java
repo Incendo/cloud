@@ -21,7 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-
 /**
  * Support for wrapping brigadier {@link com.mojang.brigadier.arguments.ArgumentType ArgumentTypes}
  * as Cloud {@link cloud.commandframework.arguments.parser.ArgumentParser}.

@@ -1,9 +1,8 @@
 pluginManagement {
     repositories {
-        maven("https://maven.fabricmc.net") {
-            name = "fabric"
-        }
         gradlePluginPortal()
+        maven("https://maven.fabricmc.net")
+        maven("https://repo.incendo.org/content/repositories/snapshots") // todo: temp for licenser snapshots
     }
 }
 
