@@ -1,5 +1,9 @@
 import de.marcphilipp.gradle.nexus.NexusPublishExtension
+import net.kyori.indra.IndraLicenseHeaderPlugin
+import net.kyori.indra.IndraCheckstylePlugin
 import net.kyori.indra.IndraExtension
+import net.kyori.indra.IndraPlugin
+import net.kyori.indra.sonatype.IndraSonatypePublishingPlugin
 import net.kyori.indra.sonatypeSnapshots
 import net.ltgt.gradle.errorprone.ErrorPronePlugin
 import net.ltgt.gradle.errorprone.errorprone
@@ -37,10 +41,10 @@ version = "1.5.0-SNAPSHOT"
 description = "Command framework and dispatcher for the JVM"
 
 subprojects {
-    plugins.apply("net.kyori.indra")
-    plugins.apply("net.kyori.indra.checkstyle")
-    plugins.apply("net.kyori.indra.publishing.sonatype")
-    plugins.apply("net.kyori.indra.license-header")
+    apply<IndraPlugin>()
+    apply<IndraCheckstylePlugin>()
+    apply<IndraSonatypePublishingPlugin>()
+    apply<IndraLicenseHeaderPlugin>()
     apply<ErrorPronePlugin>()
 
     extensions.configure(IndraExtension::class) {
