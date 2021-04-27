@@ -8,7 +8,7 @@ object Versions {
 
     // DISCORD DEPENDENCIES
     const val javacord = "3.1.1"
-    const val jda = "4.2.0_209"
+    const val jda = "4.2.1_257"
 
     // MINECRAFT DEPENDENCIES
     const val brigadier = "1.0.17"
