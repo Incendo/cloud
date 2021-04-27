@@ -30,7 +30,6 @@ import com.google.inject.Key;
 import com.google.inject.util.Types;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.service.permission.Subject;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
@@ -91,21 +90,22 @@ public final class CloudInjectionModule<C> extends AbstractModule {
     protected void configure() {
         final Type commandTreeType = Types.newParameterizedType(CommandTree.class, this.commandSenderType);
         final Type commandExecutionCoordinatorType = Types.newParameterizedType(
-                CommandExecutionCoordinator.class,
-                this.commandSenderType
+                CommandExecutionCoordinator.class, this.commandSenderType
         );
-        final Type executorFunction = Types.newParameterizedType(Function.class, commandTreeType,
-                commandExecutionCoordinatorType
+        final Type executorFunction = Types.newParameterizedType(
+                Function.class, commandTreeType, commandExecutionCoordinatorType
         );
         final Key executorFunctionKey = Key.get(executorFunction);
         this.bind(executorFunctionKey).toInstance(this.commandExecutionCoordinator);
-        final Type commandSenderMapperFunction = Types.newParameterizedType(Function.class,
-                this.commandSenderType, Subject.class
+
+        final Type commandSenderMapperFunction = Types.newParameterizedType(
+                Function.class, this.commandSenderType, CommandCause.class
         );
         final Key commandSenderMapperFunctionKey = Key.get(commandSenderMapperFunction);
         this.bind(commandSenderMapperFunctionKey).toInstance(this.causeMapper);
-        final Type backwardsCommandSenderMapperFunction = Types.newParameterizedType(Function.class, CommandCause.class,
-                this.commandSenderType
+
+        final Type backwardsCommandSenderMapperFunction = Types.newParameterizedType(
+                Function.class, CommandCause.class, this.commandSenderType
         );
         final Key backwardsCommandSenderMapperFunctionKey = Key.get(backwardsCommandSenderMapperFunction);
         this.bind(backwardsCommandSenderMapperFunctionKey).toInstance(this.backwardsCauseMapper);
