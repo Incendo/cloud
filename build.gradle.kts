@@ -23,7 +23,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.38.0"
 }
 
-buildGroups("Minecraft", "Discord", "IRC")
+//buildGroups("Minecraft", "Discord", "IRC")
 
 gradle.taskGraph.whenReady {
     gradle.taskGraph.allTasks.forEach {
