@@ -17,7 +17,6 @@ plugins {
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion
     id("net.kyori.indra.license-header") version indraVersion apply false
-    id("org.cadixdev.licenser") version "0.6.0" apply false
     id("com.github.johnrengelman.shadow") version "7.0.0" apply false
     id("net.ltgt.errorprone") version "2.0.1" apply false
     id("com.github.ben-manes.versions") version "0.36.0"
