@@ -1,10 +1,9 @@
-import de.marcphilipp.gradle.nexus.NexusPublishExtension
+import io.github.gradlenexus.publishplugin.NexusPublishExtension
 import net.kyori.indra.IndraLicenseHeaderPlugin
 import net.kyori.indra.IndraCheckstylePlugin
 import net.kyori.indra.IndraExtension
 import net.kyori.indra.IndraPlugin
-import net.kyori.indra.sonatype.IndraSonatypePublishingPlugin
-import net.kyori.indra.sonatypeSnapshots
+import net.kyori.indra.repository.sonatypeSnapshots
 import net.ltgt.gradle.errorprone.ErrorPronePlugin
 import net.ltgt.gradle.errorprone.errorprone
 import org.cadixdev.gradle.licenser.LicenseExtension
@@ -13,12 +12,12 @@ import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME
 
 plugins {
-    val indraVersion = "1.3.1"
+    val indraVersion = "2.0.0-SNAPSHOT"
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
-    id("net.kyori.indra.publishing.sonatype") version indraVersion apply false
+    id("net.kyori.indra.publishing.sonatype") version indraVersion
     id("net.kyori.indra.license-header") version indraVersion apply false
-    id("org.cadixdev.licenser") version "0.6.0-SNAPSHOT" apply false
+    id("org.cadixdev.licenser") version "0.6.0" apply false
     id("com.github.johnrengelman.shadow") version "7.0.0" apply false
     id("net.ltgt.errorprone") version "2.0.1" apply false
     id("com.github.ben-manes.versions") version "0.38.0"
@@ -40,23 +39,31 @@ group = "cloud.commandframework"
 version = "1.5.0-SNAPSHOT"
 description = "Command framework and dispatcher for the JVM"
 
+extensions.configure<NexusPublishExtension> {
+    repositories.create("incendoSnapshots") {
+        snapshotRepositoryUrl.set(uri("https://repo.incendo.org/content/repositories/snapshots/"))
+        username.set(System.getenv("SNAPSHOT_PUBLISHING_USERNAME"))
+        password.set(System.getenv("SNAPSHOT_PUBLISHING_PASSWORD"))
+    }
+}
+
 subprojects {
     apply<IndraPlugin>()
     apply<IndraCheckstylePlugin>()
-    apply<IndraSonatypePublishingPlugin>()
     apply<IndraLicenseHeaderPlugin>()
     apply<ErrorPronePlugin>()
 
     extensions.configure(IndraExtension::class) {
         github("Incendo", "cloud") {
-            ci = true
+            ci(true)
         }
         mitLicense()
 
         javaVersions {
             testWith(8, 11, 15)
         }
-        checkstyle.set("8.39")
+
+        checkstyle("8.39")
 
         configurePublications {
             pom {
@@ -69,14 +76,6 @@ subprojects {
                     }
                 }
             }
-        }
-    }
-
-    extensions.configure<NexusPublishExtension> {
-        repositories.create("incendoSnapshots") {
-            snapshotRepositoryUrl.set(uri("https://repo.incendo.org/content/repositories/snapshots/"))
-            username.set(System.getenv("SNAPSHOT_PUBLISHING_USERNAME"))
-            password.set(System.getenv("SNAPSHOT_PUBLISHING_PASSWORD"))
         }
     }
 
@@ -101,7 +100,7 @@ subprojects {
     }
 
     extensions.configure<LicenseExtension> {
-        header = rootProject.file("HEADER")
+        header(rootProject.file("HEADER"))
         style["java"] = HeaderStyle.DOUBLE_SLASH.format
         style["kt"] = HeaderStyle.DOUBLE_SLASH.format
     }

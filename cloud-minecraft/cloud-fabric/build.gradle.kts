@@ -75,7 +75,8 @@ dependencies {
 }
 
 indra {
-    includeJavaSoftwareComponentInPublications.set(false)
+// TODO: RE-ADD
+//    includeJavaSoftwareComponentInPublications.set(false)
     configurePublications {
         // add all the jars that should be included when publishing to maven
         artifact(tasks.remapJar) {
