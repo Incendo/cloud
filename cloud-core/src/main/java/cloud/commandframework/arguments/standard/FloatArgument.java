@@ -59,7 +59,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
@@ -70,7 +70,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     }
 
     /**
-     * Create a new required command argument
+     * Create a new required {@link FloatArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -81,7 +81,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link FloatArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -92,7 +92,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     }
 
     /**
-     * Create a new required command argument with a default value
+     * Create a new optional {@link FloatArgument} with the specified default value.
      *
      * @param name       Argument name
      * @param defaultNum Default num
@@ -103,7 +103,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
             final @NonNull String name,
             final float defaultNum
     ) {
-        return FloatArgument.<C>newBuilder(name).asOptionalWithDefault(Float.toString(defaultNum)).build();
+        return FloatArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**
@@ -126,8 +126,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Float> {
 
-        private float min = Float.NEGATIVE_INFINITY;
-        private float max = Float.POSITIVE_INFINITY;
+        private float min = FloatParser.DEFAULT_MINIMUM;
+        private float max = FloatParser.DEFAULT_MAXIMUM;
 
         private Builder(final @NonNull String name) {
             super(Float.class, name);
@@ -156,10 +156,17 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         }
 
         /**
-         * Builder a new float argument
+         * Sets the command argument to be optional, with the specified default value.
          *
-         * @return Constructed argument
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
          */
+        public @NonNull Builder<C> asOptionalWithDefault(final float defaultValue) {
+            return (Builder<C>) this.asOptionalWithDefault(Float.toString(defaultValue));
+        }
+
         @Override
         public @NonNull FloatArgument<C> build() {
             return new FloatArgument<>(this.isRequired(), this.getName(), this.min, this.max,
@@ -170,6 +177,20 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     }
 
     public static final class FloatParser<C> implements ArgumentParser<C, Float> {
+
+        /**
+         * Constant for the default/unset minimum value.
+         *
+         * @since 1.5.0
+         */
+        public static final float DEFAULT_MINIMUM = Float.NEGATIVE_INFINITY;
+
+        /**
+         * Constant for the default/unset maximum value.
+         *
+         * @since 1.5.0
+         */
+        public static final float DEFAULT_MAXIMUM = Float.POSITIVE_INFINITY;
 
         private final float min;
         private final float max;
@@ -192,30 +213,17 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        FloatParser.class,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new NoInputProvidedException(FloatParser.class, commandContext));
             }
             try {
                 final float value = Float.parseFloat(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new FloatParseException(
-                            input,
-                            this.min,
-                            this.max,
-                            commandContext
-                    ));
+                    return ArgumentParseResult.failure(new FloatParseException(input, this, commandContext));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new FloatParseException(
-                        input,
-                        this.min,
-                        this.max,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new FloatParseException(input, this, commandContext));
             }
         }
 
@@ -242,12 +250,36 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
             return this.min;
         }
 
+        /**
+         * Get whether this parser has a maximum set.
+         * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMax() {
+            return this.max != DEFAULT_MAXIMUM;
+        }
+
+        /**
+         * Get whether this parser has a minimum set.
+         * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMin() {
+            return this.min != DEFAULT_MINIMUM;
+        }
+
     }
 
 
     public static final class FloatParseException extends NumberParseException {
 
         private static final long serialVersionUID = -1162983846751812292L;
+
+        private final FloatParser<?> parser;
 
         /**
          * Construct a new float parse exception
@@ -256,30 +288,43 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          * @param min            Minimum value
          * @param max            Maximum value
          * @param commandContext Command context
+         * @deprecated use {@link #FloatParseException(String, FloatParser, CommandContext)} instead
          */
+        @Deprecated
         public FloatParseException(
                 final @NonNull String input,
                 final float min,
                 final float max,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(
-                    input,
-                    min,
-                    max,
-                    FloatParser.class,
-                    commandContext
-            );
+            this(input, new FloatParser<>(min, max), commandContext);
+        }
+
+        /**
+         * Create a new {@link FloatParseException}.
+         *
+         * @param input          input string
+         * @param parser         float parser
+         * @param commandContext command context
+         * @since 1.5.0
+         */
+        public FloatParseException(
+                final @NonNull String input,
+                final @NonNull FloatParser<?> parser,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(input, parser.min, parser.max, FloatParser.class, commandContext);
+            this.parser = parser;
         }
 
         @Override
         public boolean hasMin() {
-            return this.getMin().floatValue() != Float.MIN_VALUE;
+            return this.parser.hasMin();
         }
 
         @Override
         public boolean hasMax() {
-            return this.getMax().floatValue() != Float.MAX_VALUE;
+            return this.parser.hasMax();
         }
 
         @Override

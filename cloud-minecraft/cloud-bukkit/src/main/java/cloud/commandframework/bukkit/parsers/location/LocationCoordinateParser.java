@@ -71,14 +71,14 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
         try {
             coordinate = input.isEmpty() ? 0 : Double.parseDouble(input);
         } catch (final Exception e) {
-            return ArgumentParseResult.failure(
-                    new DoubleArgument.DoubleParseException(
-                            input,
-                            Double.NEGATIVE_INFINITY,
-                            Double.POSITIVE_INFINITY,
-                            commandContext
-                    )
-            );
+            return ArgumentParseResult.failure(new DoubleArgument.DoubleParseException(
+                    input,
+                    new DoubleArgument.DoubleParser<>(
+                            DoubleArgument.DoubleParser.DEFAULT_MINIMUM,
+                            DoubleArgument.DoubleParser.DEFAULT_MAXIMUM
+                    ),
+                    commandContext
+            ));
         }
 
         inputQueue.remove();

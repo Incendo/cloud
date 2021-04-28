@@ -59,7 +59,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
@@ -70,7 +70,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     }
 
     /**
-     * Create a new required command argument
+     * Create a new required {@link ByteArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -81,7 +81,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link ByteArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -92,7 +92,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     }
 
     /**
-     * Create a new required command argument with a default value
+     * Create a new optional {@link ByteArgument} with the specified default value.
      *
      * @param name       Argument name
      * @param defaultNum Default num
@@ -103,7 +103,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
             final @NonNull String name,
             final byte defaultNum
     ) {
-        return ByteArgument.<C>newBuilder(name).asOptionalWithDefault(Byte.toString(defaultNum)).build();
+        return ByteArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**
@@ -126,8 +126,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Byte> {
 
-        private byte min = Byte.MIN_VALUE;
-        private byte max = Byte.MAX_VALUE;
+        private byte min = ByteParser.DEFAULT_MINIMUM;
+        private byte max = ByteParser.DEFAULT_MAXIMUM;
 
         private Builder(final @NonNull String name) {
             super(Byte.class, name);
@@ -156,6 +156,18 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         }
 
         /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final byte defaultValue) {
+            return (Builder<C>) this.asOptionalWithDefault(Byte.toString(defaultValue));
+        }
+
+        /**
          * Builder a new byte argument
          *
          * @return Constructed argument
@@ -170,6 +182,20 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     }
 
     public static final class ByteParser<C> implements ArgumentParser<C, Byte> {
+
+        /**
+         * Constant for the default/unset minimum value.
+         *
+         * @since 1.5.0
+         */
+        public static final byte DEFAULT_MINIMUM = Byte.MIN_VALUE;
+
+        /**
+         * Constant for the default/unset maximum value.
+         *
+         * @since 1.5.0
+         */
+        public static final byte DEFAULT_MAXIMUM = Byte.MAX_VALUE;
 
         private final byte min;
         private final byte max;
@@ -192,32 +218,17 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        ByteParser.class,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new NoInputProvidedException(ByteParser.class, commandContext));
             }
             try {
                 final byte value = Byte.parseByte(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(
-                            new ByteParseException(
-                                    input,
-                                    this.min,
-                                    this.max,
-                                    commandContext
-                            ));
+                    return ArgumentParseResult.failure(new ByteParseException(input, this, commandContext));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(
-                        new ByteParseException(
-                                input,
-                                this.min,
-                                this.max,
-                                commandContext
-                        ));
+                return ArgumentParseResult.failure(new ByteParseException(input, this, commandContext));
             }
         }
 
@@ -252,6 +263,28 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
             return this.min;
         }
 
+        /**
+         * Get whether this parser has a maximum set.
+         * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMax() {
+            return this.max != DEFAULT_MAXIMUM;
+        }
+
+        /**
+         * Get whether this parser has a minimum set.
+         * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMin() {
+            return this.min != DEFAULT_MINIMUM;
+        }
+
     }
 
 
@@ -262,6 +295,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
 
         private static final long serialVersionUID = -4724241304872989208L;
 
+        private final ByteParser<?> parser;
+
         /**
          * Construct a new byte parse exception
          *
@@ -269,30 +304,43 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @param min     Minimum value
          * @param max     Maximum value
          * @param context Command context
+         * @deprecated use {@link #ByteParseException(String, ByteParser, CommandContext)} instead
          */
+        @Deprecated
         public ByteParseException(
                 final @NonNull String input,
                 final byte min,
                 final byte max,
                 final @NonNull CommandContext<?> context
         ) {
-            super(
-                    input,
-                    min,
-                    max,
-                    ByteParser.class,
-                    context
-            );
+            this(input, new ByteParser<>(min, max), context);
+        }
+
+        /**
+         * Create a new {@link ByteParseException}.
+         *
+         * @param input   input string
+         * @param parser  byte parser
+         * @param context command context
+         * @since 1.5.0
+         */
+        public ByteParseException(
+                final @NonNull String input,
+                final @NonNull ByteParser<?> parser,
+                final @NonNull CommandContext<?> context
+        ) {
+            super(input, parser.min, parser.max, ByteParser.class, context);
+            this.parser = parser;
         }
 
         @Override
         public boolean hasMin() {
-            return this.getMin().byteValue() != Byte.MIN_VALUE;
+            return this.parser.hasMin();
         }
 
         @Override
         public boolean hasMax() {
-            return this.getMax().byteValue() != Byte.MAX_VALUE;
+            return this.parser.hasMax();
         }
 
         @Override
