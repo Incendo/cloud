@@ -29,7 +29,7 @@ import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
-import cloud.commandframework.sponge.annotations.specifier.Center;
+import cloud.commandframework.sponge.annotation.specifier.Center;
 import cloud.commandframework.sponge.argument.BlockStateArgument;
 import cloud.commandframework.sponge.argument.ComponentArgument;
 import cloud.commandframework.sponge.argument.DataContainerArgument;

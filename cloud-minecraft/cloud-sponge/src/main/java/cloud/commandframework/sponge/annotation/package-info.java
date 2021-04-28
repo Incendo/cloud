@@ -24,4 +24,4 @@
 /**
  * Annotations for cloud-sponge.
  */
-package cloud.commandframework.sponge.annotations;
+package cloud.commandframework.sponge.annotation;

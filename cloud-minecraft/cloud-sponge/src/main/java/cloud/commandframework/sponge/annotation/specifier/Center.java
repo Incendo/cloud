@@ -21,7 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
+package cloud.commandframework.sponge.annotation.specifier;
+
+import cloud.commandframework.sponge.argument.Vector2dArgument;
+import cloud.commandframework.sponge.argument.Vector3dArgument;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * Specifier annotations for cloud-sponge.
+ * Annotation used to enable coordinate centering for {@link Vector3dArgument} and {@link Vector2dArgument}.
  */
-package cloud.commandframework.sponge.annotations.specifier;
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Center {
+
+}

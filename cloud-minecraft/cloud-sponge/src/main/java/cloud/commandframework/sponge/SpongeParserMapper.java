@@ -26,11 +26,13 @@ package cloud.commandframework.sponge;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.MappedArgumentParser;
 import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.ByteArgument;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
@@ -74,8 +76,11 @@ public final class SpongeParserMapper<C> {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> toSponge(final CommandArgument<C, ?> value) {
+        ArgumentParser<C, ?> parser = value.getParser();
+        while (parser instanceof MappedArgumentParser<?, ?, ?>) {
+            parser = ((MappedArgumentParser<C, ?, ?>) parser).getBaseParser();
+        }
         final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> result;
-        final ArgumentParser<C, ?> parser = value.getParser();
         final Mapping<C, ?> mapper = this.mappers.get(parser.getClass());
         if (mapper != null) {
             final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> apply =
@@ -127,12 +132,10 @@ public final class SpongeParserMapper<C> {
         this.registerMapping(new TypeToken<IntegerArgument.IntegerParser<C>>() {
         }, builder -> builder.to(integerParser -> {
             final CommandTreeNode.Range<Integer> node = ClientCompletionKeys.INTEGER.get().createNode();
-            final boolean hasMin = integerParser.getMin() != Integer.MIN_VALUE;
-            final boolean hasMax = integerParser.getMax() != Integer.MAX_VALUE;
-            if (hasMin) {
+            if (integerParser.hasMin()) {
                 node.min(integerParser.getMin());
             }
-            if (hasMax) {
+            if (integerParser.hasMax()) {
                 node.max(integerParser.getMax());
             }
             return node;
@@ -140,12 +143,10 @@ public final class SpongeParserMapper<C> {
         this.registerMapping(new TypeToken<FloatArgument.FloatParser<C>>() {
         }, builder -> builder.to(floatParser -> {
             final CommandTreeNode.Range<Float> node = ClientCompletionKeys.FLOAT.get().createNode();
-            final boolean hasMin = floatParser.getMin() != Float.NEGATIVE_INFINITY;
-            final boolean hasMax = floatParser.getMax() != Float.POSITIVE_INFINITY;
-            if (hasMin) {
+            if (floatParser.hasMin()) {
                 node.min(floatParser.getMin());
             }
-            if (hasMax) {
+            if (floatParser.hasMax()) {
                 node.max(floatParser.getMax());
             }
             return node;
@@ -153,13 +154,22 @@ public final class SpongeParserMapper<C> {
         this.registerMapping(new TypeToken<DoubleArgument.DoubleParser<C>>() {
         }, builder -> builder.to(doubleParser -> {
             final CommandTreeNode.Range<Double> node = ClientCompletionKeys.DOUBLE.get().createNode();
-            final boolean hasMin = doubleParser.getMin() != Double.NEGATIVE_INFINITY;
-            final boolean hasMax = doubleParser.getMax() != Double.POSITIVE_INFINITY;
-            if (hasMin) {
+            if (doubleParser.hasMin()) {
                 node.min(doubleParser.getMin());
             }
-            if (hasMax) {
+            if (doubleParser.hasMax()) {
                 node.max(doubleParser.getMax());
+            }
+            return node;
+        }));
+        this.registerMapping(new TypeToken<LongArgument.LongParser<C>>() {
+        }, builder -> builder.to(longParser -> {
+            final CommandTreeNode.Range<Long> node = ClientCompletionKeys.LONG.get().createNode();
+            if (longParser.hasMin()) {
+                node.min(longParser.getMin());
+            }
+            if (longParser.hasMax()) {
+                node.max(longParser.getMax());
             }
             return node;
         }));
@@ -242,6 +252,8 @@ public final class SpongeParserMapper<C> {
         this.cloudSuggestions(new TypeToken<FloatArgument.FloatParser<C>>() {
         }, cloudNumberSuggestions);
         this.cloudSuggestions(new TypeToken<DoubleArgument.DoubleParser<C>>() {
+        }, cloudNumberSuggestions);
+        this.cloudSuggestions(new TypeToken<LongArgument.LongParser<C>>() {
         }, cloudNumberSuggestions);
     }
 
