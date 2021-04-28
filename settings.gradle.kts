@@ -2,7 +2,7 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven("https://maven.fabricmc.net")
-        maven("https://repo.incendo.org/content/repositories/snapshots") // todo: temp for licenser snapshots
+        maven("https://repo.incendo.org/content/repositories/snapshots") // todo: temp for indra snapshots
     }
 }
 
