@@ -55,18 +55,26 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
             final @NonNull String name,
             final int min,
             final int max,
-            final String defaultValue,
+            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new IntegerParser<>(min, max), defaultValue, Integer.class, suggestionsProvider, defaultDescription);
+        super(
+                required,
+                name,
+                new IntegerParser<>(min, max),
+                defaultValue,
+                Integer.class,
+                suggestionsProvider,
+                defaultDescription
+        );
         this.min = min;
         this.max = max;
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
@@ -77,7 +85,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
     }
 
     /**
-     * Create a new required command argument
+     * Create a new required {@link IntegerArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -88,7 +96,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link IntegerArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -99,18 +107,15 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
     }
 
     /**
-     * Create a new required command argument with a default value
+     * Create a new required {@link IntegerArgument} with the specified default value.
      *
      * @param name       Argument name
-     * @param defaultNum Default num
+     * @param defaultNum Default value
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Integer> optional(
-            final @NonNull String name,
-            final int defaultNum
-    ) {
-        return IntegerArgument.<C>newBuilder(name).asOptionalWithDefault(Integer.toString(defaultNum)).build();
+    public static <C> @NonNull CommandArgument<C, Integer> optional(final @NonNull String name, final int defaultNum) {
+        return IntegerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**
@@ -133,8 +138,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Integer> {
 
-        private int min = Integer.MIN_VALUE;
-        private int max = Integer.MAX_VALUE;
+        private int min = IntegerParser.DEFAULT_MINIMUM;
+        private int max = IntegerParser.DEFAULT_MAXIMUM;
 
         private Builder(final @NonNull String name) {
             super(Integer.class, name);
@@ -163,10 +168,17 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         }
 
         /**
-         * Builder a new integer argument
+         * Sets the command argument to be optional, with the specified default value.
          *
-         * @return Constructed argument
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
          */
+        public @NonNull Builder<C> asOptionalWithDefault(final int defaultValue) {
+            return (Builder<C>) this.asOptionalWithDefault(Integer.toString(defaultValue));
+        }
+
         @Override
         public @NonNull IntegerArgument<C> build() {
             return new IntegerArgument<>(this.isRequired(), this.getName(), this.min, this.max,
@@ -177,6 +189,20 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
     }
 
     public static final class IntegerParser<C> implements ArgumentParser<C, Integer> {
+
+        /**
+         * Constant for the default/unset minimum value.
+         *
+         * @since 1.5.0
+         */
+        public static final int DEFAULT_MINIMUM = Integer.MIN_VALUE;
+
+        /**
+         * Constant for the default/unset maximum value.
+         *
+         * @since 1.5.0
+         */
+        public static final int DEFAULT_MAXIMUM = Integer.MAX_VALUE;
 
         private final int min;
         private final int max;
@@ -242,30 +268,17 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        IntegerParser.class,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new NoInputProvidedException(IntegerParser.class, commandContext));
             }
             try {
                 final int value = Integer.parseInt(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new IntegerParseException(
-                            input,
-                            this.min,
-                            this.max,
-                            commandContext
-                    ));
+                    return ArgumentParseResult.failure(new IntegerParseException(input, this, commandContext));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new IntegerParseException(
-                        input,
-                        this.min,
-                        this.max,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new IntegerParseException(input, this, commandContext));
             }
         }
 
@@ -285,6 +298,28 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          */
         public int getMax() {
             return this.max;
+        }
+
+        /**
+         * Get whether this parser has a maximum set.
+         * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMax() {
+            return this.max != DEFAULT_MAXIMUM;
+        }
+
+        /**
+         * Get whether this parser has a minimum set.
+         * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMin() {
+            return this.min != DEFAULT_MINIMUM;
         }
 
         @Override
@@ -307,6 +342,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
         private static final long serialVersionUID = -6933923056628373853L;
 
+        private final IntegerParser<?> parser;
+
         /**
          * Construct a new integer parse exception
          *
@@ -314,30 +351,43 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          * @param min            Minimum value
          * @param max            Maximum value
          * @param commandContext Command context
+         * @deprecated use {@link #IntegerParseException(String, IntegerParser, CommandContext)} instead
          */
+        @Deprecated
         public IntegerParseException(
                 final @NonNull String input,
                 final int min,
                 final int max,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(
-                    input,
-                    min,
-                    max,
-                    IntegerParser.class,
-                    commandContext
-            );
+            this(input, new IntegerParser<>(min, max), commandContext);
+        }
+
+        /**
+         * Create a new {@link IntegerParseException}.
+         *
+         * @param input          input string
+         * @param parser         integer parser
+         * @param commandContext command context
+         * @since 1.5.0
+         */
+        public IntegerParseException(
+                final @NonNull String input,
+                final @NonNull IntegerParser<?> parser,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(input, parser.min, parser.max, IntegerParser.class, commandContext);
+            this.parser = parser;
         }
 
         @Override
         public boolean hasMin() {
-            return this.getMin().intValue() != Integer.MIN_VALUE;
+            return this.parser.hasMin();
         }
 
         @Override
         public boolean hasMax() {
-            return this.getMax().intValue() != Integer.MAX_VALUE;
+            return this.parser.hasMax();
         }
 
         @Override

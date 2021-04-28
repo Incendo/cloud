@@ -59,7 +59,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
@@ -70,7 +70,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     }
 
     /**
-     * Create a new required command argument
+     * Create a new required {@link LongArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -81,7 +81,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link LongArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -92,7 +92,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     }
 
     /**
-     * Create a new required command argument with a default value
+     * Create a new optional {@link LongArgument} with the specified default value.
      *
      * @param name       Argument name
      * @param defaultNum Default num
@@ -103,7 +103,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
             final @NonNull String name,
             final long defaultNum
     ) {
-        return LongArgument.<C>newBuilder(name).asOptionalWithDefault(Long.toString(defaultNum)).build();
+        return LongArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**
@@ -126,8 +126,8 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Long> {
 
-        private long min = Long.MIN_VALUE;
-        private long max = Long.MAX_VALUE;
+        private long min = LongParser.DEFAULT_MINIMUM;
+        private long max = LongParser.DEFAULT_MAXIMUM;
 
         private Builder(final @NonNull String name) {
             super(Long.class, name);
@@ -156,10 +156,17 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         }
 
         /**
-         * Builder a new long argument
+         * Sets the command argument to be optional, with the specified default value.
          *
-         * @return Constructed argument
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
          */
+        public @NonNull Builder<C> asOptionalWithDefault(final long defaultValue) {
+            return (Builder<C>) this.asOptionalWithDefault(Long.toString(defaultValue));
+        }
+
         @Override
         public @NonNull LongArgument<C> build() {
             return new LongArgument<>(this.isRequired(), this.getName(), this.min,
@@ -170,6 +177,20 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     }
 
     public static final class LongParser<C> implements ArgumentParser<C, Long> {
+
+        /**
+         * Constant for the default/unset minimum value.
+         *
+         * @since 1.5.0
+         */
+        public static final long DEFAULT_MINIMUM = Long.MIN_VALUE;
+
+        /**
+         * Constant for the default/unset maximum value.
+         *
+         * @since 1.5.0
+         */
+        public static final long DEFAULT_MAXIMUM = Long.MAX_VALUE;
 
         private final long min;
         private final long max;
@@ -192,31 +213,58 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        LongParser.class,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new NoInputProvidedException(LongParser.class, commandContext));
             }
             try {
                 final long value = Long.parseLong(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new LongParseException(
-                            input,
-                            this.min,
-                            this.max,
-                            commandContext
-                    ));
+                    return ArgumentParseResult.failure(new LongParseException(input, this, commandContext));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new LongParseException(
-                        input,
-                        this.min,
-                        this.max,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new LongParseException(input, this, commandContext));
             }
+        }
+
+        /**
+         * Get the minimum value accepted by this parser
+         *
+         * @return Min value
+         */
+        public long getMin() {
+            return this.min;
+        }
+
+        /**
+         * Get the maximum value accepted by this parser
+         *
+         * @return Max value
+         */
+        public long getMax() {
+            return this.max;
+        }
+
+        /**
+         * Get whether this parser has a maximum set.
+         * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMax() {
+            return this.max != DEFAULT_MAXIMUM;
+        }
+
+        /**
+         * Get whether this parser has a minimum set.
+         * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMin() {
+            return this.min != DEFAULT_MINIMUM;
         }
 
         @Override
@@ -239,6 +287,8 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
 
         private static final long serialVersionUID = 4366856282301198232L;
 
+        private final LongParser<?> parser;
+
         /**
          * Construct a new long parse exception
          *
@@ -246,30 +296,43 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @param min            Minimum value
          * @param max            Maximum value
          * @param commandContext Command context
+         * @deprecated use {@link #LongParseException(String, LongParser, CommandContext)} instead
          */
+        @Deprecated
         public LongParseException(
                 final @NonNull String input,
                 final long min,
                 final long max,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(
-                    input,
-                    min,
-                    max,
-                    LongParser.class,
-                    commandContext
-            );
+            this(input, new LongParser<>(min, max), commandContext);
+        }
+
+        /**
+         * Create a new {@link LongParseException}.
+         *
+         * @param input          input string
+         * @param parser         long parser
+         * @param commandContext command context
+         * @since 1.5.0
+         */
+        public LongParseException(
+                final @NonNull String input,
+                final @NonNull LongParser<?> parser,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(input, parser.min, parser.max, LongParser.class, commandContext);
+            this.parser = parser;
         }
 
         @Override
         public boolean hasMin() {
-            return this.getMin().longValue() != Long.MIN_VALUE;
+            return this.parser.hasMin();
         }
 
         @Override
         public boolean hasMax() {
-            return this.getMax().longValue() != Long.MAX_VALUE;
+            return this.parser.hasMax();
         }
 
         @Override
