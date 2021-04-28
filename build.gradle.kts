@@ -12,7 +12,7 @@ import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME
 
 plugins {
-    val indraVersion = "2.0.0-SNAPSHOT"
+    val indraVersion = "2.0.0"
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion
