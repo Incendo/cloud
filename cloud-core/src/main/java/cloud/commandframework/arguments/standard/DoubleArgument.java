@@ -59,7 +59,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
@@ -70,7 +70,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     }
 
     /**
-     * Create a new required command argument
+     * Create a new required {@link DoubleArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -81,7 +81,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link DoubleArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -92,7 +92,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     }
 
     /**
-     * Create a new required command argument with a default value
+     * Create a new optional {@link DoubleArgument} with the specified default value.
      *
      * @param name       Argument name
      * @param defaultNum Default num
@@ -103,7 +103,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             final @NonNull String name,
             final double defaultNum
     ) {
-        return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(Double.toString(defaultNum)).build();
+        return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**
@@ -126,8 +126,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Double> {
 
-        private double min = Double.NEGATIVE_INFINITY;
-        private double max = Double.POSITIVE_INFINITY;
+        private double min = DoubleParser.DEFAULT_MINIMUM;
+        private double max = DoubleParser.DEFAULT_MAXIMUM;
 
         private Builder(final @NonNull String name) {
             super(Double.class, name);
@@ -156,6 +156,18 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         }
 
         /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final double defaultValue) {
+            return (Builder<C>) this.asOptionalWithDefault(Double.toString(defaultValue));
+        }
+
+        /**
          * Builder a new double argument
          *
          * @return Constructed argument
@@ -170,6 +182,20 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     }
 
     public static final class DoubleParser<C> implements ArgumentParser<C, Double> {
+
+        /**
+         * Constant for the default/unset minimum value.
+         *
+         * @since 1.5.0
+         */
+        public static final double DEFAULT_MINIMUM = Double.NEGATIVE_INFINITY;
+
+        /**
+         * Constant for the default/unset maximum value.
+         *
+         * @since 1.5.0
+         */
+        public static final double DEFAULT_MAXIMUM = Double.POSITIVE_INFINITY;
 
         private final double min;
         private final double max;
@@ -192,30 +218,17 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        DoubleParser.class,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new NoInputProvidedException(DoubleParser.class, commandContext));
             }
             try {
                 final double value = Double.parseDouble(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new DoubleParseException(
-                            input,
-                            this.min,
-                            this.max,
-                            commandContext
-                    ));
+                    return ArgumentParseResult.failure(new DoubleParseException(input, this, commandContext));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new DoubleParseException(
-                        input,
-                        this.min,
-                        this.max,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new DoubleParseException(input, this, commandContext));
             }
         }
 
@@ -242,12 +255,36 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             return this.min;
         }
 
+        /**
+         * Get whether this parser has a maximum set.
+         * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMax() {
+            return this.max != DEFAULT_MAXIMUM;
+        }
+
+        /**
+         * Get whether this parser has a minimum set.
+         * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMin() {
+            return this.min != DEFAULT_MINIMUM;
+        }
+
     }
 
 
     public static final class DoubleParseException extends NumberParseException {
 
         private static final long serialVersionUID = 1764554911581976586L;
+
+        private final DoubleParser<?> parser;
 
         /**
          * Construct a new double parse exception
@@ -256,30 +293,43 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          * @param min            Minimum value
          * @param max            Maximum value
          * @param commandContext Command context
+         * @deprecated use {@link #DoubleParseException(String, DoubleParser, CommandContext)} instead
          */
+        @Deprecated
         public DoubleParseException(
                 final @NonNull String input,
                 final double min,
                 final double max,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(
-                    input,
-                    min,
-                    max,
-                    DoubleParser.class,
-                    commandContext
-            );
+            this(input, new DoubleParser<>(min, max), commandContext);
+        }
+
+        /**
+         * Create a new {@link DoubleParseException}.
+         *
+         * @param input          input string
+         * @param parser         double parser
+         * @param commandContext command context
+         * @since 1.5.0
+         */
+        public DoubleParseException(
+                final @NonNull String input,
+                final @NonNull DoubleParser<?> parser,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(input, parser.min, parser.max, DoubleParser.class, commandContext);
+            this.parser = parser;
         }
 
         @Override
         public boolean hasMin() {
-            return this.getMin().doubleValue() != Double.MIN_VALUE;
+            return this.parser.hasMin();
         }
 
         @Override
         public boolean hasMax() {
-            return this.getMax().doubleValue() != Double.MAX_VALUE;
+            return this.parser.hasMax();
         }
 
         @Override
