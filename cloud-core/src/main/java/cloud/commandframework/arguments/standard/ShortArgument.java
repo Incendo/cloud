@@ -59,7 +59,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
@@ -70,7 +70,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     }
 
     /**
-     * Create a new required command argument
+     * Create a new required {@link ShortArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -81,7 +81,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link ShortArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
@@ -92,18 +92,15 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     }
 
     /**
-     * Create a new required command argument with a default value
+     * Create a new required {@link ShortArgument} with the specified default value.
      *
      * @param name       Argument name
-     * @param defaultNum Default num
+     * @param defaultNum Default value
      * @param <C>        Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, Short> optional(
-            final @NonNull String name,
-            final short defaultNum
-    ) {
-        return ShortArgument.<C>newBuilder(name).asOptionalWithDefault(Short.toString(defaultNum)).build();
+    public static <C> @NonNull CommandArgument<C, Short> optional(final @NonNull String name, final short defaultNum) {
+        return ShortArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**
@@ -126,8 +123,8 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Short> {
 
-        private short min = Short.MIN_VALUE;
-        private short max = Short.MAX_VALUE;
+        private short min = ShortParser.DEFAULT_MINIMUM;
+        private short max = ShortParser.DEFAULT_MAXIMUM;
 
         private Builder(final @NonNull String name) {
             super(Short.class, name);
@@ -156,10 +153,17 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         }
 
         /**
-         * Builder a new short argument
+         * Sets the command argument to be optional, with the specified default value.
          *
-         * @return Constructed argument
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
          */
+        public @NonNull Builder<C> asOptionalWithDefault(final short defaultValue) {
+            return (Builder<C>) this.asOptionalWithDefault(Short.toString(defaultValue));
+        }
+
         @Override
         public @NonNull ShortArgument<C> build() {
             return new ShortArgument<>(this.isRequired(), this.getName(), this.min, this.max,
@@ -170,6 +174,20 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     }
 
     public static final class ShortParser<C> implements ArgumentParser<C, Short> {
+
+        /**
+         * Constant for the default/unset minimum value.
+         *
+         * @since 1.5.0
+         */
+        public static final short DEFAULT_MINIMUM = Short.MIN_VALUE;
+
+        /**
+         * Constant for the default/unset maximum value.
+         *
+         * @since 1.5.0
+         */
+        public static final short DEFAULT_MAXIMUM = Short.MAX_VALUE;
 
         private final short min;
         private final short max;
@@ -192,30 +210,17 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         ) {
             final String input = inputQueue.peek();
             if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        ShortParser.class,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new NoInputProvidedException(ShortParser.class, commandContext));
             }
             try {
                 final short value = Short.parseShort(input);
                 if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new ShortParseException(
-                            input,
-                            this.min,
-                            this.max,
-                            commandContext
-                    ));
+                    return ArgumentParseResult.failure(new ShortParseException(input, this, commandContext));
                 }
                 inputQueue.remove();
                 return ArgumentParseResult.success(value);
             } catch (final Exception e) {
-                return ArgumentParseResult.failure(new ShortParseException(
-                        input,
-                        this.min,
-                        this.max,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new ShortParseException(input, this, commandContext));
             }
         }
 
@@ -250,12 +255,36 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
             return this.min;
         }
 
+        /**
+         * Get whether this parser has a maximum set.
+         * This will compare the parser's maximum to {@link #DEFAULT_MAXIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMax() {
+            return this.max != DEFAULT_MAXIMUM;
+        }
+
+        /**
+         * Get whether this parser has a minimum set.
+         * This will compare the parser's minimum to {@link #DEFAULT_MINIMUM}.
+         *
+         * @return whether the parser has a maximum set
+         * @since 1.5.0
+         */
+        public boolean hasMin() {
+            return this.min != DEFAULT_MINIMUM;
+        }
+
     }
 
 
     public static final class ShortParseException extends NumberParseException {
 
         private static final long serialVersionUID = -478674263339091032L;
+
+        private final ShortParser<?> parser;
 
         /**
          * Construct a new short parse exception
@@ -264,30 +293,43 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @param min            Minimum value
          * @param max            Maximum value
          * @param commandContext Command context
+         * @deprecated use {@link #ShortParseException(String, ShortParser, CommandContext)} instead
          */
+        @Deprecated
         public ShortParseException(
                 final @NonNull String input,
                 final short min,
                 final short max,
                 final @NonNull CommandContext<?> commandContext
         ) {
-            super(
-                    input,
-                    min,
-                    max,
-                    ShortParser.class,
-                    commandContext
-            );
+            this(input, new ShortParser<>(min, max), commandContext);
+        }
+
+        /**
+         * Create a new {@link ShortParseException}.
+         *
+         * @param input          input string
+         * @param parser         short parser
+         * @param commandContext command context
+         * @since 1.5.0
+         */
+        public ShortParseException(
+                final @NonNull String input,
+                final @NonNull ShortParser<?> parser,
+                final @NonNull CommandContext<?> commandContext
+        ) {
+            super(input, parser.min, parser.max, ShortParser.class, commandContext);
+            this.parser = parser;
         }
 
         @Override
         public boolean hasMin() {
-            return this.getMin().shortValue() != Short.MIN_VALUE;
+            return this.parser.hasMin();
         }
 
         @Override
         public boolean hasMax() {
-            return this.getMax().shortValue() != Short.MAX_VALUE;
+            return this.parser.hasMax();
         }
 
         @Override
