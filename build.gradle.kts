@@ -1,6 +1,7 @@
 import io.github.gradlenexus.publishplugin.NexusPublishExtension
 import net.kyori.indra.IndraLicenseHeaderPlugin
 import net.kyori.indra.IndraCheckstylePlugin
+import net.kyori.indra.IndraPublishingPlugin
 import net.kyori.indra.IndraExtension
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.repository.sonatypeSnapshots
@@ -15,6 +16,7 @@ plugins {
     val indraVersion = "2.0.0"
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
+    id("net.kyori.indra.publishing") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion
     id("net.kyori.indra.license-header") version indraVersion apply false
     id("com.github.johnrengelman.shadow") version "7.0.0" apply false
@@ -48,6 +50,7 @@ extensions.configure<NexusPublishExtension> {
 
 subprojects {
     apply<IndraPlugin>()
+    apply<IndraPublishingPlugin>()
     apply<IndraCheckstylePlugin>()
     apply<IndraLicenseHeaderPlugin>()
     apply<ErrorPronePlugin>()
