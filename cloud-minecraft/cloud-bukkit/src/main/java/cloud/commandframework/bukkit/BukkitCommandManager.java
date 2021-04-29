@@ -31,7 +31,10 @@ import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
+import cloud.commandframework.bukkit.data.ProtoItemStack;
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
+import cloud.commandframework.bukkit.parsers.ItemStackArgument;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
@@ -81,7 +84,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
     private final Plugin owningPlugin;
     private final int minecraftVersion;
-    private final boolean paper;
+    private final boolean paper = CraftBukkitReflection.classExists("com.destroystokyo.paper.PaperConfig");
 
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
@@ -134,30 +137,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         this.taskFactory = new TaskFactory(bukkitSynchronizer);
 
         /* Try to determine the Minecraft version */
-        int version = -1;
-        try {
-            final Matcher matcher = Pattern.compile("\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?\\)")
-                    .matcher(Bukkit.getVersion());
-            if (matcher.find()) {
-                version = Integer.parseInt(
-                        matcher.toMatchResult().group(2),
-                        VERSION_RADIX
-                );
-            }
-        } catch (final Exception e) {
-            this.owningPlugin.getLogger().severe("Failed to determine Minecraft version "
-                    + "for cloud Bukkit capability detection");
-        }
-        this.minecraftVersion = version;
-
-        boolean paper = false;
-        try {
-            Class.forName("com.destroystokyo.paper.PaperConfig");
-            paper = true;
-        } catch (final Exception ignored) {
-            // This is fine
-        }
-        this.paper = paper;
+        this.minecraftVersion = this.getMinecraftVersion();
 
         /* Register Bukkit Preprocessor */
         this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
@@ -177,6 +157,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new LocationArgument.LocationParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
                 new Location2DArgument.Location2DParser<>());
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
+                new ItemStackArgument.Parser<>());
         /* Register Entity Selector Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());
@@ -194,6 +176,19 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         );
 
         this.setCaptionRegistry(new BukkitCaptionRegistryFactory<C>().create());
+    }
+
+    private int getMinecraftVersion() {
+        try {
+            final Matcher matcher = Pattern.compile("\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?\\)").matcher(Bukkit.getVersion());
+            if (matcher.find()) {
+                return Integer.parseInt(matcher.toMatchResult().group(2), VERSION_RADIX);
+            }
+        } catch (final Exception e) {
+            this.owningPlugin.getLogger()
+                    .severe("Failed to determine Minecraft version for cloud Bukkit capability detection");
+        }
+        return -1;
     }
 
     /**
