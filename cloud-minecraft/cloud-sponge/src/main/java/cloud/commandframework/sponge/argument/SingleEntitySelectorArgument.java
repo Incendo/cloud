@@ -129,7 +129,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
             final Entity entity;
             try {
                 entity = (Entity) parsed.findSingleEntity(
-                        (CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                        ((CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE)).withPermission(2)
                 );
             } catch (final CommandSyntaxException ex) {
                 return ArgumentParseResult.failure(ex);
@@ -137,6 +137,14 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
             final int consumedChars = originalInput.length() - consumedInput.length();
             final String input = originalInput.substring(0, consumedChars);
             return ArgumentParseResult.success(new SingleEntitySelectorImpl((Selector) parsed, input, entity));
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.nativeParser.suggestions(commandContext, input);
         }
 
         @Override

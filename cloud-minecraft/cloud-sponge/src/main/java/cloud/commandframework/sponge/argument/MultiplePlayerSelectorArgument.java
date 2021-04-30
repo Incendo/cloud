@@ -131,7 +131,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             final List<Player> players;
             try {
                 players = parsed.findPlayers(
-                        (CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                        ((CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE)).withPermission(2)
                 ).stream().map(p -> (Player) p).collect(Collectors.toList());
             } catch (final CommandSyntaxException ex) {
                 return ArgumentParseResult.failure(ex);
@@ -139,6 +139,14 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             final int consumedChars = originalInput.length() - consumedInput.length();
             final String input = originalInput.substring(0, consumedChars);
             return ArgumentParseResult.success(new MultiplePlayerSelectorImpl((Selector) parsed, input, players));
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.nativeParser.suggestions(commandContext, input);
         }
 
         @Override

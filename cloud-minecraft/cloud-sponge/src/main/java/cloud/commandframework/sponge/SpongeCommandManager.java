@@ -256,6 +256,9 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
             @NonNull final C sender,
             @NonNull final String permission
     ) {
+        if (permission.isEmpty()) {
+            return true;
+        }
         return this.causeMapper.apply(sender).hasPermission(permission);
     }
 

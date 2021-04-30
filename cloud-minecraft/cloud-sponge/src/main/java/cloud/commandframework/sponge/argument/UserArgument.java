@@ -185,7 +185,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             final ServerPlayer player;
             try {
                 player = (ServerPlayer) parsed.findSinglePlayer(
-                        (CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                        (CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE)
                 );
             } catch (final CommandSyntaxException ex) {
                 return ArgumentParseResult.failure(ex);

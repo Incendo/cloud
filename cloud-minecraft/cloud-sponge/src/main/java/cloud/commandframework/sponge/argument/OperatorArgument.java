@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * An argument for parsing {@link Operator Operators}.
@@ -164,6 +165,16 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
             }
             inputQueue.remove();
             return ArgumentParseResult.success(operator.get());
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return RegistryTypes.OPERATOR.get().stream()
+                    .map(Operator::asString)
+                    .collect(Collectors.toList());
         }
 
         @Override

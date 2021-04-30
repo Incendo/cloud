@@ -202,6 +202,14 @@ public final class ItemStackSnapshotArgument<C> extends CommandArgument<C, ItemS
         }
 
         @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.mappedParser.suggestions(commandContext, input);
+        }
+
+        @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
             return ClientCompletionKeys.ITEM_STACK.get().createNode();
         }

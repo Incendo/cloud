@@ -135,7 +135,7 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
                 new WrappedBrigadierParser<C, Coordinates>(ColumnPosArgument.columnPos())
                         .map((ctx, coordinates) -> {
                             final BlockPos pos = coordinates.getBlockPos(
-                                    (CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                                    (CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE)
                             );
                             return ArgumentParseResult.success(new Vector2i(pos.getX(), pos.getZ()));
                         });
@@ -146,6 +146,14 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             return this.mappedParser.parse(commandContext, inputQueue);
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.mappedParser.suggestions(commandContext, input);
         }
 
         @Override

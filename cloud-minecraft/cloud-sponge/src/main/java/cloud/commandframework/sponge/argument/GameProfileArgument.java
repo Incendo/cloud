@@ -120,7 +120,7 @@ public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile
                     final Collection<com.mojang.authlib.GameProfile> profiles;
                     try {
                         profiles = argumentResult.getNames(
-                                (CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                                (CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE)
                         );
                     } catch (final CommandSyntaxException ex) {
                         return ArgumentParseResult.failure(ex);
@@ -138,6 +138,14 @@ public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             return this.mappedParser.parse(commandContext, inputQueue);
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.mappedParser.suggestions(commandContext, input);
         }
 
         @Override

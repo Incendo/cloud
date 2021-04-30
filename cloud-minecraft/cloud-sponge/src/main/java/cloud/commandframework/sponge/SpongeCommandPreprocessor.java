@@ -51,7 +51,7 @@ final class SpongeCommandPreprocessor<C> implements CommandPreprocessor<C> {
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
         final CommandCause commandCause = this.commandManager.causeMapper().apply(context.getCommandContext().getSender());
-        context.getCommandContext().store(SpongeCommandContextKeys.COMMAND_CAUSE_KEY, commandCause);
+        context.getCommandContext().store(SpongeCommandContextKeys.COMMAND_CAUSE, commandCause);
 
         // For WrappedBrigadierParser. The CloudBrigadierManager will store this in context as well, however we are not using
         // the CloudBrigadierManager, only the WrapperBrigadierParser. CommandCause is mixed into CommandSourceStack, which is

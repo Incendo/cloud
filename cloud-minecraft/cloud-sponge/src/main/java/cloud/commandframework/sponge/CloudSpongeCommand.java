@@ -26,6 +26,8 @@ package cloud.commandframework.sponge;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.arguments.compound.CompoundArgument;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -34,6 +36,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
+import cloud.commandframework.types.tuples.Pair;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -45,6 +48,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -260,20 +264,22 @@ final class CloudSpongeCommand<C> implements Command.Raw {
         return (CommandTreeNode.Root) root;
     }
 
+    @SuppressWarnings("unchecked")
     private void addChildren(final CommandTreeNode<?> node, final CommandTree.Node<CommandArgument<C, ?>> cloud) {
         for (final CommandTree.Node<CommandArgument<C, ?>> child : cloud.getChildren()) {
             final CommandArgument<C, ?> value = child.getValue();
             final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> treeNode;
             if (value instanceof StaticArgument) {
                 treeNode = (CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>>) CommandTreeNode.literal();
+            } else if (value instanceof CompoundArgument) {
+                final CompoundArgument<?, C, ?> compound = (CompoundArgument<?, C, ?>) value;
+                this.handleCompoundArgument(node, child, compound);
+                return;
             } else {
-                treeNode = this.commandManager.parserMapper().toSponge(value);
+                treeNode = this.commandManager.parserMapper().mapArgument(value);
             }
             this.addRequirement(child, treeNode);
-            if (child.isLeaf()
-                    || !child.getValue().isRequired()
-                    || child.getValue().getOwningCommand() != null
-                    || child.getChildren().stream().noneMatch(c -> c.getValue().isRequired())) {
+            if (canExecute(child)) {
                 treeNode.executable();
             }
             this.addChildren(treeNode, child);
@@ -281,28 +287,65 @@ final class CloudSpongeCommand<C> implements Command.Raw {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private void handleCompoundArgument(
+            final CommandTreeNode<?> node,
+            final CommandTree.Node<CommandArgument<C, ?>> child,
+            final CompoundArgument<?, C, ?> compound
+    ) {
+        final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> treeNode;
+        final Object[] names = compound.getNames().toArray();
+        final Object[] parsers = compound.getParserTuple().toArray();
+        final ArrayDeque<Pair<String, CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>>>> nodes = new ArrayDeque<>();
+        for (int i = 0; i < parsers.length; i++) {
+            final ArgumentParser<C, Object> parser = (ArgumentParser<C, Object>) parsers[i];
+            final String name = (String) names[i];
+            nodes.add(Pair.of(name, this.commandManager.parserMapper().mapParser(parser)));
+        }
+        Pair<String, CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>>> argument = null;
+        while (!nodes.isEmpty()) {
+            final Pair<String, CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>>> prev = argument;
+            argument = nodes.removeLast();
+            if (prev != null) {
+                argument.getSecond().child(prev.getFirst(), prev.getSecond());
+            } else {
+                // last node
+                if (canExecute(child)) {
+                    argument.getSecond().executable();
+                }
+            }
+            this.addRequirement(child, argument.getSecond());
+        }
+        treeNode = argument.getSecond();
+        this.addChildren(treeNode, child);
+        node.child(names[0].toString(), treeNode);
+    }
+
+    private static <C> boolean canExecute(final CommandTree.@NonNull Node<CommandArgument<C, ?>> node) {
+        return node.isLeaf()
+                || !node.getValue().isRequired()
+                || node.getValue().getOwningCommand() != null
+                || node.getChildren().stream().noneMatch(c -> c.getValue().isRequired());
+    }
+
     private void addRequirement(
             final CommandTree.@NonNull Node<CommandArgument<C, ?>> cloud,
             final @NonNull CommandTreeNode<? extends CommandTreeNode<?>> node
     ) {
-        final CommandPermission permission = (CommandPermission) cloud.getNodeMeta().getOrDefault(
-                "permission",
-                Permission.empty()
-        );
-        if (permission != Permission.empty()) {
-            node.requires(cause -> this.commandManager.hasPermission(
-                    this.commandManager.backwardsCauseMapper().apply(cause),
-                    permission
-            ));
+        final CommandPermission permission = (CommandPermission) cloud.getNodeMeta()
+                .getOrDefault("permission", Permission.empty());
+        if (permission == Permission.empty()) {
+            return;
         }
+        node.requires(cause ->
+                this.commandManager.hasPermission(this.commandManager.backwardsCauseMapper().apply(cause), permission));
     }
 
     private String formatCommandForParsing(final @NonNull String arguments) {
         if (arguments.isEmpty()) {
             return this.label;
-        } else {
-            return this.label + " " + arguments;
         }
+        return this.label + " " + arguments;
     }
 
     private String formatCommandForSuggestions(final @NonNull String arguments) {

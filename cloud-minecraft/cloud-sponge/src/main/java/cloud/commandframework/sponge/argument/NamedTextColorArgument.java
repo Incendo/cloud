@@ -36,6 +36,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -109,7 +110,7 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
      * Create a new {@link Builder}.
      *
      * @param name argument name
-     * @param <C> sender type
+     * @param <C>  sender type
      * @return a new {@link Builder}
      */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
@@ -138,6 +139,14 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
                 return ArgumentParseResult.success(color.get());
             }
             return ArgumentParseResult.failure(ColorArgument.ERROR_INVALID_VALUE.create(input));
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return new ArrayList<>(NamedTextColor.NAMES.keys());
         }
 
         @Override

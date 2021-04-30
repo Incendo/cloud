@@ -184,7 +184,7 @@ public final class Vector3dArgument<C> extends VectorArgument<C, Vector3d> {
             this.mappedParser = new WrappedBrigadierParser<C, Coordinates>(new Vec3Argument(centerIntegers))
                     .map((ctx, coordinates) -> {
                         return ArgumentParseResult.success(VecHelper.toVector3d(
-                                coordinates.getPosition((CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY))
+                                coordinates.getPosition((CommandSourceStack) ctx.get(SpongeCommandContextKeys.COMMAND_CAUSE))
                         ));
                     });
         }
@@ -195,6 +195,14 @@ public final class Vector3dArgument<C> extends VectorArgument<C, Vector3d> {
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             return this.mappedParser.parse(commandContext, inputQueue);
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.mappedParser.suggestions(commandContext, input);
         }
 
         @Override

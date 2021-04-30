@@ -37,7 +37,7 @@ public final class SpongeCommandContextKeys {
      * The Sponge native {@link org.spongepowered.api.command.CommandCause} instance is stored in the {@link cloud.commandframework.context.CommandContext}
      * by {@link SpongeCommandPreprocessor}
      */
-    public static final CloudKey<CommandCause> COMMAND_CAUSE_KEY = SimpleCloudKey.of(
+    public static final CloudKey<CommandCause> COMMAND_CAUSE = SimpleCloudKey.of(
             "cloud:sponge_command_cause",
             TypeToken.get(CommandCause.class)
     );

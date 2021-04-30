@@ -128,8 +128,9 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
             final EntitySelector parsed = result.getParsedValue().get();
             final Player player;
             try {
+                // todo: a more proper fix then setting permission level 2
                 player = (Player) parsed.findSinglePlayer(
-                        (CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE_KEY)
+                        ((CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE)).withPermission(2)
                 );
             } catch (final CommandSyntaxException ex) {
                 return ArgumentParseResult.failure(ex);
@@ -137,6 +138,14 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
             final int consumedChars = originalInput.length() - consumedInput.length();
             final String input = originalInput.substring(0, consumedChars);
             return ArgumentParseResult.success(new SinglePlayerSelectorImpl((Selector) parsed, input, player));
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.nativeParser.suggestions(commandContext, input);
         }
 
         @Override

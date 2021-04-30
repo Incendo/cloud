@@ -74,13 +74,22 @@ public final class SpongeParserMapper<C> {
         this.initStandardMappers();
     }
 
+    CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> mapArgument(final CommandArgument<C, ?> value) {
+        final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> result = this.mapParser(value.getParser());
+        final boolean customSuggestionsProvider = !DELEGATING_SUGGESTIONS_PROVIDER.isInstance(value.getSuggestionsProvider());
+        if (customSuggestionsProvider) {
+            result.customSuggestions();
+        }
+        return result;
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
-    CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> toSponge(final CommandArgument<C, ?> value) {
-        ArgumentParser<C, ?> parser = value.getParser();
+    CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> mapParser(final ArgumentParser<C, ?> argumentParser) {
+        final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> result;
+        ArgumentParser<C, ?> parser = argumentParser;
         while (parser instanceof MappedArgumentParser<?, ?, ?>) {
             parser = ((MappedArgumentParser<C, ?, ?>) parser).getBaseParser();
         }
-        final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> result;
         final Mapping<C, ?> mapper = this.mappers.get(parser.getClass());
         if (mapper != null) {
             final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> apply =
@@ -94,10 +103,6 @@ public final class SpongeParserMapper<C> {
             result = ((NodeSupplyingArgumentParser<C, ?>) parser).node();
         } else {
             result = ClientCompletionKeys.STRING.get().createNode().customSuggestions().word();
-        }
-        final boolean customSuggestionsProvider = !DELEGATING_SUGGESTIONS_PROVIDER.isInstance(value.getSuggestionsProvider());
-        if (customSuggestionsProvider) {
-            result.customSuggestions();
         }
         return result;
     }
