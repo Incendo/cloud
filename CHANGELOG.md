@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - JDA Role argument parser
  - Bukkit: Implement parser for ProtoItemStack ([#257](https://github.com/Incendo/cloud/pull/257))
  - Bukkit: Implement parsers for ItemStackPredicate and BlockPredicate ([#259](https://github.com/Incendo/cloud/pull/259))
+ - Bukkit: Implement parser for BlockData ([#258](https://github.com/Incendo/cloud/pull/258))
 
 ### Changed
  - Use Command instead of TabCompleteEvent on Bukkit

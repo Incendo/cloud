@@ -27,6 +27,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.parsers.BlockDataArgument;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
@@ -98,6 +99,8 @@ public final class BukkitBrigadierMapper<C> {
         this.mapSimpleNMS(new TypeToken<ItemStackPredicateArgument.Parser<C>>() {
         }, "ItemPredicate");
         /* Map Block arguments */
+        this.mapSimpleNMS(new TypeToken<BlockDataArgument.Parser<C>>() {
+        }, "Tile");
         this.mapSimpleNMS(new TypeToken<BlockPredicateArgument.Parser<C>>() {
         }, "BlockPredicate");
         /* Map Entity Selectors */

@@ -47,12 +47,14 @@ import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.BlockPredicate;
 import cloud.commandframework.bukkit.data.ItemStackPredicate;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
+import cloud.commandframework.bukkit.parsers.BlockDataArgument;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
+import cloud.commandframework.bukkit.parsers.location.LocationArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.SimpleCaptionRegistry;
@@ -392,10 +394,10 @@ public final class ExamplePlugin extends JavaPlugin {
                     .senderType(Player.class)
                     .argument(BlockPredicateArgument.of("predicate"))
                     .literal("with")
-                    .argument(MaterialArgument.of("block")) // todo: use BlockDataArgument
+                    .argument(BlockDataArgument.of("block"))
                     .argument(IntegerArgument.<CommandSender>newBuilder("radius").withMin(1))
                     .handler(ctx -> {
-                        final BlockData block = ctx.<Material>get("block").createBlockData();
+                        final BlockData block = ctx.get("block");
                         final BlockPredicate predicate = ctx.get("predicate");
                         final int radius = ctx.get("radius");
 
@@ -425,6 +427,15 @@ public final class ExamplePlugin extends JavaPlugin {
                         ctx.getSender().sendMessage("result: " + predicate.test(
                                 protoItemStack.createItemStack(1, true)));
                     }));
+            this.manager.command(builder.literal("setblock")
+                    .senderType(Player.class)
+                    .argument(LocationArgument.of("position"))
+                    .argument(BlockDataArgument.of("block"))
+                    .handler(context -> this.manager.taskRecipe().begin(context).synchronous(ctx -> {
+                        final Location location = ctx.get("location");
+                        final BlockData data = ctx.get("block");
+                        location.getBlock().setBlockData(data);
+                    }).execute()));
         }
 
         //

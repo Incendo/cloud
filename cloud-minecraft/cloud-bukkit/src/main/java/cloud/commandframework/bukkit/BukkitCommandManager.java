@@ -33,6 +33,7 @@ import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.parsers.BlockDataArgument;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
@@ -176,6 +177,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
             this.registerParserSupplierFor(ItemStackPredicateArgument.class);
             this.registerParserSupplierFor(BlockPredicateArgument.class);
+            this.registerParserSupplierFor(BlockDataArgument.class);
         }
 
         /* Register suggestion and state listener */
