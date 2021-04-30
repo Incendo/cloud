@@ -26,8 +26,11 @@ package cloud.commandframework.examples.bukkit;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.compound.ArgumentPair;
+import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.minecraft.extras.MinecraftExtrasMetaKeys;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
@@ -62,6 +65,7 @@ import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.tasks.TaskConsumer;
+import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.identity.Identity;
@@ -410,6 +414,22 @@ public final class ExamplePlugin extends JavaPlugin {
                     (sender, key) -> "'{input}' is not very cash money of you"
             );
         }
+
+        // vanilla-like give command
+        this.manager.command(this.manager.commandBuilder("givetest")
+                .senderType(Player.class)
+                .argument(ArgumentPair.of(
+                        this.manager,
+                        "itemstack",
+                        Pair.of("item", "amount"),
+                        Pair.of(ProtoItemStack.class, Integer.class)
+                ).withMapper(ItemStack.class, (sender, pair) -> {
+                    final ProtoItemStack proto = pair.getFirst();
+                    final int amount = pair.getSecond();
+                    return proto.createItemStack(amount, true);
+                }), ArgumentDescription.of("The ItemStack to give"))
+                .meta(MinecraftExtrasMetaKeys.DESCRIPTION, text("Vanilla-like give command"))
+                .handler(ctx -> ((Player) ctx.getSender()).getInventory().addItem(ctx.get("itemstack"))));
     }
 
     @CommandMethod("example help [query]")
