@@ -174,6 +174,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                 final @NonNull String input
         ) {
             return Arrays.stream(Material.values())
+                    .filter(Material::isItem)
                     .map(value -> value.name().toLowerCase(Locale.ROOT))
                     .collect(Collectors.toList());
         }
