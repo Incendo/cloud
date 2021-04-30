@@ -23,21 +23,25 @@
 //
 package cloud.commandframework.bukkit;
 
+import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
-import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
-import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
-import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
-import cloud.commandframework.bukkit.parsers.location.Location2D;
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
+import cloud.commandframework.bukkit.parsers.ItemStackArgument;
+import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
+import cloud.commandframework.bukkit.parsers.location.LocationArgument;
+import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
+import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument;
+import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
+import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorArgument;
 import com.mojang.brigadier.arguments.ArgumentType;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.enchantments.Enchantment;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import io.leangen.geantyref.GenericTypeReflector;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
@@ -46,14 +50,12 @@ import java.util.logging.Level;
  *
  * @param <C> Command sender type
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
 public final class BukkitBrigadierMapper<C> {
 
     private static final int UUID_ARGUMENT_VERSION = 16;
 
     private final BukkitCommandManager<C> commandManager;
-    private final CloudBrigadierManager brigadierManager;
-    private final String nmsVersion;
+    private final CloudBrigadierManager<C, ?> brigadierManager;
 
 
     /**
@@ -64,38 +66,48 @@ public final class BukkitBrigadierMapper<C> {
      */
     public BukkitBrigadierMapper(
             final @NonNull BukkitCommandManager<C> commandManager,
-            final @NonNull CloudBrigadierManager brigadierManager
+            final @NonNull CloudBrigadierManager<C, ?> brigadierManager
     ) {
         this.commandManager = commandManager;
         this.brigadierManager = brigadierManager;
 
-        /* Detect Minecraft Version Metadata */
-        final String version = Bukkit.getServer().getClass().getPackage().getName();
-        this.nmsVersion = version.substring(version.lastIndexOf(".") + 1);
-        final int majorMinecraftVersion = Integer.parseInt(this.nmsVersion.split("_")[1]);
-
-        try {
-            /* UUID nms argument is a 1.16+ feature */
-            if (majorMinecraftVersion >= UUID_ARGUMENT_VERSION) {
-                /* Map UUID */
-                this.mapSimpleNMS(UUID.class, this.getNMSArgument("UUID").getConstructor());
-            }
-            /* Map Enchantment */
-            this.mapSimpleNMS(Enchantment.class, this.getNMSArgument("Enchantment").getConstructor());
-            /* Map Entity Selectors */
-            this.mapComplexNMS(SingleEntitySelector.class, this.getEntitySelectorArgument(true, false));
-            this.mapComplexNMS(SinglePlayerSelector.class, this.getEntitySelectorArgument(true, true));
-            this.mapComplexNMS(MultipleEntitySelector.class, this.getEntitySelectorArgument(false, false));
-            this.mapComplexNMS(MultiplePlayerSelector.class, this.getEntitySelectorArgument(false, true));
-            /* Map Vec3 */
-            this.mapComplexNMS(Location.class, this.getArgumentVec3());
-            /* Map Vec2I */
-            this.mapComplexNMS(Location2D.class, this.getArgumentVec2I());
-        } catch (final Exception e) {
-            this.commandManager.getOwningPlugin()
-                    .getLogger()
-                    .log(Level.WARNING, "Failed to map Bukkit types to NMS argument types", e);
+        if (!CraftBukkitReflection.craftBukkit()) {
+            this.commandManager.getOwningPlugin().getLogger().warning(
+                    "Could not detect relocated CraftBukkit package, NMS brigadier mappings will not be enabled.");
+            return;
         }
+
+        this.registerMappings();
+    }
+
+    private void registerMappings() {
+        /* UUID nms argument is a 1.16+ feature */
+        if (CraftBukkitReflection.MAJOR_REVISION >= UUID_ARGUMENT_VERSION) {
+            /* Map UUID */
+            this.mapSimpleNMS(new TypeToken<UUIDArgument.UUIDParser<C>>() {
+            }, "UUID");
+        }
+        /* Map Enchantment */
+        this.mapSimpleNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
+        }, "Enchantment");
+        /* Map ItemStackArgument */
+        this.mapSimpleNMS(new TypeToken<ItemStackArgument.Parser<C>>() {
+        }, "ItemStack");
+        /* Map Entity Selectors */
+        this.mapNMS(new TypeToken<SingleEntitySelectorArgument.SingleEntitySelectorParser<C>>() {
+        }, this.entitySelectorArgumentSupplier(true, false));
+        this.mapNMS(new TypeToken<SinglePlayerSelectorArgument.SinglePlayerSelectorParser<C>>() {
+        }, this.entitySelectorArgumentSupplier(true, true));
+        this.mapNMS(new TypeToken<MultipleEntitySelectorArgument.MultipleEntitySelectorParser<C>>() {
+        }, this.entitySelectorArgumentSupplier(false, false));
+        this.mapNMS(new TypeToken<MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<C>>() {
+        }, this.entitySelectorArgumentSupplier(false, true));
+        /* Map Vec3 */
+        this.mapNMS(new TypeToken<LocationArgument.LocationParser<C>>() {
+        }, this::argumentVec3);
+        /* Map Vec2I */
+        this.mapNMS(new TypeToken<Location2DArgument.Location2DParser<C>>() {
+        }, this::argumentVec2i);
     }
 
     /**
@@ -103,45 +115,39 @@ public final class BukkitBrigadierMapper<C> {
      * @param playersOnly Whether the selector is for players only (true), or for all entities (false)
      * @return The NMS ArgumentType
      */
-    private @NonNull Supplier<ArgumentType<?>> getEntitySelectorArgument(
+    private @NonNull Supplier<ArgumentType<?>> entitySelectorArgumentSupplier(
             final boolean single,
             final boolean playersOnly
     ) {
         return () -> {
             try {
-                final Constructor<?> constructor = this.getNMSArgument("Entity").getDeclaredConstructors()[0];
+                final Constructor<?> constructor = getNMSArgument("Entity").getDeclaredConstructors()[0];
                 constructor.setAccessible(true);
                 return (ArgumentType<?>) constructor.newInstance(single, playersOnly);
             } catch (final Exception e) {
                 this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Selector Argument", e);
-                return null;
+                return fallbackType();
             }
         };
     }
 
-    @SuppressWarnings("UnnecessaryLambda")
-    private @NonNull Supplier<ArgumentType<?>> getArgumentVec3() {
-        return () -> {
-            try {
-                return (ArgumentType<?>) this.getNMSArgument("Vec3").getDeclaredConstructor(boolean.class)
-                        .newInstance(true);
-            } catch (final Exception e) {
-                this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec3D argument", e);
-                return null;
-            }
-        };
+    private @NonNull ArgumentType<?> argumentVec3() {
+        try {
+            return (ArgumentType<?>) getNMSArgument("Vec3").getDeclaredConstructor(boolean.class)
+                    .newInstance(true);
+        } catch (final Exception e) {
+            this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec3D argument", e);
+            return fallbackType();
+        }
     }
 
-    @SuppressWarnings("UnnecessaryLambda")
-    private @NonNull Supplier<ArgumentType<?>> getArgumentVec2I() {
-        return () -> {
-            try {
-                return (ArgumentType<?>) this.getNMSArgument("Vec2I").getDeclaredConstructor().newInstance();
-            } catch (final Exception e) {
-                this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2I argument", e);
-                return null;
-            }
-        };
+    private @NonNull ArgumentType<?> argumentVec2i() {
+        try {
+            return (ArgumentType<?>) getNMSArgument("Vec2I").getDeclaredConstructor().newInstance();
+        } catch (final Exception e) {
+            this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2I argument", e);
+            return fallbackType();
+        }
     }
 
     /**
@@ -149,40 +155,52 @@ public final class BukkitBrigadierMapper<C> {
      *
      * @param argument Argument type name
      * @return Argument class
-     * @throws Exception If the type cannot be retrieved
+     * @throws RuntimeException when the class is not found
      */
-    @NonNull
-    private Class<?> getNMSArgument(final @NonNull String argument) throws Exception {
-        return Class.forName(String.format("net.minecraft.server.%s.Argument%s", this.nmsVersion, argument));
+    private static @NonNull Class<?> getNMSArgument(final @NonNull String argument) throws RuntimeException {
+        return CraftBukkitReflection.needNMSClass("Argument" + argument);
     }
 
     /**
-     * Attempt to register a mapping between a type and a NMS argument type
+     * Attempt to register a mapping between a cloud argument parser type and an NMS brigadier argument type which
+     * has a no-args constructor.
      *
-     * @param type        Type to map
-     * @param constructor Constructor that construct the NMS argument type
+     * @param type         Type to map
+     * @param <T>          argument parser type
+     * @param argumentName NMS Argument class name (without 'Argument' prefix)
+     * @since 1.5.0
      */
-    public void mapSimpleNMS(
-            final @NonNull Class<?> type,
-            final @NonNull Constructor<?> constructor
+    public <T extends ArgumentParser<C, ?>> void mapSimpleNMS(
+            final @NonNull TypeToken<T> type,
+            final @NonNull String argumentName
     ) {
+        final Constructor<?> constructor;
         try {
-            this.brigadierManager.registerDefaultArgumentTypeSupplier(type, () -> {
-                try {
-                    return constructor.newInstance();
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            });
-        } catch (final Exception e) {
-            this.commandManager.getOwningPlugin()
-                    .getLogger()
-                    .warning(String.format(
-                            "Failed to map '%s' to a Mojang serializable argument type",
-                            type.getCanonicalName()
-                    ));
+            final Class<?> nmsArgument = getNMSArgument(argumentName);
+            constructor = nmsArgument.getConstructor();
+        } catch (final RuntimeException | ReflectiveOperationException e) {
+            this.commandManager.getOwningPlugin().getLogger().log(
+                    Level.WARNING,
+                    String.format("Failed to create mapping for NMS brigadier argument type '%s'.", argumentName),
+                    e
+            );
+            return;
         }
+        this.brigadierManager.registerMapping(type, builder -> builder.to(argument -> {
+            try {
+                return (ArgumentType<?>) constructor.newInstance();
+            } catch (final ReflectiveOperationException e) {
+                this.commandManager.getOwningPlugin().getLogger().log(
+                        Level.WARNING,
+                        String.format(
+                                "Failed to create instance of brigadier argument type '%s'.",
+                                GenericTypeReflector.erase(type.getType()).getCanonicalName()
+                        ),
+                        e
+                );
+                return fallbackType();
+            }
+        }));
     }
 
     /**
@@ -190,21 +208,61 @@ public final class BukkitBrigadierMapper<C> {
      *
      * @param type                 Type to map
      * @param argumentTypeSupplier Supplier of the NMS argument type
+     * @param <T>                  argument parser type
+     * @since 1.5.0
      */
+    public <T extends ArgumentParser<C, ?>> void mapNMS(
+            final @NonNull TypeToken<T> type,
+            final @NonNull Supplier<ArgumentType<?>> argumentTypeSupplier
+    ) {
+        this.brigadierManager.registerMapping(type, builder ->
+                builder.to(argument -> argumentTypeSupplier.get())
+        );
+    }
+
+    private static @NonNull StringArgumentType fallbackType() {
+        return StringArgumentType.word();
+    }
+
+    /**
+     * Attempt to register a mapping between a type and a NMS argument type
+     *
+     * @param type        Type to map
+     * @param constructor Constructor that construct the NMS argument type
+     * @deprecated use {@link #mapSimpleNMS(TypeToken, String)} instead
+     */
+    @Deprecated
+    public void mapSimpleNMS(
+            final @NonNull Class<?> type,
+            final @NonNull Constructor<?> constructor
+    ) {
+        this.brigadierManager.registerDefaultArgumentTypeSupplier(type, () -> {
+            try {
+                return (ArgumentType<?>) constructor.newInstance();
+            } catch (final ReflectiveOperationException e) {
+                this.commandManager.getOwningPlugin().getLogger().log(
+                        Level.WARNING,
+                        String.format("Failed to map brigadier argument type '%s'", type.getCanonicalName()),
+                        e
+                );
+                return fallbackType();
+            }
+        });
+    }
+
+    /**
+     * Attempt to register a mapping between a type and a NMS argument type
+     *
+     * @param type                 Type to map
+     * @param argumentTypeSupplier Supplier of the NMS argument type
+     * @deprecated use {@link #mapNMS(TypeToken, Supplier)} instead
+     */
+    @Deprecated
     public void mapComplexNMS(
             final @NonNull Class<?> type,
             final @NonNull Supplier<ArgumentType<?>> argumentTypeSupplier
     ) {
-        try {
-            this.brigadierManager.registerDefaultArgumentTypeSupplier(type, argumentTypeSupplier);
-        } catch (final Exception e) {
-            this.commandManager.getOwningPlugin()
-                    .getLogger()
-                    .warning(String.format(
-                            "Failed to map '%s' to a Mojang serializable argument type",
-                            type.getCanonicalName()
-                    ));
-        }
+        this.brigadierManager.registerDefaultArgumentTypeSupplier(type, argumentTypeSupplier);
     }
 
 }

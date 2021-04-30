@@ -25,8 +25,8 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.permission.CommandPermission;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.lucko.commodore.Commodore;
@@ -36,13 +36,14 @@ import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
 
     private final BukkitCommandManager<C> commandManager;
-    private final CloudBrigadierManager brigadierManager;
+    private final CloudBrigadierManager<C, Object> brigadierManager;
     private final Commodore commodore;
 
     CloudCommodoreManager(final @NonNull BukkitCommandManager<C> commandManager)
@@ -53,17 +54,29 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         }
         this.commandManager = commandManager;
         this.commodore = CommodoreProvider.getCommodore(commandManager.getOwningPlugin());
-        this.brigadierManager = new CloudBrigadierManager<>(commandManager, () ->
-                new CommandContext<>(
-                        commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
-                        commandManager
-                ));
-        this.brigadierManager.brigadierSenderMapper(
-                sender -> this.commandManager.getCommandSenderMapper().apply(
-                        this.commodore.getBukkitSender(sender)
-                )
-        );
+        this.brigadierManager = new CloudBrigadierManager<>(commandManager, () -> new CommandContext<>(
+                commandManager.getCommandSenderMapper().apply(Bukkit.getConsoleSender()),
+                commandManager
+        ));
+
+        this.brigadierManager.brigadierSenderMapper(sender ->
+                this.commandManager.getCommandSenderMapper().apply(this.commodore.getBukkitSender(sender)));
+
         new BukkitBrigadierMapper<>(this.commandManager, this.brigadierManager);
+
+        if (!CraftBukkitReflection.craftBukkit()) {
+            return;
+        }
+        final Class<?> vanillaCommandWrapperClass = CraftBukkitReflection.needOBCClass("command.VanillaCommandWrapper");
+        final Method getListenerMethod = CraftBukkitReflection.needMethod(
+                vanillaCommandWrapperClass, "getListener", CommandSender.class);
+        this.brigadierManager.backwardsBrigadierSenderMapper(cloud -> {
+            try {
+                return getListenerMethod.invoke(null, this.commandManager.getBackwardsCommandSenderMapper().apply(cloud));
+            } catch (final ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
@@ -72,7 +85,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             final @NonNull Command<?> command,
             final @NonNull BukkitCommand<C> bukkitCommand
     ) {
-        this.registerWithCommodore(label, command);
+        this.registerWithCommodore(label, (Command<C>) command);
     }
 
     protected @NonNull CloudBrigadierManager brigadierManager() {
@@ -81,17 +94,13 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
 
     private void registerWithCommodore(
             final @NonNull String label,
-            final @NonNull Command<?> command
+            final @NonNull Command<C> command
     ) {
-        final com.mojang.brigadier.Command<?> cmd = o -> 1;
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
                 .createLiteralCommandNode(label, command, (o, p) -> {
                     final CommandSender sender = this.commodore.getBukkitSender(o);
-                    return this.commandManager.hasPermission(
-                            this.commandManager.getCommandSenderMapper().apply(sender),
-                            (CommandPermission) p
-                    );
-                }, false, cmd);
+                    return this.commandManager.hasPermission(this.commandManager.getCommandSenderMapper().apply(sender), p);
+                }, false, o -> 1);
         final CommandNode existingNode = this.commodore.getDispatcher().findNode(Collections.singletonList(label));
         if (existingNode != null) {
             this.mergeChildren(existingNode, literalCommandNode);

@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.context.CommandContext;
@@ -38,7 +39,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
@@ -133,7 +133,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
-            if (!commandContext.<Set<CloudBukkitCapabilities>>get("CloudBukkitCapabilities").contains(
+            if (!commandContext.get(BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES).contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
                 return ArgumentParseResult.failure(new SelectorParseException(
                         "",
@@ -153,7 +153,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
 
             List<Entity> entities;
             try {
-                entities = Bukkit.selectEntities(commandContext.get("BukkitCommandSender"), input);
+                entities = Bukkit.selectEntities(commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER), input);
             } catch (IllegalArgumentException e) {
                 return ArgumentParseResult.failure(new SelectorParseException(
                         input,
