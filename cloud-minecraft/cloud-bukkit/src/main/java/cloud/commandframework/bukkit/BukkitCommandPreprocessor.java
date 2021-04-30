@@ -27,6 +27,8 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.Set;
+
 /**
  * Command preprocessor which decorates incoming {@link cloud.commandframework.context.CommandContext}
  * with Bukkit specific objects
@@ -35,26 +37,29 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
-    private final BukkitCommandManager<C> mgr;
+    private final BukkitCommandManager<C> commandManager;
+    private final Set<CloudBukkitCapabilities> bukkitCapabilities;
 
     /**
      * The Bukkit Command Preprocessor for storing Bukkit-specific contexts in the command contexts
      *
-     * @param mgr The BukkitCommandManager
+     * @param commandManager The BukkitCommandManager
      */
-    BukkitCommandPreprocessor(final @NonNull BukkitCommandManager<C> mgr) {
-        this.mgr = mgr;
+    BukkitCommandPreprocessor(final @NonNull BukkitCommandManager<C> commandManager) {
+        this.commandManager = commandManager;
+        this.bukkitCapabilities = commandManager.queryCapabilities();
     }
 
-    /**
-     * Stores the sender mapped to {@link org.bukkit.command.CommandSender} in the context with the key "BukkitCommandSender",
-     * and a {@link java.util.Set} of {@link CloudBukkitCapabilities} with the key "CloudBukkitCapabilities"
-     */
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
-        context.getCommandContext().store("BukkitCommandSender", this.mgr.getBackwardsCommandSenderMapper().apply(
-                context.getCommandContext().getSender()));
-        context.getCommandContext().store("CloudBukkitCapabilities", this.mgr.queryCapabilities());
+        context.getCommandContext().store(
+                BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER,
+                this.commandManager.getBackwardsCommandSenderMapper().apply(context.getCommandContext().getSender())
+        );
+        context.getCommandContext().store(
+                BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES,
+                this.bukkitCapabilities
+        );
     }
 
 }

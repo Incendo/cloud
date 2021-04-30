@@ -4,4 +4,5 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
     <suppress checks="(?:(?:Member|Method)Name|DesignForExtension|Javadoc.*)" files=".*[\\/]mixin[\\/].*"/>
+    <suppress checks="(?:Javadoc.*)" files=".*[\\/]CraftBukkitReflection.java"/>
 </suppressions>
