@@ -27,18 +27,17 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitBrigadierMapper;
+import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.permission.CommandPermission;
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.lang.reflect.Method;
 import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
 
@@ -59,20 +58,10 @@ class PaperBrigadierListener<C> implements Listener {
 
         new BukkitBrigadierMapper<>(this.paperCommandManager, this.brigadierManager);
 
-        if (!CraftBukkitReflection.craftBukkit()) {
-            return;
+        if (CraftBukkitReflection.craftBukkit()) {
+            this.brigadierManager
+                    .backwardsBrigadierSenderMapper(new BukkitBackwardsBrigadierSenderMapper<>(this.paperCommandManager));
         }
-        final Class<?> vanillaCommandWrapperClass = CraftBukkitReflection.needOBCClass("command.VanillaCommandWrapper");
-        final Method getListenerMethod = CraftBukkitReflection.needMethod(
-                vanillaCommandWrapperClass, "getListener", CommandSender.class);
-        this.brigadierManager.backwardsBrigadierSenderMapper(cloud -> {
-            try {
-                return (BukkitBrigadierCommandSource) getListenerMethod
-                        .invoke(null, this.paperCommandManager.getBackwardsCommandSenderMapper().apply(cloud));
-            } catch (final ReflectiveOperationException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     protected @NonNull CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager() {

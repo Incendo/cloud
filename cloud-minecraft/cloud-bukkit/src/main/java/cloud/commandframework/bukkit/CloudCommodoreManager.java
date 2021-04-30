@@ -25,6 +25,7 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
@@ -36,7 +37,6 @@ import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -64,19 +64,9 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
 
         new BukkitBrigadierMapper<>(this.commandManager, this.brigadierManager);
 
-        if (!CraftBukkitReflection.craftBukkit()) {
-            return;
+        if (CraftBukkitReflection.craftBukkit()) {
+            this.brigadierManager.backwardsBrigadierSenderMapper(new BukkitBackwardsBrigadierSenderMapper<>(this.commandManager));
         }
-        final Class<?> vanillaCommandWrapperClass = CraftBukkitReflection.needOBCClass("command.VanillaCommandWrapper");
-        final Method getListenerMethod = CraftBukkitReflection.needMethod(
-                vanillaCommandWrapperClass, "getListener", CommandSender.class);
-        this.brigadierManager.backwardsBrigadierSenderMapper(cloud -> {
-            try {
-                return getListenerMethod.invoke(null, this.commandManager.getBackwardsCommandSenderMapper().apply(cloud));
-            } catch (final ReflectiveOperationException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     @Override

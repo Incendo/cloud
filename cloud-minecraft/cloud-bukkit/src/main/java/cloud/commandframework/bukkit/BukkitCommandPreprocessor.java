@@ -23,9 +23,13 @@
 //
 package cloud.commandframework.bukkit;
 
+import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
+import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Set;
 
@@ -39,6 +43,7 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
     private final BukkitCommandManager<C> commandManager;
     private final Set<CloudBukkitCapabilities> bukkitCapabilities;
+    private final @Nullable BukkitBackwardsBrigadierSenderMapper<C, ?> mapper;
 
     /**
      * The Bukkit Command Preprocessor for storing Bukkit-specific contexts in the command contexts
@@ -48,10 +53,25 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
     BukkitCommandPreprocessor(final @NonNull BukkitCommandManager<C> commandManager) {
         this.commandManager = commandManager;
         this.bukkitCapabilities = commandManager.queryCapabilities();
+        if (this.bukkitCapabilities.contains(CloudBukkitCapabilities.BRIGADIER) && CraftBukkitReflection.craftBukkit()) {
+            this.mapper = new BukkitBackwardsBrigadierSenderMapper<>(this.commandManager);
+        } else {
+            this.mapper = null;
+        }
     }
 
     @Override
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
+        if (this.mapper != null) {
+            // If the server is Brigadier capable but the Brigadier manager has not been registered, store the native
+            // sender in context manually so that getting suggestions from WrappedBrigadierParser works like expected.
+            if (!context.getCommandContext().contains(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)) {
+                context.getCommandContext().store(
+                        WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER,
+                        this.mapper.apply(context.getCommandContext().getSender())
+                );
+            }
+        }
         context.getCommandContext().store(
                 BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER,
                 this.commandManager.getBackwardsCommandSenderMapper().apply(context.getCommandContext().getSender())

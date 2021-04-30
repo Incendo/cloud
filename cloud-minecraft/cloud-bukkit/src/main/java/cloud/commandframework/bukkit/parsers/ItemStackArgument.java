@@ -173,10 +173,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return Arrays.stream(Material.values())
-                    .filter(Material::isItem)
-                    .map(value -> value.name().toLowerCase(Locale.ROOT))
-                    .collect(Collectors.toList());
+            return this.parser.suggestions(commandContext, input);
         }
 
     }
@@ -226,6 +223,14 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         ) {
             // Minecraft has a parser for this - just use it
             return this.parser.parse(commandContext, inputQueue);
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.parser.suggestions(commandContext, input);
         }
 
         private static final class ModernProtoItemStack implements ProtoItemStack {
@@ -292,6 +297,17 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             return this.parser.parse(commandContext, inputQueue);
+        }
+
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return Arrays.stream(Material.values())
+                    .filter(Material::isItem)
+                    .map(value -> value.name().toLowerCase(Locale.ROOT))
+                    .collect(Collectors.toList());
         }
 
         private static final class LegacyProtoItemStack implements ProtoItemStack {
