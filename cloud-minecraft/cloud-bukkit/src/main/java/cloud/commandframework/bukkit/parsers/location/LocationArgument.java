@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
+import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
@@ -191,7 +192,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                 coordinates[i] = coordinate.getParsedValue().orElseThrow(NullPointerException::new);
             }
             final Location originalLocation;
-            final CommandSender bukkitSender = commandContext.get("BukkitCommandSender");
+            final CommandSender bukkitSender = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);
 
             if (bukkitSender instanceof BlockCommandSender) {
                 originalLocation = ((BlockCommandSender) bukkitSender).getBlock().getLocation();
