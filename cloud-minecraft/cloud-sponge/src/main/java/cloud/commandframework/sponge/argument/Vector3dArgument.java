@@ -244,7 +244,7 @@ public final class Vector3dArgument<C> extends VectorArgument<C, Vector3d> {
          */
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vector3d defaultValue) {
             return this.asOptionalWithDefault(
-                    String.format("%.10f %.10f %.10f", defaultValue.getX(), defaultValue.getY(), defaultValue.getZ())
+                    String.format("%.10f %.10f %.10f", defaultValue.x(), defaultValue.y(), defaultValue.z())
             );
         }
 

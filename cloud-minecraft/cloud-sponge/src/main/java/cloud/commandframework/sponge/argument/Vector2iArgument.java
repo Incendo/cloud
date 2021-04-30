@@ -194,7 +194,7 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
          */
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vector2i defaultValue) {
             return this.asOptionalWithDefault(
-                    String.format("%s %s", defaultValue.getX(), defaultValue.getY())
+                    String.format("%s %s", defaultValue.x(), defaultValue.y())
             );
         }
 

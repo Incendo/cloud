@@ -192,7 +192,7 @@ public final class Vector3iArgument<C> extends CommandArgument<C, Vector3i> {
          */
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vector3i defaultValue) {
             return this.asOptionalWithDefault(
-                    String.format("%s %s %s", defaultValue.getX(), defaultValue.getY(), defaultValue.getZ())
+                    String.format("%s %s %s", defaultValue.x(), defaultValue.y(), defaultValue.z())
             );
         }
 

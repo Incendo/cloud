@@ -243,7 +243,7 @@ public final class Vector2dArgument<C> extends VectorArgument<C, Vector2d> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          */
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vector2d defaultValue) {
-            return this.asOptionalWithDefault(String.format("%.10f %.10f", defaultValue.getX(), defaultValue.getY()));
+            return this.asOptionalWithDefault(String.format("%.10f %.10f", defaultValue.x(), defaultValue.y()));
         }
 
     }
