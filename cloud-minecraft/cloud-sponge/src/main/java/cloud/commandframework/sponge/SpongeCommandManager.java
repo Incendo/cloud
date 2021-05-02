@@ -30,16 +30,18 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.sponge.annotation.specifier.Center;
-import cloud.commandframework.sponge.argument.BlockStateArgument;
+import cloud.commandframework.sponge.argument.BlockInputArgument;
+import cloud.commandframework.sponge.argument.BlockPredicateArgument;
 import cloud.commandframework.sponge.argument.ComponentArgument;
 import cloud.commandframework.sponge.argument.DataContainerArgument;
 import cloud.commandframework.sponge.argument.GameProfileArgument;
 import cloud.commandframework.sponge.argument.GameProfileCollectionArgument;
-import cloud.commandframework.sponge.argument.ItemStackSnapshotArgument;
+import cloud.commandframework.sponge.argument.ItemStackPredicateArgument;
 import cloud.commandframework.sponge.argument.MultipleEntitySelectorArgument;
 import cloud.commandframework.sponge.argument.MultiplePlayerSelectorArgument;
 import cloud.commandframework.sponge.argument.NamedTextColorArgument;
 import cloud.commandframework.sponge.argument.OperatorArgument;
+import cloud.commandframework.sponge.argument.ProtoItemStackArgument;
 import cloud.commandframework.sponge.argument.RegistryEntryArgument;
 import cloud.commandframework.sponge.argument.ResourceKeyArgument;
 import cloud.commandframework.sponge.argument.SingleEntitySelectorArgument;
@@ -50,9 +52,12 @@ import cloud.commandframework.sponge.argument.Vector2iArgument;
 import cloud.commandframework.sponge.argument.Vector3dArgument;
 import cloud.commandframework.sponge.argument.Vector3iArgument;
 import cloud.commandframework.sponge.argument.WorldArgument;
+import cloud.commandframework.sponge.data.BlockPredicate;
 import cloud.commandframework.sponge.data.GameProfileCollection;
+import cloud.commandframework.sponge.data.ItemStackPredicate;
 import cloud.commandframework.sponge.data.MultipleEntitySelector;
 import cloud.commandframework.sponge.data.MultiplePlayerSelector;
+import cloud.commandframework.sponge.data.ProtoItemStack;
 import cloud.commandframework.sponge.data.SingleEntitySelector;
 import cloud.commandframework.sponge.data.SinglePlayerSelector;
 import com.google.common.collect.ImmutableSet;
@@ -68,7 +73,6 @@ import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.registry.DefaultedRegistryType;
 import org.spongepowered.api.registry.Registry;
@@ -151,8 +155,12 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
                 params -> new WorldArgument.Parser<>()
         );
         this.getParserRegistry().registerParserSupplier(
-                TypeToken.get(ItemStackSnapshot.class),
-                params -> new ItemStackSnapshotArgument.Parser<>()
+                TypeToken.get(ProtoItemStack.class),
+                params -> new ProtoItemStackArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(ItemStackPredicate.class),
+                params -> new ItemStackPredicateArgument.Parser<>()
         );
         this.getParserRegistry().registerParserSupplier(
                 TypeToken.get(ResourceKey.class),
@@ -167,8 +175,12 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
                 params -> new GameProfileCollectionArgument.Parser<>()
         );
         this.getParserRegistry().registerParserSupplier(
-                TypeToken.get(BlockStateArgument.class),
-                params -> new BlockStateArgument.Parser<>()
+                TypeToken.get(BlockInputArgument.class),
+                params -> new BlockInputArgument.Parser<>()
+        );
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(BlockPredicate.class),
+                params -> new BlockPredicateArgument.Parser<>()
         );
         this.getParserRegistry().registerParserSupplier(
                 TypeToken.get(User.class),

@@ -22,6 +22,6 @@
 // SOFTWARE.
 //
 /**
- * Cloud for Sponge API v8
+ * Cloud for Sponge 8
  */
 package cloud.commandframework.sponge;

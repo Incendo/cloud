@@ -274,7 +274,7 @@ final class CloudSpongeCommand<C> implements Command.Raw {
             } else if (value instanceof CompoundArgument) {
                 final CompoundArgument<?, C, ?> compound = (CompoundArgument<?, C, ?>) value;
                 this.handleCompoundArgument(node, child, compound);
-                return;
+                continue;
             } else {
                 treeNode = this.commandManager.parserMapper().mapArgument(value);
             }

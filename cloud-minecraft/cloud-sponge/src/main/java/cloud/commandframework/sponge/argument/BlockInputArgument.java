@@ -30,24 +30,35 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
-import net.minecraft.commands.arguments.blocks.BlockInput;
+import cloud.commandframework.sponge.data.BlockInput;
+import net.minecraft.commands.arguments.blocks.BlockStateArgument;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.registry.DefaultedRegistryReference;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.schematic.PaletteTypes;
+import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.common.data.persistence.NBTTranslator;
+import org.spongepowered.common.util.VecHelper;
+import org.spongepowered.common.world.SpongeBlockChangeFlag;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
 /**
- * An argument for parsing {@link BlockState BlockStates} from a {@link BlockType} identifier
- * and optional extra properties.
+ * An argument for parsing {@link BlockInput} from a {@link BlockState}
+ * and optional extra NBT data.
  *
  * <p>Example input strings:</p>
  * <ul>
@@ -58,9 +69,9 @@ import java.util.function.BiFunction;
  *
  * @param <C> sender type
  */
-public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> {
+public final class BlockInputArgument<C> extends CommandArgument<C, BlockInput> {
 
-    private BlockStateArgument(
+    private BlockInputArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -72,77 +83,77 @@ public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> 
                 name,
                 new Parser<>(),
                 defaultValue,
-                BlockState.class,
+                BlockInput.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
     /**
-     * Create a new required {@link BlockStateArgument}.
+     * Create a new required {@link BlockInputArgument}.
      *
      * @param name argument name
      * @param <C>  sender type
-     * @return a new {@link BlockStateArgument}
+     * @return a new {@link BlockInputArgument}
      */
-    public static <C> @NonNull BlockStateArgument<C> of(final @NonNull String name) {
-        return BlockStateArgument.<C>builder(name).build();
+    public static <C> @NonNull BlockInputArgument<C> of(final @NonNull String name) {
+        return BlockInputArgument.<C>builder(name).build();
     }
 
     /**
-     * Create a new optional {@link BlockStateArgument}.
+     * Create a new optional {@link BlockInputArgument}.
      *
      * @param name argument name
      * @param <C>  sender type
-     * @return a new {@link BlockStateArgument}
+     * @return a new {@link BlockInputArgument}
      */
-    public static <C> @NonNull BlockStateArgument<C> optional(final @NonNull String name) {
-        return BlockStateArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull BlockInputArgument<C> optional(final @NonNull String name) {
+        return BlockInputArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional {@link BlockStateArgument} with the specified default value.
+     * Create a new optional {@link BlockInputArgument} with the specified default value.
      *
      * @param name         argument name
      * @param defaultValue default value
      * @param <C>          sender type
-     * @return a new {@link BlockStateArgument}
+     * @return a new {@link BlockInputArgument}
      */
-    public static <C> @NonNull BlockStateArgument<C> optional(
+    public static <C> @NonNull BlockInputArgument<C> optional(
             final @NonNull String name,
             final @NonNull BlockState defaultValue
     ) {
-        return BlockStateArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return BlockInputArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
-     * Create a new optional {@link BlockStateArgument} with the specified default value.
+     * Create a new optional {@link BlockInputArgument} with the specified default value.
      *
      * @param name         argument name
      * @param defaultValue default value
      * @param <C>          sender type
-     * @return a new {@link BlockStateArgument}
+     * @return a new {@link BlockInputArgument}
      */
-    public static <C> @NonNull BlockStateArgument<C> optional(
+    public static <C> @NonNull BlockInputArgument<C> optional(
             final @NonNull String name,
             final @NonNull BlockType defaultValue
     ) {
-        return BlockStateArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return BlockInputArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
-     * Create a new optional {@link BlockStateArgument} with the specified default value.
+     * Create a new optional {@link BlockInputArgument} with the specified default value.
      *
      * @param name         argument name
      * @param defaultValue default value
      * @param <C>          sender type
-     * @return a new {@link BlockStateArgument}
+     * @return a new {@link BlockInputArgument}
      */
-    public static <C> @NonNull BlockStateArgument<C> optional(
+    public static <C> @NonNull BlockInputArgument<C> optional(
             final @NonNull String name,
             final @NonNull DefaultedRegistryReference<BlockType> defaultValue
     ) {
-        return BlockStateArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return BlockInputArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
@@ -161,14 +172,14 @@ public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> 
      *
      * @param <C> sender type
      */
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, BlockState> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, BlockInput> {
 
-        private final ArgumentParser<C, BlockState> mappedParser =
-                new WrappedBrigadierParser<C, BlockInput>(net.minecraft.commands.arguments.blocks.BlockStateArgument.block())
-                        .map((ctx, blockInput) -> ArgumentParseResult.success((BlockState) blockInput.getState()));
+        private final ArgumentParser<C, BlockInput> mappedParser =
+                new WrappedBrigadierParser<C, net.minecraft.commands.arguments.blocks.BlockInput>(BlockStateArgument.block())
+                        .map((ctx, blockInput) -> ArgumentParseResult.success(new BlockInputImpl(blockInput)));
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull BlockState> parse(
+        public @NonNull ArgumentParseResult<cloud.commandframework.sponge.data.@NonNull BlockInput> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
@@ -188,22 +199,74 @@ public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> 
             return ClientCompletionKeys.BLOCK_STATE.get().createNode();
         }
 
+        private static final class BlockInputImpl implements BlockInput {
+
+            private static final Field COMPOUND_TAG_FIELD;
+
+            static {
+                try {
+                    COMPOUND_TAG_FIELD = net.minecraft.commands.arguments.blocks.BlockInput.class.getDeclaredField("tag");
+                    COMPOUND_TAG_FIELD.setAccessible(true);
+                } catch (final ReflectiveOperationException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            private final net.minecraft.commands.arguments.blocks.BlockInput blockInput;
+            private final @Nullable DataContainer extraData;
+
+            BlockInputImpl(final net.minecraft.commands.arguments.blocks.@NonNull BlockInput blockInput) {
+                this.blockInput = blockInput;
+                try {
+                    final CompoundTag tag = (CompoundTag) COMPOUND_TAG_FIELD.get(blockInput);
+                    this.extraData = tag == null ? null : NBTTranslator.INSTANCE.translate(tag);
+                } catch (final IllegalAccessException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            @Override
+            public @NonNull BlockState blockState() {
+                return (BlockState) this.blockInput.getState();
+            }
+
+            @Override
+            public @Nullable DataContainer extraData() {
+                return this.extraData;
+            }
+
+            @Override
+            public boolean place(final @NonNull ServerLocation location) {
+                return this.place(location, BlockChangeFlags.DEFAULT_PLACEMENT);
+            }
+
+            @Override
+            public boolean place(final @NonNull ServerLocation location, final @NonNull BlockChangeFlag flag) {
+                return this.blockInput.place(
+                        (ServerLevel) location.world(),
+                        VecHelper.toBlockPos(location.position()),
+                        ((SpongeBlockChangeFlag) flag).getRawFlag()
+                );
+            }
+
+        }
+
     }
 
     /**
-     * Builder for {@link BlockStateArgument}.
+     * Builder for {@link BlockInputArgument}.
      *
      * @param <C> sender type
      */
-    public static final class Builder<C> extends TypedBuilder<C, BlockState, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, BlockInput, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(BlockState.class, name);
+            super(BlockInput.class, name);
         }
 
         @Override
-        public @NonNull BlockStateArgument<C> build() {
-            return new BlockStateArgument<>(
+        public @NonNull BlockInputArgument<C> build() {
+            return new BlockInputArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
@@ -215,13 +278,30 @@ public final class BlockStateArgument<C> extends CommandArgument<C, BlockState> 
         /**
          * Sets the command argument to be optional, with the specified default value.
          *
+         * @param defaultState     default {@link BlockState}
+         * @param defaultExtraData default extra data
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(
+                final @NonNull BlockState defaultState,
+                final @Nullable DataContainer defaultExtraData
+        ) {
+            final String value = PaletteTypes.BLOCK_STATE_PALETTE.get().stringifier()
+                    .apply(RegistryTypes.BLOCK_TYPE.get(), defaultState)
+                    + (defaultExtraData == null ? "" : NBTTranslator.INSTANCE.translate(defaultExtraData).toString());
+            return this.asOptionalWithDefault(value);
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
          * @param defaultValue default value
          * @return this builder
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          */
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull BlockState defaultValue) {
-            return this.asOptionalWithDefault(PaletteTypes.BLOCK_STATE_PALETTE.get().stringifier()
-                    .apply(RegistryTypes.BLOCK_TYPE.get(), defaultValue));
+            return this.asOptionalWithDefault(defaultValue, null);
         }
 
         /**

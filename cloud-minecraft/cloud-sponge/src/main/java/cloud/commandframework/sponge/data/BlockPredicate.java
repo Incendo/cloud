@@ -21,28 +21,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.sponge;
+package cloud.commandframework.sponge.data;
 
-import cloud.commandframework.keys.CloudKey;
-import cloud.commandframework.keys.SimpleCloudKey;
-import io.leangen.geantyref.TypeToken;
-import org.spongepowered.api.command.CommandCause;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+
+import java.util.function.Predicate;
 
 /**
- * Sponge related {@link cloud.commandframework.context.CommandContext} keys.
+ * A {@link Predicate} for blocks in a {@link ServerWorld}, parsed from user input.
+ *
+ * <p>By default, a parsed {@link BlockPredicate} will not load chunks to perform tests. It will simply
+ * return {@code false} when attempting to test a block in unloaded chunks.</p>
+ *
+ * <p>To get a {@link BlockPredicate} which will load chunks, use {@link #loadChunks()}.</p>
  */
-public final class SpongeCommandContextKeys {
+public interface BlockPredicate extends Predicate<ServerLocation> {
 
     /**
-     * The Sponge native {@link org.spongepowered.api.command.CommandCause} instance is stored in the {@link cloud.commandframework.context.CommandContext}
-     * by {@link SpongeCommandPreprocessor}
+     * Get a version of this {@link BlockPredicate} which will load chunks in order to perform
+     * tests.
+     *
+     * <p>If this {@link BlockPredicate} already loads chunks, it will simply return itself.</p>
+     *
+     * @return a {@link BlockPredicate} which loads chunks
      */
-    public static final CloudKey<CommandCause> COMMAND_CAUSE = SimpleCloudKey.of(
-            "cloud:sponge_command_cause",
-            TypeToken.get(CommandCause.class)
-    );
-
-    private SpongeCommandContextKeys() {
-    }
+    @NonNull BlockPredicate loadChunks();
 
 }

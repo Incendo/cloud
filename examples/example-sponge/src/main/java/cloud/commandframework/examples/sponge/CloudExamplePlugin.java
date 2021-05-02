@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.examples.sponge;
 
+import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
@@ -32,20 +33,27 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.sponge.CloudInjectionModule;
 import cloud.commandframework.sponge.SpongeCommandManager;
-import cloud.commandframework.sponge.argument.BlockStateArgument;
+import cloud.commandframework.sponge.argument.BlockInputArgument;
+import cloud.commandframework.sponge.argument.BlockPredicateArgument;
 import cloud.commandframework.sponge.argument.DataContainerArgument;
-import cloud.commandframework.sponge.argument.ItemStackSnapshotArgument;
+import cloud.commandframework.sponge.argument.ItemStackPredicateArgument;
 import cloud.commandframework.sponge.argument.MultipleEntitySelectorArgument;
 import cloud.commandframework.sponge.argument.NamedTextColorArgument;
 import cloud.commandframework.sponge.argument.OperatorArgument;
+import cloud.commandframework.sponge.argument.ProtoItemStackArgument;
 import cloud.commandframework.sponge.argument.RegistryEntryArgument;
 import cloud.commandframework.sponge.argument.SinglePlayerSelectorArgument;
 import cloud.commandframework.sponge.argument.UserArgument;
 import cloud.commandframework.sponge.argument.Vector3dArgument;
 import cloud.commandframework.sponge.argument.Vector3iArgument;
 import cloud.commandframework.sponge.argument.WorldArgument;
+import cloud.commandframework.sponge.data.BlockInput;
+import cloud.commandframework.sponge.data.BlockPredicate;
+import cloud.commandframework.sponge.data.ItemStackPredicate;
 import cloud.commandframework.sponge.data.MultipleEntitySelector;
+import cloud.commandframework.sponge.data.ProtoItemStack;
 import cloud.commandframework.sponge.data.SinglePlayerSelector;
+import cloud.commandframework.types.tuples.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -58,7 +66,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.command.parameter.managed.operator.Operators;
@@ -75,13 +82,12 @@ import org.spongepowered.api.entity.living.trader.Villager;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.registry.RegistryHolder;
 import org.spongepowered.api.registry.RegistryTypes;
-import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.biome.Biome;
 import org.spongepowered.api.world.schematic.PaletteTypes;
 import org.spongepowered.api.world.server.ServerLocation;
@@ -177,7 +183,7 @@ public final class CloudExamplePlugin {
                 .argument(RegistryEntryArgument.of("enchantment_type", EnchantmentType.class, RegistryTypes.ENCHANTMENT_TYPE))
                 .argument(IntegerArgument.optional("level", 1))
                 .handler(ctx -> {
-                    final Subject subject = ctx.getSender().subject();
+                    final Object subject = ctx.getSender().cause().root();
                     if (!(subject instanceof Player)) {
                         ctx.getSender().audience().sendMessage(text("This command is for players only!", RED));
                         return;
@@ -241,7 +247,7 @@ public final class CloudExamplePlugin {
                 .argument(OperatorArgument.of("operator"))
                 .argument(DoubleArgument.of("value"))
                 .handler(ctx -> {
-                    final Subject subject = ctx.getSender().subject();
+                    final Object subject = ctx.getSender().cause().root();
                     if (!(subject instanceof Player)) { // todo: a solution to this
                         ctx.getSender().audience().sendMessage(text("This command is for players only!", RED));
                         return;
@@ -276,12 +282,23 @@ public final class CloudExamplePlugin {
                 .handler(ctx -> {
                     ctx.getSender().audience().sendMessage(text(ctx.<ServerWorld>get("world").key().asString()));
                 }));
-        this.commandManager.command(cloud.literal("give_item")
-                .argument(SinglePlayerSelectorArgument.of("player"))
-                .argument(ItemStackSnapshotArgument.of("item"))
+        this.commandManager.command(cloud.literal("test_item")
+                .argument(ProtoItemStackArgument.of("item"))
+                .literal("is")
+                .argument(ItemStackPredicateArgument.of("predicate"))
                 .handler(ctx -> {
-                    final Player player = ctx.<SinglePlayerSelector>get("player").getSingle();
-                    player.inventory().offer(ctx.<ItemStackSnapshot>get("item").createStack());
+                    final ItemStack item = ctx.<ProtoItemStack>get("item").createItemStack(1, true);
+                    final ItemStackPredicate predicate = ctx.get("predicate");
+                    final Component message = text(builder -> {
+                        builder.append(item.get(Keys.DISPLAY_NAME).orElse(item.type().asComponent()))
+                                .append(space());
+                        if (predicate.test(item)) {
+                            builder.append(text("passes!", GREEN));
+                            return;
+                        }
+                        builder.append(text("does not pass!", RED));
+                    });
+                    ctx.getSender().audience().sendMessage(message);
                 }));
         this.commandManager.command(cloud.literal("test_entity_type")
                 .argument(RegistryEntryArgument.of("type", new TypeToken<EntityType<?>>() {
@@ -291,8 +308,8 @@ public final class CloudExamplePlugin {
                 }));
         final Function<CommandContext<CommandCause>, RegistryHolder> holderFunction = ctx -> ctx.getSender()
                 .location()
-                .orElse(Sponge.server().worldManager().defaultWorld().location(0, 0, 0))
-                .world()
+                .map(Location::world)
+                .orElse(Sponge.server().worldManager().defaultWorld())
                 .registries();
         this.commandManager.command(cloud.literal("test_biomes")
                 .argument(RegistryEntryArgument.of("biome", Biome.class, holderFunction, RegistryTypes.BIOME))
@@ -364,26 +381,71 @@ public final class CloudExamplePlugin {
         this.commandManager.command(cloud.literal("setblock")
                 .permission("cloud.setblock")
                 .argument(Vector3iArgument.of("position"))
-                .argument(BlockStateArgument.of("blockstate"))
+                .argument(BlockInputArgument.of("block"))
                 .handler(ctx -> {
                     final Vector3i position = ctx.get("position");
-                    final BlockState blockState = ctx.get("blockstate");
+                    final BlockInput input = ctx.get("block");
                     final Optional<ServerLocation> location = ctx.getSender().location();
                     if (location.isPresent()) {
-                        location.get().world().setBlock(position, blockState);
+                        final ServerWorld world = location.get().world();
+                        input.place(world.location(position));
                         ctx.getSender().audience().sendMessage(text("set block!"));
                     } else {
                         ctx.getSender().audience().sendMessage(text("no location!"));
                     }
                 }));
-        this.commandManager.command(cloud.literal("blockstate")
-                .argument(BlockStateArgument.of("blockstate"))
+        this.commandManager.command(cloud.literal("blockinput")
+                .argument(BlockInputArgument.of("block"))
                 .handler(ctx -> {
-                    final BlockState blockState = ctx.get("blockstate");
+                    final BlockInput input = ctx.get("block");
                     ctx.getSender().audience().sendMessage(text(
                             PaletteTypes.BLOCK_STATE_PALETTE.get().stringifier()
-                                    .apply(RegistryTypes.BLOCK_TYPE.get(), blockState)
+                                    .apply(RegistryTypes.BLOCK_TYPE.get(), input.blockState())
                     ));
+                }));
+        this.commandManager.command(this.commandManager.commandBuilder("gib")
+                .permission("cloud.gib")
+                .argumentPair(
+                        "itemstack",
+                        TypeToken.get(ItemStack.class),
+                        Pair.of("item", "amount"),
+                        Pair.of(ProtoItemStack.class, Integer.class),
+                        (sender, pair) -> {
+                            final ProtoItemStack proto = pair.getFirst();
+                            final int amount = pair.getSecond();
+                            return proto.createItemStack(amount, true);
+                        },
+                        ArgumentDescription.of("The ItemStack to give")
+                )
+                .handler(ctx -> ((Player) ctx.getSender().cause().root()).inventory().offer(ctx.<ItemStack>get("itemstack"))));
+        this.commandManager.command(cloud.literal("replace")
+                .permission(cause -> {
+                    // works but error message is ugly
+                    return cause.cause().root() instanceof Player;
+                })
+                .argument(BlockPredicateArgument.of("predicate"))
+                .argument(IntegerArgument.of("radius"))
+                .argument(BlockInputArgument.of("replacement"))
+                .handler(ctx -> {
+                    final BlockPredicate predicate = ctx.get("predicate");
+                    final int radius = ctx.get("radius");
+                    final BlockInput replacement = ctx.get("replacement");
+
+                    // its a player so get is fine
+                    final ServerLocation loc = ctx.getSender().location().get();
+                    final ServerWorld world = loc.world();
+                    final Vector3d vec = loc.position();
+
+                    for (double x = vec.x() - radius; x < vec.x() + radius; x++) {
+                        for (double y = vec.y() - radius; y < vec.y() + radius; y++) {
+                            for (double z = vec.z() - radius; z < vec.z() + radius; z++) {
+                                final ServerLocation location = world.location(x, y, z);
+                                if (predicate.test(location)) {
+                                    location.setBlock(replacement.blockState());
+                                }
+                            }
+                        }
+                    }
                 }));
     }
 
