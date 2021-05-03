@@ -92,7 +92,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull CommandArgument<C, ProtoItemStack> of(final @NonNull String name) {
+    public static <C> @NonNull ItemStackArgument<C> of(final @NonNull String name) {
         return ItemStackArgument.<C>builder(name).build();
     }
 
@@ -104,7 +104,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull CommandArgument<C, ProtoItemStack> optional(final @NonNull String name) {
+    public static <C> @NonNull ItemStackArgument<C> optional(final @NonNull String name) {
         return ItemStackArgument.<C>builder(name).asOptional().build();
     }
 

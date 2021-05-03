@@ -33,8 +33,10 @@ import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
+import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
@@ -62,6 +64,7 @@ import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.lang.reflect.Method;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -168,6 +171,12 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
                 new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
+
+        /* Register MC 1.13+ parsers */
+        if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
+            this.registerParserSupplierFor(ItemStackPredicateArgument.class);
+            this.registerParserSupplierFor(BlockPredicateArgument.class);
+        }
 
         /* Register suggestion and state listener */
         this.owningPlugin.getServer().getPluginManager().registerEvents(
@@ -394,6 +403,24 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      */
     public final @NonNull Function<@NonNull C, @NonNull CommandSender> getBackwardsCommandSenderMapper() {
         return this.backwardsCommandSenderMapper;
+    }
+
+    /**
+     * Attempts to call the method on the provided class matching the signature
+     * <p>{@code private static void registerParserSupplier(BukkitCommandManager)}</p>
+     * using reflection.
+     *
+     * @param argumentClass argument class
+     */
+    private void registerParserSupplierFor(final @NonNull Class<?> argumentClass) {
+        try {
+            final Method registerParserSuppliers = argumentClass
+                    .getDeclaredMethod("registerParserSupplier", BukkitCommandManager.class);
+            registerParserSuppliers.setAccessible(true);
+            registerParserSuppliers.invoke(null, this);
+        } catch (final ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     final void lockIfBrigadierCapable() {
