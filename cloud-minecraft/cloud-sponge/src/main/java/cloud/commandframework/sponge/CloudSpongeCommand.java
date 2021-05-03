@@ -147,13 +147,13 @@ final class CloudSpongeCommand<C> implements Command.Raw {
                     (CommandExecutionException) throwable,
                     (c, e) -> {
                         audience.sendMessage(MESSAGE_INTERNAL_ERROR);
-                        this.commandManager.owningPluginContainer().getLogger()
+                        this.commandManager.owningPluginContainer().logger()
                                 .error("Exception executing command handler", throwable.getCause());
                     }
             );
         } else {
             audience.sendMessage(MESSAGE_INTERNAL_ERROR);
-            this.commandManager.owningPluginContainer().getLogger()
+            this.commandManager.owningPluginContainer().logger()
                     .error("An unhandled exception was thrown during command execution", throwable);
         }
     }
