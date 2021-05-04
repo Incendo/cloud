@@ -38,8 +38,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.common.util.VecHelper;
 
@@ -146,7 +146,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.BLOCK_PREDICATE.get().createNode();
+            return CommandTreeNodeTypes.BLOCK_PREDICATE.get().createNode();
         }
 
         private static final class BlockPredicateImpl implements BlockPredicate {

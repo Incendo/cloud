@@ -33,8 +33,8 @@ import net.minecraft.commands.arguments.ColorArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,7 +151,7 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.COLOR.get().createNode();
+            return CommandTreeNodeTypes.COLOR.get().createNode();
         }
 
     }

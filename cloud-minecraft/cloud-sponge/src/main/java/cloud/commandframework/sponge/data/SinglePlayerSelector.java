@@ -23,11 +23,12 @@
 //
 package cloud.commandframework.sponge.data;
 
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 /**
- * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may select a single {@link Player}.
+ * A wrapper for {@link org.spongepowered.api.command.selector.Selector Selectors} which may
+ * select a single {@link ServerPlayer}.
  */
-public interface SinglePlayerSelector extends SelectorWrapper.Single<Player> {
+public interface SinglePlayerSelector extends SelectorWrapper.Single<ServerPlayer> {
 
 }

@@ -35,9 +35,9 @@ import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
-import org.spongepowered.api.command.registrar.tree.ClientSuggestionProviders;
+import org.spongepowered.api.command.registrar.tree.CommandCompletionProviders;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.registry.DefaultedRegistryType;
 import org.spongepowered.api.registry.Registry;
 import org.spongepowered.api.registry.RegistryEntry;
@@ -511,23 +511,23 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
             if (this.registryType.equals(RegistryTypes.SOUND_TYPE)) {
-                return ClientCompletionKeys.RESOURCE_LOCATION.get().createNode()
-                        .suggestions(ClientSuggestionProviders.AVAILABLE_SOUNDS);
+                return CommandTreeNodeTypes.RESOURCE_LOCATION.get().createNode()
+                        .completions(CommandCompletionProviders.AVAILABLE_SOUNDS);
             } else if (this.registryType.equals(RegistryTypes.BIOME)) {
-                return ClientCompletionKeys.RESOURCE_LOCATION.get().createNode()
-                        .suggestions(ClientSuggestionProviders.AVAILABLE_BIOMES);
+                return CommandTreeNodeTypes.RESOURCE_LOCATION.get().createNode()
+                        .completions(CommandCompletionProviders.AVAILABLE_BIOMES);
             } else if (this.registryType.equals(RegistryTypes.ENTITY_TYPE)) {
-                return ClientCompletionKeys.ENTITY_SUMMON.get().createNode()
-                        .suggestions(ClientSuggestionProviders.SUMMONABLE_ENTITIES);
+                return CommandTreeNodeTypes.ENTITY_SUMMON.get().createNode()
+                        .completions(CommandCompletionProviders.SUMMONABLE_ENTITIES);
             } else if (this.registryType.equals(RegistryTypes.ENCHANTMENT_TYPE)) {
-                return ClientCompletionKeys.ITEM_ENCHANTMENT.get().createNode();
+                return CommandTreeNodeTypes.ITEM_ENCHANTMENT.get().createNode();
             } else if (this.registryType.equals(RegistryTypes.POTION_EFFECT_TYPE)) {
-                return ClientCompletionKeys.MOB_EFFECT.get().createNode();
+                return CommandTreeNodeTypes.MOB_EFFECT.get().createNode();
             } else if (this.registryType.equals(RegistryTypes.WORLD_TYPE)) {
                 // todo: should we use custom suggestions? sponge seems to include non-vanilla dimension types in it's registry.
-                return ClientCompletionKeys.DIMENSION.get().createNode();
+                return CommandTreeNodeTypes.DIMENSION.get().createNode();
             }
-            return ClientCompletionKeys.RESOURCE_LOCATION.get().createNode().customSuggestions();
+            return CommandTreeNodeTypes.RESOURCE_LOCATION.get().createNode().customCompletions();
         }
 
     }

@@ -34,8 +34,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.server.WorldManager;
 
@@ -171,7 +171,7 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.RESOURCE_LOCATION.get().createNode().customSuggestions();
+            return CommandTreeNodeTypes.RESOURCE_LOCATION.get().createNode().customCompletions();
         }
 
     }

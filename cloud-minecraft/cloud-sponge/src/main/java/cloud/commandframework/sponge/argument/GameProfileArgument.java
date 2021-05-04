@@ -37,8 +37,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.common.profile.SpongeGameProfile;
@@ -150,7 +150,7 @@ public final class GameProfileArgument<C> extends CommandArgument<C, GameProfile
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.GAME_PROFILE.get().createNode();
+            return CommandTreeNodeTypes.GAME_PROFILE.get().createNode();
         }
 
     }

@@ -38,10 +38,11 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.List;
 import java.util.Queue;
@@ -126,10 +127,10 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
             }
             final String consumedInput = String.join(" ", inputQueue);
             final EntitySelector parsed = result.getParsedValue().get();
-            final Player player;
+            final ServerPlayer player;
             try {
                 // todo: a more proper fix then setting permission level 2
-                player = (Player) parsed.findSinglePlayer(
+                player = (ServerPlayer) parsed.findSinglePlayer(
                         ((CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE)).withPermission(2)
                 );
             } catch (final CommandSyntaxException ex) {
@@ -150,7 +151,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.ENTITY.get().createNode().playersOnly().single();
+            return CommandTreeNodeTypes.ENTITY.get().createNode().playersOnly().single();
         }
 
     }
@@ -183,12 +184,12 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
 
         private final Selector selector;
         private final String inputString;
-        private final Player result;
+        private final ServerPlayer result;
 
         private SinglePlayerSelectorImpl(
                 final Selector selector,
                 final String inputString,
-                final Player result
+                final ServerPlayer result
         ) {
             this.selector = selector;
             this.inputString = inputString;
@@ -206,7 +207,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         }
 
         @Override
-        public @NonNull Player getSingle() {
+        public @NonNull ServerPlayer getSingle() {
             return this.result;
         }
 

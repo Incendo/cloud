@@ -37,8 +37,8 @@ import net.minecraft.commands.arguments.coordinates.Coordinates;
 import net.minecraft.core.BlockPos;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.math.vector.Vector2i;
 
 import java.util.List;
@@ -158,7 +158,7 @@ public final class Vector2iArgument<C> extends CommandArgument<C, Vector2i> {
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.COLUMN_POS.get().createNode();
+            return CommandTreeNodeTypes.COLUMN_POS.get().createNode();
         }
 
     }

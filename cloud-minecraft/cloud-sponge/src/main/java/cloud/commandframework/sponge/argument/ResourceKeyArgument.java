@@ -31,8 +31,8 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 
 import java.util.List;
 import java.util.Queue;
@@ -134,7 +134,7 @@ public final class ResourceKeyArgument<C> extends CommandArgument<C, ResourceKey
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.RESOURCE_LOCATION.get().createNode();
+            return CommandTreeNodeTypes.RESOURCE_LOCATION.get().createNode();
         }
 
     }

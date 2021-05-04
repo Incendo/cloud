@@ -38,8 +38,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.registry.DefaultedRegistryReference;
 import org.spongepowered.api.registry.RegistryTypes;
@@ -196,7 +196,7 @@ public final class BlockInputArgument<C> extends CommandArgument<C, BlockInput> 
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.BLOCK_STATE.get().createNode();
+            return CommandTreeNodeTypes.BLOCK_STATE.get().createNode();
         }
 
         private static final class BlockInputImpl implements BlockInput {

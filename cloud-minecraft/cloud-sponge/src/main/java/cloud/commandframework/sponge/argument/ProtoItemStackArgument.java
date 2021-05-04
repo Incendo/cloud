@@ -39,8 +39,8 @@ import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.nbt.CompoundTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -209,7 +209,7 @@ public final class ProtoItemStackArgument<C> extends CommandArgument<C, ProtoIte
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.ITEM_STACK.get().createNode();
+            return CommandTreeNodeTypes.ITEM_STACK.get().createNode();
         }
 
         private static final class ProtoItemStackImpl implements ProtoItemStack {

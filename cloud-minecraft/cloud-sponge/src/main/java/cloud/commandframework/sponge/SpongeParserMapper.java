@@ -40,8 +40,8 @@ import cloud.commandframework.arguments.standard.UUIDArgument;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,7 +78,7 @@ public final class SpongeParserMapper<C> {
         final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> result = this.mapParser(value.getParser());
         final boolean customSuggestionsProvider = !DELEGATING_SUGGESTIONS_PROVIDER.isInstance(value.getSuggestionsProvider());
         if (customSuggestionsProvider) {
-            result.customSuggestions();
+            result.customCompletions();
         }
         return result;
     }
@@ -95,14 +95,14 @@ public final class SpongeParserMapper<C> {
             final CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>> apply =
                     (CommandTreeNode.Argument<? extends CommandTreeNode.Argument<?>>) ((Function) mapper.mapper).apply(parser);
             if (mapper.cloudSuggestions) {
-                apply.customSuggestions();
+                apply.customCompletions();
                 return apply;
             }
             result = apply;
         } else if (parser instanceof NodeSupplyingArgumentParser) {
             result = ((NodeSupplyingArgumentParser<C, ?>) parser).node();
         } else {
-            result = ClientCompletionKeys.STRING.get().createNode().customSuggestions().word();
+            result = CommandTreeNodeTypes.STRING.get().createNode().customCompletions().word();
         }
         return result;
     }
@@ -112,31 +112,31 @@ public final class SpongeParserMapper<C> {
         }, builder -> builder.to(stringParser -> {
             final StringArgument.StringMode mode = stringParser.getStringMode();
             if (mode == StringArgument.StringMode.SINGLE) {
-                return ClientCompletionKeys.STRING.get().createNode().customSuggestions().word();
+                return CommandTreeNodeTypes.STRING.get().createNode().customCompletions().word();
             } else if (mode == StringArgument.StringMode.QUOTED) {
-                return ClientCompletionKeys.STRING.get().createNode().customSuggestions();
+                return CommandTreeNodeTypes.STRING.get().createNode().customCompletions();
             } else if (mode == StringArgument.StringMode.GREEDY) {
-                return ClientCompletionKeys.STRING.get().createNode().customSuggestions().greedy();
+                return CommandTreeNodeTypes.STRING.get().createNode().customCompletions().greedy();
             }
             throw new IllegalArgumentException("Unknown string mode '" + mode + "'!");
         }));
         this.registerMapping(new TypeToken<ByteArgument.ByteParser<C>>() {
         }, builder -> builder.to(byteParser -> {
-            final CommandTreeNode.Range<Integer> node = ClientCompletionKeys.INTEGER.get().createNode();
+            final CommandTreeNode.Range<Integer> node = CommandTreeNodeTypes.INTEGER.get().createNode();
             node.min((int) byteParser.getMin());
             node.max((int) byteParser.getMax());
             return node;
         }));
         this.registerMapping(new TypeToken<ShortArgument.ShortParser<C>>() {
         }, builder -> builder.to(shortParser -> {
-            final CommandTreeNode.Range<Integer> node = ClientCompletionKeys.INTEGER.get().createNode();
+            final CommandTreeNode.Range<Integer> node = CommandTreeNodeTypes.INTEGER.get().createNode();
             node.min((int) shortParser.getMin());
             node.max((int) shortParser.getMax());
             return node;
         }));
         this.registerMapping(new TypeToken<IntegerArgument.IntegerParser<C>>() {
         }, builder -> builder.to(integerParser -> {
-            final CommandTreeNode.Range<Integer> node = ClientCompletionKeys.INTEGER.get().createNode();
+            final CommandTreeNode.Range<Integer> node = CommandTreeNodeTypes.INTEGER.get().createNode();
             if (integerParser.hasMin()) {
                 node.min(integerParser.getMin());
             }
@@ -147,7 +147,7 @@ public final class SpongeParserMapper<C> {
         }));
         this.registerMapping(new TypeToken<FloatArgument.FloatParser<C>>() {
         }, builder -> builder.to(floatParser -> {
-            final CommandTreeNode.Range<Float> node = ClientCompletionKeys.FLOAT.get().createNode();
+            final CommandTreeNode.Range<Float> node = CommandTreeNodeTypes.FLOAT.get().createNode();
             if (floatParser.hasMin()) {
                 node.min(floatParser.getMin());
             }
@@ -158,7 +158,7 @@ public final class SpongeParserMapper<C> {
         }));
         this.registerMapping(new TypeToken<DoubleArgument.DoubleParser<C>>() {
         }, builder -> builder.to(doubleParser -> {
-            final CommandTreeNode.Range<Double> node = ClientCompletionKeys.DOUBLE.get().createNode();
+            final CommandTreeNode.Range<Double> node = CommandTreeNodeTypes.DOUBLE.get().createNode();
             if (doubleParser.hasMin()) {
                 node.min(doubleParser.getMin());
             }
@@ -169,7 +169,7 @@ public final class SpongeParserMapper<C> {
         }));
         this.registerMapping(new TypeToken<LongArgument.LongParser<C>>() {
         }, builder -> builder.to(longParser -> {
-            final CommandTreeNode.Range<Long> node = ClientCompletionKeys.LONG.get().createNode();
+            final CommandTreeNode.Range<Long> node = CommandTreeNodeTypes.LONG.get().createNode();
             if (longParser.hasMin()) {
                 node.min(longParser.getMin());
             }
@@ -180,19 +180,19 @@ public final class SpongeParserMapper<C> {
         }));
         this.registerMapping(new TypeToken<BooleanArgument.BooleanParser<C>>() {
         }, builder -> builder.to(booleanParser -> {
-            return ClientCompletionKeys.BOOL.get().createNode();
+            return CommandTreeNodeTypes.BOOL.get().createNode();
         }));
         this.registerMapping(new TypeToken<FlagArgument.FlagArgumentParser<C>>() {
         }, builder -> builder.to(flagArgumentParser -> {
-            return ClientCompletionKeys.STRING.get().createNode().customSuggestions().greedy();
+            return CommandTreeNodeTypes.STRING.get().createNode().customCompletions().greedy();
         }));
         this.registerMapping(new TypeToken<StringArrayArgument.StringArrayParser<C>>() {
         }, builder -> builder.to(stringArrayParser -> {
-            return ClientCompletionKeys.STRING.get().createNode().customSuggestions().greedy();
+            return CommandTreeNodeTypes.STRING.get().createNode().customCompletions().greedy();
         }));
         this.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {
         }, builder -> builder.to(uuidParser -> {
-            return ClientCompletionKeys.UUID.get().createNode();
+            return CommandTreeNodeTypes.UUID.get().createNode();
         }));
     }
 
@@ -272,7 +272,7 @@ public final class SpongeParserMapper<C> {
     public interface MappingBuilder<C, A extends ArgumentParser<C, ?>> {
 
         /**
-         * Set whether to use cloud suggestions, or to fall back onto {@link ClientCompletionKeys}. By default, this is set to
+         * Set whether to use cloud suggestions, or to fall back onto {@link CommandTreeNodeTypes}. By default, this is set to
          * {@code false}.
          *
          * @param cloudSuggestions whether to use cloud suggestions

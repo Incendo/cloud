@@ -34,8 +34,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.common.adventure.SpongeAdventure;
 
 import java.util.List;
@@ -138,7 +138,7 @@ public final class ComponentArgument<C> extends CommandArgument<C, Component> {
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.COMPONENT.get().createNode();
+            return CommandTreeNodeTypes.COMPONENT.get().createNode();
         }
 
     }

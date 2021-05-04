@@ -38,10 +38,11 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.Collection;
 import java.util.List;
@@ -128,11 +129,11 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             }
             final String consumedInput = String.join(" ", inputQueue);
             final EntitySelector parsed = result.getParsedValue().get();
-            final List<Player> players;
+            final List<ServerPlayer> players;
             try {
                 players = parsed.findPlayers(
                         ((CommandSourceStack) commandContext.get(SpongeCommandContextKeys.COMMAND_CAUSE)).withPermission(2)
-                ).stream().map(p -> (Player) p).collect(Collectors.toList());
+                ).stream().map(p -> (ServerPlayer) p).collect(Collectors.toList());
             } catch (final CommandSyntaxException ex) {
                 return ArgumentParseResult.failure(ex);
             }
@@ -151,7 +152,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.ENTITY.get().createNode().playersOnly();
+            return CommandTreeNodeTypes.ENTITY.get().createNode().playersOnly();
         }
 
     }
@@ -184,12 +185,12 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
 
         private final Selector selector;
         private final String inputString;
-        private final Collection<Player> result;
+        private final Collection<ServerPlayer> result;
 
         private MultiplePlayerSelectorImpl(
                 final Selector selector,
                 final String inputString,
-                final Collection<Player> result
+                final Collection<ServerPlayer> result
         ) {
             this.selector = selector;
             this.inputString = inputString;
@@ -207,7 +208,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         }
 
         @Override
-        public @NonNull Collection<Player> get() {
+        public @NonNull Collection<ServerPlayer> get() {
             return this.result;
         }
 

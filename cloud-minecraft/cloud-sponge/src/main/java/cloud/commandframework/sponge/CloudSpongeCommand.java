@@ -44,6 +44,7 @@ import net.kyori.adventure.util.ComponentMessageThrowable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
@@ -55,6 +56,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
@@ -164,11 +166,14 @@ final class CloudSpongeCommand<C> implements Command.Raw {
     }
 
     @Override
-    public List<String> suggestions(final @NonNull CommandCause cause, final ArgumentReader.@NonNull Mutable arguments) {
+    public List<CommandCompletion> complete(
+            final @NonNull CommandCause cause,
+            final ArgumentReader.@NonNull Mutable arguments
+    ) {
         return this.commandManager.suggest(
                 this.commandManager.backwardsCauseMapper().apply(cause),
                 this.formatCommandForSuggestions(arguments.input())
-        );
+        ).stream().map(CommandCompletion::of).collect(Collectors.toList());
     }
 
     @Override

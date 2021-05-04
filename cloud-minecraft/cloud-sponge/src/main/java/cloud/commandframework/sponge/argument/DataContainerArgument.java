@@ -34,8 +34,8 @@ import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.nbt.CompoundTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.ClientCompletionKeys;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.common.data.persistence.NBTTranslator;
 
@@ -139,7 +139,7 @@ public final class DataContainerArgument<C> extends CommandArgument<C, DataConta
 
         @Override
         public CommandTreeNode.@NonNull Argument<? extends CommandTreeNode.Argument<?>> node() {
-            return ClientCompletionKeys.NBT_COMPOUND_TAG.get().createNode();
+            return CommandTreeNodeTypes.NBT_COMPOUND_TAG.get().createNode();
         }
 
     }

@@ -183,7 +183,7 @@ public final class CloudExamplePlugin {
                 .argument(RegistryEntryArgument.of("enchantment_type", EnchantmentType.class, RegistryTypes.ENCHANTMENT_TYPE))
                 .argument(IntegerArgument.optional("level", 1))
                 .handler(ctx -> {
-                    final Object subject = ctx.getSender().cause().root();
+                    final Object subject = ctx.getSender().subject();
                     if (!(subject instanceof Player)) {
                         ctx.getSender().audience().sendMessage(text("This command is for players only!", RED));
                         return;
@@ -247,7 +247,7 @@ public final class CloudExamplePlugin {
                 .argument(OperatorArgument.of("operator"))
                 .argument(DoubleArgument.of("value"))
                 .handler(ctx -> {
-                    final Object subject = ctx.getSender().cause().root();
+                    final Object subject = ctx.getSender().subject();
                     if (!(subject instanceof Player)) { // todo: a solution to this
                         ctx.getSender().audience().sendMessage(text("This command is for players only!", RED));
                         return;
@@ -417,11 +417,12 @@ public final class CloudExamplePlugin {
                         },
                         ArgumentDescription.of("The ItemStack to give")
                 )
-                .handler(ctx -> ((Player) ctx.getSender().cause().root()).inventory().offer(ctx.<ItemStack>get("itemstack"))));
+                .handler(ctx -> ((Player) ctx.getSender().subject()).inventory().offer(ctx.<ItemStack>get("itemstack"))));
         this.commandManager.command(cloud.literal("replace")
                 .permission(cause -> {
                     // works but error message is ugly
-                    return cause.cause().root() instanceof Player;
+                    // todo: cause.cause().root() returns DedicatedServer during permission checks?
+                    return cause.subject() instanceof Player;
                 })
                 .argument(BlockPredicateArgument.of("predicate"))
                 .argument(IntegerArgument.of("radius"))
