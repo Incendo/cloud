@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for resolving column (xz) coordinates.
+ * An argument for resolving {@link ColumnCoordinates column (xz) coordinates}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -62,19 +62,19 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> ColumnPosArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+    public static <C> ColumnPosArgument.@NonNull Builder<C> builder(final @NonNull String name) {
         return new ColumnPosArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link ColumnPosArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -82,11 +82,11 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
      * @since 1.5.0
      */
     public static <C> @NonNull ColumnPosArgument<C> of(final @NonNull String name) {
-        return ColumnPosArgument.<C>newBuilder(name).asRequired().build();
+        return ColumnPosArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link ColumnPosArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -94,11 +94,11 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
      * @since 1.5.0
      */
     public static <C> @NonNull ColumnPosArgument<C> optional(final @NonNull String name) {
-        return ColumnPosArgument.<C>newBuilder(name).asOptional().build();
+        return ColumnPosArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link ColumnPosArgument} with the specified default value.
      *
      * @param name         Component name
      * @param defaultValue default value, y coordinate will be ignored as it is always 0
@@ -107,17 +107,9 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
      * @since 1.5.0
      */
     public static <C> @NonNull ColumnPosArgument<C> optional(final @NonNull String name, final @NonNull BlockPos defaultValue) {
-        return ColumnPosArgument.<C>newBuilder(name)
-                .asOptionalWithDefault(serializeColumnPos(defaultValue))
+        return ColumnPosArgument.<C>builder(name)
+                .asOptionalWithDefault(defaultValue)
                 .build();
-    }
-
-    private static @NonNull String serializeColumnPos(final @NonNull BlockPos pos) {
-        return String.format(
-                "%s %s",
-                pos.getX(),
-                pos.getZ()
-        );
     }
 
     /**
@@ -133,7 +125,7 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
         }
 
         /**
-         * Build a column position argument.
+         * Build a new {@link ColumnPosArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -147,6 +139,22 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull BlockPos defaultValue) {
+            return this.asOptionalWithDefault(String.format(
+                    "%s %s",
+                    defaultValue.getX(),
+                    defaultValue.getZ()
+            ));
         }
 
     }

@@ -36,16 +36,16 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for resolving x and z coordinates from 2 doubles.
+ * An argument for resolving {@link Coordinates} from 3 doubles.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class Vec2Argument<C> extends CommandArgument<C, Coordinates.CoordinatesXZ> {
+public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
 
     private final boolean centerIntegers;
 
-    Vec2Argument(
+    Vec3dArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -56,9 +56,9 @@ public final class Vec2Argument<C> extends CommandArgument<C, Coordinates.Coordi
         super(
                 required,
                 name,
-                FabricArgumentParsers.vec2(centerIntegers),
+                FabricArgumentParsers.vec3(centerIntegers),
                 defaultValue,
-                Coordinates.CoordinatesXZ.class,
+                Coordinates.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -76,31 +76,31 @@ public final class Vec2Argument<C> extends CommandArgument<C, Coordinates.Coordi
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> Vec2Argument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new Vec2Argument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link Vec3dArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull Vec2Argument<C> of(final @NonNull String name) {
-        return Vec2Argument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull Vec3dArgument<C> of(final @NonNull String name) {
+        return Vec3dArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link Vec3dArgument}.
      *
      * @param name           Component name
      * @param centerIntegers whether to center integers to x.5.
@@ -108,24 +108,24 @@ public final class Vec2Argument<C> extends CommandArgument<C, Coordinates.Coordi
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull Vec2Argument<C> of(final @NonNull String name, final boolean centerIntegers) {
-        return Vec2Argument.<C>newBuilder(name).centerIntegers(centerIntegers).asRequired().build();
+    public static <C> @NonNull Vec3dArgument<C> of(final @NonNull String name, final boolean centerIntegers) {
+        return Vec3dArgument.<C>builder(name).centerIntegers(centerIntegers).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link Vec3dArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull Vec2Argument<C> optional(final @NonNull String name) {
-        return Vec2Argument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull Vec3dArgument<C> optional(final @NonNull String name) {
+        return Vec3dArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link Vec3dArgument}.
      *
      * @param name           Component name
      * @param centerIntegers whether to center integers to x.5.
@@ -133,66 +133,53 @@ public final class Vec2Argument<C> extends CommandArgument<C, Coordinates.Coordi
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull Vec2Argument<C> optional(final @NonNull String name, final boolean centerIntegers) {
-        return Vec2Argument.<C>newBuilder(name).centerIntegers(centerIntegers).asOptional().build();
+    public static <C> @NonNull Vec3dArgument<C> optional(final @NonNull String name, final boolean centerIntegers) {
+        return Vec3dArgument.<C>builder(name).centerIntegers(centerIntegers).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link Vec3dArgument} with the specified default value.
      *
      * @param name         Component name
-     * @param defaultValue default value, y will be ignored as it is always 0
+     * @param defaultValue default value
      * @param <C>          Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull Vec2Argument<C> optional(final @NonNull String name, final @NonNull Vec3d defaultValue) {
-        return Vec2Argument.<C>newBuilder(name)
-                .asOptionalWithDefault(serializeXandZ(defaultValue))
-                .build();
+    public static <C> @NonNull Vec3dArgument<C> optional(final @NonNull String name, final @NonNull Vec3d defaultValue) {
+        return Vec3dArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link Vec3dArgument} with the specified default value.
      *
      * @param name           Component name
-     * @param defaultValue   default value, y will be ignored as it is always 0
+     * @param defaultValue   default value
      * @param centerIntegers whether to center integers to x.5.
      * @param <C>            Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull Vec2Argument<C> optional(
+    public static <C> @NonNull Vec3dArgument<C> optional(
             final @NonNull String name,
             final boolean centerIntegers,
             final @NonNull Vec3d defaultValue
     ) {
-        return Vec2Argument.<C>newBuilder(name)
-                .centerIntegers(centerIntegers)
-                .asOptionalWithDefault(serializeXandZ(defaultValue))
-                .build();
-    }
-
-    private static @NonNull String serializeXandZ(final @NonNull Vec3d vec3d) {
-        return String.format(
-                "%.10f %.10f",
-                vec3d.x,
-                vec3d.z
-        );
+        return Vec3dArgument.<C>builder(name).centerIntegers(centerIntegers).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
-     * Builder for {@link Vec2Argument}.
+     * Builder for {@link Vec3dArgument}.
      *
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Coordinates.CoordinatesXZ, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, Coordinates, Builder<C>> {
 
         private boolean centerIntegers = false;
 
         Builder(final @NonNull String name) {
-            super(Coordinates.CoordinatesXZ.class, name);
+            super(Coordinates.class, name);
         }
 
         /**
@@ -218,14 +205,31 @@ public final class Vec2Argument<C> extends CommandArgument<C, Coordinates.Coordi
         }
 
         /**
-         * Build a vec2 argument.
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vec3d defaultValue) {
+            return this.asOptionalWithDefault(String.format(
+                    "%.10f %.10f %.10f",
+                    defaultValue.x,
+                    defaultValue.y,
+                    defaultValue.z
+            ));
+        }
+
+        /**
+         * Build a new {@link Vec3dArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
          */
         @Override
-        public @NonNull Vec2Argument<C> build() {
-            return new Vec2Argument<>(
+        public @NonNull Vec3dArgument<C> build() {
+            return new Vec3dArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),

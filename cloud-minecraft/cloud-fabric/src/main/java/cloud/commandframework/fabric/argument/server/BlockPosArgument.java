@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for resolving block coordinates.
+ * An argument for resolving {@link BlockCoordinates}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -62,19 +62,19 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> BlockPosArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+    public static <C> BlockPosArgument.@NonNull Builder<C> builder(final @NonNull String name) {
         return new BlockPosArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link BlockPosArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -82,11 +82,11 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
      * @since 1.5.0
      */
     public static <C> @NonNull BlockPosArgument<C> of(final @NonNull String name) {
-        return BlockPosArgument.<C>newBuilder(name).asRequired().build();
+        return BlockPosArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link BlockPosArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -94,11 +94,11 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
      * @since 1.5.0
      */
     public static <C> @NonNull BlockPosArgument<C> optional(final @NonNull String name) {
-        return BlockPosArgument.<C>newBuilder(name).asOptional().build();
+        return BlockPosArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link BlockPosArgument} with the specified default value.
      *
      * @param name         Component name
      * @param defaultValue default value
@@ -107,18 +107,9 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
      * @since 1.5.0
      */
     public static <C> @NonNull BlockPosArgument<C> optional(final @NonNull String name, final @NonNull BlockPos defaultValue) {
-        return BlockPosArgument.<C>newBuilder(name)
-                .asOptionalWithDefault(serializeBlockPos(defaultValue))
+        return BlockPosArgument.<C>builder(name)
+                .asOptionalWithDefault(defaultValue)
                 .build();
-    }
-
-    private static @NonNull String serializeBlockPos(final @NonNull BlockPos pos) {
-        return String.format(
-                "%s %s %s",
-                pos.getX(),
-                pos.getY(),
-                pos.getZ()
-        );
     }
 
     /**
@@ -134,7 +125,7 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
         }
 
         /**
-         * Build a block position argument.
+         * Build a new {@link BlockPosArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -148,6 +139,23 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull BlockPos defaultValue) {
+            return this.asOptionalWithDefault(String.format(
+                    "%s %s %s",
+                    defaultValue.getX(),
+                    defaultValue.getY(),
+                    defaultValue.getZ()
+            ));
         }
 
     }

@@ -61,19 +61,19 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> MessageArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+    public static <C> MessageArgument.@NonNull Builder<C> builder(final @NonNull String name) {
         return new MessageArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link MessageArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -81,11 +81,11 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
      * @since 1.5.0
      */
     public static <C> @NonNull MessageArgument<C> of(final @NonNull String name) {
-        return MessageArgument.<C>newBuilder(name).asRequired().build();
+        return MessageArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument
+     * Create a new optional {@link MessageArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -93,11 +93,11 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
      * @since 1.5.0
      */
     public static <C> @NonNull MessageArgument<C> optional(final @NonNull String name) {
-        return MessageArgument.<C>newBuilder(name).asOptional().build();
+        return MessageArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value
+     * Create a new optional {@link MessageArgument} with the specified value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -109,7 +109,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
             final @NonNull String name,
             final @NonNull String defaultValue
     ) {
-        return MessageArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
+        return MessageArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
@@ -126,7 +126,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
         }
 
         /**
-         * Build a new message argument.
+         * Build a new {@link MessageArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0

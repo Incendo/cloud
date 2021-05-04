@@ -35,7 +35,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for NBT paths to locations within {@link net.minecraft.nbt.Tag Tags}.
+ * An argument for {@link net.minecraft.command.argument.NbtPathArgumentType.NbtPath NBT paths} to locations within
+ * {@link net.minecraft.nbt.Tag Tags}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -61,19 +62,19 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the component
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> NbtPathArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new NbtPathArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link NbtPathArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -81,11 +82,11 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
      * @since 1.5.0
      */
     public static <C> @NonNull NbtPathArgument<C> of(final @NonNull String name) {
-        return NbtPathArgument.<C>newBuilder(name).asRequired().build();
+        return NbtPathArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link NbtPathArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -93,11 +94,11 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
      * @since 1.5.0
      */
     public static <C> @NonNull NbtPathArgument<C> optional(final @NonNull String name) {
-        return NbtPathArgument.<C>newBuilder(name).asOptional().build();
+        return NbtPathArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link NbtPathArgument} with the specified default value.
      *
      * @param name       Component name
      * @param defaultTag Default tag value
@@ -109,7 +110,7 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
             final @NonNull String name,
             final NbtPathArgumentType.@NonNull NbtPath defaultTag
     ) {
-        return NbtPathArgument.<C>newBuilder(name).asOptionalWithDefault(defaultTag.toString()).build();
+        return NbtPathArgument.<C>builder(name).asOptionalWithDefault(defaultTag).build();
     }
 
 
@@ -140,6 +141,18 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final NbtPathArgumentType.@NonNull NbtPath defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.toString());
         }
 
     }

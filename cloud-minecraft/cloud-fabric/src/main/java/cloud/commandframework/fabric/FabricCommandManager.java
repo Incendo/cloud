@@ -208,7 +208,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void registerRegistryEntryMappings() {
         this.brigadierManager.registerMapping(
-                new TypeToken<RegistryEntryArgument.RegistryEntryParser<C, ?>>() {
+                new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {
                 },
                 builder -> builder.to(argument -> {
                             /* several registries have specialized argument types, so let's use those where possible */
@@ -289,7 +289,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
             /* and now, finally, we can register */
             this.getParserRegistry().registerParserSupplier(
                     TypeToken.get(valueType),
-                    params -> new RegistryEntryArgument.RegistryEntryParser(key)
+                    params -> new RegistryEntryArgument.Parser(key)
             );
         }
     }

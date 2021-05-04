@@ -35,7 +35,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for selecting a single entity
+ * An argument for selecting a single {@link net.minecraft.entity.Entity entity} using an
+ * {@link net.minecraft.command.EntitySelector}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -61,19 +62,19 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> SingleEntitySelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+    public static <C> SingleEntitySelectorArgument.@NonNull Builder<C> builder(final @NonNull String name) {
         return new SingleEntitySelectorArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link SingleEntitySelectorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -81,11 +82,11 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @since 1.5.0
      */
     public static <C> @NonNull SingleEntitySelectorArgument<C> of(final @NonNull String name) {
-        return SingleEntitySelectorArgument.<C>newBuilder(name).asRequired().build();
+        return SingleEntitySelectorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link SingleEntitySelectorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -93,7 +94,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @since 1.5.0
      */
     public static <C> @NonNull SingleEntitySelectorArgument<C> optional(final @NonNull String name) {
-        return SingleEntitySelectorArgument.<C>newBuilder(name).asOptional().build();
+        return SingleEntitySelectorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -109,7 +110,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
         }
 
         /**
-         * Build a single entity selector argument.
+         * Build a new {@link SingleEntitySelectorArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0

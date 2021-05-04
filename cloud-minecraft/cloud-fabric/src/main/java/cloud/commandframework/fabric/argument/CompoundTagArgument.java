@@ -62,19 +62,19 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the component
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> CompoundTagArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new CompoundTagArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link CompoundTagArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -82,11 +82,11 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
      * @since 1.5.0
      */
     public static <C> @NonNull CompoundTagArgument<C> of(final @NonNull String name) {
-        return CompoundTagArgument.<C>newBuilder(name).asRequired().build();
+        return CompoundTagArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link CompoundTagArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -94,11 +94,11 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
      * @since 1.5.0
      */
     public static <C> @NonNull CompoundTagArgument<C> optional(final @NonNull String name) {
-        return CompoundTagArgument.<C>newBuilder(name).asOptional().build();
+        return CompoundTagArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link CompoundTagArgument} with the specified default value.
      *
      * @param name       Component name
      * @param defaultTag Default tag value
@@ -110,7 +110,7 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
             final @NonNull String name,
             final @NonNull CompoundTag defaultTag
     ) {
-        return CompoundTagArgument.<C>newBuilder(name).asOptionalWithDefault(defaultTag.toString()).build();
+        return CompoundTagArgument.<C>builder(name).asOptionalWithDefault(defaultTag).build();
     }
 
 
@@ -127,7 +127,7 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
         }
 
         /**
-         * Build a new compound tag argument.
+         * Build a new {@link CompoundTagArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -141,6 +141,18 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull CompoundTag defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.toString());
         }
 
     }

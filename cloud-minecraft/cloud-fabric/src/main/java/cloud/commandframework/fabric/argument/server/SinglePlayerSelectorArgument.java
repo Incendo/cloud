@@ -35,7 +35,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for selecting a single player
+ * An argument for selecting a single {@link net.minecraft.server.network.ServerPlayerEntity player} using an
+ * {@link net.minecraft.command.EntitySelector}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -61,19 +62,19 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> SinglePlayerSelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new SinglePlayerSelectorArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link SinglePlayerSelectorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -81,11 +82,11 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @since 1.5.0
      */
     public static <C> @NonNull SinglePlayerSelectorArgument<C> of(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
+        return SinglePlayerSelectorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link SinglePlayerSelectorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -93,7 +94,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @since 1.5.0
      */
     public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
+        return SinglePlayerSelectorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -109,7 +110,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         }
 
         /**
-         * Build a single player selector argument.
+         * Build a new {@link SinglePlayerSelectorArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0

@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an unbounded float range, in the form {@code [min]..[max] }, where both lower and upper bounds are
- * optional.
+ * An argument parsing an unbounded {@link net.minecraft.predicate.NumberRange.FloatRange float range}, in the form
+ * {@code [min]..[max]}, where both lower and upper bounds are optional.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -63,19 +63,19 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> FloatRangeArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new FloatRangeArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link FloatRangeArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -83,11 +83,11 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
      * @since 1.5.0
      */
     public static <C> @NonNull FloatRangeArgument<C> of(final @NonNull String name) {
-        return FloatRangeArgument.<C>newBuilder(name).asRequired().build();
+        return FloatRangeArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link FloatRangeArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -95,11 +95,11 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
      * @since 1.5.0
      */
     public static <C> @NonNull FloatRangeArgument<C> optional(final @NonNull String name) {
-        return FloatRangeArgument.<C>newBuilder(name).asOptional().build();
+        return FloatRangeArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link FloatRangeArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -111,16 +111,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
             final @NonNull String name,
             final NumberRange.@NonNull FloatRange defaultValue
     ) {
-        final StringBuilder value = new StringBuilder(6);
-        if (defaultValue.getMin() != null) {
-            value.append(defaultValue.getMin());
-        }
-        value.append("..");
-        if (defaultValue.getMax() != null) {
-            value.append(defaultValue.getMax());
-        }
-
-        return FloatRangeArgument.<C>newBuilder(name).asOptionalWithDefault(value.toString()).build();
+        return FloatRangeArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
@@ -137,7 +128,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
         }
 
         /**
-         * Build a new float range argument.
+         * Build a new {@link FloatRangeArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -151,6 +142,26 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final NumberRange.@NonNull FloatRange defaultValue) {
+            final StringBuilder value = new StringBuilder(6);
+            if (defaultValue.getMin() != null) {
+                value.append(defaultValue.getMin());
+            }
+            value.append("..");
+            if (defaultValue.getMax() != null) {
+                value.append(defaultValue.getMax());
+            }
+            return this.asOptionalWithDefault(value.toString());
         }
 
     }

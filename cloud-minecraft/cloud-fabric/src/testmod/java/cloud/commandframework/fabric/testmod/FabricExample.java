@@ -35,7 +35,7 @@ import cloud.commandframework.fabric.argument.ItemDataArgument;
 import cloud.commandframework.fabric.argument.server.ColumnPosArgument;
 import cloud.commandframework.fabric.argument.server.MultipleEntitySelectorArgument;
 import cloud.commandframework.fabric.argument.server.MultiplePlayerSelectorArgument;
-import cloud.commandframework.fabric.argument.server.Vec3Argument;
+import cloud.commandframework.fabric.argument.server.Vec3dArgument;
 import cloud.commandframework.fabric.data.Coordinates;
 import cloud.commandframework.fabric.data.Coordinates.ColumnCoordinates;
 import cloud.commandframework.fabric.data.MultipleEntitySelector;
@@ -56,6 +56,7 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.TextColor;
+import net.minecraft.text.Texts;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.ChunkPos;
@@ -118,7 +119,7 @@ public final class FabricExample implements ModInitializer {
                             ));
                     ctx.getSender().sendFeedback(
                             new LiteralText(String.format("Waved at %d players (%s)", selected.size(),
-                                    selector.getInput()
+                                    selector.inputString()
                             )),
                             false
                     );
@@ -229,7 +230,7 @@ public final class FabricExample implements ModInitializer {
         manager.command(base.literal("teleport")
                 .permission("cloud.teleport")
                 .argument(MultipleEntitySelectorArgument.of("targets"))
-                .argument(Vec3Argument.of("location"))
+                .argument(Vec3dArgument.of("location"))
                 .handler(ctx -> {
                     final MultipleEntitySelector selector = ctx.get("targets");
                     final Vec3d location = ctx.<Coordinates>get("location").position();
@@ -245,7 +246,7 @@ public final class FabricExample implements ModInitializer {
                     try {
                         player = ctx.getSender().getPlayer();
                     } catch (final CommandSyntaxException e) {
-                        ctx.getSender().sendFeedback(new LiteralText("Must be a player to use this command"), false);
+                        ctx.getSender().sendFeedback(Texts.toText(e.getRawMessage()), false);
                         return;
                     }
                     final Vec3d vec = ctx.<ColumnCoordinates>get("chunk_position").position();
