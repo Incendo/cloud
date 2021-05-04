@@ -26,12 +26,6 @@ package cloud.commandframework.examples.bukkit;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.compound.ArgumentPair;
-import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.keys.SimpleCloudKey;
-import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
-import cloud.commandframework.minecraft.extras.MinecraftExtrasMetaKeys;
-import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandDescription;
@@ -50,7 +44,13 @@ import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
+import cloud.commandframework.bukkit.data.BlockPredicate;
+import cloud.commandframework.bukkit.data.ItemStackPredicate;
+import cloud.commandframework.bukkit.data.ProtoItemStack;
+import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
+import cloud.commandframework.bukkit.parsers.ItemStackArgument;
+import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
 import cloud.commandframework.bukkit.parsers.MaterialArgument;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
@@ -59,7 +59,10 @@ import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
+import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
@@ -80,6 +83,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -343,7 +348,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .argument(IntegerArgument.of("level"))
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Player player = ((Player) ctx.getSender());
-                    player.getInventory().getItemInHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));
+                    player.getInventory().getItemInMainHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));
                 }).execute()));
 
         //
@@ -381,6 +386,47 @@ public final class ExamplePlugin extends JavaPlugin {
                 )))
         );
 
+        // MC 1.13+ commands
+        if (this.manager.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+            this.manager.command(builder.literal("replace")
+                    .senderType(Player.class)
+                    .argument(BlockPredicateArgument.of("predicate"))
+                    .literal("with")
+                    .argument(MaterialArgument.of("block")) // todo: use BlockDataArgument
+                    .argument(IntegerArgument.<CommandSender>newBuilder("radius").withMin(1))
+                    .handler(ctx -> {
+                        final BlockData block = ctx.<Material>get("block").createBlockData();
+                        final BlockPredicate predicate = ctx.get("predicate");
+                        final int radius = ctx.get("radius");
+
+                        final Player player = (Player) ctx.getSender();
+                        final Location loc = player.getLocation();
+
+                        this.manager.taskRecipe().begin(ctx).synchronous(context -> {
+                            for (double x = loc.getX() - radius; x < loc.getX() + radius; x++) {
+                                for (double y = loc.getY() - radius; y < loc.getY() + radius; y++) {
+                                    for (double z = loc.getZ() - radius; z < loc.getZ() + radius; z++) {
+                                        final Block blockAt = player.getWorld().getBlockAt((int) x, (int) y, (int) z);
+                                        if (predicate.test(blockAt)) {
+                                            blockAt.setBlockData(block);
+                                        }
+                                    }
+                                }
+                            }
+                        }).execute();
+                    }));
+            this.manager.command(builder.literal("test_item")
+                    .argument(ItemStackArgument.of("item"))
+                    .literal("is")
+                    .argument(ItemStackPredicateArgument.of("predicate"))
+                    .handler(ctx -> {
+                        final ProtoItemStack protoItemStack = ctx.get("item");
+                        final ItemStackPredicate predicate = ctx.get("predicate");
+                        ctx.getSender().sendMessage("result: " + predicate.test(
+                                protoItemStack.createItemStack(1, true)));
+                    }));
+        }
+
         //
         // Create a Bukkit-like command
         //
@@ -415,20 +461,21 @@ public final class ExamplePlugin extends JavaPlugin {
             );
         }
 
-        // vanilla-like give command
-        this.manager.command(this.manager.commandBuilder("givetest")
+        // compound itemstack arg
+        this.manager.command(this.manager.commandBuilder("gib")
                 .senderType(Player.class)
-                .argument(ArgumentPair.of(
-                        this.manager,
+                .argumentPair(
                         "itemstack",
+                        TypeToken.get(ItemStack.class),
                         Pair.of("item", "amount"),
-                        Pair.of(ProtoItemStack.class, Integer.class)
-                ).withMapper(ItemStack.class, (sender, pair) -> {
-                    final ProtoItemStack proto = pair.getFirst();
-                    final int amount = pair.getSecond();
-                    return proto.createItemStack(amount, true);
-                }), ArgumentDescription.of("The ItemStack to give"))
-                .meta(MinecraftExtrasMetaKeys.DESCRIPTION, text("Vanilla-like give command"))
+                        Pair.of(ProtoItemStack.class, Integer.class),
+                        (sender, pair) -> {
+                            final ProtoItemStack proto = pair.getFirst();
+                            final int amount = pair.getSecond();
+                            return proto.createItemStack(amount, true);
+                        },
+                        ArgumentDescription.of("The ItemStack to give")
+                )
                 .handler(ctx -> ((Player) ctx.getSender()).getInventory().addItem(ctx.get("itemstack"))));
     }
 

@@ -27,8 +27,10 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
+import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
 import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
@@ -90,9 +92,14 @@ public final class BukkitBrigadierMapper<C> {
         /* Map Enchantment */
         this.mapSimpleNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
         }, "Enchantment");
-        /* Map ItemStackArgument */
+        /* Map Item arguments */
         this.mapSimpleNMS(new TypeToken<ItemStackArgument.Parser<C>>() {
         }, "ItemStack");
+        this.mapSimpleNMS(new TypeToken<ItemStackPredicateArgument.Parser<C>>() {
+        }, "ItemPredicate");
+        /* Map Block arguments */
+        this.mapSimpleNMS(new TypeToken<BlockPredicateArgument.Parser<C>>() {
+        }, "BlockPredicate");
         /* Map Entity Selectors */
         this.mapNMS(new TypeToken<SingleEntitySelectorArgument.SingleEntitySelectorParser<C>>() {
         }, this.entitySelectorArgumentSupplier(true, false));
@@ -105,9 +112,9 @@ public final class BukkitBrigadierMapper<C> {
         /* Map Vec3 */
         this.mapNMS(new TypeToken<LocationArgument.LocationParser<C>>() {
         }, this::argumentVec3);
-        /* Map Vec2I */
+        /* Map Vec2 */
         this.mapNMS(new TypeToken<Location2DArgument.Location2DParser<C>>() {
-        }, this::argumentVec2i);
+        }, this::argumentVec2);
     }
 
     /**
@@ -141,11 +148,11 @@ public final class BukkitBrigadierMapper<C> {
         }
     }
 
-    private @NonNull ArgumentType<?> argumentVec2i() {
+    private @NonNull ArgumentType<?> argumentVec2() {
         try {
-            return (ArgumentType<?>) getNMSArgument("Vec2I").getDeclaredConstructor().newInstance();
+            return (ArgumentType<?>) getNMSArgument("Vec2").getDeclaredConstructor().newInstance();
         } catch (final Exception e) {
-            this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2I argument", e);
+            this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2 argument", e);
             return fallbackType();
         }
     }

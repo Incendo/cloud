@@ -22,5 +22,5 @@ dependencies {
     implementation("me.lucko", "commodore", Versions.commodore)
     implementation("net.kyori", "adventure-platform-bukkit", Versions.adventurePlatform)
     /* Bukkit */
-    compileOnly("org.bukkit", "bukkit", "1.8.8-R0.1-SNAPSHOT")
+    compileOnly("org.bukkit", "bukkit", Versions.bukkit)
 }
