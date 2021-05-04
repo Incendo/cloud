@@ -63,19 +63,19 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> StatusEffectArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new StatusEffectArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link StatusEffectArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -83,11 +83,11 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
      * @since 1.5.0
      */
     public static <C> @NonNull StatusEffectArgument<C> of(final @NonNull String name) {
-        return StatusEffectArgument.<C>newBuilder(name).asRequired().build();
+        return StatusEffectArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link StatusEffectArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -95,11 +95,11 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
      * @since 1.5.0
      */
     public static <C> @NonNull StatusEffectArgument<C> optional(final @NonNull String name) {
-        return StatusEffectArgument.<C>newBuilder(name).asOptional().build();
+        return StatusEffectArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link StatusEffectArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -111,9 +111,7 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
             final @NonNull String name,
             final @NonNull StatusEffect defaultValue
     ) {
-        return StatusEffectArgument.<C>newBuilder(name)
-                .asOptionalWithDefault(Registry.STATUS_EFFECT.getId(defaultValue).toString())
-                .build();
+        return StatusEffectArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
@@ -130,7 +128,7 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
         }
 
         /**
-         * Build a new status effect argument.
+         * Build a new {@link StatusEffectArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -144,6 +142,18 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull StatusEffect defaultValue) {
+            return this.asOptionalWithDefault(Registry.STATUS_EFFECT.getId(defaultValue).toString());
         }
 
     }

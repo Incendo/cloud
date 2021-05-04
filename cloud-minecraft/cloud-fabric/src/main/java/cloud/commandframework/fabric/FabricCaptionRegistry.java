@@ -26,7 +26,7 @@ package cloud.commandframework.fabric;
 import cloud.commandframework.captions.SimpleCaptionRegistry;
 
 /**
- * Caption registry that uses bi-functions to produce messages
+ * Caption registry that uses bi-functions to produce messages.
  *
  * @param <C> Command sender type
  * @since 1.5.0
@@ -38,7 +38,9 @@ public class FabricCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      *
      * @since 1.5.0
      */
-    public static final String ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY = "Could not find key {id} in registry '{registry}'";
+    public static final String ARGUMENT_PARSE_FAILURE_REGISTRY_ENTRY_UNKNOWN_ENTRY =
+            "Could not find value with key '{id}' in registry '{registry}'.";
+
     /**
      * Default caption for {@link FabricCaptionKeys#ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN}
      *

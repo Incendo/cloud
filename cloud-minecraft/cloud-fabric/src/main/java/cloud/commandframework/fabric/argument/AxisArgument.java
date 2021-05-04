@@ -39,7 +39,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
- * An argument for a set of axes, described in Vanilla as a "swizzle".
+ * An argument for a set of {@link net.minecraft.util.math.Direction.Axis axes}, described in Vanilla as a "swizzle".
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -68,19 +68,19 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> AxisArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new AxisArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link AxisArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -88,11 +88,11 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
      * @since 1.5.0
      */
     public static <C> @NonNull AxisArgument<C> of(final @NonNull String name) {
-        return AxisArgument.<C>newBuilder(name).asRequired().build();
+        return AxisArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link AxisArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -100,27 +100,23 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
      * @since 1.5.0
      */
     public static <C> @NonNull AxisArgument<C> optional(final @NonNull String name) {
-        return AxisArgument.<C>newBuilder(name).asOptional().build();
+        return AxisArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link AxisArgument} with the specified default value.
      *
-     * @param name          Argument name
-     * @param defaultValues Default axes to include
-     * @param <C>           Command sender type
+     * @param name         Argument name
+     * @param defaultValue Default axes to include
+     * @param <C>          Command sender type
      * @return Created argument
      * @since 1.5.0
      */
     public static <C> @NonNull AxisArgument<C> optional(
             final @NonNull String name,
-            final @NonNull Set<Direction.@NonNull Axis> defaultValues
+            final @NonNull Set<Direction.@NonNull Axis> defaultValue
     ) {
-        final StringBuilder builder = new StringBuilder();
-        for (final Direction.Axis axis : defaultValues) {
-            builder.append(axis.getName());
-        }
-        return AxisArgument.<C>newBuilder(name).asOptionalWithDefault(builder.toString()).build();
+        return AxisArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
@@ -137,7 +133,7 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
         }
 
         /**
-         * Build a new axis argument.
+         * Build a new {@link AxisArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -151,6 +147,25 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Set<Direction.@NonNull Axis> defaultValue) {
+            if (defaultValue.isEmpty()) {
+                throw new IllegalArgumentException("Default value must include at least one Axis!");
+            }
+            final StringBuilder builder = new StringBuilder();
+            for (final Direction.Axis axis : defaultValue) {
+                builder.append(axis.getName());
+            }
+            return this.asOptionalWithDefault(builder.toString());
         }
 
     }

@@ -61,19 +61,19 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> AngleArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new AngleArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link AngleArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -81,11 +81,11 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @since 1.5.0
      */
     public static <C> @NonNull AngleArgument<C> of(final @NonNull String name) {
-        return AngleArgument.<C>newBuilder(name).asRequired().build();
+        return AngleArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link AngleArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -93,11 +93,11 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @since 1.5.0
      */
     public static <C> @NonNull AngleArgument<C> optional(final @NonNull String name) {
-        return AngleArgument.<C>newBuilder(name).asOptional().build();
+        return AngleArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link AngleArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultAngle Default angle, in degrees
@@ -109,7 +109,7 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
             final @NonNull String name,
             final float defaultAngle
     ) {
-        return AngleArgument.<C>newBuilder(name).asOptionalWithDefault(Float.toString(defaultAngle)).build();
+        return AngleArgument.<C>builder(name).asOptionalWithDefault(defaultAngle).build();
     }
 
 
@@ -126,7 +126,7 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
         }
 
         /**
-         * Build a new angle argument.
+         * Build a new {@link AngleArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -140,6 +140,18 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final float defaultValue) {
+            return this.asOptionalWithDefault(Float.toString(defaultValue));
         }
 
     }

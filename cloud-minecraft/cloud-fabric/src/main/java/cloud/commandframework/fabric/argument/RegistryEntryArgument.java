@@ -52,7 +52,7 @@ import java.util.function.BiFunction;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Get a value from a registry.
+ * Argument for getting a values from a {@link Registry}.
  *
  * <p>Both static and dynamic registries are supported.</p>
  *
@@ -76,7 +76,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         super(
                 required,
                 name,
-                new RegistryEntryParser<>(registry),
+                new Parser<>(registry),
                 defaultValue,
                 valueType,
                 suggestionsProvider,
@@ -85,7 +85,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name     Name of the argument
      * @param type     The type of registry entry
@@ -104,7 +104,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name     Name of the argument
      * @param type     The type of registry entry
@@ -123,7 +123,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link RegistryEntryArgument}.
      *
      * @param name     Argument name
      * @param type     The type of registry entry
@@ -142,7 +142,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link RegistryEntryArgument}.
      *
      * @param name     Argument name
      * @param type     The type of registry entry
@@ -161,7 +161,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link RegistryEntryArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param type         The type of registry entry
@@ -179,7 +179,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final @NonNull RegistryKey<V> defaultValue
     ) {
         return RegistryEntryArgument.<C, V>newBuilder(name, type, registry)
-                .asOptionalWithDefault(defaultValue.getValue().toString())
+                .asOptionalWithDefault(defaultValue)
                 .build();
     }
 
@@ -190,17 +190,17 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      * @param <V> Registry entry type
      * @since 1.5.0
      */
-    public static final class RegistryEntryParser<C, V> implements ArgumentParser<C, V> {
+    public static final class Parser<C, V> implements ArgumentParser<C, V> {
 
         private final RegistryKey<? extends Registry<V>> registryIdent;
 
         /**
-         * Create a new parser for registry entries.
+         * Create a new {@link Parser}.
          *
          * @param registryIdent the registry identifier
          * @since 1.5.0
          */
-        public RegistryEntryParser(final RegistryKey<? extends Registry<V>> registryIdent) {
+        public Parser(final RegistryKey<? extends Registry<V>> registryIdent) {
             this.registryIdent = requireNonNull(registryIdent, "registryIdent");
         }
 
@@ -211,10 +211,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         ) {
             final String possibleIdentifier = inputQueue.peek();
             if (possibleIdentifier == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        RegistryEntryArgument.class,
-                        commandContext
-                ));
+                return ArgumentParseResult.failure(new NoInputProvidedException(RegistryEntryArgument.class, commandContext));
             }
 
             final Identifier key;
@@ -285,7 +282,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     }
 
     /**
-     * A builder for registry entry arguments.
+     * A builder for {@link RegistryEntryArgument}.
      *
      * @param <C> The sender type
      * @param <V> The registry value type
@@ -324,6 +321,18 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C, V> asOptionalWithDefault(final @NonNull RegistryKey<V> defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.getValue().toString());
         }
 
     }

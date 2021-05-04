@@ -32,9 +32,7 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.command.ServerCommandSource;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -46,7 +44,7 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an entity anchor.
+ * An argument for parsing {@link Team Teams}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -72,19 +70,19 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> TeamArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new TeamArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link TeamArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -92,11 +90,11 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
      * @since 1.5.0
      */
     public static <C> @NonNull TeamArgument<C> of(final @NonNull String name) {
-        return TeamArgument.<C>newBuilder(name).asRequired().build();
+        return TeamArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link TeamArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -104,11 +102,11 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
      * @since 1.5.0
      */
     public static <C> @NonNull TeamArgument<C> optional(final @NonNull String name) {
-        return TeamArgument.<C>newBuilder(name).asOptional().build();
+        return TeamArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link TeamArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -118,13 +116,13 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
      */
     public static <C> @NonNull TeamArgument<C> optional(
             final @NonNull String name,
-            final EntityAnchorArgumentType.@NonNull EntityAnchor defaultValue
+            final @NonNull Team defaultValue
     ) {
-        return TeamArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue.name()).build();
+        return TeamArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
-     * Argument parser for {@link Team}.
+     * Argument parser for {@link Team Teams}.
      *
      * @param <C> sender type
      * @since 1.5.0
@@ -154,10 +152,10 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         @Override
         protected @NonNull ArgumentParseResult<Team> resolveClient(
                 final @NonNull CommandContext<C> context,
-                final @NonNull CommandSource source,
+                final @NonNull FabricClientCommandSource source,
                 final @NonNull String value
         ) {
-            final Team result = MinecraftClient.getInstance().getNetworkHandler().getWorld().getScoreboard().getTeam(value);
+            final Team result = source.getClient().getNetworkHandler().getWorld().getScoreboard().getTeam(value);
             if (result == null) {
                 return ArgumentParseResult.failure(new UnknownTeamException(context, value));
             }
@@ -167,10 +165,10 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         @Override
         protected @NonNull ArgumentParseResult<Team> resolveServer(
                 final @NonNull CommandContext<C> context,
-                final @NonNull CommandSource source,
+                final @NonNull ServerCommandSource source,
                 final @NonNull String value
         ) {
-            final Team result = ((ServerCommandSource) source).getWorld().getScoreboard().getTeam(value);
+            final Team result = source.getWorld().getScoreboard().getTeam(value);
             if (result == null) {
                 return ArgumentParseResult.failure(new UnknownTeamException(context, value));
             }
@@ -192,7 +190,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         /**
-         * Build a new team argument.
+         * Build a new {@link TeamArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -206,6 +204,18 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Team defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.getName());
         }
 
     }

@@ -35,7 +35,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for selecting multiple players
+ * An argument for selecting multiple {@link net.minecraft.server.network.ServerPlayerEntity players} using an
+ * {@link net.minecraft.command.EntitySelector}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -61,19 +62,19 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> MultiplePlayerSelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new MultiplePlayerSelectorArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link MultiplePlayerSelectorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -81,11 +82,11 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @since 1.5.0
      */
     public static <C> @NonNull MultiplePlayerSelectorArgument<C> of(final @NonNull String name) {
-        return MultiplePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
+        return MultiplePlayerSelectorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link MultiplePlayerSelectorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -93,7 +94,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @since 1.5.0
      */
     public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(final @NonNull String name) {
-        return MultiplePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
+        return MultiplePlayerSelectorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -109,7 +110,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         }
 
         /**
-         * Build a multiple player selector argument.
+         * Build a new {@link MultiplePlayerSelectorArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0

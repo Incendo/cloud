@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an identifier, or "resource location".
+ * An argument parsing an {@link Identifier}, or "resource location".
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -62,19 +62,19 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> IdentifierArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new IdentifierArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link IdentifierArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -82,11 +82,11 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
      * @since 1.5.0
      */
     public static <C> @NonNull IdentifierArgument<C> of(final @NonNull String name) {
-        return IdentifierArgument.<C>newBuilder(name).asRequired().build();
+        return IdentifierArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link IdentifierArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -94,11 +94,11 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
      * @since 1.5.0
      */
     public static <C> @NonNull IdentifierArgument<C> optional(final @NonNull String name) {
-        return IdentifierArgument.<C>newBuilder(name).asOptional().build();
+        return IdentifierArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link IdentifierArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -110,7 +110,7 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
             final @NonNull String name,
             final @NonNull Identifier defaultValue
     ) {
-        return IdentifierArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue.toString()).build();
+        return IdentifierArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
@@ -127,7 +127,7 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
         }
 
         /**
-         * Build a new identifier argument.
+         * Build a new {@link IdentifierArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -141,6 +141,18 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Identifier defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.toString());
         }
 
     }

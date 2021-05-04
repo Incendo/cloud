@@ -27,8 +27,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -55,9 +54,9 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
 
         return intermediate.flatMapParsedValue(value -> {
             if (source instanceof ServerCommandSource) {
-                return this.resolveServer(commandContext, source, value);
-            } else if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-                return this.resolveClient(commandContext, source, value);
+                return this.resolveServer(commandContext, (ServerCommandSource) source, value);
+            } else if (source instanceof FabricClientCommandSource) {
+                return this.resolveClient(commandContext, (FabricClientCommandSource) source, value);
             } else {
                 throw new IllegalStateException("Cannot have non-server command source when not on client");
             }
@@ -80,7 +79,7 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      */
     protected abstract @NonNull ArgumentParseResult<@NonNull R> resolveClient(
             @NonNull CommandContext<@NonNull C> context,
-            @NonNull CommandSource source,
+            @NonNull FabricClientCommandSource source,
             @NonNull I value
     );
 
@@ -95,7 +94,7 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      */
     protected abstract @NonNull ArgumentParseResult<@NonNull R> resolveServer(
             @NonNull CommandContext<@NonNull C> context,
-            @NonNull CommandSource source,
+            @NonNull ServerCommandSource source,
             @NonNull I value
     );
 
