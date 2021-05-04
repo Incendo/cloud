@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an item identifier and optional NBT data.
+ * An argument parsing an item identifier and optional extra NBT data into an {@link ItemStackArgument}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -64,19 +64,19 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> ItemDataArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new ItemDataArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link ItemDataArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -84,11 +84,11 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
      * @since 1.5.0
      */
     public static <C> @NonNull ItemDataArgument<C> of(final @NonNull String name) {
-        return ItemDataArgument.<C>newBuilder(name).asRequired().build();
+        return ItemDataArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link ItemDataArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -96,11 +96,11 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
      * @since 1.5.0
      */
     public static <C> @NonNull ItemDataArgument<C> optional(final @NonNull String name) {
-        return ItemDataArgument.<C>newBuilder(name).asOptional().build();
+        return ItemDataArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link ItemDataArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -108,17 +108,8 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ItemDataArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull ItemStack defaultValue
-    ) {
-        final String serializedDefault;
-        if (defaultValue.hasTag()) {
-            serializedDefault = Registry.ITEM.getId(defaultValue.getItem()).toString() + defaultValue.getTag().toString();
-        } else {
-            serializedDefault = Registry.ITEM.getId(defaultValue.getItem()).toString();
-        }
-        return ItemDataArgument.<C>newBuilder(name).asOptionalWithDefault(serializedDefault).build();
+    public static <C> @NonNull ItemDataArgument<C> optional(final @NonNull String name, final @NonNull ItemStack defaultValue) {
+        return ItemDataArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
 
     }
 
@@ -134,7 +125,7 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
         }
 
         /**
-         * Build a new item data argument.
+         * Build a new {@link ItemDataArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -148,6 +139,24 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ItemStack defaultValue) {
+            final String serializedDefault;
+            if (defaultValue.hasTag()) {
+                serializedDefault = Registry.ITEM.getId(defaultValue.getItem()) + defaultValue.getTag().toString();
+            } else {
+                serializedDefault = Registry.ITEM.getId(defaultValue.getItem()).toString();
+            }
+            return this.asOptionalWithDefault(serializedDefault);
         }
 
     }

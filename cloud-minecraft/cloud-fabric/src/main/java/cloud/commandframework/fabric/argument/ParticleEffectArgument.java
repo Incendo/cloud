@@ -62,19 +62,19 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> ParticleEffectArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new ParticleEffectArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link ParticleEffectArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -82,11 +82,11 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
      * @since 1.5.0
      */
     public static <C> @NonNull ParticleEffectArgument<C> of(final @NonNull String name) {
-        return ParticleEffectArgument.<C>newBuilder(name).asRequired().build();
+        return ParticleEffectArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link ParticleEffectArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -94,11 +94,11 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
      * @since 1.5.0
      */
     public static <C> @NonNull ParticleEffectArgument<C> optional(final @NonNull String name) {
-        return ParticleEffectArgument.<C>newBuilder(name).asOptional().build();
+        return ParticleEffectArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link ParticleEffectArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default particle effect value
@@ -110,7 +110,7 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
             final @NonNull String name,
             final @NonNull ParticleEffect defaultValue
     ) {
-        return ParticleEffectArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue.asString()).build();
+        return ParticleEffectArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
@@ -141,6 +141,18 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ParticleEffect defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.asString());
         }
 
     }

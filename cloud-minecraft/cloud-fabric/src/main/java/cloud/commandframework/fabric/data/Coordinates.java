@@ -84,7 +84,7 @@ public interface Coordinates {
      * @return the base coordinates
      * @since 1.5.0
      */
-    @NonNull PosArgument getWrappedCoordinates();
+    @NonNull PosArgument wrappedCoordinates();
 
     /**
      * A specialized version of {@link Coordinates} for representing the result of the vanilla {@link Vec2ArgumentType},

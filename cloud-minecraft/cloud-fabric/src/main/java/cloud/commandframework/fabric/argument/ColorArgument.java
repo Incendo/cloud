@@ -62,19 +62,19 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the component
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> ColorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new ColorArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link ColorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -82,11 +82,11 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
      * @since 1.5.0
      */
     public static <C> @NonNull ColorArgument<C> of(final @NonNull String name) {
-        return ColorArgument.<C>newBuilder(name).asRequired().build();
+        return ColorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link ColorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -94,11 +94,11 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
      * @since 1.5.0
      */
     public static <C> @NonNull ColorArgument<C> optional(final @NonNull String name) {
-        return ColorArgument.<C>newBuilder(name).asOptional().build();
+        return ColorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link ColorArgument} with the specified default value.
      *
      * @param name         Component name
      * @param defaultColor Default colour, must be {@link Formatting#isColor() a color}
@@ -110,10 +110,7 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
             final @NonNull String name,
             final @NonNull Formatting defaultColor
     ) {
-        if (!defaultColor.isColor()) {
-            throw new IllegalArgumentException("Only color types are allowed but " + defaultColor + " was provided");
-        }
-        return ColorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultColor.toString()).build();
+        return ColorArgument.<C>builder(name).asOptionalWithDefault(defaultColor).build();
     }
 
 
@@ -130,7 +127,7 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
         }
 
         /**
-         * Build a new color argument.
+         * Build a new {@link ColorArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -144,6 +141,21 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultColor default value, must be {@link Formatting#isColor() a color}
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Formatting defaultColor) {
+            if (!defaultColor.isColor()) {
+                throw new IllegalArgumentException("Only color types are allowed but " + defaultColor + " was provided");
+            }
+            return this.asOptionalWithDefault(defaultColor.toString());
         }
 
     }

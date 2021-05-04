@@ -62,19 +62,19 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> ScoreboardCriterionArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new ScoreboardCriterionArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link ScoreboardCriterionArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -82,11 +82,11 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
      * @since 1.5.0
      */
     public static <C> @NonNull ScoreboardCriterionArgument<C> of(final @NonNull String name) {
-        return ScoreboardCriterionArgument.<C>newBuilder(name).asRequired().build();
+        return ScoreboardCriterionArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link ScoreboardCriterionArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -94,11 +94,11 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
      * @since 1.5.0
      */
     public static <C> @NonNull ScoreboardCriterionArgument<C> optional(final @NonNull String name) {
-        return ScoreboardCriterionArgument.<C>newBuilder(name).asOptional().build();
+        return ScoreboardCriterionArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link ScoreboardCriterionArgument} with the specified default value.
      *
      * @param name             Argument name
      * @param defaultCriterion Default criterion
@@ -110,7 +110,7 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
             final @NonNull String name,
             final @NonNull ScoreboardCriterion defaultCriterion
     ) {
-        return ScoreboardCriterionArgument.<C>newBuilder(name).asOptionalWithDefault(defaultCriterion.getName()).build();
+        return ScoreboardCriterionArgument.<C>builder(name).asOptionalWithDefault(defaultCriterion).build();
     }
 
 
@@ -127,7 +127,7 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
         }
 
         /**
-         * Build a new criterion argument.
+         * Build a new {@link ScoreboardCriterionArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -141,6 +141,18 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ScoreboardCriterion defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.getName());
         }
 
     }

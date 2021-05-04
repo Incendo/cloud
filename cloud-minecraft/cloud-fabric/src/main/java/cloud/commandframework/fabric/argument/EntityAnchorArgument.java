@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an entity anchor.
+ * An argument parsing an {@link net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor}.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -61,19 +61,19 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> EntityAnchorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new EntityAnchorArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link EntityAnchorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -81,11 +81,11 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
      * @since 1.5.0
      */
     public static <C> @NonNull EntityAnchorArgument<C> of(final @NonNull String name) {
-        return EntityAnchorArgument.<C>newBuilder(name).asRequired().build();
+        return EntityAnchorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link EntityAnchorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -93,11 +93,11 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
      * @since 1.5.0
      */
     public static <C> @NonNull EntityAnchorArgument<C> optional(final @NonNull String name) {
-        return EntityAnchorArgument.<C>newBuilder(name).asOptional().build();
+        return EntityAnchorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link EntityAnchorArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -109,7 +109,7 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
             final @NonNull String name,
             final EntityAnchorArgumentType.@NonNull EntityAnchor defaultValue
     ) {
-        return EntityAnchorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue.name()).build();
+        return EntityAnchorArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
@@ -126,7 +126,7 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
         }
 
         /**
-         * Build a new entity anchor argument.
+         * Build a new {@link EntityAnchorArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -140,6 +140,18 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final EntityAnchorArgumentType.@NonNull EntityAnchor defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.name());
         }
 
     }

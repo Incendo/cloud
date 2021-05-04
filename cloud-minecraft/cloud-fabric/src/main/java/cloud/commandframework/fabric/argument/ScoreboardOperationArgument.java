@@ -64,19 +64,19 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> ScoreboardOperationArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new ScoreboardOperationArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link ScoreboardOperationArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -84,11 +84,11 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
      * @since 1.5.0
      */
     public static <C> @NonNull ScoreboardOperationArgument<C> of(final @NonNull String name) {
-        return ScoreboardOperationArgument.<C>newBuilder(name).asRequired().build();
+        return ScoreboardOperationArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link ScoreboardOperationArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -96,7 +96,7 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
      * @since 1.5.0
      */
     public static <C> @NonNull ScoreboardOperationArgument<C> optional(final @NonNull String name) {
-        return ScoreboardOperationArgument.<C>newBuilder(name).asOptional().build();
+        return ScoreboardOperationArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -112,7 +112,7 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
         }
 
         /**
-         * Build a new operation argument.
+         * Build a new {@link ScoreboardOperationArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0

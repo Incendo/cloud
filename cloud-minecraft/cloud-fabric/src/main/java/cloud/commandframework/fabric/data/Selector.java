@@ -44,15 +44,15 @@ public interface Selector<V> {
      * @return the input
      * @since 1.5.0
      */
-    @NonNull String getInput();
+    @NonNull String inputString();
 
     /**
-     * If this value came from a parsed selector, this will provide the details of that selector.
+     * If this value came from a parsed {@link EntitySelector}, this will provide the details of that selector.
      *
      * @return the selector
      * @since 1.5.0
      */
-    @Nullable EntitySelector getSelector();
+    @Nullable EntitySelector selector();
 
     /**
      * Resolve the value of this selector.

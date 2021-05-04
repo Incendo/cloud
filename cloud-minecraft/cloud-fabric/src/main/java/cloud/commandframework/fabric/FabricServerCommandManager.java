@@ -189,7 +189,8 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
     /**
      * Check if a sender has a certain permission.
      *
-     * <p>The current implementation checks op level, pending a full Fabric permissions api.</p>
+     * <p>The current implementation checks permissions using {@code fabric-permissions-api-v0},
+     * falling back to op level checks.</p>
      *
      * @param sender     Command sender
      * @param permission Permission node

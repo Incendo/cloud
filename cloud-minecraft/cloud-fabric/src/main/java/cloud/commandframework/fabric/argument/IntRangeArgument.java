@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an unbounded number range, in the form {@code [min]..[max] }, where both lower and upper bounds are
- * optional.
+ * An argument parsing an unbounded {@link net.minecraft.predicate.NumberRange.IntRange integer range}, in the form
+ * {@code [min]..[max]}, where both lower and upper bounds are optional.
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -63,19 +63,19 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
     }
 
     /**
-     * Create a new builder.
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
-    public static <C> IntRangeArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new IntRangeArgument.Builder<>(name);
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required command argument.
+     * Create a new required {@link IntRangeArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -83,11 +83,11 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
      * @since 1.5.0
      */
     public static <C> @NonNull IntRangeArgument<C> of(final @NonNull String name) {
-        return IntRangeArgument.<C>newBuilder(name).asRequired().build();
+        return IntRangeArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command argument.
+     * Create a new optional {@link IntRangeArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
@@ -95,11 +95,11 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
      * @since 1.5.0
      */
     public static <C> @NonNull IntRangeArgument<C> optional(final @NonNull String name) {
-        return IntRangeArgument.<C>newBuilder(name).asOptional().build();
+        return IntRangeArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional command argument with a default value.
+     * Create a new optional {@link IntRangeArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -111,16 +111,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
             final @NonNull String name,
             final NumberRange.@NonNull IntRange defaultValue
     ) {
-        final StringBuilder value = new StringBuilder(6);
-        if (defaultValue.getMin() != null) {
-            value.append(defaultValue.getMin());
-        }
-        value.append("..");
-        if (defaultValue.getMax() != null) {
-            value.append(defaultValue.getMax());
-        }
-
-        return IntRangeArgument.<C>newBuilder(name).asOptionalWithDefault(value.toString()).build();
+        return IntRangeArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
@@ -137,7 +128,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
         }
 
         /**
-         * Build a new int range argument.
+         * Build a new {@link IntRangeArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
@@ -151,6 +142,26 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+        /**
+         * Sets the command argument to be optional, with the specified default value.
+         *
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.5.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final NumberRange.@NonNull IntRange defaultValue) {
+            final StringBuilder value = new StringBuilder(6);
+            if (defaultValue.getMin() != null) {
+                value.append(defaultValue.getMin());
+            }
+            value.append("..");
+            if (defaultValue.getMax() != null) {
+                value.append(defaultValue.getMax());
+            }
+            return this.asOptionalWithDefault(value.toString());
         }
 
     }

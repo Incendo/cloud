@@ -366,7 +366,7 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull PosArgument getWrappedCoordinates() {
+        public @NonNull PosArgument wrappedCoordinates() {
             return this.posArgument;
         }
 
@@ -389,12 +389,12 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull String getInput() {
+        public @NonNull String inputString() {
             return this.inputString;
         }
 
         @Override
-        public @NonNull EntitySelector getSelector() {
+        public @NonNull EntitySelector selector() {
             return this.entitySelector;
         }
 
@@ -422,12 +422,12 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull String getInput() {
+        public @NonNull String inputString() {
             return this.inputString;
         }
 
         @Override
-        public @NonNull EntitySelector getSelector() {
+        public @NonNull EntitySelector selector() {
             return this.entitySelector;
         }
 
@@ -455,12 +455,12 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull String getInput() {
+        public @NonNull String inputString() {
             return this.inputString;
         }
 
         @Override
-        public @NonNull EntitySelector getSelector() {
+        public @NonNull EntitySelector selector() {
             return this.entitySelector;
         }
 
@@ -488,12 +488,12 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull String getInput() {
+        public @NonNull String inputString() {
             return this.inputString;
         }
 
         @Override
-        public @NonNull EntitySelector getSelector() {
+        public @NonNull EntitySelector selector() {
             return this.entitySelector;
         }
 
