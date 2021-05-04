@@ -28,6 +28,7 @@ import org.bukkit.Bukkit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -99,13 +100,16 @@ public final class CraftBukkitReflection {
         }
     }
 
-    public static boolean classExists(final @NonNull String className) {
+    public static @NonNull Constructor<?> needConstructor(final @NonNull Class<?> holder, final @NonNull Class<?>... parameters) {
         try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
+            return holder.getDeclaredConstructor(parameters);
+        } catch (final NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
         }
+    }
+
+    public static boolean classExists(final @NonNull String className) {
+        return findClass(className) != null;
     }
 
     public static @NonNull Method needMethod(
