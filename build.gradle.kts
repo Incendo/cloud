@@ -12,7 +12,7 @@ plugins {
     id("net.kyori.indra") version indraVersion apply false
     id("net.kyori.indra.checkstyle") version indraVersion apply false
     id("net.kyori.indra.publishing.sonatype") version indraVersion apply false
-    id("com.github.hierynomus.license") version "0.15.0" apply false
+    id("com.github.hierynomus.license") version "0.16.1" apply false
     id("com.github.johnrengelman.shadow") version "6.1.0" apply false
     id("net.ltgt.errorprone") version "1.3.0" apply false
     id("com.github.ben-manes.versions") version "0.38.0"
