@@ -54,8 +54,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.text;
@@ -178,51 +176,11 @@ final class CloudSpongeCommand<C> implements Command.Raw {
 
     @Override
     public boolean canExecute(final @NonNull CommandCause cause) {
-        final C sender = this.commandManager.backwardsCauseMapper().apply(cause);
-        // check whether there are any commands we can execute
-        final AtomicBoolean result = new AtomicBoolean(false);
-        visit(this.commandManager.getCommandTree().getNamedNode(this.label), node -> {
-            if (node.getValue().getOwningCommand() == null) {
-                return VisitAction.CONTINUE;
-            }
-            final boolean permitted = this.commandManager.hasPermission(
-                    sender,
-                    node.getValue().getOwningCommand().getCommandPermission()
-            );
-            if (permitted) {
-                result.set(true);
-                return VisitAction.END;
-            }
-            return VisitAction.CONTINUE;
-        });
-        return result.get();
-    }
-
-    private static <C> void visit(
-            final CommandTree.Node<CommandArgument<C, ?>> node,
-            final Function<CommandTree.Node<CommandArgument<C, ?>>, VisitAction> visitor
-    ) {
-        visitImpl(node, visitor);
-    }
-
-    private static <C> VisitAction visitImpl(
-            final CommandTree.Node<CommandArgument<C, ?>> node,
-            final Function<CommandTree.Node<CommandArgument<C, ?>>, VisitAction> visitor
-    ) {
-        if (visitor.apply(node) == VisitAction.END) {
-            return VisitAction.END;
-        }
-        for (final CommandTree.Node<CommandArgument<C, ?>> child : node.getChildren()) {
-            if (visitImpl(child, visitor) == VisitAction.END) {
-                break;
-            }
-        }
-        return VisitAction.END;
-    }
-
-    private enum VisitAction {
-        CONTINUE,
-        END
+        final CommandTree.Node<CommandArgument<C, ?>> rootNode = this.commandManager.getCommandTree().getNamedNode(this.label);
+        return this.commandManager.hasPermission(
+                this.commandManager.backwardsCauseMapper().apply(cause),
+                (CommandPermission) rootNode.getNodeMeta().getOrDefault("permission", Permission.empty())
+        );
     }
 
     @Override
