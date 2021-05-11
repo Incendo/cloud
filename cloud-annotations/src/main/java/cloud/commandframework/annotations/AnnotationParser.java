@@ -542,7 +542,7 @@ public final class AnnotationParser<C> {
                                             + "has parser '%s' but no parser exists "
                                             + "for that type",
                                     parameter.getName(), method.getName(),
-                                    token.toString()
+                                    token.getType().getTypeName()
                             )));
         } else {
             parser = this.manager.getParserRegistry()
@@ -552,7 +552,7 @@ public final class AnnotationParser<C> {
                                             + "has parser '%s' but no parser exists "
                                             + "for that type",
                                     parameter.getName(), method.getName(),
-                                    token.toString()
+                                    token.getType().getTypeName()
                             )));
         }
         /* Check whether or not the corresponding method parameter actually exists */
