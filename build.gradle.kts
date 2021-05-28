@@ -15,7 +15,7 @@ plugins {
     id("com.github.hierynomus.license") version "0.15.0" apply false
     id("com.github.johnrengelman.shadow") version "6.1.0" apply false
     id("net.ltgt.errorprone") version "1.3.0" apply false
-    id("com.github.ben-manes.versions") version "0.38.0"
+    id("com.github.ben-manes.versions") version "0.39.0"
 }
 
 buildGroups("Minecraft", "Discord", "IRC")
