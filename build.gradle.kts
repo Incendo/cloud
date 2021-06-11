@@ -62,7 +62,7 @@ subprojects {
         mitLicense()
 
         javaVersions {
-            testWith(8, 11, 15)
+            testWith(8, 11, 16)
         }
 
         checkstyle("8.39")
