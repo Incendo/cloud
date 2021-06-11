@@ -142,10 +142,14 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
 
         private static final Class<?> CRAFT_ITEM_STACK_CLASS =
                 CraftBukkitReflection.needOBCClass("inventory.CraftItemStack");
-        private static final Class<?> ARGUMENT_ITEM_PREDICATE_CLASS =
-                CraftBukkitReflection.needNMSClass("ArgumentItemPredicate");
-        private static final Class<?> ARGUMENT_ITEM_PREDICATE_RESULT_CLASS =
-                CraftBukkitReflection.needNMSClass("ArgumentItemPredicate$b");
+        private static final Class<?> ARGUMENT_ITEM_PREDICATE_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "ArgumentItemPredicate",
+                "net.minecraft.commands.arguments.item.ArgumentItemPredicate"
+        );
+        private static final Class<?> ARGUMENT_ITEM_PREDICATE_RESULT_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "ArgumentItemPredicate$b",
+                "net.minecraft.commands.arguments.item.ArgumentItemPredicate$b"
+        );
         private static final Method CREATE_PREDICATE_METHOD = CraftBukkitReflection.needMethod(
                 ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
                 "create",

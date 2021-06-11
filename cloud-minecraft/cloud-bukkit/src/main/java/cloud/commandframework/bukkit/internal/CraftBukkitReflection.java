@@ -31,6 +31,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * Utilities for doing reflection on CraftBukkit, used by the cloud implementation.
@@ -41,6 +42,7 @@ import java.lang.reflect.Method;
 public final class CraftBukkitReflection {
 
     private static final String PREFIX_NMS = "net.minecraft.server";
+    private static final String PREFIX_MC = "net.minecraft.";
     private static final String PREFIX_CRAFTBUKKIT = "org.bukkit.craftbukkit";
     private static final String CRAFT_SERVER = "CraftServer";
     private static final String VERSION;
@@ -66,12 +68,49 @@ public final class CraftBukkitReflection {
         return MAJOR_REVISION != -1 && VERSION != null;
     }
 
+    public static @NonNull Class<?> needNMSClassOrElse(
+            final @NonNull String nms,
+            final @NonNull String... classNames
+    ) throws RuntimeException {
+        final Class<?> nmsClass = findNMSClass(nms);
+        if (nmsClass != null) {
+            return nmsClass;
+        }
+        for (final String name : classNames) {
+            final Class<?> maybe = findClass(name);
+            if (maybe != null) {
+                return maybe;
+            }
+        }
+        throw new IllegalStateException(String.format(
+                "Couldn't find a class! NMS: '%s' or '%s'.",
+                nms,
+                Arrays.toString(classNames)
+        ));
+    }
+
+    public static @NonNull Class<?> needMCClass(final @NonNull String name) throws RuntimeException {
+        return needClass(PREFIX_MC + name);
+    }
+
     public static @NonNull Class<?> needNMSClass(final @NonNull String className) throws RuntimeException {
         return needClass(PREFIX_NMS + VERSION + className);
     }
 
     public static @NonNull Class<?> needOBCClass(final @NonNull String className) throws RuntimeException {
         return needClass(PREFIX_CRAFTBUKKIT + VERSION + className);
+    }
+
+    public static @Nullable Class<?> findMCClass(final @NonNull String name) throws RuntimeException {
+        return findClass(PREFIX_MC + name);
+    }
+
+    public static @Nullable Class<?> findNMSClass(final @NonNull String className) throws RuntimeException {
+        return findClass(PREFIX_NMS + VERSION + className);
+    }
+
+    public static @Nullable Class<?> findOBCClass(final @NonNull String className) throws RuntimeException {
+        return findClass(PREFIX_CRAFTBUKKIT + VERSION + className);
     }
 
     public static @NonNull Class<?> needClass(final @NonNull String className) throws RuntimeException {

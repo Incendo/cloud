@@ -27,6 +27,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
@@ -41,6 +42,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
+import org.bukkit.NamespacedKey;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Constructor;
@@ -58,7 +60,6 @@ public final class BukkitBrigadierMapper<C> {
 
     private final BukkitCommandManager<C> commandManager;
     private final CloudBrigadierManager<C, ?> brigadierManager;
-
 
     /**
      * Class that handles mapping argument types to Brigadier for Bukkit (Commodore) and Paper.
@@ -87,19 +88,19 @@ public final class BukkitBrigadierMapper<C> {
         if (CraftBukkitReflection.MAJOR_REVISION >= UUID_ARGUMENT_VERSION) {
             /* Map UUID */
             this.mapSimpleNMS(new TypeToken<UUIDArgument.UUIDParser<C>>() {
-            }, "UUID");
+            }, "uuid");
         }
         /* Map Enchantment */
         this.mapSimpleNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
-        }, "Enchantment");
+        }, "item_enchantment");
         /* Map Item arguments */
         this.mapSimpleNMS(new TypeToken<ItemStackArgument.Parser<C>>() {
-        }, "ItemStack");
+        }, "item_stack");
         this.mapSimpleNMS(new TypeToken<ItemStackPredicateArgument.Parser<C>>() {
-        }, "ItemPredicate");
+        }, "item_predicate");
         /* Map Block arguments */
         this.mapSimpleNMS(new TypeToken<BlockPredicateArgument.Parser<C>>() {
-        }, "BlockPredicate");
+        }, "block_predicate");
         /* Map Entity Selectors */
         this.mapNMS(new TypeToken<SingleEntitySelectorArgument.SingleEntitySelectorParser<C>>() {
         }, this.entitySelectorArgumentSupplier(true, false));
@@ -128,7 +129,8 @@ public final class BukkitBrigadierMapper<C> {
     ) {
         return () -> {
             try {
-                final Constructor<?> constructor = getNMSArgument("Entity").getDeclaredConstructors()[0];
+                final Constructor<?> constructor =
+                        MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("entity")).getDeclaredConstructors()[0];
                 constructor.setAccessible(true);
                 return (ArgumentType<?>) constructor.newInstance(single, playersOnly);
             } catch (final Exception e) {
@@ -140,7 +142,8 @@ public final class BukkitBrigadierMapper<C> {
 
     private @NonNull ArgumentType<?> argumentVec3() {
         try {
-            return (ArgumentType<?>) getNMSArgument("Vec3").getDeclaredConstructor(boolean.class)
+            return MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("vec3"))
+                    .getDeclaredConstructor(boolean.class)
                     .newInstance(true);
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec3D argument", e);
@@ -150,7 +153,7 @@ public final class BukkitBrigadierMapper<C> {
 
     private @NonNull ArgumentType<?> argumentVec2() {
         try {
-            return (ArgumentType<?>) getNMSArgument("Vec2").getDeclaredConstructor().newInstance();
+            return MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("vec2")).getDeclaredConstructor().newInstance();
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2 argument", e);
             return fallbackType();
@@ -158,37 +161,26 @@ public final class BukkitBrigadierMapper<C> {
     }
 
     /**
-     * Attempt to retrieve an NMS argument type
-     *
-     * @param argument Argument type name
-     * @return Argument class
-     * @throws RuntimeException when the class is not found
-     */
-    private static @NonNull Class<?> getNMSArgument(final @NonNull String argument) throws RuntimeException {
-        return CraftBukkitReflection.needNMSClass("Argument" + argument);
-    }
-
-    /**
      * Attempt to register a mapping between a cloud argument parser type and an NMS brigadier argument type which
      * has a no-args constructor.
      *
-     * @param type         Type to map
-     * @param <T>          argument parser type
-     * @param argumentName NMS Argument class name (without 'Argument' prefix)
+     * @param type       Type to map
+     * @param <T>        argument parser type
+     * @param argumentId network id of argument type
      * @since 1.5.0
      */
     public <T extends ArgumentParser<C, ?>> void mapSimpleNMS(
             final @NonNull TypeToken<T> type,
-            final @NonNull String argumentName
+            final @NonNull String argumentId
     ) {
         final Constructor<?> constructor;
         try {
-            final Class<?> nmsArgument = getNMSArgument(argumentName);
+            final Class<?> nmsArgument = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft(argumentId));
             constructor = nmsArgument.getConstructor();
         } catch (final RuntimeException | ReflectiveOperationException e) {
             this.commandManager.getOwningPlugin().getLogger().log(
                     Level.WARNING,
-                    String.format("Failed to create mapping for NMS brigadier argument type '%s'.", argumentName),
+                    String.format("Failed to create mapping for NMS brigadier argument type '%s'.", argumentId),
                     e
             );
             return;
