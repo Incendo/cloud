@@ -49,6 +49,7 @@ package cloud.commandframework.bukkit.internal;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.NamespacedKey;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -109,7 +110,7 @@ public final class MinecraftArgumentTypes {
      * @throws IllegalArgumentException if no such argument is registered
      */
     @SuppressWarnings("unchecked")
-    public static Class<? extends ArgumentType<?>> getClassByKey(NamespacedKey key) throws IllegalArgumentException {
+    public static Class<? extends ArgumentType<?>> getClassByKey(final @NonNull NamespacedKey key) throws IllegalArgumentException {
         try {
             Object minecraftKey = MINECRAFT_KEY_CONSTRUCTOR.newInstance(key.getNamespace(), key.getKey());
             Object entry = ARGUMENT_REGISTRY_GET_BY_KEY_METHOD.invoke(null, minecraftKey);
