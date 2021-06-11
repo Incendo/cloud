@@ -13,7 +13,7 @@ object Versions {
     // MINECRAFT DEPENDENCIES
     const val brigadier = "1.0.17"
     const val bukkit = "1.13.2-R0.1-SNAPSHOT"
-    const val commodore = "1.9"
+    const val commodore = "1.10-SNAPSHOT"
     const val bungeecord = "1.8-SNAPSHOT"
     const val cloudburst = "1.0.0-SNAPSHOT"
     const val adventureApi = "4.7.0"

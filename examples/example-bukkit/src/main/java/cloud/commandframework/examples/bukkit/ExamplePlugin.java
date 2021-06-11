@@ -476,7 +476,10 @@ public final class ExamplePlugin extends JavaPlugin {
                         },
                         ArgumentDescription.of("The ItemStack to give")
                 )
-                .handler(ctx -> ((Player) ctx.getSender()).getInventory().addItem(ctx.get("itemstack"))));
+                .handler(ctx -> {
+                    final ItemStack stack = ctx.get("itemstack");
+                    ((Player) ctx.getSender()).getInventory().addItem(stack);
+                }));
     }
 
     @CommandMethod("example help [query]")
