@@ -1,5 +1,6 @@
 plugins {
     id("com.github.johnrengelman.shadow")
+    id("xyz.jpenilla.run-paper") version "1.0.3-SNAPSHOT"
 }
 
 tasks {
@@ -10,6 +11,11 @@ tasks {
     }
     build {
         dependsOn(shadowJar)
+    }
+    runServer {
+        minecraftVersion("1.17")
+        paperclip(file("spigot-1.17.jar"))
+        legacyPluginLoading()
     }
 }
 

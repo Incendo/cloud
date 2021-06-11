@@ -180,14 +180,24 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
 
     private static final class ModernParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
-        private static final Class<?> NMS_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClass("ItemStack");
+        private static final Class<?> NMS_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "ItemStack",
+                "net.minecraft.world.item.ItemStack"
+        );
         private static final Class<?> CRAFT_ITEM_STACK_CLASS =
                 CraftBukkitReflection.needOBCClass("inventory.CraftItemStack");
-        private static final Class<?> ARGUMENT_ITEM_STACK_CLASS =
-                CraftBukkitReflection.needNMSClass("ArgumentItemStack");
-        private static final Class<?> ARGUMENT_PREDICATE_ITEM_STACK_CLASS =
-                CraftBukkitReflection.needNMSClass("ArgumentPredicateItemStack");
-        private static final Class<?> NMS_ITEM_CLASS = CraftBukkitReflection.needNMSClass("Item");
+        private static final Class<?> ARGUMENT_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "ArgumentItemStack",
+                "net.minecraft.commands.arguments.item.ArgumentItemStack"
+        );
+        private static final Class<?> ARGUMENT_PREDICATE_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "ArgumentPredicateItemStack",
+                "net.minecraft.commands.arguments.item.ArgumentPredicateItemStack"
+        );
+        private static final Class<?> NMS_ITEM_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "Item",
+                "net.minecraft.world.item.Item"
+        );
         private static final Class<?> CRAFT_MAGIC_NUMBERS_CLASS =
                 CraftBukkitReflection.needOBCClass("util.CraftMagicNumbers");
         private static final Method GET_MATERIAL_METHOD = CraftBukkitReflection

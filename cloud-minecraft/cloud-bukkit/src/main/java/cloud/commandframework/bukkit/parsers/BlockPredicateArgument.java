@@ -143,24 +143,45 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
 
         static {
             if (CraftBukkitReflection.MAJOR_REVISION >= 16) {
-                TAG_REGISTRY_CLASS = CraftBukkitReflection.needNMSClass("ITagRegistry");
+                TAG_REGISTRY_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                        "ITagRegistry",
+                        "net.minecraft.tags.ITagRegistry"
+                );
             } else {
                 TAG_REGISTRY_CLASS = CraftBukkitReflection.needNMSClass("TagRegistry");
             }
         }
 
         private static final Class<?> CRAFT_WORLD_CLASS = CraftBukkitReflection.needOBCClass("CraftWorld");
-        private static final Class<?> MINECRAFT_SERVER_CLASS = CraftBukkitReflection.needNMSClass("MinecraftServer");
-        private static final Class<?> COMMAND_LISTENER_WRAPPER_CLASS =
-                CraftBukkitReflection.needNMSClass("CommandListenerWrapper");
-        private static final Class<?> ARGUMENT_BLOCK_PREDICATE_CLASS =
-                CraftBukkitReflection.needNMSClass("ArgumentBlockPredicate");
-        private static final Class<?> ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS =
-                CraftBukkitReflection.needNMSClass("ArgumentBlockPredicate$b");
-        private static final Class<?> SHAPE_DETECTOR_BLOCK_CLASS = // BlockInWorld
-                CraftBukkitReflection.needNMSClass("ShapeDetectorBlock");
-        private static final Class<?> I_WORLD_READER_CLASS = CraftBukkitReflection.needNMSClass("IWorldReader");
-        private static final Class<?> BLOCK_POSITION_CLASS = CraftBukkitReflection.needNMSClass("BlockPosition");
+        private static final Class<?> MINECRAFT_SERVER_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "MinecraftServer",
+                "net.minecraft.server.MinecraftServer"
+        );
+        private static final Class<?> COMMAND_LISTENER_WRAPPER_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "CommandListenerWrapper",
+                "net.minecraft.commands.CommandListenerWrapper"
+        );
+        private static final Class<?> ARGUMENT_BLOCK_PREDICATE_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "ArgumentBlockPredicate",
+                "net.minecraft.commands.arguments.blocks.ArgumentBlockPredicate"
+        );
+        private static final Class<?> ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "ArgumentBlockPredicate$b",
+                "net.minecraft.commands.arguments.blocks.ArgumentBlockPredicate$b"
+        );
+        // BlockInWorld
+        private static final Class<?> SHAPE_DETECTOR_BLOCK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "ShapeDetectorBlock",
+                "net.minecraft.world.level.block.state.pattern.ShapeDetectorBlock"
+        );
+        private static final Class<?> I_WORLD_READER_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "IWorldReader",
+                "net.minecraft.world.level.IWorldReader"
+        );
+        private static final Class<?> BLOCK_POSITION_CLASS = CraftBukkitReflection.needNMSClassOrElse(
+                "BlockPosition",
+                "net.minecraft.core.BlockPosition"
+        );
         private static final Constructor<?> BLOCK_POSITION_CTR =
                 CraftBukkitReflection.needConstructor(BLOCK_POSITION_CLASS, int.class, int.class, int.class);
         private static final Constructor<?> SHAPE_DETECTOR_BLOCK_CTR = CraftBukkitReflection
