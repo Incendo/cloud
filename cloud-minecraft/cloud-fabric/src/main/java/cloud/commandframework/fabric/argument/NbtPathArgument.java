@@ -150,7 +150,8 @@ public final class NbtPathArgument<C> extends CommandArgument<C, net.minecraft.c
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final net.minecraft.commands.arguments.NbtPathArgument.@NonNull NbtPath defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(
+                final net.minecraft.commands.arguments.NbtPathArgument.@NonNull NbtPath defaultValue) {
             return this.asOptionalWithDefault(defaultValue.toString());
         }
 

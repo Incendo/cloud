@@ -149,7 +149,8 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, net.minecr
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final net.minecraft.commands.arguments.EntityAnchorArgument.@NonNull Anchor defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(
+                final net.minecraft.commands.arguments.EntityAnchorArgument.@NonNull Anchor defaultValue) {
             return this.asOptionalWithDefault(defaultValue.name());
         }
 
