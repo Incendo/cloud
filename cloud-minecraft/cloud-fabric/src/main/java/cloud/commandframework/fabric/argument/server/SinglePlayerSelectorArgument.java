@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for selecting a single {@link net.minecraft.server.network.ServerPlayerEntity player} using an
- * {@link net.minecraft.command.EntitySelector}.
+ * An argument for selecting a single {@link net.minecraft.server.level.ServerPlayer player} using an
+ * {@link net.minecraft.commands.arguments.selector.EntitySelector}.
  *
  * @param <C> the sender type
  * @since 1.5.0

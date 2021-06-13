@@ -36,25 +36,24 @@ import cloud.commandframework.fabric.data.MultiplePlayerSelector;
 import cloud.commandframework.fabric.data.SingleEntitySelector;
 import cloud.commandframework.fabric.data.SinglePlayerSelector;
 import cloud.commandframework.fabric.internal.EntitySelectorAccess;
-import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageFormatAccess;
-import cloud.commandframework.fabric.mixin.MessageArgumentTypeMessageSelectorAccess;
+import cloud.commandframework.fabric.mixin.MessageArgumentMessageAccess;
+import cloud.commandframework.fabric.mixin.MessageArgumentPartAccess;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.EntitySelector;
-import net.minecraft.command.argument.BlockPosArgumentType;
-import net.minecraft.command.argument.ColumnPosArgumentType;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.command.argument.MessageArgumentType;
-import net.minecraft.command.argument.PosArgument;
-import net.minecraft.command.argument.TimeArgumentType;
-import net.minecraft.command.argument.Vec2ArgumentType;
-import net.minecraft.command.argument.Vec3ArgumentType;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.MessageArgument;
+import net.minecraft.commands.arguments.TimeArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
+import net.minecraft.commands.arguments.coordinates.Vec2Argument;
+import net.minecraft.commands.arguments.coordinates.Vec3Argument;
+import net.minecraft.commands.arguments.selector.EntitySelector;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -80,7 +79,7 @@ public final class FabricArgumentParsers {
      * @since 1.5.0
      */
     public static <C> @NonNull ArgumentParser<C, MinecraftTime> time() {
-        return new WrappedBrigadierParser<C, Integer>(TimeArgumentType.time())
+        return new WrappedBrigadierParser<C, Integer>(TimeArgument.time())
                 .map((ctx, val) -> ArgumentParseResult.success(MinecraftTime.of(val)));
     }
 
@@ -91,7 +90,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      */
     public static <C> @NonNull ArgumentParser<C, Coordinates.BlockCoordinates> blockPos() {
-        return new WrappedBrigadierParser<C, PosArgument>(BlockPosArgumentType.blockPos())
+        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(BlockPosArgument.blockPos())
                 .map(FabricArgumentParsers::mapToCoordinates);
     }
 
@@ -102,7 +101,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      */
     public static <C> @NonNull ArgumentParser<C, Coordinates.ColumnCoordinates> columnPos() {
-        return new WrappedBrigadierParser<C, PosArgument>(ColumnPosArgumentType.columnPos())
+        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(ColumnPosArgument.columnPos())
                 .map(FabricArgumentParsers::mapToCoordinates);
     }
 
@@ -115,7 +114,7 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      */
     public static <C> @NonNull ArgumentParser<C, Coordinates.CoordinatesXZ> vec2(final boolean centerIntegers) {
-        return new WrappedBrigadierParser<C, PosArgument>(new Vec2ArgumentType(centerIntegers))
+        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(new Vec2Argument(centerIntegers))
                 .map(FabricArgumentParsers::mapToCoordinates);
     }
 
@@ -127,14 +126,14 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      */
     public static <C> @NonNull ArgumentParser<C, Coordinates> vec3(final boolean centerIntegers) {
-        return new WrappedBrigadierParser<C, PosArgument>(Vec3ArgumentType.vec3(centerIntegers))
+        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(Vec3Argument.vec3(centerIntegers))
                 .map(FabricArgumentParsers::mapToCoordinates);
     }
 
     @SuppressWarnings("unchecked")
     private static <C, O extends Coordinates> @NonNull ArgumentParseResult<@NonNull O> mapToCoordinates(
             final @NonNull CommandContext<C> ctx,
-            final @NonNull PosArgument posArgument
+            final net.minecraft.commands.arguments.coordinates.@NonNull Coordinates posArgument
     ) {
         return requireServerCommandSource(
                 ctx,
@@ -153,14 +152,14 @@ public final class FabricArgumentParsers {
      * @since 1.5.0
      */
     public static <C> @NonNull ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
-        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.player())
+        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.player())
                 .map((ctx, entitySelector) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new SinglePlayerSelectorImpl(
                                         ((EntitySelectorAccess) entitySelector).inputString(),
                                         entitySelector,
-                                        entitySelector.getPlayer(serverCommandSource)
+                                        entitySelector.findSinglePlayer(serverCommandSource)
                                 ))
                         )
                 ));
@@ -174,14 +173,14 @@ public final class FabricArgumentParsers {
      * @since 1.5.0
      */
     public static <C> @NonNull ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
-        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.players())
+        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.players())
                 .map((ctx, entitySelector) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new MultiplePlayerSelectorImpl(
                                         ((EntitySelectorAccess) entitySelector).inputString(),
                                         entitySelector,
-                                        entitySelector.getPlayers(serverCommandSource)
+                                        entitySelector.findPlayers(serverCommandSource)
                                 ))
                         )
                 ));
@@ -195,14 +194,14 @@ public final class FabricArgumentParsers {
      * @since 1.5.0
      */
     public static <C> @NonNull ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
-        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entity())
+        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entity())
                 .map((ctx, entitySelector) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new SingleEntitySelectorImpl(
                                         ((EntitySelectorAccess) entitySelector).inputString(),
                                         entitySelector,
-                                        entitySelector.getEntity(serverCommandSource)
+                                        entitySelector.findSingleEntity(serverCommandSource)
                                 ))
                         )
                 ));
@@ -216,14 +215,14 @@ public final class FabricArgumentParsers {
      * @since 1.5.0
      */
     public static <C> @NonNull ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
-        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgumentType.entities())
+        return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entities())
                 .map((ctx, entitySelector) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new MultipleEntitySelectorImpl(
                                         ((EntitySelectorAccess) entitySelector).inputString(),
                                         entitySelector,
-                                        Collections.unmodifiableCollection(entitySelector.getEntities(serverCommandSource))
+                                        Collections.unmodifiableCollection(entitySelector.findEntities(serverCommandSource))
                                 ))
                         )
                 ));
@@ -237,7 +236,7 @@ public final class FabricArgumentParsers {
      * @since 1.5.0
      */
     public static <C> @NonNull ArgumentParser<C, Message> message() {
-        return new WrappedBrigadierParser<C, MessageArgumentType.MessageFormat>(MessageArgumentType.message())
+        return new WrappedBrigadierParser<C, MessageArgument.Message>(MessageArgument.message())
                 .map((ctx, format) -> requireServerCommandSource(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
@@ -273,44 +272,44 @@ public final class FabricArgumentParsers {
 
     private static <C, O> @NonNull ArgumentParseResult<O> requireServerCommandSource(
             final @NonNull CommandContext<C> context,
-            final @NonNull Function<ServerCommandSource, ArgumentParseResult<O>> resultFunction
+            final @NonNull Function<CommandSourceStack, ArgumentParseResult<O>> resultFunction
     ) {
-        final CommandSource nativeSource = context.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-        if (!(nativeSource instanceof ServerCommandSource)) {
+        final SharedSuggestionProvider nativeSource = context.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+        if (!(nativeSource instanceof CommandSourceStack)) {
             return ArgumentParseResult.failure(serverOnly());
         }
-        return resultFunction.apply((ServerCommandSource) nativeSource);
+        return resultFunction.apply((CommandSourceStack) nativeSource);
     }
 
     static final class MessageImpl implements Message {
 
         private final Collection<Entity> mentionedEntities;
-        private final Text contents;
+        private final Component contents;
 
         static MessageImpl from(
-                final @NonNull ServerCommandSource source,
-                final MessageArgumentType.@NonNull MessageFormat message,
+                final @NonNull CommandSourceStack source,
+                final MessageArgument.@NonNull Message message,
                 final boolean useSelectors
         ) throws CommandSyntaxException {
-            final Text contents = message.format(source, useSelectors);
-            final MessageArgumentType.MessageSelector[] selectors =
-                    ((MessageArgumentTypeMessageFormatAccess) message).accessor$selectors();
+            final Component contents = message.toComponent(source, useSelectors);
+            final MessageArgument.Part[] selectors =
+                    ((MessageArgumentMessageAccess) message).accessor$parts();
             final Collection<Entity> entities;
             if (!useSelectors || selectors.length == 0) {
                 entities = Collections.emptySet();
             } else {
                 entities = new HashSet<>();
-                for (final MessageArgumentType.MessageSelector selector : selectors) {
-                    entities.addAll(((MessageArgumentTypeMessageSelectorAccess) selector)
+                for (final MessageArgument.Part selector : selectors) {
+                    entities.addAll(((MessageArgumentPartAccess) selector)
                             .accessor$selector()
-                            .getEntities(source));
+                            .findEntities(source));
                 }
             }
 
             return new MessageImpl(entities, contents);
         }
 
-        MessageImpl(final Collection<Entity> mentionedEntities, final Text contents) {
+        MessageImpl(final Collection<Entity> mentionedEntities, final Component contents) {
             this.mentionedEntities = mentionedEntities;
             this.contents = contents;
         }
@@ -321,7 +320,7 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull Text getContents() {
+        public @NonNull Component getContents() {
             return this.contents;
         }
 
@@ -332,17 +331,17 @@ public final class FabricArgumentParsers {
             Coordinates.BlockCoordinates,
             Coordinates.ColumnCoordinates {
 
-        private final ServerCommandSource source;
-        private final PosArgument posArgument;
+        private final CommandSourceStack source;
+        private final net.minecraft.commands.arguments.coordinates.Coordinates posArgument;
 
-        CoordinatesImpl(final @NonNull ServerCommandSource source, final @NonNull PosArgument posArgument) {
+        CoordinatesImpl(final @NonNull CommandSourceStack source, final net.minecraft.commands.arguments.coordinates.@NonNull Coordinates posArgument) {
             this.source = source;
             this.posArgument = posArgument;
         }
 
         @Override
-        public @NonNull Vec3d position() {
-            return this.posArgument.toAbsolutePos(this.source);
+        public @NonNull Vec3 position() {
+            return this.posArgument.getPosition(this.source);
         }
 
         @Override
@@ -366,7 +365,7 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull PosArgument wrappedCoordinates() {
+        public net.minecraft.commands.arguments.coordinates.@NonNull Coordinates wrappedCoordinates() {
             return this.posArgument;
         }
 
@@ -442,12 +441,12 @@ public final class FabricArgumentParsers {
 
         private final String inputString;
         private final EntitySelector entitySelector;
-        private final ServerPlayerEntity selectedPlayer;
+        private final ServerPlayer selectedPlayer;
 
         SinglePlayerSelectorImpl(
                 final @NonNull String inputString,
                 final @NonNull EntitySelector entitySelector,
-                final @NonNull ServerPlayerEntity selectedPlayer
+                final @NonNull ServerPlayer selectedPlayer
         ) {
             this.inputString = inputString;
             this.entitySelector = entitySelector;
@@ -465,7 +464,7 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull ServerPlayerEntity getSingle() {
+        public @NonNull ServerPlayer getSingle() {
             return this.selectedPlayer;
         }
 
@@ -475,12 +474,12 @@ public final class FabricArgumentParsers {
 
         private final String inputString;
         private final EntitySelector entitySelector;
-        private final Collection<ServerPlayerEntity> selectedPlayers;
+        private final Collection<ServerPlayer> selectedPlayers;
 
         MultiplePlayerSelectorImpl(
                 final @NonNull String inputString,
                 final @NonNull EntitySelector entitySelector,
-                final @NonNull Collection<ServerPlayerEntity> selectedPlayers
+                final @NonNull Collection<ServerPlayer> selectedPlayers
         ) {
             this.inputString = inputString;
             this.entitySelector = entitySelector;
@@ -498,7 +497,7 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull Collection<ServerPlayerEntity> get() {
+        public @NonNull Collection<ServerPlayer> get() {
             return this.selectedPlayers;
         }
 

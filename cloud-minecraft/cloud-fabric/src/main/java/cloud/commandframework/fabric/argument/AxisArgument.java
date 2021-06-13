@@ -28,8 +28,8 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
-import net.minecraft.command.argument.SwizzleArgumentType;
-import net.minecraft.util.math.Direction;
+import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
+import net.minecraft.core.Direction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -39,7 +39,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
- * An argument for a set of {@link net.minecraft.util.math.Direction.Axis axes}, described in Vanilla as a "swizzle".
+ * An argument for a set of {@link net.minecraft.core.Direction.Axis axes}, described in Vanilla as a "swizzle".
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -59,7 +59,7 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(SwizzleArgumentType.swizzle()),
+                new WrappedBrigadierParser<>(SwizzleArgument.swizzle()),
                 defaultValue,
                 TYPE,
                 suggestionsProvider,

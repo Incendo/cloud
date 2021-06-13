@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.command.EntitySelector;
+import net.minecraft.commands.arguments.selector.EntitySelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

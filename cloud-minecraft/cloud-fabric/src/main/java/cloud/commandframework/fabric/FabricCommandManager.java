@@ -44,41 +44,40 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.serialization.Codec;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.AngleArgumentType;
-import net.minecraft.command.argument.BlockPredicateArgumentType;
-import net.minecraft.command.argument.ColorArgumentType;
-import net.minecraft.command.argument.DimensionArgumentType;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
-import net.minecraft.command.argument.EntitySummonArgumentType;
-import net.minecraft.command.argument.IdentifierArgumentType;
-import net.minecraft.command.argument.ItemEnchantmentArgumentType;
-import net.minecraft.command.argument.ItemStackArgument;
-import net.minecraft.command.argument.ItemStackArgumentType;
-import net.minecraft.command.argument.MessageArgumentType;
-import net.minecraft.command.argument.MobEffectArgumentType;
-import net.minecraft.command.argument.NbtCompoundTagArgumentType;
-import net.minecraft.command.argument.NbtPathArgumentType;
-import net.minecraft.command.argument.NbtTagArgumentType;
-import net.minecraft.command.argument.NumberRangeArgumentType;
-import net.minecraft.command.argument.ObjectiveCriteriaArgumentType;
-import net.minecraft.command.argument.OperationArgumentType;
-import net.minecraft.command.argument.ParticleArgumentType;
-import net.minecraft.command.argument.SwizzleArgumentType;
-import net.minecraft.command.argument.TeamArgumentType;
-import net.minecraft.command.argument.UuidArgumentType;
-import net.minecraft.command.suggestion.SuggestionProviders;
+import net.minecraft.ChatFormatting;
+import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.AngleArgument;
+import net.minecraft.commands.arguments.ColorArgument;
+import net.minecraft.commands.arguments.CompoundTagArgument;
+import net.minecraft.commands.arguments.DimensionArgument;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.commands.arguments.EntitySummonArgument;
+import net.minecraft.commands.arguments.ItemEnchantmentArgument;
+import net.minecraft.commands.arguments.MessageArgument;
+import net.minecraft.commands.arguments.MobEffectArgument;
+import net.minecraft.commands.arguments.NbtPathArgument;
+import net.minecraft.commands.arguments.NbtTagArgument;
+import net.minecraft.commands.arguments.ObjectiveCriteriaArgument;
+import net.minecraft.commands.arguments.OperationArgument;
+import net.minecraft.commands.arguments.ParticleArgument;
+import net.minecraft.commands.arguments.RangeArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.UuidArgument;
+import net.minecraft.commands.arguments.blocks.BlockPredicateArgument;
+import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
+import net.minecraft.commands.arguments.item.ItemArgument;
+import net.minecraft.commands.arguments.item.ItemInput;
+import net.minecraft.commands.synchronization.SuggestionProviders;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.predicate.NumberRange;
-import net.minecraft.scoreboard.ScoreboardCriterion;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -108,7 +107,7 @@ import java.util.function.Supplier;
  * @see FabricServerCommandManager for server commands
  * @since 1.5.0
  */
-public abstract class FabricCommandManager<C, S extends CommandSource> extends CommandManager<C> implements
+public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider> extends CommandManager<C> implements
         BrigadierManagerHolder<C> {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -130,8 +129,8 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link AsynchronousCommandExecutionCoordinator}
-     * @param commandSourceMapper          Function that maps {@link CommandSource} to the command sender type
-     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link CommandSource}
+     * @param commandSourceMapper          Function that maps {@link SharedSuggestionProvider} to the command sender type
+     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link SharedSuggestionProvider}
      * @param registrationHandler          the handler accepting command registrations
      * @param dummyCommandSourceProvider   a provider of a dummy command source, for use with brigadier registration
      * @since 1.5.0
@@ -167,38 +166,38 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     private void registerNativeBrigadierMappings(final @NonNull CloudBrigadierManager<C, S> brigadier) {
         /* Cloud-native argument types */
         brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {
-        }, builder -> builder.toConstant(UuidArgumentType.uuid()));
+        }, builder -> builder.toConstant(UuidArgument.uuid()));
         this.registerRegistryEntryMappings();
         brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {
-        }, builder -> builder.toConstant(TeamArgumentType.team()));
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Team.class), params -> new TeamArgument.TeamParser<>());
+        }, builder -> builder.toConstant(net.minecraft.commands.arguments.TeamArgument.team()));
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(PlayerTeam.class), params -> new TeamArgument.TeamParser<>());
 
         /* Wrapped/Constant Brigadier types, native value type */
-        this.registerConstantNativeParserSupplier(Formatting.class, ColorArgumentType.color());
-        this.registerConstantNativeParserSupplier(CompoundTag.class, NbtCompoundTagArgumentType.nbtCompound());
-        this.registerConstantNativeParserSupplier(Tag.class, NbtTagArgumentType.nbtTag());
-        this.registerConstantNativeParserSupplier(NbtPathArgumentType.NbtPath.class, NbtPathArgumentType.nbtPath());
-        this.registerConstantNativeParserSupplier(ScoreboardCriterion.class, ObjectiveCriteriaArgumentType.objectiveCriteria());
-        this.registerConstantNativeParserSupplier(OperationArgumentType.Operation.class, OperationArgumentType.operation());
-        this.registerConstantNativeParserSupplier(ParticleEffect.class, ParticleArgumentType.particle());
-        this.registerConstantNativeParserSupplier(AngleArgumentType.Angle.class, AngleArgumentType.angle());
+        this.registerConstantNativeParserSupplier(ChatFormatting.class, ColorArgument.color());
+        this.registerConstantNativeParserSupplier(CompoundTag.class, CompoundTagArgument.compoundTag());
+        this.registerConstantNativeParserSupplier(Tag.class, NbtTagArgument.nbtTag());
+        this.registerConstantNativeParserSupplier(NbtPathArgument.NbtPath.class, NbtPathArgument.nbtPath());
+        this.registerConstantNativeParserSupplier(ObjectiveCriteria.class, ObjectiveCriteriaArgument.criteria());
+        this.registerConstantNativeParserSupplier(OperationArgument.Operation.class, OperationArgument.operation());
+        this.registerConstantNativeParserSupplier(ParticleOptions.class, ParticleArgument.particle());
+        this.registerConstantNativeParserSupplier(AngleArgument.SingleAngle.class, AngleArgument.angle());
         this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {
-        }, SwizzleArgumentType.swizzle());
-        this.registerConstantNativeParserSupplier(Identifier.class, IdentifierArgumentType.identifier());
+        }, SwizzleArgument.swizzle());
+        this.registerConstantNativeParserSupplier(ResourceLocation.class, ResourceLocationArgument.id());
         this.registerConstantNativeParserSupplier(
-                EntityAnchorArgumentType.EntityAnchor.class,
-                EntityAnchorArgumentType.entityAnchor()
+                EntityAnchorArgument.Anchor.class,
+                EntityAnchorArgument.anchor()
         );
-        this.registerConstantNativeParserSupplier(NumberRange.IntRange.class, NumberRangeArgumentType.numberRange());
-        this.registerConstantNativeParserSupplier(NumberRange.FloatRange.class, NumberRangeArgumentType.method_30918());
-        this.registerConstantNativeParserSupplier(ItemStackArgument.class, ItemStackArgumentType.itemStack());
+        this.registerConstantNativeParserSupplier(MinMaxBounds.Ints.class, RangeArgument.intRange());
+        this.registerConstantNativeParserSupplier(MinMaxBounds.Floats.class, RangeArgument.floatRange());
+        this.registerConstantNativeParserSupplier(ItemInput.class, ItemArgument.item());
 
         /* Wrapped/Constant Brigadier types, mapped value type */
         this.registerConstantNativeParserSupplier(
-                BlockPredicateArgumentType.BlockPredicate.class,
-                BlockPredicateArgumentType.blockPredicate()
+                BlockPredicateArgument.Result.class,
+                BlockPredicateArgument.blockPredicate()
         );
-        this.registerConstantNativeParserSupplier(MessageArgumentType.MessageFormat.class, MessageArgumentType.message());
+        this.registerConstantNativeParserSupplier(MessageArgument.Message.class, MessageArgument.message());
         this.getParserRegistry().registerParserSupplier(
                 TypeToken.get(MinecraftTime.class),
                 params -> FabricArgumentParsers.time()
@@ -212,30 +211,30 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
                 },
                 builder -> builder.to(argument -> {
                             /* several registries have specialized argument types, so let's use those where possible */
-                            final RegistryKey<? extends Registry<?>> registry = argument.getRegistry();
-                            if (registry.equals(Registry.ENTITY_TYPE_KEY)) {
-                                return EntitySummonArgumentType.entitySummon();
-                            } else if (registry.equals(Registry.ENCHANTMENT_KEY)) {
-                                return ItemEnchantmentArgumentType.itemEnchantment();
-                            } else if (registry.equals(Registry.MOB_EFFECT_KEY)) { // yarn wai
-                                return MobEffectArgumentType.mobEffect();
-                            } else if (registry.equals(Registry.DIMENSION)) {
-                                return DimensionArgumentType.dimension();
+                            final ResourceKey<? extends Registry<?>> registry = argument.getRegistry();
+                            if (registry.equals(Registry.ENTITY_TYPE_REGISTRY)) {
+                                return EntitySummonArgument.id();
+                            } else if (registry.equals(Registry.ENCHANTMENT_REGISTRY)) {
+                                return ItemEnchantmentArgument.enchantment();
+                            } else if (registry.equals(Registry.MOB_EFFECT_REGISTRY)) {
+                                return MobEffectArgument.effect();
+                            } else if (registry.equals(Registry.DIMENSION_REGISTRY)) {
+                                return DimensionArgument.dimension();
                             }
-                            return IdentifierArgumentType.identifier();
+                            return ResourceLocationArgument.id();
                         }
                 ).suggestedBy((argument, useCloud) -> {
                     /* A few other registries have client-side suggestion providers but no argument type */
                     /* Type parameters are messed up here for some reason */
-                    final RegistryKey<? extends Registry<?>> registry = argument.getRegistry();
-                    if (registry.equals(Registry.SOUND_EVENT_KEY)) {
+                    final ResourceKey<? extends Registry<?>> registry = argument.getRegistry();
+                    if (registry.equals(Registry.SOUND_EVENT_REGISTRY)) {
                         return (SuggestionProvider<S>) SuggestionProviders.AVAILABLE_SOUNDS;
-                    } else if (registry.equals(Registry.BIOME_KEY)) {
-                        return (SuggestionProvider<S>) SuggestionProviders.ALL_BIOMES;
-                    } else if (registry.equals(Registry.ENTITY_TYPE_KEY)
-                            || registry.equals(Registry.ENCHANTMENT_KEY)
-                            || registry.equals(Registry.MOB_EFFECT_KEY)
-                            || registry.equals(Registry.DIMENSION)) {
+                    } else if (registry.equals(Registry.BIOME_REGISTRY)) {
+                        return (SuggestionProvider<S>) SuggestionProviders.AVAILABLE_BIOMES;
+                    } else if (registry.equals(Registry.ENTITY_TYPE_REGISTRY)
+                            || registry.equals(Registry.ENCHANTMENT_REGISTRY)
+                            || registry.equals(Registry.MOB_EFFECT_REGISTRY)
+                            || registry.equals(Registry.DIMENSION_REGISTRY)) {
                         return null; /* for types with their own argument type, use Brigadier */
                     }
                     return useCloud; /* use cloud suggestions for anything else */
@@ -247,13 +246,13 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
         final Set<Class<?>> seenClasses = new HashSet<>();
         /* Some registries have types that are too generic... we'll skip those for now.
          * Eventually, these could be resolved by using ParserParameters in some way? */
-        seenClasses.add(Identifier.class);
+        seenClasses.add(ResourceLocation.class);
         seenClasses.add(Codec.class);
         for (final Field field : Registry.class.getDeclaredFields()) {
             if ((field.getModifiers() & MOD_PUBLIC_STATIC_FINAL) != MOD_PUBLIC_STATIC_FINAL) {
                 continue;
             }
-            if (!field.getType().equals(RegistryKey.class)) {
+            if (!field.getType().equals(ResourceKey.class)) {
                 continue;
             }
 
@@ -271,9 +270,9 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
                 continue;
             }
 
-            final RegistryKey<?> key;
+            final ResourceKey<?> key;
             try {
-                key = (RegistryKey<?>) field.get(null);
+                key = (ResourceKey<?>) field.get(null);
             } catch (final IllegalAccessException ex) {
                 LOGGER.warn("Failed to access value of registry key in field {} of type {}", field.getName(), generic, ex);
                 continue;
@@ -327,7 +326,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     }
 
     /**
-     * Gets the mapper from a game {@link CommandSource} to the manager's {@code C} type.
+     * Gets the mapper from a game {@link SharedSuggestionProvider} to the manager's {@code C} type.
      *
      * @return Command source mapper
      * @since 1.5.0
@@ -337,7 +336,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     }
 
     /**
-     * Gets the mapper from the manager's {@code C} type to a game {@link CommandSource}.
+     * Gets the mapper from the manager's {@code C} type to a game {@link SharedSuggestionProvider}.
      *
      * @return Command source mapper
      * @since 1.5.0
@@ -366,7 +365,7 @@ public abstract class FabricCommandManager<C, S extends CommandSource> extends C
     public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
         return sender -> this.getBackwardsCommandSourceMapper()
                 .apply(sender)
-                .hasPermissionLevel(permissionLevel);
+                .hasPermission(permissionLevel);
     }
 
 }

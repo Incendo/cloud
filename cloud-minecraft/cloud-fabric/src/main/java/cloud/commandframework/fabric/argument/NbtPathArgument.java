@@ -27,7 +27,6 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.NbtPathArgumentType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -35,13 +34,13 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for {@link net.minecraft.command.argument.NbtPathArgumentType.NbtPath NBT paths} to locations within
+ * An argument for {@link net.minecraft.commands.arguments.NbtPathArgument.NbtPath NBT paths} to locations within
  * {@link net.minecraft.nbt.Tag Tags}.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgumentType.NbtPath> {
+public final class NbtPathArgument<C> extends CommandArgument<C, net.minecraft.commands.arguments.NbtPathArgument.NbtPath> {
 
     NbtPathArgument(
             final boolean required,
@@ -53,9 +52,9 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(NbtPathArgumentType.nbtPath()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.NbtPathArgument.nbtPath()),
                 defaultValue,
-                NbtPathArgumentType.NbtPath.class,
+                net.minecraft.commands.arguments.NbtPathArgument.NbtPath.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -108,7 +107,7 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
      */
     public static <C> @NonNull NbtPathArgument<C> optional(
             final @NonNull String name,
-            final NbtPathArgumentType.@NonNull NbtPath defaultTag
+            final net.minecraft.commands.arguments.NbtPathArgument.@NonNull NbtPath defaultTag
     ) {
         return NbtPathArgument.<C>builder(name).asOptionalWithDefault(defaultTag).build();
     }
@@ -120,10 +119,10 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, NbtPathArgumentType.NbtPath, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, net.minecraft.commands.arguments.NbtPathArgument.NbtPath, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(NbtPathArgumentType.NbtPath.class, name);
+            super(net.minecraft.commands.arguments.NbtPathArgument.NbtPath.class, name);
         }
 
         /**
@@ -151,7 +150,7 @@ public final class NbtPathArgument<C> extends CommandArgument<C, NbtPathArgument
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final NbtPathArgumentType.@NonNull NbtPath defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(final net.minecraft.commands.arguments.NbtPathArgument.@NonNull NbtPath defaultValue) {
             return this.asOptionalWithDefault(defaultValue.toString());
         }
 

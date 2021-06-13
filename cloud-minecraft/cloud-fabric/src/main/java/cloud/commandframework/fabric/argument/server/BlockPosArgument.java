@@ -28,7 +28,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates.BlockCoordinates;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

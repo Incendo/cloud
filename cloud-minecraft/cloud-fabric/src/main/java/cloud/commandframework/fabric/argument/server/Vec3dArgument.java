@@ -28,7 +28,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -146,7 +146,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull Vec3dArgument<C> optional(final @NonNull String name, final @NonNull Vec3d defaultValue) {
+    public static <C> @NonNull Vec3dArgument<C> optional(final @NonNull String name, final @NonNull Vec3 defaultValue) {
         return Vec3dArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
@@ -163,7 +163,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
     public static <C> @NonNull Vec3dArgument<C> optional(
             final @NonNull String name,
             final boolean centerIntegers,
-            final @NonNull Vec3d defaultValue
+            final @NonNull Vec3 defaultValue
     ) {
         return Vec3dArgument.<C>builder(name).centerIntegers(centerIntegers).asOptionalWithDefault(defaultValue).build();
     }
@@ -212,7 +212,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vec3d defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vec3 defaultValue) {
             return this.asOptionalWithDefault(String.format(
                     "%.10f %.10f %.10f",
                     defaultValue.x,

@@ -23,13 +23,33 @@
 //
 package cloud.commandframework.fabric.mixin;
 
-import net.minecraft.command.argument.MessageArgumentType;
+import cloud.commandframework.fabric.internal.EntitySelectorAccess;
+import com.mojang.brigadier.StringReader;
+import net.minecraft.commands.arguments.selector.EntitySelector;
+import net.minecraft.commands.arguments.selector.EntitySelectorParser;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(MessageArgumentType.MessageFormat.class)
-public interface MessageArgumentTypeMessageFormatAccess {
+@Mixin(EntitySelectorParser.class)
+abstract class EntitySelectorParserMixin {
 
-    @Accessor("selectors") MessageArgumentType.MessageSelector[] accessor$selectors();
+    @Shadow
+    private int startPosition;
+
+    @Shadow
+    @Final
+    private StringReader reader;
+
+    @Inject(method = "parse", at = @At("RETURN"))
+    public void setInputString(final @NonNull CallbackInfoReturnable<EntitySelector> cir) {
+        final EntitySelector selector = cir.getReturnValue();
+        final String inputString = this.reader.getString().substring(this.startPosition, this.reader.getCursor());
+        ((EntitySelectorAccess) selector).inputString(inputString);
+    }
 
 }

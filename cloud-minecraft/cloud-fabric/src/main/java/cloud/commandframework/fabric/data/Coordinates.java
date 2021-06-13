@@ -23,16 +23,15 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.command.argument.BlockPosArgumentType;
-import net.minecraft.command.argument.ColumnPosArgumentType;
-import net.minecraft.command.argument.PosArgument;
-import net.minecraft.command.argument.Vec2ArgumentType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.commands.arguments.coordinates.ColumnPosArgument;
+import net.minecraft.commands.arguments.coordinates.Vec2Argument;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * A {@link PosArgument} wrapper for easier use with cloud commands.
+ * A {@link net.minecraft.commands.arguments.coordinates.Coordinates} wrapper for easier use with cloud commands.
  *
  * @since 1.5.0
  */
@@ -44,7 +43,7 @@ public interface Coordinates {
      * @return position
      * @since 1.5.0
      */
-    @NonNull Vec3d position();
+    @NonNull Vec3 position();
 
     /**
      * Resolve a block position from the parsed coordinates.
@@ -84,10 +83,10 @@ public interface Coordinates {
      * @return the base coordinates
      * @since 1.5.0
      */
-    @NonNull PosArgument wrappedCoordinates();
+    net.minecraft.commands.arguments.coordinates.@NonNull Coordinates wrappedCoordinates();
 
     /**
-     * A specialized version of {@link Coordinates} for representing the result of the vanilla {@link Vec2ArgumentType},
+     * A specialized version of {@link Coordinates} for representing the result of the vanilla {@link Vec2Argument},
      * which accepts two doubles for the x and z coordinate, always defaulting to 0 for the y coordinate.
      *
      * @since 1.5.0
@@ -97,7 +96,7 @@ public interface Coordinates {
     }
 
     /**
-     * A specialized version of {@link Coordinates} for representing the result of the vanilla {@link BlockPosArgumentType}.
+     * A specialized version of {@link Coordinates} for representing the result of the vanilla {@link BlockPosArgument}.
      *
      * @since 1.5.0
      */
@@ -106,7 +105,7 @@ public interface Coordinates {
     }
 
     /**
-     * A specialized version of {@link Coordinates} for representing the result of the vanilla {@link ColumnPosArgumentType}.
+     * A specialized version of {@link Coordinates} for representing the result of the vanilla {@link ColumnPosArgument}.
      *
      * @since 1.5.0
      */

@@ -27,7 +27,6 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.NbtTagArgumentType;
 import net.minecraft.nbt.Tag;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -53,7 +52,7 @@ public final class NbtTagArgument<C> extends CommandArgument<C, Tag> {
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(NbtTagArgumentType.nbtTag()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.NbtTagArgument.nbtTag()),
                 defaultValue,
                 Tag.class,
                 suggestionsProvider,

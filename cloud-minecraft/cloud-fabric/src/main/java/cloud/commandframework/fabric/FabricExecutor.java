@@ -32,14 +32,14 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.Texts;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -50,11 +50,11 @@ import java.util.concurrent.CompletionException;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
+final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Command<S> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final Text NEWLINE = new LiteralText("\n");
+    private static final Component NEWLINE = new TextComponent("\n");
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
             "I'm sorry, but you do not have permission to perform this command. "
@@ -63,12 +63,12 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
 
     private final FabricCommandManager<C, S> manager;
     private final Function<S, String> getName;
-    private final BiConsumer<S, Text> sendError;
+    private final BiConsumer<S, Component> sendError;
 
     FabricExecutor(
             final @NonNull FabricCommandManager<C, S> manager,
             final @NonNull Function<S, String> getName,
-            final @NonNull BiConsumer<S, Text> sendError
+            final @NonNull BiConsumer<S, Component> sendError
     ) {
         this.manager = manager;
         this.getName = getName;
@@ -100,9 +100,9 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
                     (InvalidSyntaxException) throwable,
                     (c, e) -> this.sendError.accept(
                             source,
-                            new LiteralText("Invalid Command Syntax. Correct command syntax is: ")
-                                    .append(new LiteralText(String.format("/%s", e.getCorrectSyntax()))
-                                            .styled(style -> style.withColor(Formatting.GRAY)))
+                            new TextComponent("Invalid Command Syntax. Correct command syntax is: ")
+                                    .append(new TextComponent(String.format("/%s", e.getCorrectSyntax()))
+                                            .withStyle(style -> style.withColor(ChatFormatting.GRAY)))
                     )
             );
         } else if (throwable instanceof InvalidCommandSenderException) {
@@ -110,21 +110,21 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
                     sender,
                     InvalidCommandSenderException.class,
                     (InvalidCommandSenderException) throwable,
-                    (c, e) -> this.sendError.accept(source, new LiteralText(throwable.getMessage()))
+                    (c, e) -> this.sendError.accept(source, new TextComponent(throwable.getMessage()))
             );
         } else if (throwable instanceof NoPermissionException) {
             this.manager.handleException(
                     sender,
                     NoPermissionException.class,
                     (NoPermissionException) throwable,
-                    (c, e) -> this.sendError.accept(source, new LiteralText(MESSAGE_NO_PERMS))
+                    (c, e) -> this.sendError.accept(source, new TextComponent(MESSAGE_NO_PERMS))
             );
         } else if (throwable instanceof NoSuchCommandException) {
             this.manager.handleException(
                     sender,
                     NoSuchCommandException.class,
                     (NoSuchCommandException) throwable,
-                    (c, e) -> this.sendError.accept(source, new LiteralText(MESSAGE_UNKNOWN_COMMAND))
+                    (c, e) -> this.sendError.accept(source, new TextComponent(MESSAGE_UNKNOWN_COMMAND))
             );
         } else if (throwable instanceof ArgumentParseException) {
             this.manager.handleException(
@@ -133,14 +133,14 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
                     (ArgumentParseException) throwable,
                     (c, e) -> {
                         if (throwable.getCause() instanceof CommandSyntaxException) {
-                            this.sendError.accept(source, new LiteralText("Invalid Command Argument: ")
-                                    .append(new LiteralText("")
-                                            .append(Texts.toText(((CommandSyntaxException) throwable.getCause()).getRawMessage()))
-                                            .formatted(Formatting.GRAY)));
+                            this.sendError.accept(source, new TextComponent("Invalid Command Argument: ")
+                                    .append(new TextComponent("")
+                                            .append(ComponentUtils.fromMessage(((CommandSyntaxException) throwable.getCause()).getRawMessage()))
+                                            .withStyle(ChatFormatting.GRAY)));
                         } else {
-                            this.sendError.accept(source, new LiteralText("Invalid Command Argument: ")
-                                    .append(new LiteralText(throwable.getCause().getMessage())
-                                            .formatted(Formatting.GRAY)));
+                            this.sendError.accept(source, new TextComponent("Invalid Command Argument: ")
+                                    .append(new TextComponent(throwable.getCause().getMessage())
+                                            .withStyle(ChatFormatting.GRAY)));
                         }
                     }
             );
@@ -151,7 +151,7 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
                     (CommandExecutionException) throwable,
                     (c, e) -> {
                         this.sendError.accept(source, this.decorateHoverStacktrace(
-                                new LiteralText(MESSAGE_INTERNAL_ERROR),
+                                new TextComponent(MESSAGE_INTERNAL_ERROR),
                                 throwable.getCause(),
                                 sender
                         ));
@@ -164,7 +164,7 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
             );
         } else {
             this.sendError.accept(source, this.decorateHoverStacktrace(
-                    new LiteralText(MESSAGE_INTERNAL_ERROR),
+                    new TextComponent(MESSAGE_INTERNAL_ERROR),
                     throwable,
                     sender
             ));
@@ -172,7 +172,7 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
         }
     }
 
-    private MutableText decorateHoverStacktrace(final MutableText input, final Throwable cause, final C sender) {
+    private MutableComponent decorateHoverStacktrace(final MutableComponent input, final Throwable cause, final C sender) {
         if (!this.manager.hasPermission(sender, "cloud.hover-stacktrace")) {
             return input;
         }
@@ -180,13 +180,13 @@ final class FabricExecutor<C, S extends CommandSource> implements Command<S> {
         final StringWriter writer = new StringWriter();
         cause.printStackTrace(new PrintWriter(writer));
         final String stackTrace = writer.toString().replace("\t", "    ");
-        return input.styled(style -> style
+        return input.withStyle(style -> style
                 .withHoverEvent(new HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
-                        new LiteralText(stackTrace)
+                        new TextComponent(stackTrace)
                                 .append(NEWLINE)
-                                .append(new LiteralText("    Click to copy")
-                                        .styled(s2 -> s2.withColor(Formatting.GRAY).withItalic(true)))
+                                .append(new TextComponent("    Click to copy")
+                                        .withStyle(s2 -> s2.withColor(ChatFormatting.GRAY).withItalic(true)))
                 ))
                 .withClickEvent(new ClickEvent(
                         ClickEvent.Action.COPY_TO_CLIPBOARD,

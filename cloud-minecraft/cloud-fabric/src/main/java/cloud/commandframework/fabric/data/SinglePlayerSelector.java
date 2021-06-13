@@ -23,13 +23,13 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * A selector for a single player.
  *
  * @since 1.5.0
  */
-public interface SinglePlayerSelector extends Selector.Single<ServerPlayerEntity> {
+public interface SinglePlayerSelector extends Selector.Single<ServerPlayer> {
 
 }
