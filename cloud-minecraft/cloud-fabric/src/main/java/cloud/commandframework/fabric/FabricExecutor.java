@@ -135,7 +135,8 @@ final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Com
                         if (throwable.getCause() instanceof CommandSyntaxException) {
                             this.sendError.accept(source, new TextComponent("Invalid Command Argument: ")
                                     .append(new TextComponent("")
-                                            .append(ComponentUtils.fromMessage(((CommandSyntaxException) throwable.getCause()).getRawMessage()))
+                                            .append(ComponentUtils
+                                                    .fromMessage(((CommandSyntaxException) throwable.getCause()).getRawMessage()))
                                             .withStyle(ChatFormatting.GRAY)));
                         } else {
                             this.sendError.accept(source, new TextComponent("Invalid Command Argument: ")
