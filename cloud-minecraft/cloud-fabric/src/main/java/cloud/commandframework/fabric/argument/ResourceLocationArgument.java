@@ -27,8 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.ColorArgumentType;
-import net.minecraft.util.Formatting;
+import net.minecraft.resources.ResourceLocation;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -36,14 +35,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for named colors in the {@link Formatting} enum.
+ * An argument parsing a {@link ResourceLocation}.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
+public final class ResourceLocationArgument<C> extends CommandArgument<C, ResourceLocation> {
 
-    ColorArgument(
+    ResourceLocationArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -53,9 +52,9 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(ColorArgumentType.color()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ResourceLocationArgument.id()),
                 defaultValue,
-                Formatting.class,
+                ResourceLocation.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -64,7 +63,7 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
     /**
      * Create a new {@link Builder}.
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
@@ -74,67 +73,67 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
     }
 
     /**
-     * Create a new required {@link ColorArgument}.
+     * Create a new required {@link ResourceLocationArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ColorArgument<C> of(final @NonNull String name) {
-        return ColorArgument.<C>builder(name).asRequired().build();
+    public static <C> @NonNull ResourceLocationArgument<C> of(final @NonNull String name) {
+        return ResourceLocationArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional {@link ColorArgument}.
+     * Create a new optional {@link ResourceLocationArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return Created component
+     * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ColorArgument<C> optional(final @NonNull String name) {
-        return ColorArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull ResourceLocationArgument<C> optional(final @NonNull String name) {
+        return ResourceLocationArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional {@link ColorArgument} with the specified default value.
+     * Create a new optional {@link ResourceLocationArgument} with the specified default value.
      *
-     * @param name         Component name
-     * @param defaultColor Default colour, must be {@link Formatting#isColor() a color}
+     * @param name         Argument name
+     * @param defaultValue Default value
      * @param <C>          Command sender type
-     * @return Created component
+     * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ColorArgument<C> optional(
+    public static <C> @NonNull ResourceLocationArgument<C> optional(
             final @NonNull String name,
-            final @NonNull Formatting defaultColor
+            final @NonNull ResourceLocation defaultValue
     ) {
-        return ColorArgument.<C>builder(name).asOptionalWithDefault(defaultColor).build();
+        return ResourceLocationArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
     /**
-     * Builder for {@link ColorArgument}.
+     * Builder for {@link ResourceLocationArgument}.
      *
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Formatting, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, ResourceLocation, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(Formatting.class, name);
+            super(ResourceLocation.class, name);
         }
 
         /**
-         * Build a new {@link ColorArgument}.
+         * Build a new {@link ResourceLocationArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
          */
         @Override
-        public @NonNull ColorArgument<C> build() {
-            return new ColorArgument<>(
+        public @NonNull ResourceLocationArgument<C> build() {
+            return new ResourceLocationArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
@@ -146,16 +145,13 @@ public final class ColorArgument<C> extends CommandArgument<C, Formatting> {
         /**
          * Sets the command argument to be optional, with the specified default value.
          *
-         * @param defaultColor default value, must be {@link Formatting#isColor() a color}
+         * @param defaultValue default value
          * @return this builder
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Formatting defaultColor) {
-            if (!defaultColor.isColor()) {
-                throw new IllegalArgumentException("Only color types are allowed but " + defaultColor + " was provided");
-            }
-            return this.asOptionalWithDefault(defaultColor.toString());
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ResourceLocation defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.toString());
         }
 
     }

@@ -27,8 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.ParticleArgumentType;
-import net.minecraft.particle.ParticleEffect;
+import net.minecraft.core.particles.ParticleOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -36,14 +35,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for any {@link net.minecraft.particle.ParticleEffect}.
+ * An argument for any {@link net.minecraft.core.particles.ParticleOptions}.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class ParticleEffectArgument<C> extends CommandArgument<C, ParticleEffect> {
+public final class ParticleArgument<C> extends CommandArgument<C, ParticleOptions> {
 
-    ParticleEffectArgument(
+    ParticleArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -53,9 +52,9 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(ParticleArgumentType.particle()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ParticleArgument.particle()),
                 defaultValue,
-                ParticleEffect.class,
+                ParticleOptions.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -74,31 +73,31 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
     }
 
     /**
-     * Create a new required {@link ParticleEffectArgument}.
+     * Create a new required {@link ParticleArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ParticleEffectArgument<C> of(final @NonNull String name) {
-        return ParticleEffectArgument.<C>builder(name).asRequired().build();
+    public static <C> @NonNull ParticleArgument<C> of(final @NonNull String name) {
+        return ParticleArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional {@link ParticleEffectArgument}.
+     * Create a new optional {@link ParticleArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ParticleEffectArgument<C> optional(final @NonNull String name) {
-        return ParticleEffectArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull ParticleArgument<C> optional(final @NonNull String name) {
+        return ParticleArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional {@link ParticleEffectArgument} with the specified default value.
+     * Create a new optional {@link ParticleArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default particle effect value
@@ -106,24 +105,24 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ParticleEffectArgument<C> optional(
+    public static <C> @NonNull ParticleArgument<C> optional(
             final @NonNull String name,
-            final @NonNull ParticleEffect defaultValue
+            final @NonNull ParticleOptions defaultValue
     ) {
-        return ParticleEffectArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return ParticleArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
     /**
-     * Builder for {@link ParticleEffectArgument}.
+     * Builder for {@link ParticleArgument}.
      *
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, ParticleEffect, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, ParticleOptions, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(ParticleEffect.class, name);
+            super(ParticleOptions.class, name);
         }
 
         /**
@@ -133,8 +132,8 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
          * @since 1.5.0
          */
         @Override
-        public @NonNull ParticleEffectArgument<C> build() {
-            return new ParticleEffectArgument<>(
+        public @NonNull ParticleArgument<C> build() {
+            return new ParticleArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
@@ -151,8 +150,8 @@ public final class ParticleEffectArgument<C> extends CommandArgument<C, Particle
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ParticleEffect defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.asString());
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ParticleOptions defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.writeToString());
         }
 
     }

@@ -39,7 +39,7 @@ tasks {
 
     withType(Javadoc::class).configureEach {
         (options as? StandardJavadocDocletOptions)?.apply {
-            links("https://maven.fabricmc.net/docs/yarn-${Versions.fabricMc}+build.${Versions.fabricYarn}/")
+            //links("https://maven.fabricmc.net/docs/yarn-${Versions.fabricMc}+build.${Versions.fabricYarn}/") // todo
         }
     }
 
@@ -60,7 +60,7 @@ tasks {
 
 dependencies {
     minecraft("com.mojang", "minecraft", Versions.fabricMc)
-    mappings("net.fabricmc", "yarn", "${Versions.fabricMc}+build.${Versions.fabricYarn}", classifier = "v2")
+    mappings(minecraft.officialMojangMappings())
     modImplementation("net.fabricmc", "fabric-loader", Versions.fabricLoader)
     modImplementation(fabricApi.module("fabric-command-api-v1", Versions.fabricApi))
     modImplementation(fabricApi.module("fabric-lifecycle-events-v1", Versions.fabricApi))

@@ -27,7 +27,6 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.AngleArgumentType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -40,7 +39,7 @@ import java.util.function.BiFunction;
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType.Angle> {
+public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.commands.arguments.AngleArgument.SingleAngle> {
 
     AngleArgument(
             final boolean required,
@@ -52,9 +51,9 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(AngleArgumentType.angle()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.AngleArgument.angle()),
                 defaultValue,
-                AngleArgumentType.Angle.class,
+                net.minecraft.commands.arguments.AngleArgument.SingleAngle.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -119,10 +118,10 @@ public final class AngleArgument<C> extends CommandArgument<C, AngleArgumentType
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, AngleArgumentType.Angle, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, net.minecraft.commands.arguments.AngleArgument.SingleAngle, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(AngleArgumentType.Angle.class, name);
+            super(net.minecraft.commands.arguments.AngleArgument.SingleAngle.class, name);
         }
 
         /**

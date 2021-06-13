@@ -27,8 +27,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.NumberRangeArgumentType;
-import net.minecraft.predicate.NumberRange;
+import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.commands.arguments.RangeArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -36,13 +36,13 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an unbounded {@link net.minecraft.predicate.NumberRange.IntRange integer range}, in the form
+ * An argument parsing an unbounded {@link net.minecraft.advancements.critereon.MinMaxBounds.Ints integer range}, in the form
  * {@code [min]..[max]}, where both lower and upper bounds are optional.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.IntRange> {
+public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.Ints> {
 
     IntRangeArgument(
             final boolean required,
@@ -54,9 +54,9 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(NumberRangeArgumentType.numberRange()),
+                new WrappedBrigadierParser<>(RangeArgument.intRange()),
                 defaultValue,
-                NumberRange.IntRange.class,
+                MinMaxBounds.Ints.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -109,7 +109,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
      */
     public static <C> @NonNull IntRangeArgument<C> optional(
             final @NonNull String name,
-            final NumberRange.@NonNull IntRange defaultValue
+            final MinMaxBounds.@NonNull Ints defaultValue
     ) {
         return IntRangeArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
@@ -121,10 +121,10 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, NumberRange.IntRange, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, MinMaxBounds.Ints, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(NumberRange.IntRange.class, name);
+            super(MinMaxBounds.Ints.class, name);
         }
 
         /**
@@ -152,7 +152,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, NumberRange.In
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final NumberRange.@NonNull IntRange defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(final MinMaxBounds.@NonNull Ints defaultValue) {
             final StringBuilder value = new StringBuilder(6);
             if (defaultValue.getMin() != null) {
                 value.append(defaultValue.getMin());

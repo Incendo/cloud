@@ -27,10 +27,10 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.ItemStackArgument;
-import net.minecraft.command.argument.ItemStackArgumentType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.commands.arguments.item.ItemArgument;
+import net.minecraft.commands.arguments.item.ItemInput;
+import net.minecraft.core.Registry;
+import net.minecraft.world.item.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -38,14 +38,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an item identifier and optional extra NBT data into an {@link ItemStackArgument}.
+ * An argument parsing an item identifier and optional extra NBT data into an {@link ItemInput}.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgument> {
+public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
 
-    ItemDataArgument(
+    ItemInputArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -55,9 +55,9 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(ItemStackArgumentType.itemStack()),
+                new WrappedBrigadierParser<>(ItemArgument.item()),
                 defaultValue,
-                ItemStackArgument.class,
+                ItemInput.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -76,31 +76,31 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
     }
 
     /**
-     * Create a new required {@link ItemDataArgument}.
+     * Create a new required {@link ItemInputArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ItemDataArgument<C> of(final @NonNull String name) {
-        return ItemDataArgument.<C>builder(name).asRequired().build();
+    public static <C> @NonNull ItemInputArgument<C> of(final @NonNull String name) {
+        return ItemInputArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional {@link ItemDataArgument}.
+     * Create a new optional {@link ItemInputArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ItemDataArgument<C> optional(final @NonNull String name) {
-        return ItemDataArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull ItemInputArgument<C> optional(final @NonNull String name) {
+        return ItemInputArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional {@link ItemDataArgument} with the specified default value.
+     * Create a new optional {@link ItemInputArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -108,31 +108,31 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ItemDataArgument<C> optional(final @NonNull String name, final @NonNull ItemStack defaultValue) {
-        return ItemDataArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+    public static <C> @NonNull ItemInputArgument<C> optional(final @NonNull String name, final @NonNull ItemStack defaultValue) {
+        return ItemInputArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
 
     }
 
     /**
-     * Builder for {@link ItemDataArgument}.
+     * Builder for {@link ItemInputArgument}.
      *
      * @param <C> sender type
      */
-    public static final class Builder<C> extends TypedBuilder<C, ItemStackArgument, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, ItemInput, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(ItemStackArgument.class, name);
+            super(ItemInput.class, name);
         }
 
         /**
-         * Build a new {@link ItemDataArgument}.
+         * Build a new {@link ItemInputArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
          */
         @Override
-        public @NonNull ItemDataArgument<C> build() {
-            return new ItemDataArgument<>(
+        public @NonNull ItemInputArgument<C> build() {
+            return new ItemInputArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
@@ -152,9 +152,9 @@ public final class ItemDataArgument<C> extends CommandArgument<C, ItemStackArgum
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ItemStack defaultValue) {
             final String serializedDefault;
             if (defaultValue.hasTag()) {
-                serializedDefault = Registry.ITEM.getId(defaultValue.getItem()) + defaultValue.getTag().toString();
+                serializedDefault = Registry.ITEM.getKey(defaultValue.getItem()) + defaultValue.getTag().toString();
             } else {
-                serializedDefault = Registry.ITEM.getId(defaultValue.getItem()).toString();
+                serializedDefault = Registry.ITEM.getKey(defaultValue.getItem()).toString();
             }
             return this.asOptionalWithDefault(serializedDefault);
         }

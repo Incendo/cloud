@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 /**
  * A selector for multiple entities.

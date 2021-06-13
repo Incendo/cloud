@@ -27,8 +27,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.NumberRangeArgumentType;
-import net.minecraft.predicate.NumberRange;
+import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.commands.arguments.RangeArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -36,13 +36,13 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an unbounded {@link net.minecraft.predicate.NumberRange.FloatRange float range}, in the form
+ * An argument parsing an unbounded {@link net.minecraft.advancements.critereon.MinMaxBounds.Floats float range}, in the form
  * {@code [min]..[max]}, where both lower and upper bounds are optional.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.FloatRange> {
+public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds.Floats> {
 
     FloatRangeArgument(
             final boolean required,
@@ -54,9 +54,9 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(NumberRangeArgumentType.method_30918()),
+                new WrappedBrigadierParser<>(RangeArgument.floatRange()),
                 defaultValue,
-                NumberRange.FloatRange.class,
+                MinMaxBounds.Floats.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -109,7 +109,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
      */
     public static <C> @NonNull FloatRangeArgument<C> optional(
             final @NonNull String name,
-            final NumberRange.@NonNull FloatRange defaultValue
+            final MinMaxBounds.@NonNull Floats defaultValue
     ) {
         return FloatRangeArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
@@ -121,10 +121,10 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, NumberRange.FloatRange, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, MinMaxBounds.Floats, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(NumberRange.FloatRange.class, name);
+            super(MinMaxBounds.Floats.class, name);
         }
 
         /**
@@ -152,7 +152,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, NumberRange.
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final NumberRange.@NonNull FloatRange defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(final MinMaxBounds.@NonNull Floats defaultValue) {
             final StringBuilder value = new StringBuilder(6);
             if (defaultValue.getMin() != null) {
                 value.append(defaultValue.getMin());

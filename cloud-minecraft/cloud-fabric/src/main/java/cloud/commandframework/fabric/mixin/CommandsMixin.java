@@ -23,12 +23,20 @@
 //
 package cloud.commandframework.fabric.mixin;
 
-import net.minecraft.command.EntitySelector;
-import net.minecraft.command.argument.MessageArgumentType;
+import cloud.commandframework.fabric.internal.CloudStringReader;
+import com.mojang.brigadier.StringReader;
+import net.minecraft.commands.Commands;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(MessageArgumentType.MessageSelector.class)
-public interface MessageArgumentTypeMessageSelectorAccess {
-    @Accessor("selector") EntitySelector accessor$selector();
+@Mixin(Commands.class)
+public class CommandsMixin {
+
+    /* Use our StringReader. This is technically optional, but it's nicer to avoid re-wrapping the object every time */
+    @Redirect(method = "performCommand", at = @At(value = "NEW", target = "com/mojang/brigadier/StringReader", remap = false), require = 0)
+    private StringReader cloud$newStringReader(final String arguments) {
+        return new CloudStringReader(arguments);
+    }
+
 }

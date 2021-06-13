@@ -27,7 +27,6 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -35,12 +34,12 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an {@link net.minecraft.command.argument.EntityAnchorArgumentType.EntityAnchor}.
+ * An argument parsing an {@link net.minecraft.commands.arguments.EntityAnchorArgument.Anchor}.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnchorArgumentType.EntityAnchor> {
+public final class EntityAnchorArgument<C> extends CommandArgument<C, net.minecraft.commands.arguments.EntityAnchorArgument.Anchor> {
 
     EntityAnchorArgument(
             final boolean required,
@@ -52,9 +51,9 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(EntityAnchorArgumentType.entityAnchor()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.EntityAnchorArgument.anchor()),
                 defaultValue,
-                EntityAnchorArgumentType.EntityAnchor.class,
+                net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -107,7 +106,7 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
      */
     public static <C> @NonNull EntityAnchorArgument<C> optional(
             final @NonNull String name,
-            final EntityAnchorArgumentType.@NonNull EntityAnchor defaultValue
+            final net.minecraft.commands.arguments.EntityAnchorArgument.@NonNull Anchor defaultValue
     ) {
         return EntityAnchorArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
@@ -119,10 +118,10 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, EntityAnchorArgumentType.EntityAnchor, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, net.minecraft.commands.arguments.EntityAnchorArgument.Anchor, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(EntityAnchorArgumentType.EntityAnchor.class, name);
+            super(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.class, name);
         }
 
         /**
@@ -150,7 +149,7 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, EntityAnch
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final EntityAnchorArgumentType.@NonNull EntityAnchor defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(final net.minecraft.commands.arguments.EntityAnchorArgument.@NonNull Anchor defaultValue) {
             return this.asOptionalWithDefault(defaultValue.name());
         }
 

@@ -27,9 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.MobEffectArgumentType;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.ChatFormatting;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -37,14 +35,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing a status effect from the {@link net.minecraft.util.registry.Registry#STATUS_EFFECT status effect registry}.
+ * An argument for named colors in the {@link ChatFormatting} enum.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffect> {
+public final class NamedColorArgument<C> extends CommandArgument<C, ChatFormatting> {
 
-    StatusEffectArgument(
+    NamedColorArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -54,88 +52,88 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(MobEffectArgumentType.mobEffect()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ColorArgument.color()),
                 defaultValue,
-                StatusEffect.class,
+                ChatFormatting.class,
                 suggestionsProvider,
                 defaultDescription
         );
     }
 
     /**
-     * Create a new {@link Builder}.
+     * Create a new {@link NamedColorArgument.Builder}.
      *
-     * @param name Name of the argument
+     * @param name Name of the component
      * @param <C>  Command sender type
      * @return Created builder
      * @since 1.5.0
      */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
-        return new StatusEffectArgument.Builder<>(name);
+        return new Builder<>(name);
     }
 
     /**
-     * Create a new required {@link StatusEffectArgument}.
+     * Create a new required {@link NamedColorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return Created argument
+     * @return Created component
      * @since 1.5.0
      */
-    public static <C> @NonNull StatusEffectArgument<C> of(final @NonNull String name) {
-        return StatusEffectArgument.<C>builder(name).asRequired().build();
+    public static <C> @NonNull NamedColorArgument<C> of(final @NonNull String name) {
+        return NamedColorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional {@link StatusEffectArgument}.
+     * Create a new optional {@link NamedColorArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
-     * @return Created argument
+     * @return Created component
      * @since 1.5.0
      */
-    public static <C> @NonNull StatusEffectArgument<C> optional(final @NonNull String name) {
-        return StatusEffectArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull NamedColorArgument<C> optional(final @NonNull String name) {
+        return NamedColorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional {@link StatusEffectArgument} with the specified default value.
+     * Create a new optional {@link NamedColorArgument} with the specified default value.
      *
-     * @param name         Argument name
-     * @param defaultValue Default value
+     * @param name         Component name
+     * @param defaultColor Default colour, must be {@link ChatFormatting#isColor() a color}
      * @param <C>          Command sender type
-     * @return Created argument
+     * @return Created component
      * @since 1.5.0
      */
-    public static <C> @NonNull StatusEffectArgument<C> optional(
+    public static <C> @NonNull NamedColorArgument<C> optional(
             final @NonNull String name,
-            final @NonNull StatusEffect defaultValue
+            final @NonNull ChatFormatting defaultColor
     ) {
-        return StatusEffectArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return NamedColorArgument.<C>builder(name).asOptionalWithDefault(defaultColor).build();
     }
 
 
     /**
-     * Builder for {@link StatusEffectArgument}.
+     * Builder for {@link NamedColorArgument}.
      *
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, StatusEffect, Builder<C>> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, ChatFormatting, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(StatusEffect.class, name);
+            super(ChatFormatting.class, name);
         }
 
         /**
-         * Build a new {@link StatusEffectArgument}.
+         * Build a new {@link NamedColorArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
          */
         @Override
-        public @NonNull StatusEffectArgument<C> build() {
-            return new StatusEffectArgument<>(
+        public @NonNull NamedColorArgument<C> build() {
+            return new NamedColorArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
@@ -147,13 +145,16 @@ public final class StatusEffectArgument<C> extends CommandArgument<C, StatusEffe
         /**
          * Sets the command argument to be optional, with the specified default value.
          *
-         * @param defaultValue default value
+         * @param defaultColor default value, must be {@link ChatFormatting#isColor() a color}
          * @return this builder
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull StatusEffect defaultValue) {
-            return this.asOptionalWithDefault(Registry.STATUS_EFFECT.getId(defaultValue).toString());
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ChatFormatting defaultColor) {
+            if (!defaultColor.isColor()) {
+                throw new IllegalArgumentException("Only color types are allowed but " + defaultColor + " was provided");
+            }
+            return this.asOptionalWithDefault(defaultColor.toString());
         }
 
     }

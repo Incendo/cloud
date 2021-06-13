@@ -27,7 +27,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.SharedSuggestionProvider;
 
 /**
  * Keys used in {@link CommandContext}s available within a {@link FabricCommandManager}
@@ -40,13 +40,13 @@ public final class FabricCommandContextKeys {
     }
 
     /**
-     * Key used to store the native {@link CommandSource} in the command context.
+     * Key used to store the native {@link SharedSuggestionProvider} in the command context.
      *
      * @since 1.5.0
      */
-    public static final CloudKey<CommandSource> NATIVE_COMMAND_SOURCE = SimpleCloudKey.of(
+    public static final CloudKey<SharedSuggestionProvider> NATIVE_COMMAND_SOURCE = SimpleCloudKey.of(
             "cloud:fabric_command_source",
-            TypeToken.get(CommandSource.class)
+            TypeToken.get(SharedSuggestionProvider.class)
     );
 
 }

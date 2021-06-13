@@ -34,9 +34,9 @@ import com.mojang.brigadier.tree.RootCommandNode;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.CommandManager.RegistrationEnvironment;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands.CommandSelection;
+import net.minecraft.commands.SharedSuggestionProvider;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <C> command sender type
  * @param <S> native sender type
  */
-abstract class FabricCommandRegistrationHandler<C, S extends CommandSource> implements CommandRegistrationHandler {
+abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionProvider> implements CommandRegistrationHandler {
     private @MonotonicNonNull FabricCommandManager<C, S> commandManager;
 
     void initialize(final FabricCommandManager<C, S> manager) {
@@ -122,7 +122,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends CommandSource> impl
                             true,
                             new FabricExecutor<>(
                                     this.getCommandManager(),
-                                    source -> source.getPlayer().getName().asString(),
+                                    source -> source.getPlayer().getGameProfile().getName(),
                                     FabricClientCommandSource::sendError
                             )
                     );
@@ -136,11 +136,11 @@ abstract class FabricCommandRegistrationHandler<C, S extends CommandSource> impl
         }
     }
 
-    static class Server<C> extends FabricCommandRegistrationHandler<C, ServerCommandSource> {
+    static class Server<C> extends FabricCommandRegistrationHandler<C, CommandSourceStack> {
         private final Set<Command<C>> registeredCommands = ConcurrentHashMap.newKeySet();
 
         @Override
-        void initialize(final FabricCommandManager<C, ServerCommandSource> manager) {
+        void initialize(final FabricCommandManager<C, CommandSourceStack> manager) {
             super.initialize(manager);
             CommandRegistrationCallback.EVENT.register(this::registerAllCommands);
         }
@@ -151,27 +151,27 @@ abstract class FabricCommandRegistrationHandler<C, S extends CommandSource> impl
             return this.registeredCommands.add((Command<C>) command);
         }
 
-        private void registerAllCommands(final CommandDispatcher<ServerCommandSource> dispatcher, final boolean isDedicated) {
+        private void registerAllCommands(final CommandDispatcher<CommandSourceStack> dispatcher, final boolean isDedicated) {
             this.getCommandManager().registrationCalled();
             for (final Command<C> command : this.registeredCommands) {
                 /* Only register commands in the declared environment */
-                final RegistrationEnvironment env = command.getCommandMeta().getOrDefault(
+                final CommandSelection env = command.getCommandMeta().getOrDefault(
                         FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
-                        RegistrationEnvironment.ALL
+                        CommandSelection.ALL
                 );
 
-                if ((env == RegistrationEnvironment.INTEGRATED && isDedicated)
-                        || (env == RegistrationEnvironment.DEDICATED && !isDedicated)) {
+                if ((env == CommandSelection.INTEGRATED && isDedicated)
+                        || (env == CommandSelection.DEDICATED && !isDedicated)) {
                     continue;
                 }
                 this.registerCommand(dispatcher.getRoot(), command);
             }
         }
 
-        private void registerCommand(final RootCommandNode<ServerCommandSource> dispatcher, final Command<C> command) {
+        private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
             @SuppressWarnings("unchecked")
             final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
-            final CommandNode<ServerCommandSource> baseNode = this.getCommandManager().brigadierManager().createLiteralCommandNode(
+            final CommandNode<CommandSourceStack> baseNode = this.getCommandManager().brigadierManager().createLiteralCommandNode(
                     first.getName(),
                     command,
                     (src, perm) -> this.getCommandManager().hasPermission(
@@ -179,7 +179,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends CommandSource> impl
                             perm
                     ),
                     true,
-                    new FabricExecutor<>(this.getCommandManager(), ServerCommandSource::getName, ServerCommandSource::sendError));
+                    new FabricExecutor<>(this.getCommandManager(), CommandSourceStack::getTextName, CommandSourceStack::sendFailure));
 
             dispatcher.addChild(baseNode);
 

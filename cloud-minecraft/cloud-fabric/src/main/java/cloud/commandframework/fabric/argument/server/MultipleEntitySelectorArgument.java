@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for selecting multiple {@link net.minecraft.entity.Entity entities} using an
- * {@link net.minecraft.command.EntitySelector}.
+ * An argument for selecting multiple {@link net.minecraft.world.entity.Entity entities} using an
+ * {@link net.minecraft.commands.arguments.selector.EntitySelector}.
  *
  * @param <C> the sender type
  * @since 1.5.0

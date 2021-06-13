@@ -33,8 +33,8 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.scores.PlayerTeam;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,12 +44,12 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 
 /**
- * An argument for parsing {@link Team Teams}.
+ * An argument for parsing {@link PlayerTeam Teams}.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class TeamArgument<C> extends CommandArgument<C, Team> {
+public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
 
     TeamArgument(
             final boolean required,
@@ -63,7 +63,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
                 name,
                 new TeamParser<>(),
                 defaultValue,
-                Team.class,
+                PlayerTeam.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -116,25 +116,25 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
      */
     public static <C> @NonNull TeamArgument<C> optional(
             final @NonNull String name,
-            final @NonNull Team defaultValue
+            final @NonNull PlayerTeam defaultValue
     ) {
         return TeamArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     /**
-     * Argument parser for {@link Team Teams}.
+     * Argument parser for {@link PlayerTeam Teams}.
      *
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class TeamParser<C> extends SidedArgumentParser<C, String, Team> {
+    public static final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTeam> {
 
         @Override
         public @NonNull List<@NonNull String> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return new ArrayList<>(commandContext.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE).getTeamNames());
+            return new ArrayList<>(commandContext.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE).getAllTeams());
         }
 
         @Override
@@ -150,12 +150,12 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         @Override
-        protected @NonNull ArgumentParseResult<Team> resolveClient(
+        protected @NonNull ArgumentParseResult<PlayerTeam> resolveClient(
                 final @NonNull CommandContext<C> context,
                 final @NonNull FabricClientCommandSource source,
                 final @NonNull String value
         ) {
-            final Team result = source.getClient().getNetworkHandler().getWorld().getScoreboard().getTeam(value);
+            final PlayerTeam result = source.getClient().getConnection().getLevel().getScoreboard().getPlayerTeam(value);
             if (result == null) {
                 return ArgumentParseResult.failure(new UnknownTeamException(context, value));
             }
@@ -163,12 +163,12 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
         }
 
         @Override
-        protected @NonNull ArgumentParseResult<Team> resolveServer(
+        protected @NonNull ArgumentParseResult<PlayerTeam> resolveServer(
                 final @NonNull CommandContext<C> context,
-                final @NonNull ServerCommandSource source,
+                final @NonNull CommandSourceStack source,
                 final @NonNull String value
         ) {
-            final Team result = source.getWorld().getScoreboard().getTeam(value);
+            final PlayerTeam result = source.getLevel().getScoreboard().getPlayerTeam(value);
             if (result == null) {
                 return ArgumentParseResult.failure(new UnknownTeamException(context, value));
             }
@@ -183,10 +183,10 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Team, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, PlayerTeam, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(Team.class, name);
+            super(PlayerTeam.class, name);
         }
 
         /**
@@ -214,7 +214,7 @@ public final class TeamArgument<C> extends CommandArgument<C, Team> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Team defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull PlayerTeam defaultValue) {
             return this.asOptionalWithDefault(defaultValue.getName());
         }
 
