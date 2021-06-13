@@ -136,13 +136,6 @@ subprojects {
         }
         /* JDA's maven repository for cloud-jda */
         maven("https://m2.dv8tion.net/releases")
-        // todo - temp for commodore snapshot
-        maven("https://repo.incendo.org/content/repositories/snapshots/") {
-            mavenContent {
-                snapshotsOnly()
-                includeGroup("me.lucko")
-            }
-        }
     }
 
     dependencies {
