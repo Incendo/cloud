@@ -4,11 +4,11 @@
   "required": true,
   "mixins": [
     "CloudStringReaderMixin",
-    "CommandManagerMixin",
+    "CommandsMixin",
     "EntitySelectorMixin",
-    "EntitySelectorReaderMixin",
-    "MessageArgumentTypeMessageFormatAccess",
-    "MessageArgumentTypeMessageSelectorAccess"
+    "EntitySelectorParserMixin",
+    "MessageArgumentMessageAccess",
+    "MessageArgumentPartAccess"
   ],
   "injectors": {
     "defaultRequire": 1

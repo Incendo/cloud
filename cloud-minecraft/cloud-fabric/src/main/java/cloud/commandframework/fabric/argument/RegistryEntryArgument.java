@@ -36,10 +36,10 @@ import cloud.commandframework.fabric.FabricCommandContextKeys;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.leangen.geantyref.TypeToken;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -67,7 +67,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     RegistryEntryArgument(
             final boolean required,
             final @NonNull String name,
-            final @NonNull RegistryKey<? extends Registry<V>> registry,
+            final @NonNull ResourceKey<? extends Registry<V>> registry,
             final @NonNull String defaultValue,
             final @NonNull TypeToken<V> valueType,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
@@ -98,9 +98,9 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     public static <C, V> RegistryEntryArgument.@NonNull Builder<C, V> newBuilder(
             final @NonNull String name,
             final @NonNull Class<V> type,
-            final @NonNull RegistryKey<? extends Registry<V>> registry
+            final @NonNull ResourceKey<? extends Registry<V>> registry
     ) {
-        return new RegistryEntryArgument.Builder<>(registry, type, name);
+        return new Builder<>(registry, type, name);
     }
 
     /**
@@ -117,9 +117,9 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     public static <C, V> RegistryEntryArgument.@NonNull Builder<C, V> newBuilder(
             final @NonNull String name,
             final @NonNull TypeToken<V> type,
-            final @NonNull RegistryKey<? extends Registry<V>> registry
+            final @NonNull ResourceKey<? extends Registry<V>> registry
     ) {
-        return new RegistryEntryArgument.Builder<>(registry, type, name);
+        return new Builder<>(registry, type, name);
     }
 
     /**
@@ -136,7 +136,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     public static <C, V> @NonNull RegistryEntryArgument<C, V> of(
             final @NonNull String name,
             final @NonNull Class<V> type,
-            final @NonNull RegistryKey<? extends Registry<V>> registry
+            final @NonNull ResourceKey<? extends Registry<V>> registry
     ) {
         return RegistryEntryArgument.<C, V>newBuilder(name, type, registry).asRequired().build();
     }
@@ -155,7 +155,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
             final @NonNull String name,
             final @NonNull Class<V> type,
-            final @NonNull RegistryKey<? extends Registry<V>> registry
+            final @NonNull ResourceKey<? extends Registry<V>> registry
     ) {
         return RegistryEntryArgument.<C, V>newBuilder(name, type, registry).asOptional().build();
     }
@@ -175,8 +175,8 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
             final @NonNull String name,
             final @NonNull Class<V> type,
-            final @NonNull RegistryKey<? extends Registry<V>> registry,
-            final @NonNull RegistryKey<V> defaultValue
+            final @NonNull ResourceKey<? extends Registry<V>> registry,
+            final @NonNull ResourceKey<V> defaultValue
     ) {
         return RegistryEntryArgument.<C, V>newBuilder(name, type, registry)
                 .asOptionalWithDefault(defaultValue)
@@ -192,7 +192,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      */
     public static final class Parser<C, V> implements ArgumentParser<C, V> {
 
-        private final RegistryKey<? extends Registry<V>> registryIdent;
+        private final ResourceKey<? extends Registry<V>> registryIdent;
 
         /**
          * Create a new {@link Parser}.
@@ -200,7 +200,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
          * @param registryIdent the registry identifier
          * @since 1.5.0
          */
-        public Parser(final RegistryKey<? extends Registry<V>> registryIdent) {
+        public Parser(final ResourceKey<? extends Registry<V>> registryIdent) {
             this.registryIdent = requireNonNull(registryIdent, "registryIdent");
         }
 
@@ -214,9 +214,9 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                 return ArgumentParseResult.failure(new NoInputProvidedException(RegistryEntryArgument.class, commandContext));
             }
 
-            final Identifier key;
+            final ResourceLocation key;
             try {
-                key = Identifier.fromCommandInput(new StringReader(possibleIdentifier));
+                key = ResourceLocation.read(new StringReader(possibleIdentifier));
             } catch (final CommandSyntaxException ex) {
                 return ArgumentParseResult.failure(ex);
             }
@@ -237,12 +237,12 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
 
         @SuppressWarnings("unchecked")
         Registry<V> getRegistry(final CommandContext<C> ctx) {
-            final CommandSource reverseMapped = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+            final SharedSuggestionProvider reverseMapped = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
             // First try dynamic registries (for things loaded from data-packs)
-            Registry<V> registry = reverseMapped.getRegistryManager().getOptional(this.registryIdent).orElse(null);
+            Registry<V> registry = reverseMapped.registryAccess().registry(this.registryIdent).orElse(null);
             if (registry == null) {
                 // And then static registries
-                registry = (Registry<V>) Registry.REGISTRIES.get(this.registryIdent.getValue());
+                registry = (Registry<V>) Registry.REGISTRY.get(this.registryIdent.location());
             }
             return registry;
         }
@@ -252,9 +252,9 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            final Set<Identifier> ids = this.getRegistry(commandContext).getIds();
+            final Set<ResourceLocation> ids = this.getRegistry(commandContext).keySet();
             final List<String> results = new ArrayList<>(ids.size());
-            for (final Identifier entry : ids) {
+            for (final ResourceLocation entry : ids) {
                 if (entry.getNamespace().equals(NAMESPACE_MINECRAFT)) {
                     results.add(entry.getPath());
                 }
@@ -275,7 +275,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
          * @return the registry
          * @since 1.5.0
          */
-        public RegistryKey<? extends Registry<?>> getRegistry() {
+        public ResourceKey<? extends Registry<?>> getRegistry() {
             return this.registryIdent;
         }
 
@@ -290,10 +290,10 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
      */
     public static final class Builder<C, V> extends CommandArgument.TypedBuilder<C, V, Builder<C, V>> {
 
-        private final RegistryKey<? extends Registry<V>> registryIdent;
+        private final ResourceKey<? extends Registry<V>> registryIdent;
 
         Builder(
-                final RegistryKey<? extends Registry<V>> key,
+                final ResourceKey<? extends Registry<V>> key,
                 final @NonNull Class<V> valueType,
                 final @NonNull String name
         ) {
@@ -302,7 +302,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         }
 
         Builder(
-                final RegistryKey<? extends Registry<V>> key,
+                final ResourceKey<? extends Registry<V>> key,
                 final @NonNull TypeToken<V> valueType,
                 final @NonNull String name
         ) {
@@ -331,8 +331,8 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C, V> asOptionalWithDefault(final @NonNull RegistryKey<V> defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.getValue().toString());
+        public @NonNull Builder<C, V> asOptionalWithDefault(final @NonNull ResourceKey<V> defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.location().toString());
         }
 
     }
@@ -348,8 +348,8 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
 
         UnknownEntryException(
                 final CommandContext<?> context,
-                final Identifier key,
-                final RegistryKey<? extends Registry<?>> registry
+                final ResourceLocation key,
+                final ResourceKey<? extends Registry<?>> registry
         ) {
             super(
                     RegistryEntryArgument.class,

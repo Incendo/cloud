@@ -25,7 +25,6 @@ object Versions {
     const val guava = "21.0-jre"
     const val fabricLoader = "0.11.1"
     const val fabricMc = "1.16.5"
-    const val fabricYarn = "1"
     const val fabricApi = "0.31.0+1.16"
 
     // IRC DEPENDENCIES

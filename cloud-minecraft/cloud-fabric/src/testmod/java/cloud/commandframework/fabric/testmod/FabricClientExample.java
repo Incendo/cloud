@@ -35,16 +35,16 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.SaveLevelScreen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
-import net.minecraft.client.realms.gui.screen.RealmsBridgeScreen;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.ArgumentTypes;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.synchronization.ArgumentTypes;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.realms.RealmsBridge;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.BufferedWriter;
@@ -69,23 +69,23 @@ public final class FabricClientExample implements ClientModInitializer {
                             "cloud-dump-" + Instant.now().toString().replace(':', '-') + ".json"
                     );
                     ctx.getSender().sendFeedback(
-                            new LiteralText("Dumping command output to ")
-                                    .append(new LiteralText(target.toString())
-                                            .styled(s -> s.withClickEvent(new ClickEvent(
+                            new TextComponent("Dumping command output to ")
+                                    .append(new TextComponent(target.toString())
+                                            .withStyle(s -> s.withClickEvent(new ClickEvent(
                                                     ClickEvent.Action.OPEN_FILE,
                                                     target.toAbsolutePath().toString()
                                             ))))
                     );
 
                     try (BufferedWriter writer = Files.newBufferedWriter(target); JsonWriter json = new JsonWriter(writer)) {
-                        final CommandDispatcher<CommandSource> dispatcher = MinecraftClient.getInstance()
-                                .getNetworkHandler()
-                                .getCommandDispatcher();
-                        final JsonObject object = ArgumentTypes.toJson(dispatcher, dispatcher.getRoot());
+                        final CommandDispatcher<SharedSuggestionProvider> dispatcher = Minecraft.getInstance()
+                                .getConnection()
+                                .getCommands();
+                        final JsonObject object = ArgumentTypes.serializeNodeToJson(dispatcher, dispatcher.getRoot());
                         json.setIndent("  ");
                         Streams.write(object, json);
                     } catch (final IOException ex) {
-                        ctx.getSender().sendError(new LiteralText(
+                        ctx.getSender().sendError(new TextComponent(
                                 "Unable to write file, see console for details: " + ex.getMessage()
                         ));
                     }
@@ -94,38 +94,38 @@ public final class FabricClientExample implements ClientModInitializer {
         commandManager.command(base.literal("say")
                 .argument(StringArgument.greedy("message"))
                 .handler(ctx -> ctx.getSender().sendFeedback(
-                        new LiteralText("Cloud client commands says: " + ctx.get("message"))
+                        new TextComponent("Cloud client commands says: " + ctx.get("message"))
                 )));
 
         commandManager.command(base.literal("quit")
                 .handler(ctx -> {
-                    final MinecraftClient client = MinecraftClient.getInstance();
+                    final Minecraft client = Minecraft.getInstance();
                     disconnectClient(client);
-                    client.scheduleStop();
+                    client.stop();
                 }));
 
         commandManager.command(base.literal("disconnect")
-                .handler(ctx -> disconnectClient(MinecraftClient.getInstance())));
+                .handler(ctx -> disconnectClient(Minecraft.getInstance())));
 
         commandManager.command(base.literal("requires_cheats")
                 .permission(FabricClientCommandManager.cheatsAllowed(false))
-                .handler(ctx -> ctx.getSender().sendFeedback(new LiteralText("Cheats are enabled!"))));
+                .handler(ctx -> ctx.getSender().sendFeedback(new TextComponent("Cheats are enabled!"))));
     }
 
-    private static void disconnectClient(final @NonNull MinecraftClient client) {
-        boolean singlePlayer = client.isInSingleplayer();
-        client.world.disconnect();
+    private static void disconnectClient(final @NonNull Minecraft client) {
+        boolean singlePlayer = client.hasSingleplayerServer();
+        client.level.disconnect();
         if (singlePlayer) {
-            client.disconnect(new SaveLevelScreen(new TranslatableText("menu.savingLevel")));
+            client.clearLevel(new GenericDirtMessageScreen(new TranslatableComponent("menu.savingLevel")));
         } else {
-            client.disconnect();
+            client.clearLevel();
         }
         if (singlePlayer) {
-            client.openScreen(new TitleScreen());
+            client.setScreen(new TitleScreen());
         } else if (client.isConnectedToRealms()) {
-            new RealmsBridgeScreen().switchToRealms(new TitleScreen());
+            new RealmsBridge().switchToRealms(new TitleScreen());
         } else {
-            client.openScreen(new MultiplayerScreen(new TitleScreen()));
+            client.setScreen(new JoinMultiplayerScreen(new TitleScreen()));
         }
     }
 

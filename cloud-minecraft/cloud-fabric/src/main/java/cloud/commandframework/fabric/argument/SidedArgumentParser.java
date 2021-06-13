@@ -28,8 +28,8 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Queue;
@@ -49,12 +49,12 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
             @NonNull final CommandContext<@NonNull C> commandContext,
             @NonNull final Queue<@NonNull String> inputQueue
     ) {
-        final CommandSource source = commandContext.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
+        final SharedSuggestionProvider source = commandContext.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
         final ArgumentParseResult<I> intermediate = this.parseIntermediate(commandContext, inputQueue);
 
         return intermediate.flatMapParsedValue(value -> {
-            if (source instanceof ServerCommandSource) {
-                return this.resolveServer(commandContext, (ServerCommandSource) source, value);
+            if (source instanceof CommandSourceStack) {
+                return this.resolveServer(commandContext, (CommandSourceStack) source, value);
             } else if (source instanceof FabricClientCommandSource) {
                 return this.resolveClient(commandContext, (FabricClientCommandSource) source, value);
             } else {
@@ -94,7 +94,7 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
      */
     protected abstract @NonNull ArgumentParseResult<@NonNull R> resolveServer(
             @NonNull CommandContext<@NonNull C> context,
-            @NonNull ServerCommandSource source,
+            @NonNull CommandSourceStack source,
             @NonNull I value
     );
 

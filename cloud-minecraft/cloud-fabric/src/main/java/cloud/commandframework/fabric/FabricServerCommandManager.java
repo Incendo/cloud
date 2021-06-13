@@ -40,12 +40,12 @@ import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.CommandOutput;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Function;
@@ -60,17 +60,17 @@ import java.util.function.Function;
  * @param <C> the command sender type
  * @since 1.5.0
  */
-public final class FabricServerCommandManager<C> extends FabricCommandManager<C, ServerCommandSource> {
+public final class FabricServerCommandManager<C> extends FabricCommandManager<C, CommandSourceStack> {
 
     /**
      * A meta attribute specifying which environments a command should be registered in.
      *
-     * <p>The default value is {@link CommandManager.RegistrationEnvironment#ALL}.</p>
+     * <p>The default value is {@link Commands.CommandSelection#ALL}.</p>
      *
      * @since 1.5.0
      */
-    public static final CommandMeta.Key<CommandManager.RegistrationEnvironment> META_REGISTRATION_ENVIRONMENT = CommandMeta.Key.of(
-            CommandManager.RegistrationEnvironment.class,
+    public static final CommandMeta.Key<Commands.CommandSelection> META_REGISTRATION_ENVIRONMENT = CommandMeta.Key.of(
+            Commands.CommandSelection.class,
             "cloud:registration-environment"
     );
 
@@ -82,9 +82,9 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      * @see #FabricServerCommandManager(Function, Function, Function) for a more thorough explanation
      * @since 1.5.0
      */
-    public static @NonNull FabricServerCommandManager<@NonNull ServerCommandSource> createNative(
-            final @NonNull Function<@NonNull CommandTree<@NonNull ServerCommandSource>,
-                    @NonNull CommandExecutionCoordinator<@NonNull ServerCommandSource>> execCoordinator
+    public static @NonNull FabricServerCommandManager<@NonNull CommandSourceStack> createNative(
+            final @NonNull Function<@NonNull CommandTree<@NonNull CommandSourceStack>,
+                    @NonNull CommandExecutionCoordinator<@NonNull CommandSourceStack>> execCoordinator
     ) {
         return new FabricServerCommandManager<>(execCoordinator, Function.identity(), Function.identity());
     }
@@ -100,29 +100,29 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      *                                     use a synchronous execution coordinator. In most cases you will want to pick between
      *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
      *                                     {@link AsynchronousCommandExecutionCoordinator}
-     * @param commandSourceMapper          Function that maps {@link ServerCommandSource} to the command sender type
-     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link ServerCommandSource}
+     * @param commandSourceMapper          Function that maps {@link CommandSourceStack} to the command sender type
+     * @param backwardsCommandSourceMapper Function that maps the command sender type to {@link CommandSourceStack}
      * @since 1.5.0
      */
     public FabricServerCommandManager(
             final @NonNull Function<@NonNull CommandTree<@NonNull C>,
                     @NonNull CommandExecutionCoordinator<@NonNull C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull ServerCommandSource, @NonNull C> commandSourceMapper,
-            final @NonNull Function<@NonNull C, @NonNull ServerCommandSource> backwardsCommandSourceMapper
+            final @NonNull Function<@NonNull CommandSourceStack, @NonNull C> commandSourceMapper,
+            final @NonNull Function<@NonNull C, @NonNull CommandSourceStack> backwardsCommandSourceMapper
     ) {
         super(
                 commandExecutionCoordinator,
                 commandSourceMapper,
                 backwardsCommandSourceMapper,
                 new FabricCommandRegistrationHandler.Server<>(),
-                () -> new ServerCommandSource(
-                        CommandOutput.DUMMY,
-                        Vec3d.ZERO,
-                        Vec2f.ZERO,
+                () -> new CommandSourceStack(
+                        CommandSource.NULL,
+                        Vec3.ZERO,
+                        Vec2.ZERO,
                         null,
                         4,
                         "",
-                        LiteralText.EMPTY,
+                        TextComponent.EMPTY,
                         null,
                         null
                 )
@@ -199,8 +199,8 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      */
     @Override
     public boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
-        final ServerCommandSource source = this.getBackwardsCommandSourceMapper().apply(sender);
-        return Permissions.check(source, permission, source.getMinecraftServer().getOpPermissionLevel());
+        final CommandSourceStack source = this.getBackwardsCommandSourceMapper().apply(sender);
+        return Permissions.check(source, permission, source.getServer().getOperatorUserPermissionLevel());
     }
 
 }

@@ -24,10 +24,10 @@
 package cloud.commandframework.fabric.testmod.mixin;
 
 import com.mojang.brigadier.Command;
-import net.minecraft.command.argument.ItemStackArgument;
-import net.minecraft.server.command.GiveCommand;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.item.ItemInput;
+import net.minecraft.server.commands.GiveCommand;
+import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
@@ -36,11 +36,11 @@ import java.util.Collection;
 @Mixin(GiveCommand.class)
 public interface GiveCommandAccess {
 
-    @Invoker("execute")
-    static int give(
-            final ServerCommandSource source,
-            final ItemStackArgument item,
-            final Collection<ServerPlayerEntity> targets,
+    @Invoker("giveItem")
+    static int giveItem(
+            final CommandSourceStack source,
+            final ItemInput item,
+            final Collection<ServerPlayer> targets,
             final int count
     ) {
         return Command.SINGLE_SUCCESS;

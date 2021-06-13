@@ -27,8 +27,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.IdentifierArgumentType;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.world.effect.MobEffect;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -36,14 +36,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument parsing an {@link Identifier}, or "resource location".
+ * An argument parsing a status effect from the {@link net.minecraft.core.Registry#MOB_EFFECT status effect registry}.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> {
+public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
 
-    IdentifierArgument(
+    MobEffectArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -53,9 +53,9 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(IdentifierArgumentType.identifier()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.MobEffectArgument.effect()),
                 defaultValue,
-                Identifier.class,
+                MobEffect.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -70,35 +70,35 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
      * @since 1.5.0
      */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
-        return new Builder<>(name);
+        return new MobEffectArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required {@link IdentifierArgument}.
+     * Create a new required {@link MobEffectArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull IdentifierArgument<C> of(final @NonNull String name) {
-        return IdentifierArgument.<C>builder(name).asRequired().build();
+    public static <C> @NonNull MobEffectArgument<C> of(final @NonNull String name) {
+        return MobEffectArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional {@link IdentifierArgument}.
+     * Create a new optional {@link MobEffectArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull IdentifierArgument<C> optional(final @NonNull String name) {
-        return IdentifierArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull MobEffectArgument<C> optional(final @NonNull String name) {
+        return MobEffectArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional {@link IdentifierArgument} with the specified default value.
+     * Create a new optional {@link MobEffectArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -106,35 +106,35 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull IdentifierArgument<C> optional(
+    public static <C> @NonNull MobEffectArgument<C> optional(
             final @NonNull String name,
-            final @NonNull Identifier defaultValue
+            final @NonNull MobEffect defaultValue
     ) {
-        return IdentifierArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return MobEffectArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
 
     /**
-     * Builder for {@link IdentifierArgument}.
+     * Builder for {@link MobEffectArgument}.
      *
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, Identifier, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, MobEffect, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(Identifier.class, name);
+            super(MobEffect.class, name);
         }
 
         /**
-         * Build a new {@link IdentifierArgument}.
+         * Build a new {@link MobEffectArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
          */
         @Override
-        public @NonNull IdentifierArgument<C> build() {
-            return new IdentifierArgument<>(
+        public @NonNull MobEffectArgument<C> build() {
+            return new MobEffectArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
@@ -151,8 +151,8 @@ public final class IdentifierArgument<C> extends CommandArgument<C, Identifier> 
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Identifier defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.toString());
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull MobEffect defaultValue) {
+            return this.asOptionalWithDefault(Registry.MOB_EFFECT.getKey(defaultValue).toString());
         }
 
     }

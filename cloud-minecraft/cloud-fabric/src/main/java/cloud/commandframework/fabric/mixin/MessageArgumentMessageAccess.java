@@ -23,33 +23,11 @@
 //
 package cloud.commandframework.fabric.mixin;
 
-import cloud.commandframework.fabric.internal.EntitySelectorAccess;
-import com.mojang.brigadier.StringReader;
-import net.minecraft.command.EntitySelector;
-import net.minecraft.command.EntitySelectorReader;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.commands.arguments.MessageArgument;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(EntitySelectorReader.class)
-abstract class EntitySelectorReaderMixin {
-
-    @Shadow
-    private int startCursor;
-
-    @Shadow
-    @Final
-    private StringReader reader;
-
-    @Inject(method = "read", at = @At("RETURN"))
-    public void setInputString(final @NonNull CallbackInfoReturnable<EntitySelector> cir) {
-        final EntitySelector selector = cir.getReturnValue();
-        final String inputString = this.reader.getString().substring(this.startCursor, this.reader.getCursor());
-        ((EntitySelectorAccess) selector).inputString(inputString);
-    }
-
+@Mixin(MessageArgument.Message.class)
+public interface MessageArgumentMessageAccess {
+    @Accessor("parts") MessageArgument.Part[] accessor$parts();
 }

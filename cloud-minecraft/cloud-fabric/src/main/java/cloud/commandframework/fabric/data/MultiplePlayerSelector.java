@@ -23,13 +23,13 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * A selector for multiple players.
  *
  * @since 1.5.0
  */
-public interface MultiplePlayerSelector extends Selector<ServerPlayerEntity> {
+public interface MultiplePlayerSelector extends Selector<ServerPlayer> {
 
 }

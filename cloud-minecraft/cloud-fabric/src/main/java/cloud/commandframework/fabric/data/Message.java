@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.fabric.data;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collection;
@@ -50,6 +50,6 @@ public interface Message {
      * @return the parsed text
      * @since 1.5.0
      */
-    @NonNull Text getContents();
+    @NonNull Component getContents();
 
 }

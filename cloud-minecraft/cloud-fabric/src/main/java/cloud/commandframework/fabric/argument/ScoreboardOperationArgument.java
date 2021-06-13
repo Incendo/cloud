@@ -27,8 +27,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.OperationArgumentType;
-import net.minecraft.command.argument.OperationArgumentType.Operation;
+import net.minecraft.commands.arguments.OperationArgument;
+import net.minecraft.commands.arguments.OperationArgument.Operation;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -38,7 +38,7 @@ import java.util.function.BiFunction;
 /**
  * An argument for selecting any of the logical operations in {@link Operation}.
  *
- * <p>These operations can be used to compare scores on a {@link net.minecraft.scoreboard.Scoreboard}.</p>
+ * <p>These operations can be used to compare scores on a {@link net.minecraft.world.scores.Scoreboard}.</p>
  *
  * @param <C> the sender type
  * @since 1.5.0
@@ -55,7 +55,7 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(OperationArgumentType.operation()),
+                new WrappedBrigadierParser<>(OperationArgument.operation()),
                 defaultValue,
                 Operation.class,
                 suggestionsProvider,

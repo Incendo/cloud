@@ -27,8 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
-import net.minecraft.command.argument.ObjectiveCriteriaArgumentType;
-import net.minecraft.scoreboard.ScoreboardCriterion;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -36,14 +35,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * An argument for a {@linkplain ScoreboardCriterion criterion} in a scoreboard.
+ * An argument for a {@linkplain ObjectiveCriteria criterion} in a scoreboard.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, ScoreboardCriterion> {
+public final class ObjectiveCriteriaArgument<C> extends CommandArgument<C, ObjectiveCriteria> {
 
-    ScoreboardCriterionArgument(
+    ObjectiveCriteriaArgument(
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -53,9 +52,9 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(ObjectiveCriteriaArgumentType.objectiveCriteria()),
+                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ObjectiveCriteriaArgument.criteria()),
                 defaultValue,
-                ScoreboardCriterion.class,
+                ObjectiveCriteria.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -74,31 +73,31 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
     }
 
     /**
-     * Create a new required {@link ScoreboardCriterionArgument}.
+     * Create a new required {@link ObjectiveCriteriaArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ScoreboardCriterionArgument<C> of(final @NonNull String name) {
-        return ScoreboardCriterionArgument.<C>builder(name).asRequired().build();
+    public static <C> @NonNull ObjectiveCriteriaArgument<C> of(final @NonNull String name) {
+        return ObjectiveCriteriaArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional {@link ScoreboardCriterionArgument}.
+     * Create a new optional {@link ObjectiveCriteriaArgument}.
      *
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ScoreboardCriterionArgument<C> optional(final @NonNull String name) {
-        return ScoreboardCriterionArgument.<C>builder(name).asOptional().build();
+    public static <C> @NonNull ObjectiveCriteriaArgument<C> optional(final @NonNull String name) {
+        return ObjectiveCriteriaArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional {@link ScoreboardCriterionArgument} with the specified default value.
+     * Create a new optional {@link ObjectiveCriteriaArgument} with the specified default value.
      *
      * @param name             Argument name
      * @param defaultCriterion Default criterion
@@ -106,35 +105,35 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
      * @return Created argument
      * @since 1.5.0
      */
-    public static <C> @NonNull ScoreboardCriterionArgument<C> optional(
+    public static <C> @NonNull ObjectiveCriteriaArgument<C> optional(
             final @NonNull String name,
-            final @NonNull ScoreboardCriterion defaultCriterion
+            final @NonNull ObjectiveCriteria defaultCriterion
     ) {
-        return ScoreboardCriterionArgument.<C>builder(name).asOptionalWithDefault(defaultCriterion).build();
+        return ObjectiveCriteriaArgument.<C>builder(name).asOptionalWithDefault(defaultCriterion).build();
     }
 
 
     /**
-     * Builder for {@link ScoreboardCriterionArgument}.
+     * Builder for {@link ObjectiveCriteriaArgument}.
      *
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, ScoreboardCriterion, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, ObjectiveCriteria, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(ScoreboardCriterion.class, name);
+            super(ObjectiveCriteria.class, name);
         }
 
         /**
-         * Build a new {@link ScoreboardCriterionArgument}.
+         * Build a new {@link ObjectiveCriteriaArgument}.
          *
          * @return Constructed argument
          * @since 1.5.0
          */
         @Override
-        public @NonNull ScoreboardCriterionArgument<C> build() {
-            return new ScoreboardCriterionArgument<>(
+        public @NonNull ObjectiveCriteriaArgument<C> build() {
+            return new ObjectiveCriteriaArgument<>(
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
@@ -151,7 +150,7 @@ public final class ScoreboardCriterionArgument<C> extends CommandArgument<C, Sco
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ScoreboardCriterion defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ObjectiveCriteria defaultValue) {
             return this.asOptionalWithDefault(defaultValue.getName());
         }
 

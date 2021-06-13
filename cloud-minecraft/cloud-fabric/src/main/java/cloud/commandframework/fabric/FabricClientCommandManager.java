@@ -29,8 +29,8 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.permission.PredicatePermission;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Function;
@@ -88,9 +88,9 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
                 commandSourceMapper,
                 backwardsCommandSourceMapper,
                 new FabricCommandRegistrationHandler.Client<>(),
-                () -> (FabricClientCommandSource) new ClientCommandSource(
-                        MinecraftClient.getInstance().getNetworkHandler(),
-                        MinecraftClient.getInstance()
+                () -> (FabricClientCommandSource) new ClientSuggestionProvider(
+                        Minecraft.getInstance().getConnection(),
+                        Minecraft.getInstance()
                 )
         );
 
@@ -123,7 +123,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> integratedServerRunning() {
-        return sender -> MinecraftClient.getInstance().isIntegratedServerRunning();
+        return sender -> Minecraft.getInstance().hasSingleplayerServer();
     }
 
     /**
@@ -134,7 +134,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      * @since 1.5.0
      */
     public static <C> @NonNull PredicatePermission<C> integratedServerNotRunning() {
-        return sender -> !MinecraftClient.getInstance().isIntegratedServerRunning();
+        return sender -> !Minecraft.getInstance().hasSingleplayerServer();
     }
 
     /**
@@ -163,10 +163,10 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      */
     public static <C> @NonNull PredicatePermission<C> cheatsAllowed(final boolean allowOnMultiplayer) {
         return sender -> {
-            if (!MinecraftClient.getInstance().isIntegratedServerRunning()) {
+            if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 return allowOnMultiplayer;
             }
-            return MinecraftClient.getInstance().getServer().getPlayerManager().areCheatsAllowed();
+            return Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers();
         };
     }
 
@@ -196,10 +196,10 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
      */
     public static <C> @NonNull PredicatePermission<C> cheatsDisallowed(final boolean allowOnMultiplayer) {
         return sender -> {
-            if (!MinecraftClient.getInstance().isIntegratedServerRunning()) {
+            if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 return allowOnMultiplayer;
             }
-            return !MinecraftClient.getInstance().getServer().getPlayerManager().areCheatsAllowed();
+            return !Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers();
         };
     }
 

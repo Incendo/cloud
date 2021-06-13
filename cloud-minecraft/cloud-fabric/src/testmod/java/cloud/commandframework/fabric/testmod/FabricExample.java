@@ -30,8 +30,8 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
-import cloud.commandframework.fabric.argument.ColorArgument;
-import cloud.commandframework.fabric.argument.ItemDataArgument;
+import cloud.commandframework.fabric.argument.ItemInputArgument;
+import cloud.commandframework.fabric.argument.NamedColorArgument;
 import cloud.commandframework.fabric.argument.server.ColumnPosArgument;
 import cloud.commandframework.fabric.argument.server.MultipleEntitySelectorArgument;
 import cloud.commandframework.fabric.argument.server.MultiplePlayerSelectorArgument;
@@ -47,20 +47,20 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
-import net.minecraft.command.argument.ItemStackArgument;
-import net.minecraft.network.MessageType;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.TextColor;
-import net.minecraft.text.Texts;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.item.ItemInput;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -72,13 +72,13 @@ public final class FabricExample implements ModInitializer {
     @Override
     public void onInitialize() {
         // Create a commands manager. We'll use native command source types for this.
-        final FabricServerCommandManager<ServerCommandSource> manager =
+        final FabricServerCommandManager<CommandSourceStack> manager =
                 FabricServerCommandManager.createNative(CommandExecutionCoordinator.simpleCoordinator());
 
-        final Command.Builder<ServerCommandSource> base = manager.commandBuilder("cloudtest");
+        final Command.Builder<CommandSourceStack> base = manager.commandBuilder("cloudtest");
 
-        final CommandArgument<ServerCommandSource, String> name = StringArgument.of("name");
-        final CommandArgument<ServerCommandSource, Integer> hugs = IntegerArgument.<ServerCommandSource>newBuilder("hugs")
+        final CommandArgument<CommandSourceStack, String> name = StringArgument.of("name");
+        final CommandArgument<CommandSourceStack, Integer> hugs = IntegerArgument.<CommandSourceStack>newBuilder("hugs")
                 .asOptionalWithDefault("1")
                 .build();
 
@@ -87,38 +87,38 @@ public final class FabricExample implements ModInitializer {
                 .argument(name)
                 .argument(hugs)
                 .handler(ctx -> {
-                    ctx.getSender().sendFeedback(new LiteralText("Hello, ")
+                    ctx.getSender().sendSuccess(new TextComponent("Hello, ")
                             .append(ctx.get(name))
                             .append(", hope you're doing well!")
-                            .styled(style -> style.withColor(TextColor.fromRgb(0xAA22BB))), false);
+                            .withStyle(style -> style.withColor(TextColor.fromRgb(0xAA22BB))), false);
 
-                    ctx.getSender().sendFeedback(new LiteralText("Cloud would like to give you ")
-                            .append(new LiteralText(String.valueOf(ctx.get(hugs)))
-                                    .styled(style -> style.withColor(TextColor.fromRgb(0xFAB3DA))))
+                    ctx.getSender().sendSuccess(new TextComponent("Cloud would like to give you ")
+                            .append(new TextComponent(String.valueOf(ctx.get(hugs)))
+                                    .withStyle(style -> style.withColor(TextColor.fromRgb(0xFAB3DA))))
                             .append(" hug(s) <3")
-                            .styled(style -> style.withBold(true)), false);
+                            .withStyle(style -> style.withBold(true)), false);
                 }));
 
-        final CommandArgument<ServerCommandSource, MultiplePlayerSelector> playerSelector =
+        final CommandArgument<CommandSourceStack, MultiplePlayerSelector> playerSelector =
                 MultiplePlayerSelectorArgument.of("players");
-        final CommandArgument<ServerCommandSource, Formatting> textColor = ColorArgument.of("color");
+        final CommandArgument<CommandSourceStack, ChatFormatting> textColor = NamedColorArgument.of("color");
 
         manager.command(base.literal("wave")
                 .argument(playerSelector)
                 .argument(textColor)
                 .handler(ctx -> {
                     final MultiplePlayerSelector selector = ctx.get(playerSelector);
-                    final Collection<ServerPlayerEntity> selected = selector.get();
+                    final Collection<ServerPlayer> selected = selector.get();
                     selected.forEach(selectedPlayer ->
                             selectedPlayer.sendMessage(
-                                    new LiteralText("Wave from ")
-                                            .styled(style -> style.withColor(ctx.get(textColor)))
+                                    new TextComponent("Wave from ")
+                                            .withStyle(style -> style.withColor(ctx.get(textColor)))
                                             .append(ctx.getSender().getDisplayName()),
-                                    MessageType.SYSTEM,
+                                    ChatType.SYSTEM,
                                     Util.NIL_UUID
                             ));
-                    ctx.getSender().sendFeedback(
-                            new LiteralText(String.format("Waved at %d players (%s)", selected.size(),
+                    ctx.getSender().sendSuccess(
+                            new TextComponent(String.format("Waved at %d players (%s)", selected.size(),
                                     selector.inputString()
                             )),
                             false
@@ -128,15 +128,15 @@ public final class FabricExample implements ModInitializer {
         manager.command(base.literal("give")
                 .permission("cloud.give")
                 .argument(MultiplePlayerSelectorArgument.of("targets"))
-                .argument(ItemDataArgument.of("item"))
-                .argument(IntegerArgument.<ServerCommandSource>newBuilder("amount")
+                .argument(ItemInputArgument.of("item"))
+                .argument(IntegerArgument.<CommandSourceStack>newBuilder("amount")
                         .withMin(1)
                         .asOptionalWithDefault("1"))
                 .handler(ctx -> {
-                    final ItemStackArgument item = ctx.get("item");
+                    final ItemInput item = ctx.get("item");
                     final MultiplePlayerSelector targets = ctx.get("targets");
                     final int amount = ctx.get("amount");
-                    GiveCommandAccess.give(
+                    GiveCommandAccess.giveItem(
                             ctx.getSender(),
                             item,
                             targets.get(),
@@ -144,43 +144,45 @@ public final class FabricExample implements ModInitializer {
                     );
                 }));
 
-        final Command.Builder<ServerCommandSource> mods = base.literal("mods").permission("cloud.mods");
+        final Command.Builder<CommandSourceStack> mods = base.literal("mods").permission("cloud.mods");
 
         manager.command(mods.handler(ctx -> {
             final List<ModMetadata> modList = FabricLoader.getInstance().getAllMods().stream()
                     .map(ModContainer::getMetadata)
                     .sorted(Comparator.comparing(ModMetadata::getId))
                     .collect(Collectors.toList());
-            final LiteralText text = new LiteralText("");
-            text.append(new LiteralText("Loaded Mods")
-                    .styled(style -> style.withColor(Formatting.BLUE).withFormatting(Formatting.BOLD)));
-            text.append(new LiteralText(String.format(" (%s)\n", modList.size()))
-                    .styled(style -> style.withColor(Formatting.GRAY).withFormatting(Formatting.ITALIC)));
+            final TextComponent text = new TextComponent("");
+            text.append(new TextComponent("Loaded Mods")
+                    .withStyle(style -> style.withColor(ChatFormatting.BLUE).applyFormat(ChatFormatting.BOLD)));
+            text.append(new TextComponent(String.format(" (%s)\n", modList.size()))
+                    .withStyle(style -> style.withColor(ChatFormatting.GRAY).applyFormat(ChatFormatting.ITALIC)));
             for (final ModMetadata mod : modList) {
                 text.append(
-                        new LiteralText("")
-                                .styled(style -> style.withColor(Formatting.WHITE)
+                        new TextComponent("")
+                                .withStyle(style -> style.withColor(ChatFormatting.WHITE)
                                         .withClickEvent(new ClickEvent(
                                                 ClickEvent.Action.SUGGEST_COMMAND,
                                                 String.format("/cloudtest mods %s", mod.getId())
                                         ))
                                         .withHoverEvent(new HoverEvent(
                                                 HoverEvent.Action.SHOW_TEXT,
-                                                new LiteralText("Click for more info")
+                                                new TextComponent("Click for more info")
                                         )))
-                                .append(new LiteralText(mod.getName()).styled(style -> style.withColor(Formatting.GREEN)))
-                                .append(new LiteralText(String.format(" (%s) ", mod.getId()))
-                                        .styled(style -> style.withColor(Formatting.GRAY).withFormatting(Formatting.ITALIC)))
-                                .append(new LiteralText(String.format("v%s", mod.getVersion())))
+                                .append(new TextComponent(mod.getName()).withStyle(style -> style.withColor(ChatFormatting.GREEN)))
+                                .append(new TextComponent(String.format(" (%s) ", mod.getId()))
+                                        .withStyle(style -> style
+                                                .withColor(ChatFormatting.GRAY)
+                                                .applyFormat(ChatFormatting.ITALIC)))
+                                .append(new TextComponent(String.format("v%s", mod.getVersion())))
                 );
                 if (modList.indexOf(mod) != modList.size() - 1) {
-                    text.append(new LiteralText(", ").styled(style -> style.withColor(Formatting.GRAY)));
+                    text.append(new TextComponent(", ").withStyle(style -> style.withColor(ChatFormatting.GRAY)));
                 }
             }
-            ctx.getSender().sendFeedback(text, false);
+            ctx.getSender().sendSuccess(text, false);
         }));
 
-        final CommandArgument<ServerCommandSource, ModMetadata> modMetadata = manager.argumentBuilder(ModMetadata.class, "mod")
+        final CommandArgument<CommandSourceStack, ModMetadata> modMetadata = manager.argumentBuilder(ModMetadata.class, "mod")
                 .withSuggestionsProvider((ctx, input) -> FabricLoader.getInstance().getAllMods().stream()
                         .map(ModContainer::getMetadata)
                         .map(ModMetadata::getId)
@@ -203,25 +205,25 @@ public final class FabricExample implements ModInitializer {
         manager.command(mods.argument(modMetadata)
                 .handler(ctx -> {
                     final ModMetadata meta = ctx.get(modMetadata);
-                    final MutableText text = new LiteralText("")
-                            .append(new LiteralText(meta.getName())
-                                    .styled(style -> style.withColor(Formatting.BLUE).withFormatting(Formatting.BOLD)))
-                            .append(new LiteralText("\n modid: " + meta.getId()))
-                            .append(new LiteralText("\n version: " + meta.getVersion()))
-                            .append(new LiteralText("\n type: " + meta.getType()));
+                    final MutableComponent text = new TextComponent("")
+                            .append(new TextComponent(meta.getName())
+                                    .withStyle(style -> style.withColor(ChatFormatting.BLUE).applyFormat(ChatFormatting.BOLD)))
+                            .append(new TextComponent("\n modid: " + meta.getId()))
+                            .append(new TextComponent("\n version: " + meta.getVersion()))
+                            .append(new TextComponent("\n type: " + meta.getType()));
 
                     if (!meta.getDescription().isEmpty()) {
-                        text.append(new LiteralText("\n description: " + meta.getDescription()));
+                        text.append(new TextComponent("\n description: " + meta.getDescription()));
                     }
                     if (!meta.getAuthors().isEmpty()) {
-                        text.append(new LiteralText("\n authors: " + meta.getAuthors().stream()
+                        text.append(new TextComponent("\n authors: " + meta.getAuthors().stream()
                                 .map(Person::getName)
                                 .collect(Collectors.joining(", "))));
                     }
                     if (!meta.getLicense().isEmpty()) {
-                        text.append(new LiteralText("\n license: " + String.join(", ", meta.getLicense())));
+                        text.append(new TextComponent("\n license: " + String.join(", ", meta.getLicense())));
                     }
-                    ctx.getSender().sendFeedback(
+                    ctx.getSender().sendSuccess(
                             text,
                             false
                     );
@@ -233,25 +235,25 @@ public final class FabricExample implements ModInitializer {
                 .argument(Vec3dArgument.of("location"))
                 .handler(ctx -> {
                     final MultipleEntitySelector selector = ctx.get("targets");
-                    final Vec3d location = ctx.<Coordinates>get("location").position();
+                    final Vec3 location = ctx.<Coordinates>get("location").position();
                     selector.get().forEach(target ->
-                            target.requestTeleport(location.getX(), location.getY(), location.getZ()));
+                            target.teleportToWithTicket(location.x(), location.y(), location.z()));
                 }));
 
         manager.command(base.literal("gotochunk")
                 .permission("cloud.gotochunk")
                 .argument(ColumnPosArgument.of("chunk_position"))
                 .handler(ctx -> {
-                    final ServerPlayerEntity player;
+                    final ServerPlayer player;
                     try {
-                        player = ctx.getSender().getPlayer();
+                        player = ctx.getSender().getPlayerOrException();
                     } catch (final CommandSyntaxException e) {
-                        ctx.getSender().sendFeedback(Texts.toText(e.getRawMessage()), false);
+                        ctx.getSender().sendSuccess(ComponentUtils.fromMessage(e.getRawMessage()), false);
                         return;
                     }
-                    final Vec3d vec = ctx.<ColumnCoordinates>get("chunk_position").position();
-                    final ChunkPos pos = new ChunkPos((int) vec.getX(), (int) vec.getZ());
-                    player.requestTeleport(pos.getStartX(), 128, pos.getStartZ());
+                    final Vec3 vec = ctx.<ColumnCoordinates>get("chunk_position").position();
+                    final ChunkPos pos = new ChunkPos((int) vec.x(), (int) vec.z());
+                    player.teleportToWithTicket(pos.getMinBlockX(), 128, pos.getMinBlockZ());
                 }));
     }
 
