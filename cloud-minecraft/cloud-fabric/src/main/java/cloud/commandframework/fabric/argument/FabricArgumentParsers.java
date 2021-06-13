@@ -334,7 +334,10 @@ public final class FabricArgumentParsers {
         private final CommandSourceStack source;
         private final net.minecraft.commands.arguments.coordinates.Coordinates posArgument;
 
-        CoordinatesImpl(final @NonNull CommandSourceStack source, final net.minecraft.commands.arguments.coordinates.@NonNull Coordinates posArgument) {
+        CoordinatesImpl(
+                final @NonNull CommandSourceStack source,
+                final net.minecraft.commands.arguments.coordinates.@NonNull Coordinates posArgument
+        ) {
             this.source = source;
             this.posArgument = posArgument;
         }
