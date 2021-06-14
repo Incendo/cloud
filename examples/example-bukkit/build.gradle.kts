@@ -1,6 +1,19 @@
 plugins {
+    id("cloud.example-conventions")
     id("com.github.johnrengelman.shadow")
     id("xyz.jpenilla.run-paper") version "1.0.3-SNAPSHOT"
+}
+
+dependencies {
+    /* Cloud */
+    implementation(project(":cloud-paper"))
+    implementation(project(":cloud-annotations"))
+    implementation(project(":cloud-minecraft-extras"))
+    /* Extras */
+    implementation("me.lucko", "commodore", Versions.commodore)
+    implementation("net.kyori", "adventure-platform-bukkit", Versions.adventurePlatform)
+    /* Bukkit */
+    compileOnly("org.bukkit", "bukkit", Versions.bukkit)
 }
 
 tasks {
@@ -17,16 +30,4 @@ tasks {
         paperclip(file("spigot-1.17.jar"))
         legacyPluginLoading()
     }
-}
-
-dependencies {
-    /* Cloud */
-    implementation(project(":cloud-paper"))
-    implementation(project(":cloud-annotations"))
-    implementation(project(":cloud-minecraft-extras"))
-    /* Extras */
-    implementation("me.lucko", "commodore", Versions.commodore)
-    implementation("net.kyori", "adventure-platform-bukkit", Versions.adventurePlatform)
-    /* Bukkit */
-    compileOnly("org.bukkit", "bukkit", Versions.bukkit)
 }

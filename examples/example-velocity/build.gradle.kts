@@ -1,5 +1,6 @@
 plugins {
-    id ("com.github.johnrengelman.shadow")
+    id("com.github.johnrengelman.shadow")
+    id("cloud.example-conventions")
 }
 
 val velocityRunClasspath by configurations.creating {

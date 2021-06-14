@@ -1,4 +1,5 @@
 plugins {
+    id("cloud.example-conventions")
     id ("com.github.johnrengelman.shadow")
 }
 
