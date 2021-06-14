@@ -4,6 +4,11 @@ pluginManagement {
         maven("https://maven.fabricmc.net")
         maven("https://repo.jpenilla.xyz/snapshots") // todo - for run-paper snapshot
     }
+    includeBuild("build-logic")
+}
+
+plugins {
+    id("ca.stellardrift.polyglot-version-catalogs") version "5.0.0"
 }
 
 rootProject.name = "cloud"
