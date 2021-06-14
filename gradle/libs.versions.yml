@@ -1,0 +1,49 @@
+metadata:
+  format: { version: 1.0 }
+  polyglot-extensions:
+    - plugins
+
+plugins:
+  com.github.johnrengelman.shadow: 7.0.0
+  net.ltgt.errorprone: 2.0.1
+  com.github.ben-manes.versions: 0.36.0
+
+versions:
+  checkerQual: 3.14.0
+
+  # build-logic
+  checkstyle: 8.39
+  indra: 2.0.5
+  testLoggerPlugin: 3.0.0
+  errorpronePlugin: 2.0.1
+  licenser: 0.6.0
+
+dependencies:
+  checkerQual:
+    group: org.checkerframework
+    name: checker-qual
+    version: { ref: checkerQual }
+
+  # build-logic
+  indraCommon:
+    group: net.kyori
+    name: indra-common
+    version: { ref: indra }
+  indraPublishingSonatype:
+    group: net.kyori
+    name: indra-publishing-sonatype
+    version: { ref: indra }
+  licenser:
+    group: gradle.plugin.org.cadixdev.gradle
+    name: licenser
+    version: { ref: licenser }
+  testLoggerPlugin:
+    group: com.adarshr
+    name: gradle-test-logger-plugin
+    version: { ref: testLoggerPlugin }
+  errorpronePlugin:
+    group: net.ltgt.gradle
+    name: gradle-errorprone-plugin
+    version: { ref: errorpronePlugin }
+
+bundles:
