@@ -2,7 +2,6 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven("https://maven.fabricmc.net")
-        maven("https://repo.jpenilla.xyz/snapshots") // todo - for run-paper snapshot
     }
     includeBuild("build-logic")
 }
