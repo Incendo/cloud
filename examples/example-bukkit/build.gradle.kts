@@ -1,7 +1,7 @@
 plugins {
     id("cloud.example-conventions")
     id("com.github.johnrengelman.shadow")
-    id("xyz.jpenilla.run-paper") version "1.0.3-SNAPSHOT"
+    id("xyz.jpenilla.run-paper") version "1.0.3"
 }
 
 dependencies {
@@ -27,7 +27,5 @@ tasks {
     }
     runServer {
         minecraftVersion("1.17")
-        paperclip(file("spigot-1.17.jar"))
-        legacyPluginLoading()
     }
 }
