@@ -153,7 +153,9 @@ public final class BukkitBrigadierMapper<C> {
 
     private @NonNull ArgumentType<?> argumentVec2() {
         try {
-            return MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("vec2")).getDeclaredConstructor().newInstance();
+            return MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("vec2"))
+                    .getDeclaredConstructor(boolean.class)
+                    .newInstance(true);
         } catch (final Exception e) {
             this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve Vec2 argument", e);
             return fallbackType();
