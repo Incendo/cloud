@@ -75,7 +75,10 @@ public final class MinecraftArgumentTypes {
             final Class<?> minecraftKey;
             final Class<?> argumentRegistry;
 
-            if (CraftBukkitReflection.MAJOR_REVISION > 16) {
+            if (CraftBukkitReflection.findMCClass("resources.ResourceLocation") != null) {
+                minecraftKey = CraftBukkitReflection.needMCClass("resources.ResourceLocation");
+                argumentRegistry = CraftBukkitReflection.needMCClass("commands.synchronization.ArgumentTypes");
+            } else if (CraftBukkitReflection.MAJOR_REVISION > 16) {
                 minecraftKey = CraftBukkitReflection.needMCClass("resources.MinecraftKey");
                 argumentRegistry = CraftBukkitReflection.needMCClass("commands.synchronization.ArgumentRegistry");
             } else {
