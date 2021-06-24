@@ -25,7 +25,6 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
-import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -53,7 +52,7 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
     BukkitCommandPreprocessor(final @NonNull BukkitCommandManager<C> commandManager) {
         this.commandManager = commandManager;
         this.bukkitCapabilities = commandManager.queryCapabilities();
-        if (this.bukkitCapabilities.contains(CloudBukkitCapabilities.BRIGADIER) && CraftBukkitReflection.craftBukkit()) {
+        if (this.bukkitCapabilities.contains(CloudBukkitCapabilities.BRIGADIER)) {
             this.mapper = new BukkitBackwardsBrigadierSenderMapper<>(this.commandManager);
         } else {
             this.mapper = null;

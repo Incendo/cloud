@@ -32,6 +32,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 /**
  * Utilities for doing reflection on CraftBukkit, used by the cloud implementation.
@@ -45,7 +46,7 @@ public final class CraftBukkitReflection {
     private static final String PREFIX_MC = "net.minecraft.";
     private static final String PREFIX_CRAFTBUKKIT = "org.bukkit.craftbukkit";
     private static final String CRAFT_SERVER = "CraftServer";
-    private static final String VERSION;
+    private static final String CB_PKG_VERSION;
     public static final int MAJOR_REVISION;
 
     static {
@@ -54,18 +55,26 @@ public final class CraftBukkitReflection {
         final String nmsVersion = pkg.substring(pkg.lastIndexOf(".") + 1);
         if (!nmsVersion.contains("_")) {
             MAJOR_REVISION = -1;
-            VERSION = null;
         } else {
             MAJOR_REVISION = Integer.parseInt(nmsVersion.split("_")[1]);
-            String name = serverClass.getName();
-            name = name.substring(PREFIX_CRAFTBUKKIT.length());
-            name = name.substring(0, name.length() - CRAFT_SERVER.length());
-            VERSION = name;
         }
+        String name = serverClass.getName();
+        name = name.substring(PREFIX_CRAFTBUKKIT.length());
+        name = name.substring(0, name.length() - CRAFT_SERVER.length());
+        CB_PKG_VERSION = name;
     }
 
-    public static boolean craftBukkit() {
-        return MAJOR_REVISION != -1 && VERSION != null;
+    @SafeVarargs
+    public static <T> @NonNull T firstNonNullOrThrow(
+            final @NonNull Supplier<@NonNull String> errorMessage,
+            final @Nullable T @NonNull... elements
+    ) {
+        for (final T element : elements) {
+            if (element != null) {
+                return element;
+            }
+        }
+        throw new IllegalArgumentException(errorMessage.get());
     }
 
     public static @NonNull Class<?> needNMSClassOrElse(
@@ -76,17 +85,12 @@ public final class CraftBukkitReflection {
         if (nmsClass != null) {
             return nmsClass;
         }
-        for (final String name : classNames) {
-            final Class<?> maybe = findClass(name);
-            if (maybe != null) {
-                return maybe;
-            }
-        }
-        throw new IllegalStateException(String.format(
-                "Couldn't find a class! NMS: '%s' or '%s'.",
-                nms,
-                Arrays.toString(classNames)
-        ));
+        return firstNonNullOrThrow(
+                () -> "Couldn't find a class! NMS: '%s' or '%s'.",
+                Arrays.stream(classNames)
+                        .map(CraftBukkitReflection::findClass)
+                        .toArray(Class[]::new)
+        );
     }
 
     public static @NonNull Class<?> needMCClass(final @NonNull String name) throws RuntimeException {
@@ -94,11 +98,11 @@ public final class CraftBukkitReflection {
     }
 
     public static @NonNull Class<?> needNMSClass(final @NonNull String className) throws RuntimeException {
-        return needClass(PREFIX_NMS + VERSION + className);
+        return needClass(PREFIX_NMS + CB_PKG_VERSION + className);
     }
 
     public static @NonNull Class<?> needOBCClass(final @NonNull String className) throws RuntimeException {
-        return needClass(PREFIX_CRAFTBUKKIT + VERSION + className);
+        return needClass(PREFIX_CRAFTBUKKIT + CB_PKG_VERSION + className);
     }
 
     public static @Nullable Class<?> findMCClass(final @NonNull String name) throws RuntimeException {
@@ -106,11 +110,11 @@ public final class CraftBukkitReflection {
     }
 
     public static @Nullable Class<?> findNMSClass(final @NonNull String className) throws RuntimeException {
-        return findClass(PREFIX_NMS + VERSION + className);
+        return findClass(PREFIX_NMS + CB_PKG_VERSION + className);
     }
 
     public static @Nullable Class<?> findOBCClass(final @NonNull String className) throws RuntimeException {
-        return findClass(PREFIX_CRAFTBUKKIT + VERSION + className);
+        return findClass(PREFIX_CRAFTBUKKIT + CB_PKG_VERSION + className);
     }
 
     public static @NonNull Class<?> needClass(final @NonNull String className) throws RuntimeException {
@@ -139,6 +143,14 @@ public final class CraftBukkitReflection {
         }
     }
 
+    public static @Nullable Field findField(final @NonNull Class<?> holder, final @NonNull String name) throws RuntimeException {
+        try {
+            return needField(holder, name);
+        } catch (final RuntimeException e) {
+            return null;
+        }
+    }
+
     public static @NonNull Constructor<?> needConstructor(final @NonNull Class<?> holder, final @NonNull Class<?>... parameters) {
         try {
             return holder.getDeclaredConstructor(parameters);
@@ -149,6 +161,18 @@ public final class CraftBukkitReflection {
 
     public static boolean classExists(final @NonNull String className) {
         return findClass(className) != null;
+    }
+
+    public static @Nullable Method findMethod(
+            final @NonNull Class<?> holder,
+            final @NonNull String name,
+            final @NonNull Class<?>... params
+    ) throws RuntimeException {
+        try {
+            return holder.getMethod(name, params);
+        } catch (final NoSuchMethodException e) {
+            return null;
+        }
     }
 
     public static @NonNull Method needMethod(

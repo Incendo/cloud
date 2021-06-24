@@ -26,7 +26,6 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
-import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -64,9 +63,7 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
 
         new BukkitBrigadierMapper<>(this.commandManager, this.brigadierManager);
 
-        if (CraftBukkitReflection.craftBukkit()) {
-            this.brigadierManager.backwardsBrigadierSenderMapper(new BukkitBackwardsBrigadierSenderMapper<>(this.commandManager));
-        }
+        this.brigadierManager.backwardsBrigadierSenderMapper(new BukkitBackwardsBrigadierSenderMapper<>(this.commandManager));
     }
 
     @Override

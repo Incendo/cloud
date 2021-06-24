@@ -31,10 +31,12 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ItemStackPredicate;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.StringRange;
 import io.leangen.geantyref.TypeToken;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -142,13 +144,13 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
 
         private static final Class<?> CRAFT_ITEM_STACK_CLASS =
                 CraftBukkitReflection.needOBCClass("inventory.CraftItemStack");
-        private static final Class<?> ARGUMENT_ITEM_PREDICATE_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "ArgumentItemPredicate",
-                "net.minecraft.commands.arguments.item.ArgumentItemPredicate"
-        );
-        private static final Class<?> ARGUMENT_ITEM_PREDICATE_RESULT_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "ArgumentItemPredicate$b",
-                "net.minecraft.commands.arguments.item.ArgumentItemPredicate$b"
+        private static final Class<?> ARGUMENT_ITEM_PREDICATE_CLASS =
+                MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("item_predicate"));
+        private static final Class<?> ARGUMENT_ITEM_PREDICATE_RESULT_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find ItemPredicateArgument$Result class",
+                CraftBukkitReflection.findNMSClass("ArgumentItemPredicate$b"),
+                CraftBukkitReflection.findMCClass("commands.arguments.item.ArgumentItemPredicate$b"),
+                CraftBukkitReflection.findMCClass("commands.arguments.item.ItemPredicateArgument$Result")
         );
         private static final Method CREATE_PREDICATE_METHOD = CraftBukkitReflection.needMethod(
                 ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,

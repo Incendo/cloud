@@ -26,7 +26,6 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
@@ -56,8 +55,6 @@ import java.util.logging.Level;
  */
 public final class BukkitBrigadierMapper<C> {
 
-    private static final int UUID_ARGUMENT_VERSION = 16;
-
     private final BukkitCommandManager<C> commandManager;
     private final CloudBrigadierManager<C, ?> brigadierManager;
 
@@ -74,18 +71,13 @@ public final class BukkitBrigadierMapper<C> {
         this.commandManager = commandManager;
         this.brigadierManager = brigadierManager;
 
-        if (!CraftBukkitReflection.craftBukkit()) {
-            this.commandManager.getOwningPlugin().getLogger().warning(
-                    "Could not detect relocated CraftBukkit package, NMS brigadier mappings will not be enabled.");
-            return;
-        }
-
         this.registerMappings();
     }
 
     private void registerMappings() {
         /* UUID nms argument is a 1.16+ feature */
-        if (CraftBukkitReflection.MAJOR_REVISION >= UUID_ARGUMENT_VERSION) {
+        final Class<? extends ArgumentType<?>> uuid = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("uuid"));
+        if (uuid != null) {
             /* Map UUID */
             this.mapSimpleNMS(new TypeToken<UUIDArgument.UUIDParser<C>>() {
             }, "uuid");

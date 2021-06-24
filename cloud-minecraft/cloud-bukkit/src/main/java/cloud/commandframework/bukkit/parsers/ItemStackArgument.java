@@ -31,10 +31,12 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -48,6 +50,8 @@ import java.util.Locale;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Argument type for parsing a {@link Material} and optional extra NBT data into a {@link ProtoItemStack}.
@@ -150,10 +154,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
          * @since 1.5.0
          */
         public Parser() {
-            if (!CraftBukkitReflection.craftBukkit()) {
-                throw new UnsupportedOperationException("ItemStack parser requires CraftBukkit");
-            }
-            if (CraftBukkitReflection.MAJOR_REVISION >= 13) {
+            if (findItemInputClass() != null) {
                 this.parser = new ModernParser<>();
             } else {
                 this.parser = new LegacyParser<>();
@@ -178,6 +179,20 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
 
     }
 
+    private static @Nullable Class<?> findItemInputClass() {
+        final Class<?>[] classes = new Class<?>[] {
+                CraftBukkitReflection.findNMSClass("ArgumentPredicateItemStack"),
+                CraftBukkitReflection.findMCClass("commands.arguments.item.ArgumentPredicateItemStack"),
+                CraftBukkitReflection.findMCClass("commands.arguments.item.ItemInput")
+        };
+        for (final Class<?> clazz : classes) {
+            if (clazz != null) {
+                return clazz;
+            }
+        }
+        return null;
+    }
+
     private static final class ModernParser<C> implements ArgumentParser<C, ProtoItemStack> {
 
         private static final Class<?> NMS_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
@@ -186,14 +201,9 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         );
         private static final Class<?> CRAFT_ITEM_STACK_CLASS =
                 CraftBukkitReflection.needOBCClass("inventory.CraftItemStack");
-        private static final Class<?> ARGUMENT_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "ArgumentItemStack",
-                "net.minecraft.commands.arguments.item.ArgumentItemStack"
-        );
-        private static final Class<?> ARGUMENT_PREDICATE_ITEM_STACK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "ArgumentPredicateItemStack",
-                "net.minecraft.commands.arguments.item.ArgumentPredicateItemStack"
-        );
+        private static final Class<?> ARGUMENT_ITEM_STACK_CLASS =
+                MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("item_stack"));
+        private static final Class<?> ITEM_INPUT_CLASS = requireNonNull(findItemInputClass(), "ItemInput class");
         private static final Class<?> NMS_ITEM_CLASS = CraftBukkitReflection.needNMSClassOrElse(
                 "Item",
                 "net.minecraft.world.item.Item"
@@ -202,12 +212,23 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                 CraftBukkitReflection.needOBCClass("util.CraftMagicNumbers");
         private static final Method GET_MATERIAL_METHOD = CraftBukkitReflection
                 .needMethod(CRAFT_MAGIC_NUMBERS_CLASS, "getMaterial", NMS_ITEM_CLASS);
-        private static final Method CREATE_ITEM_STACK_METHOD = CraftBukkitReflection
-                .needMethod(ARGUMENT_PREDICATE_ITEM_STACK_CLASS, "a", int.class, boolean.class);
+        private static final Method CREATE_ITEM_STACK_METHOD = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find createItemStack method on ItemInput",
+                CraftBukkitReflection.findMethod(ITEM_INPUT_CLASS, "a", int.class, boolean.class),
+                CraftBukkitReflection.findMethod(ITEM_INPUT_CLASS, "createItemStack", int.class, boolean.class)
+        );
         private static final Method AS_BUKKIT_COPY_METHOD = CraftBukkitReflection
                 .needMethod(CRAFT_ITEM_STACK_CLASS, "asBukkitCopy", NMS_ITEM_STACK_CLASS);
-        private static final Field ITEM_FIELD = CraftBukkitReflection.needField(ARGUMENT_PREDICATE_ITEM_STACK_CLASS, "b");
-        private static final Field COMPOUND_TAG_FIELD = CraftBukkitReflection.needField(ARGUMENT_PREDICATE_ITEM_STACK_CLASS, "c");
+        private static final Field ITEM_FIELD = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find item field on ItemInput",
+                CraftBukkitReflection.findField(ITEM_INPUT_CLASS, "b"),
+                CraftBukkitReflection.findField(ITEM_INPUT_CLASS, "item")
+        );
+        private static final Field COMPOUND_TAG_FIELD = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find tag field on ItemInput",
+                CraftBukkitReflection.findField(ITEM_INPUT_CLASS, "c"),
+                CraftBukkitReflection.findField(ITEM_INPUT_CLASS, "tag")
+        );
 
         private final ArgumentParser<C, ProtoItemStack> parser;
 
