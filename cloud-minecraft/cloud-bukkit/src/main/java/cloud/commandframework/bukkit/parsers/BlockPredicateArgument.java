@@ -31,9 +31,11 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.BlockPredicate;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.leangen.geantyref.TypeToken;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -142,13 +144,15 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
         private static final Class<?> TAG_REGISTRY_CLASS;
 
         static {
-            if (CraftBukkitReflection.MAJOR_REVISION >= 16) {
-                TAG_REGISTRY_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                        "ITagRegistry",
-                        "net.minecraft.tags.ITagRegistry"
-                );
-            } else {
+            if (CraftBukkitReflection.MAJOR_REVISION > 12 && CraftBukkitReflection.MAJOR_REVISION < 16) {
                 TAG_REGISTRY_CLASS = CraftBukkitReflection.needNMSClass("TagRegistry");
+            } else {
+                TAG_REGISTRY_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
+                        () -> "Couldn't find TagContainer class",
+                        CraftBukkitReflection.findNMSClass("ITagRegistry"),
+                        CraftBukkitReflection.findMCClass("tags.ITagRegistry"),
+                        CraftBukkitReflection.findMCClass("tags.TagContainer")
+                );
             }
         }
 
@@ -157,42 +161,52 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                 "MinecraftServer",
                 "net.minecraft.server.MinecraftServer"
         );
-        private static final Class<?> COMMAND_LISTENER_WRAPPER_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "CommandListenerWrapper",
-                "net.minecraft.commands.CommandListenerWrapper"
+        private static final Class<?> COMMAND_LISTENER_WRAPPER_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find CommandSourceStack class",
+                CraftBukkitReflection.findNMSClass("CommandListenerWrapper"),
+                CraftBukkitReflection.findMCClass("commands.CommandListenerWrapper"),
+                CraftBukkitReflection.findMCClass("commands.CommandSourceStack")
         );
-        private static final Class<?> ARGUMENT_BLOCK_PREDICATE_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "ArgumentBlockPredicate",
-                "net.minecraft.commands.arguments.blocks.ArgumentBlockPredicate"
+        private static final Class<?> ARGUMENT_BLOCK_PREDICATE_CLASS =
+                MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("block_predicate"));
+        private static final Class<?> ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find BlockPredicateArgument$Result class",
+                CraftBukkitReflection.findNMSClass("ArgumentBlockPredicate$b"),
+                CraftBukkitReflection.findMCClass("commands.arguments.blocks.ArgumentBlockPredicate$b"),
+                CraftBukkitReflection.findMCClass("commands.arguments.blocks.BlockPredicateArgument$Result")
         );
-        private static final Class<?> ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "ArgumentBlockPredicate$b",
-                "net.minecraft.commands.arguments.blocks.ArgumentBlockPredicate$b"
+        private static final Class<?> SHAPE_DETECTOR_BLOCK_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find BlockInWorld class",
+                CraftBukkitReflection.findNMSClass("ShapeDetectorBlock"),
+                CraftBukkitReflection.findMCClass("world.level.block.state.pattern.ShapeDetectorBlock"),
+                CraftBukkitReflection.findMCClass("world.level.block.state.pattern.BlockInWorld")
         );
-        // BlockInWorld
-        private static final Class<?> SHAPE_DETECTOR_BLOCK_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "ShapeDetectorBlock",
-                "net.minecraft.world.level.block.state.pattern.ShapeDetectorBlock"
+        private static final Class<?> LEVEL_READER_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find LevelReader class",
+                CraftBukkitReflection.findNMSClass("IWorldReader"),
+                CraftBukkitReflection.findMCClass("world.level.IWorldReader"),
+                CraftBukkitReflection.findMCClass("world.level.LevelReader")
         );
-        private static final Class<?> I_WORLD_READER_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "IWorldReader",
-                "net.minecraft.world.level.IWorldReader"
-        );
-        private static final Class<?> BLOCK_POSITION_CLASS = CraftBukkitReflection.needNMSClassOrElse(
-                "BlockPosition",
-                "net.minecraft.core.BlockPosition"
+        private static final Class<?> BLOCK_POSITION_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "Couldn't find BlockPos class",
+                CraftBukkitReflection.findNMSClass("BlockPosition"),
+                CraftBukkitReflection.findMCClass("core.BlockPosition"),
+                CraftBukkitReflection.findMCClass("core.BlockPos")
         );
         private static final Constructor<?> BLOCK_POSITION_CTR =
                 CraftBukkitReflection.needConstructor(BLOCK_POSITION_CLASS, int.class, int.class, int.class);
         private static final Constructor<?> SHAPE_DETECTOR_BLOCK_CTR = CraftBukkitReflection
-                .needConstructor(SHAPE_DETECTOR_BLOCK_CLASS, I_WORLD_READER_CLASS, BLOCK_POSITION_CLASS, boolean.class);
+                .needConstructor(SHAPE_DETECTOR_BLOCK_CLASS, LEVEL_READER_CLASS, BLOCK_POSITION_CLASS, boolean.class);
         private static final Method GET_HANDLE_METHOD = CraftBukkitReflection.needMethod(CRAFT_WORLD_CLASS, "getHandle");
         private static final Method CREATE_PREDICATE_METHOD =
                 CraftBukkitReflection.needMethod(ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS, "create", TAG_REGISTRY_CLASS);
         private static final Method GET_SERVER_METHOD =
                 CraftBukkitReflection.needMethod(COMMAND_LISTENER_WRAPPER_CLASS, "getServer");
-        private static final Method GET_TAG_REGISTRY_METHOD =
-                CraftBukkitReflection.needMethod(MINECRAFT_SERVER_CLASS, "getTagRegistry");
+        private static final Method GET_TAG_REGISTRY_METHOD = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "getTags method on MinecraftServer",
+                CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTagRegistry"),
+                CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTags")
+        );
 
         private final ArgumentParser<C, BlockPredicate> parser;
 

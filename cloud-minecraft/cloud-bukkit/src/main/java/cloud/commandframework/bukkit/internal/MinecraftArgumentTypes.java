@@ -78,12 +78,15 @@ public final class MinecraftArgumentTypes {
             if (CraftBukkitReflection.findMCClass("resources.ResourceLocation") != null) {
                 minecraftKey = CraftBukkitReflection.needMCClass("resources.ResourceLocation");
                 argumentRegistry = CraftBukkitReflection.needMCClass("commands.synchronization.ArgumentTypes");
-            } else if (CraftBukkitReflection.MAJOR_REVISION > 16) {
-                minecraftKey = CraftBukkitReflection.needMCClass("resources.MinecraftKey");
-                argumentRegistry = CraftBukkitReflection.needMCClass("commands.synchronization.ArgumentRegistry");
             } else {
-                minecraftKey = CraftBukkitReflection.needNMSClass("MinecraftKey");
-                argumentRegistry = CraftBukkitReflection.needNMSClass("ArgumentRegistry");
+                minecraftKey = CraftBukkitReflection.needNMSClassOrElse(
+                        "MinecraftKey",
+                        "net.minecraft.resources.MinecraftKey"
+                );
+                argumentRegistry = CraftBukkitReflection.needNMSClassOrElse(
+                        "ArgumentRegistry",
+                        "commands.synchronization.ArgumentRegistry"
+                );
             }
 
             MINECRAFT_KEY_CONSTRUCTOR = minecraftKey.getConstructor(String.class, String.class);
