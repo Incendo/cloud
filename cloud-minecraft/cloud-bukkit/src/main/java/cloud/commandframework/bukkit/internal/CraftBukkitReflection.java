@@ -86,7 +86,11 @@ public final class CraftBukkitReflection {
             return nmsClass;
         }
         return firstNonNullOrThrow(
-                () -> "Couldn't find a class! NMS: '%s' or '%s'.",
+                () -> String.format(
+                        "Cound't find the NMS class '%s', or any of the following fallbacks: %s",
+                        nms,
+                        Arrays.toString(classNames)
+                ),
                 Arrays.stream(classNames)
                         .map(CraftBukkitReflection::findClass)
                         .toArray(Class[]::new)
