@@ -85,7 +85,7 @@ public final class MinecraftArgumentTypes {
                 );
                 argumentRegistry = CraftBukkitReflection.needNMSClassOrElse(
                         "ArgumentRegistry",
-                        "commands.synchronization.ArgumentRegistry"
+                        "net.minecraft.commands.synchronization.ArgumentRegistry"
                 );
             }
 
