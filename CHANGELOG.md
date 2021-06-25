@@ -4,23 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.5.0]
 
 ### Added
- - JDA Role argument parser
+ - `@Quoted` annotation for the `String` argument ([#239](https://github.com/Incendo/cloud/pull/239))
+ - Expose `min` and `max` values on numerous number aruments ([#255](https://github.com/Incendo/cloud/pull/255))
+ - JDA: Role argument parser ([#219](https://github.com/Incendo/cloud/pull/219))
  - Bukkit: Implement parser for ProtoItemStack ([#257](https://github.com/Incendo/cloud/pull/257))
  - Bukkit: Implement parsers for ItemStackPredicate and BlockPredicate ([#259](https://github.com/Incendo/cloud/pull/259))
+ - Bukkit: Support for Mojang mapped servers ([#267](https://github.com/Incendo/cloud/pull/267))
+ - Fabric: Fabric implementation added ([#223](https://github.com/Incendo/cloud/pull/223))
+ - Minecraft-Extras/Bukkit/Paper/Velocity: `AudienceProvider.nativeAudience`, `MinecraftHelp.createNative` , `BukkitCommandManager.createNative` , `PaperCommandManager.createNative`, `CloudInjectionModule.createNative`  helper methods for `Audience` sender types ([#240](https://github.com/Incendo/cloud/pull/240))
 
 ### Changed
- - Use Command instead of TabCompleteEvent on Bukkit
- - Add isolation system to JDA user argument
+ - `Long` argument parser is now public ([#229](https://github.com/Incendo/cloud/pull/229))
+ - JDA: Add isolation system to JDA user argument ([#220](https://github.com/Incendo/cloud/pull/220))
+ - Bukkit: Use Command instead of TabCompleteEvent on Bukkit
+ - Bukkit: Minecraft 1.17 support added
 
 ### Deprecated
- - Deprecated old JDA UserParser that did not take an isolation parameter 
+ - JDA: Deprecated old UserParser that did not take an isolation parameter ([#220](https://github.com/Incendo/cloud/pull/220))
  
 ### Fixed
- - Tuple implementations now do not throw an error when using the toArray method
- - Argument parser for `long` types was not registered
+ - Tuple implementations now do not throw an error when using the toArray method ([#222](https://github.com/Incendo/cloud/pull/222))
+ - Argument parser for `long` types was not registered ([#229](https://github.com/Incendo/cloud/pull/229))
 
 ## [1.4.0] - 2021-01-16
 
