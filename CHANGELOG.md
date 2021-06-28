@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - `@Quoted` annotation for the `String` argument ([#239](https://github.com/Incendo/cloud/pull/239))
  - Expose `min` and `max` values on numerous number aruments ([#255](https://github.com/Incendo/cloud/pull/255))
+ - `CommandArgument.TypedBuilder`, a variant of `CommandArgument.Builder` designed for subclassing, that returns a self type
+ - `MappedArgumentParser` and `ArgumentParser#map` for creating mapped argument parsers
+ - Helper methods for mapping values/failures of `ArgumentParseResult`s (`ArgumentParseResult#mapParsedValue`, `ArgumentParseResult#flatMapParsedValue`, and `ArgumentParseResult#mapFailure`)
  - JDA: Role argument parser ([#219](https://github.com/Incendo/cloud/pull/219))
+ - Brigadier: `WrappedBrigadierParser` for wrapping Brigadier `ArgumentType`s as cloud `ArgumentParser`s
  - Bukkit: Implement parser for ProtoItemStack ([#257](https://github.com/Incendo/cloud/pull/257))
  - Bukkit: Implement parsers for ItemStackPredicate and BlockPredicate ([#259](https://github.com/Incendo/cloud/pull/259))
  - Bukkit: Support for Mojang mapped servers ([#267](https://github.com/Incendo/cloud/pull/267))
