@@ -47,6 +47,7 @@
  */
 package cloud.commandframework.bukkit.internal;
 
+import com.google.common.annotations.Beta;
 import com.mojang.brigadier.arguments.ArgumentType;
 import org.bukkit.NamespacedKey;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -58,9 +59,12 @@ import java.util.Arrays;
 
 /**
  * A registry of the {@link ArgumentType}s provided by Minecraft.
- *
+ * <p>
  * This file is taken from MIT licensed code in commodore (https://github.com/lucko/commodore).
+ *
+ * <p>This is not API, and as such, may break, change, or be removed without any notice.</p>
  */
+@Beta
 public final class MinecraftArgumentTypes {
 
     private MinecraftArgumentTypes() {
@@ -116,7 +120,9 @@ public final class MinecraftArgumentTypes {
      * @throws IllegalArgumentException if no such argument is registered
      */
     @SuppressWarnings("unchecked")
-    public static Class<? extends ArgumentType<?>> getClassByKey(final @NonNull NamespacedKey key) throws IllegalArgumentException {
+    public static Class<? extends ArgumentType<?>> getClassByKey(
+            final @NonNull NamespacedKey key
+    ) throws IllegalArgumentException {
         try {
             Object minecraftKey = MINECRAFT_KEY_CONSTRUCTOR.newInstance(key.getNamespace(), key.getKey());
             Object entry = ARGUMENT_REGISTRY_GET_BY_KEY_METHOD.invoke(null, minecraftKey);
