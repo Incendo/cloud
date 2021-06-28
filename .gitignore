@@ -5,6 +5,7 @@
 ### Cloud ###
 
 /examples/*/run/
+/examples/*/run*/
 
 ### Eclipse ###
 .metadata
