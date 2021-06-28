@@ -199,7 +199,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
      */
     @Override
     public boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
-        final CommandSourceStack source = this.getBackwardsCommandSourceMapper().apply(sender);
+        final CommandSourceStack source = this.backwardsCommandSourceMapper().apply(sender);
         return Permissions.check(source, permission, source.getServer().getOperatorUserPermissionLevel());
     }
 

@@ -211,7 +211,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                 },
                 builder -> builder.to(argument -> {
                             /* several registries have specialized argument types, so let's use those where possible */
-                            final ResourceKey<? extends Registry<?>> registry = argument.getRegistry();
+                            final ResourceKey<? extends Registry<?>> registry = argument.registryKey();
                             if (registry.equals(Registry.ENTITY_TYPE_REGISTRY)) {
                                 return EntitySummonArgument.id();
                             } else if (registry.equals(Registry.ENCHANTMENT_REGISTRY)) {
@@ -226,7 +226,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                 ).suggestedBy((argument, useCloud) -> {
                     /* A few other registries have client-side suggestion providers but no argument type */
                     /* Type parameters are messed up here for some reason */
-                    final ResourceKey<? extends Registry<?>> registry = argument.getRegistry();
+                    final ResourceKey<? extends Registry<?>> registry = argument.registryKey();
                     if (registry.equals(Registry.SOUND_EVENT_REGISTRY)) {
                         return (SuggestionProvider<S>) SuggestionProviders.AVAILABLE_SOUNDS;
                     } else if (registry.equals(Registry.BIOME_REGISTRY)) {
@@ -331,7 +331,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * @return Command source mapper
      * @since 1.5.0
      */
-    public final @NonNull Function<@NonNull S, @NonNull C> getCommandSourceMapper() {
+    public final @NonNull Function<@NonNull S, @NonNull C> commandSourceMapper() {
         return this.commandSourceMapper;
     }
 
@@ -341,7 +341,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * @return Command source mapper
      * @since 1.5.0
      */
-    public final @NonNull Function<@NonNull C, @NonNull S> getBackwardsCommandSourceMapper() {
+    public final @NonNull Function<@NonNull C, @NonNull S> backwardsCommandSourceMapper() {
         return this.backwardsCommandSourceMapper;
     }
 
@@ -363,7 +363,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * @since 1.5.0
      */
     public @NonNull PredicatePermission<C> permissionLevel(final int permissionLevel) {
-        return sender -> this.getBackwardsCommandSourceMapper()
+        return sender -> this.backwardsCommandSourceMapper()
                 .apply(sender)
                 .hasPermission(permissionLevel);
     }

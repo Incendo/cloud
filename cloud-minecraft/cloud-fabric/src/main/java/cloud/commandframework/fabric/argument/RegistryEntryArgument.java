@@ -222,7 +222,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             }
             inputQueue.poll();
 
-            final Registry<V> registry = this.getRegistry(commandContext);
+            final Registry<V> registry = this.resolveRegistry(commandContext);
             if (registry == null) {
                 return ArgumentParseResult.failure(new IllegalArgumentException("Unknown registry " + this.registryIdent));
             }
@@ -236,7 +236,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         }
 
         @SuppressWarnings("unchecked")
-        Registry<V> getRegistry(final CommandContext<C> ctx) {
+        Registry<V> resolveRegistry(final CommandContext<C> ctx) {
             final SharedSuggestionProvider reverseMapped = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
             // First try dynamic registries (for things loaded from data-packs)
             Registry<V> registry = reverseMapped.registryAccess().registry(this.registryIdent).orElse(null);
@@ -252,7 +252,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            final Set<ResourceLocation> ids = this.getRegistry(commandContext).keySet();
+            final Set<ResourceLocation> ids = this.resolveRegistry(commandContext).keySet();
             final List<String> results = new ArrayList<>(ids.size());
             for (final ResourceLocation entry : ids) {
                 if (entry.getNamespace().equals(NAMESPACE_MINECRAFT)) {
@@ -275,7 +275,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
          * @return the registry
          * @since 1.5.0
          */
-        public ResourceKey<? extends Registry<?>> getRegistry() {
+        public ResourceKey<? extends Registry<?>> registryKey() {
             return this.registryIdent;
         }
 

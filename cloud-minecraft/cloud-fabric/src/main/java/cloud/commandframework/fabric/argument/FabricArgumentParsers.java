@@ -135,7 +135,7 @@ public final class FabricArgumentParsers {
             final @NonNull CommandContext<C> ctx,
             final net.minecraft.commands.arguments.coordinates.@NonNull Coordinates posArgument
     ) {
-        return requireServerCommandSource(
+        return requireCommandSourceStack(
                 ctx,
                 serverCommandSource -> ArgumentParseResult.success((O) new CoordinatesImpl(
                         serverCommandSource,
@@ -153,7 +153,7 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, SinglePlayerSelector> singlePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.player())
-                .map((ctx, entitySelector) -> requireServerCommandSource(
+                .map((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new SinglePlayerSelectorImpl(
@@ -174,7 +174,7 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, MultiplePlayerSelector> multiplePlayerSelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.players())
-                .map((ctx, entitySelector) -> requireServerCommandSource(
+                .map((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new MultiplePlayerSelectorImpl(
@@ -195,7 +195,7 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, SingleEntitySelector> singleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entity())
-                .map((ctx, entitySelector) -> requireServerCommandSource(
+                .map((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new SingleEntitySelectorImpl(
@@ -216,7 +216,7 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, MultipleEntitySelector> multipleEntitySelector() {
         return new WrappedBrigadierParser<C, EntitySelector>(EntityArgument.entities())
-                .map((ctx, entitySelector) -> requireServerCommandSource(
+                .map((ctx, entitySelector) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(new MultipleEntitySelectorImpl(
@@ -237,7 +237,7 @@ public final class FabricArgumentParsers {
      */
     public static <C> @NonNull ArgumentParser<C, Message> message() {
         return new WrappedBrigadierParser<C, MessageArgument.Message>(MessageArgument.message())
-                .map((ctx, format) -> requireServerCommandSource(
+                .map((ctx, format) -> requireCommandSourceStack(
                         ctx,
                         serverCommandSource -> handleCommandSyntaxExceptionAsFailure(
                                 () -> ArgumentParseResult.success(MessageImpl.from(
@@ -270,7 +270,7 @@ public final class FabricArgumentParsers {
         return new IllegalStateException("This command argument type is server-only.");
     }
 
-    private static <C, O> @NonNull ArgumentParseResult<O> requireServerCommandSource(
+    private static <C, O> @NonNull ArgumentParseResult<O> requireCommandSourceStack(
             final @NonNull CommandContext<C> context,
             final @NonNull Function<CommandSourceStack, ArgumentParseResult<O>> resultFunction
     ) {
@@ -315,12 +315,12 @@ public final class FabricArgumentParsers {
         }
 
         @Override
-        public @NonNull Collection<Entity> getMentionedEntities() {
+        public @NonNull Collection<Entity> mentionedEntities() {
             return this.mentionedEntities;
         }
 
         @Override
-        public @NonNull Component getContents() {
+        public @NonNull Component contents() {
             return this.contents;
         }
 

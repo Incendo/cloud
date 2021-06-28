@@ -117,6 +117,7 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
      * Builder for {@link ItemInputArgument}.
      *
      * @param <C> sender type
+     * @since 1.5.0
      */
     public static final class Builder<C> extends TypedBuilder<C, ItemInput, Builder<C>> {
 

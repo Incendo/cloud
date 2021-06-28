@@ -42,7 +42,7 @@ public interface Message {
      * @return the mentioned entities
      * @since 1.5.0
      */
-    @NonNull Collection<Entity> getMentionedEntities();
+    @NonNull Collection<Entity> mentionedEntities();
 
     /**
      * Get the parsed text contents of this message.
@@ -50,6 +50,6 @@ public interface Message {
      * @return the parsed text
      * @since 1.5.0
      */
-    @NonNull Component getContents();
+    @NonNull Component contents();
 
 }

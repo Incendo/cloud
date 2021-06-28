@@ -89,12 +89,12 @@ public final class MinecraftTime {
      * Get the number of in-game ticks represented by this time.
      *
      * <p>This time will be truncated to the maximum value of an integer.
-     * See {@link #getLongTicks()} for the full contents.</p>
+     * See {@link #ticksLong()} for the full contents.</p>
      *
      * @return the time in ticks
      * @since 1.5.0
      */
-    public int getTicks() {
+    public int ticks() {
         return (int) this.ticks;
     }
 
@@ -104,7 +104,7 @@ public final class MinecraftTime {
      * @return the time in ticks
      * @since 1.5.0
      */
-    public long getLongTicks() {
+    public long ticksLong() {
         return this.ticks;
     }
 
