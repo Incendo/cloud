@@ -71,7 +71,7 @@ public final class FabricCaptionKeys {
      * @return Immutable collection of keys
      * @since 1.5.0
      */
-    public static @NonNull Collection<@NonNull Caption> getFabricCaptionKeys() {
+    public static @NonNull Collection<@NonNull Caption> fabricCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
 

@@ -79,7 +79,7 @@ final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Com
     public int run(final @NonNull CommandContext<S> ctx) {
         final S source = ctx.getSource();
         final String input = ctx.getInput().substring(ctx.getLastChild().getNodes().get(0).getRange().getStart());
-        final C sender = this.manager.getCommandSourceMapper().apply(source);
+        final C sender = this.manager.commandSourceMapper().apply(source);
         this.manager.executeCommand(sender, input).whenComplete((result, throwable) -> {
             if (throwable == null) {
                 return;

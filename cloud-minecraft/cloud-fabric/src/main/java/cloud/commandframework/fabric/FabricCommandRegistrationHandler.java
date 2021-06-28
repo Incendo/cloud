@@ -58,7 +58,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         this.commandManager = manager;
     }
 
-    FabricCommandManager<C, S> getCommandManager() {
+    FabricCommandManager<C, S> commandManager() {
         return this.commandManager;
     }
 
@@ -110,18 +110,18 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
             final RootCommandNode<FabricClientCommandSource> rootNode = ClientCommandManager.DISPATCHER.getRoot();
             final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
             final CommandNode<FabricClientCommandSource> baseNode = this
-                    .getCommandManager()
+                    .commandManager()
                     .brigadierManager()
                     .createLiteralCommandNode(
                             first.getName(),
                             command,
-                            (src, perm) -> this.getCommandManager().hasPermission(
-                                    this.getCommandManager().getCommandSourceMapper().apply(src),
+                            (src, perm) -> this.commandManager().hasPermission(
+                                    this.commandManager().commandSourceMapper().apply(src),
                                     perm
                             ),
                             true,
                             new FabricExecutor<>(
-                                    this.getCommandManager(),
+                                    this.commandManager(),
                                     source -> source.getPlayer().getGameProfile().getName(),
                                     FabricClientCommandSource::sendError
                             )
@@ -152,7 +152,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         }
 
         private void registerAllCommands(final CommandDispatcher<CommandSourceStack> dispatcher, final boolean isDedicated) {
-            this.getCommandManager().registrationCalled();
+            this.commandManager().registrationCalled();
             for (final Command<C> command : this.registeredCommands) {
                 /* Only register commands in the declared environment */
                 final CommandSelection env = command.getCommandMeta().getOrDefault(
@@ -171,15 +171,15 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
             @SuppressWarnings("unchecked")
             final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
-            final CommandNode<CommandSourceStack> baseNode = this.getCommandManager().brigadierManager().createLiteralCommandNode(
+            final CommandNode<CommandSourceStack> baseNode = this.commandManager().brigadierManager().createLiteralCommandNode(
                     first.getName(),
                     command,
-                    (src, perm) -> this.getCommandManager().hasPermission(
-                            this.getCommandManager().getCommandSourceMapper().apply(src),
+                    (src, perm) -> this.commandManager().hasPermission(
+                            this.commandManager().commandSourceMapper().apply(src),
                             perm
                     ),
                     true,
-                    new FabricExecutor<>(this.getCommandManager(), CommandSourceStack::getTextName, CommandSourceStack::sendFailure));
+                    new FabricExecutor<>(this.commandManager(), CommandSourceStack::getTextName, CommandSourceStack::sendFailure));
 
             dispatcher.addChild(baseNode);
 
