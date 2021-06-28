@@ -44,10 +44,8 @@ import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
-import cloud.commandframework.bukkit.data.BlockPredicate;
 import cloud.commandframework.bukkit.data.ItemStackPredicate;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackPredicateArgument;
@@ -83,8 +81,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -386,8 +382,9 @@ public final class ExamplePlugin extends JavaPlugin {
                 )))
         );
 
-        // MC 1.13+ commands
+        // MC 1.13+ commands todo: move to separate class
         if (this.manager.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+            /*
             this.manager.command(builder.literal("replace")
                     .senderType(Player.class)
                     .argument(BlockPredicateArgument.of("predicate"))
@@ -415,6 +412,7 @@ public final class ExamplePlugin extends JavaPlugin {
                             }
                         }).execute();
                     }));
+             */
             this.manager.command(builder.literal("test_item")
                     .argument(ItemStackArgument.of("item"))
                     .literal("is")

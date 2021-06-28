@@ -32,7 +32,6 @@ import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
-import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
@@ -52,7 +51,6 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -65,12 +63,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Method;
-import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Command manager for the Bukkit platform
@@ -80,14 +75,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unchecked")
 public class BukkitCommandManager<C> extends CommandManager<C> implements BrigadierManagerHolder<C> {
 
-    private static final int VERSION_RADIX = 10;
-    private static final int BRIGADIER_MINIMUM_VERSION = 13;
-    private static final int PAPER_BRIGADIER_VERSION = 15;
-    private static final int ASYNC_TAB_MINIMUM_VERSION = 12;
-
     private final Plugin owningPlugin;
-    private final int minecraftVersion;
-    private final boolean paper = CraftBukkitReflection.classExists("com.destroystokyo.paper.PaperConfig");
 
     private final Function<CommandSender, C> commandSenderMapper;
     private final Function<C, CommandSender> backwardsCommandSenderMapper;
@@ -139,9 +127,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         final BukkitSynchronizer bukkitSynchronizer = new BukkitSynchronizer(owningPlugin);
         this.taskFactory = new TaskFactory(bukkitSynchronizer);
 
-        /* Try to determine the Minecraft version */
-        this.minecraftVersion = this.getMinecraftVersion();
-
         /* Register Bukkit Preprocessor */
         this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
 
@@ -173,7 +158,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
 
         /* Register MC 1.13+ parsers */
-        if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
+        if (this.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
             this.registerParserSupplierFor(ItemStackPredicateArgument.class);
             this.registerParserSupplierFor(BlockPredicateArgument.class);
         }
@@ -185,19 +170,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         );
 
         this.setCaptionRegistry(new BukkitCaptionRegistryFactory<C>().create());
-    }
-
-    private int getMinecraftVersion() {
-        try {
-            final Matcher matcher = Pattern.compile("\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?\\)").matcher(Bukkit.getVersion());
-            if (matcher.find()) {
-                return Integer.parseInt(matcher.toMatchResult().group(2), VERSION_RADIX);
-            }
-        } catch (final Exception e) {
-            this.owningPlugin.getLogger()
-                    .severe("Failed to determine Minecraft version for cloud Bukkit capability detection");
-        }
-        return -1;
     }
 
     /**
@@ -288,7 +260,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         if (!this.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
             throw new BrigadierFailureException(
                     BrigadierFailureReason.VERSION_TOO_LOW,
-                    new IllegalArgumentException("Version: " + this.minecraftVersion)
+                    new IllegalArgumentException(
+                            "Brigadier does not appear to be present on the currently running server. This is usually due to "
+                                    + "running too old a version of Minecraft (Brigadier is implemented in 1.13 and newer).")
             );
         }
     }
@@ -300,7 +274,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @return {@code true} if the manager has the given capability, else {@code false}
      */
     public final boolean queryCapability(final @NonNull CloudBukkitCapabilities capability) {
-        return this.queryCapabilities().contains(capability);
+        return capability.capable();
     }
 
     /**
@@ -309,33 +283,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @return A set containing all capabilities of the instance
      */
     public final @NonNull Set<@NonNull CloudBukkitCapabilities> queryCapabilities() {
-        if (this.paper) {
-            if (this.minecraftVersion >= ASYNC_TAB_MINIMUM_VERSION) {
-                if (this.minecraftVersion >= PAPER_BRIGADIER_VERSION) {
-                    return EnumSet.of(
-                            CloudBukkitCapabilities.NATIVE_BRIGADIER,
-                            CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
-                            CloudBukkitCapabilities.BRIGADIER
-                    );
-                } else if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
-                    return EnumSet.of(
-                            CloudBukkitCapabilities.COMMODORE_BRIGADIER,
-                            CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION,
-                            CloudBukkitCapabilities.BRIGADIER
-                    );
-                } else {
-                    return EnumSet.of(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION);
-                }
-            }
-        } else {
-            if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
-                return EnumSet.of(
-                        CloudBukkitCapabilities.COMMODORE_BRIGADIER,
-                        CloudBukkitCapabilities.BRIGADIER
-                );
-            }
-        }
-        return EnumSet.noneOf(CloudBukkitCapabilities.class);
+        return CloudBukkitCapabilities.CAPABLE;
     }
 
     /**
@@ -424,7 +372,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     final void lockIfBrigadierCapable() {
-        if (this.minecraftVersion >= BRIGADIER_MINIMUM_VERSION) {
+        if (this.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
             this.lockRegistration();
         }
     }

@@ -74,13 +74,16 @@ public final class BukkitBrigadierMapper<C> {
         this.registerMappings();
     }
 
+    @SuppressWarnings("unused")
     private void registerMappings() {
         /* UUID nms argument is a 1.16+ feature */
-        final Class<? extends ArgumentType<?>> uuid = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("uuid"));
-        if (uuid != null) {
+        try {
+            final Class<? extends ArgumentType<?>> uuid = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("uuid"));
             /* Map UUID */
             this.mapSimpleNMS(new TypeToken<UUIDArgument.UUIDParser<C>>() {
             }, "uuid");
+        } catch (final IllegalArgumentException ignore) {
+            // < 1.16
         }
         /* Map Enchantment */
         this.mapSimpleNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {

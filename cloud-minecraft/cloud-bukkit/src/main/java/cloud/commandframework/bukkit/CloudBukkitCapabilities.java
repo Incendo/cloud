@@ -23,12 +23,38 @@
 //
 package cloud.commandframework.bukkit;
 
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Capabilities for the Bukkit module
  */
 public enum CloudBukkitCapabilities {
-    BRIGADIER,
-    COMMODORE_BRIGADIER,
-    NATIVE_BRIGADIER,
-    ASYNCHRONOUS_COMPLETION
+    BRIGADIER(CraftBukkitReflection.classExists("com.mojang.brigadier.tree.CommandNode")
+    && CraftBukkitReflection.findOBCClass("command.BukkitCommandWrapper") != null),
+
+    NATIVE_BRIGADIER(CraftBukkitReflection.classExists(
+            "com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent")),
+
+    COMMODORE_BRIGADIER(BRIGADIER.capable() && !NATIVE_BRIGADIER.capable()),
+
+    ASYNCHRONOUS_COMPLETION(CraftBukkitReflection.classExists(
+            "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent"));
+
+    static final Set<CloudBukkitCapabilities> CAPABLE = Arrays.stream(values())
+            .filter(CloudBukkitCapabilities::capable)
+            .collect(Collectors.toSet());
+
+    private final boolean capable;
+
+    CloudBukkitCapabilities(final boolean capable) {
+        this.capable = capable;
+    }
+
+    boolean capable() {
+        return this.capable;
+    }
 }
