@@ -49,7 +49,7 @@ tasks {
 fun TaskContainerScope.createVersionedRun(
         version: String,
         javaVersion: Int
-) = register<RunServerTask>("runServer${version.replace(".", "")}") {
+) = register<RunServerTask>("runServer${version.replace(".", "_")}") {
     group = "cloud"
     pluginJars.from(shadowJar.flatMap { it.archiveFile })
     minecraftVersion(version)
