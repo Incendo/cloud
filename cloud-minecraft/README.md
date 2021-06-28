@@ -212,7 +212,7 @@ cloud mappings for the Fabric mod loader for Minecraft 1.16+
 **gradle**:
 ```groovy
 dependencies {
-    modImplementation 'cloud.commandframework:cloud-fabric:1.3.0-SNAPSHOT'
+    modImplementation 'cloud.commandframework:cloud-fabric:1.5.0-SNAPSHOT'
 }
 ```
 

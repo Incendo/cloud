@@ -167,15 +167,15 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
         return ((VelocityPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).brigadierManager();
     }
 
-    final @NonNull ProxyServer getProxyServer() {
+    final @NonNull ProxyServer proxyServer() {
         return this.proxyServer;
     }
 
-    final @NonNull Function<@NonNull CommandSource, @NonNull C> getCommandSenderMapper() {
+    final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper() {
         return this.commandSenderMapper;
     }
 
-    final @NonNull Function<@NonNull C, @NonNull CommandSource> getBackwardsCommandSenderMapper() {
+    final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper() {
         return this.backwardsCommandSenderMapper;
     }
 

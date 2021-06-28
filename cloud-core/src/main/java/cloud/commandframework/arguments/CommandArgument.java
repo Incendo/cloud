@@ -746,7 +746,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     }
 
     /**
-     * A variant of builders designed for subclassing, that returns a self type .
+     * A variant of builders designed for subclassing, that returns a self type.
      *
      * @param <C> sender type
      * @param <T> argument value type

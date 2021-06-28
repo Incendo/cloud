@@ -46,16 +46,16 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
         this.brigadierManager = new CloudBrigadierManager<>(
                 velocityCommandManager,
                 () -> new CommandContext<>(
-                        velocityCommandManager.getCommandSenderMapper()
-                                .apply(velocityCommandManager.getProxyServer()
+                        velocityCommandManager.commandSenderMapper()
+                                .apply(velocityCommandManager.proxyServer()
                                         .getConsoleCommandSource()),
                         velocityCommandManager
                 )
         );
         this.brigadierManager.brigadierSenderMapper(
-                sender -> this.manager.getCommandSenderMapper().apply(sender)
+                sender -> this.manager.commandSenderMapper().apply(sender)
         );
-        this.brigadierManager.backwardsBrigadierSenderMapper(this.manager.getBackwardsCommandSenderMapper());
+        this.brigadierManager.backwardsBrigadierSenderMapper(this.manager.backwardsCommandSenderMapper());
     }
 
     @Override
@@ -68,18 +68,18 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                         command.getArguments().get(0).getName(),
                         (Command<C>) command,
                         (c, p) -> this.manager.hasPermission(
-                                this.manager.getCommandSenderMapper().apply(c),
+                                this.manager.commandSenderMapper().apply(c),
                                 p
                         ),
                         true,
                         new VelocityExecutor<>(this.manager)
                 )
         );
-        final CommandMeta commandMeta = this.manager.getProxyServer().getCommandManager()
+        final CommandMeta commandMeta = this.manager.proxyServer().getCommandManager()
                 .metaBuilder(brigadierCommand)
                 .aliases(aliases.toArray(new String[0])).build();
-        aliases.forEach(this.manager.getProxyServer().getCommandManager()::unregister);
-        this.manager.getProxyServer().getCommandManager().register(commandMeta, brigadierCommand);
+        aliases.forEach(this.manager.proxyServer().getCommandManager()::unregister);
+        this.manager.proxyServer().getCommandManager().register(commandMeta, brigadierCommand);
         return true;
     }
 

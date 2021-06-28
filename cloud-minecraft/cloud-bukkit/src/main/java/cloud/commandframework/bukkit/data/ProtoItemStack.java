@@ -46,6 +46,7 @@ public interface ProtoItemStack {
      * Get whether this {@link ProtoItemStack} contains extra data besides the {@link Material}.
      *
      * @return whether there is extra data
+     * @since 1.5.0
      */
     boolean hasExtraData();
 
@@ -56,6 +57,7 @@ public interface ProtoItemStack {
      * @param respectMaximumStackSize whether to respect the maximum stack size for the material
      * @return the created {@link ItemStack}
      * @throws IllegalArgumentException if the {@link ItemStack} could not be created, due to max stack size or other reasons
+     * @since 1.5.0
      */
     @NonNull ItemStack createItemStack(int stackSize, boolean respectMaximumStackSize)
             throws IllegalArgumentException;

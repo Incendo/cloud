@@ -70,7 +70,7 @@ public final class ExamplePlugin extends Plugin {
                     mapperFunction
             );
         } catch (final Exception e) {
-            this.getLogger().severe("Failed to initialize the command this.manager");
+            this.getLogger().severe("Failed to initialize the command manager");
             return;
         }
 
