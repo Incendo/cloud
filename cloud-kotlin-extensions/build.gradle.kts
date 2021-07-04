@@ -6,6 +6,16 @@ plugins {
     id("org.jetbrains.dokka") version "1.4.20"
 }
 
+configurations.all {
+    dependencies.removeIf { it.group == "org.jetbrains.kotlin" }
+}
+
+dependencies {
+    api(project(":cloud-core"))
+    implementation(kotlin("stdlib-jdk8"))
+    testImplementation("org.jetbrains.kotlin", "kotlin-test-junit5")
+}
+
 tasks {
     withType<DokkaTask>().configureEach {
         dokkaSourceSets.getByName("main") {
@@ -31,9 +41,4 @@ tasks {
 
 kotlin {
     explicitApi()
-}
-
-dependencies {
-    api(project(":cloud-core"))
-    testImplementation("org.jetbrains.kotlin", "kotlin-test-junit5")
 }
