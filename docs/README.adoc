@@ -2,7 +2,7 @@
 Alexander Söderberg <contact@alexander-soderberg.com>
 v0.1.0, 2020-12-30
 :sectnums:
-:cloud-version: 1.4.0
+:cloud-version: 1.5.0
 :toc: left
 :toclevels: 4
 :icons: font
@@ -77,6 +77,8 @@ cloud-velocity:: Cloud implementation for the Velocity (1.1.0+) API.
 cloud-brigadier:: Cloud utilities for Mojang's Brigadier API.
 
 cloud-bungee:: Cloud implementation for the BungeeCord API.
+
+cloud-fabric:: Cloud implementation for Minecraft clients and servers using the Fabric mod loader and API.
 
 cloud-jda:: Cloud implementation for the JDA API.
 
@@ -1050,7 +1052,7 @@ TODO
 
 ==== Fabric
 
-The Fabric implementation is still a work in progress.
+Documentation for the Fabric implementation is still a work in progress.
 
 ==== minecraft-extras
 
