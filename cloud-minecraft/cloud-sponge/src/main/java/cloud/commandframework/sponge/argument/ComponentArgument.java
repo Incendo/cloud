@@ -32,6 +32,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
@@ -108,7 +109,7 @@ public final class ComponentArgument<C> extends CommandArgument<C, Component> {
      * Create a new {@link Builder}.
      *
      * @param name argument name
-     * @param <C> sender type
+     * @param <C>  sender type
      * @return a new {@link Builder}
      */
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
@@ -173,7 +174,7 @@ public final class ComponentArgument<C> extends CommandArgument<C, Component> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          */
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ComponentLike defaultValue) {
-            return this.asOptionalWithDefault(SpongeAdventure.json(defaultValue.asComponent()));
+            return this.asOptionalWithDefault(GsonComponentSerializer.gson().serialize(defaultValue.asComponent()));
         }
 
     }

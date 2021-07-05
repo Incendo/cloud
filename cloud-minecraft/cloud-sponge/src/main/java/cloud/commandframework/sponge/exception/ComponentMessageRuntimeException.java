@@ -25,7 +25,7 @@ package cloud.commandframework.sponge.exception;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.util.ComponentMessageThrowable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -83,7 +83,7 @@ public class ComponentMessageRuntimeException extends RuntimeException implement
      */
     @Override
     public @Nullable String getMessage() {
-        return PlainComponentSerializer.plain().serializeOrNull(this.message);
+        return PlainTextComponentSerializer.plainText().serializeOrNull(this.message);
     }
 
     /**

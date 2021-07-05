@@ -32,7 +32,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.commands.arguments.ColorArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 
@@ -40,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 
@@ -130,13 +128,10 @@ public final class NamedTextColorArgument<C> extends CommandArgument<C, NamedTex
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek().toLowerCase(Locale.ROOT);
-            final Optional<NamedTextColor> color = Sponge.registry()
-                    .adventureRegistry()
-                    .namedColors()
-                    .value(input);
-            if (color.isPresent()) {
+            final NamedTextColor color = NamedTextColor.NAMES.value(input);
+            if (color != null) {
                 inputQueue.remove();
-                return ArgumentParseResult.success(color.get());
+                return ArgumentParseResult.success(color);
             }
             return ArgumentParseResult.failure(ColorArgument.ERROR_INVALID_VALUE.create(input));
         }
