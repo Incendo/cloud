@@ -1,0 +1,45 @@
+name: Build Cloud
+on:
+  push:
+    branches: "*"
+    tags-ignore: [ "*" ]
+  pull_request:
+  release:
+    types: [ released ]
+jobs:
+  build:
+    # Only run on PRs if the source branch is on someone else's repo
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/wrapper
+            ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-gradle-
+      - uses: gradle/wrapper-validation-action@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 16
+      - name: Build
+        run: ./gradlew build
+      - name: Determine Status
+        run: |
+          if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
+            echo "STATUS=snapshot" >> $GITHUB_ENV
+          else
+            echo "STATUS=release" >> $GITHUB_ENV
+          fi
+      - name: Publish Release
+        if: "${{ env.STATUS == 'release' && github.event_name == 'release' }}"
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -PreleasePublishing
+        env:
+          ORG_GRADLE_PROJECT_sonatypeUsername: "${{ secrets.SONATYPE_USERNAME }}"
+          ORG_GRADLE_PROJECT_sonatypePassword: "${{ secrets.SONATYPE_PASSWORD }}"
+          ORG_GRADLE_PROJECT_signingKey: "${{ secrets.SIGNING_KEY }}"
+          ORG_GRADLE_PROJECT_signingPassword: "${{ secrets.SIGNING_PASSWORD }}"
