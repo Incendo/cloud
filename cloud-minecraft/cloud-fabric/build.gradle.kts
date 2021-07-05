@@ -55,8 +55,13 @@ tasks {
             }
         }
     }
-}
 
+    remapSourcesJar {
+        inputs.files(configurations.compileClasspath)
+                .ignoreEmptyDirectories()
+                .withPropertyName("sourceClasspathWhyDoesLoomNotDoThis")
+    }
+}
 
 dependencies {
     minecraft("com.mojang", "minecraft", Versions.fabricMc)
