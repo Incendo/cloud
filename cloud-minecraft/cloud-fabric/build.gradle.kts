@@ -83,6 +83,9 @@ indra {
         artifact(tasks.sourcesJar) {
             builtBy(tasks.remapSourcesJar)
         }
+        artifact(tasks.javadocJar) {
+            builtBy(tasks.javadocJar)
+        }
 
         // Loom is broken with project dependencies in the same build (because it resolves dependencies during configuration)
         // Please look away
