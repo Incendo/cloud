@@ -321,6 +321,12 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
+            final String peek = inputQueue.peek();
+            if (peek != null && !peek.startsWith("'") && !peek.startsWith("\"")) {
+                inputQueue.remove();
+                return ArgumentParseResult.success(peek);
+            }
+
             final StringJoiner sj = new StringJoiner(" ");
             for (final String string : inputQueue) {
                 sj.add(string);
