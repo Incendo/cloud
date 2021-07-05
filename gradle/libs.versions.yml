@@ -29,6 +29,10 @@ dependencies:
     group: net.kyori
     name: indra-common
     version: { ref: indra }
+  indraPublishingSonatype :
+    group : net.kyori
+    name : indra-publishing-sonatype
+    version : { ref : indra }
   licenser:
     group: gradle.plugin.org.cadixdev.gradle
     name: licenser
