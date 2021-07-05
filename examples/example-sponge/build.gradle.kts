@@ -2,7 +2,7 @@ import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.PluginDependency
 
 plugins {
-    id("org.spongepowered.gradle.plugin") version "1.0.3"
+    id("org.spongepowered.gradle.plugin") version "1.1.1"
     id("com.github.johnrengelman.shadow")
 }
 
@@ -25,9 +25,6 @@ sponge {
 }
 
 tasks {
-    runServer {
-        classpath(shadowJar)
-    }
     build {
         dependsOn(shadowJar)
     }
