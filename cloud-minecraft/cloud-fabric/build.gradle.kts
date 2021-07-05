@@ -2,7 +2,7 @@ import net.fabricmc.loom.task.AbstractRunTask
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
-    id("fabric-loom") version "0.7-SNAPSHOT"
+    id("quiet-fabric-loom") version "0.8-SNAPSHOT"
 }
 
 /* set up a testmod source set */
@@ -30,20 +30,20 @@ tasks {
         }
     }
 
-    withType(ProcessResources::class).configureEach {
+    withType<ProcessResources> {
         inputs.property("version", project.version)
         filesMatching("fabric.mod.json") {
             expand("version" to project.version)
         }
     }
 
-    withType(Javadoc::class).configureEach {
+    withType<Javadoc> {
         (options as? StandardJavadocDocletOptions)?.apply {
             //links("https://maven.fabricmc.net/docs/yarn-${Versions.fabricMc}+build.${Versions.fabricYarn}/") // todo
         }
     }
 
-    withType(AbstractRunTask::class).configureEach {
+    withType<AbstractRunTask> {
         standardInput = System.`in`
         jvmArgumentProviders += CommandLineArgumentProvider {
             if (System.getProperty("idea.active")?.toBoolean() == true || // IntelliJ
