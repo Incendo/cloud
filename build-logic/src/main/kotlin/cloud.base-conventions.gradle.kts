@@ -19,6 +19,8 @@ indra {
     mitLicense()
 
     javaVersions {
+        minimumToolchain(16)
+        target(8)
         testWith(8, 11, 16)
     }
 
