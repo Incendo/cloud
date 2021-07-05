@@ -40,6 +40,12 @@ indra {
     }
 }
 
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
+}
+
 /* Disable checkstyle on tests */
 project.gradle.startParameter.excludedTaskNames.add("checkstyleTest")
 
