@@ -4,7 +4,6 @@ import org.cadixdev.gradle.licenser.header.HeaderStyle
 
 plugins {
     id("net.kyori.indra")
-    id("net.kyori.indra.publishing")
     id("net.kyori.indra.checkstyle")
     id("net.kyori.indra.license-header")
     id("net.ltgt.errorprone")
@@ -38,12 +37,6 @@ indra {
             }
         }
     }
-}
-
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
 }
 
 /* Disable checkstyle on tests */
