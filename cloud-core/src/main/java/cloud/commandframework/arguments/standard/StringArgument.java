@@ -311,62 +311,72 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 inputQueue.remove();
                 return ArgumentParseResult.success(input);
             } else if (this.stringMode == StringMode.QUOTED) {
-                final StringJoiner sj = new StringJoiner(" ");
-                for (final String string : inputQueue) {
-                    sj.add(string);
-                }
-                final String string = sj.toString();
+                return this.parseQuoted(commandContext, inputQueue);
+            } else {
+                return this.parseGreedy(commandContext, inputQueue);
+            }
+        }
 
-                final Matcher doubleMatcher = QUOTED_DOUBLE.matcher(string);
-                String doubleMatch = null;
-                if (doubleMatcher.find()) {
-                    doubleMatch = doubleMatcher.group("inner");
-                }
-                final Matcher singleMatcher = QUOTED_SINGLE.matcher(string);
-                String singleMatch = null;
-                if (singleMatcher.find()) {
-                    singleMatch = singleMatcher.group("inner");
-                }
+        private @NonNull ArgumentParseResult<String> parseQuoted(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
+            final StringJoiner sj = new StringJoiner(" ");
+            for (final String string : inputQueue) {
+                sj.add(string);
+            }
+            final String string = sj.toString();
 
-                String inner = null;
-                if (singleMatch != null && doubleMatch != null) {
-                    final int singleIndex = string.indexOf(singleMatch);
-                    final int doubleIndex = string.indexOf(doubleMatch);
-                    inner = doubleIndex < singleIndex ? doubleMatch : singleMatch;
-                } else if (singleMatch == null && doubleMatch != null) {
-                    inner = doubleMatch;
-                } else if (singleMatch != null) {
-                    inner = singleMatch;
-                }
-
-                if (inner != null) {
-                    final int numSpaces = StringUtils.countCharOccurrences(inner, ' ');
-                    for (int i = 0; i <= numSpaces; i++) {
-                        inputQueue.remove();
-                    }
-                } else {
-                    inner = inputQueue.remove();
-                    if (inner.startsWith("\"") || inner.startsWith("'")) {
-                        return ArgumentParseResult.failure(new StringParseException(sj.toString(),
-                                StringMode.QUOTED, commandContext
-                        ));
-                    }
-                }
-
-                inner = inner.replace("\\\"", "\"").replace("\\'", "'");
-
-                return ArgumentParseResult.success(inner);
+            final Matcher doubleMatcher = QUOTED_DOUBLE.matcher(string);
+            String doubleMatch = null;
+            if (doubleMatcher.find()) {
+                doubleMatch = doubleMatcher.group("inner");
+            }
+            final Matcher singleMatcher = QUOTED_SINGLE.matcher(string);
+            String singleMatch = null;
+            if (singleMatcher.find()) {
+                singleMatch = singleMatcher.group("inner");
             }
 
+            String inner = null;
+            if (singleMatch != null && doubleMatch != null) {
+                final int singleIndex = string.indexOf(singleMatch);
+                final int doubleIndex = string.indexOf(doubleMatch);
+                inner = doubleIndex < singleIndex ? doubleMatch : singleMatch;
+            } else if (singleMatch == null && doubleMatch != null) {
+                inner = doubleMatch;
+            } else if (singleMatch != null) {
+                inner = singleMatch;
+            }
+
+            if (inner != null) {
+                final int numSpaces = StringUtils.countCharOccurrences(inner, ' ');
+                for (int i = 0; i <= numSpaces; i++) {
+                    inputQueue.remove();
+                }
+            } else {
+                inner = inputQueue.remove();
+                if (inner.startsWith("\"") || inner.startsWith("'")) {
+                    return ArgumentParseResult.failure(new StringParseException(sj.toString(),
+                            StringMode.QUOTED, commandContext
+                    ));
+                }
+            }
+
+            inner = inner.replace("\\\"", "\"").replace("\\'", "'");
+
+            return ArgumentParseResult.success(inner);
+        }
+
+        private @NonNull ArgumentParseResult<String> parseGreedy(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull Queue<@NonNull String> inputQueue
+        ) {
             final StringJoiner sj = new StringJoiner(" ");
             final int size = inputQueue.size();
 
-            boolean started = false;
-            boolean finished = false;
-
-            char start = ' ';
             for (int i = 0; i < size; i++) {
-                String string = inputQueue.peek();
+                final String string = inputQueue.peek();
 
                 if (string == null) {
                     break;
