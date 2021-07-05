@@ -55,12 +55,6 @@ tasks {
             }
         }
     }
-
-    remapSourcesJar {
-        inputs.files(configurations.compileClasspath)
-                .ignoreEmptyDirectories()
-                .withPropertyName("sourceClasspathWhyDoesLoomNotDoThis")
-    }
 }
 
 dependencies {
