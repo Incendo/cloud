@@ -52,6 +52,7 @@ public interface CommandExecutionHandler<C> {
      *
      * @param commandContext Command context
      * @return future that completes when the command has finished execution
+     * @since 1.6.0
      */
     default CompletableFuture<@Nullable Object> executeFuture(@NonNull CommandContext<C> commandContext) {
         final CompletableFuture<Object> future = new CompletableFuture<>();
@@ -83,6 +84,7 @@ public interface CommandExecutionHandler<C> {
      * by a command sender
      *
      * @param <C> Command sender type
+     * @since 1.6.0
      */
     @FunctionalInterface
     interface FutureCommandExecutionHandler<C> extends CommandExecutionHandler<C> {
