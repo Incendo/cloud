@@ -190,6 +190,7 @@ public final class AnnotationParser<C> {
      * Returns the command manager that was used to create this parser
      *
      * @return Command manager
+     * @since 1.6.0
      */
     public @NonNull CommandManager<C> manager() {
         return this.manager;
@@ -201,6 +202,7 @@ public final class AnnotationParser<C> {
      *
      * @param predicate The predicate that decides whether or not to apply the custom execution handler to the given method
      * @param function The function that produces the command execution handler
+     * @since 1.6.0
      */
     public void registerCommandExecutionMethodFactory(
             final @NonNull Predicate<@NonNull Method> predicate,

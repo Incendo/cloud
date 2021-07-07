@@ -14,7 +14,11 @@ import kotlin.reflect.jvm.kotlinFunction
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asCompletableFuture
 
-/** Adds coroutine support to the [AnnotationParser]. */
+/**
+ * Adds coroutine support to the [AnnotationParser].
+ *
+ * @since 1.6.0
+ */
 public fun <C> AnnotationParser<C>.installCoroutineSupport(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext

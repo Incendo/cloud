@@ -44,6 +44,7 @@ import java.util.Optional;
  * A command execution handler that invokes a method.
  *
  * @param <C> Command sender type.
+ * @since 1.6.0 (Was made public in 1.6.0)
  */
 public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
 
