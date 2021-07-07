@@ -70,7 +70,16 @@ repositories {
     sonatypeSnapshots()
     /* Velocity, used for cloud-velocity */
     maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-release/") {
-        mavenContent { releasesOnly() }
+        mavenContent {
+            releasesOnly()
+            includeGroup("com.velocitypowered")
+        }
+    }
+    maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-snapshots/") {
+        mavenContent {
+            snapshotsOnly()
+            includeGroup("com.velocitypowered")
+        }
     }
     /* The Minecraft repository, used for cloud-brigadier */
     maven("https://libraries.minecraft.net/") {
