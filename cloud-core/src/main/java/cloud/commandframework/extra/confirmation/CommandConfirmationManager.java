@@ -24,7 +24,6 @@
 package cloud.commandframework.extra.confirmation;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
