@@ -57,7 +57,7 @@ public interface CommandExecutionHandler<C> {
     default CompletableFuture<@Nullable Object> executeFuture(@NonNull CommandContext<C> commandContext) {
         final CompletableFuture<Object> future = new CompletableFuture<>();
         try {
-            execute(commandContext);
+            this.execute(commandContext);
             /* The command executed successfully */
             future.complete(null);
         } catch (final Throwable throwable) {

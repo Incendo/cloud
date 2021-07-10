@@ -74,10 +74,12 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
     public void execute(final @NonNull CommandContext<C> commandContext) {
         /* Invoke the command method */
         try {
-            this.methodHandle.invokeWithArguments(createParameterValues(
-                    commandContext,
-                    commandContext.flags(),
-                    true)
+            this.methodHandle.invokeWithArguments(
+                    this.createParameterValues(
+                        commandContext,
+                        commandContext.flags(),
+                        true
+                    )
             );
         } catch (final Error e) {
             throw e;
@@ -86,7 +88,15 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         }
     }
 
-    protected List<Object> createParameterValues(
+    /**
+     * Creates a list containing the values for all method parameters
+     *
+     * @param commandContext The context
+     * @param flagContext    The flag context
+     * @param throwOnMissing Whether exceptions should be thrown on missing parameters
+     * @return A list containing all parameters, in order
+     */
+    protected final List<Object> createParameterValues(
             final CommandContext<C> commandContext,
             final FlagContext flagContext,
             final boolean throwOnMissing

@@ -485,7 +485,8 @@ public final class AnnotationParser<C> {
                 builder = builder.senderType(senderType);
             }
             try {
-                final MethodCommandExecutionHandler.CommandMethodContext<C> context = new MethodCommandExecutionHandler.CommandMethodContext<>(
+                final MethodCommandExecutionHandler.CommandMethodContext<C> context =
+                        new MethodCommandExecutionHandler.CommandMethodContext<>(
                         instance,
                         commandArguments,
                         method,
@@ -494,8 +495,9 @@ public final class AnnotationParser<C> {
 
                 /* Create the command execution handler */
                 CommandExecutionHandler<C> commandExecutionHandler = new MethodCommandExecutionHandler<>(context);
-                for (final Map.Entry<Predicate<Method>, Function<MethodCommandExecutionHandler.CommandMethodContext<C>, MethodCommandExecutionHandler<C>>> entry :
-                        commandMethodFactories.entrySet()) {
+                for (final Map.Entry<Predicate<Method>, Function<MethodCommandExecutionHandler.CommandMethodContext<C>,
+                        MethodCommandExecutionHandler<C>>> entry
+                        : this.commandMethodFactories.entrySet()) {
                     if (entry.getKey().test(method)) {
                         commandExecutionHandler = entry.getValue().apply(context);
 
