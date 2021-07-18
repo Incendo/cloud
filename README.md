@@ -200,7 +200,7 @@ More information about the Minecraft specific modules can be found [here](https:
   
 This library is licensed under the <a href="https://opensource.org/licenses/MIT">MIT</a> license, and the code copyright  belongs to Alexander Söderberg. The implementation is based on a paper written by the copyright holder, and this paper exists under the <a href="https://creativecommons.org/licenses/by/4.0/legalcode">CC Attribution 4</a> license.  
   
-The <a href="https://iconscout.com/icons/cloud" target="_blank">Cloud</a> icon was created by by <a href="https://iconscout.com/contributors/oviyan">
+The <a href="https://iconscout.com/icons/cloud" target="_blank">Cloud</a> icon was created by <a href="https://iconscout.com/contributors/oviyan">
 Thanga Vignesh P</a> on <a href="https://iconscout.com">Iconscout</a> and Digital rights were purchased under a premium plan.
 
 ## projects using cloud
