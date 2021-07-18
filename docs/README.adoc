@@ -617,7 +617,7 @@ https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.htm
 in which case you may override the exception handling by using
 https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#registerExceptionHandler(java.lang.Class,java.util.function.BiConsumer)[CommandManager#registerExceptionHandler].
 
-ArgumentParseException is a spacial case which makes use of the internal caption
+ArgumentParseException is a special case which makes use of the internal caption
 system. (Nearly) all argument parsers in cloud will throw
 https://javadoc.commandframework.cloud/cloud/commandframework/exceptions/parsing/ParserException.html[ParserException]
 on
