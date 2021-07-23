@@ -88,4 +88,11 @@ public @interface Flag {
      */
     @NonNull String description() default "";
 
+    /**
+     * The flag permission
+     *
+     * @return Flag permission
+     */
+    @NonNull String permission() default "";
+
 }
