@@ -173,7 +173,6 @@ public final class CommandContext<C> {
         return this.commandManager.hasPermission(this.commandSender, permission);
     }
 
-
     /**
      * Check if this context was created for tab completion purposes
      *
