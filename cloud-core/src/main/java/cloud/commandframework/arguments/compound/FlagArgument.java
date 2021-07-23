@@ -355,6 +355,12 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                                                         FailureReason.DUPLICATE_FLAG,
                                                         commandContext
                                                 ));
+                                            } else if (!commandContext.hasPermission(flag.getCommandPermission())) {
+                                                return ArgumentParseResult.failure(new FlagParseException(
+                                                        string,
+                                                        FailureReason.NO_PERMISSION,
+                                                        commandContext
+                                                ));
                                             }
                                             parsedFlags.add(flag);
                                             commandContext.flags().addPresenceFlag(flag);
