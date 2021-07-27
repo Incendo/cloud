@@ -47,6 +47,7 @@ import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.user.UserManager;
 
 import java.util.ArrayList;
@@ -62,9 +63,11 @@ import java.util.stream.Collectors;
  * Argument for parsing {@link User Users} in the {@link UserManager} from
  * a {@link Selector}, last known username, or {@link UUID}.
  *
+ * TODO: Update javadocs
+ *
  * @param <C> sender type
  */
-public final class UserArgument<C> extends CommandArgument<C, User> {
+public final class UserArgument<C> extends CommandArgument<C, UUID> {
 
     private UserArgument(
             final boolean required,
@@ -78,7 +81,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 name,
                 new Parser<>(),
                 defaultValue,
-                User.class,
+                UUID.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -123,13 +126,13 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      *
      * @param <C> sender type
      */
-    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, User> {
+    public static final class Parser<C> implements NodeSupplyingArgumentParser<C, UUID> {
 
         private final ArgumentParser<C, EntitySelector> singlePlayerSelectorParser =
                 new WrappedBrigadierParser<>(EntityArgument.player());
 
         @Override
-        public @NonNull ArgumentParseResult<@NonNull User> parse(
+        public @NonNull ArgumentParseResult<@NonNull UUID> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
@@ -139,11 +142,11 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             }
 
             try {
-                final Optional<User> optionalUser = Sponge.server().userManager().find(peek);
+                final Optional<GameProfile> optionalUser = Sponge.server().gameProfileManager().cache().findByName(peek);
                 // valid username
                 if (optionalUser.isPresent()) {
                     inputQueue.remove();
-                    return ArgumentParseResult.success(optionalUser.get());
+                    return ArgumentParseResult.success(optionalUser.get().uniqueId());
                 }
                 return ArgumentParseResult.failure(new UserNotFoundException(
                         commandContext, UserNotFoundException.Type.NAME, peek
@@ -155,10 +158,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             try {
                 final UUID uuid = UUID.fromString(peek);
                 // valid uuid
-                final Optional<User> optionalUser = Sponge.server().userManager().find(uuid);
-                if (optionalUser.isPresent()) {
-                    inputQueue.remove();
-                    return ArgumentParseResult.success(optionalUser.get());
+                if (Sponge.server().userManager().exists(uuid)) {
+                    return ArgumentParseResult.success(uuid);
                 }
 
                 return ArgumentParseResult.failure(new UserNotFoundException(
@@ -173,7 +174,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             ));
         }
 
-        private @NonNull ArgumentParseResult<@NonNull User> handleSelector(
+        private @NonNull ArgumentParseResult<@NonNull UUID> handleSelector(
                 final @NonNull CommandContext<@NonNull C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
@@ -190,7 +191,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             } catch (final CommandSyntaxException ex) {
                 return ArgumentParseResult.failure(ex);
             }
-            return ArgumentParseResult.success(player.user());
+            return ArgumentParseResult.success(player.uniqueId());
         }
 
         @Override
@@ -201,6 +202,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             final List<String> suggestions = new ArrayList<>(this.singlePlayerSelectorParser.suggestions(commandContext, input));
             if (!input.startsWith("@")) {
                 suggestions.addAll(Sponge.server().userManager().streamOfMatches(input)
+                        .filter(GameProfile::hasName)
                         .map(profile -> profile.name().orElse(null))
                         .filter(Objects::nonNull)
                         .filter(name -> !suggestions.contains(name))
@@ -221,10 +223,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      *
      * @param <C> sender type
      */
-    public static final class Builder<C> extends TypedBuilder<C, User, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, UUID, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(User.class, name);
+            super(UUID.class, name);
         }
 
         @Override

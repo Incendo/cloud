@@ -67,7 +67,6 @@ import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -134,7 +133,6 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
         this.registerCommandPreProcessor(new SpongeCommandPreprocessor<>(this));
         this.registerParsers();
         this.setCaptionRegistry(new SpongeCaptionRegistry<>());
-        Sponge.eventManager().registerListeners(this.pluginContainer, this.getCommandRegistrationHandler());
     }
 
     private void registerParsers() {

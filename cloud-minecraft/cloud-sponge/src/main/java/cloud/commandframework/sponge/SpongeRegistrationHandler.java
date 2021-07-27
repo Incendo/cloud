@@ -31,6 +31,7 @@ import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
+import org.spongepowered.api.event.EventListenerRegistration;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 
 import java.util.HashSet;
@@ -47,8 +48,7 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
     }
 
     @SuppressWarnings("unchecked")
-    //@Listener
-    public void handleRegistrationEvent(final RegisterCommandEvent<Command.Raw> event) {
+    private void handleRegistrationEvent(final RegisterCommandEvent<Command.Raw> event) {
         this.commandManager.registrationCalled();
         for (final CommandTree.Node<CommandArgument<C, ?>> node : this.commandManager.getCommandTree().getRootNodes()) {
             final StaticArgument<C> value = requireNonNull((StaticArgument<C>) node.getValue());
@@ -68,12 +68,11 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
 
     void initialize(final @NonNull SpongeCommandManager<C> commandManager) {
         this.commandManager = commandManager;
-        // todo: https://github.com/SpongePowered/Sponge/issues/3367
         Sponge.eventManager().registerListener(
-                this.commandManager.owningPluginContainer(),
-                new TypeToken<RegisterCommandEvent<Command.Raw>>() {
-                },
-                this::handleRegistrationEvent
+                EventListenerRegistration.builder(new TypeToken<RegisterCommandEvent<Command.Raw>>() {})
+                        .plugin(this.commandManager.owningPluginContainer())
+                        .listener(this::handleRegistrationEvent)
+                        .build()
         );
     }
 
