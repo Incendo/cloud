@@ -10,13 +10,6 @@ plugins {
 }
 
 indra {
-    publishSnapshotsTo("incendo", "https://repo.incendo.org/content/repositories/snapshots/")
-
-    github("Incendo", "cloud") {
-        ci(true)
-    }
-    mitLicense()
-
     javaVersions {
         minimumToolchain(16)
         target(8)
@@ -24,19 +17,6 @@ indra {
     }
 
     checkstyle("8.39")
-
-    configurePublications {
-        pom {
-            developers {
-                developer {
-                    id.set("Sauilitired")
-                    name.set("Alexander Söderberg")
-                    url.set("https://alexander-soderberg.com")
-                    email.set("contact@alexander-soderberg.com")
-                }
-            }
-        }
-    }
 }
 
 /* Disable checkstyle on tests */
