@@ -171,6 +171,8 @@ public abstract class CommandManager<C> {
                 this
         );
         final LinkedList<String> inputQueue = new CommandInputTokenizer(input).tokenize();
+        /* Store a copy of the input queue in the context */
+        context.store("__raw_input__", new LinkedList<>(inputQueue));
         try {
             if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
                 return this.commandExecutionCoordinator.coordinateExecution(context, inputQueue);

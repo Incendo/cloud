@@ -514,7 +514,7 @@ public final class CommandContext<C> {
     }
 
     /**
-     * Get the raw input. This should only be used when {@link #isSuggestions()} is {@code true}
+     * Get the raw input.
      *
      * @return Raw input in token form
      */
