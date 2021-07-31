@@ -158,6 +158,7 @@ public final class CommandContext<C> {
      *
      * @param permission The permission
      * @return Command sender
+     * @since 1.6.0
      */
     public boolean hasPermission(final @NonNull CommandPermission permission) {
         return this.commandManager.hasPermission(this.commandSender, permission);
@@ -168,6 +169,7 @@ public final class CommandContext<C> {
      *
      * @param permission The permission
      * @return Command sender
+     * @since 1.6.0
      */
     public boolean hasPermission(final @NonNull String permission) {
         return this.commandManager.hasPermission(this.commandSender, permission);
