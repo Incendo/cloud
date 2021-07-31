@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -37,7 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -136,7 +137,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     public static final class Builder<C> extends CommandArgument.Builder<C, User> {
 
-        private Set<ParserMode> modes = new HashSet<>();
+        private Set<ParserMode> modes = EnumSet.noneOf(ParserMode.class);
         private Isolation isolationLevel = Isolation.GLOBAL;
 
         private Builder(final @NonNull String name) {
@@ -291,8 +292,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 if (this.isolationLevel == Isolation.GLOBAL) {
                     users = event.getJDA().getUsersByName(input, true);
                 } else if (event.isFromGuild()) {
-                    users = event.getGuild().getMembersByEffectiveName(input, true)
-                            .stream().map(Member::getUser)
+                    users = event.getGuild().getMembers()
+                            .stream()
+                            .filter(member -> member.getEffectiveName().toLowerCase().startsWith(input))
+                            .map(Member::getUser)
                             .collect(Collectors.toList());
                 } else if (event.getAuthor().getName().equalsIgnoreCase(input)) {
                     users = Collections.singletonList(event.getAuthor());
@@ -335,10 +338,11 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
                 user = globalUser;
             } else if (event.isFromGuild()) {
-                Member member = event.getGuild().getMemberById(id);
+                final Guild guild = event.getGuild();
+                Member member = guild.getMemberById(id);
 
                 if (member == null) { // fallback if user is not cached
-                    member = event.getGuild().retrieveMemberById(id).complete();
+                    member = guild.retrieveMemberById(id).complete();
                 }
 
                 user = member.getUser();
@@ -420,7 +424,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("User not found for '%s'.", getInput());
+            return String.format("User not found for '%s'. Note: if a user is not cached, they cannot be loaded by name.",
+                    getInput());
         }
 
     }

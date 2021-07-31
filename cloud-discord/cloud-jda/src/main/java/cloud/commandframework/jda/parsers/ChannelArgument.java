@@ -237,7 +237,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
             if (this.modes.contains(ParserMode.NAME)) {
                 final List<TextChannel> channels = event.getGuild().getTextChannelsByName(input, true);
 
-                if (channels.size() == 0) {
+                if (channels.isEmpty()) {
                     exception = new ChannelNotFoundException(input);
                 } else if (channels.size() > 1) {
                     exception = new TooManyChannelsFoundParseException(input);

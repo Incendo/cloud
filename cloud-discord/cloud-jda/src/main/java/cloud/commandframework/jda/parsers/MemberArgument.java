@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * Command Argument for {@link Member}
@@ -258,7 +259,10 @@ public final class MemberArgument<C> extends CommandArgument<C, Member> {
                 if (event.getAuthor().getName().equalsIgnoreCase(input)) {
                     members = Collections.singletonList(event.getMember());
                 } else {
-                    members = event.getGuild().getMembersByEffectiveName(input, true);
+                    members = event.getGuild().getMembers()
+                            .stream()
+                            .filter(member -> member.getEffectiveName().toLowerCase().startsWith(input))
+                            .collect(Collectors.toList());
                 }
 
                 if (members.isEmpty()) {

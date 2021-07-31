@@ -228,7 +228,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
             if (this.modes.contains(ParserMode.NAME)) {
                 final List<Role> roles = event.getGuild().getRolesByName(input, true);
 
-                if (roles.size() == 0) {
+                if (roles.isEmpty()) {
                     exception = new RoleNotFoundException(input);
                 } else if (roles.size() > 1) {
                     exception = new TooManyRolesFoundParseException(input);
