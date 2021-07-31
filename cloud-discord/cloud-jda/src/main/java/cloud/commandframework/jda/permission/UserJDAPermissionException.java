@@ -1,0 +1,50 @@
+package cloud.commandframework.jda.permission;
+
+import cloud.commandframework.context.CommandContext;
+import net.dv8tion.jda.api.Permission;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+/**
+ * Exception thrown when the bot is lacking a specific permission.
+ */
+public class UserJDAPermissionException extends IllegalArgumentException {
+
+    private static final long serialVersionUID = -3711728262439302251L;
+    private final @NonNull CommandContext<?> commandContext;
+    private final @NonNull List<Permission> missingPermissions;
+
+    /**
+     * Construct a new no JDA permission exception
+     *
+     * @param commandContext     Command context
+     * @param missingPermissions The permissions that are missing
+     */
+    UserJDAPermissionException(
+            final @NonNull CommandContext<?> commandContext,
+            final @NonNull List<Permission> missingPermissions
+    ) {
+        this.commandContext = commandContext;
+        this.missingPermissions = missingPermissions;
+    }
+
+    public CommandContext<?> getCommandContext() {
+        return commandContext;
+    }
+
+    public List<Permission> getMissingPermissions() {
+        return missingPermissions;
+    }
+
+    @Override
+    public String getMessage() {
+        return String.format(
+                "Cannot execute command due to insufficient permission. You require the following permission(s) to execute this command: %s",
+                missingPermissions.stream().map(Permission::getName).collect(Collectors.joining(", "))
+        );
+    }
+
+}

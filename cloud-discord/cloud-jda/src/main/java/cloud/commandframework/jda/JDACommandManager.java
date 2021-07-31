@@ -32,6 +32,8 @@ import cloud.commandframework.jda.parsers.EmoteArgument;
 import cloud.commandframework.jda.parsers.MemberArgument;
 import cloud.commandframework.jda.parsers.RoleArgument;
 import cloud.commandframework.jda.parsers.UserArgument;
+import cloud.commandframework.jda.permission.BotPermissionPostProcessor;
+import cloud.commandframework.jda.permission.UserPermissionPostProcessor;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
@@ -106,6 +108,10 @@ public class JDACommandManager<C> extends CommandManager<C> {
 
         /* Register JDA Preprocessor */
         this.registerCommandPreProcessor(new JDACommandPreprocessor<>(this));
+
+        /* Register JDA Command Postprocessors */
+        this.registerCommandPostProcessor(new BotPermissionPostProcessor<>());
+        this.registerCommandPostProcessor(new UserPermissionPostProcessor<>());
 
         /* Register JDA Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(User.class), parserParameters ->
