@@ -262,7 +262,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     }
 
                     try {
-                        final ArgumentParseResult<User> result = this.userFromId(event, input, id);
+                        final ArgumentParseResult<User> result = this.userFromId(event, input, Long.parseLong(id));
                         inputQueue.remove();
                         return result;
                     } catch (final UserNotFoundParseException | NumberFormatException e) {
@@ -277,7 +277,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
             if (this.modes.contains(ParserMode.ID)) {
                 try {
-                    final ArgumentParseResult<User> result = this.userFromId(event, input, input);
+                    final ArgumentParseResult<User> result = this.userFromId(event, input, Long.parseLong(input));
                     inputQueue.remove();
                     return result;
                 } catch (final UserNotFoundParseException | NumberFormatException e) {
@@ -300,7 +300,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     users = Collections.emptyList();
                 }
 
-                if (users.size() == 0) {
+                if (users.isEmpty()) {
                     exception = new UserNotFoundParseException(input);
                 } else if (users.size() > 1) {
                     exception = new TooManyUsersFoundParseException(input);
@@ -322,17 +322,27 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         private @NonNull ArgumentParseResult<User> userFromId(
                 final @NonNull MessageReceivedEvent event,
                 final @NonNull String input,
-                final @NonNull String id
+                final @NonNull Long id
         )
                 throws UserNotFoundParseException, NumberFormatException {
             final User user;
             if (this.isolationLevel == Isolation.GLOBAL) {
-                user = event.getJDA().getUserById(id);
+                User globalUser = event.getJDA().getUserById(id);
+
+                if (globalUser == null) { // fallback if user is not cached
+                    globalUser = event.getJDA().retrieveUserById(id).complete();
+                }
+
+                user = globalUser;
             } else if (event.isFromGuild()) {
                 Member member = event.getGuild().getMemberById(id);
 
-                user = member != null ? member.getUser() : null;
-            } else if (event.getAuthor().getId().equalsIgnoreCase(id)) {
+                if (member == null) { // fallback if user is not cached
+                    member = event.getGuild().retrieveMemberById(id).complete();
+                }
+
+                user = member.getUser();
+            } else if (event.getAuthor().getIdLong() == id) {
                 user = event.getAuthor();
             } else {
                 user = null;
