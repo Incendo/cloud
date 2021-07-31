@@ -33,6 +33,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +44,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -145,39 +148,6 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         }
 
         /**
-         * Set the modes for the parsers to use
-         *
-         * @param modes List of Modes
-         * @return Builder instance
-         */
-        public @NonNull Builder<C> withParsers(final @NonNull Set<ParserMode> modes) {
-            this.modes = modes;
-            return this;
-        }
-
-        /**
-         * Add a parser mode to use
-         *
-         * @param mode Parser mode to add
-         * @return Builder instance
-         */
-        public @NonNull Builder<C> withParserMode(final @NonNull ParserMode mode) {
-            this.modes.add(mode);
-            return this;
-        }
-
-        /**
-         * Set the isolation level of the parser
-         *
-         * @param isolation Isolation level
-         * @return Builder instance
-         */
-        public @NonNull Builder<C> withIsolationLevel(final @NonNull Isolation isolation) {
-            this.isolationLevel = isolation;
-            return this;
-        }
-
-        /**
          * Builder a new example component
          *
          * @return Constructed component
@@ -193,6 +163,39 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     this.modes,
                     this.isolationLevel
             );
+        }
+
+        /**
+         * Set the isolation level of the parser
+         *
+         * @param isolation Isolation level
+         * @return Builder instance
+         */
+        public @NonNull Builder<C> withIsolationLevel(final @NonNull Isolation isolation) {
+            this.isolationLevel = isolation;
+            return this;
+        }
+
+        /**
+         * Add a parser mode to use
+         *
+         * @param mode Parser mode to add
+         * @return Builder instance
+         */
+        public @NonNull Builder<C> withParserMode(final @NonNull ParserMode mode) {
+            this.modes.add(mode);
+            return this;
+        }
+
+        /**
+         * Set the modes for the parsers to use
+         *
+         * @param modes List of Modes
+         * @return Builder instance
+         */
+        public @NonNull Builder<C> withParsers(final @NonNull Set<ParserMode> modes) {
+            this.modes = modes;
+            return this;
         }
 
     }
@@ -317,17 +320,11 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             return ArgumentParseResult.failure(exception);
         }
 
-        @Override
-        public boolean isContextFree() {
-            return true;
-        }
-
         private @NonNull ArgumentParseResult<User> userFromId(
                 final @NonNull MessageReceivedEvent event,
                 final @NonNull String input,
                 final @NonNull Long id
-        )
-                throws UserNotFoundParseException, NumberFormatException {
+        ) throws UserNotFoundParseException, NumberFormatException {
             final User user;
             if (this.isolationLevel == Isolation.GLOBAL) {
                 User globalUser = event.getJDA().getUserById(id);
@@ -338,14 +335,23 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
                 user = globalUser;
             } else if (event.isFromGuild()) {
-                final Guild guild = event.getGuild();
-                Member member = guild.getMemberById(id);
+                try {
+                    final Guild guild = event.getGuild();
+                    Member member = guild.getMemberById(id);
 
-                if (member == null) { // fallback if user is not cached
-                    member = guild.retrieveMemberById(id).complete();
+                    if (member == null) { // fallback if user is not cached
+                        member = guild.retrieveMemberById(id).complete();
+                    }
+
+                    user = member.getUser();
+                } catch (final CompletionException e) {
+                    if (e.getCause().getClass().equals(ErrorResponseException.class)
+                            && ((ErrorResponseException) e.getCause()).getErrorResponse() == ErrorResponse.UNKNOWN_USER) {
+                        //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
+                        throw new UserNotFoundParseException(input);
+                    }
+                    throw e;
                 }
-
-                user = member.getUser();
             } else if (event.getAuthor().getIdLong() == id) {
                 user = event.getAuthor();
             } else {
@@ -357,6 +363,11 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             } else {
                 return ArgumentParseResult.success(user);
             }
+        }
+
+        @Override
+        public boolean isContextFree() {
+            return true;
         }
 
     }
@@ -424,8 +435,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
         @Override
         public @NonNull String getMessage() {
-            return String.format("User not found for '%s'. Note: if a user is not cached, they cannot be loaded by name.",
-                    getInput());
+            return String.format(
+                    "User not found for '%s'. Note: if a user is not cached, they cannot be loaded by name.",
+                    getInput()
+            );
         }
 
     }

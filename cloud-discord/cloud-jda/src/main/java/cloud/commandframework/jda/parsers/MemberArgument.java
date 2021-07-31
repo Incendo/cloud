@@ -32,6 +32,8 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +43,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -283,26 +286,34 @@ public final class MemberArgument<C> extends CommandArgument<C, Member> {
                 final @NonNull MessageReceivedEvent event,
                 final @NonNull String input,
                 final @NonNull Long id
-        )
-                throws MemberNotFoundParseException, NumberFormatException {
-            final Guild guild = event.getGuild();
+        ) throws MemberNotFoundParseException, NumberFormatException {
+            try {
+                final Guild guild = event.getGuild();
 
-            final Member member;
-            if (event.getAuthor().getIdLong() == id) {
-                member = event.getMember();
-            } else {
-                Member guildMember = guild.getMemberById(id);
+                final Member member;
+                if (event.getAuthor().getIdLong() == id) {
+                    member = event.getMember();
+                } else {
+                    Member guildMember = guild.getMemberById(id);
 
-                if (guildMember == null) { // fallback if member is not cached
-                    guildMember = guild.retrieveMemberById(id).complete();
+                    if (guildMember == null) { // fallback if member is not cached
+                        guildMember = guild.retrieveMemberById(id).complete();
+                    }
+                    member = guildMember;
                 }
-                member = guildMember;
-            }
 
-            if (member == null) {
-                throw new MemberNotFoundParseException(input);
-            } else {
-                return ArgumentParseResult.success(member);
+                if (member == null) {
+                    throw new MemberNotFoundParseException(input);
+                } else {
+                    return ArgumentParseResult.success(member);
+                }
+            } catch (final CompletionException e) {
+                if (e.getCause().getClass().equals(ErrorResponseException.class)
+                        && ((ErrorResponseException) e.getCause()).getErrorResponse() == ErrorResponse.UNKNOWN_MEMBER) {
+                    //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
+                    throw new MemberNotFoundParseException(input);
+                }
+                throw e;
             }
         }
 

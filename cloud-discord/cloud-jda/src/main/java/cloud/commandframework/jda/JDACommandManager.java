@@ -28,6 +28,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.jda.parsers.ChannelArgument;
+import cloud.commandframework.jda.parsers.EmoteArgument;
 import cloud.commandframework.jda.parsers.MemberArgument;
 import cloud.commandframework.jda.parsers.RoleArgument;
 import cloud.commandframework.jda.parsers.UserArgument;
@@ -36,6 +37,7 @@ import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
@@ -122,6 +124,10 @@ public class JDACommandManager<C> extends CommandManager<C> {
         this.getParserRegistry().registerParserSupplier(TypeToken.get(Role.class), parserParameters ->
                 new RoleArgument.RoleParser<>(
                         EnumSet.allOf(RoleArgument.ParserMode.class)
+                ));
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(Emote.class), parserParameters ->
+                new EmoteArgument.EmoteParser<>(
+                        EnumSet.allOf(EmoteArgument.ParserMode.class)
                 ));
     }
 
