@@ -134,6 +134,7 @@ public final class CommandFlag<T> {
      * Get the command permission, if it exists
      *
      * @return Command permission, or {@code null}
+     * @since 1.6.0
      */
     public CommandPermission getCommandPermission() {
         return this.permission;
