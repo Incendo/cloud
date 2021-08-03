@@ -428,6 +428,15 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                             this.currentFlagBeingParsed = Optional.of(currentFlag);
                             this.currentFlagNameBeingParsed = Optional.of(currentFlagName);
 
+                            // Don't attempt to parse empty strings
+                            if (inputQueue.peek().isEmpty()) {
+                                return ArgumentParseResult.failure(new FlagParseException(
+                                        currentFlag.getName(),
+                                        FailureReason.MISSING_ARGUMENT,
+                                        commandContext
+                                ));
+                            }
+
                             final ArgumentParseResult<?> result =
                                     ((CommandArgument) currentFlag.getCommandArgument())
                                             .getParser()
