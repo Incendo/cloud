@@ -83,7 +83,8 @@ public final class ExampleVelocityPlugin {
                         .color(NamedTextColor.WHITE)
                         .append(Component.text('['))
                         .append(Component.text("cloud-velocity-example", TextColor.color(0x1CBAE0)))
-                        .append(Component.text(']'))
+                        .append(Component.text("] "))
+                        .append(component)
                         .build())
                 .apply(commandManager, AudienceProvider.nativeAudience());
         commandManager.command(
