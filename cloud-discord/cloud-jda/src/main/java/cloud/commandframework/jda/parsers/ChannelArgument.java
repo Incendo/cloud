@@ -217,7 +217,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                         final ArgumentParseResult<MessageChannel> channel = this.channelFromId(event, input, id);
                         inputQueue.remove();
                         return channel;
-                    } catch (final ChannelNotFoundParseException | NumberFormatException e) {
+                    } catch (final ChannelNotFoundException | NumberFormatException e) {
                         exception = e;
                     }
                 } else {
@@ -232,7 +232,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                     final ArgumentParseResult<MessageChannel> result = this.channelFromId(event, input, input);
                     inputQueue.remove();
                     return result;
-                } catch (final ChannelNotFoundParseException | NumberFormatException e) {
+                } catch (final ChannelNotFoundException | NumberFormatException e) {
                     exception = e;
                 }
             }
@@ -241,7 +241,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 final List<TextChannel> channels = event.getGuild().getTextChannelsByName(input, true);
 
                 if (channels.isEmpty()) {
-                    exception = new ChannelNotFoundParseException(input);
+                    exception = new ChannelNotFoundException(input);
                 } else if (channels.size() > 1) {
                     exception = new TooManyChannelsFoundParseException(input);
                 } else {
@@ -258,12 +258,12 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 final @NonNull MessageReceivedEvent event,
                 final @NonNull String input,
                 final @NonNull String id
-        ) throws ChannelNotFoundParseException, NumberFormatException {
+        ) throws ChannelNotFoundException, NumberFormatException {
             try {
                 final MessageChannel channel = event.getGuild().getTextChannelById(id);
 
                 if (channel == null) {
-                    throw new ChannelNotFoundParseException(input);
+                    throw new ChannelNotFoundException(input);
                 }
 
                 return ArgumentParseResult.success(channel);
@@ -271,7 +271,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 if (e.getCause().getClass().equals(ErrorResponseException.class)
                         && ((ErrorResponseException) e.getCause()).getErrorResponse() == ErrorResponse.UNKNOWN_CHANNEL) {
                     //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
-                    throw new ChannelNotFoundParseException(input);
+                    throw new ChannelNotFoundException(input);
                 }
                 throw e;
             }
@@ -331,8 +331,8 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
     }
 
-
-    public static final class ChannelNotFoundParseException extends ChannelParseException {
+    // TODO: 2021-08-28 Rename to ChannelNotFoundParseException in 2.0, to keep consistency
+    public static final class ChannelNotFoundException extends ChannelParseException {
 
         private static final long serialVersionUID = -8299458048947528494L;
 
@@ -341,7 +341,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
          *
          * @param input String input
          */
-        public ChannelNotFoundParseException(final @NonNull String input) {
+        public ChannelNotFoundException(final @NonNull String input) {
             super(input);
         }
 

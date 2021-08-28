@@ -208,7 +208,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                         final ArgumentParseResult<Role> role = this.roleFromId(event, input, id);
                         inputQueue.remove();
                         return role;
-                    } catch (final RoleNotFoundParseException | NumberFormatException e) {
+                    } catch (final RoleNotFoundException | NumberFormatException e) {
                         exception = e;
                     }
                 } else {
@@ -223,7 +223,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                     final ArgumentParseResult<Role> result = this.roleFromId(event, input, input);
                     inputQueue.remove();
                     return result;
-                } catch (final RoleNotFoundParseException | NumberFormatException e) {
+                } catch (final RoleNotFoundException | NumberFormatException e) {
                     exception = e;
                 }
             }
@@ -232,7 +232,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                 final List<Role> roles = event.getGuild().getRolesByName(input, true);
 
                 if (roles.isEmpty()) {
-                    exception = new RoleNotFoundParseException(input);
+                    exception = new RoleNotFoundException(input);
                 } else if (roles.size() > 1) {
                     exception = new TooManyRolesFoundParseException(input);
                 } else {
@@ -249,12 +249,12 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                 final @NonNull MessageReceivedEvent event,
                 final @NonNull String input,
                 final @NonNull String id
-        ) throws RoleNotFoundParseException, NumberFormatException {
+        ) throws RoleNotFoundException, NumberFormatException {
             try {
                 final Role role = event.getGuild().getRoleById(id);
 
                 if (role == null) {
-                    throw new RoleNotFoundParseException(input);
+                    throw new RoleNotFoundException(input);
                 }
 
                 return ArgumentParseResult.success(role);
@@ -262,7 +262,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                 if (e.getCause().getClass().equals(ErrorResponseException.class)
                         && ((ErrorResponseException) e.getCause()).getErrorResponse() == ErrorResponse.UNKNOWN_ROLE) {
                     //noinspection ThrowInsideCatchBlockWhichIgnoresCaughtException
-                    throw new RoleNotFoundParseException(input);
+                    throw new RoleNotFoundException(input);
                 }
                 throw e;
             }
@@ -322,8 +322,8 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
 
     }
 
-
-    public static final class RoleNotFoundParseException extends RoleParseException {
+    // TODO: 2021-08-28 Rename to RoleNotFoundParseException in 2.0, to keep consistency
+    public static final class RoleNotFoundException extends RoleParseException {
 
         private static final long serialVersionUID = 7931804739792920510L;
 
@@ -332,7 +332,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
          *
          * @param input String input
          */
-        public RoleNotFoundParseException(final @NonNull String input) {
+        public RoleNotFoundException(final @NonNull String input) {
             super(input);
         }
 
