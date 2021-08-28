@@ -35,6 +35,9 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.List;
 
 /**
  * JDA Command Listener
@@ -51,6 +54,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command";
 
     private final JDACommandManager<C> commandManager;
+    private final String idString; // just because making strings every message is slow
 
     /**
      * Construct a new JDA Command Listener
@@ -59,6 +63,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
      */
     public JDACommandListener(final @NonNull JDACommandManager<C> commandManager) {
         this.commandManager = commandManager;
+        this.idString = Long.toString(commandManager.getBotId());
     }
 
     @Override
@@ -70,10 +75,11 @@ public class JDACommandListener<C> extends ListenerAdapter {
             return;
         }
 
-        final String prefix = this.commandManager.getPrefixMapper().apply(sender);
         String content = message.getContentRaw();
 
-        if (!content.startsWith(prefix)) {
+        final String prefix = startsWithPrefix(content, sender);
+
+        if (prefix == null) {
             return;
         }
 
@@ -160,6 +166,55 @@ public class JDACommandListener<C> extends ListenerAdapter {
 
     private void sendMessage(final @NonNull MessageReceivedEvent event, final @NonNull String message) {
         event.getChannel().sendMessage(message).queue();
+    }
+
+    /**
+     * @param rawContent The raw string content
+     * @return The prefix it begins with. Returns {@code null} if none.
+     */
+    private @Nullable String startsWithPrefix(final String rawContent, final C sender) {
+        final String primaryPrefix = this.commandManager.getPrefixMapper().apply(sender);
+        final List<String> auxiliaryPrefixes = this.commandManager.getAuxiliaryPrefixMapper().apply(sender);
+
+        if (rawContent.startsWith(primaryPrefix)) { // first match primary prefix
+            return primaryPrefix;
+        }
+
+        for (final String auxiliaryPrefix : auxiliaryPrefixes) { // second, match auxiliary prefixes
+            if (rawContent.startsWith(auxiliaryPrefix)) {
+                return auxiliaryPrefix;
+            }
+        }
+
+
+        if (rawContent.startsWith("<@")) { // last, match against bot mention
+            final int angleClose = rawContent.indexOf('>');
+            if (angleClose != -1) {
+                final StringBuilder match = new StringBuilder();
+                final int prefixSize;
+
+                if (rawContent.startsWith("<@!")) {
+                    prefixSize = 3;
+                } else {
+                    prefixSize = 2;
+                }
+
+                if (!rawContent.substring(prefixSize, angleClose).equals(idString)) {
+                    return null;
+                }
+
+                match.append(rawContent, prefixSize, angleClose + 1);
+
+                if (rawContent.charAt(angleClose + 1) == ' ') {
+                    match.append(' ');
+                }
+
+                return match.toString();
+            }
+        }
+
+
+        return null;
     }
 
 }

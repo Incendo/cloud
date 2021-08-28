@@ -48,7 +48,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -65,6 +67,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
     private final long botId;
 
     private final Function<@NonNull C, @NonNull String> prefixMapper;
+    private final Function<@NonNull C, @NonNull List<String>> auxiliaryPrefixMapper;
     private final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
     private final Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper;
     private final Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper;
@@ -94,11 +97,53 @@ public class JDACommandManager<C> extends CommandManager<C> {
             final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper,
             final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper
+    ) throws InterruptedException {
+        this(
+                jda,
+                prefixMapper,
+                (c) -> Collections.emptyList(),
+                permissionMapper,
+                commandExecutionCoordinator,
+                commandSenderMapper,
+                backwardsCommandSenderMapper
+        );
+    }
+
+    /**
+     * Construct a new JDA Command Manager
+     *
+     * @param jda                          JDA instance to register against
+     * @param prefixMapper                 Function that maps the sender to a command prefix string
+     * @param auxiliaryPrefixMapper        Auxiliary prefix mapper used as a workaround for breaking changes until 2.0 is
+     *                                     released. This has been added because there may be instances where you'd like more
+     *                                     than 1 prefix to be checked against.
+     * @param permissionMapper             Function used to check if a command sender has the permission to execute a command
+     * @param commandExecutionCoordinator  Execution coordinator instance. The coordinator is in charge of executing incoming
+     *                                     commands. Some considerations must be made when picking a suitable execution coordinator
+     *                                     for your platform. For example, an entirely asynchronous coordinator is not suitable
+     *                                     when the parsers used in that particular platform are not thread safe. If you have
+     *                                     commands that perform blocking operations, however, it might not be a good idea to
+     *                                     use a synchronous execution coordinator. In most cases you will want to pick between
+     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
+     *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}
+     * @param commandSenderMapper          Function that maps {@link MessageReceivedEvent} to the command sender type
+     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link MessageReceivedEvent}
+     * @throws InterruptedException If the jda instance does not ready correctly
+     */
+    public JDACommandManager(
+            final @NonNull JDA jda,
+            final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
+            final @NonNull Function<@NonNull C, @NonNull List<String>> auxiliaryPrefixMapper,
+            final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
+            final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper,
+            final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper
     )
             throws InterruptedException {
         super(commandExecutionCoordinator, CommandRegistrationHandler.nullCommandRegistrationHandler());
         this.jda = jda;
         this.prefixMapper = prefixMapper;
+        this.auxiliaryPrefixMapper = auxiliaryPrefixMapper;
         this.permissionMapper = permissionMapper;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
@@ -137,6 +182,11 @@ public class JDACommandManager<C> extends CommandManager<C> {
                 ));
     }
 
+    @Override
+    public final @NonNull CommandMeta createDefaultCommandMeta() {
+        return SimpleCommandMeta.empty();
+    }
+
     /**
      * Get the JDA instance
      *
@@ -153,6 +203,15 @@ public class JDACommandManager<C> extends CommandManager<C> {
      */
     public final @NonNull Function<@NonNull C, @NonNull String> getPrefixMapper() {
         return this.prefixMapper;
+    }
+
+    /**
+     * Get the auxiliary prefix mapper
+     *
+     * @return Auxiliary prefix mapper
+     */
+    public final @NonNull Function<C, List<String>> getAuxiliaryPrefixMapper() {
+        return auxiliaryPrefixMapper;
     }
 
     /**
@@ -201,11 +260,6 @@ public class JDACommandManager<C> extends CommandManager<C> {
         final JDAGuildSender guildSender = (JDAGuildSender) jdaSender;
 
         return guildSender.getMember().hasPermission(Permission.valueOf(permission));
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
 }
