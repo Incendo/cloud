@@ -38,7 +38,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserPermissionPostProcessor<T> implements CommandPostprocessor<T> {
+public final class UserPermissionPostProcessor<T> implements CommandPostprocessor<T> {
 
     @Override
     public void accept(@NonNull final CommandPostprocessingContext<T> postprocessingContext) {
@@ -59,7 +59,7 @@ public class UserPermissionPostProcessor<T> implements CommandPostprocessor<T> {
                 actualPermissions = user.getPermissions();
             }
         } else {
-            actualPermissions = EnumSet.of( // dms ?
+            actualPermissions = EnumSet.of(// dms ?
                     Permission.MESSAGE_ADD_REACTION,
                     Permission.MESSAGE_WRITE,
                     Permission.MESSAGE_READ,

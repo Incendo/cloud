@@ -211,7 +211,7 @@ public class JDACommandManager<C> extends CommandManager<C> {
      * @return Auxiliary prefix mapper
      */
     public final @NonNull Function<C, List<String>> getAuxiliaryPrefixMapper() {
-        return auxiliaryPrefixMapper;
+        return this.auxiliaryPrefixMapper;
     }
 
     /**

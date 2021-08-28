@@ -30,6 +30,11 @@ import net.dv8tion.jda.api.Permission;
  */
 public @interface JDAUserPermission {
 
+    /**
+     * The permissions required by the user to execute the command.
+     *
+     * @return The permissions
+     */
     Permission[] permissions();
 
 }

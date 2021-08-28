@@ -26,6 +26,7 @@ package cloud.commandframework.jda.permission;
 import cloud.commandframework.context.CommandContext;
 import net.dv8tion.jda.api.Permission;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Exception thrown when the bot is lacking a specific permission.
  */
-public class BotJDAPermissionException extends IllegalArgumentException {
+public final class BotJDAPermissionException extends IllegalArgumentException {
 
     private static final long serialVersionUID = 2035924515750548930L;
     private final @NonNull CommandContext<?> commandContext;
@@ -57,17 +58,30 @@ public class BotJDAPermissionException extends IllegalArgumentException {
     @Override
     public String getMessage() {
         return String.format(
-                "Cannot execute command due to insufficient permission. The bot requires the following permission(s) to execute this command: %s",
-                missingPermissions.stream().map(Permission::getName).collect(Collectors.joining(", "))
+                "Cannot execute command due to insufficient permission. "
+                        + "The bot requires the following permission(s) to execute this command: %s",
+                this.missingPermissions.stream().map(Permission::getName).collect(Collectors.joining(", "))
         );
     }
 
-    public CommandContext<?> getCommandContext() {
-        return commandContext;
+    /**
+     * Get the CommandContext, which led to this exception
+     *
+     * @return Command Context
+     * @since 1.6.0
+     */
+    public @NotNull CommandContext<?> getCommandContext() {
+        return this.commandContext;
     }
 
-    public List<Permission> getMissingPermissions() {
-        return missingPermissions;
+    /**
+     * Get the permissions that the bot is missing.
+     *
+     * @return The missing permissions
+     * @since 1.6.0
+     */
+    public @NotNull List<Permission> getMissingPermissions() {
+        return this.missingPermissions;
     }
 
 }

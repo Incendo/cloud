@@ -21,20 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.jda.permission;
-
-import net.dv8tion.jda.api.Permission;
-
 /**
- * Annotation to set the permissions required by the bot to execute this command.
+ * JDA specific permission stuff
  */
-public @interface JDABotPermission {
-
-    /**
-     * The permissions required by the bot to execute the command in the server.
-     *
-     * @return The permissions
-     */
-    Permission[] permissions();
-
-}
+package cloud.commandframework.jda.permission;

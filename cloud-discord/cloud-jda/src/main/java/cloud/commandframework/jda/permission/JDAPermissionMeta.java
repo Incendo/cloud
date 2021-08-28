@@ -53,6 +53,13 @@ public final class JDAPermissionMeta {
     private JDAPermissionMeta() {
     }
 
+    /**
+     * Static utility method to register the builder modifiers to the annotation parsers for the JDA permissions.
+     *
+     * @param annotationParser The parser for which to register the builder modifiers.
+     * @param <C>              Command sender type
+     * @return The passed annotation parser
+     */
     public static <C> AnnotationParser<C> register(final AnnotationParser<C> annotationParser) {
 
         annotationParser.registerBuilderModifier(JDABotPermission.class, new BotPermissionMetaModifier<>());

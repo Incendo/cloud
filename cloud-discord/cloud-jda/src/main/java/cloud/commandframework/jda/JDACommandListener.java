@@ -77,7 +77,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
 
         String content = message.getContentRaw();
 
-        final String prefix = startsWithPrefix(content, sender);
+        final String prefix = this.startsWithPrefix(content, sender);
 
         if (prefix == null) {
             return;
@@ -157,7 +157,6 @@ public class JDACommandListener<C> extends ListenerAdapter {
                                 (UserJDAPermissionException) throwable,
                                 (c, e) -> this.sendMessage(event, e.getMessage())
                         );
-
                     } else {
                         this.sendMessage(event, throwable.getMessage());
                     }
@@ -169,7 +168,11 @@ public class JDACommandListener<C> extends ListenerAdapter {
     }
 
     /**
+     * Check if the raw content begins with any of the prefixes.
+     * Returns null if no prefix is found to match.
+     *
      * @param rawContent The raw string content
+     * @param sender     The sender
      * @return The prefix it begins with. Returns {@code null} if none.
      */
     private @Nullable String startsWithPrefix(final String rawContent, final C sender) {
@@ -199,7 +202,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
                     prefixSize = 2;
                 }
 
-                if (!rawContent.substring(prefixSize, angleClose).equals(idString)) {
+                if (!rawContent.substring(prefixSize, angleClose).equals(this.idString)) {
                     return null;
                 }
 
