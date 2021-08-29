@@ -331,7 +331,6 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
     }
 
-    // TODO: 2021-08-28 Rename to ChannelNotFoundParseException in 2.0, to keep consistency
     public static final class ChannelNotFoundException extends ChannelParseException {
 
         private static final long serialVersionUID = -8299458048947528494L;

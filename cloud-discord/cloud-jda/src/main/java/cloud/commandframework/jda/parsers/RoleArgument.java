@@ -322,7 +322,6 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
 
     }
 
-    // TODO: 2021-08-28 Rename to RoleNotFoundParseException in 2.0, to keep consistency
     public static final class RoleNotFoundException extends RoleParseException {
 
         private static final long serialVersionUID = 7931804739792920510L;
