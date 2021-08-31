@@ -64,6 +64,7 @@ import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
+import cloud.commandframework.paper.argument.KeyedWorldArgument;
 import cloud.commandframework.permission.PredicatePermission;
 import cloud.commandframework.tasks.TaskConsumer;
 import cloud.commandframework.types.tuples.Pair;
@@ -477,6 +478,15 @@ public final class ExamplePlugin extends JavaPlugin {
                 .handler(ctx -> {
                     final ItemStack stack = ctx.get("itemstack");
                     ((Player) ctx.getSender()).getInventory().addItem(stack);
+                }));
+
+        this.manager.command(builder.literal("keyed_world")
+                .argument(KeyedWorldArgument.of("world"))
+                .senderType(Player.class)
+                .handler(ctx -> {
+                    final World world = ctx.get("world");
+                    final Player sender = (Player) ctx.getSender();
+                    this.getServer().getScheduler().runTask(this, () -> sender.teleport(world.getSpawnLocation()));
                 }));
     }
 
