@@ -42,7 +42,7 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 
 /**
- * cloud argument type that parses Bukkit {@link World worlds} from a namespaced key
+ * Argument type that parses Bukkit {@link World worlds} from a {@link NamespacedKey}.
  *
  * @param <C> Command sender type
  */
@@ -55,44 +55,44 @@ public class KeyedWorldArgument<C> extends CommandArgument<C, World> {
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new KeyedWorldParser<>(), defaultValue, World.class, suggestionsProvider, defaultDescription);
+        super(required, name, new Parser<>(), defaultValue, World.class, suggestionsProvider, defaultDescription);
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> KeyedWorldArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
+    public static <C> KeyedWorldArgument.@NonNull Builder<C> builder(final @NonNull String name) {
         return new KeyedWorldArgument.Builder<>(name);
     }
 
     /**
-     * Create a new required argument
+     * Create a new required {@link KeyedWorldArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
      * @return Created argument
      */
     public static <C> @NonNull KeyedWorldArgument<C> of(final @NonNull String name) {
-        return KeyedWorldArgument.<C>newBuilder(name).asRequired().build();
+        return KeyedWorldArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional argument
+     * Create a new optional {@link KeyedWorldArgument}.
      *
      * @param name Argument name
      * @param <C>  Command sender type
      * @return Created argument
      */
     public static <C> @NonNull KeyedWorldArgument<C> optional(final @NonNull String name) {
-        return KeyedWorldArgument.<C>newBuilder(name).asOptional().build();
+        return KeyedWorldArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new optional argument with a default value
+     * Create a new {@link KeyedWorldArgument} with the specified default value.
      *
      * @param name         Argument name
      * @param defaultValue Default value
@@ -103,7 +103,7 @@ public class KeyedWorldArgument<C> extends CommandArgument<C, World> {
             final @NonNull String name,
             final @NonNull String defaultValue
     ) {
-        return KeyedWorldArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
+        return KeyedWorldArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
 
     public static final class Builder<C> extends CommandArgument.TypedBuilder<C, World, Builder<C>> {
@@ -125,7 +125,7 @@ public class KeyedWorldArgument<C> extends CommandArgument<C, World> {
 
     }
 
-    public static final class KeyedWorldParser<C> implements ArgumentParser<C, World> {
+    public static final class Parser<C> implements ArgumentParser<C, World> {
 
         @Override
         public @NonNull ArgumentParseResult<@NonNull World> parse(
@@ -135,7 +135,7 @@ public class KeyedWorldArgument<C> extends CommandArgument<C, World> {
             final String input = inputQueue.peek();
             if (input == null) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
-                        KeyedWorldParser.class,
+                        Parser.class,
                         commandContext
                 ));
             }

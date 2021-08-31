@@ -48,7 +48,7 @@ final class PaperBrigadierMapper<C> {
     private void registerMappings(final @NonNull BukkitBrigadierMapper<C> mapper) {
         final Class<?> keyed = CraftBukkitReflection.findClass("org.bukkit.Keyed");
         if (keyed != null && keyed.isAssignableFrom(World.class)) {
-            mapper.mapSimpleNMS(new TypeToken<KeyedWorldArgument.KeyedWorldParser<C>>() {
+            mapper.mapSimpleNMS(new TypeToken<KeyedWorldArgument.Parser<C>>() {
             }, "resource_location");
         }
     }
