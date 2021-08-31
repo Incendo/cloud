@@ -49,7 +49,7 @@ final class PaperBrigadierMapper<C> {
         final Class<?> keyed = CraftBukkitReflection.findClass("org.bukkit.Keyed");
         if (keyed != null && keyed.isAssignableFrom(World.class)) {
             mapper.mapSimpleNMS(new TypeToken<KeyedWorldArgument.Parser<C>>() {
-            }, "resource_location");
+            }, "resource_location", true);
         }
     }
 
