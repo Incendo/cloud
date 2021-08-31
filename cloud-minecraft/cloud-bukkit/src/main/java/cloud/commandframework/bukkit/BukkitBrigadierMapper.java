@@ -170,6 +170,24 @@ public final class BukkitBrigadierMapper<C> {
             final @NonNull TypeToken<T> type,
             final @NonNull String argumentId
     ) {
+        this.mapSimpleNMS(type, argumentId, false);
+    }
+
+    /**
+     * Attempt to register a mapping between a cloud argument parser type and an NMS brigadier argument type which
+     * has a no-args constructor.
+     *
+     * @param type       Type to map
+     * @param <T>        argument parser type
+     * @param argumentId network id of argument type
+     * @param useCloudSuggestions whether to use cloud suggestions
+     * @since 1.6.0
+     */
+    public <T extends ArgumentParser<C, ?>> void mapSimpleNMS(
+            final @NonNull TypeToken<T> type,
+            final @NonNull String argumentId,
+            final boolean useCloudSuggestions
+    ) {
         final Constructor<?> constructor;
         try {
             final Class<?> nmsArgument = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft(argumentId));
@@ -182,21 +200,26 @@ public final class BukkitBrigadierMapper<C> {
             );
             return;
         }
-        this.brigadierManager.registerMapping(type, builder -> builder.to(argument -> {
-            try {
-                return (ArgumentType<?>) constructor.newInstance();
-            } catch (final ReflectiveOperationException e) {
-                this.commandManager.getOwningPlugin().getLogger().log(
-                        Level.WARNING,
-                        String.format(
-                                "Failed to create instance of brigadier argument type '%s'.",
-                                GenericTypeReflector.erase(type.getType()).getCanonicalName()
-                        ),
-                        e
-                );
-                return fallbackType();
+        this.brigadierManager.registerMapping(type, builder -> {
+            builder.to(argument -> {
+                try {
+                    return (ArgumentType<?>) constructor.newInstance();
+                } catch (final ReflectiveOperationException e) {
+                    this.commandManager.getOwningPlugin().getLogger().log(
+                            Level.WARNING,
+                            String.format(
+                                    "Failed to create instance of brigadier argument type '%s'.",
+                                    GenericTypeReflector.erase(type.getType()).getCanonicalName()
+                            ),
+                            e
+                    );
+                    return fallbackType();
+                }
+            });
+            if (useCloudSuggestions) {
+                builder.cloudSuggestions();
             }
-        }));
+        });
     }
 
     /**
