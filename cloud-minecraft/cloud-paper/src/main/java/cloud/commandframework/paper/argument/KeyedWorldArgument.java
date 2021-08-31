@@ -1,4 +1,27 @@
-package cloud.commandframework.paper.parsers;
+//
+// MIT License
+//
+// Copyright (c) 2021 Alexander Söderberg & Contributors
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+package cloud.commandframework.paper.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
@@ -42,7 +65,7 @@ public class KeyedWorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>  Command sender type
      * @return Created builder
      */
-    public static <C> CommandArgument.@NonNull Builder<C, World> newBuilder(final @NonNull String name) {
+    public static <C> KeyedWorldArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new KeyedWorldArgument.Builder<>(name);
     }
 
@@ -53,7 +76,7 @@ public class KeyedWorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, World> of(final @NonNull String name) {
+    public static <C> @NonNull KeyedWorldArgument<C> of(final @NonNull String name) {
         return KeyedWorldArgument.<C>newBuilder(name).asRequired().build();
     }
 
@@ -64,7 +87,7 @@ public class KeyedWorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, World> optional(final @NonNull String name) {
+    public static <C> @NonNull KeyedWorldArgument<C> optional(final @NonNull String name) {
         return KeyedWorldArgument.<C>newBuilder(name).asOptional().build();
     }
 
@@ -76,21 +99,21 @@ public class KeyedWorldArgument<C> extends CommandArgument<C, World> {
      * @param <C>          Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, World> optional(
+    public static <C> @NonNull KeyedWorldArgument<C> optional(
             final @NonNull String name,
             final @NonNull String defaultValue
     ) {
         return KeyedWorldArgument.<C>newBuilder(name).asOptionalWithDefault(defaultValue).build();
     }
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, World> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, World, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(World.class, name);
         }
 
         @Override
-        public @NonNull CommandArgument<@NonNull C, @NonNull World> build() {
+        public @NonNull KeyedWorldArgument<C> build() {
             return new KeyedWorldArgument<>(
                     this.isRequired(),
                     this.getName(),
