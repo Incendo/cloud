@@ -55,7 +55,7 @@ class PaperBrigadierListener<C> implements Listener {
         this.brigadierManager.brigadierSenderMapper(sender ->
                 this.paperCommandManager.getCommandSenderMapper().apply(sender.getBukkitSender()));
 
-        new BukkitBrigadierMapper<>(this.paperCommandManager, this.brigadierManager);
+        new PaperBrigadierMapper<>(new BukkitBrigadierMapper<>(this.paperCommandManager, this.brigadierManager));
 
         this.brigadierManager
                 .backwardsBrigadierSenderMapper(new BukkitBackwardsBrigadierSenderMapper<>(this.paperCommandManager));
