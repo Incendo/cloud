@@ -39,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 final class PaperBrigadierMapper<C> {
 
-    public PaperBrigadierMapper(
+    PaperBrigadierMapper(
             final @NonNull BukkitBrigadierMapper<C> mapper
     ) {
         this.registerMappings(mapper);
