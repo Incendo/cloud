@@ -21,46 +21,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.jda.slashcommands;
+
+package cloud.commandframework.jda.slashcommands.sender;
 
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
+public class JDAPrivateSlashSender extends JDASlashCommandSender implements JDAPrivateSender {
 
-/**
- * Private message specific JDA Command Sender
- */
-public class JDAPrivateSender extends JDACommandSender {
+    private final PrivateChannel privateChannel;
 
-    private final PrivateChannel channel;
-
-    /**
-     * Construct a JDA Private Sender using an event
-     *
-     * @param event   Message received event
-     * @param user    Sending user
-     * @param channel Channel sent in
-     */
-    public JDAPrivateSender(
-            final @Nullable MessageReceivedEvent event,
+    public JDAPrivateSlashSender(
+            final @NonNull SlashCommandEvent event,
             final @NonNull User user,
-            final @NonNull PrivateChannel channel
+            final @NonNull PrivateChannel privateChannel
     ) {
-        super(event, user, channel);
-        this.channel = channel;
+        super(event, user, privateChannel);
+        this.privateChannel = privateChannel;
     }
 
-    /**
-     * Get the channel the user sent the message in
-     *
-     * @return Channel that the message was sent in
-     * @since 1.1.0
-     */
+    @Override
     public @NonNull PrivateChannel getPrivateChannel() {
-        return this.channel;
+        return privateChannel;
     }
 
 }

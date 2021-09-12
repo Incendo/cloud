@@ -21,44 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.jda.slashcommands;
+package cloud.commandframework.jda.slashcommands.sender;
 
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Objects;
-import java.util.Optional;
 
 
 /**
- * Wrapper for {@link MessageReceivedEvent}
+ *
  */
-public class JDACommandSender {
-
-    private final MessageReceivedEvent event;
-    private final User user;
-    private final MessageChannel channel;
-
-    /**
-     * Construct a JDA Command Sender
-     *
-     * @param event   Message received event
-     * @param user    Sending user
-     * @param channel Channel sent in
-     */
-    protected JDACommandSender(
-            final @Nullable MessageReceivedEvent event,
-            final @NonNull User user,
-            final @NonNull MessageChannel channel
-    ) {
-        this.event = event;
-        this.user = user;
-        this.channel = channel;
-    }
+public interface JDACommandSender {
 
     /**
      * Create a JDA Command Sender from a {@link MessageReceivedEvent}
@@ -66,24 +44,30 @@ public class JDACommandSender {
      * @param event Message Received Event
      * @return Constructed JDA Command Sender
      */
-    public static @NonNull JDACommandSender of(final @NonNull MessageReceivedEvent event) {
+    @SuppressWarnings("ClassReferencesSubclass")
+    static @NonNull JDAMessageCommandSender of(final @NonNull MessageReceivedEvent event) {
         if (event.isWebhookMessage()) {
-            return new JDACommandSender(event, event.getAuthor(), event.getChannel());
+            return new JDAMessageCommandSender(event, event.getAuthor(), event.getChannel());
         } else if (event.isFromType(ChannelType.PRIVATE)) {
-            return new JDAPrivateSender(event, event.getAuthor(), event.getPrivateChannel());
+            return new JDAPrivateMessageSender(event, event.getAuthor(), event.getPrivateChannel());
         }
 
-        return new JDAGuildSender(event, Objects.requireNonNull(event.getMember()), event.getTextChannel());
+        return new JDAGuildMessageSender(event, Objects.requireNonNull(event.getMember()), event.getTextChannel());
     }
 
     /**
-     * Get the message receive event
+     * Create a JDA Command Sender from a {@link SlashCommandEvent}
      *
-     * @return Optional of the message receive event
-     * @since 1.1.0
+     * @param event Slash Command Event
+     * @return Constructed JDA Command Sender
      */
-    public final @NonNull Optional<MessageReceivedEvent> getEvent() {
-        return Optional.ofNullable(this.event);
+    @SuppressWarnings("ClassReferencesSubclass")
+    static @NonNull JDASlashCommandSender of(final @NonNull SlashCommandEvent event) {
+        if (event.getChannelType() == ChannelType.PRIVATE) {
+            return new JDAPrivateSlashSender(event, event.getUser(), event.getPrivateChannel());
+        }
+
+        return new JDAGuildSlashSender(event, Objects.requireNonNull(event.getMember()), event.getTextChannel());
     }
 
     /**
@@ -92,17 +76,13 @@ public class JDACommandSender {
      * @return User that sent the message
      * @since 1.1.0
      */
-    public final @NonNull User getUser() {
-        return this.user;
-    }
+    @NonNull User getUser();
 
     /**
      * Get the channel the user sent the message in
      *
      * @return Channel that the message was sent in
      */
-    public final @NonNull MessageChannel getChannel() {
-        return this.channel;
-    }
+    @NonNull MessageChannel getChannel();
 
 }

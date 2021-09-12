@@ -24,9 +24,11 @@
 package cloud.commandframework.jda.slashcommands;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.arguments.CommandSyntaxFormatter;
+import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import cloud.commandframework.jda.slashcommands.internal.CommandConfig;
+import cloud.commandframework.jda.slashcommands.internal.ParserConfig;
 import cloud.commandframework.jda.slashcommands.parsers.ChannelArgument;
 import cloud.commandframework.jda.slashcommands.parsers.EmoteArgument;
 import cloud.commandframework.jda.slashcommands.parsers.MemberArgument;
@@ -34,8 +36,9 @@ import cloud.commandframework.jda.slashcommands.parsers.RoleArgument;
 import cloud.commandframework.jda.slashcommands.parsers.UserArgument;
 import cloud.commandframework.jda.slashcommands.permission.BotPermissionPostProcessor;
 import cloud.commandframework.jda.slashcommands.permission.UserPermissionPostProcessor;
+import cloud.commandframework.jda.slashcommands.sender.JDACommandSender;
+import cloud.commandframework.jda.slashcommands.sender.JDAGuildSender;
 import cloud.commandframework.meta.CommandMeta;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -44,14 +47,13 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 /**
@@ -63,62 +65,95 @@ public class JDASlashCommandManager<C> extends CommandManager<C> {
 
     private final JDA jda;
     private final long botId;
-
-    private final Function<@NonNull C, @NonNull String> prefixMapper;
-    private final Function<@NonNull C, @NonNull List<String>> auxiliaryPrefixMapper;
+    private final BiFunction<@NonNull C, @NonNull String, @Nullable String> prefixMatcher;
     private final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
-    private final Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper;
-    private final Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper;
+    private final Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
+    private final Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
+    private final @NonNull Supplier<CommandMeta> commandMetaSupplier;
 
     /**
      * Construct a new JDA Command Manager
      *
-     * @param jda                          JDA instance to register against
-     * @param prefixMapper                 Function that maps the sender to a command prefix string
-     * @param auxiliaryPrefixMapper        Auxiliary prefix mapper used as a workaround for breaking changes until 2.0 is
-     *                                     released. This has been added because there may be instances where you'd like more
-     *                                     than 1 prefix to be checked against.
-     * @param permissionMapper             Function used to check if a command sender has the permission to execute a command
-     * @param commandExecutionCoordinator  Execution coordinator instance. The coordinator is in charge of executing incoming
-     *                                     commands. Some considerations must be made when picking a suitable execution coordinator
-     *                                     for your platform. For example, an entirely asynchronous coordinator is not suitable
-     *                                     when the parsers used in that particular platform are not thread safe. If you have
-     *                                     commands that perform blocking operations, however, it might not be a good idea to
-     *                                     use a synchronous execution coordinator. In most cases you will want to pick between
-     *                                     {@link CommandExecutionCoordinator#simpleCoordinator()} and
-     *                                     {@link cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator}
-     * @param commandSenderMapper          Function that maps {@link MessageReceivedEvent} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link MessageReceivedEvent}
+     * @param jda JDA instance to register against
      * @throws InterruptedException If the jda instance does not ready correctly
      */
     public JDASlashCommandManager(
-            final @NonNull JDA jda,
-            final @NonNull Function<@NonNull C, @NonNull String> prefixMapper,
-            final @NonNull Function<@NonNull C, @NonNull List<String>> auxiliaryPrefixMapper,
-            final @Nullable BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper,
-            final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> backwardsCommandSenderMapper
-    )
-            throws InterruptedException {
-        super(commandExecutionCoordinator, CommandRegistrationHandler.nullCommandRegistrationHandler());
+            @NonNull final JDA jda,
+            @NonNull final CommandConfig<C> commandConfig,
+            @NonNull final ParserConfig<C> parserConfig
+    ) throws InterruptedException {
+        super(commandConfig.getCommandExecutionCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
         this.jda = jda;
-        this.prefixMapper = prefixMapper;
-        this.auxiliaryPrefixMapper = auxiliaryPrefixMapper;
-        this.permissionMapper = permissionMapper;
-        this.commandSenderMapper = commandSenderMapper;
-        this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
-        jda.addEventListener(new JDACommandListener<>(this));
+        this.prefixMatcher = parserConfig.getPrefixMatcher();
+
+        this.permissionMapper = commandConfig.getPermissionMapper();
+        this.commandSenderMapper = commandConfig.getCommandSenderMapper();
+        this.backwardsCommandSenderMapper = commandConfig.getBackwardsCommandSenderMapper();
+        this.commandMetaSupplier = commandConfig.getCommandMetaSupplier();
+
+
+        if (commandConfig.isRegisterCommandListener()) {
+            jda.addEventListener(new JDACommandListener<>(
+                    this,
+                    parserConfig.isEnableSlashCommands(),
+                    parserConfig.isEnableMessageCommands()
+            ));
+        }
+
         jda.awaitReady();
         this.botId = jda.getSelfUser().getIdLong();
 
-        /* Register JDA Preprocessor */
-        this.registerCommandPreProcessor(new JDACommandPreprocessor<>(this));
+        if (commandConfig.isEnableDefaultPreprocessors()) {
+            /* Register JDA Preprocessor */
+            this.registerCommandPreProcessor(new JDACommandPreprocessor<>(this));
+        }
 
         /* Register JDA Command Postprocessors */
         this.registerCommandPostProcessor(new BotPermissionPostProcessor<>());
         this.registerCommandPostProcessor(new UserPermissionPostProcessor<>());
 
+        if (parserConfig.isEnableDefaultParsers()) {
+            this.registerParsers();
+        }
+
+        final CaptionRegistry<C> captionRegistry = commandConfig.getCaptionRegistry();
+        if (captionRegistry != null) {
+            this.setCaptionRegistry(captionRegistry);
+        }
+
+        final CommandSyntaxFormatter<C> commandSyntaxFormatter = commandConfig.getCommandSyntaxFormatter();
+        if (commandSyntaxFormatter != null) {
+            this.setCommandSyntaxFormatter(commandSyntaxFormatter);
+        }
+    }
+
+    @Override
+    public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
+        if (permission.isEmpty()) {
+            return true;
+        }
+
+        if (this.permissionMapper != null) {
+            return this.permissionMapper.apply(sender, permission);
+        }
+
+        final JDACommandSender jdaSender = this.backwardsCommandSenderMapper.apply(sender);
+
+        if (!(jdaSender instanceof JDAGuildSender)) {
+            return true;
+        }
+
+        final JDAGuildSender guildSender = (JDAGuildSender) jdaSender;
+
+        return guildSender.getMember().hasPermission(Permission.valueOf(permission));
+    }
+
+    @Override
+    public final @NonNull CommandMeta createDefaultCommandMeta() {
+        return commandMetaSupplier.get();
+    }
+
+    private void registerParsers() {
         /* Register JDA Parsers */
         this.getParserRegistry().registerParserSupplier(TypeToken.get(User.class), parserParameters ->
                 new UserArgument.UserParser<>(
@@ -143,6 +178,10 @@ public class JDASlashCommandManager<C> extends CommandManager<C> {
                 ));
     }
 
+    public BiFunction<C, String, String> getPrefixMatcher() {
+        return prefixMatcher;
+    }
+
     /**
      * Get the JDA instance
      *
@@ -153,29 +192,11 @@ public class JDASlashCommandManager<C> extends CommandManager<C> {
     }
 
     /**
-     * Get the prefix mapper
-     *
-     * @return Prefix mapper
-     */
-    public final @NonNull Function<@NonNull C, @NonNull String> getPrefixMapper() {
-        return this.prefixMapper;
-    }
-
-    /**
-     * Get the auxiliary prefix mapper
-     *
-     * @return Auxiliary prefix mapper
-     */
-    public final @NonNull Function<C, List<String>> getAuxiliaryPrefixMapper() {
-        return this.auxiliaryPrefixMapper;
-    }
-
-    /**
      * Get the command sender mapper
      *
      * @return Command sender mapper
      */
-    public final @NonNull Function<@NonNull MessageReceivedEvent, @NonNull C> getCommandSenderMapper() {
+    public final @NonNull Function<@NonNull JDACommandSender, @NonNull C> getCommandSenderMapper() {
         return this.commandSenderMapper;
     }
 
@@ -184,7 +205,7 @@ public class JDASlashCommandManager<C> extends CommandManager<C> {
      *
      * @return The backwards command sender mapper
      */
-    public final @NonNull Function<@NonNull C, @NonNull MessageReceivedEvent> getBackwardsCommandSenderMapper() {
+    public final @NonNull Function<@NonNull C, @NonNull JDACommandSender> getBackwardsCommandSenderMapper() {
         return this.backwardsCommandSenderMapper;
     }
 
@@ -195,32 +216,6 @@ public class JDASlashCommandManager<C> extends CommandManager<C> {
      */
     public final long getBotId() {
         return this.botId;
-    }
-
-    @Override
-    public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
-        if (permission.isEmpty()) {
-            return true;
-        }
-
-        if (this.permissionMapper != null) {
-            return this.permissionMapper.apply(sender, permission);
-        }
-
-        final JDACommandSender jdaSender = this.backwardsCommandSenderMapper.andThen(JDACommandSender::of).apply(sender);
-
-        if (!(jdaSender instanceof JDAGuildSender)) {
-            return true;
-        }
-
-        final JDAGuildSender guildSender = (JDAGuildSender) jdaSender;
-
-        return guildSender.getMember().hasPermission(Permission.valueOf(permission));
-    }
-
-    @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
     }
 
 }

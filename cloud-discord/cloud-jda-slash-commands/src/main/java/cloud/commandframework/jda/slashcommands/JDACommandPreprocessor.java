@@ -67,9 +67,9 @@ final class JDACommandPreprocessor<C> implements CommandPreprocessor<C> {
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
         context.getCommandContext().store("JDA", this.mgr.getJDA());
 
-        MessageReceivedEvent event;
+        MessageReceivedEvent event = null;
         try {
-            event = this.mgr.getBackwardsCommandSenderMapper().apply(context.getCommandContext().getSender());
+//            event = this.mgr.getBackwardsCommandSenderMapper().apply(context.getCommandContext().getSender());
         } catch (IllegalStateException e) {
             // The event could not be resolved from the backwards command sender mapper
             return;

@@ -46,7 +46,7 @@ public final class BotPermissionPostProcessor<T> implements CommandPostprocessor
     public void accept(@NonNull final CommandPostprocessingContext<T> postprocessingContext) {
         final CommandContext<T> context = postprocessingContext.getCommandContext();
         final CommandMeta meta = postprocessingContext.getCommand().getCommandMeta();
-        final MessageReceivedEvent event = context.get("MessageReceivedEvent");
+        @SuppressWarnings("unused") final MessageReceivedEvent event = context.get("MessageReceivedEvent");
 
         final EnumSet<Permission> actualPermissions;
 

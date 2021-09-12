@@ -21,58 +21,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.jda.slashcommands;
+
+package cloud.commandframework.jda.slashcommands.sender;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
+public class JDAGuildSlashSender extends JDASlashCommandSender implements JDAGuildSender {
 
-/**
- * Guild specific JDA Command Sender
- */
-public class JDAGuildSender extends JDACommandSender {
-
+    @NonNull
     private final Member member;
-    private final TextChannel channel;
+    @NonNull
+    private final TextChannel textChannel;
 
-    /**
-     * Construct a JDA Guild Sender using an event
-     *
-     * @param event   Message received event
-     * @param member  Sending member
-     * @param channel Channel sent in
-     */
-    public JDAGuildSender(
-            final @Nullable MessageReceivedEvent event,
+    public JDAGuildSlashSender(
+            final @NonNull SlashCommandEvent event,
             final @NonNull Member member,
-            final @NonNull TextChannel channel
+            final @NonNull TextChannel textChannel
     ) {
-        super(event, member.getUser(), channel);
+        super(event, member.getUser(), textChannel);
+        this.textChannel = textChannel;
         this.member = member;
-        this.channel = channel;
     }
 
-    /**
-     * Get the member the command sender represents
-     *
-     * @return Member that sent the message
-     * @since 1.1.0
-     */
+    @Override
     public @NonNull Member getMember() {
-        return this.member;
+        return member;
     }
 
-    /**
-     * Get the channel the user sent the message in
-     *
-     * @return Channel that the message was sent in
-     * @since 1.1.0
-     */
+    @Override
     public @NonNull TextChannel getTextChannel() {
-        return this.channel;
+        return textChannel;
     }
 
 }

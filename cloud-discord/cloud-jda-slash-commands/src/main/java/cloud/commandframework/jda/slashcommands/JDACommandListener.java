@@ -31,13 +31,14 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.jda.slashcommands.permission.BotJDAPermissionException;
 import cloud.commandframework.jda.slashcommands.permission.UserJDAPermissionException;
+import cloud.commandframework.jda.slashcommands.sender.JDACommandSender;
+import cloud.commandframework.jda.slashcommands.sender.JDAMessageCommandSender;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -45,48 +46,67 @@ import java.util.List;
  *
  * @param <C> Command sender type
  */
-@SuppressWarnings("deprecation")
-public class JDACommandListener<C> extends ListenerAdapter {
+public final class JDACommandListener<C> extends ListenerAdapter {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
-    private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is: ";
+    private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is:";
     private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have permission to perform this command. "
             + "Please contact the server administrators if you believe that this is in error.";
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command";
 
     private final JDASlashCommandManager<C> commandManager;
-    private final String idString; // just because making strings every message is slow
+    private final boolean enableSlashCommands;
+    private final boolean enableMessageCommands;
 
     /**
      * Construct a new JDA Command Listener
      *
      * @param commandManager Command Manager instance
      */
-    public JDACommandListener(final @NonNull JDASlashCommandManager<C> commandManager) {
+    public JDACommandListener(
+            final @NonNull JDASlashCommandManager<C> commandManager,
+            final boolean enableSlashCommands,
+            final boolean enableMessageCommands
+    ) {
         this.commandManager = commandManager;
-        this.idString = Long.toString(commandManager.getBotId());
+        this.enableSlashCommands = enableSlashCommands;
+        this.enableMessageCommands = enableMessageCommands;
     }
 
     @Override
-    public final void onMessageReceived(final @NonNull MessageReceivedEvent event) {
+    public void onSlashCommand(@NotNull final SlashCommandEvent event) {
+        if (!enableSlashCommands) {
+            return;
+        }
+//        event.getOptions()
+    }
+
+    @Override
+    public void onMessageReceived(final @NonNull MessageReceivedEvent event) {
+        if (!enableMessageCommands) {
+            return;
+        }
+
         final Message message = event.getMessage();
-        final C sender = this.commandManager.getCommandSenderMapper().apply(event);
+        final JDAMessageCommandSender commandSender = JDACommandSender.of(event);
+        final C sender = this.commandManager.getCommandSenderMapper().apply(commandSender);
 
         if (this.commandManager.getBotId() == event.getAuthor().getIdLong()) {
             return;
         }
 
-        String content = message.getContentRaw();
+        attemptCommand(commandSender, sender, message.getContentRaw());
+    }
 
-        final String prefix = this.startsWithPrefix(content, sender);
+    private void attemptCommand(
+            final @NonNull JDACommandSender commandSender,
+            final @NonNull C sender,
+            final @NonNull String contentRaw
+    ) {
+        final String commandContent = commandManager.getPrefixMatcher().apply(sender, contentRaw);
+        final String prefix = contentRaw.substring(0, commandContent.length());
 
-        if (prefix == null) {
-            return;
-        }
-
-        content = content.substring(prefix.length());
-
-        this.commandManager.executeCommand(sender, content)
+        this.commandManager.executeCommand(sender, commandContent)
                 .whenComplete((commandResult, throwable) -> {
                     if (throwable == null) {
                         return;
@@ -98,9 +118,13 @@ public class JDACommandListener<C> extends ListenerAdapter {
                                 InvalidSyntaxException.class,
                                 (InvalidSyntaxException) throwable,
                                 (c, e) -> this.sendMessage(
-                                        event,
-                                        MESSAGE_INVALID_SYNTAX + prefix + ((InvalidSyntaxException) throwable)
-                                                .getCorrectSyntax()
+                                        commandSender,
+                                        String.format(
+                                                "%s %s%s",
+                                                MESSAGE_INVALID_SYNTAX,
+                                                prefix,
+                                                ((InvalidSyntaxException) throwable).getCorrectSyntax()
+                                        )
                                 )
                         );
                     } else if (throwable instanceof InvalidCommandSenderException) {
@@ -108,21 +132,21 @@ public class JDACommandListener<C> extends ListenerAdapter {
                                 sender,
                                 InvalidCommandSenderException.class,
                                 (InvalidCommandSenderException) throwable,
-                                (c, e) -> this.sendMessage(event, throwable.getMessage())
+                                (c, e) -> this.sendMessage(commandSender, throwable.getMessage())
                         );
                     } else if (throwable instanceof NoPermissionException) {
                         this.commandManager.handleException(
                                 sender,
                                 NoPermissionException.class,
                                 (NoPermissionException) throwable,
-                                (c, e) -> this.sendMessage(event, MESSAGE_NO_PERMS)
+                                (c, e) -> this.sendMessage(commandSender, MESSAGE_NO_PERMS)
                         );
                     } else if (throwable instanceof NoSuchCommandException) {
                         this.commandManager.handleException(
                                 sender,
                                 NoSuchCommandException.class,
                                 (NoSuchCommandException) throwable,
-                                (c, e) -> this.sendMessage(event, MESSAGE_UNKNOWN_COMMAND)
+                                (c, e) -> this.sendMessage(commandSender, MESSAGE_UNKNOWN_COMMAND)
                         );
                     } else if (throwable instanceof ArgumentParseException) {
                         this.commandManager.handleException(
@@ -130,7 +154,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
                                 ArgumentParseException.class,
                                 (ArgumentParseException) throwable,
                                 (c, e) -> this.sendMessage(
-                                        event,
+                                        commandSender,
                                         "Invalid Command Argument: " + throwable.getCause().getMessage()
                                 )
                         );
@@ -140,7 +164,7 @@ public class JDACommandListener<C> extends ListenerAdapter {
                                 CommandExecutionException.class,
                                 (CommandExecutionException) throwable,
                                 (c, e) -> {
-                                    this.sendMessage(event, MESSAGE_INTERNAL_ERROR);
+                                    this.sendMessage(commandSender, MESSAGE_INTERNAL_ERROR);
                                     throwable.getCause().printStackTrace();
                                 }
                         );
@@ -149,76 +173,32 @@ public class JDACommandListener<C> extends ListenerAdapter {
                                 sender,
                                 BotJDAPermissionException.class,
                                 (BotJDAPermissionException) throwable,
-                                (c, e) -> this.sendMessage(event, e.getMessage())
+                                (c, e) -> this.sendMessage(commandSender, e.getMessage())
                         );
                     } else if (throwable instanceof UserJDAPermissionException) {
                         this.commandManager.handleException(
                                 sender,
                                 UserJDAPermissionException.class,
                                 (UserJDAPermissionException) throwable,
-                                (c, e) -> this.sendMessage(event, e.getMessage())
+                                (c, e) -> this.sendMessage(commandSender, e.getMessage())
                         );
-                    } else {
-                        this.sendMessage(event, throwable.getMessage());
+                    } else if (throwable instanceof Exception) {
+                        final Exception exception = (Exception) throwable;
+
+                        //noinspection unchecked
+                        this.commandManager.handleException(
+                                sender,
+                                (Class<Exception>) exception.getClass(),
+                                exception,
+                                (c, e) -> this.sendMessage(commandSender, e.getMessage())
+                        );
+
                     }
                 });
     }
 
-    private void sendMessage(final @NonNull MessageReceivedEvent event, final @NonNull String message) {
-        event.getChannel().sendMessage(message).queue();
-    }
-
-    /**
-     * Check if the raw content begins with any of the prefixes.
-     * Returns null if no prefix is found to match.
-     *
-     * @param rawContent The raw string content
-     * @param sender     The sender
-     * @return The prefix it begins with. Returns {@code null} if none.
-     */
-    private @Nullable String startsWithPrefix(final String rawContent, final C sender) {
-        final String primaryPrefix = this.commandManager.getPrefixMapper().apply(sender);
-        final List<String> auxiliaryPrefixes = this.commandManager.getAuxiliaryPrefixMapper().apply(sender);
-
-        if (rawContent.startsWith(primaryPrefix)) { // first match primary prefix
-            return primaryPrefix;
-        }
-
-        for (final String auxiliaryPrefix : auxiliaryPrefixes) { // second, match auxiliary prefixes
-            if (rawContent.startsWith(auxiliaryPrefix)) {
-                return auxiliaryPrefix;
-            }
-        }
-
-
-        if (rawContent.startsWith("<@")) { // last, match against bot mention
-            final int angleClose = rawContent.indexOf('>');
-            if (angleClose != -1) {
-                final StringBuilder match = new StringBuilder();
-                final int prefixSize;
-
-                if (rawContent.startsWith("<@!")) {
-                    prefixSize = 3;
-                } else {
-                    prefixSize = 2;
-                }
-
-                if (!rawContent.substring(prefixSize, angleClose).equals(this.idString)) {
-                    return null;
-                }
-
-                match.append(rawContent, prefixSize, angleClose + 1);
-
-                if (rawContent.charAt(angleClose + 1) == ' ') {
-                    match.append(' ');
-                }
-
-                return match.toString();
-            }
-        }
-
-
-        return null;
+    private void sendMessage(final @NonNull JDACommandSender sender, final @NonNull String message) {
+        sender.getChannel().sendMessage(message).queue();
     }
 
 }

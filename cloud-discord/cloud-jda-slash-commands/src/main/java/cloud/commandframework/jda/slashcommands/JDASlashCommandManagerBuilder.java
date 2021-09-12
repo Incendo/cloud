@@ -26,12 +26,15 @@ package cloud.commandframework.jda.slashcommands;
 
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
-import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.CommandSuggestionProcessor;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.jda.slashcommands.internal.CommandConfig;
+import cloud.commandframework.jda.slashcommands.internal.ComplexPrefixMatcher;
+import cloud.commandframework.jda.slashcommands.internal.ParserConfig;
+import cloud.commandframework.jda.slashcommands.sender.JDACommandSender;
+import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.meta.SimpleCommandMeta;
 import net.dv8tion.jda.api.JDA;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -41,15 +44,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
-
-@SuppressWarnings("unused")
 public final class JDASlashCommandManagerBuilder<C> {
 
     @NonNull
     private final JDA jda;
-    @NonNull
-    private final List<Function<@NonNull C, @NonNull String>> prefixMatchers = new ArrayList<>();
     @NonNull
     private final List<Function<@NonNull C, @NonNull List<String>>> prefixMappers = new ArrayList<>();
     @NonNull
@@ -60,13 +60,12 @@ public final class JDASlashCommandManagerBuilder<C> {
     private final Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
     private boolean enableBotMentionPrefix = false;
     private boolean enableSlashCommands = true;
+    private boolean enableMessageCommands = true;
     private boolean enableDefaultPreprocessors = true;
     private boolean enableDefaultParsers = true;
     private boolean registerCommandListener = true;
-    @NonNull
-    private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
-    @NonNull
-    private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
+    @Nullable
+    private CommandSyntaxFormatter<C> commandSyntaxFormatter = null;
     @Nullable
     private CaptionRegistry<C> captionRegistry = null;
     @NonNull
@@ -77,6 +76,8 @@ public final class JDASlashCommandManagerBuilder<C> {
                     .<C>newBuilder()
                     .withAsynchronousParsing()
                     .build();
+    @NonNull
+    private Supplier<CommandMeta> commandMetaSupplier = SimpleCommandMeta::empty;
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static <C> JDASlashCommandManagerBuilder<C> Builder(
@@ -102,6 +103,11 @@ public final class JDASlashCommandManagerBuilder<C> {
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
     }
 
+    /**
+     * Sets the command execution coordinator to use {@link AsynchronousCommandExecutionCoordinator}.
+     *
+     * @return The builder. Useful for chaining.
+     */
     @NonNull
     public JDASlashCommandManagerBuilder<C> withAsynchronousCoordinator() {
         commandExecutionCoordinator = AsynchronousCommandExecutionCoordinator
@@ -112,6 +118,11 @@ public final class JDASlashCommandManagerBuilder<C> {
         return this;
     }
 
+    /**
+     * Sets the command execution coordinator to use {@link CommandExecutionCoordinator.SimpleCoordinator}.
+     *
+     * @return The builder. Useful for chaining.
+     */
     @NonNull
     public JDASlashCommandManagerBuilder<C> withSynchronousCoordinator() {
         commandExecutionCoordinator = CommandExecutionCoordinator.simpleCoordinator();
@@ -121,14 +132,7 @@ public final class JDASlashCommandManagerBuilder<C> {
 
     @NonNull
     @SafeVarargs
-    public final JDASlashCommandManagerBuilder<C> addPrefixMatchers(@NonNull final Function<C, @Nullable String>... prefixMatchers) {
-        Collections.addAll(this.prefixMatchers, prefixMatchers);
-
-        return this;
-    }
-
-    @NonNull
-    @SafeVarargs
+    @SuppressWarnings("varargs")
     public final JDASlashCommandManagerBuilder<C> addPrefixMappers(@NonNull final Function<C, @NonNull List<String>>... prefixMappers) {
         Collections.addAll(this.prefixMappers, prefixMappers);
 
@@ -137,56 +141,19 @@ public final class JDASlashCommandManagerBuilder<C> {
 
     @NonNull
     @SafeVarargs
-    public final JDASlashCommandManagerBuilder<C> addSinglePrefixMappers(@NonNull final Function<C, @NonNull String>... prefixMappers) {
-        Collections.addAll(this.singlePrefixMappers, prefixMappers);
+    @SuppressWarnings("varargs")
+    public final JDASlashCommandManagerBuilder<C> addSinglePrefixMappers(@NonNull final Function<C, @NonNull String>... singlePrefixMappers) {
+        Collections.addAll(this.singlePrefixMappers, singlePrefixMappers);
 
         return this;
     }
 
-    public boolean isEnableDefaultPreprocessors() {
-        return enableDefaultPreprocessors;
+    public boolean isEnableMessageCommands() {
+        return enableMessageCommands;
     }
 
-    public JDASlashCommandManagerBuilder<C> setEnableDefaultPreprocessors(final boolean enableDefaultPreprocessors) {
-        this.enableDefaultPreprocessors = enableDefaultPreprocessors;
-        return this;
-    }
-
-    public boolean isEnableDefaultParsers() {
-        return enableDefaultParsers;
-    }
-
-    public JDASlashCommandManagerBuilder<C> setEnableDefaultParsers(final boolean enableDefaultParsers) {
-        this.enableDefaultParsers = enableDefaultParsers;
-        return this;
-    }
-
-    public boolean isEnableSlashCommands() {
-        return enableSlashCommands;
-    }
-
-    public JDASlashCommandManagerBuilder<C> setEnableSlashCommands(final boolean enableSlashCommands) {
-        this.enableSlashCommands = enableSlashCommands;
-        return this;
-    }
-
-    public boolean isRegisterCommandListener() {
-        return registerCommandListener;
-    }
-
-    public JDASlashCommandManagerBuilder<C> setRegisterCommandListener(final boolean registerCommandListener) {
-        this.registerCommandListener = registerCommandListener;
-        return this;
-    }
-
-    public boolean isEnableBotMentionPrefix() {
-        return enableBotMentionPrefix;
-    }
-
-    @NonNull
-    public JDASlashCommandManagerBuilder<C> setEnableBotMentionPrefix(final boolean enableBotMentionPrefix) {
-        this.enableBotMentionPrefix = enableBotMentionPrefix;
-
+    public JDASlashCommandManagerBuilder<C> setEnableMessageCommands(final boolean enableMessageCommands) {
+        this.enableMessageCommands = enableMessageCommands;
         return this;
     }
 
@@ -196,31 +163,13 @@ public final class JDASlashCommandManagerBuilder<C> {
     }
 
     @NonNull
-    public List<Function<C, String>> getPrefixMatchers() {
-        return prefixMatchers;
+    public List<Function<C, List<String>>> getPrefixMappers() {
+        return prefixMappers;
     }
 
     @NonNull
     public List<Function<C, String>> getSinglePrefixMappers() {
         return singlePrefixMappers;
-    }
-
-    @NonNull
-    public Function<CommandTree<C>, CommandExecutionCoordinator<C>> getCommandExecutionCoordinator() {
-        return commandExecutionCoordinator;
-    }
-
-    @NonNull
-    public JDASlashCommandManagerBuilder<C> setCommandExecutionCoordinator(
-            final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator
-    ) {
-        this.commandExecutionCoordinator = commandExecutionCoordinator;
-        return this;
-    }
-
-    @NonNull
-    public List<Function<C, List<String>>> getPrefixMappers() {
-        return prefixMappers;
     }
 
     @NonNull
@@ -233,15 +182,66 @@ public final class JDASlashCommandManagerBuilder<C> {
         return backwardsCommandSenderMapper;
     }
 
+    public boolean isEnableBotMentionPrefix() {
+        return enableBotMentionPrefix;
+    }
+
     @NonNull
+    public JDASlashCommandManagerBuilder<C> setEnableBotMentionPrefix(final boolean enableBotMentionPrefix) {
+        this.enableBotMentionPrefix = enableBotMentionPrefix;
+        return this;
+    }
+
+    public boolean isEnableSlashCommands() {
+        return enableSlashCommands;
+    }
+
+    @NonNull
+    public JDASlashCommandManagerBuilder<C> setEnableSlashCommands(final boolean enableSlashCommands) {
+        this.enableSlashCommands = enableSlashCommands;
+        return this;
+    }
+
+    public boolean isEnableDefaultPreprocessors() {
+        return enableDefaultPreprocessors;
+    }
+
+    @NonNull
+    public JDASlashCommandManagerBuilder<C> setEnableDefaultPreprocessors(final boolean enableDefaultPreprocessors) {
+        this.enableDefaultPreprocessors = enableDefaultPreprocessors;
+        return this;
+    }
+
+    public boolean isEnableDefaultParsers() {
+        return enableDefaultParsers;
+    }
+
+    @NonNull
+    public JDASlashCommandManagerBuilder<C> setEnableDefaultParsers(final boolean enableDefaultParsers) {
+        this.enableDefaultParsers = enableDefaultParsers;
+        return this;
+    }
+
+    public boolean isRegisterCommandListener() {
+        return registerCommandListener;
+    }
+
+    @NonNull
+    public JDASlashCommandManagerBuilder<C> setRegisterCommandListener(final boolean registerCommandListener) {
+        this.registerCommandListener = registerCommandListener;
+        return this;
+    }
+
+    @Nullable
     public CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
         return commandSyntaxFormatter;
     }
 
     @NonNull
-    public JDASlashCommandManagerBuilder<C> setCommandSyntaxFormatter(final CommandSyntaxFormatter<C> commandSyntaxFormatter) {
+    public JDASlashCommandManagerBuilder<C> setCommandSyntaxFormatter(
+            @Nullable final CommandSyntaxFormatter<C> commandSyntaxFormatter
+    ) {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
-
         return this;
     }
 
@@ -251,9 +251,8 @@ public final class JDASlashCommandManagerBuilder<C> {
     }
 
     @NonNull
-    public JDASlashCommandManagerBuilder<C> setCaptionRegistry(final CaptionRegistry<C> captionRegistry) {
+    public JDASlashCommandManagerBuilder<C> setCaptionRegistry(@Nullable final CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
-
         return this;
     }
 
@@ -263,27 +262,63 @@ public final class JDASlashCommandManagerBuilder<C> {
     }
 
     @NonNull
-    public JDASlashCommandManagerBuilder<C> setPermissionMapper(final BiFunction<C, String, Boolean> permissionMapper) {
+    public JDASlashCommandManagerBuilder<C> setPermissionMapper(
+            @NonNull final BiFunction<C, String, Boolean> permissionMapper
+    ) {
         this.permissionMapper = permissionMapper;
-
         return this;
     }
 
     @NonNull
-    public CommandSuggestionProcessor<C> getCommandSuggestionProcessor() {
-        return commandSuggestionProcessor;
+    public Function<CommandTree<C>, CommandExecutionCoordinator<C>> getCommandExecutionCoordinator() {
+        return commandExecutionCoordinator;
     }
 
     @NonNull
-    public JDASlashCommandManagerBuilder<C> setCommandSuggestionProcessor(final CommandSuggestionProcessor<C> commandSuggestionProcessor) {
-        this.commandSuggestionProcessor = commandSuggestionProcessor;
+    public JDASlashCommandManagerBuilder<C> setCommandExecutionCoordinator(
+            @NonNull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator
+    ) {
+        this.commandExecutionCoordinator = commandExecutionCoordinator;
+        return this;
+    }
 
+    @NonNull
+    public Supplier<CommandMeta> getCommandMetaSupplier() {
+        return commandMetaSupplier;
+    }
+
+    @NonNull
+    public JDASlashCommandManagerBuilder<C> setCommandMetaSupplier(
+            @NonNull final Supplier<CommandMeta> commandMetaSupplier
+    ) {
+        this.commandMetaSupplier = commandMetaSupplier;
         return this;
     }
 
     @NonNull
     public JDASlashCommandManager<C> build() throws InterruptedException {
-        return null; // TODO: 2021-09-12  
+        jda.awaitReady();
+
+        final CommandConfig<C> commandConfig = new CommandConfig<>(
+                commandSenderMapper,
+                backwardsCommandSenderMapper,
+                enableDefaultPreprocessors,
+                registerCommandListener,
+                commandMetaSupplier,
+                commandSyntaxFormatter,
+                permissionMapper,
+                commandExecutionCoordinator,
+                captionRegistry
+        );
+
+        final ParserConfig<C> parserConfig = new ParserConfig<>(
+                new ComplexPrefixMatcher<>(prefixMappers, singlePrefixMappers, enableBotMentionPrefix, jda.getSelfUser().getId()),
+                enableSlashCommands,
+                enableMessageCommands,
+                enableDefaultParsers
+        );
+
+        return new JDASlashCommandManager<>(jda, commandConfig, parserConfig);
     }
 
 }
