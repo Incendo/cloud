@@ -40,7 +40,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -199,7 +198,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     @Override
-    public boolean testPermissionSilent(@NotNull final CommandSender target) {
+    public boolean testPermissionSilent(final @NonNull CommandSender target) {
         final CommandPermission permission = (CommandPermission) this.namedNode()
                 .getNodeMeta()
                 .getOrDefault("permission", Permission.empty());
