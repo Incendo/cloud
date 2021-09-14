@@ -30,14 +30,14 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.meta.SimpleCommandMeta
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class KotlinAnnotatedMethodsTest {
 
@@ -60,22 +60,23 @@ class KotlinAnnotatedMethodsTest {
     @Test
     fun `test suspending command methods`(): Unit = runBlocking {
         AnnotationParser(commandManager, TestCommandSender::class.java) {
-                SimpleCommandMeta.empty()
-            }
+            SimpleCommandMeta.empty()
+        }
             .also { it.installCoroutineSupport() }
             .parse(CommandMethods())
 
         commandManager.executeCommand(TestCommandSender(), "test").await()
     }
 
-    private class TestCommandSender {}
+    private class TestCommandSender
 
     private class TestCommandManager :
         CommandManager<TestCommandSender>(
             AsynchronousCommandExecutionCoordinator.newBuilder<TestCommandSender>()
                 .withExecutor(executorService)
                 .build(),
-            CommandRegistrationHandler.nullCommandRegistrationHandler()) {
+            CommandRegistrationHandler.nullCommandRegistrationHandler()
+        ) {
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean = true
 

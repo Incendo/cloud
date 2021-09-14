@@ -1,10 +1,9 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import java.net.URL
 
 plugins {
     kotlin("jvm") version "1.4.31"
     id("org.jetbrains.dokka") version "1.4.20"
-    id("com.ncorti.ktfmt.gradle") version "0.6.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
 configurations.all {
@@ -49,8 +48,4 @@ tasks {
 
 kotlin {
     explicitApi()
-}
-
-ktfmt {
-    dropboxStyle()
 }
