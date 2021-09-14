@@ -3,7 +3,7 @@ import xyz.jpenilla.runpaper.task.RunServerTask
 plugins {
     id("cloud.example-conventions")
     id("com.github.johnrengelman.shadow")
-    id("xyz.jpenilla.run-paper") version "1.0.3"
+    id("xyz.jpenilla.run-paper") version "1.0.4"
 }
 
 dependencies {
@@ -12,7 +12,9 @@ dependencies {
     implementation(project(":cloud-annotations"))
     implementation(project(":cloud-minecraft-extras"))
     /* Extras */
-    implementation("me.lucko", "commodore", Versions.commodore)
+    implementation("me.lucko", "commodore", Versions.commodore) {
+        isTransitive = false
+    }
     implementation("net.kyori", "adventure-platform-bukkit", Versions.adventurePlatform)
     /* Bukkit */
     compileOnly("org.bukkit", "bukkit", Versions.bukkit)
@@ -20,9 +22,9 @@ dependencies {
 
 tasks {
     shadowJar {
-        dependencies {
-            exclude(dependency("org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT"))
-        }
+        relocate("net.kyori", "cloud.commandframework.example.kyori")
+        relocate("me.lucko", "cloud.commandframework.example.lucko")
+        relocate("io.leangen.geantyref", "cloud.commandframework.example.geantyref")
     }
     build {
         dependsOn(shadowJar)
