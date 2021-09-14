@@ -27,6 +27,10 @@ import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.MethodCommandExecutionHandler
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.execution.CommandExecutionCoordinator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.future.asCompletableFuture
 import java.lang.reflect.Method
 import java.util.concurrent.CompletableFuture
 import java.util.function.Predicate
@@ -34,8 +38,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.jvm.kotlinFunction
-import kotlinx.coroutines.*
-import kotlinx.coroutines.future.asCompletableFuture
 
 /**
  * Adds coroutine support to the [AnnotationParser].
@@ -48,8 +50,9 @@ public fun <C> AnnotationParser<C>.installCoroutineSupport(
 ) {
     if (manager().commandExecutionCoordinator() is CommandExecutionCoordinator.SimpleCoordinator) {
         RuntimeException(
-                """You are highly advised to not use the simple command execution coordinator together
-                            with coroutine support. Consider using the asynchronous command execution coordinator instead.""")
+            """You are highly advised to not use the simple command execution coordinator together
+                            with coroutine support. Consider using the asynchronous command execution coordinator instead."""
+        )
             .printStackTrace()
     }
 
