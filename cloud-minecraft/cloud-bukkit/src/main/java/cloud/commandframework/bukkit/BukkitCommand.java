@@ -198,4 +198,10 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         return this.manager.getCommandSyntaxFormatter().apply(this.cloudCommand.getArguments(), null);
     }
 
+    @Override
+    public boolean testPermissionSilent(@NonNull final CommandSender target) {
+        return this.manager.hasPermission(this.manager.getCommandSenderMapper().apply(target),
+                this.cloudCommand.getCommandPermission());
+    }
+
 }
