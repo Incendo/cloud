@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
@@ -32,12 +33,16 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.permission.Permission;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
@@ -77,7 +82,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     @Override
-    public List<String> tabComplete(
+    public @NonNull List<String> tabComplete(
             final @NonNull CommandSender sender,
             final @NonNull String alias,
             final @NonNull String @NonNull [] args
@@ -104,10 +109,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             builder.append(" ").append(string);
         }
         final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
-        this.manager.executeCommand(
-                sender,
-                builder.toString()
-        )
+        this.manager.executeCommand(sender, builder.toString())
                 .whenComplete((commandResult, throwable) -> {
                     if (throwable != null) {
                         if (throwable instanceof CompletionException) {
@@ -179,23 +181,34 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     @Override
-    public String getDescription() {
+    public @NonNull String getDescription() {
         return this.cloudCommand.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
     }
 
     @Override
-    public Plugin getPlugin() {
+    public @NonNull Plugin getPlugin() {
         return this.manager.getOwningPlugin();
     }
 
     @Override
-    public String getPermission() {
-        return this.cloudCommand.getCommandPermission().toString();
+    public @NonNull String getUsage() {
+        return this.manager.getCommandSyntaxFormatter().apply(
+                Collections.singletonList(this.namedNode().getValue()),
+                this.namedNode()
+        );
     }
 
     @Override
-    public String getUsage() {
-        return this.manager.getCommandSyntaxFormatter().apply(this.cloudCommand.getArguments(), null);
+    public boolean testPermissionSilent(@NotNull final CommandSender target) {
+        final CommandPermission permission = (CommandPermission) this.namedNode()
+                .getNodeMeta()
+                .getOrDefault("permission", Permission.empty());
+
+        return this.manager.hasPermission(this.manager.getCommandSenderMapper().apply(target), permission);
+    }
+
+    private CommandTree.Node<CommandArgument<C, ?>> namedNode() {
+        return this.manager.getCommandTree().getNamedNode(this.getLabel());
     }
 
 }
