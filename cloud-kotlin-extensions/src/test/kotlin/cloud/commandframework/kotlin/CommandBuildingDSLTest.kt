@@ -27,7 +27,10 @@ import cloud.commandframework.CommandManager
 import cloud.commandframework.arguments.standard.StringArgument
 import cloud.commandframework.execution.CommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
-import cloud.commandframework.kotlin.extension.*
+import cloud.commandframework.kotlin.extension.argumentDescription
+import cloud.commandframework.kotlin.extension.buildAndRegister
+import cloud.commandframework.kotlin.extension.command
+import cloud.commandframework.kotlin.extension.commandBuilder
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.meta.SimpleCommandMeta
 import org.junit.jupiter.api.Assertions
@@ -58,8 +61,10 @@ class CommandBuildingDSLTest {
                         handler {
                             // ...
                         }
-                    })
-            })
+                    }
+                )
+            }
+        )
 
         manager.buildAndRegister("is") {
             commandDescription("Command description")
@@ -85,20 +90,21 @@ class CommandBuildingDSLTest {
         Assertions.assertEquals(
             manager.commandHelpHandler.allCommands.map { it.syntaxString }.sorted(),
             setOf(
-                    "kotlin dsl <moment>",
-                    "kotlin dsl <moment> bruh_moment",
-                    "is",
-                    "is this",
-                    "is this going",
-                    "is this going too_far",
-                )
-                .sorted())
+                "kotlin dsl <moment>",
+                "kotlin dsl <moment> bruh_moment",
+                "is",
+                "is this",
+                "is this going",
+                "is this going too_far",
+            )
+                .sorted()
+        )
     }
 
-    class TestCommandManager :
-        CommandManager<TestCommandSender>(
-            CommandExecutionCoordinator.simpleCoordinator(),
-            CommandRegistrationHandler.nullCommandRegistrationHandler()) {
+    class TestCommandManager : CommandManager<TestCommandSender>(
+        CommandExecutionCoordinator.simpleCoordinator(),
+        CommandRegistrationHandler.nullCommandRegistrationHandler()
+    ) {
         override fun createDefaultCommandMeta(): SimpleCommandMeta {
             return SimpleCommandMeta.empty()
         }

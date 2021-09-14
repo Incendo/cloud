@@ -42,7 +42,8 @@ import kotlin.reflect.KClass
 @Suppress("DEPRECATION")
 @Deprecated(
     message = "ArgumentDescription should be used over Description",
-    level = DeprecationLevel.HIDDEN)
+    level = DeprecationLevel.HIDDEN
+)
 public fun <C : Any> CommandManager<C>.commandBuilder(
     name: String,
     description: Description = Description.empty(),
@@ -79,7 +80,8 @@ public fun <C : Any> CommandManager<C>.commandBuilder(
 @Suppress("DEPRECATION")
 @Deprecated(
     message = "ArgumentDescription should be used over Description",
-    level = DeprecationLevel.HIDDEN)
+    level = DeprecationLevel.HIDDEN
+)
 public fun <C : Any> CommandManager<C>.buildAndRegister(
     name: String,
     description: Description = Description.empty(),
@@ -137,7 +139,8 @@ public fun <C : Any> Command.Builder<C>.senderType(type: KClass<out C>): Command
 @Suppress("DEPRECATION")
 @Deprecated(
     message = "Use interface variant that allows for rich text",
-    replaceWith = ReplaceWith("argumentDescription(description)"))
+    replaceWith = ReplaceWith("argumentDescription(description)")
+)
 public fun description(description: String = ""): Description =
     if (description.isEmpty()) Description.empty() else Description.of(description)
 

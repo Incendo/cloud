@@ -57,7 +57,8 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(
         message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN)
+        level = DeprecationLevel.HIDDEN
+    )
     public constructor(
         name: String,
         description: Description = Description.empty(),
@@ -100,7 +101,8 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(
         message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN)
+        level = DeprecationLevel.HIDDEN
+    )
     public constructor(
         name: String,
         description: Description = Description.empty(),
@@ -171,7 +173,7 @@ public class MutableCommandBuilder<C : Any> {
         return this
     }
 
-    private fun onlyMutate(mutator: (Command.Builder<C>) -> Command.Builder<C>): Unit {
+    private fun onlyMutate(mutator: (Command.Builder<C>) -> Command.Builder<C>) {
         mutate(mutator)
     }
 
@@ -207,7 +209,8 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(
         message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN)
+        level = DeprecationLevel.HIDDEN
+    )
     public fun copy(
         literal: String,
         description: Description,
@@ -306,7 +309,8 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(
         message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN)
+        level = DeprecationLevel.HIDDEN
+    )
     public fun registerCopy(
         literal: String,
         description: Description,
@@ -341,8 +345,8 @@ public class MutableCommandBuilder<C : Any> {
      */
     public fun <T : Any> meta(key: CommandMeta.Key<T>, value: T): MutableCommandBuilder<C> =
         mutate {
-        it.meta(key, value)
-    }
+            it.meta(key, value)
+        }
 
     /**
      * Set the value for a certain [CommandMeta.Key] in the command meta storage for this builder
@@ -481,7 +485,8 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(
         message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN)
+        level = DeprecationLevel.HIDDEN
+    )
     public fun argument(
         argument: CommandArgument<C, *>,
         description: Description = Description.empty()
@@ -511,7 +516,8 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(
         message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN)
+        level = DeprecationLevel.HIDDEN
+    )
     public fun argument(
         argument: CommandArgument.Builder<C, *>,
         description: Description = Description.empty()
@@ -541,7 +547,8 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(
         message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN)
+        level = DeprecationLevel.HIDDEN
+    )
     public fun argument(
         description: Description = Description.empty(),
         argumentSupplier: () -> CommandArgument<C, *>
@@ -572,7 +579,8 @@ public class MutableCommandBuilder<C : Any> {
     @Suppress("DEPRECATION")
     @Deprecated(
         message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN)
+        level = DeprecationLevel.HIDDEN
+    )
     public fun literal(
         name: String,
         description: Description = Description.empty(),
@@ -627,7 +635,8 @@ public class MutableCommandBuilder<C : Any> {
                 .withAliases(*aliases)
                 .withDescription(description)
                 .withArgument(argumentSupplier())
-                .build())
+                .build()
+        )
     }
 
     /**
@@ -652,7 +661,8 @@ public class MutableCommandBuilder<C : Any> {
                 .withAliases(*aliases)
                 .withDescription(description)
                 .withArgument(argument)
-                .build())
+                .build()
+        )
     }
 
     /**
@@ -677,7 +687,8 @@ public class MutableCommandBuilder<C : Any> {
                 .withAliases(*aliases)
                 .withDescription(description)
                 .withArgument(argumentBuilder)
-                .build())
+                .build()
+        )
     }
 
     /**
@@ -699,6 +710,7 @@ public class MutableCommandBuilder<C : Any> {
                 .flagBuilder(name)
                 .withAliases(*aliases)
                 .withDescription(description)
-                .build())
+                .build()
+        )
     }
 }
