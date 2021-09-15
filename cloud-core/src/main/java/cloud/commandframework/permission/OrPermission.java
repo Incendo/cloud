@@ -50,11 +50,7 @@ public final class OrPermission implements CommandPermission {
      * @return Constructed permission
      */
     public static @NonNull CommandPermission of(final @NonNull Collection<CommandPermission> permissions) {
-        final Set<CommandPermission> permissionSet = new HashSet<>();
-        for (final CommandPermission permission : permissions) {
-            permissionSet.addAll(permission.getPermissions());
-        }
-        return new OrPermission(permissionSet);
+        return new OrPermission(new HashSet<>(permissions));
     }
 
     @Override
