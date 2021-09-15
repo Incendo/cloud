@@ -6,21 +6,29 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
 
-configurations.all {
-    dependencies.removeIf { it.group == "org.jetbrains.kotlin" }
+val compileAndTest: Configuration by configurations.creating
+
+configurations {
+    all {
+        dependencies.removeIf { it.group == "org.jetbrains.kotlin" }
+    }
+
+    compileOnly {
+        extendsFrom(compileAndTest)
+    }
+    testImplementation {
+        extendsFrom(compileAndTest)
+    }
 }
 
 dependencies {
     api(project(":cloud-core"))
-    implementation(kotlin("stdlib-jdk8"))
 
-    implementation(project(":cloud-annotations"))
-    implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2")
-
-    testImplementation("org.jetbrains.kotlin", "kotlin-test-junit5")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2")
+    compileAndTest(project(":cloud-annotations"))
+    compileAndTest(kotlin("stdlib-jdk8"))
+    compileAndTest(kotlin("reflect"))
+    compileAndTest("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    compileAndTest("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2")
 }
 
 tasks {
