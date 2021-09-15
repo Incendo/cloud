@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Bukkit: Permission checking and syntax string for Bukkit '/help' command
+- And/OrPermission factory method `of` did not preserve the conditional tree
 
 ## [1.5.0]
 
