@@ -1,7 +1,7 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.5.30"
     id("org.jetbrains.dokka") version "1.4.20"
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
@@ -15,12 +15,12 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     implementation(project(":cloud-annotations"))
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.31")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.4.3")
+    implementation(kotlin("reflect"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2")
 
     testImplementation("org.jetbrains.kotlin", "kotlin-test-junit5")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.4.3")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2")
 }
 
 tasks {
