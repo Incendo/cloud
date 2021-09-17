@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -43,6 +44,9 @@ import java.util.function.BiFunction;
 
 /**
  * Argument type that parses Bukkit {@link World worlds} from a {@link NamespacedKey}.
+ *
+ * <p>Falls back to parsing by name, using the {@link WorldArgument.WorldParser} on server implementations where {@link World}
+ * does not implement {@link org.bukkit.Keyed}.</p>
  *
  * @param <C> Command sender type
  * @since 1.6.0
@@ -162,6 +166,20 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
      */
     public static final class Parser<C> implements ArgumentParser<C, World> {
 
+        private final ArgumentParser<C, World> parser;
+
+        /**
+         * Create a new {@link Parser}.
+         */
+        public Parser() {
+            final Class<?> keyed = CraftBukkitReflection.findClass("org.bukkit.Keyed");
+            if (keyed != null && keyed.isAssignableFrom(World.class)) {
+                this.parser = null;
+            } else {
+                this.parser = new WorldArgument.WorldParser<>();
+            }
+        }
+
         @Override
         public @NonNull ArgumentParseResult<@NonNull World> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
@@ -173,6 +191,10 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
                         Parser.class,
                         commandContext
                 ));
+            }
+
+            if (this.parser != null) {
+                return this.parser.parse(commandContext, inputQueue);
             }
 
             final NamespacedKey key = NamespacedKey.fromString(input);
@@ -194,6 +216,10 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
+            if (this.parser != null) {
+                return this.parser.suggestions(commandContext, input);
+            }
+
             final List<String> completions = new ArrayList<>();
             for (final World world : Bukkit.getWorlds()) {
                 if (world.getKey().getNamespace().equals(NamespacedKey.MINECRAFT)) {
