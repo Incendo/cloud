@@ -104,6 +104,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             } else if (argument instanceof FlagArgument) {
                 formattingInstance.appendBlankSpace();
                 formattingInstance.appendFlag((FlagArgument<?>) argument);
+            } else if (argument instanceof StaticArgument) {
+                formattingInstance.appendBlankSpace();
+                formattingInstance.appendLiteral((StaticArgument<?>) argument);
             } else {
                 formattingInstance.appendBlankSpace();
                 if (argument.isRequired()) {
