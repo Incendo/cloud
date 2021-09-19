@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  * Used to declare a class method as a command method
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface CommandMethod {
 
     /**
