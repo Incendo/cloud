@@ -406,7 +406,8 @@ public final class AnnotationParser<C> {
             final @NonNull Object instance,
             final @NonNull Collection<@NonNull CommandMethodPair> methodPairs
     ) {
-        final CommandMethod classCommandMethod = instance.getClass().getAnnotation(CommandMethod.class);
+        final AnnotationAccessor classAnnotations = AnnotationAccessor.of(instance.getClass());
+        final CommandMethod classCommandMethod = classAnnotations.annotation(CommandMethod.class);
         final String syntaxPrefix = classCommandMethod == null ? "" : (classCommandMethod.value() + " ");
         final Collection<Command<C>> commands = new ArrayList<>();
         for (final CommandMethodPair commandMethodPair : methodPairs) {
