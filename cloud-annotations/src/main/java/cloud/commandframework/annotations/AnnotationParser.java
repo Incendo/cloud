@@ -406,13 +406,16 @@ public final class AnnotationParser<C> {
             final @NonNull Object instance,
             final @NonNull Collection<@NonNull CommandMethodPair> methodPairs
     ) {
+        final CommandMethod classCommandMethod = instance.getClass().getAnnotation(CommandMethod.class);
+        final String syntaxPrefix = classCommandMethod == null ? "" : (classCommandMethod.value() + " ");
         final Collection<Command<C>> commands = new ArrayList<>();
         for (final CommandMethodPair commandMethodPair : methodPairs) {
             final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
             final Method method = commandMethodPair.getMethod();
-            final List<SyntaxFragment> tokens = this.syntaxParser.apply(commandMethod.value());
+            final String syntax = syntaxPrefix + commandMethod.value();
+            final List<SyntaxFragment> tokens = this.syntaxParser.apply(syntax);
             /* Determine command name */
-            final String commandToken = commandMethod.value().split(" ")[0].split("\\|")[0];
+            final String commandToken = syntax.split(" ")[0].split("\\|")[0];
             @SuppressWarnings("rawtypes") final CommandManager manager = this.manager;
             final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
                     .with(this.metaFactory.apply(method));
