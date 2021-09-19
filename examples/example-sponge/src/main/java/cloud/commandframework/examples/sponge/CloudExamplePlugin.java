@@ -61,7 +61,6 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.ResourceKey;
@@ -94,7 +93,7 @@ import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
-import org.spongepowered.plugin.jvm.Plugin;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -144,7 +143,7 @@ public final class CloudExamplePlugin {
         // Register minecraft-extras exception handlers
         new MinecraftExceptionHandler<CommandCause>()
                 .withDefaultHandlers()
-                .withDecorator(message -> TextComponent.ofChildren(COMMAND_PREFIX, space(), message))
+                .withDecorator(message -> Component.text().append(COMMAND_PREFIX, space(), message).build())
                 .apply(this.commandManager, CommandCause::audience);
 
         this.registerCommands();
@@ -272,10 +271,10 @@ public final class CloudExamplePlugin {
                 .argument(SinglePlayerSelectorArgument.of("player"))
                 .handler(ctx -> {
                     final Player player = ctx.<SinglePlayerSelector>get("player").getSingle();
-                    ctx.getSender().audience().sendMessage(TextComponent.ofChildren(
+                    ctx.getSender().audience().sendMessage(Component.text().append(
                             text("Display name of selected player: ", GRAY),
                             player.displayName().get()
-                    ));
+                    ).build());
                 }));
         this.commandManager.command(cloud.literal("world_test")
                 .argument(WorldArgument.of("world"))
@@ -309,8 +308,7 @@ public final class CloudExamplePlugin {
         final Function<CommandContext<CommandCause>, RegistryHolder> holderFunction = ctx -> ctx.getSender()
                 .location()
                 .map(Location::world)
-                .orElse(Sponge.server().worldManager().defaultWorld())
-                .registries();
+                .orElse(Sponge.server().worldManager().defaultWorld());
         this.commandManager.command(cloud.literal("test_biomes")
                 .argument(RegistryEntryArgument.of("biome", Biome.class, holderFunction, RegistryTypes.BIOME))
                 .handler(ctx -> {
@@ -357,7 +355,7 @@ public final class CloudExamplePlugin {
                 .argument(MultipleEntitySelectorArgument.of("selector"))
                 .handler(ctx -> {
                     final MultipleEntitySelector selector = ctx.get("selector");
-                    ctx.getSender().audience().sendMessage(TextComponent.ofChildren(
+                    ctx.getSender().audience().sendMessage(Component.text().append(
                             text("Using selector: ", BLUE),
                             text(selector.inputString()),
                             newline(),
@@ -365,7 +363,7 @@ public final class CloudExamplePlugin {
                             selector.get().stream()
                                     .map(e -> e.displayName().get())
                                     .collect(Component.toComponent(text(", ", GRAY)))
-                    ));
+                    ).build());
                 }));
 
         this.commandManager.command(cloud.literal("user")

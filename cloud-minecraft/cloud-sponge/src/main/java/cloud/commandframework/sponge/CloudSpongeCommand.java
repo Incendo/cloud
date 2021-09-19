@@ -39,7 +39,6 @@ import cloud.commandframework.permission.Permission;
 import cloud.commandframework.types.tuples.Pair;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.util.ComponentMessageThrowable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.command.Command;
@@ -104,10 +103,10 @@ final class CloudSpongeCommand<C> implements Command.Raw {
                     cloudSender,
                     InvalidSyntaxException.class,
                     (InvalidSyntaxException) throwable,
-                    (c, e) -> audience.sendMessage(TextComponent.ofChildren(
+                    (c, e) -> audience.sendMessage(Component.text().append(
                             text("Invalid Command Syntax. Correct command syntax is: ", RED),
                             text("/" + e.getCorrectSyntax(), GRAY)
-                    ))
+                    ).build())
             );
         } else if (throwable instanceof InvalidCommandSenderException) {
             this.commandManager.handleException(
@@ -135,10 +134,10 @@ final class CloudSpongeCommand<C> implements Command.Raw {
                     cloudSender,
                     ArgumentParseException.class,
                     (ArgumentParseException) throwable,
-                    (c, e) -> audience.sendMessage(TextComponent.ofChildren(
+                    (c, e) -> audience.sendMessage(Component.text().append(
                             text("Invalid Command Argument: ", RED),
                             getMessage(throwable.getCause()).colorIfAbsent(GRAY)
-                    ))
+                    ).build())
             );
         } else if (throwable instanceof CommandExecutionException) {
             this.commandManager.handleException(

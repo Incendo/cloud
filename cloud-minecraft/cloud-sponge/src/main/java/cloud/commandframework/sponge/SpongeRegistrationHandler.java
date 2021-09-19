@@ -32,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.event.EventListenerRegistration;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 
 import java.util.HashSet;
@@ -72,6 +73,7 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
                 EventListenerRegistration.builder(new TypeToken<RegisterCommandEvent<Command.Raw>>() {})
                         .plugin(this.commandManager.owningPluginContainer())
                         .listener(this::handleRegistrationEvent)
+                        .order(Order.DEFAULT)
                         .build()
         );
     }

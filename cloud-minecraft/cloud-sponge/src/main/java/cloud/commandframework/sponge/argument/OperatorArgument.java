@@ -141,7 +141,7 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
 
         static {
             try {
-                // todo: use an accessor (Sponge has one but we don't have a way of using it)
+                // todo: use an accessor (Sponge has one but we don't have a good way of using it)
                 final Field errorInvalidOperationField = OperationArgument.class
                         .getDeclaredField("ERROR_INVALID_OPERATION");
                 errorInvalidOperationField.setAccessible(true);
