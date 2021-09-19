@@ -37,6 +37,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import java.util.Set;
@@ -91,7 +92,9 @@ class AnnotationParserTest {
                 (injector, builder) -> builder.argument(IntegerArgument.of(injector.value()))
         );
         /* Parse the class. Required for both testMethodConstruction() and testNamedSuggestionProvider() */
-        commands = annotationParser.parse(this);
+        commands = new ArrayList<>();
+        commands.addAll(annotationParser.parse(this));
+        commands.addAll(annotationParser.parse(new ClassCommandMethod()));
     }
 
     @Test
@@ -104,6 +107,7 @@ class AnnotationParserTest {
                 manager.executeCommand(new TestCommandSender(), "test 101").join());
         manager.executeCommand(new TestCommandSender(), "flagcommand -p").join();
         manager.executeCommand(new TestCommandSender(), "flagcommand --print --word peanut").join();
+        manager.executeCommand(new TestCommandSender(), "class method").join();
     }
 
     @Test
@@ -251,6 +255,16 @@ class AnnotationParserTest {
             final InjectableValue injectableValue
     ) {
         System.out.printf("Injected value: %s\n", injectableValue.toString());
+    }
+
+    @CommandMethod("class")
+    private static class ClassCommandMethod {
+
+        @CommandMethod("method")
+        public void annotatedMethod() {
+            System.out.println("kekw");
+        }
+
     }
 
     @CommandPermission("some.permission")
