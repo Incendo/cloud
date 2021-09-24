@@ -207,7 +207,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     private CommandTree.Node<CommandArgument<C, ?>> namedNode() {
-        return this.manager.getCommandTree().getNamedNode(this.getLabel());
+        return this.manager.getCommandTree().getNamedNode(this.getName());
     }
 
 }
