@@ -68,13 +68,14 @@ private class KotlinMethodCommandExecutionHandler<C>(
     context: CommandMethodContext<C>
 ) : MethodCommandExecutionHandler<C>(context) {
 
-    override fun executeFuture(commandContext: CommandContext<C>): CompletableFuture<Any?> {
+    override fun executeFuture(commandContext: CommandContext<C>): CompletableFuture<Void?> {
         val instance = context().instance()
         val params = createParameterValues(commandContext, commandContext.flags(), false)
         // We need to propagate exceptions to the caller.
         return coroutineScope
-            .async(this@KotlinMethodCommandExecutionHandler.coroutineContext) {
+            .async<Void?>(this@KotlinMethodCommandExecutionHandler.coroutineContext) {
                 context().method().kotlinFunction?.callSuspend(instance, *params.toTypedArray())
+                null
             }
             .asCompletableFuture()
     }

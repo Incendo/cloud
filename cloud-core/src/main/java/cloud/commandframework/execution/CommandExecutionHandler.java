@@ -54,8 +54,8 @@ public interface CommandExecutionHandler<C> {
      * @return future that completes when the command has finished execution
      * @since 1.6.0
      */
-    default CompletableFuture<@Nullable Object> executeFuture(@NonNull CommandContext<C> commandContext) {
-        final CompletableFuture<Object> future = new CompletableFuture<>();
+    default CompletableFuture<@Nullable Void> executeFuture(@NonNull CommandContext<C> commandContext) {
+        final CompletableFuture<Void> future = new CompletableFuture<>();
         try {
             this.execute(commandContext);
             /* The command executed successfully */
@@ -97,7 +97,7 @@ public interface CommandExecutionHandler<C> {
         }
 
         @Override
-        CompletableFuture<@Nullable Object> executeFuture(
+        CompletableFuture<@Nullable Void> executeFuture(
                 @NonNull CommandContext<C> commandContext
         );
 
