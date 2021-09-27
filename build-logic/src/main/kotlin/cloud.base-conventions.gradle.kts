@@ -32,7 +32,8 @@ tasks {
                     "ImmutableEnumChecker",
                     "StringSplitter",
                     "EqualsGetClass",
-                    "CatchAndPrintStackTrace"
+                    "CatchAndPrintStackTrace",
+                    "InlineMeSuggester",
             )
         }
         options.compilerArgs.addAll(listOf("-Xlint:-processing", "-Werror"))
@@ -89,5 +90,6 @@ dependencies {
     compileOnlyApi("org.checkerframework", "checker-qual", Versions.checkerQual)
     testImplementation("org.junit.jupiter", "junit-jupiter-engine", Versions.jupiterEngine)
     errorprone("com.google.errorprone", "error_prone_core", Versions.errorprone)
-    compileOnlyApi("com.google.errorprone", "error_prone_annotations", Versions.errorprone)
+    // Silences compiler warnings from guava using errorprone
+    compileOnly("com.google.errorprone", "error_prone_annotations", Versions.errorprone)
 }
