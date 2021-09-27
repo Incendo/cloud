@@ -43,6 +43,7 @@ public class ParserRegistryTest {
     public static final int RANGE_MIN = 10;
     public static final int RANGE_MAX = 100;
 
+    @SuppressWarnings("ReturnValueIgnored")
     @Test
     void testParserRegistry() {
         final ParserRegistry<TestCommandSender> parserRegistry = new StandardParserRegistry<>();

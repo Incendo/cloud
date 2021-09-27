@@ -28,7 +28,8 @@ import com.mojang.brigadier.StringReader;
 /**
  * An extension to the Brigadier StringReader that also implements Queue (via mixin).
  *
- * @see cloud.commandframework.fabric.mixin.CloudStringReaderMixin for the {@link java.util.Queue} implementation
+ * <p>See {@link cloud.commandframework.fabric.mixin.CloudStringReaderMixin} for the
+ * {@link java.util.Queue} implementation.</p>
  */
 public final class CloudStringReader extends StringReader {
 

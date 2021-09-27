@@ -1,7 +1,7 @@
 object Versions {
     const val checkerQual = "3.9.1"
     const val geantyref = "1.3.11"
-    const val errorprone = "2.5.1"
+    const val errorprone = "2.9.0"
 
     // INTEGRATION DEPENDENCIES
     const val guice = "4.2.3"

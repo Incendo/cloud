@@ -5,7 +5,6 @@ metadata:
 
 plugins:
   com.github.johnrengelman.shadow: 7.0.0
-  net.ltgt.errorprone: 2.0.1
   com.github.ben-manes.versions: 0.36.0
 
 versions:
@@ -15,7 +14,7 @@ versions:
   checkstyle: 8.39
   indra: 2.0.6
   gradleTestLogger: 3.0.0
-  gradleErrorprone: 2.0.1
+  gradleErrorprone: 2.0.2
   licenser: 0.6.1
 
 dependencies:
