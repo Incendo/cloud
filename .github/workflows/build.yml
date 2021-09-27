@@ -24,8 +24,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          distribution: 'adopt'
-          java-version: 16
+          distribution: 'temurin'
+          java-version: 17
       - name: Build
         run: ./gradlew build
       - name: Determine Status
