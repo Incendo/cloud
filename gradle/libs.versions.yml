@@ -11,7 +11,6 @@ versions:
   checkerQual: 3.14.0
 
   # build-logic
-  checkstyle: 8.39
   indra: 2.0.6
   gradleTestLogger: 3.0.0
   gradleErrorprone: 2.0.2
