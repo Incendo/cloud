@@ -97,7 +97,6 @@ public final class CommandFlag<T> {
 
     /**
      * Get the flag description
-     * <p>
      *
      * @return Flag description
      * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
@@ -131,12 +130,12 @@ public final class CommandFlag<T> {
     }
 
     /**
-     * Get the command permission, if it exists
+     * Get the permission required to use this flag, if it exists
      *
      * @return Command permission, or {@code null}
      * @since 1.6.0
      */
-    public CommandPermission getCommandPermission() {
+    public CommandPermission permission() {
         return this.permission;
     }
 
