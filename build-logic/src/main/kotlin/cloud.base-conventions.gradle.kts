@@ -16,7 +16,7 @@ indra {
         testWith(8, 11, 16)
     }
 
-    checkstyle("8.39")
+    checkstyle("9.0")
 }
 
 /* Disable checkstyle on tests */
