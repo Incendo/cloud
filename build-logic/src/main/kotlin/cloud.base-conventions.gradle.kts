@@ -13,7 +13,7 @@ indra {
     javaVersions {
         minimumToolchain(16)
         target(8)
-        testWith(8, 11, 16)
+        testWith(8, 11, 17)
     }
 
     checkstyle("9.0")
