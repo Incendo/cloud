@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Added `executeFuture` to `CommandExecutionHandler` which is now used internally. By default, this delegates to the old 
   `execute` method
+- Annotations: Apply builder modifiers from class annotations ([#303](https://github.com/Incendo/cloud/pull/303))
 
 ### Fixed
 - Bukkit: Permission checking and syntax string for Bukkit '/help' command
