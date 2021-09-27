@@ -45,11 +45,7 @@ final class AnnotatedElementAccessor implements AnnotationAccessor {
     public <A extends Annotation> @Nullable A annotation(
             final @NonNull Class<A> clazz
     ) {
-        try {
-            return this.element.getAnnotation(clazz);
-        } catch (final NullPointerException exception) {
-            return null;
-        }
+        return this.element.getAnnotation(clazz);
     }
 
     @Override
