@@ -522,7 +522,10 @@ public final class AnnotationParser<C> {
             for (final CommandFlag<?> flag : flags) {
                 builder = builder.flag(flag);
             }
-            for (final Annotation annotation : method.getDeclaredAnnotations()) {
+
+            /* Apply builder modifiers */
+            for (final Annotation annotation
+                    : AnnotationAccessor.of(classAnnotations, AnnotationAccessor.of(method)).annotations()) {
                 @SuppressWarnings("rawtypes")
                 final BiFunction builderModifier = this.builderModifiers.get(annotation.annotationType());
                 if (builderModifier == null) {
@@ -530,6 +533,7 @@ public final class AnnotationParser<C> {
                 }
                 builder = (Command.Builder<C>) builderModifier.apply(annotation, builder);
             }
+
             /* Construct and register the command */
             final Command<C> builtCommand = builder.build();
             commands.add(builtCommand);
