@@ -273,7 +273,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
 
-    public static class StringParser<C> implements ArgumentParser<C, String> {
+    public static final class StringParser<C> implements ArgumentParser<C, String> {
 
         private final StringMode stringMode;
         private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;

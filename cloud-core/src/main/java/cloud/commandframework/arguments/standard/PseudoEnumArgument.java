@@ -3,6 +3,7 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -296,15 +297,16 @@ public class PseudoEnumArgument<C> extends CommandArgument<C, String> {
      * @param <C> Command sender type
      * @since 1.6.0
      */
-    public static final class PseudoEnumParser<C> extends StringArgument.StringParser<C> {
+    public static final class PseudoEnumParser<C> implements ArgumentParser<C, String> {
 
         private final Set<String> allowedValues;
+        private final StringArgument.StringParser<C> stringParser;
 
         public PseudoEnumParser(
                 final StringArgument.@NonNull StringMode stringMode,
                 final @NonNull Set<String> allowedValues
         ) {
-            super(stringMode, (context, s) -> new ArrayList<>(allowedValues));
+            this.stringParser = new StringArgument.StringParser<>(stringMode, (context, s) -> new ArrayList<>(allowedValues));
             this.allowedValues = allowedValues;
         }
 
@@ -313,7 +315,7 @@ public class PseudoEnumArgument<C> extends CommandArgument<C, String> {
                 @NonNull final CommandContext<@NonNull C> commandContext,
                 @NonNull final Queue<@NonNull String> inputQueue
         ) {
-            ArgumentParseResult<String> result = super.parse(commandContext, inputQueue);
+            ArgumentParseResult<String> result = this.stringParser.parse(commandContext, inputQueue);
             if (result.getFailure().isPresent()) {
                 return result;
             } else if (result.getParsedValue().isPresent()) {
@@ -328,6 +330,28 @@ public class PseudoEnumArgument<C> extends CommandArgument<C, String> {
             }
         }
 
+        @Override
+        public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return this.stringParser.suggestions(commandContext, input);
+        }
+
+        @Override
+        public boolean isContextFree() {
+            return true;
+        }
+
+        /**
+         * Get the string mode
+         *
+         * @return String mode
+         * @since 1.6.0
+         */
+        public StringArgument.@NonNull StringMode getStringMode() {
+            return this.stringParser.getStringMode();
+        }
     }
 
 
