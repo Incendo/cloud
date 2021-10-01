@@ -94,13 +94,11 @@ public final class ServiceSpigot<Context, Result> {
             try {
                 result = wrapper.getImplementation().handle(this.context);
             } catch (final Exception e) {
-                throw new PipelineException(
-                        String.format("Failed to retrieve result from %s", wrapper.toString()), e);
+                throw new PipelineException(String.format("Failed to retrieve result from %s", wrapper), e);
             }
             if (wrapper.getImplementation() instanceof SideEffectService) {
                 if (result == null) {
-                    throw new IllegalStateException(
-                            String.format("SideEffectService '%s' returned null", wrapper.toString()));
+                    throw new IllegalStateException(String.format("SideEffectService '%s' returned null", wrapper));
                 } else if (result == State.ACCEPTED) {
                     return result;
                 }
