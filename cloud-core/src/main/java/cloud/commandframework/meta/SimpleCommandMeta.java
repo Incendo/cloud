@@ -104,7 +104,7 @@ public class SimpleCommandMeta extends CommandMeta {
         }
         if (!GenericTypeReflector.isSuperType(key.getValueType().getType(), value.getClass())) {
             throw new IllegalArgumentException("Conflicting argument types between key type of "
-                    + key.getValueType().getType() + " and value type of " + value.getClass());
+                    + key.getValueType().getType().getTypeName() + " and value type of " + value.getClass());
         }
 
         return Optional.of((V) value);

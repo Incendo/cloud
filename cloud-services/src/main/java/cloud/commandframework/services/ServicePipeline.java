@@ -80,7 +80,7 @@ public final class ServicePipeline {
                 throw new IllegalArgumentException(String
                         .format(
                                 "Service of type '%s' has already been registered",
-                                type.toString()
+                                type.getType().getTypeName()
                         ));
             }
             final ServiceRepository<Context, Result> repository = new ServiceRepository<>(type);
@@ -121,7 +121,7 @@ public final class ServicePipeline {
                 final ServiceRepository<?, ?> repository = this.repositories.get(type.getType());
                 if (repository == null) {
                     throw new IllegalArgumentException(
-                            String.format("No service registered for type '%s'", type.toString()));
+                            String.format("No service registered for type '%s'", type.getType().getTypeName()));
                 }
                 repository.<Service>registerImplementation(
                         serviceEntry.getKey(),
@@ -199,7 +199,7 @@ public final class ServicePipeline {
                 (ServiceRepository<Context, Result>) this.repositories.get(type.getType());
         if (repository == null) {
             throw new IllegalArgumentException(
-                    String.format("No service registered for type '%s'", type.toString()));
+                    String.format("No service registered for type '%s'", type.getType().getTypeName()));
         }
         return repository;
     }
