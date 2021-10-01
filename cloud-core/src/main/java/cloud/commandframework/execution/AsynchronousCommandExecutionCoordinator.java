@@ -51,6 +51,16 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     private final Executor executor;
     private final boolean synchronizeParsing;
 
+    /**
+     * Create a new {@link Builder} instance
+     *
+     * @param <C> Command sender type
+     * @return Builder
+     */
+    public static <C> @NonNull Builder<C> newBuilder() {
+        return new Builder<>();
+    }
+
     private AsynchronousCommandExecutionCoordinator(
             final @Nullable Executor executor,
             final boolean synchronizeParsing,
@@ -60,16 +70,6 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
         this.executor = executor == null ? ForkJoinPool.commonPool() : executor;
         this.synchronizeParsing = synchronizeParsing;
         this.commandManager = commandTree.getCommandManager();
-    }
-
-    /**
-     * Create a new {@link Builder} instance
-     *
-     * @param <C> Command sender type
-     * @return Builder
-     */
-    public static <C> @NonNull Builder<C> newBuilder() {
-        return new Builder<>();
     }
 
     @Override
@@ -89,6 +89,8 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
                             resultFuture.completeExceptionally(new CommandExecutionException(throwable, commandContext));
                         }
                     }
+                    // Only complete when the execution is actually finished. See #306 for more info.
+                    resultFuture.complete(new CommandResult<>(commandContext));
                 });
             }
         };
@@ -97,30 +99,25 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
             final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
                     this.getCommandTree().parse(commandContext, input);
             if (pair.getSecond() != null) {
-                final CompletableFuture<CommandResult<C>> future = new CompletableFuture<>();
-                future.completeExceptionally(pair.getSecond());
-                return future;
+                resultFuture.completeExceptionally(pair.getSecond());
+            } else {
+                this.executor.execute(() -> commandConsumer.accept(pair.getFirst()));
             }
-            return CompletableFuture.supplyAsync(() -> {
-                commandConsumer.accept(pair.getFirst());
-                return new CommandResult<>(commandContext);
-            }, this.executor);
-        }
-
-        this.executor.execute(() -> {
-            try {
-                final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
-                        this.getCommandTree().parse(commandContext, input);
-                if (pair.getSecond() != null) {
-                    resultFuture.completeExceptionally(pair.getSecond());
-                } else {
-                    commandConsumer.accept(pair.getFirst());
-                    resultFuture.complete(new CommandResult<>(commandContext));
+        } else {
+            this.executor.execute(() -> {
+                try {
+                    final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
+                            this.getCommandTree().parse(commandContext, input);
+                    if (pair.getSecond() != null) {
+                        resultFuture.completeExceptionally(pair.getSecond());
+                    } else {
+                        commandConsumer.accept(pair.getFirst());
+                    }
+                } catch (final Exception e) {
+                    resultFuture.completeExceptionally(e);
                 }
-            } catch (final Exception e) {
-                resultFuture.completeExceptionally(e);
-            }
-        });
+            });
+        }
 
         return resultFuture;
     }
