@@ -24,6 +24,7 @@
 package cloud.commandframework.services;
 
 import cloud.commandframework.services.types.Service;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.function.Predicate;
@@ -44,7 +45,7 @@ enum ServiceFilterHandler {
                 } catch (final Exception e) {
                     throw new PipelineException(String
                             .format("Failed to evaluate filter '%s' for '%s'",
-                                    predicate.getClass().getCanonicalName(), service.toString()
+                                    TypeToken.get(predicate.getClass()).getType().getTypeName(), service
                             ), e);
                 }
             }

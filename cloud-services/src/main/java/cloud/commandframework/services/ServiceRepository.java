@@ -138,10 +138,11 @@ public final class ServiceRepository<Context, Response> {
 
         @Override
         public String toString() {
-            return String
-                    .format("ServiceWrapper{type=%s,implementation=%s}", ServiceRepository.this.serviceType.toString(),
-                            TypeToken.get(this.implementation.getClass()).toString()
-                    );
+            return String.format(
+                    "ServiceWrapper{type=%s,implementation=%s}",
+                    ServiceRepository.this.serviceType.getType().getTypeName(),
+                    TypeToken.get(this.implementation.getClass()).getType().getTypeName()
+            );
         }
 
         @Override
