@@ -51,16 +51,6 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     private final Executor executor;
     private final boolean synchronizeParsing;
 
-    /**
-     * Create a new {@link Builder} instance
-     *
-     * @param <C> Command sender type
-     * @return Builder
-     */
-    public static <C> @NonNull Builder<C> newBuilder() {
-        return new Builder<>();
-    }
-
     private AsynchronousCommandExecutionCoordinator(
             final @Nullable Executor executor,
             final boolean synchronizeParsing,
@@ -70,6 +60,16 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
         this.executor = executor == null ? ForkJoinPool.commonPool() : executor;
         this.synchronizeParsing = synchronizeParsing;
         this.commandManager = commandTree.getCommandManager();
+    }
+
+    /**
+     * Create a new {@link Builder} instance
+     *
+     * @param <C> Command sender type
+     * @return Builder
+     */
+    public static <C> @NonNull Builder<C> newBuilder() {
+        return new Builder<>();
     }
 
     @Override
