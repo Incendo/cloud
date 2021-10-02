@@ -39,11 +39,17 @@ import java.util.function.BiFunction;
 public @interface Argument {
 
     /**
-     * Argument name
+     * The name of the argument that this parameter is bound to.
+     * This value must be overridden unless you have explicitly enabled
+     * the preservation of parameter names in your compiler options.
+     *
+     * If the parameter names are preserved and the name of the bound
+     * argument is the same as the parameter name, the default value
+     * may be used.
      *
      * @return Argument name
      */
-    @NonNull String value();
+    @NonNull String value() default AnnotationParser.INFERRED_ARGUMENT_NAME;
 
     /**
      * Name of the argument parser
