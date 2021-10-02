@@ -48,4 +48,12 @@ final class ArgumentParameterPair {
         return this.argument;
     }
 
+    @NonNull String argumentName() {
+        if (this.argument.value().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
+            return this.parameter.getName();
+        } else {
+            return this.argument.value();
+        }
+    }
+
 }

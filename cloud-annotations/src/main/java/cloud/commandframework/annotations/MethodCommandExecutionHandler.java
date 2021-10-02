@@ -105,11 +105,19 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         for (final Parameter parameter : this.parameters) {
             if (parameter.isAnnotationPresent(Argument.class)) {
                 final Argument argument = parameter.getAnnotation(Argument.class);
-                final CommandArgument<C, ?> commandArgument = this.context.commandArguments.get(argument.value());
-                if (commandArgument.isRequired()) {
-                    arguments.add(commandContext.get(argument.value()));
+
+                final String argumentName;
+                if (argument.value().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
+                    argumentName = parameter.getName();
                 } else {
-                    final Object optional = commandContext.getOptional(argument.value()).orElse(null);
+                    argumentName = argument.value();
+                }
+
+                final CommandArgument<C, ?> commandArgument = this.context.commandArguments.get(argumentName);
+                if (commandArgument.isRequired()) {
+                    arguments.add(commandContext.get(argumentName));
+                } else {
+                    final Object optional = commandContext.getOptional(argumentName).orElse(null);
                     arguments.add(optional);
                 }
             } else if (parameter.isAnnotationPresent(Flag.class)) {
