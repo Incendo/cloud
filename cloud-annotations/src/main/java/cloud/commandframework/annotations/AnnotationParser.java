@@ -79,6 +79,11 @@ import java.util.function.Function;
  */
 public final class AnnotationParser<C> {
 
+    /**
+     * The value of {@link Argument} that should be used to infer argument names from parameter names.
+     */
+    public static final String INFERRED_ARGUMENT_NAME = "__INFERRED_ARGUMENT_NAME__";
+
     private final SyntaxParser syntaxParser = new SyntaxParser();
     private final ArgumentExtractor argumentExtractor = new ArgumentExtractor();
 
@@ -438,7 +443,7 @@ public final class AnnotationParser<C> {
             for (final ArgumentParameterPair argumentPair : arguments) {
                 final CommandArgument<C, ?> argument = this.buildArgument(
                         method,
-                        this.findSyntaxFragment(tokens, argumentPair.getArgument().value()),
+                        this.findSyntaxFragment(tokens, argumentPair.argumentName()),
                         argumentPair
                 );
                 commandArguments.put(argument.getName(), argument);
@@ -606,13 +611,13 @@ public final class AnnotationParser<C> {
         if (syntaxFragment == null || syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
             throw new IllegalArgumentException(String.format(
                     "Invalid command argument '%s' in method '%s': "
-                            + "Missing syntax mapping", argumentPair.getArgument().value(), method.getName()));
+                            + "Missing syntax mapping", argumentPair.argumentName(), method.getName()));
         }
         final Argument argument = argumentPair.getArgument();
         /* Create the argument builder */
         @SuppressWarnings("rawtypes") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
                 parameter.getType(),
-                argument.value()
+                argumentPair.argumentName()
         );
         /* Set the argument requirement status */
         if (syntaxFragment.getArgumentMode() == ArgumentMode.OPTIONAL) {
