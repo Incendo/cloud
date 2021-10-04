@@ -72,9 +72,9 @@ private class KotlinMethodCommandExecutionHandler<C>(
     override fun executeFuture(commandContext: CommandContext<C>): CompletableFuture<Void?> {
         val instance = context().instance()
         val params = createParameterValues(
-                commandContext,
-                commandContext.flags(),
-                this.parameters().filterNot { Continuation::class.java == it.type }.toTypedArray()
+            commandContext,
+            commandContext.flags(),
+            this.parameters().filterNot { Continuation::class.java == it.type }.toTypedArray()
         )
 
         // We need to propagate exceptions to the caller.
