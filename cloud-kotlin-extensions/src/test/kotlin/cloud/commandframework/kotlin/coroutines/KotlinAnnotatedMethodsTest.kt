@@ -26,6 +26,7 @@ package cloud.commandframework.kotlin.coroutines
 import cloud.commandframework.CommandManager
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.CommandMethod
+import cloud.commandframework.exceptions.CommandExecutionException
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.meta.CommandMeta
@@ -36,13 +37,15 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class KotlinAnnotatedMethodsTest {
 
     companion object {
-        val executorService = Executors.newSingleThreadExecutor()
+        val executorService: ExecutorService = Executors.newSingleThreadExecutor()
     }
 
     private lateinit var commandManager: CommandManager<TestCommandSender>
@@ -68,15 +71,27 @@ class KotlinAnnotatedMethodsTest {
         commandManager.executeCommand(TestCommandSender(), "test").await()
     }
 
+    @Test
+    fun `test suspending command methods with exception`(): Unit = runBlocking {
+        AnnotationParser(commandManager, TestCommandSender::class.java) {
+            SimpleCommandMeta.empty()
+        }
+            .also { it.installCoroutineSupport() }
+            .parse(CommandMethods())
+
+        assertThrows<CommandExecutionException> {
+            commandManager.executeCommand(TestCommandSender(), "test-exception").await()
+        }
+    }
+
     private class TestCommandSender
 
-    private class TestCommandManager :
-        CommandManager<TestCommandSender>(
-            AsynchronousCommandExecutionCoordinator.newBuilder<TestCommandSender>()
-                .withExecutor(executorService)
-                .build(),
-            CommandRegistrationHandler.nullCommandRegistrationHandler()
-        ) {
+    private class TestCommandManager : CommandManager<TestCommandSender>(
+        AsynchronousCommandExecutionCoordinator.newBuilder<TestCommandSender>()
+            .withExecutor(executorService)
+            .build(),
+        CommandRegistrationHandler.nullCommandRegistrationHandler()
+    ) {
 
         override fun hasPermission(sender: TestCommandSender, permission: String): Boolean = true
 
@@ -90,5 +105,8 @@ class KotlinAnnotatedMethodsTest {
             withContext(Dispatchers.Default) {
                 println("called from thread: ${Thread.currentThread().name}")
             }
+
+        @CommandMethod("test-exception")
+        public suspend fun suspendingCommandWithException(): Unit = throw IllegalStateException()
     }
 }
