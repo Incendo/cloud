@@ -64,7 +64,7 @@ public interface CommandPermission {
         final Set<CommandPermission> permission = new HashSet<>(2);
         permission.add(this);
         permission.add(other);
-        return new OrPermission(permission);
+        return OrPermission.of(permission);
     }
 
     /**
@@ -79,7 +79,7 @@ public interface CommandPermission {
         final Set<CommandPermission> permission = new HashSet<>(other.length + 1);
         permission.add(this);
         permission.addAll(Arrays.asList(other));
-        return new OrPermission(permission);
+        return OrPermission.of(permission);
     }
 
     /**
@@ -94,7 +94,7 @@ public interface CommandPermission {
         final Set<CommandPermission> permission = new HashSet<>(2);
         permission.add(this);
         permission.add(other);
-        return new AndPermission(permission);
+        return AndPermission.of(permission);
     }
 
     /**
@@ -109,7 +109,7 @@ public interface CommandPermission {
         final Set<CommandPermission> permission = new HashSet<>(other.length + 1);
         permission.add(this);
         permission.addAll(Arrays.asList(other));
-        return new AndPermission(permission);
+        return AndPermission.of(permission);
     }
 
 }

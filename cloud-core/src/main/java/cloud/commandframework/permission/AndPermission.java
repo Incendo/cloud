@@ -50,7 +50,15 @@ public final class AndPermission implements CommandPermission {
      * @return Constructed permission
      */
     public static @NonNull CommandPermission of(final @NonNull Collection<CommandPermission> permissions) {
-        return new AndPermission(new HashSet<>(permissions));
+        final Set<CommandPermission> objects = new HashSet<>();
+        for (final CommandPermission permission : permissions) {
+            if (permission instanceof AndPermission) {
+                objects.addAll(permission.getPermissions());
+            } else {
+                objects.add(permission);
+            }
+        }
+        return new AndPermission(objects);
     }
 
     @Override
