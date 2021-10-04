@@ -57,6 +57,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      * Constructs a new method command execution handler
      *
      * @param context The context
+     * @since 1.6.0
      */
     public MethodCommandExecutionHandler(
             final @NonNull CommandMethodContext<C> context
@@ -76,9 +77,9 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         try {
             this.methodHandle.invokeWithArguments(
                     this.createParameterValues(
-                        commandContext,
-                        commandContext.flags(),
-                        true
+                            commandContext,
+                            commandContext.flags(),
+                            this.parameters
                     )
             );
         } catch (final Error e) {
@@ -89,20 +90,21 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
     }
 
     /**
-     * Creates a list containing the values for all method parameters
+     * Creates a list containing the values for the given method parameters.
      *
      * @param commandContext The context
      * @param flagContext    The flag context
-     * @param throwOnMissing Whether exceptions should be thrown on missing parameters
+     * @param parameters     The parameters to create values for
      * @return A list containing all parameters, in order
+     * @since 1.6.0
      */
     protected final List<Object> createParameterValues(
             final CommandContext<C> commandContext,
             final FlagContext flagContext,
-            final boolean throwOnMissing
+            final Parameter[] parameters
     ) {
-        final List<Object> arguments = new ArrayList<>(this.parameters.length);
-        for (final Parameter parameter : this.parameters) {
+        final List<Object> arguments = new ArrayList<>(parameters.length);
+        for (final Parameter parameter : parameters) {
             if (parameter.isAnnotationPresent(Argument.class)) {
                 final Argument argument = parameter.getAnnotation(Argument.class);
 
@@ -138,10 +140,11 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                     );
                     if (value.isPresent()) {
                         arguments.add(value.get());
-                    } else if (throwOnMissing) {
+                    } else {
                         throw new IllegalArgumentException(String.format(
-                                "Unknown command parameter '%s' in method '%s'",
+                                "Could not create value for parameter '%s' of type '%s' in method '%s'",
                                 parameter.getName(),
+                                parameter.getType().getTypeName(),
                                 this.methodHandle.toString()
                         ));
                     }
@@ -155,6 +158,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      * Returns the command method context
      *
      * @return The context
+     * @since 1.6.0
      */
     public @NonNull CommandMethodContext<C> context() {
         return this.context;
@@ -164,6 +168,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      * Returns all parameters passed to the method
      *
      * @return The parameters
+     * @since 1.6.0
      */
     public final @NonNull Parameter @NonNull [] parameters() {
         return this.parameters;
@@ -173,6 +178,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      * Returns the compiled method handle for the command method.
      *
      * @return The method handle
+     * @since 1.6.0
      */
     public final @NonNull MethodHandle methodHandle() {
         return this.methodHandle;
@@ -182,6 +188,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      * The annotation accessor for the command method
      *
      * @return Annotation accessor
+     * @since 1.6.0
      */
     public final AnnotationAccessor annotationAccessor() {
         return this.annotationAccessor;
@@ -191,6 +198,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      * Context for command methods
      *
      * @param <C> Command sender type
+     * @since 1.6.0
      */
     public static class CommandMethodContext<C> {
 
@@ -216,6 +224,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
          * The instance that owns the command method
          *
          * @return The instance
+         * @since 1.6.0
          */
         public @NonNull Object instance() {
             return this.instance;
@@ -225,6 +234,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
          * The command method
          *
          * @return The method
+         * @since 1.6.0
          */
         public final @NonNull Method method() {
             return this.method;
@@ -234,6 +244,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
          * The compiled command arguments
          *
          * @return Compiled command arguments
+         * @since 1.6.0
          */
         public final @NonNull Map<@NonNull String, @NonNull CommandArgument<C, ?>> commandArguments() {
             return this.commandArguments;
@@ -243,6 +254,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
          * The injector registry
          *
          * @return Injector registry
+         * @since 1.6.0
          */
         public final @NonNull ParameterInjectorRegistry<C> injectorRegistry() {
             return this.injectorRegistry;
