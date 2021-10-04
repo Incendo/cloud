@@ -34,6 +34,7 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.concurrent.CompletableFuture
 import java.util.function.Predicate
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.full.callSuspend
@@ -70,7 +71,11 @@ private class KotlinMethodCommandExecutionHandler<C>(
 
     override fun executeFuture(commandContext: CommandContext<C>): CompletableFuture<Void?> {
         val instance = context().instance()
-        val params = createParameterValues(commandContext, commandContext.flags(), false)
+        val params = createParameterValues(
+                commandContext,
+                commandContext.flags(),
+                this.parameters().filterNot { Continuation::class.java == it.type }.toTypedArray()
+        )
 
         // We need to propagate exceptions to the caller.
         return coroutineScope.future(this@KotlinMethodCommandExecutionHandler.coroutineContext) {
