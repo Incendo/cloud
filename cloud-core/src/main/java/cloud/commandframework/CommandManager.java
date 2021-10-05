@@ -104,7 +104,7 @@ public abstract class CommandManager<C> {
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
 
     /**
-     * Create a new command manager instance
+     * Creates a new command manager instance
      *
      * @param commandExecutionCoordinator Execution coordinator instance. The coordinator is in charge of executing incoming
      *                                    commands. Some considerations must be made when picking a suitable execution coordinator
@@ -141,7 +141,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Execute a command and get a future that completes with the result. The command may be executed immediately
+     * Executes a command and returns a future that completes with the result. The command may be executed immediately
      * or at some point in the future, depending on the {@link CommandExecutionCoordinator} used in the command manager.
      * <p>
      * The command may also be filtered out by preprocessors (see {@link CommandPreprocessor}) before they are parsed,
@@ -187,7 +187,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get command suggestions for the "next" argument that would yield a correctly parsing command input. The command
+     * Returns command suggestions for the "next" argument that would yield a correctly parsing command input. The command
      * suggestions provided by the command argument parsers will be filtered using the {@link CommandSuggestionProcessor}
      * before being returned.
      *
@@ -209,7 +209,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Register a new command to the command manager and insert it into the underlying command tree. The command will be
+     * Registers a new command to the command manager and inserts it into the underlying command tree. The command will be
      * forwarded to the {@link CommandRegistrationHandler} and will, depending on the platform, be forwarded to the platform.
      * <p>
      * Different command manager implementations have different requirements for the command registration. It is possible
@@ -232,7 +232,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Register a new command
+     * Registers a new command.
      *
      * @param command Command to register. {@link Command.Builder#build()}} will be invoked.
      * @return The command manager instance
@@ -245,37 +245,78 @@ public abstract class CommandManager<C> {
      * Get the command syntax formatter
      *
      * @return Command syntax formatter
+     * @deprecated Use {@link #commandSyntaxFormatter()}
      */
+    @Deprecated
     public @NonNull CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
+        return this.commandSyntaxFormatter();
+    }
+
+    /**
+     * Returns the command syntax formatter.
+     *
+     * @return Command syntax formatter
+     * @since 1.6.0
+     */
+    public @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter() {
         return this.commandSyntaxFormatter;
     }
 
     /**
-     * Set the command syntax formatter
+     * Sets the command syntax formatter.
      *
      * @param commandSyntaxFormatter New formatter
+     * @deprecated Use {@link #commandSyntaxFormatter(CommandSyntaxFormatter)}
      */
+    @Deprecated
     public void setCommandSyntaxFormatter(final @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter) {
+        this.commandSyntaxFormatter(commandSyntaxFormatter);
+    }
+
+    /**
+     * Sets the command syntax formatter.
+     *
+     * @param commandSyntaxFormatter New formatter
+     * @since 1.6.0
+     */
+    public void commandSyntaxFormatter(final @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter) {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
     }
 
     /**
-     * Get the command registration handler
+     * Returns the command registration handler.
      *
      * @return Command registration handler
+     * @deprecated Use {@link #commandRegistrationHandler()}
      */
+    @Deprecated
     public @NonNull CommandRegistrationHandler getCommandRegistrationHandler() {
+        return this.commandRegistrationHandler();
+    }
+
+    /**
+     * Returns the command registration handler.
+     *
+     * @return Command registration handler
+     * @since 1.6.0
+     */
+    public @NonNull CommandRegistrationHandler commandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
 
+    @Deprecated
     protected final void setCommandRegistrationHandler(final @NonNull CommandRegistrationHandler commandRegistrationHandler) {
+        this.commandRegistrationHandler(commandRegistrationHandler);
+    }
+
+    protected final void commandRegistrationHandler(final @NonNull CommandRegistrationHandler commandRegistrationHandler) {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
     /**
-     * Check if the command sender has the required permission. If the permission node is
-     * empty, this should return {@code true}
+     * Checks if the command sender has the required permission. If the permission node is
+     * empty, this should return {@code true}.
      *
      * @param sender     Command sender
      * @param permission Permission node
@@ -313,26 +354,51 @@ public abstract class CommandManager<C> {
     }
 
     /**
+     * Returns the caption registry.
+     *
+     * @return Caption registry
+     * @deprecated Use {@link #captionRegistry()}
+     */
+    @Deprecated
+    public final @NonNull CaptionRegistry<C> getCaptionRegistry() {
+        return this.captionRegistry();
+    }
+
+    /**
      * Get the caption registry
      *
      * @return Caption registry
+     * @since 1.6.0
      */
-    public final @NonNull CaptionRegistry<C> getCaptionRegistry() {
+    public final @NonNull CaptionRegistry<C> captionRegistry() {
         return this.captionRegistry;
     }
 
     /**
-     * Replace the caption registry. Some platforms may inject their own captions into the default registry,
+     * Replaces the caption registry. Some platforms may inject their own captions into the default registry,
      * and so you may need to insert these captions yourself if you do decide to replace the caption registry.
      *
      * @param captionRegistry New caption registry
+     * @deprecated Use {@link #captionRegistry(CaptionRegistry)}
      */
+    @Deprecated
     public final void setCaptionRegistry(final @NonNull CaptionRegistry<C> captionRegistry) {
+        this.captionRegistry(captionRegistry);
+    }
+
+    /**
+     * Replaces the caption registry. Some platforms may inject their own captions into the default registry,
+     * and so you may need to insert these captions yourself if you do decide to replace the caption registry.
+     *
+     * @param captionRegistry New caption registry
+     * @since 1.6.0
+     */
+    public final void captionRegistry(final @NonNull CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
     }
 
     /**
-     * Replace the default caption registry
+     * Replaces the default caption registry.
      *
      * @param captionRegistry Caption registry to use
      * @deprecated Use {@link #setCaptionRegistry(CaptionRegistry)} These methods are identical.
@@ -343,8 +409,8 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Check if the command sender has the required permission. If the permission node is
-     * empty, this should return {@code true}
+     * Checks if the command sender has the required permission. If the permission node is
+     * empty, this should return {@code true}.
      *
      * @param sender     Command sender
      * @param permission Permission node
@@ -353,10 +419,10 @@ public abstract class CommandManager<C> {
     public abstract boolean hasPermission(@NonNull C sender, @NonNull String permission);
 
     /**
-     * Create a new command builder. This will also register the creating manager in the command
+     * Creates a new command builder. This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
@@ -380,14 +446,14 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command builder. This will also register the creating manager in the command
+     * Creates a new command builder. This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * {@link Command command} instance.
      *
      * @param name        Command name
      * @param aliases     Command aliases
@@ -411,16 +477,16 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command builder with an empty description.
+     * Creates a new command builder with an empty description.
      * <p>
      * This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * {@link Command command} instance.
      *
      * @param name    Command name
      * @param aliases Command aliases
@@ -441,14 +507,14 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command builder. This will also register the creating manager in the command
+     * Creates a new command builder. This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * {@link Command command} instance.
      *
      * @param name        Command name
      * @param meta        Command meta
@@ -469,14 +535,14 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command builder. This will also register the creating manager in the command
+     * Creates a new command builder. This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * {@link Command command} instance.
      *
      * @param name        Command name
      * @param meta        Command meta
@@ -500,16 +566,16 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command builder with an empty description.
+     * Creates a new command builder with an empty description.
      * <p>
      * This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * {@link Command command} instance.
      *
      * @param name    Command name
      * @param meta    Command meta
@@ -530,16 +596,16 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}.
+     * Creates a new command builder using default command meta created by {@link #createDefaultCommandMeta()}.
      * <p>
      * This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * {@link Command command} instance.
      *
      * @param name        Command name
      * @param description Description for the root literal
@@ -559,16 +625,16 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}.
+     * Creates a new command builder using default command meta created by {@link #createDefaultCommandMeta()}.
      * <p>
      * This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * {@link Command command} instance.
      *
      * @param name        Command name
      * @param description Description for the root literal
@@ -592,17 +658,17 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}, and
+     * Creates a new command builder using default command meta created by {@link #createDefaultCommandMeta()}, and
      * an empty description.
      * <p>
      * This will also register the creating manager in the command
      * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
      * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
+     * the type, with the help of the {@link ParserRegistry parser registry}.
      * <p>
      * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
      * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
+     * {@link Command command} instance.
      *
      * @param name    Command name
      * @param aliases Command aliases
@@ -623,7 +689,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command argument builder.
+     * Creates a new command argument builder.
      * <p>
      * This will also invoke {@link CommandArgument.Builder#manager(CommandManager)}
      * so that the argument is associated with the calling command manager. This allows for parser inference based on
@@ -642,7 +708,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command flag builder
+     * Creates a new command flag builder.
      *
      * @param name Flag name
      * @return Flag builder
@@ -652,17 +718,30 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the internal command tree. This should not be accessed unless you know what you
-     * are doing
+     * Returns the internal command tree. This should not be accessed unless you know what you
+     * are doing.
      *
      * @return Command tree
+     * @deprecated Use {@link #commandTree()}
      */
+    @Deprecated
     public @NonNull CommandTree<C> getCommandTree() {
+        return this.commandTree();
+    }
+
+    /**
+     * Returns the internal command tree. This should not be accessed unless you know what you
+     * are doing.
+     *
+     * @return Command tree
+     * @since 1.6.0
+     */
+    public @NonNull CommandTree<C> commandTree() {
         return this.commandTree;
     }
 
     /**
-     * Construct a default command meta instance
+     * Constructs a default command meta instance.
      *
      * @return Default command meta
      * @throws UnsupportedOperationException If the command manager does not support this operation
@@ -670,8 +749,8 @@ public abstract class CommandManager<C> {
     public abstract @NonNull CommandMeta createDefaultCommandMeta();
 
     /**
-     * Register a new command preprocessor. The order they are registered in is respected, and they
-     * are called in LIFO order
+     * Registers a new command preprocessor. The order they are registered in is respected, and they
+     * are called in LIFO order.
      *
      * @param processor Processor to register
      * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
@@ -686,8 +765,8 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Register a new command postprocessor. The order they are registered in is respected, and they
-     * are called in LIFO order
+     * Registers a new command postprocessor. The order they are registered in is respected, and they
+     * are called in LIFO order.
      *
      * @param processor Processor to register
      * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
@@ -700,7 +779,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Preprocess a command context instance
+     * Preprocesses a command context instance.
      *
      * @param context    Command context
      * @param inputQueue Command input as supplied by sender
@@ -721,7 +800,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Postprocess a command context instance
+     * Postprocesses a command context instance.
      *
      * @param context Command context
      * @param command Command instance
@@ -742,28 +821,55 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the command suggestions processor instance currently used in this command manager
+     * Returns the command suggestion processor instance currently used in this command manager.
      *
      * @return Command suggestions processor
      * @see #setCommandSuggestionProcessor(CommandSuggestionProcessor) Setting the suggestion processor
+     * @deprecated Use {@link #commandSuggestionProcessor()}
      */
+    @Deprecated
     public @NonNull CommandSuggestionProcessor<C> getCommandSuggestionProcessor() {
+        return this.commandSuggestionProcessor();
+    }
+
+    /**
+     * Returns the command suggestion processor instance currently used in this command manager.
+     *
+     * @return Command suggestions processor
+     * @see #setCommandSuggestionProcessor(CommandSuggestionProcessor) Setting the suggestion processor
+     * @since 1.6.0
+     */
+    public @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor() {
         return this.commandSuggestionProcessor;
     }
 
     /**
-     * Set the command suggestions processor for this command manager. This will be called every
+     * Sets the command suggestion processor for this command manager. This will be called every
      * time {@link #suggest(Object, String)} is called, to process the list of suggestions
-     * before it's returned to the caller
+     * before it's returned to the caller.
      *
      * @param commandSuggestionProcessor New command suggestions processor
+     * @deprecated Use {@link #commandSuggestionProcessor()}
      */
+    @Deprecated
     public void setCommandSuggestionProcessor(final @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor) {
+        this.commandSuggestionProcessor(commandSuggestionProcessor);
+    }
+
+    /**
+     * Sets the command suggestion processor for this command manager. This will be called every
+     * time {@link #suggest(Object, String)} is called, to process the list of suggestions
+     * before it's returned to the caller.
+     *
+     * @param commandSuggestionProcessor New command suggestions processor
+     * @since 1.6.0
+     */
+    public void commandSuggestionProcessor(final @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor) {
         this.commandSuggestionProcessor = commandSuggestionProcessor;
     }
 
     /**
-     * Get the parser registry instance. The parser registry contains default
+     * Returns the parser registry instance. The parser registry contains default
      * mappings to {@link ArgumentParser}
      * and allows for the registration of custom mappings. The parser registry also
      * contains mappings of annotations to {@link ParserParameter}
@@ -771,16 +877,36 @@ public abstract class CommandManager<C> {
      * <p>
      * When creating a new parser type, it is recommended to register it in the parser
      * registry. In particular, default parser types (shipped with cloud implementations)
-     * should be registered in the constructor of the platform {@link CommandManager}
+     * should be registered in the constructor of the platform {@link CommandManager}.
      *
      * @return Parser registry instance
+     * @deprecated Use {@link #parserRegistry()}
      */
-    public ParserRegistry<C> getParserRegistry() {
+    @Deprecated
+    public @NonNull ParserRegistry<C> getParserRegistry() {
+        return this.parserRegistry();
+    }
+
+    /**
+     * Returns the parser registry instance. The parser registry contains default
+     * mappings to {@link ArgumentParser}
+     * and allows for the registration of custom mappings. The parser registry also
+     * contains mappings of annotations to {@link ParserParameter}
+     * which allows for annotations to be used to customize parser settings.
+     * <p>
+     * When creating a new parser type, it is recommended to register it in the parser
+     * registry. In particular, default parser types (shipped with cloud implementations)
+     * should be registered in the constructor of the platform {@link CommandManager}.
+     *
+     * @return Parser registry instance
+     * @since 1.6.0
+     */
+    public @NonNull ParserRegistry<C> parserRegistry() {
         return this.parserRegistry;
     }
 
     /**
-     * Get the parameter injector registry instance
+     * Returns the parameter injector registry instance.
      *
      * @return Parameter injector registry
      * @since 1.3.0
@@ -789,9 +915,8 @@ public abstract class CommandManager<C> {
         return this.parameterInjectorRegistry;
     }
 
-
     /**
-     * Get the exception handler for an exception type, if one has been registered
+     * Returns the exception handler for an exception type, if one has been registered.
      *
      * @param clazz Exception class
      * @param <E>   Exception type
@@ -809,9 +934,9 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Register an exception handler for an exception type. This will then be used
+     * Registers an exception handler for an exception type. This will then be used
      * when {@link #handleException(Object, Class, Exception, BiConsumer)} is called
-     * for the particular exception type
+     * for the particular exception type.
      *
      * @param clazz   Exception class
      * @param handler Exception handler
@@ -825,8 +950,8 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Handle an exception using the registered exception handler for the exception type, or using the
-     * provided default handler if no exception handler has been registered for the exception type
+     * Handles an exception using the registered exception handler for the exception type, or using the
+     * provided default handler if no exception handler has been registered for the exception type.
      *
      * @param sender         Executing command sender
      * @param clazz          Exception class
@@ -845,28 +970,55 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get a collection containing all registered commands.
+     * Returns a collection containing all registered commands.
      *
      * @return Unmodifiable view of all registered commands
+     * @deprecated Use {@link #commands()}
      */
+    @Deprecated
     public final @NonNull Collection<@NonNull Command<C>> getCommands() {
+        return this.commands();
+    }
+
+    /**
+     * Returns a collection containing all registered commands.
+     *
+     * @return Unmodifiable view of all registered commands
+     * @since 1.6.0
+     */
+    public final @NonNull Collection<@NonNull Command<C>> commands() {
         return Collections.unmodifiableCollection(this.commands);
     }
 
     /**
-     * Get a command help handler instance. This can be used to assist in the production
+     * Returns a command help handler instance. This can be used to assist in the production
      * of command help menus, etc. This command help handler instance will display
      * all commands registered in this command manager.
      *
      * @return Command help handler. A new instance will be created
      *         each time this method is called.
+     * @deprecated Use {@link #commandHelpHandler()}
      */
+    @Deprecated
     public final @NonNull CommandHelpHandler<C> getCommandHelpHandler() {
+        return this.commandHelpHandler();
+    }
+
+    /**
+     * Returns a command help handler instance. This can be used to assist in the production
+     * of command help menus, etc. This command help handler instance will display
+     * all commands registered in this command manager.
+     *
+     * @return Command help handler. A new instance will be created
+     *         each time this method is called.
+     * @since 1.6.0
+     */
+    public final @NonNull CommandHelpHandler<C> commandHelpHandler() {
         return new CommandHelpHandler<>(this, cmd -> true);
     }
 
     /**
-     * Get a command help handler instance. This can be used to assist in the production
+     * Returns a command help handler instance. This can be used to assist in the production
      * of command help menus, etc. A predicate can be specified to filter what commands
      * registered in this command manager are visible in the help menu.
      *
@@ -874,34 +1026,86 @@ public abstract class CommandManager<C> {
      *                         the help menu.
      * @return Command help handler. A new instance will be created
      *         each time this method is called.
+     * @deprecated Use {@link #commandHelpHandler(Predicate)}
      */
+    @Deprecated
     public final @NonNull CommandHelpHandler<C> getCommandHelpHandler(
+            final @NonNull Predicate<Command<C>> commandPredicate
+    ) {
+        return this.commandHelpHandler(commandPredicate);
+    }
+
+    /**
+     * Returns a command help handler instance. This can be used to assist in the production
+     * of command help menus, etc. A predicate can be specified to filter what commands
+     * registered in this command manager are visible in the help menu.
+     *
+     * @param commandPredicate Predicate that filters what commands are displayed in
+     *                         the help menu.
+     * @return Command help handler. A new instance will be created
+     *         each time this method is called.
+     * @since 1.6.0
+     */
+    public final @NonNull CommandHelpHandler<C> commandHelpHandler(
             final @NonNull Predicate<Command<C>> commandPredicate
     ) {
         return new CommandHelpHandler<>(this, commandPredicate);
     }
 
     /**
-     * Get a command manager setting
+     * Returns a command manager setting.
      *
      * @param setting Setting
      * @return {@code true} if the setting is activated or {@code false} if it's not
      * @see #setSetting(ManagerSettings, boolean) Update a manager setting
+     * @deprecated Use {@link #setting(ManagerSettings)}
      */
+    @Deprecated
     public boolean getSetting(final @NonNull ManagerSettings setting) {
+        return this.setting(setting);
+    }
+
+    /**
+     * Returns a command manager setting.
+     *
+     * @param setting Setting
+     * @return {@code true} if the setting is activated or {@code false} if it's not
+     * @see #setSetting(ManagerSettings, boolean) Update a manager setting
+     * @since 1.6.0
+     */
+    public boolean setting(final @NonNull ManagerSettings setting) {
         return this.managerSettings.contains(setting);
     }
 
     /**
-     * Update a command manager setting
+     * Updates a command manager setting.
      *
      * @param setting Setting to update
      * @param value   Value. In most cases {@code true} will enable a feature, whereas {@code false} will disable it.
      *                The value passed to the method will be reflected in {@link #getSetting(ManagerSettings)}
      * @see #getSetting(ManagerSettings) Get a manager setting
+     * @deprecated Use {@link #setting(ManagerSettings, boolean)}
      */
+    @Deprecated
     @SuppressWarnings("unused")
     public void setSetting(
+            final @NonNull ManagerSettings setting,
+            final boolean value
+    ) {
+        this.setting(setting, value);
+    }
+
+    /**
+     * Updates a command manager setting.
+     *
+     * @param setting Setting to update
+     * @param value   Value. In most cases {@code true} will enable a feature, whereas {@code false} will disable it.
+     *                The value passed to the method will be reflected in {@link #getSetting(ManagerSettings)}
+     * @see #getSetting(ManagerSettings) Get a manager setting
+     * @since 1.6.0
+     */
+    @SuppressWarnings("unused")
+    public void setting(
             final @NonNull ManagerSettings setting,
             final boolean value
     ) {
@@ -913,7 +1117,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Returns the command execution coordinator used in this manager
+     * Returns the command execution coordinator used in this manager.
      *
      * @return Command execution coordinator
      * @since 1.6.0
@@ -923,7 +1127,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
+     * Transitions from the {@code in} state to the {@code out} state, if the manager is not already in that state.
      *
      * @param in  The starting state
      * @param out The ending state
@@ -938,7 +1142,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Transition from the {@code in} state to the {@code out} state, if the manager is not already in that state.
+     * Transitions from the {@code in} state to the {@code out} state, if the manager is not already in that state.
      *
      * @param in  The starting state
      * @param out The ending state
@@ -950,7 +1154,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Require that the commands manager is in a certain state.
+     * Requires that the commands manager is in a certain state.
      *
      * @param expected The required state
      * @throws IllegalStateException if the manager is not in the expected state
@@ -964,7 +1168,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Transition the command manager from either {@link RegistrationState#BEFORE_REGISTRATION} or
+     * Transitions the command manager from either {@link RegistrationState#BEFORE_REGISTRATION} or
      * {@link RegistrationState#REGISTERING} to {@link RegistrationState#AFTER_REGISTRATION}.
      *
      * @throws IllegalStateException if the manager is not in the expected state
@@ -979,19 +1183,33 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the active registration state for this manager.
+     * Returns the active registration state for this manager.
      * <p>
-     * If this state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered
+     * If this state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered.
      *
      * @return The current state
      * @since 1.2.0
+     * @deprecated Use {@link #registrationState()}
      */
+    @Deprecated
     public final @NonNull RegistrationState getRegistrationState() {
+        return this.registrationState();
+    }
+
+    /**
+     * Returns the active registration state for this manager.
+     * <p>
+     * If this state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered.
+     *
+     * @return The current state
+     * @since 1.6.0
+     */
+    public final @NonNull RegistrationState registrationState() {
         return this.state.get();
     }
 
     /**
-     * Check if command registration is allowed.
+     * Checks if command registration is allowed.
      * <p>
      * On platforms where unsafe registration is possible, this can be overridden by enabling the
      * {@link ManagerSettings#ALLOW_UNSAFE_REGISTRATION} setting.
