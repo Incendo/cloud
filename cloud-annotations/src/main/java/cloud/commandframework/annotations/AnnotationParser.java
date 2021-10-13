@@ -47,6 +47,9 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.permission.AndPermission;
+import cloud.commandframework.permission.OrPermission;
+import cloud.commandframework.permission.Permission;
 import io.leangen.geantyref.TypeToken;
 
 import java.util.function.Predicate;
@@ -485,7 +488,7 @@ public final class AnnotationParser<C> {
 
             final CommandPermission commandPermission = getMethodOrClassAnnotation(method, CommandPermission.class);
             if (commandPermission != null) {
-                builder = builder.permission(commandPermission.value());
+                builder = builder.permission(this.parsePermission(commandPermission.value()));
             }
 
             if (commandMethod.requiredSender() != Object.class) {
@@ -558,6 +561,44 @@ public final class AnnotationParser<C> {
             }
         }
         return commands;
+    }
+
+    private cloud.commandframework.permission.CommandPermission parsePermission(final @NonNull String input) {
+        return this.parsePermission(input, input);
+    }
+
+    private cloud.commandframework.permission.CommandPermission parsePermission(
+            final @NonNull String input,
+            final @NonNull String previousInput
+    ) {
+        if (input.trim().isEmpty()) {
+            throw new IllegalArgumentException(String.format(
+                    "@CommandPermission contains empty permission in chain near %s",
+                    previousInput
+            ));
+        }
+        // split the permission at the first '&' to get the left and right side permission expressions of it
+        String[] sideExpressions = input.split("&", 2);
+        // there is no more ands in the array
+        if (sideExpressions.length == 1) {
+            // split the permission at the first '|' to get the left and right side permission expressions of it
+            sideExpressions = input.split("\\|", 2);
+            if (sideExpressions.length == 1) {
+                // no remaining '&' and '|' operators - it's a normal permission
+                return Permission.of(input);
+            }
+            // Get an OR permission from the parsed left and right sided expressions
+            return OrPermission.of(Arrays.asList(
+                    parsePermission(sideExpressions[0], input),
+                    parsePermission(sideExpressions[1], input)
+            ));
+        } else {
+            // Get an AND permission from the parsed left and right sided expressions
+            return AndPermission.of(Arrays.asList(
+                    parsePermission(sideExpressions[0], input),
+                    parsePermission(sideExpressions[1], input)
+            ));
+        }
     }
 
     private @NonNull SyntaxFragment findSyntaxFragment(

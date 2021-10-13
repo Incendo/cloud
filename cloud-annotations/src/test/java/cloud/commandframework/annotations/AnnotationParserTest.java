@@ -111,6 +111,18 @@ class AnnotationParserTest {
     }
 
     @Test
+    void testCommandPermissionParsing() {
+        Collection<Command<TestCommandSender>> commands = annotationParser.parse(new CommandPermissionTest());
+        Assertions.assertEquals(1, commands.size());
+
+        cloud.commandframework.permission.CommandPermission rootPermission = commands.iterator().next().getCommandPermission();
+        Assertions.assertEquals(2, rootPermission.getPermissions().size());
+        Assertions.assertEquals("((test.perm2)|(test.perm)) & (test.perm3)", rootPermission.toString());
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> annotationParser.parse(new InvalidCommandPermissionTest()));
+    }
+
+    @Test
     void testNamedSuggestionProvider() {
         Assertions.assertEquals(NAMED_SUGGESTIONS, manager.suggest(new TestCommandSender(), "namedsuggestions "));
     }
@@ -261,10 +273,29 @@ class AnnotationParserTest {
     private static class ClassCommandMethod {
 
         @CommandMethod("method")
+        @CommandPermission("test.perm|test.perm2&test.perm3")
         public void annotatedMethod() {
             System.out.println("kekw");
         }
 
+    }
+
+    private static class CommandPermissionTest {
+
+        @CommandMethod("test world")
+        @CommandPermission("test.perm|test.perm2&test.perm3")
+        public void annotatedMethod() {
+            System.out.println("hello world");
+        }
+    }
+
+    private static class InvalidCommandPermissionTest {
+
+        @CommandMethod("test world")
+        @CommandPermission("test.perm|test.perm2&test.perm3&|test4")
+        public void annotatedMethod() {
+            System.out.println("hello world");
+        }
     }
 
     @CommandPermission("some.permission")

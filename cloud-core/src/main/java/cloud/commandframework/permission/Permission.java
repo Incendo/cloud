@@ -61,7 +61,7 @@ public final class Permission implements CommandPermission {
      * @return Created command permission
      */
     public static @NonNull Permission of(final @NonNull String string) {
-        return new Permission(string);
+        return new Permission(string.trim());
     }
 
     /**
