@@ -70,6 +70,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
@@ -439,14 +440,20 @@ public final class CloudBrigadierManager<C, S> {
                 node.getValue(),
                 builder
         );
+        final Optional<Class<? extends C>> senderType = cloudCommand.getSenderType();
 
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
                 .<S>literal(label)
-                .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.getNodeMeta()
-                        .getOrDefault(
-                                "permission",
-                                Permission.empty()
-                        )));
+                .requires(sender -> (!senderType.isPresent() || senderType
+                        .get()
+                        .isAssignableFrom(this.brigadierCommandSenderMapper.apply(sender).getClass())) && permissionChecker.test(
+                        sender,
+                        (CommandPermission) node.getNodeMeta()
+                                .getOrDefault(
+                                        "permission",
+                                        Permission.empty()
+                                )
+                ));
         if (forceRegister || (node.getValue() != null && node.getValue().getOwningCommand() != null)) {
             literalArgumentBuilder.executes(executor);
         }
