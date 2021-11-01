@@ -69,7 +69,9 @@ class CommandTreeTest {
                         .argument(IntegerArgument
                                 .optional("num", EXPECTED_INPUT_NUMBER))
                         .build())
-                .command(manager.commandBuilder("req").senderType(SpecificCommandSender.class).build());
+                .command(manager.commandBuilder("require").senderType(SpecificCommandSender.class).build())
+                .command(manager.commandBuilder("requireArg")
+                        .senderType(SpecificCommandSender.class).argument(IntegerArgument.of("num")));
 
         /* Build command to test command proxying */
         final Command<TestCommandSender> toProxy = manager.commandBuilder("test")
@@ -280,9 +282,21 @@ class CommandTreeTest {
     }
 
     @Test
-    void testRequiredSender() {
+    void testRequiredSenderExecute() {
         Assertions.assertThrows(CompletionException.class, () ->
-                manager.executeCommand(new TestCommandSender(), "req").join());
+                manager.executeCommand(new TestCommandSender(), "require").join());
+    }
+
+    @Test
+    void testRequiredSenderSuggest() {
+        Assertions.assertEquals(
+                Collections.emptyList(),
+                manager.suggest(new TestCommandSender(), "req")
+        );
+        Assertions.assertEquals(
+                Arrays.asList("require", "requireArg"),
+                manager.suggest(new SpecificCommandSender(), "req")
+        );
     }
 
     @Test

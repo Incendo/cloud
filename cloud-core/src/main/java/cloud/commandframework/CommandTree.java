@@ -535,7 +535,10 @@ public final class CommandTree<C> {
         if (commandQueue.size() <= 1) {
             final String literalValue = this.stringOrEmpty(commandQueue.peek());
             for (final Node<CommandArgument<C, ?>> argument : staticArguments) {
-                if (this.isPermitted(commandContext.getSender(), argument) != null) {
+                if (this.isPermitted(
+                        commandContext.getSender(),
+                        argument
+                ) != null || !this.isValidSender(commandContext.getSender(), argument)) {
                     continue;
                 }
                 commandContext.setCurrentArgument(argument.getValue());
@@ -745,6 +748,14 @@ public final class CommandTree<C> {
         return OrPermission.of(missingPermissions);
     }
 
+    public boolean isValidSender(
+            final @NonNull C sender,
+            final @NonNull Node<@Nullable CommandArgument<C, ?>> node
+    ) {
+        @SuppressWarnings("unchecked") final Class<? extends C> senderType = (Class<? extends C>) node.nodeMeta.get("sender");
+        return senderType == null || senderType.isAssignableFrom(sender.getClass());
+    }
+
     /**
      * Go through all commands and register them, and verify the
      * command tree contracts
@@ -773,8 +784,12 @@ public final class CommandTree<C> {
         this.getLeavesRaw(this.internalTree).forEach(node -> {
             // noinspection all
             final CommandPermission commandPermission = node.getValue().getOwningCommand().getCommandPermission();
+            final Optional<Class<? extends C>> commandSenderType = node.getValue().getOwningCommand().getSenderType();
             /* All leaves must necessarily have an owning command */
             node.nodeMeta.put("permission", commandPermission);
+            if (commandSenderType.isPresent()) {
+                node.nodeMeta.put("sender", commandSenderType.get());
+            }
             // Get chain and order it tail->head then skip the tail (leaf node)
             List<Node<CommandArgument<C, ?>>> chain = this.getChain(node);
             Collections.reverse(chain);
@@ -783,12 +798,27 @@ public final class CommandTree<C> {
             for (final Node<CommandArgument<C, ?>> commandArgumentNode : chain) {
                 final CommandPermission existingPermission = (CommandPermission) commandArgumentNode.nodeMeta
                         .get("permission");
+                @SuppressWarnings("unchecked") final Class<? extends C> existingSenderType =
+                        (Class<? extends C>) commandArgumentNode.nodeMeta
+                                .get("sender");
 
                 CommandPermission permission;
                 if (existingPermission != null) {
                     permission = OrPermission.of(Arrays.asList(commandPermission, existingPermission));
                 } else {
                     permission = commandPermission;
+                }
+
+                Class<?> senderType = null;
+                if (commandSenderType.isPresent()) {
+                    if (existingSenderType != null) {
+                        senderType = existingSenderType;
+                        while (!senderType.isAssignableFrom(commandSenderType.get())) {
+                            senderType = senderType.getSuperclass();
+                        }
+                    } else {
+                        senderType = commandSenderType.get();
+                    }
                 }
 
                 /* Now also check if there's a command handler attached to an upper level node */
@@ -806,6 +836,7 @@ public final class CommandTree<C> {
                 }
 
                 commandArgumentNode.nodeMeta.put("permission", permission);
+                commandArgumentNode.nodeMeta.put("sender", senderType);
             }
         });
     }
