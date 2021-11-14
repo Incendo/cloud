@@ -16,10 +16,6 @@ kotlin {
     }
 }
 
-configurations.all {
-    dependencies.removeIf { it.group == "org.jetbrains.kotlin" }
-}
-
 val compileAndTest: Configuration by configurations.creating
 listOf(configurations.compileOnly, configurations.testImplementation).forEach { config ->
     config {
