@@ -226,3 +226,4 @@ gradle-app.setting
 ### Fabric Loom run files ###
 
 /run/
+/cloud-minecraft/cloud-fabric/run/
