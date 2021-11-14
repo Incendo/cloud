@@ -23,7 +23,7 @@ object Versions {
     const val spongeApi7 = "7.3.0"
     const val jetbrainsAnnotations = "20.1.0"
     const val guava = "21.0-jre"
-    const val fabricLoader = "0.11.1"
+    const val fabricLoader = "0.12.5"
     const val fabricMc = "1.16.5"
     const val fabricApi = "0.31.0+1.16"
 
