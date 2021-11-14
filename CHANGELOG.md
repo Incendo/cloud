@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Kotlin: Support for suspending command functions using `AnnotationParser<C>.installCoroutineSupport()`
 - Flags can be bound to a permission
 - Paper: Implement KeyedWorldArgument for matching worlds by their namespaced key
+- Annotations: Parser parameter annotations are now also parsed for flags ([#315](https://github.com/Incendo/cloud/pull/315))
 
 ### Changed
 - Added `executeFuture` to `CommandExecutionHandler` which is now used internally. By default, this delegates to the old 
