@@ -26,6 +26,8 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.parsers.Parser;
+import cloud.commandframework.annotations.specifier.Greedy;
+import cloud.commandframework.annotations.specifier.Quoted;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.StaticArgument;
@@ -37,29 +39,27 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
-import java.util.Set;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.CompletionException;
 import java.util.function.BiFunction;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AnnotationParserTest {
@@ -107,6 +107,8 @@ class AnnotationParserTest {
                 manager.executeCommand(new TestCommandSender(), "test 101").join());
         manager.executeCommand(new TestCommandSender(), "flagcommand -p").join();
         manager.executeCommand(new TestCommandSender(), "flagcommand --print --word peanut").join();
+        manager.executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\"").join();
+        manager.executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\" -o This is a test").join();
         manager.executeCommand(new TestCommandSender(), "class method").join();
     }
 
@@ -242,6 +244,15 @@ class AnnotationParserTest {
         if (print) {
             System.out.println(word);
         }
+    }
+
+    @CommandMethod("parserflagcommand")
+    public void testQuotedFlags(
+            final TestCommandSender sender,
+            @Flag(value = "sentence", aliases = "s") @Quoted final String sentence,
+            @Flag(value = "other", aliases = "o") @Greedy final String otherStuff
+    ) {
+        System.out.println(sentence + (otherStuff == null ? "" : " " + otherStuff));
     }
 
     @CommandMethod("namedsuggestions <input>")
