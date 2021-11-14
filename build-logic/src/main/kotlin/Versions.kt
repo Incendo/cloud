@@ -1,6 +1,6 @@
 object Versions {
-    const val checkerQual = "3.9.1"
-    const val geantyref = "1.3.11"
+    const val checkerQual = "3.19.0"
+    const val geantyref = "1.3.13"
     const val errorprone = "2.9.0"
 
     // INTEGRATION DEPENDENCIES
@@ -16,7 +16,7 @@ object Versions {
     const val commodore = "1.10"
     const val bungeecord = "1.8-SNAPSHOT"
     const val cloudburst = "1.0.0-SNAPSHOT"
-    const val adventureApi = "4.9.1"
+    const val adventureApi = "4.9.3"
     const val adventurePlatform = "4.0.0"
     const val paperApi = "1.16.5-R0.1-SNAPSHOT"
     const val velocityApi = "1.1.0"
@@ -31,6 +31,6 @@ object Versions {
     const val pircbotx = "83a4c22e80"
 
     // TEST DEPENDENCIES
-    const val jupiterEngine = "5.7.0"
+    const val jupiterEngine = "5.8.1"
     const val jmh = "1.27"
 }
