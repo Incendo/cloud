@@ -11,7 +11,7 @@ plugins {
 
 indra {
     javaVersions {
-        minimumToolchain(16)
+        minimumToolchain(17)
         target(8)
         testWith(8, 11, 17)
     }
