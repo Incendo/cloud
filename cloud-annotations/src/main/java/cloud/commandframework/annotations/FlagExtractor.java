@@ -28,14 +28,15 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.permission.Permission;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,13 +68,15 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
             if (parameter.getType().equals(boolean.class)) {
                 flags.add(builder.build());
             } else {
+                final TypeToken<?> token = TypeToken.get(parameter.getType());
+                final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
                 final ParserRegistry<?> registry = this.commandManager.getParserRegistry();
                 final ArgumentParser<?, ?> parser;
                 if (flag.parserName().isEmpty()) {
-                    parser = registry.createParser(TypeToken.get(parameter.getType()), ParserParameters.empty())
+                    parser = registry.createParser(token, registry.parseAnnotations(token, annotations))
                             .orElse(null);
                 } else {
-                    parser = registry.createParser(flag.parserName(), ParserParameters.empty())
+                    parser = registry.createParser(flag.parserName(), registry.parseAnnotations(token, annotations))
                             .orElse(null);
                 }
                 if (parser == null) {
