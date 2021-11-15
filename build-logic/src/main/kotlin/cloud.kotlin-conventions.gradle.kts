@@ -16,15 +16,8 @@ kotlin {
     }
 }
 
-val compileAndTest: Configuration by configurations.creating
-listOf(configurations.compileOnly, configurations.testImplementation).forEach { config ->
-    config {
-        extendsFrom(compileAndTest)
-    }
-}
-
 dependencies {
-    compileAndTest(kotlin("stdlib-jdk8"))
+    api(kotlin("stdlib-jdk8"))
 }
 
 tasks {
