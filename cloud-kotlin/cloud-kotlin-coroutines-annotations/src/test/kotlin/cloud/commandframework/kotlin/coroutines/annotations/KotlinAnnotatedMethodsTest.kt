@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.kotlin.coroutines
+package cloud.commandframework.kotlin.coroutines.annotations
 
 import cloud.commandframework.CommandManager
 import cloud.commandframework.annotations.AnnotationParser
@@ -65,7 +65,7 @@ class KotlinAnnotatedMethodsTest {
         AnnotationParser(commandManager, TestCommandSender::class.java) {
             SimpleCommandMeta.empty()
         }
-            .also { it.installCoroutineSupport() }
+            .installCoroutineSupport()
             .parse(CommandMethods())
 
         commandManager.executeCommand(TestCommandSender(), "test").await()
@@ -76,7 +76,7 @@ class KotlinAnnotatedMethodsTest {
         AnnotationParser(commandManager, TestCommandSender::class.java) {
             SimpleCommandMeta.empty()
         }
-            .also { it.installCoroutineSupport() }
+            .installCoroutineSupport()
             .parse(CommandMethods())
 
         assertThrows<CommandExecutionException> {
