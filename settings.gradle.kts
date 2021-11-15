@@ -22,8 +22,9 @@ include(":cloud-services")
 include(":cloud-tasks")
 include(":cloud-annotations")
 
-// Extension Modules
-include(":cloud-kotlin-extensions")
+// Kotlin Extensions
+setupKotlinModule("cloud-kotlin-extensions")
+setupKotlinModule("cloud-kotlin-coroutines-annotations")
 
 // Discord Modules
 setupDiscordModule("cloud-javacord")
@@ -58,6 +59,9 @@ fun setupDiscordModule(name: String) =
 
 fun setupMinecraftModule(name: String) =
         setupSubproject(name, file("cloud-minecraft/$name"))
+
+fun setupKotlinModule(name: String) =
+        setupSubproject(name, file("cloud-kotlin/$name"))
 
 fun setupExampleModule(name: String) =
         setupSubproject(name, file("examples/$name"))

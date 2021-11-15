@@ -6,8 +6,11 @@ metadata:
 plugins:
   com.github.johnrengelman.shadow: 7.1.0
   com.github.ben-manes.versions: 0.36.0
+  org.jlleitschuh.gradle.ktlint: &ktlint 10.2.0
 
 versions:
+  kotlin: &kotlin 1.5.31
+  dokka: *kotlin
   checkerQual: 3.14.0
 
   # build-logic
@@ -15,6 +18,7 @@ versions:
   gradleTestLogger: 3.0.0
   gradleErrorprone: 2.0.2
   licenser: 0.6.1
+  ktlint: *ktlint
 
 dependencies:
   checkerQual:
@@ -43,5 +47,17 @@ dependencies:
     group: net.ltgt.gradle
     name: gradle-errorprone-plugin
     version: { ref: gradleErrorprone }
+  gradleKotlinJvm:
+    group: org.jetbrains.kotlin.jvm
+    name: org.jetbrains.kotlin.jvm.gradle.plugin
+    version: { ref: kotlin }
+  gradleDokka:
+    group: org.jetbrains.dokka
+    name: dokka-gradle-plugin
+    version: { ref: dokka }
+  gradleKtlint:
+    group: org.jlleitschuh.gradle
+    name: ktlint-gradle
+    version: { ref: ktlint }
 
 bundles:
