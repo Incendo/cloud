@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.kotlin.coroutines
+package cloud.commandframework.kotlin.coroutines.annotations
 
 import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.MethodCommandExecutionHandler
@@ -43,12 +43,15 @@ import kotlin.reflect.jvm.kotlinFunction
 /**
  * Adds coroutine support to the [AnnotationParser].
  *
+ * @param scope coroutine scope
+ * @param context coroutine context
+ * @return annotation parser
  * @since 1.6.0
  */
 public fun <C> AnnotationParser<C>.installCoroutineSupport(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext
-) {
+): AnnotationParser<C> {
     if (manager().commandExecutionCoordinator() is CommandExecutionCoordinator.SimpleCoordinator) {
         RuntimeException(
             """You are highly advised to not use the simple command execution coordinator together
@@ -61,6 +64,8 @@ public fun <C> AnnotationParser<C>.installCoroutineSupport(
     registerCommandExecutionMethodFactory(predicate) {
         KotlinMethodCommandExecutionHandler(scope, context, it)
     }
+
+    return this
 }
 
 private class KotlinMethodCommandExecutionHandler<C>(

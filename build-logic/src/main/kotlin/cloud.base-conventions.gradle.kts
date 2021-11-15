@@ -27,13 +27,13 @@ tasks {
         options.errorprone {
             /* These are just annoying */
             disable(
-                    "JdkObsolete",
-                    "FutureReturnValueIgnored",
-                    "ImmutableEnumChecker",
-                    "StringSplitter",
-                    "EqualsGetClass",
-                    "CatchAndPrintStackTrace",
-                    "InlineMeSuggester",
+                "JdkObsolete",
+                "FutureReturnValueIgnored",
+                "ImmutableEnumChecker",
+                "StringSplitter",
+                "EqualsGetClass",
+                "CatchAndPrintStackTrace",
+                "InlineMeSuggester",
             )
         }
         options.compilerArgs.addAll(listOf("-Xlint:-processing", "-Werror"))
