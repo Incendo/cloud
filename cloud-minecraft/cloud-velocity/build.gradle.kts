@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":cloud-core"))
-    api(project(":cloud-brigadier"))
+    api(projects.cloudCore)
+    api(projects.cloudBrigadier)
     compileOnly("com.velocitypowered", "velocity-api", Versions.velocityApi)
 }

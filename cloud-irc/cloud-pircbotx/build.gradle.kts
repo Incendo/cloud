@@ -1,4 +1,4 @@
 dependencies {
-    api(project(":cloud-core"))
+    api(projects.cloudCore)
     implementation("com.github.pircbotx", "pircbotx", Versions.pircbotx)
 }

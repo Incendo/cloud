@@ -3,9 +3,9 @@ plugins {
 }
 
 dependencies {
-    api(project(":cloud-core"))
+    api(projects.cloudCore)
     api(libs.bundles.coroutines)
 
-    compileOnly(project(":cloud-kotlin-extensions"))
-    testImplementation(project(":cloud-kotlin-extensions"))
+    compileOnly(projects.cloudKotlinExtensions)
+    testImplementation(projects.cloudKotlinExtensions)
 }

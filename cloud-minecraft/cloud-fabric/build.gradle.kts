@@ -48,9 +48,9 @@ dependencies {
 
     modApi(include("me.lucko", "fabric-permissions-api", "0.1-SNAPSHOT"))
 
-    api(include(project(":cloud-core"))!!)
-    api(include(project(":cloud-brigadier"))!!)
-    api(include(project(":cloud-services"))!!)
+    api(include(projects.cloudCore)!!)
+    api(include(projects.cloudBrigadier)!!)
+    api(include(projects.cloudServices)!!)
 
     api(include("io.leangen.geantyref", "geantyref", Versions.geantyref))
 }
