@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    api(project(":cloud-core"))
+    api(projects.cloudCore)
 }

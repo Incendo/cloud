@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    api(project(":cloud-core"))
-    api(project(":cloud-annotations"))
+    api(projects.cloudCore)
+    api(projects.cloudAnnotations)
     api(kotlin("reflect"))
     api(libs.bundles.coroutines)
 }
