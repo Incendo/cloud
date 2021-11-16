@@ -31,15 +31,43 @@ import kotlinx.coroutines.future.future
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+/**
+ * Suspending version of [CommandExecutionHandler] for use with
+ * coroutines.
+ *
+ * @param C command sender type
+ */
 public fun interface SuspendingExecutionHandler<C : Any> {
+    /**
+     * Handles command execution.
+     *
+     * @param commandContext command context
+     */
     public suspend operator fun invoke(commandContext: CommandContext<C>)
 
+    /**
+     * Create a new [CommandExecutionHandler] for use in building commands,
+     * backed by this [SuspendingExecutionHandler].
+     *
+     * @param scope coroutine scope
+     * @param context coroutine context
+     * @return new [CommandExecutionHandler]
+     */
     public fun asCommandExecutionHandler(
         scope: CoroutineScope = GlobalScope,
         context: CoroutineContext = EmptyCoroutineContext,
     ): CommandExecutionHandler<C> = createCommandExecutionHandler(scope, context, this)
 
     public companion object {
+        /**
+         * Create a new [CommandExecutionHandler] for use in building commands,
+         * backed by the given [SuspendingExecutionHandler].
+         *
+         * @param scope coroutine scope
+         * @param context coroutine context
+         * @param handler suspending handler
+         * @return new [CommandExecutionHandler]
+         */
         public fun <C : Any> createCommandExecutionHandler(
             scope: CoroutineScope = GlobalScope,
             context: CoroutineContext = EmptyCoroutineContext,
