@@ -38,6 +38,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @param handler suspending handler
  * @return this [MutableCommandBuilder]
  * @see MutableCommandBuilder.handler
+ * @see SuspendingExecutionHandler
  */
 public fun <C : Any> MutableCommandBuilder<C>.suspendingHandler(
     scope: CoroutineScope = GlobalScope,

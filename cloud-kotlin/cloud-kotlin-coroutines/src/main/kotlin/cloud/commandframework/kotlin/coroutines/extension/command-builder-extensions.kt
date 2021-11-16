@@ -38,6 +38,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @param handler suspending handler
  * @return modified copy of this [Command.Builder]
  * @see Command.Builder.handler
+ * @see SuspendingExecutionHandler
  */
 public fun <C : Any> Command.Builder<C>.suspendingHandler(
     scope: CoroutineScope = GlobalScope,

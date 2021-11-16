@@ -24,6 +24,8 @@
 package cloud.commandframework.kotlin.coroutines
 
 import cloud.commandframework.context.CommandContext
+import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
+import cloud.commandframework.execution.CommandExecutionCoordinator
 import cloud.commandframework.execution.CommandExecutionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -34,6 +36,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 /**
  * Suspending version of [CommandExecutionHandler] for use with
  * coroutines.
+ *
+ * NOTE: It is highly advised to not use [CommandExecutionCoordinator.SimpleCoordinator] together
+ * with coroutine support. Consider using [AsynchronousCommandExecutionCoordinator] instead.
  *
  * @param C command sender type
  */
