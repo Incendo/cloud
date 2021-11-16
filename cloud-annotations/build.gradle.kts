@@ -1,3 +1,3 @@
 dependencies {
-    implementation(project(":cloud-core"))
+    implementation(projects.cloudCore)
 }

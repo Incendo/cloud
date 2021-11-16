@@ -1,4 +1,4 @@
 dependencies {
-    api(project(":cloud-core"))
+    api(projects.cloudCore)
     implementation("org.javacord", "javacord", Versions.javacord)
 }

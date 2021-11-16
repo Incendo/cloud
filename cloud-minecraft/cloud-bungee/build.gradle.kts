@@ -1,4 +1,4 @@
 dependencies {
-    api(project(":cloud-core"))
+    api(projects.cloudCore)
     compileOnly("net.md-5", "bungeecord-api", Versions.bungeecord)
 }

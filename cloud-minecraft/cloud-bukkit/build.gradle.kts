@@ -1,7 +1,7 @@
 dependencies {
-    api(project(":cloud-core"))
-    api(project(":cloud-brigadier"))
-    api(project(":cloud-tasks"))
+    api(projects.cloudCore)
+    api(projects.cloudBrigadier)
+    api(projects.cloudTasks)
     compileOnly("org.bukkit", "bukkit", Versions.bukkit)
     compileOnly("me.lucko", "commodore", Versions.commodore)
     compileOnly("org.jetbrains", "annotations", Versions.jetbrainsAnnotations)
