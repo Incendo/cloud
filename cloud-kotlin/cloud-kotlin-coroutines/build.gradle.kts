@@ -4,7 +4,8 @@ plugins {
 
 dependencies {
     api(project(":cloud-core"))
-    api(project(":cloud-annotations"))
-    api(kotlin("reflect"))
     api(libs.bundles.coroutines)
+
+    compileOnly(project(":cloud-kotlin-extensions"))
+    testImplementation(project(":cloud-kotlin-extensions"))
 }

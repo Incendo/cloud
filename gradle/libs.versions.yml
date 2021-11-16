@@ -11,6 +11,7 @@ plugins:
 versions:
   kotlin: &kotlin 1.5.31
   dokka: *kotlin
+  coroutines: 1.5.2
   checkerQual: 3.14.0
 
   # build-logic
@@ -25,6 +26,15 @@ dependencies:
     group: org.checkerframework
     name: checker-qual
     version: { ref: checkerQual }
+
+  coroutinesCore:
+    group: org.jetbrains.kotlinx
+    name: kotlinx-coroutines-core
+    version: { ref: coroutines }
+  coroutinesJdk8:
+    group: org.jetbrains.kotlinx
+    name: kotlinx-coroutines-jdk8
+    version: { ref: coroutines }
 
   # build-logic
   indraCommon:
@@ -61,3 +71,6 @@ dependencies:
     version: { ref: ktlint }
 
 bundles:
+  coroutines:
+    - coroutinesCore
+    - coroutinesJdk8

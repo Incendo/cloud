@@ -24,6 +24,7 @@ include(":cloud-annotations")
 
 // Kotlin Extensions
 setupKotlinModule("cloud-kotlin-extensions")
+setupKotlinModule("cloud-kotlin-coroutines")
 setupKotlinModule("cloud-kotlin-coroutines-annotations")
 
 // Discord Modules
