@@ -193,19 +193,32 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                 CraftBukkitReflection.findMCClass("core.BlockPosition"),
                 CraftBukkitReflection.findMCClass("core.BlockPos")
         );
+        private static final @Nullable Class<?> TAG_CONTAINER_CLASS = CraftBukkitReflection.firstNonNullOrNull(
+                CraftBukkitReflection.findClass("net.minecraft.tags.TagContainer"),
+                CraftBukkitReflection.findClass("net.minecraft.tags.ITagRegistry")
+        );
         private static final Constructor<?> BLOCK_POSITION_CTR =
                 CraftBukkitReflection.needConstructor(BLOCK_POSITION_CLASS, int.class, int.class, int.class);
         private static final Constructor<?> SHAPE_DETECTOR_BLOCK_CTR = CraftBukkitReflection
                 .needConstructor(SHAPE_DETECTOR_BLOCK_CLASS, LEVEL_READER_CLASS, BLOCK_POSITION_CLASS, boolean.class);
         private static final Method GET_HANDLE_METHOD = CraftBukkitReflection.needMethod(CRAFT_WORLD_CLASS, "getHandle");
-        private static final Method CREATE_PREDICATE_METHOD =
-                CraftBukkitReflection.needMethod(ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS, "create", TAG_REGISTRY_CLASS);
-        private static final Method GET_SERVER_METHOD =
-                CraftBukkitReflection.needMethod(COMMAND_LISTENER_WRAPPER_CLASS, "getServer");
+        private static final Method CREATE_PREDICATE_METHOD = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "create on BlockPredicateArgument$Result",
+                CraftBukkitReflection.findMethod(ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS, "create", TAG_REGISTRY_CLASS),
+                CraftBukkitReflection.findMethod(ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS, "a", TAG_REGISTRY_CLASS)
+        );
+        private static final Method GET_SERVER_METHOD = CraftBukkitReflection.streamMethods(
+                COMMAND_LISTENER_WRAPPER_CLASS,
+                stream -> stream.filter(it -> it.getReturnType().equals(MINECRAFT_SERVER_CLASS) && it.getParameterCount() == 0)
+                        .findFirst().orElseThrow(() -> new IllegalStateException("Could not find CommandSourceStack#getServer."))
+        );
         private static final Method GET_TAG_REGISTRY_METHOD = CraftBukkitReflection.firstNonNullOrThrow(
                 () -> "getTags method on MinecraftServer",
                 CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTagRegistry"),
-                CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTags")
+                CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTags"),
+                TAG_CONTAINER_CLASS == null ? null : CraftBukkitReflection.streamMethods(MINECRAFT_SERVER_CLASS, stream ->
+                        stream.filter(it -> it.getReturnType().equals(TAG_CONTAINER_CLASS) && it.getParameterCount() == 0)
+                                .findFirst().orElse(null))
         );
 
         private final ArgumentParser<C, BlockPredicate> parser;
