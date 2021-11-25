@@ -203,18 +203,18 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                 CraftBukkitReflection.findMethod(ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS, "create", TAG_CONTAINER_CLASS),
                 CraftBukkitReflection.findMethod(ARGUMENT_BLOCK_PREDICATE_RESULT_CLASS, "a", TAG_CONTAINER_CLASS)
         );
-        private static final Method GET_SERVER_METHOD = CraftBukkitReflection.streamMethods(
-                COMMAND_LISTENER_WRAPPER_CLASS,
-                stream -> stream.filter(it -> it.getReturnType().equals(MINECRAFT_SERVER_CLASS) && it.getParameterCount() == 0)
-                        .findFirst().orElseThrow(() -> new IllegalStateException("Could not find CommandSourceStack#getServer."))
-        );
+        private static final Method GET_SERVER_METHOD = CraftBukkitReflection.streamMethods(COMMAND_LISTENER_WRAPPER_CLASS)
+                .filter(it -> it.getReturnType().equals(MINECRAFT_SERVER_CLASS) && it.getParameterCount() == 0)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Could not find CommandSourceStack#getServer."));
         private static final Method GET_TAG_REGISTRY_METHOD = CraftBukkitReflection.firstNonNullOrThrow(
                 () -> "getTags method on MinecraftServer",
                 CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTagRegistry"),
                 CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTags"),
-                CraftBukkitReflection.streamMethods(MINECRAFT_SERVER_CLASS, stream ->
-                        stream.filter(it -> it.getReturnType().equals(TAG_CONTAINER_CLASS) && it.getParameterCount() == 0)
-                                .findFirst().orElse(null))
+                CraftBukkitReflection.streamMethods(MINECRAFT_SERVER_CLASS)
+                        .filter(it -> it.getReturnType().equals(TAG_CONTAINER_CLASS) && it.getParameterCount() == 0)
+                        .findFirst()
+                        .orElse(null)
         );
 
         private final ArgumentParser<C, BlockPredicate> parser;
