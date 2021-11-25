@@ -32,7 +32,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Utilities for doing reflection on CraftBukkit, used by the cloud implementation.
@@ -65,8 +67,7 @@ public final class CraftBukkitReflection {
     }
 
     @SafeVarargs
-    public static <T> @NonNull T firstNonNullOrThrow(
-            final @NonNull Supplier<@NonNull String> errorMessage,
+    public static <T> @Nullable T firstNonNullOrNull(
             final @Nullable T @NonNull... elements
     ) {
         for (final T element : elements) {
@@ -74,7 +75,20 @@ public final class CraftBukkitReflection {
                 return element;
             }
         }
-        throw new IllegalArgumentException(errorMessage.get());
+        return null;
+    }
+
+    @SafeVarargs
+    @SuppressWarnings("varargs")
+    public static <T> @NonNull T firstNonNullOrThrow(
+            final @NonNull Supplier<@NonNull String> errorMessage,
+            final @Nullable T @NonNull... elements
+    ) {
+        final @Nullable T t = firstNonNullOrNull(elements);
+        if (t == null) {
+            throw new IllegalArgumentException(errorMessage.get());
+        }
+        return t;
     }
 
     public static @NonNull Class<?> needNMSClassOrElse(
@@ -189,6 +203,13 @@ public final class CraftBukkitReflection {
         } catch (final NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> T streamMethods(
+            final @NonNull Class<?> clazz,
+            final @NonNull Function<Stream<Method>, T> function
+    ) {
+        return function.apply(Arrays.stream(clazz.getDeclaredMethods()));
     }
 
     private CraftBukkitReflection() {

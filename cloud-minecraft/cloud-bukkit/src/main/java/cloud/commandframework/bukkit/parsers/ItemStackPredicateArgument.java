@@ -152,10 +152,18 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
                 CraftBukkitReflection.findMCClass("commands.arguments.item.ArgumentItemPredicate$b"),
                 CraftBukkitReflection.findMCClass("commands.arguments.item.ItemPredicateArgument$Result")
         );
-        private static final Method CREATE_PREDICATE_METHOD = CraftBukkitReflection.needMethod(
-                ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
-                "create",
-                com.mojang.brigadier.context.CommandContext.class
+        private static final Method CREATE_PREDICATE_METHOD = CraftBukkitReflection.firstNonNullOrThrow(
+                () -> "ItemPredicateArgument$Result#create",
+                CraftBukkitReflection.findMethod(
+                        ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
+                        "create",
+                        com.mojang.brigadier.context.CommandContext.class
+                ),
+                CraftBukkitReflection.findMethod(
+                        ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
+                        "a",
+                        com.mojang.brigadier.context.CommandContext.class
+                )
         );
         private static final Method AS_NMS_COPY_METHOD =
                 CraftBukkitReflection.needMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
