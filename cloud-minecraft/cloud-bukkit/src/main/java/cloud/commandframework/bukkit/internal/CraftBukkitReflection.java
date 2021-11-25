@@ -32,7 +32,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -68,7 +67,7 @@ public final class CraftBukkitReflection {
 
     @SafeVarargs
     public static <T> @Nullable T firstNonNullOrNull(
-            final @Nullable T @NonNull... elements
+            final @Nullable T @NonNull ... elements
     ) {
         for (final T element : elements) {
             if (element != null) {
@@ -82,7 +81,7 @@ public final class CraftBukkitReflection {
     @SuppressWarnings("varargs")
     public static <T> @NonNull T firstNonNullOrThrow(
             final @NonNull Supplier<@NonNull String> errorMessage,
-            final @Nullable T @NonNull... elements
+            final @Nullable T @NonNull ... elements
     ) {
         final @Nullable T t = firstNonNullOrNull(elements);
         if (t == null) {
@@ -205,11 +204,8 @@ public final class CraftBukkitReflection {
         }
     }
 
-    public static <T> T streamMethods(
-            final @NonNull Class<?> clazz,
-            final @NonNull Function<Stream<Method>, T> function
-    ) {
-        return function.apply(Arrays.stream(clazz.getDeclaredMethods()));
+    public static Stream<Method> streamMethods(final @NonNull Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredMethods());
     }
 
     private CraftBukkitReflection() {
