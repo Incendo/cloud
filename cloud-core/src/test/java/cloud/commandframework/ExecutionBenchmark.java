@@ -23,6 +23,8 @@
 //
 package cloud.commandframework;
 
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -46,7 +48,7 @@ public class ExecutionBenchmark {
 
     @Setup(Level.Trial)
     public void setup() {
-        manager = new TestCommandManager();
+        manager = createManager();
 
         final StringBuilder literalBuilder = new StringBuilder("literals");
 

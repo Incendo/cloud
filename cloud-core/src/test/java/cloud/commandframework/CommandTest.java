@@ -23,6 +23,8 @@
 //
 package cloud.commandframework;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.SimpleCommandMeta;
@@ -33,14 +35,23 @@ class CommandTest {
 
     @Test()
     void noArguments() {
-        Assertions.assertEquals(1, Command.newBuilder("test", SimpleCommandMeta.empty()).build().getArguments().size());
+        assertThat(
+                Command
+                        .newBuilder("test", SimpleCommandMeta.empty())
+                        .build()
+                        .getArguments()
+                        .size()
+        ).isEqualTo(1);
     }
 
     @Test
     void ensureOrdering() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                Command.newBuilder("test", SimpleCommandMeta.empty()).argument(StringArgument.optional("something"))
-                        .argument(StaticArgument.of("somethingelse")).build());
+                Command.newBuilder("test", SimpleCommandMeta.empty())
+                        .argument(StringArgument.optional("something"))
+                        .argument(StaticArgument.of("somethingelse"))
+                        .build()
+        );
     }
 
 }

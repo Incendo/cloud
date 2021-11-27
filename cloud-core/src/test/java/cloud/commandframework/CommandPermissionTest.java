@@ -23,6 +23,8 @@
 //
 package cloud.commandframework;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.keys.SimpleCloudKey;
@@ -33,7 +35,7 @@ import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.permission.PredicatePermission;
-import org.junit.jupiter.api.Assertions;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +44,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CommandPermissionTest {
@@ -58,16 +61,18 @@ class CommandPermissionTest {
 
     @Test
     void testCompoundPermission() {
-        Assertions.assertTrue(manager.suggest(new TestCommandSender(), "t").isEmpty());
-        assertFalse(manager.suggest(new TestCommandSender("test.permission.four"), "t").isEmpty());
+       assertThat(manager.suggest(new TestCommandSender(), "t")).isEmpty();
+       assertThat(manager.suggest(new TestCommandSender("test.permission.four"), "t")).isNotEmpty();
     }
 
     @Test
     void testComplexPermissions() {
         manager.command(manager.commandBuilder("first").permission("first"));
         manager.command(manager.commandBuilder("first").argument(IntegerArgument.of("second")).permission("second"));
+
         manager.executeCommand(new TestCommandSender(), "first").join();
-        Assertions.assertThrows(
+
+        assertThrows(
                 CompletionException.class,
                 () -> manager.executeCommand(new TestCommandSender(), "first 10").join()
         );
@@ -77,10 +82,12 @@ class CommandPermissionTest {
     void testAndPermissions() {
         final CommandPermission test = Permission.of("one").and(Permission.of("two"));
         final TestCommandSender sender = new TestCommandSender("one");
-        assertFalse(manager.hasPermission(sender, test));
-        assertFalse(manager.hasPermission(new TestCommandSender("two"), test));
+
+        assertThat(manager.hasPermission(sender, test)).isFalse();
+        assertThat(manager.hasPermission(new TestCommandSender("two"), test)).isFalse();
+
         sender.addPermission("two");
-        assertTrue(manager.hasPermission(sender, test));
+        assertThat(manager.hasPermission(sender, test)).isTrue();
     }
 
     @Test
@@ -126,7 +133,7 @@ class CommandPermissionTest {
         manager.executeCommand(new TestCommandSender(), "predicate").join();
         // Now we force it to fail
         condition.set(false);
-        Assertions.assertThrows(
+        assertThrows(
                 CompletionException.class,
                 () -> manager.executeCommand(new TestCommandSender(), "predicate").join()
         );
@@ -141,7 +148,7 @@ class CommandPermissionTest {
 
         @Override
         public boolean hasPermission(
-                final TestCommandSender sender,
+                final @NonNull TestCommandSender sender,
                 final String permission
         ) {
             if (permission.equalsIgnoreCase("first")) {
@@ -154,7 +161,7 @@ class CommandPermissionTest {
         }
 
         @Override
-        public CommandMeta createDefaultCommandMeta() {
+        public @NonNull CommandMeta createDefaultCommandMeta() {
             return SimpleCommandMeta.empty();
         }
 

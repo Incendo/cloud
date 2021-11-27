@@ -23,6 +23,10 @@
 //
 package cloud.commandframework;
 
+import static com.google.common.truth.Truth8.assertThat;
+
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.annotations.injection.GuiceInjectionService;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
@@ -50,7 +54,7 @@ public class ParameterInjectorRegistryTest {
     @BeforeEach
     void setup() {
         this.commandSender = new TestCommandSender();
-        this.commandManager = new TestCommandManager();
+        this.commandManager = createManager();
         this.commandContextFactory = new StandardCommandContextFactory<>();
         this.parameterInjectorRegistry = new ParameterInjectorRegistry<>();
         this.parameterInjectorRegistry.registerInjector(Integer.class, (context, annotationAccessor) -> INJECTED_INTEGER);
@@ -64,30 +68,37 @@ public class ParameterInjectorRegistryTest {
 
     @Test
     void testSimpleInjection() {
-        Assertions.assertEquals(INJECTED_INTEGER, parameterInjectorRegistry.getInjectable(
-                Integer.class,
-                this.createContext(),
-                AnnotationAccessor.empty()
-        ).orElse(-1));
+        assertThat(
+                parameterInjectorRegistry.getInjectable(
+                        Integer.class,
+                        this.createContext(),
+                        AnnotationAccessor.empty()
+                )
+        ).hasValue(INJECTED_INTEGER);
     }
 
     @Test
     void testGuiceInjection() {
         this.parameterInjectorRegistry.registerInjectionService(GuiceInjectionService.create(this.injector));
-        Assertions.assertEquals(TestModule.INJECTED_INTEGER, parameterInjectorRegistry.getInjectable(
-                Integer.class,
-                this.createContext(),
-                AnnotationAccessor.empty()
-        ).orElse(-1));
+
+        assertThat(
+                parameterInjectorRegistry.getInjectable(
+                        Integer.class,
+                        this.createContext(),
+                        AnnotationAccessor.empty()
+                )
+        ).hasValue(TestModule.INJECTED_INTEGER);
     }
 
     @Test
     void testNonExistentInjection() {
-        Assertions.assertNull(parameterInjectorRegistry.getInjectable(
-                String.class,
-                this.createContext(),
-                AnnotationAccessor.empty()
-        ).orElse(null));
+        assertThat(
+                parameterInjectorRegistry.getInjectable(
+                        String.class,
+                        this.createContext(),
+                        AnnotationAccessor.empty()
+                )
+        ).isEmpty();
     }
 
     private static final class TestModule extends AbstractModule {
