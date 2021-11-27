@@ -23,9 +23,12 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import static com.google.common.truth.Truth.assertThat;
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.TestCommandManager;
 import cloud.commandframework.TestCommandSender;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,7 +42,7 @@ class StringArgumentTest {
 
     @BeforeAll
     static void setup() {
-        manager = new TestCommandManager();
+        manager = createManager();
         manager.command(manager.commandBuilder("quoted")
                 .argument(StringArgument.of("message1", StringArgument.StringMode.QUOTED))
                 .argument(StringArgument.of("message2"))
@@ -66,32 +69,44 @@ class StringArgumentTest {
                 .build());
     }
 
-    private static void clear() {
+    @AfterEach
+    void reset() {
         storage[0] = storage[1] = null;
     }
 
     @Test
-    void testSingle() {
-        clear();
-        manager.executeCommand(new TestCommandSender(), "single string");
-        Assertions.assertEquals("string", storage[0]);
+    void single_single() {
+        manager.executeCommand(new TestCommandSender(), "single string").join();
+
+        assertThat(storage[0]).isEqualTo("string");
     }
 
     @Test
-    void testQuotes() {
-        clear();
+    void quoted_single_quoted_string_containing_double_quote_followed_by_unquoted() {
         manager.executeCommand(new TestCommandSender(), "quoted 'quoted \" string' unquoted").join();
-        Assertions.assertEquals("quoted \" string", storage[0]);
-        Assertions.assertEquals("unquoted", storage[1]);
-        clear();
-        manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted");
-        Assertions.assertEquals("quoted", storage[0]);
-        Assertions.assertEquals("unquoted", storage[1]);
-        clear();
+
+        assertThat(storage[0]).isEqualTo("quoted \" string");
+        assertThat(storage[1]).isEqualTo("unquoted");
+    }
+
+    @Test
+    void quoted_unquoted_strings() {
+        manager.executeCommand(new TestCommandSender(), "quoted quoted unquoted").join();
+
+        assertThat(storage[0]).isEqualTo("quoted");
+        assertThat(storage[1]).isEqualTo("unquoted");
+    }
+
+    @Test
+    void quoted_quoted_string_containing_escaped_quote_followed_by_unquoted() {
         manager.executeCommand(new TestCommandSender(), "quoted \"quoted \\\" string\" unquoted").join();
-        Assertions.assertEquals("quoted \" string", storage[0]);
-        Assertions.assertEquals("unquoted", storage[1]);
-        clear();
+
+        assertThat(storage[0]).isEqualTo("quoted \" string");
+        assertThat(storage[1]).isEqualTo("unquoted");
+    }
+
+    @Test
+    void quoted_unmatched_quotes_failing() {
         Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(
                 new TestCommandSender(),
                 "'quoted quoted unquoted"
@@ -99,10 +114,10 @@ class StringArgumentTest {
     }
 
     @Test
-    void testGreedy() {
-        clear();
+    void greedy_consumes_all() {
         manager.executeCommand(new TestCommandSender(), "greedy greedy string content").join();
-        Assertions.assertEquals("greedy string content", storage[0]);
+
+        assertThat(storage[0]).isEqualTo("greedy string content");
     }
 
 }

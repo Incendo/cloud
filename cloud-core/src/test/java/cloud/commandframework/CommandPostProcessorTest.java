@@ -23,10 +23,13 @@
 //
 package cloud.commandframework;
 
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,7 +41,7 @@ public class CommandPostProcessorTest {
 
     @BeforeAll
     static void newTree() {
-        manager = new TestCommandManager();
+        manager = createManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
                 .handler(c -> state[0] = true)
                 .build());
@@ -48,13 +51,13 @@ public class CommandPostProcessorTest {
     @Test
     void testPreprocessing() {
         manager.executeCommand(new TestCommandSender(), "test").join();
-        Assertions.assertEquals(false, state[0]);
+        Assertions.assertFalse(state[0]);
     }
 
     static final class SamplePostprocessor implements CommandPostprocessor<TestCommandSender> {
 
         @Override
-        public void accept(final CommandPostprocessingContext<TestCommandSender> context) {
+        public void accept(final @NonNull CommandPostprocessingContext<TestCommandSender> context) {
             ConsumerService.interrupt();
         }
 

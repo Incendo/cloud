@@ -23,8 +23,9 @@
 //
 package cloud.commandframework;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import cloud.commandframework.annotations.AnnotationAccessor;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.ElementType;
@@ -36,21 +37,29 @@ import java.lang.reflect.Parameter;
 
 public class AnnotationAccessorTest {
 
-    @Qualifier("method")
-    public static void annotatedMethod(@Qualifier("parameter") final String parameter) {
+    private static final String QUALIFIER_TEST_STRING_PARAMETER = "parameter";
+    private static final String QUALIFIER_TEST_STRING_METHOD = "method";
+
+    @Qualifier(QUALIFIER_TEST_STRING_METHOD)
+    public static void annotatedMethod(@Qualifier(QUALIFIER_TEST_STRING_PARAMETER) final String parameter) {
     }
 
     @Test
     void testQualifierResolutionOrder() throws Exception {
+        // Given
         final Method method = AnnotationAccessorTest.class.getMethod("annotatedMethod", String.class);
         final Parameter parameter = method.getParameters()[0];
         final AnnotationAccessor accessor = AnnotationAccessor.of(
                 AnnotationAccessor.of(parameter),
                 AnnotationAccessor.of(method)
         );
+
+        // When
         final Qualifier qualifier = accessor.annotation(Qualifier.class);
-        Assertions.assertNotNull(qualifier);
-        Assertions.assertEquals("parameter", qualifier.value());
+
+        // Then
+        assertThat(qualifier).isNotNull();
+        assertThat(qualifier.value()).isEqualTo(QUALIFIER_TEST_STRING_PARAMETER);
     }
 
     @Target({ElementType.PARAMETER, ElementType.METHOD})

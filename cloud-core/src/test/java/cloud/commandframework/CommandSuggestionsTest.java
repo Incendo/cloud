@@ -23,6 +23,8 @@
 //
 package cloud.commandframework;
 
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
@@ -45,7 +47,7 @@ public class CommandSuggestionsTest {
 
     @BeforeAll
     static void setupManager() {
-        manager = new TestCommandManager();
+        manager = createManager();
         manager.command(manager.commandBuilder("test", "testalias").literal("one").build());
         manager.command(manager.commandBuilder("test").literal("two").build());
         manager.command(manager.commandBuilder("test")
@@ -107,16 +109,18 @@ public class CommandSuggestionsTest {
                 .argument(IntegerArgument.<TestCommandSender>newBuilder("num").withMin(5).withMax(100)));
 
         manager.command(manager.commandBuilder("partial")
-                .argument(StringArgument.<TestCommandSender>newBuilder("arg").withSuggestionsProvider((contect, input) -> {
-                    return Arrays.asList("hi", "hey", "heya", "hai", "hello");
-                }))
+                .argument(
+                        StringArgument.<TestCommandSender>newBuilder("arg")
+                                .withSuggestionsProvider((contect, input) -> Arrays.asList("hi", "hey", "heya", "hai", "hello"))
+                )
                 .literal("literal")
                 .build());
 
         manager.command(manager.commandBuilder("literal_with_variable")
-                .argument(StringArgument.<TestCommandSender>newBuilder("arg").withSuggestionsProvider((context, input) -> {
-                    return Arrays.asList("veni", "vidi");
-                }).build())
+                .argument(
+                        StringArgument.<TestCommandSender>newBuilder("arg")
+                                .withSuggestionsProvider((context, input) -> Arrays.asList("veni", "vidi")).build()
+                )
                 .literal("now"));
         manager.command(manager.commandBuilder("literal_with_variable")
                 .literal("vici")
@@ -239,7 +243,7 @@ public class CommandSuggestionsTest {
 
         final String input2 = "flags3 --c";
         final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("--compound"), suggestions2);
+        Assertions.assertEquals(Collections.singletonList("--compound"), suggestions2);
 
         final String input3 = "flags3 --compound ";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
@@ -264,11 +268,11 @@ public class CommandSuggestionsTest {
 
         final String input8 = "flags3 --compound 22 33 44 --pres";
         final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
-        Assertions.assertEquals(Arrays.asList("--presence"), suggestions8);
+        Assertions.assertEquals(Collections.singletonList("--presence"), suggestions8);
 
         final String input9 = "flags3 --compound 22 33 44 --presence ";
         final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
-        Assertions.assertEquals(Arrays.asList("--single"), suggestions9);
+        Assertions.assertEquals(Collections.singletonList("--single"), suggestions9);
 
         final String input10 = "flags3 --compound 22 33 44 --single ";
         final List<String> suggestions10 = manager.suggest(new TestCommandSender(), input10);

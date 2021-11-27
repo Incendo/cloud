@@ -23,6 +23,8 @@
 //
 package cloud.commandframework;
 
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandResult;
 import org.junit.jupiter.api.Assertions;
@@ -42,7 +44,7 @@ final class CommandPerformanceTest {
 
     @BeforeAll
     static void setup() {
-        manager = new TestCommandManager();
+        manager = createManager();
 
         final StringBuilder literalBuilder = new StringBuilder("literals");
 

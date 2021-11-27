@@ -23,6 +23,9 @@
 //
 package cloud.commandframework;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
+
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
@@ -31,7 +34,10 @@ import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import io.leangen.geantyref.TypeToken;
-import org.junit.jupiter.api.Assertions;
+
+import java.util.Optional;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Test;
 
 import java.lang.annotation.Annotation;
@@ -40,70 +46,105 @@ import java.util.Objects;
 
 public class ParserRegistryTest {
 
-    public static final int RANGE_MIN = 10;
-    public static final int RANGE_MAX = 100;
+    private static final int RANGE_MIN = 10;
+    private static final int RANGE_MAX = 100;
+    private static final Range RANGE = new Range() {
 
-    @SuppressWarnings("ReturnValueIgnored")
+        @Override
+        public Class<? extends Annotation> annotationType() {
+            return Range.class;
+        }
+
+        @Override
+        public @NonNull String min() {
+            return Integer.toString(RANGE_MIN);
+        }
+
+        @Override
+        public @NonNull String max() {
+            return Integer.toString(RANGE_MAX);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (!(obj instanceof Range)) {
+                return false;
+            }
+            final Range range = (Range) obj;
+            return this.min().equals(range.min()) && this.max().equals(range.max());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.min(), this.max());
+        }
+    };
+
     @Test
-    void testParserRegistry() {
+    void parsing_range_annotation_results_in_correct_parser_parameters() {
+        // Given
         final ParserRegistry<TestCommandSender> parserRegistry = new StandardParserRegistry<>();
-        final Range range = new Range() {
-
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return Range.class;
-            }
-
-            @Override
-            public String min() {
-                return Integer.toString(RANGE_MIN);
-            }
-
-            @Override
-            public String max() {
-                return Integer.toString(RANGE_MAX);
-            }
-
-            @Override
-            public boolean equals(final Object obj) {
-                if (!(obj instanceof Range)) {
-                    return false;
-                }
-                final Range range = (Range) obj;
-                return this.min().equals(range.min()) && this.max().equals(range.max());
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(this.min(), this.max());
-            }
-        };
-
-
         final TypeToken<?> parsedType = TypeToken.get(int.class);
-        final ParserParameters parserParameters = parserRegistry.parseAnnotations(parsedType, Collections.singleton(range));
-        Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MIN));
-        Assertions.assertTrue(parserParameters.has(StandardParameters.RANGE_MAX));
+
+        // When
+        final ParserParameters parserParameters = parserRegistry.parseAnnotations(parsedType, Collections.singleton(RANGE));
+
+        // Then
+        assertThat(parserParameters.has(StandardParameters.RANGE_MIN)).isTrue();
+        assertThat(parserParameters.has(StandardParameters.RANGE_MAX)).isTrue();
+    }
+
+    @Test
+    void creating_integer_parser_from_parameters_results_in_correct_parser() {
+        final ParserRegistry<TestCommandSender> parserRegistry = new StandardParserRegistry<>();
+        final TypeToken<?> parsedType = TypeToken.get(int.class);
+
+        final ParserParameters parserParameters = ParserParameters.empty();
+        parserParameters.store(StandardParameters.RANGE_MIN, RANGE_MIN);
+        parserParameters.store(StandardParameters.RANGE_MAX, RANGE_MAX);
+
         final ArgumentParser<TestCommandSender, ?> parser = parserRegistry.createParser(
-                parsedType,
-                parserParameters
-        )
-                .orElseThrow(
-                        () -> new NullPointerException(
-                                "No parser found"));
-        Assertions.assertTrue(parser instanceof IntegerArgument.IntegerParser);
+            parsedType,
+            parserParameters
+        ).orElseThrow(() -> new NullPointerException("No parser found"));
+
+        assertThat(parser).isInstanceOf(IntegerArgument.IntegerParser.class);
+
         @SuppressWarnings("unchecked") final IntegerArgument.IntegerParser<TestCommandSender> integerParser =
                 (IntegerArgument.IntegerParser<TestCommandSender>) parser;
-        Assertions.assertEquals(RANGE_MIN, integerParser.getMin());
-        Assertions.assertEquals(RANGE_MAX, integerParser.getMax());
 
-        /* Test integer */
-        parserRegistry.createParser(TypeToken.get(int.class), ParserParameters.empty())
-                .orElseThrow(() -> new IllegalArgumentException("No parser found for int.class"));
+        assertThat(integerParser.getMin()).isEqualTo(RANGE_MIN);
+        assertThat(integerParser.getMax()).isEqualTo(RANGE_MAX);
+    }
 
-        /* Test Enum */
-        parserRegistry.createParser(TypeToken.get(CommandManager.ManagerSettings.class), ParserParameters.empty())
-                .orElseThrow(() -> new IllegalArgumentException("No parser found for enum"));
+    @Test
+    void retrieving_integer_parser_from_parser_registry() {
+        // Given
+        final ParserRegistry<TestCommandSender> parserRegistry = new StandardParserRegistry<>();
+
+        // When
+        final Optional<?> parserOptional = parserRegistry.createParser(
+                TypeToken.get(int.class),
+                ParserParameters.empty()
+        );
+
+        // Then
+        assertThat(parserOptional).isPresent();
+    }
+
+    @Test
+    void retrieving_enum_parser_from_registry() {
+        // Given
+        final ParserRegistry<TestCommandSender> parserRegistry = new StandardParserRegistry<>();
+
+        // When
+        final Optional<?> parserOptional = parserRegistry.createParser(
+                TypeToken.get(CommandManager.ManagerSettings.class),
+                ParserParameters.empty()
+        );
+
+        // Then
+        assertThat(parserOptional).isPresent();
     }
 
 }

@@ -41,7 +41,6 @@ public class TestCommandSender {
         return this.permissions.contains(permission);
     }
 
-
     public void addPermission(final String permission) {
         this.permissions.add(permission);
     }

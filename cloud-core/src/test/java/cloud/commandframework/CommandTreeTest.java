@@ -23,6 +23,8 @@
 //
 package cloud.commandframework;
 
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -55,7 +57,7 @@ class CommandTreeTest {
 
     @BeforeAll
     static void newTree() {
-        manager = new TestCommandManager();
+        manager = createManager();
 
         /* Build general test commands */
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
@@ -146,9 +148,7 @@ class CommandTreeTest {
         /* Build command for testing float */
         manager.command(manager.commandBuilder("float")
                 .argument(FloatArgument.of("num"))
-                .handler(c -> {
-                    System.out.printf("%f\n", c.<Float>get("num"));
-                }));
+                .handler(c -> System.out.printf("%f\n", c.<Float>get("num"))));
 
         /* Build command for testing preprocessing */
         manager.command(manager.commandBuilder("preprocess")
