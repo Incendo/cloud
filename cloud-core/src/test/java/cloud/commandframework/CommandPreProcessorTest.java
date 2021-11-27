@@ -23,11 +23,14 @@
 //
 package cloud.commandframework;
 
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,7 +41,7 @@ public class CommandPreProcessorTest {
 
     @BeforeAll
     static void newTree() {
-        manager = new TestCommandManager();
+        manager = createManager();
         manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
                 .argument(EnumArgument.of(SampleEnum.class, "enum"))
                 .handler(
@@ -72,7 +75,7 @@ public class CommandPreProcessorTest {
     static final class SamplePreprocessor implements CommandPreprocessor<TestCommandSender> {
 
         @Override
-        public void accept(final CommandPreprocessingContext<TestCommandSender> context) {
+        public void accept(final @NonNull CommandPreprocessingContext<TestCommandSender> context) {
             try {
                 final int num = Integer.parseInt(context.getInputQueue().removeFirst());
                 context.getCommandContext().store("int", num);

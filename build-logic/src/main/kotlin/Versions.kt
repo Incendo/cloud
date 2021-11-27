@@ -33,4 +33,7 @@ object Versions {
     // TEST DEPENDENCIES
     const val jupiterEngine = "5.8.1"
     const val jmh = "1.27"
+    const val mockitoCore = "4.1.0"
+    const val mockitoKotlin = "4.0.0"
+    const val truth = "1.1.3"
 }

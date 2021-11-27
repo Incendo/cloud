@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.util.TestUtils.createManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -33,25 +34,35 @@ public class CommandRegistrationStateTest {
 
     @Test
     void testInitialState() {
-        final TestCommandManager manager = new TestCommandManager();
+        final CommandManager<TestCommandSender> manager = createManager();
         assertEquals(CommandManager.RegistrationState.BEFORE_REGISTRATION, manager.getRegistrationState());
     }
 
     @Test
     void testRegistrationChangesState() {
-        final TestCommandManager manager = new TestCommandManager();
+        final CommandManager<TestCommandSender> manager = createManager();
+
         manager.command(manager.commandBuilder("test").handler(ctx -> {
         }));
+
         assertEquals(CommandManager.RegistrationState.REGISTERING, manager.getRegistrationState());
-        // And a second registration maintains it
+    }
+
+    @Test
+    void testDoubleRegistrationPersistsState() {
+        final CommandManager<TestCommandSender> manager = createManager();
+
+        manager.command(manager.commandBuilder("test").handler(ctx -> {
+        }));
         manager.command(manager.commandBuilder("test2").handler(ctx -> {
         }));
+
         assertEquals(CommandManager.RegistrationState.REGISTERING, manager.getRegistrationState());
     }
 
     @Test
     void testChangingRegistrationHandlerFails() {
-        final TestCommandManager manager = new TestCommandManager();
+        final CommandManager<TestCommandSender> manager = createManager();
         manager.command(manager.commandBuilder("test").handler(ctx -> {
         }));
         assertThrows(
@@ -62,7 +73,7 @@ public class CommandRegistrationStateTest {
 
     @Test
     void testRegistrationFailsInAfterRegistrationState() {
-        final TestCommandManager manager = new TestCommandManager();
+        final CommandManager<TestCommandSender> manager = createManager();
         manager.command(manager.commandBuilder("test").handler(ctx -> {
         }));
 
@@ -76,7 +87,7 @@ public class CommandRegistrationStateTest {
 
     @Test
     void testAllowUnsafeRegistration() {
-        final TestCommandManager manager = new TestCommandManager();
+        final CommandManager<TestCommandSender> manager = createManager();
         manager.setSetting(CommandManager.ManagerSettings.ALLOW_UNSAFE_REGISTRATION, true);
         manager.command(manager.commandBuilder("test").handler(ctx -> {
         }));

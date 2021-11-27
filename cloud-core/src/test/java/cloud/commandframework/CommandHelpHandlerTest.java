@@ -23,6 +23,8 @@
 //
 package cloud.commandframework;
 
+import static cloud.commandframework.util.TestUtils.createManager;
+
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
@@ -47,7 +49,7 @@ class CommandHelpHandlerTest {
 
     @BeforeAll
     static void setup() {
-        manager = new TestCommandManager();
+        manager = createManager();
         final SimpleCommandMeta meta1 = SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "Command with only literals").build();
         manager.command(manager.commandBuilder("test", meta1).literal("this").literal("thing").build());
         final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "Command with variables").build();
@@ -103,10 +105,8 @@ class CommandHelpHandlerTest {
          * This predicate only displays the commands starting with /test
          * The one command ending in 'thing' is excluded as well, for complexity
          */
-        final Predicate<Command<TestCommandSender>> predicate = (command) -> {
-            return command.toString().startsWith("test ")
-                    && !command.toString().endsWith(" thing");
-        };
+        final Predicate<Command<TestCommandSender>> predicate = (command) -> command.toString().startsWith("test ")
+                && !command.toString().endsWith(" thing");
 
         /*
          * List all commands from root, which should show only:
@@ -132,7 +132,7 @@ class CommandHelpHandlerTest {
          */
         final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.getCommandHelpHandler(predicate).queryHelp("test int");
         Assertions.assertTrue(query3 instanceof CommandHelpHandler.VerboseHelpTopic);
-        Assertions.assertEquals(Arrays.asList("test int <int>"), getSortedSyntaxStrings(query3));
+        Assertions.assertEquals(Collections.singletonList("test int <int>"), getSortedSyntaxStrings(query3));
 
         /*
          * List all commands from /vec, which should show none
@@ -228,7 +228,7 @@ class CommandHelpHandlerTest {
                 printBuilder.append("└── ");
             }
             printBuilder.append(suggestion);
-            System.out.println(printBuilder.toString());
+            System.out.println(printBuilder);
         }
     }
 
