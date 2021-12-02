@@ -8,8 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Kotlin: New module `cloud-kotlin-coroutines`: Support for suspending command handlers in builders and the Kotlin builder DSL
-- Kotlin: New module `cloud-kotlin-coroutines-annotations`: Support for suspending annotated command functions using 
-  `AnnotationParser<C>.installCoroutineSupport()`
+- Kotlin: New module `cloud-kotlin-coroutines-annotations`: Support for suspending annotated command functions using `AnnotationParser<C>.installCoroutineSupport()`
 - Flags can be bound to a permission
 - Paper: Implement KeyedWorldArgument for matching worlds by their namespaced key
 - Annotations: Parser parameter annotations are now also parsed for flags ([#315](https://github.com/Incendo/cloud/pull/315))
@@ -17,13 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Added `executeFuture` to `CommandExecutionHandler` which is now used internally. By default, this delegates to the old 
   `execute` method
+- Added `@Liberal` annotation to mark boolean arguments as liberal when using the annotation parser ([#288](https://github.com/Incendo/cloud/pull/288))
 - Annotations: Apply builder modifiers from class annotations ([#303](https://github.com/Incendo/cloud/pull/303))
 - Annotations: Add default value to `@Argument`, which will force the parser to infer the argument name from the parameter name
+- Annotations: `@CommandMethod` can now be used to annotate a class, allowing for a common literal prefix on all annotated command methods in that class. ([#301](https://github.com/Incendo/cloud/pull/301))
 
 ### Fixed
 - Bukkit: Permission checking and syntax string for Bukkit '/help' command
 - And/OrPermission factory method `of` did not preserve the conditional tree
 - Formatting of literal arguments with no siblings in StandardCommandSyntaxFormatter
+- Replaced improper usages of TypeToken#toString in error messages
+- Fixed unhandled exceptions being swallowed when AsynchronousCommandExecutionCoordinator is configured with Synchronous Parsing enabled ([#307](https://github.com/Incendo/cloud/pull/307))
 
 ## [1.5.0]
 
