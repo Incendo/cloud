@@ -34,12 +34,11 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.javacord.sender.JavacordCommandSender;
 import cloud.commandframework.javacord.sender.JavacordPrivateSender;
 import cloud.commandframework.javacord.sender.JavacordServerSender;
+import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
-
-import java.util.concurrent.CompletionException;
 
 public class JavacordCommand<C> implements MessageCreateListener {
 

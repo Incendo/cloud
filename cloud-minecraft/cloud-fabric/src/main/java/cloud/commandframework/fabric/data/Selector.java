@@ -23,12 +23,11 @@
 //
 package cloud.commandframework.fabric.data;
 
+import java.util.Collection;
+import java.util.Collections;
 import net.minecraft.commands.arguments.selector.EntitySelector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * A selector string to query multiple entity-like values

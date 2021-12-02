@@ -24,12 +24,11 @@
 package cloud.commandframework.annotations.specifier;
 
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Used to specify min and max values of numerical

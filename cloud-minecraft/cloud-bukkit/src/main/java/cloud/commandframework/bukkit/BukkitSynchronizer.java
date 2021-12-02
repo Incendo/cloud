@@ -26,10 +26,9 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.tasks.TaskConsumer;
 import cloud.commandframework.tasks.TaskFunction;
 import cloud.commandframework.tasks.TaskSynchronizer;
+import java.util.concurrent.CompletableFuture;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * {@link TaskSynchronizer} using Bukkit's {@link org.bukkit.scheduler.BukkitScheduler}

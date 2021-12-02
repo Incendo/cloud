@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import static cloud.commandframework.util.TestUtils.createManager;
-
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
@@ -34,6 +32,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static cloud.commandframework.util.TestUtils.createManager;
 
 public class CommandPreProcessorTest {
 

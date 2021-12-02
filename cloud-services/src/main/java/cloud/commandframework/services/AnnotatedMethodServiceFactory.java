@@ -26,11 +26,10 @@ package cloud.commandframework.services;
 import cloud.commandframework.services.annotations.ServiceImplementation;
 import cloud.commandframework.services.types.Service;
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 enum AnnotatedMethodServiceFactory {
     INSTANCE;

@@ -25,12 +25,11 @@ package cloud.commandframework.brigadier.argument;
 
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.StringReader;
-import org.junit.jupiter.api.Test;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

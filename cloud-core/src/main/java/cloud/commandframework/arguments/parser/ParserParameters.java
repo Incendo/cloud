@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Collection of {@link ParserParameter parameter}-{@link Object object} pairs

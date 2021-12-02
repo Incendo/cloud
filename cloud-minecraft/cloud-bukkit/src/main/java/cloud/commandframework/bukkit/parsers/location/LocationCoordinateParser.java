@@ -29,9 +29,8 @@ import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Queue;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A single coordinate, meant to be used as an element in a position vector

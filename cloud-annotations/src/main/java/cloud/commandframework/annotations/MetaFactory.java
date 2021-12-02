@@ -25,11 +25,10 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.meta.CommandMeta;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 class MetaFactory implements Function<@NonNull Method, @NonNull CommandMeta> {
 

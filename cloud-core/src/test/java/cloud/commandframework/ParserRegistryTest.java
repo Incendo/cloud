@@ -23,9 +23,6 @@
 //
 package cloud.commandframework;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
-
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
@@ -34,15 +31,15 @@ import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import io.leangen.geantyref.TypeToken;
-
-import java.util.Optional;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.junit.jupiter.api.Test;
-
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.junit.jupiter.api.Test;
+
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth8.assertThat;
 
 public class ParserRegistryTest {
 

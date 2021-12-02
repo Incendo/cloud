@@ -25,8 +25,6 @@ package cloud.commandframework.services;
 
 import cloud.commandframework.services.types.Service;
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Predicate;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Service pipeline

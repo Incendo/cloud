@@ -28,12 +28,11 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates;
+import java.util.List;
+import java.util.function.BiFunction;
 import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * An argument for resolving {@link cloud.commandframework.fabric.data.Coordinates.CoordinatesXZ} from 2 doubles.

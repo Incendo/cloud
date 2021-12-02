@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.services;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Builder for {@link ServicePipeline}

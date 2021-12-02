@@ -31,6 +31,11 @@ import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument.LocationParseException;
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -39,12 +44,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
 
 /**
  * Argument parser that parses {@link Location2D} from two doubles. This will use the command

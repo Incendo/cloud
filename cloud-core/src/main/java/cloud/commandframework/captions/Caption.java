@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.captions;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This is a reference to a caption and does not contain any message itself

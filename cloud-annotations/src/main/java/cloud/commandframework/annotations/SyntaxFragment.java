@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class SyntaxFragment {
 

@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.captions;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Caption registry that uses bi-functions to produce messages

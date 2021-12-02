@@ -25,14 +25,13 @@ package cloud.commandframework.arguments.parser;
 
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Registry of {@link ArgumentParser} that allows these arguments to be

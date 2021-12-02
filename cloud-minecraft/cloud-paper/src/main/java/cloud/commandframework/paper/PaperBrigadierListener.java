@@ -31,14 +31,13 @@ import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapp
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.permission.CommandPermission;
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
+import java.util.function.BiPredicate;
+import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.function.BiPredicate;
-import java.util.regex.Pattern;
 
 class PaperBrigadierListener<C> implements Listener {
 

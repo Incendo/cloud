@@ -23,10 +23,9 @@
 //
 package cloud.commandframework.minecraft.extras;
 
+import java.util.function.Function;
 import net.kyori.adventure.audience.Audience;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.function.Function;
 
 /**
  * Function that maps the command sender type to an adventure {@link net.kyori.adventure.audience.Audience}

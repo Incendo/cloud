@@ -24,9 +24,8 @@
 package cloud.commandframework.arguments.parser;
 
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Parser parameter used when retrieving parsers from the {@link ParserRegistry}

@@ -27,11 +27,10 @@ import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.services.types.Service;
 import cloud.commandframework.services.types.SideEffectService;
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Class that outputs results from the given context, using the specified service type

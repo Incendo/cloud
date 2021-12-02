@@ -23,8 +23,6 @@
 //
 package cloud.commandframework.annotations;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +30,7 @@ import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Parses command syntax into syntax fragments

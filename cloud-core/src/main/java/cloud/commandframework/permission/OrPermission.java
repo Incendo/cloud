@@ -23,14 +23,13 @@
 //
 package cloud.commandframework.permission;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Accepts as long as at least one of the permissions is accepted

@@ -31,16 +31,13 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
 import cloud.commandframework.types.tuples.Pair;
-
-import java.util.concurrent.CompletableFuture;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Manager for the command confirmation system that enables the ability to add "confirmation" requirements to commands,

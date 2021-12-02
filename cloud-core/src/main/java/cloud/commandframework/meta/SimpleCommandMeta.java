@@ -24,14 +24,13 @@
 package cloud.commandframework.meta;
 
 import io.leangen.geantyref.GenericTypeReflector;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A simple immutable string-string map containing command meta

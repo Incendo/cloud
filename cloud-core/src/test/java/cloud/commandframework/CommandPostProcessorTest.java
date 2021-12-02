@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import static cloud.commandframework.util.TestUtils.createManager;
-
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.meta.SimpleCommandMeta;
@@ -33,6 +31,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static cloud.commandframework.util.TestUtils.createManager;
 
 public class CommandPostProcessorTest {
 

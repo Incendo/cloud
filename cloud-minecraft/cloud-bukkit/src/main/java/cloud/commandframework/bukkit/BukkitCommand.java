@@ -35,16 +35,15 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletionException;
+import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletionException;
-import java.util.logging.Level;
 
 final class BukkitCommand<C> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 

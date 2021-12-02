@@ -24,10 +24,9 @@
 package cloud.commandframework.brigadier.argument;
 
 import com.mojang.brigadier.StringReader;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Objects;
 import java.util.Queue;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A wrapper around Mojang's {@link StringReader} that implements the {@link Queue} interface.

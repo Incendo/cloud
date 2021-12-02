@@ -23,10 +23,9 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Optional;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Result of the parsing done by a {@link ArgumentParser}

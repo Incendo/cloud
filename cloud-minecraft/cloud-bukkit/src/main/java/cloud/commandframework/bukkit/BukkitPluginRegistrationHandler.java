@@ -28,13 +28,6 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.PluginIdentifiableCommand;
-import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.help.GenericCommandHelpTopic;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -44,6 +37,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.PluginIdentifiableCommand;
+import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.help.GenericCommandHelpTopic;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
 

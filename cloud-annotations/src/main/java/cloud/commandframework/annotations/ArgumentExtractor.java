@@ -23,13 +23,12 @@
 //
 package cloud.commandframework.annotations;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Utility that extract {@link Argument arguments} from

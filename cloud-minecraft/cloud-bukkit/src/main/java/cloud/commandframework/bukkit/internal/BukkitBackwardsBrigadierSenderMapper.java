@@ -25,11 +25,10 @@ package cloud.commandframework.bukkit.internal;
 
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import com.google.common.annotations.Beta;
-import org.bukkit.command.CommandSender;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.reflect.Method;
 import java.util.function.Function;
+import org.bukkit.command.CommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This is not API, and as such, may break, change, or be removed without any notice.

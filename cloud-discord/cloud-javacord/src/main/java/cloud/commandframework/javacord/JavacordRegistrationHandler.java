@@ -26,10 +26,9 @@ package cloud.commandframework.javacord;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler {
 

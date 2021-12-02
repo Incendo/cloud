@@ -27,13 +27,12 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.permission.PredicatePermission;
+import java.util.function.Function;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.function.Function;
 
 /**
  * A command manager for registering client-side commands.

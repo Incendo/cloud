@@ -23,14 +23,13 @@
 //
 package cloud.commandframework.minecraft.extras;
 
+import java.util.Locale;
+import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 final class ComponentHelper {
 

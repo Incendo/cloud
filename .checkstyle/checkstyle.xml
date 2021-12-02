@@ -156,6 +156,13 @@
             <property name="processJavadoc" value="true"/>
         </module>
 
+        <!-- https://checkstyle.org/config_imports.html#CustomImportOrder -->
+        <module name="CustomImportOrder">
+            <property name="customImportOrderRules" value="THIRD_PARTY_PACKAGE###STATIC"/>
+            <property name="standardPackageRegExp" value="^$"/>
+            <property name="sortImportsInGroupAlphabetically" value="true"/>
+        </module>
+
         <!-- Checks for whitespace                               -->
         <!-- See https://checkstyle.org/config_whitespace.html -->
         <module name="EmptyForIteratorPad"/>

@@ -24,7 +24,6 @@
 package cloud.commandframework.services.mock;
 
 import cloud.commandframework.services.ChunkedRequestContext;
-
 import java.util.Collection;
 
 public class MockChunkedRequest

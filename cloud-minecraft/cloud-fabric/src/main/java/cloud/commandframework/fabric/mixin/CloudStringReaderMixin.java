@@ -26,10 +26,9 @@ package cloud.commandframework.fabric.mixin;
 import cloud.commandframework.brigadier.argument.StringReaderAsQueue;
 import cloud.commandframework.fabric.internal.CloudStringReader;
 import com.mojang.brigadier.StringReader;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-
-import java.util.Objects;
 
 
 /**

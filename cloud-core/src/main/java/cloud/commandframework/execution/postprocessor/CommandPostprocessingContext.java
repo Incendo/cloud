@@ -25,9 +25,8 @@ package cloud.commandframework.execution.postprocessor;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Context for {@link CommandPostprocessor command postprocessors}

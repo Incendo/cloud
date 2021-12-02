@@ -23,13 +23,12 @@
 //
 package cloud.commandframework.tasks;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A task recipe is a chain of tasks with optional synchronization steps,

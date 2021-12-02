@@ -23,14 +23,13 @@
 //
 package cloud.commandframework.javacord.sender;
 
+import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.event.message.MessageCreateEvent;
-
-import java.util.concurrent.CompletableFuture;
 
 public class JavacordCommandSender {
 

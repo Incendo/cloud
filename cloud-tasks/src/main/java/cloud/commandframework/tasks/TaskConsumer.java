@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.tasks;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Task step that does not produce any output

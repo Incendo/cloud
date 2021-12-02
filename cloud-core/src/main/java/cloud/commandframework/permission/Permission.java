@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.permission;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link cloud.commandframework.arguments.CommandArgument} permission

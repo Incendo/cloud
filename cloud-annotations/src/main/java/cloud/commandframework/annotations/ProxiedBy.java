@@ -24,12 +24,11 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.Command;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Creates a command proxy for the command. This is similar to

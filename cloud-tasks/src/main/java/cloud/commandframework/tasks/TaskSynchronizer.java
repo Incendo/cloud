@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.tasks;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.concurrent.CompletableFuture;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Utility responsible for synchronizing {@link TaskRecipeStep task recipe steps}

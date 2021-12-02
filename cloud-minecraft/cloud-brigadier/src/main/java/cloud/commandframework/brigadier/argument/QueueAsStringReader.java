@@ -24,7 +24,6 @@
 package cloud.commandframework.brigadier.argument;
 
 import com.mojang.brigadier.StringReader;
-
 import java.util.Deque;
 import java.util.Queue;
 

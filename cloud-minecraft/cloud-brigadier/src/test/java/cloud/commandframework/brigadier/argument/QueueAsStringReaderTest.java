@@ -24,11 +24,10 @@
 package cloud.commandframework.brigadier.argument;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

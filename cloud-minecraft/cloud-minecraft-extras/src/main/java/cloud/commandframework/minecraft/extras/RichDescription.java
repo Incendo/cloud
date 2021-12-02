@@ -24,12 +24,11 @@
 package cloud.commandframework.minecraft.extras;
 
 import cloud.commandframework.ArgumentDescription;
+import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Locale;
 
 import static java.util.Objects.requireNonNull;
 

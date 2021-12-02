@@ -43,9 +43,6 @@ import cloud.commandframework.services.mock.StateSettingConsumerService;
 import cloud.commandframework.services.types.Service;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,6 +50,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ServicesTest {
 

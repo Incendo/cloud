@@ -32,9 +32,8 @@ import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationHandler {
 

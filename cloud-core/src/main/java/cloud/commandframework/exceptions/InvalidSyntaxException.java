@@ -24,9 +24,8 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Exception sent when a command sender inputs invalid command syntax

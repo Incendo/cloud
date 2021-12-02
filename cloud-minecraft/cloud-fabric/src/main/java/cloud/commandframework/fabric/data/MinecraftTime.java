@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.fabric.data;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.time.temporal.TemporalUnit;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static java.util.Objects.requireNonNull;
 

@@ -24,10 +24,9 @@
 package cloud.commandframework.execution.preprocessor;
 
 import cloud.commandframework.context.CommandContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.LinkedList;
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Context for {@link CommandPreprocessor command preprocessors}

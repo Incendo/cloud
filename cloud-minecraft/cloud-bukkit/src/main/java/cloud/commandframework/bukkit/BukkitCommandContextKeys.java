@@ -26,9 +26,8 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
-import org.bukkit.command.CommandSender;
-
 import java.util.Set;
+import org.bukkit.command.CommandSender;
 
 /**
  * Bukkit related {@link cloud.commandframework.context.CommandContext} keys.

@@ -23,10 +23,9 @@
 //
 package cloud.commandframework.internal;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.LinkedList;
 import java.util.StringTokenizer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Tokenizer that splits command inputs into tokens. This will split the string
