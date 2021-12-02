@@ -38,6 +38,7 @@ import cloud.commandframework.fabric.data.SinglePlayerSelector;
 import cloud.commandframework.fabric.internal.LateRegistrationCatcher;
 import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
+import java.util.function.Function;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSource;
@@ -47,8 +48,6 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.function.Function;
 
 /**
  * A command manager for registering server-side commands.

@@ -49,13 +49,12 @@ package cloud.commandframework.bukkit.internal;
 
 import com.google.common.annotations.Beta;
 import com.mojang.brigadier.arguments.ArgumentType;
-import org.bukkit.NamespacedKey;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import org.bukkit.NamespacedKey;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A registry of the {@link ArgumentType}s provided by Minecraft.

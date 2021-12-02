@@ -25,13 +25,12 @@ package cloud.commandframework.paper;
 
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 final class AsyncCommandSuggestionsListener<C> implements Listener {
 

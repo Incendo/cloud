@@ -29,15 +29,14 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.javacord.sender.JavacordCommandSender;
 import cloud.commandframework.javacord.sender.JavacordServerSender;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
-
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class JavacordCommandManager<C> extends CommandManager<C> {
 

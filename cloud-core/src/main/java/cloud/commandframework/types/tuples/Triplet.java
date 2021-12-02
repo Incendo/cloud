@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.types.tuples;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Immutable generic 3-tuple

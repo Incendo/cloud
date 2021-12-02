@@ -24,9 +24,8 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A single literal or argument component of a command

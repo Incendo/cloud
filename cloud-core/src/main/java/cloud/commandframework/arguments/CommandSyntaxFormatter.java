@@ -24,10 +24,9 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandTree;
+import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.List;
 
 /**
  * Utility that formats chains of {@link CommandArgument command arguments} into syntax strings

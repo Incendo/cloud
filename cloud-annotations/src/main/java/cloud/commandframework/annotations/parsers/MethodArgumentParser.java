@@ -26,14 +26,13 @@ package cloud.commandframework.annotations.parsers;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents a method annotated with {@link Parser}

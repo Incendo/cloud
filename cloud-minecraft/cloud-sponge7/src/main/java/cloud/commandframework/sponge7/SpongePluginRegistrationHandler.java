@@ -28,12 +28,11 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.google.common.collect.ImmutableList;
+import java.util.HashMap;
+import java.util.Map;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
-
-import java.util.HashMap;
-import java.util.Map;
 
 final class SpongePluginRegistrationHandler<C> implements CommandRegistrationHandler {
 

@@ -26,9 +26,8 @@ package cloud.commandframework.exceptions;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.permission.CommandPermission;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Exception thrown when a command sender misses a permission required

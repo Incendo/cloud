@@ -24,9 +24,8 @@
 package cloud.commandframework.permission;
 
 import cloud.commandframework.keys.CloudKey;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.function.Predicate;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class WrappingPredicatePermission<C> implements PredicatePermission<C> {
 

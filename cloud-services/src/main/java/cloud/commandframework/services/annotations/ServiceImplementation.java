@@ -24,7 +24,6 @@
 package cloud.commandframework.services.annotations;
 
 import cloud.commandframework.services.types.Service;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

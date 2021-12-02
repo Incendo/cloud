@@ -23,13 +23,13 @@
 //
 package cloud.commandframework;
 
-import static com.google.common.truth.Truth.assertThat;
-
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static com.google.common.truth.Truth.assertThat;
 
 class CommandTest {
 

@@ -23,12 +23,11 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This annotation allows you to create annotated methods that behave like suggestions providers.

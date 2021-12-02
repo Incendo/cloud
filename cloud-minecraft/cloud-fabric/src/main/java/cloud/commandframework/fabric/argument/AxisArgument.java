@@ -28,15 +28,14 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
-import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
-import net.minecraft.core.Direction;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
+import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
+import net.minecraft.core.Direction;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An argument for a set of {@link net.minecraft.core.Direction.Axis axes}, described in Vanilla as a "swizzle".

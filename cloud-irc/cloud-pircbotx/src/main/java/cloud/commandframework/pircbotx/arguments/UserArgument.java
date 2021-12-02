@@ -33,14 +33,14 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.pircbotx.PircBotXCommandManager;
 import io.leangen.geantyref.TypeToken;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.exception.DaoException;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
 
 /**
  * {@link CommandArgument Command argument} that parses PircBotX {@link User users}

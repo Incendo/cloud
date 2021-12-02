@@ -24,9 +24,8 @@
 package cloud.commandframework.services.types;
 
 import cloud.commandframework.services.State;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Service type where each implementation gets a chance to consume the context. This service type

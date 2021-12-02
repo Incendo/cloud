@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.bukkit.parsers.location;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Single coordinate with a type

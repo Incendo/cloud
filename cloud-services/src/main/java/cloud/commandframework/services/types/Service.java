@@ -25,10 +25,9 @@ package cloud.commandframework.services.types;
 
 import cloud.commandframework.services.ExecutionOrder;
 import cloud.commandframework.services.PipelineException;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.function.Function;
 
 /**
  * A service is anything that can take in a context, and produce a response. Most service

@@ -25,7 +25,6 @@ package cloud.commandframework.fabric.annotations.specifier;
 
 import cloud.commandframework.fabric.argument.server.Vec2dArgument;
 import cloud.commandframework.fabric.argument.server.Vec3dArgument;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

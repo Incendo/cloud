@@ -24,7 +24,6 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
-
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;

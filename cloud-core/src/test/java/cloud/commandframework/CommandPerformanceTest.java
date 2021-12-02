@@ -23,10 +23,9 @@
 //
 package cloud.commandframework;
 
-import static cloud.commandframework.util.TestUtils.createManager;
-
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandResult;
+import java.util.Collection;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.util.Collection;
+import static cloud.commandframework.util.TestUtils.createManager;
 
 final class CommandPerformanceTest {
 

@@ -24,11 +24,10 @@
 package cloud.commandframework.services.types;
 
 import cloud.commandframework.services.ChunkedRequestContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.List;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Service type that allows service to generate partial results for bigger requests

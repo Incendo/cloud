@@ -26,9 +26,8 @@ package cloud.commandframework;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link CommandManager} implementation that allows you to lock command registrations.

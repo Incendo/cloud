@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import static cloud.commandframework.util.TestUtils.createManager;
-
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -39,16 +37,16 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletionException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static cloud.commandframework.util.TestUtils.createManager;
 
 class CommandTreeTest {
 

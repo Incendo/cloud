@@ -39,6 +39,10 @@ import cloud.commandframework.fabric.internal.EntitySelectorAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentMessageAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentPartAccess;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.function.Function;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -55,11 +59,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.function.Function;
 
 /**
  * Parsers for Vanilla command argument types.

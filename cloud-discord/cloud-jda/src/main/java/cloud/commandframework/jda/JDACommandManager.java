@@ -33,6 +33,10 @@ import cloud.commandframework.jda.parsers.UserArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -41,11 +45,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * Command manager for use with JDA

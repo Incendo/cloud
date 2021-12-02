@@ -27,12 +27,11 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
+import java.util.HashMap;
+import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.Server;
 import org.cloudburstmc.server.plugin.Plugin;
-
-import java.util.HashMap;
-import java.util.Map;
 
 class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandler {
 

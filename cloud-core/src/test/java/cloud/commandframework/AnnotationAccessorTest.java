@@ -23,17 +23,16 @@
 //
 package cloud.commandframework;
 
-import static com.google.common.truth.Truth.assertThat;
-
 import cloud.commandframework.annotations.AnnotationAccessor;
-import org.junit.jupiter.api.Test;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import org.junit.jupiter.api.Test;
+
+import static com.google.common.truth.Truth.assertThat;
 
 public class AnnotationAccessorTest {
 

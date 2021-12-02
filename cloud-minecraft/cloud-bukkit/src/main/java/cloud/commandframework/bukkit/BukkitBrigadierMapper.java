@@ -41,12 +41,11 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
-import org.bukkit.NamespacedKey;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.reflect.Constructor;
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import org.bukkit.NamespacedKey;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Class which handles mapping argument types to their NMS Brigadier counterpart on Bukkit platforms.

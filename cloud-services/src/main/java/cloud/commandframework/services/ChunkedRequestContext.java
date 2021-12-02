@@ -23,14 +23,13 @@
 //
 package cloud.commandframework.services;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This class represents a request that can be fulfilled by one, or multiple services, for one or

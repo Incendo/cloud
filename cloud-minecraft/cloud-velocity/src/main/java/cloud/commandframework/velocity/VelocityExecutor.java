@@ -33,13 +33,12 @@ import cloud.commandframework.execution.CommandResult;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.velocitypowered.api.command.CommandSource;
+import java.util.concurrent.CompletionException;
+import java.util.function.BiConsumer;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.concurrent.CompletionException;
-import java.util.function.BiConsumer;
 
 final class VelocityExecutor<C> implements Command<CommandSource> {
 

@@ -24,10 +24,9 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.LinkedList;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Command suggestions processor that checks the input queue head and filters based on that

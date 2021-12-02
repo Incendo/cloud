@@ -27,13 +27,12 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
+import java.util.List;
+import java.util.function.BiFunction;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.commands.arguments.RangeArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * An argument parsing an unbounded {@link net.minecraft.advancements.critereon.MinMaxBounds.Ints integer range}, in the form

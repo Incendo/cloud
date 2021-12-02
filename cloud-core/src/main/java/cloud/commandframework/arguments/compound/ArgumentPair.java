@@ -29,9 +29,8 @@ import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.function.BiFunction;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A compound argument consisting of two inner arguments

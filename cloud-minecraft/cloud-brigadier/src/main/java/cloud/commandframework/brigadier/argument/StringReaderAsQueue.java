@@ -24,14 +24,13 @@
 package cloud.commandframework.brigadier.argument;
 
 import com.mojang.brigadier.StringReader;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * An interface combining {@link Queue} behaviour with a Brigadier {@link StringReader}.

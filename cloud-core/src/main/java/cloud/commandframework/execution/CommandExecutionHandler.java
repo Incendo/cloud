@@ -25,9 +25,7 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
-
 import java.util.concurrent.CompletableFuture;
-
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

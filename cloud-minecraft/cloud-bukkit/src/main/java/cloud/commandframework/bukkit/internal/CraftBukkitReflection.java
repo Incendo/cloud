@@ -24,16 +24,15 @@
 package cloud.commandframework.bukkit.internal;
 
 import com.google.common.annotations.Beta;
-import org.bukkit.Bukkit;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import org.bukkit.Bukkit;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Utilities for doing reflection on CraftBukkit, used by the cloud implementation.

@@ -23,10 +23,9 @@
 //
 package cloud.commandframework.bukkit.arguments.selector;
 
+import java.util.List;
 import org.bukkit.entity.Entity;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.List;
 
 public class MultipleEntitySelector extends EntitySelector {
 

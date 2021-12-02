@@ -23,14 +23,13 @@
 //
 package cloud.commandframework.bukkit.arguments.selector;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class MultiplePlayerSelector extends MultipleEntitySelector {
 

@@ -24,11 +24,10 @@
 package cloud.commandframework.velocity;
 
 import cloud.commandframework.captions.Caption;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Velocity specific {@link Caption caption keys}

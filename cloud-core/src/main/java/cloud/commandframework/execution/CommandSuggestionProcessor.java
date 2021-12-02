@@ -24,10 +24,9 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.List;
 import java.util.function.BiFunction;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Processor that formats command suggestions

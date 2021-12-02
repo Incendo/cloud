@@ -24,9 +24,8 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.context.CommandContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Handler that produces command suggestions depending on input

@@ -25,13 +25,12 @@ package cloud.commandframework.services;
 
 import cloud.commandframework.services.annotations.Order;
 import cloud.commandframework.services.types.Service;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 class AnnotatedMethodService<Context, Result> implements Service<Context, Result> {
 

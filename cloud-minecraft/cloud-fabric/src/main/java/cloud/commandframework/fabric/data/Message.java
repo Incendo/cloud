@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.fabric.data;
 
+import java.util.Collection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collection;
 
 /**
  * A parsed message.

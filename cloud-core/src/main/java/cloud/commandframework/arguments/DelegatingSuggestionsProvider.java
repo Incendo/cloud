@@ -25,10 +25,9 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.List;
 import java.util.function.BiFunction;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull CommandContext<C>,
         @NonNull String, @NonNull List<String>> {

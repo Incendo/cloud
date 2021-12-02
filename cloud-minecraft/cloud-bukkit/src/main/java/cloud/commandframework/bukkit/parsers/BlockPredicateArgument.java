@@ -35,17 +35,16 @@ import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.leangen.geantyref.TypeToken;
-import org.bukkit.NamespacedKey;
-import org.bukkit.block.Block;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Argument type for parsing a {@link BlockPredicate}.

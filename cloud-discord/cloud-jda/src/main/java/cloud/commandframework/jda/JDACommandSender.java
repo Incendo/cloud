@@ -23,15 +23,14 @@
 //
 package cloud.commandframework.jda;
 
+import java.util.Objects;
+import java.util.Optional;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Wrapper for {@link MessageReceivedEvent}

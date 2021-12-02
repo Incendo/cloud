@@ -29,14 +29,13 @@ import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapp
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import java.util.Collections;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Collections;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {

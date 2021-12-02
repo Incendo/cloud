@@ -32,14 +32,13 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.meta.CommandMeta;
+import java.util.List;
+import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
 import org.cloudburstmc.server.command.PluginCommand;
 import org.cloudburstmc.server.command.data.CommandData;
 import org.cloudburstmc.server.plugin.Plugin;
-
-import java.util.List;
-import java.util.concurrent.CompletionException;
 
 final class CloudburstCommand<C> extends PluginCommand<Plugin> {
 

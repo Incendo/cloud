@@ -31,15 +31,14 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import java.util.concurrent.CompletionException;
+import java.util.logging.Level;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.concurrent.CompletionException;
-import java.util.logging.Level;
 
 public final class BungeeCommand<C> extends Command implements TabExecutor {
 

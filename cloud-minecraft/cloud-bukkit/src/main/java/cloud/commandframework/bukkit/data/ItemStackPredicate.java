@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.bukkit.data;
 
-import org.bukkit.inventory.ItemStack;
-
 import java.util.function.Predicate;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * {@link Predicate} for {@link ItemStack ItemStacks}, parsed from user input.

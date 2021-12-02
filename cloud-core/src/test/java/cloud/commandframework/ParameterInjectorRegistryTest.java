@@ -23,10 +23,6 @@
 //
 package cloud.commandframework;
 
-import static com.google.common.truth.Truth8.assertThat;
-
-import static cloud.commandframework.util.TestUtils.createManager;
-
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.annotations.injection.GuiceInjectionService;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
@@ -37,9 +33,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static cloud.commandframework.util.TestUtils.createManager;
+import static com.google.common.truth.Truth8.assertThat;
 
 public class ParameterInjectorRegistryTest {
 

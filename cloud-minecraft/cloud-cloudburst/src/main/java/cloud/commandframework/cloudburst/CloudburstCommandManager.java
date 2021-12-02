@@ -28,14 +28,13 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
 import org.cloudburstmc.server.event.EventPriority;
 import org.cloudburstmc.server.event.Listener;
 import org.cloudburstmc.server.event.server.RegistriesClosedEvent;
 import org.cloudburstmc.server.plugin.Plugin;
-
-import java.util.function.Function;
 
 /**
  * Command manager for the Cloudburst platform

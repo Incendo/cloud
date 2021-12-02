@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.captions;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.function.BiFunction;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Caption registry that delegates to factory methods

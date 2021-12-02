@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.bukkit.data;
 
+import java.util.function.Predicate;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.function.Predicate;
 
 /**
  * A {@link Predicate} for {@link Block Blocks} in a {@link World}, parsed from user input.

@@ -23,17 +23,16 @@
 //
 package cloud.commandframework.arguments.standard;
 
-import static com.google.common.truth.Truth.assertThat;
-import static cloud.commandframework.util.TestUtils.createManager;
-
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
+import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.CompletionException;
+import static cloud.commandframework.util.TestUtils.createManager;
+import static com.google.common.truth.Truth.assertThat;
 
 class StringArgumentTest {
 

@@ -33,12 +33,11 @@ import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.pircbotx.arguments.UserArgument;
 import io.leangen.geantyref.TypeToken;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * Command manager implementation for PircBotX 2.0

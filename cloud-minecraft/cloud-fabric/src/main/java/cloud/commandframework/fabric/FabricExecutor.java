@@ -32,6 +32,11 @@ import cloud.commandframework.exceptions.NoSuchCommandException;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.concurrent.CompletionException;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.ClickEvent;
@@ -43,12 +48,6 @@ import net.minecraft.network.chat.TextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.concurrent.CompletionException;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Command<S> {
 

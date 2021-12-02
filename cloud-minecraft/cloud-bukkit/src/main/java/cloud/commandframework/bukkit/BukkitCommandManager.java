@@ -51,6 +51,10 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
+import java.lang.reflect.Method;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -61,11 +65,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.lang.reflect.Method;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 /**
  * Command manager for the Bukkit platform

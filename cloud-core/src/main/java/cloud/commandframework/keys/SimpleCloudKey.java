@@ -24,9 +24,8 @@
 package cloud.commandframework.keys;
 
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Simple immutable implementation of {@link CloudKey}. Key equality is

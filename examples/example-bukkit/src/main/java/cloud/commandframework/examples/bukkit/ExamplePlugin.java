@@ -67,6 +67,14 @@ import cloud.commandframework.tasks.TaskConsumer;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -89,15 +97,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -254,28 +253,28 @@ public final class ExamplePlugin extends JavaPlugin {
         // Create a teleportation command
         //
         this.manager.command(builder.literal("teleport")
-                .literal("me")
-                // Require a player sender
-                .senderType(Player.class)
-                .argument(worldArgument, ArgumentDescription.of("World name"))
-                .argumentTriplet(
-                        "coords",
-                        TypeToken.get(Vector.class),
-                        Triplet.of("x", "y", "z"),
-                        Triplet.of(Integer.class, Integer.class, Integer.class),
-                        (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
-                                triplet.getThird()
-                        ),
-                        ArgumentDescription.of("Coordinates")
-                )
-                .handler(context -> this.manager.taskRecipe().begin(context)
-                        .synchronous(commandContext -> {
-                            final Player player = (Player) commandContext.getSender();
-                            final World world = commandContext.get(worldArgument);
-                            final Vector coords = commandContext.get("coords");
-                            final Location location = coords.toLocation(world);
-                            player.teleport(location);
-                        }).execute()))
+                        .literal("me")
+                        // Require a player sender
+                        .senderType(Player.class)
+                        .argument(worldArgument, ArgumentDescription.of("World name"))
+                        .argumentTriplet(
+                                "coords",
+                                TypeToken.get(Vector.class),
+                                Triplet.of("x", "y", "z"),
+                                Triplet.of(Integer.class, Integer.class, Integer.class),
+                                (sender, triplet) -> new Vector(triplet.getFirst(), triplet.getSecond(),
+                                        triplet.getThird()
+                                ),
+                                ArgumentDescription.of("Coordinates")
+                        )
+                        .handler(context -> this.manager.taskRecipe().begin(context)
+                                .synchronous(commandContext -> {
+                                    final Player player = (Player) commandContext.getSender();
+                                    final World world = commandContext.get(worldArgument);
+                                    final Vector coords = commandContext.get("coords");
+                                    final Location location = coords.toLocation(world);
+                                    player.teleport(location);
+                                }).execute()))
                 .command(builder.literal("teleport")
                         .literal("entity")
                         .senderType(Player.class)

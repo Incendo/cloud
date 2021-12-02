@@ -25,9 +25,8 @@ package cloud.commandframework.services;
 
 import cloud.commandframework.services.types.Service;
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.function.Predicate;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 enum ServiceFilterHandler {
     INSTANCE;

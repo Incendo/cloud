@@ -29,12 +29,11 @@ import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Command preprocessor that filters based on regular expressions

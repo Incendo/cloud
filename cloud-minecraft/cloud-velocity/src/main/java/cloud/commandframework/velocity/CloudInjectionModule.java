@@ -29,11 +29,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.util.Types;
 import com.velocitypowered.api.command.CommandSource;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.lang.reflect.Type;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Injection module that allows for {@link VelocityCommandManager} to be injectable

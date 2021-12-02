@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.bukkit.arguments.selector;
 
-import org.bukkit.entity.Entity;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.entity.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A class to represent the result of parsing a Minecraft Entity/Target Selector argument

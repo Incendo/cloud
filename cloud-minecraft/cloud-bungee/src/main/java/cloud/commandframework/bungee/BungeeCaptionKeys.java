@@ -24,11 +24,10 @@
 package cloud.commandframework.bungee;
 
 import cloud.commandframework.captions.Caption;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Bungee specific {@link Caption caption keys}

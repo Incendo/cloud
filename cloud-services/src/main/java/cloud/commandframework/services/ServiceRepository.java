@@ -26,14 +26,13 @@ package cloud.commandframework.services;
 import cloud.commandframework.services.annotations.Order;
 import cloud.commandframework.services.types.Service;
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Repository that contains implementations for a given service type
