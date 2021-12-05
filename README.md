@@ -94,7 +94,7 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 
 ## links  
 
-- JavaDoc: https://javadoc.commandframework.cloud/
+- JavaDoc: https://javadoc.io/doc/cloud.commandframework
 - Wiki: https://github.com/Incendo/cloud/wiki
 - Discord: https://discord.gg/aykZu32
   
