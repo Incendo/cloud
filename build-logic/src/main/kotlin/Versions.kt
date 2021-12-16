@@ -1,5 +1,5 @@
 object Versions {
-    const val checkerQual = "3.19.0"
+    const val checkerQual = "3.21.0"
     const val geantyref = "1.3.13"
     const val errorprone = "2.9.0"
 
@@ -13,17 +13,17 @@ object Versions {
     // MINECRAFT DEPENDENCIES
     const val brigadier = "1.0.17"
     const val bukkit = "1.13.2-R0.1-SNAPSHOT"
-    const val commodore = "1.10"
+    const val commodore = "1.11"
     const val bungeecord = "1.8-SNAPSHOT"
     const val cloudburst = "1.0.0-SNAPSHOT"
     const val adventureApi = "4.9.3"
-    const val adventurePlatform = "4.0.0"
+    const val adventurePlatform = "4.0.1"
     const val paperApi = "1.16.5-R0.1-SNAPSHOT"
     const val velocityApi = "1.1.0"
     const val spongeApi7 = "7.3.0"
-    const val jetbrainsAnnotations = "20.1.0"
+    const val jetbrainsAnnotations = "23.0.0"
     const val guava = "21.0-jre"
-    const val fabricLoader = "0.12.5"
+    const val fabricLoader = "0.12.11"
     const val fabricMc = "1.16.5"
     const val fabricApi = "0.31.0+1.16"
 

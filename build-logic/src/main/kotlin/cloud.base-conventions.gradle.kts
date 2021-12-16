@@ -66,8 +66,6 @@ repositories {
     maven("https://libraries.minecraft.net/") {
         mavenContent { releasesOnly() }
     }
-    /* The current Sponge repository */
-    maven("https://repo-new.spongepowered.org/repository/maven-public/")
     /* The Spigot repository, used for cloud-bukkit */
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
         mavenContent { snapshotsOnly() }
@@ -77,6 +75,14 @@ repositories {
     /* The NukkitX repository, used for cloud-cloudburst */
     maven("https://repo.nukkitx.com/maven-snapshots") {
         mavenContent { snapshotsOnly() }
+    }
+    /* The current Fabric repository */
+    maven("https://maven.fabricmc.net/") {
+        mavenContent { includeGroup("net.fabricmc") }
+    }
+    /* The current Sponge repository */
+    maven("https://repo.spongepowered.org/repository/maven-public/") {
+        mavenContent { includeGroup("org.spongepowered") }
     }
     /* JitPack, used for random dependencies */
     maven("https://jitpack.io") {
