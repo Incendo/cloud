@@ -360,11 +360,13 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     inputQueue.remove();
                 }
             } else {
-                inner = inputQueue.remove();
+                inner = inputQueue.peek();
                 if (inner.startsWith("\"") || inner.startsWith("'")) {
                     return ArgumentParseResult.failure(new StringParseException(sj.toString(),
                             StringMode.QUOTED, commandContext
                     ));
+                } else {
+                    inputQueue.remove();
                 }
             }
 
