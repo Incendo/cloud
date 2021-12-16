@@ -3,7 +3,7 @@ import xyz.jpenilla.runpaper.task.RunServerTask
 plugins {
     id("cloud.example-conventions")
     id("com.github.johnrengelman.shadow")
-    id("xyz.jpenilla.run-paper") version "1.0.4"
+    id("xyz.jpenilla.run-paper") version "1.0.6"
 }
 
 dependencies {
@@ -30,7 +30,7 @@ tasks {
         dependsOn(shadowJar)
     }
     runServer {
-        minecraftVersion("1.17.1")
+        minecraftVersion("1.18.1")
         runDirectory(file("run/latest"))
         javaLauncher.set(project.javaToolchains.launcherFor {
             languageVersion.set(JavaLanguageVersion.of(17))
@@ -40,7 +40,7 @@ tasks {
     // Setup a run task for each supported version
     mapOf(
             setOf("1.8.8", "1.9.4", "1.10.2", "1.11.2") to 11,
-            setOf("1.12.2", "1.13.2", "1.14.4", "1.15.2", "1.16.5", "1.17.1") to 17,
+            setOf("1.12.2", "1.13.2", "1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.1") to 17,
     ).forEach { (minecraftVersions, javaVersion) ->
         for (version in minecraftVersions) {
             createVersionedRun(version, javaVersion)
