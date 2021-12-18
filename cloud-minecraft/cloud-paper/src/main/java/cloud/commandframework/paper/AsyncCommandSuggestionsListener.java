@@ -42,7 +42,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
 
     @EventHandler
     void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
-        /* Turn '(/)plugin:command arg1 arg2 ...' into 'plugin:command arg1 arg2 ...' */
+        // Strip leading slash
         final String strippedBuffer = event.getBuffer().startsWith("/")
                 ? event.getBuffer().substring(1)
                 : event.getBuffer();
