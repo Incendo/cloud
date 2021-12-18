@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1]
+
+### Fixed
+- Fix concurrent cause of execution exception not being wrapped right ([#326](https://github.com/Incendo/cloud/pull/326))
+- Paper: Fix handling of empty slash buffer in async suggestion listener ([#327](https://github.com/Incendo/cloud/pull/327))
+- Fix StringParser sometimes removing from input queue on failure
+
 ## [1.6.0]
 
 ### Added
