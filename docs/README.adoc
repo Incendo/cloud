@@ -524,7 +524,7 @@ to the context.
     * If the command is valid, it will be sent to the postprocessors.
 5. The command postprocessors get to act on the command can alter the command context. they may now postpone command execution,
 such is the case with the command confirmation postprocessor.
-    * If a postprocessor causes an interrupt using `ConsumerService.interupt()` the command will not be executed.
+    * If a postprocessor causes an interrupt using `ConsumerService.interrupt()` the command will not be executed.
     * If no postprocessor interrupts during the post-processing stage, the command will be sent to the executor.
 6. The command is executed using the command executor.
 
@@ -584,16 +584,16 @@ original command. Essentially, they can be thought of as more powerful
 command aliases.
 
 It is easier understood by an example. Imagine you have a warp command in a game,
-let's call it `/game warp me <warp>` but you feel like it's a little too verbose for common use, you may then choose to introduce a
-`/warpme <warp>` command proxy that gets forwarded to the original command.
+let's call it `/game warp me <warp>`, but you feel like it's a little too verbose for common use. You may then choose to introduce
+a `/warpme <warp>` command proxy that gets forwarded to the original command.
 
 To create a command proxy you can use
 https://javadoc.commandframework.cloud/cloud/commandframework/Command.Builder.html#proxies(cloud.commandframework.Command)[Command.Builder#proxies(Command)].
-Please not the documentation of the method, which reads:
+Please note the documentation of the method, which reads:
 
 > Make the current command be a proxy of the supplied command.
-This means that all of the proxied commands variable command arguments will be inserted into this builder instance,
-in the order they are declared in the proxied command. Furthermore, the proxied commands command handler will be showed by the
+This means that all of the proxied command's variable command arguments will be inserted into this builder instance,
+in the order they are declared in the proxied command. Furthermore, the proxied command's command handler will be shown by the
 command that is currently being built. If the current command builder does not have a permission node set, this too will be copied.
 
 === Permissions
@@ -662,7 +662,7 @@ until an additional command has been dispatched.
 You first have to create a command confirmation manager:
 [source,java]
 ----
-CommandConfirmationmanager<YourSender> confirmationManager = new CommandConfirmationManager<>(
+CommandConfirmationManager<YourSender> confirmationManager = new CommandConfirmationManager<>(
     30L, <1>
     TimeUnit.SECONDS,
     context -> context.getCommandContext().getSender().sendMessage("Confirmation required!"), <2>
@@ -1126,7 +1126,7 @@ https://javadoc.commandframework.cloud/cloud/commandframework/CommandHelpHandler
 
 https://github.com/Mojang/Brigadier[Brigadier]
 is Mojang's command parser and dispatcher for Minecraft: Java Edition.
-It was released in version 1.13, and is available in notchain
+It was released in version 1.13, and is available in Notchian
 servers and clients released since. The most notable feature of Brigadier
 is the real-time argument parsing and feedback system, which allows you
 to see whether your argument is valid, while writing it. This feature
@@ -1140,10 +1140,10 @@ https://github.com/lucko/commodore[commodore],
 and Sponge v8+.
 When using Paper/Spigot, this feature is opt-in (refer to the platform documentation for more information).
 
-Cloud will try to hook into the Mojang (`net.minecraft.server`) serilizable types. In most cases this works when using the
-platform specific argument types, such as Location.
-You can also create your own mappings. See the platform adapter JavaDoc for
-more information.
+Cloud will try to hook into the Mojang (`net.minecraft.server`) serializable
+types. In most cases this works when using the platform specific argument types,
+such as Location. You can also create your own mappings. See the platform adapter
+JavaDoc for more information.
 
 === Discord
 TODO
