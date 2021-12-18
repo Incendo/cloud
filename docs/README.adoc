@@ -1126,7 +1126,7 @@ https://javadoc.commandframework.cloud/cloud/commandframework/CommandHelpHandler
 
 https://github.com/Mojang/Brigadier[Brigadier]
 is Mojang's command parser and dispatcher for Minecraft: Java Edition.
-It was released in version 1.13, and is available in notchain
+It was released in version 1.13, and is available in Notchian
 servers and clients released since. The most notable feature of Brigadier
 is the real-time argument parsing and feedback system, which allows you
 to see whether your argument is valid, while writing it. This feature
@@ -1140,10 +1140,10 @@ https://github.com/lucko/commodore[commodore],
 and Sponge v8+.
 When using Paper/Spigot, this feature is opt-in (refer to the platform documentation for more information).
 
-Cloud will try to hook into the Mojang (`net.minecraft.server`) serilizable types. In most cases this works when using the
-platform specific argument types, such as Location.
-You can also create your own mappings. See the platform adapter JavaDoc for
-more information.
+Cloud will try to hook into the Mojang (`net.minecraft.server`) serializable
+types. In most cases this works when using the platform specific argument types,
+such as Location. You can also create your own mappings. See the platform adapter
+JavaDoc for more information.
 
 === Discord
 TODO
