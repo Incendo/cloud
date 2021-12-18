@@ -42,7 +42,11 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
 
     @EventHandler
     void onTabCompletion(final @NonNull AsyncTabCompleteEvent event) {
-        if (event.getBuffer().trim().isEmpty()) {
+        /* Turn '(/)plugin:command arg1 arg2 ...' into 'plugin:command arg1 arg2 ...' */
+        final String strippedBuffer = event.getBuffer().startsWith("/")
+                ? event.getBuffer().substring(1)
+                : event.getBuffer();
+        if (strippedBuffer.trim().isEmpty()) {
             return;
         }
 
@@ -50,11 +54,8 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
                 (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.getCommandRegistrationHandler();
 
-        /* Turn '(/)plugin:command arg1 arg2 ...' into 'plugin:command' */
-        final String commandLabel = (event.getBuffer().startsWith("/")
-                ? event.getBuffer().substring(1)
-                : event.getBuffer())
-                .split(" ")[0];
+        /* Turn 'plugin:command arg1 arg2 ...' into 'plugin:command' */
+        final String commandLabel = strippedBuffer.split(" ")[0];
         if (!bukkitPluginRegistrationHandler.isRecognized(commandLabel)) {
             return;
         }
