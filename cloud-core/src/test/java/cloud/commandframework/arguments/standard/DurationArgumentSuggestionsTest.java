@@ -42,6 +42,11 @@ public class DurationArgumentSuggestionsTest {
         Assertions.assertTrue(suggestions4.containsAll(Arrays.asList("1d2h", "1d2m", "1d2s")));
         Assertions.assertFalse(suggestions4.contains("1d2d"));
 
+        final String input9 = "duration 1d22";
+        final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        Assertions.assertTrue(suggestions9.containsAll(Arrays.asList("1d22h", "1d22m", "1d22s")));
+        Assertions.assertFalse(suggestions9.contains("1d22d"));
+
         final String input5 = "duration d";
         final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
         Assertions.assertEquals(Collections.emptyList(), suggestions5);
