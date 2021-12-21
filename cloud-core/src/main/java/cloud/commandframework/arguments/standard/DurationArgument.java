@@ -35,6 +35,7 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
@@ -193,6 +194,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         }
 
         @Override
+        @SuppressWarnings("MixedMutabilityReturnType")
         public @NonNull List<@NonNull String> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
@@ -222,23 +224,17 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                     }
                 }
                 if (found == units.size()) {
-                    return new ArrayList<>();
+                    return Collections.emptyList();
                 }
 
                 // if the input is just a letter ("d"), return nothing
                 if (!units.contains(last) || chars.length == 1) {
-                    return new ArrayList<>();
-                }
-
-                // if the input is just a letter repeated ("dd"), return nothing
-                char secondLast = chars[chars.length - 2];
-                if (last == secondLast || Character.isLetter(secondLast)) {
-                    return new ArrayList<>();
+                    return Collections.emptyList();
                 }
 
                 // if the input is a letter which is already in the input, return nothing ("1d2d")
-                if (charsContainsMultiple(chars, last)) {
-                    return new ArrayList<>();
+                if (charsContainsMultiple(chars, last, false)) {
+                    return Collections.emptyList();
                 }
 
                 // add each of the numbers to the input
@@ -249,10 +245,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                 // add each of the time units to each of the possible combos
                 for (String num : numList) {
                     for (char unit : units) {
-                        if (unit == last) {
-                            continue;
-                        }
-                        if (!charsContainsMultiple(chars, unit)) {
+                        if (!charsContainsMultiple(chars, unit, true)) {
                             completions.add(num + unit);
                         }
                     }
@@ -269,14 +262,14 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
 
     }
 
-    private static boolean charsContainsMultiple(final char[] chars, final char c) {
+    private static boolean charsContainsMultiple(final char[] chars, final char c, final boolean onlyOne) {
         int count = 0;
         for (char ch : chars) {
             if (ch == c) {
                 count++;
             }
         }
-        return count > 1;
+        return onlyOne ? count == 1 : count > 1;
     }
 
 
