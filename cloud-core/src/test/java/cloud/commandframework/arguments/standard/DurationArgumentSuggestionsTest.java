@@ -35,14 +35,12 @@ public class DurationArgumentSuggestionsTest {
 
         final String input3 = "duration 1d";
         final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertTrue(suggestions3.containsAll(Arrays.asList("1d1h", "1d1m", "1d1s")));
-        Assertions.assertFalse(suggestions3.contains("1d1d"));
+        Assertions.assertEquals(Collections.emptyList(), suggestions3);
 
-        final String input4 = "duration 1d2h";
+        final String input4 = "duration 1d2";
         final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertTrue(suggestions4.containsAll(Arrays.asList("1d2h1m", "1d2h1s")));
-        Assertions.assertFalse(suggestions4.contains("1d2h1d"));
-        Assertions.assertFalse(suggestions4.contains("1d2h1h"));
+        Assertions.assertTrue(suggestions4.containsAll(Arrays.asList("1d2h", "1d2m", "1d2s")));
+        Assertions.assertFalse(suggestions4.contains("1d2d"));
 
         final String input5 = "duration d";
         final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);

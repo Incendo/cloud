@@ -215,42 +215,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
 
             // 1d_, 5d4m_, etc
             if (Character.isLetter(last)) {
-
-                // if the input contains all the units already, then we can't suggest anything
-                int found = 0;
-                for (char unit : units) {
-                    if (input.contains(String.valueOf(unit))) {
-                        found++;
-                    }
-                }
-                if (found == units.size()) {
-                    return Collections.emptyList();
-                }
-
-                // if the input is just a letter ("d"), return nothing
-                if (!units.contains(last) || chars.length == 1) {
-                    return Collections.emptyList();
-                }
-
-                // if the input is a letter which is already in the input, return nothing ("1d2d")
-                if (charsContainsMultiple(chars, last, false)) {
-                    return Collections.emptyList();
-                }
-
-                // add each of the numbers to the input
-                nums = nums.map(i -> input + i);
-                List<String> numList = nums.collect(Collectors.toList());
-
-                List<String> completions = new ArrayList<>();
-                // add each of the time units to each of the possible combos
-                for (String num : numList) {
-                    for (char unit : units) {
-                        if (!charsContainsMultiple(chars, unit, true)) {
-                            completions.add(num + unit);
-                        }
-                    }
-                }
-                return completions;
+                return Collections.emptyList();
             }
 
             // 1d5_, 5d4m2_, etc
