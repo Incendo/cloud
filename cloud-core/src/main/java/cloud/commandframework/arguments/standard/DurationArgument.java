@@ -33,7 +33,6 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -51,6 +50,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unused")
 public final class DurationArgument<C> extends CommandArgument<C, Duration> {
+
+    /**
+     * Matches durations in the format of: <code>2d15h7m12s</code>
+     */
+    private static final Pattern DURATION_PATTERN = Pattern.compile("(([1-9][0-9]+|[1-9])[dhms])");
 
     private DurationArgument(
             final boolean required,
@@ -157,10 +161,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
             }
             inputQueue.remove();
 
-            /*
-             * Matches durations in the format of: "2d15h7m12s"
-             */
-            final Matcher matcher = Pattern.compile("(([1-9][0-9]+|[1-9])[dhms])").matcher(input);
+            final Matcher matcher = DURATION_PATTERN.matcher(input);
 
             Duration duration = Duration.ofNanos(0);
 
@@ -209,7 +210,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                 return nums.collect(Collectors.toList());
             }
 
-            List<Character> units = Arrays.asList('d', 'h', 'm', 's');
+            List<String> units = Arrays.asList("d", "h", "m", "s");
 
             char last = chars[chars.length - 1];
 
@@ -220,23 +221,12 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
 
             // 1d5_, 5d4m2_, etc
             return units.stream()
-                    .filter(c -> !input.contains(String.valueOf(c)))
-                    .map(c -> input + c)
+                    .filter(unit -> !input.contains(unit))
+                    .map(unit -> input + unit)
                     .collect(Collectors.toList());
         }
 
     }
-
-    private static boolean charsContainsMultiple(final char[] chars, final char c, final boolean onlyOne) {
-        int count = 0;
-        for (char ch : chars) {
-            if (ch == c) {
-                count++;
-            }
-        }
-        return onlyOne ? count == 1 : count > 1;
-    }
-
 
     /**
      * Duration parse exception
