@@ -159,7 +159,6 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                         commandContext
                 ));
             }
-            inputQueue.remove();
 
             final Matcher matcher = DURATION_PATTERN.matcher(input);
 
@@ -191,6 +190,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                 return ArgumentParseResult.failure(new DurationArgument.DurationParseException(input, commandContext));
             }
 
+            inputQueue.remove();
             return ArgumentParseResult.success(duration);
         }
 
@@ -202,15 +202,12 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         ) {
             char[] chars = input.toLowerCase(Locale.ROOT).toCharArray();
 
-            Stream<String> nums = IntStream.range(1, 10).boxed()
-                    .sorted()
-                    .map(String::valueOf);
-
             if (chars.length == 0) {
-                return nums.collect(Collectors.toList());
+                return IntStream.range(1, 10).boxed()
+                        .sorted()
+                        .map(String::valueOf)
+                        .collect(Collectors.toList());
             }
-
-            List<String> units = Arrays.asList("d", "h", "m", "s");
 
             char last = chars[chars.length - 1];
 
@@ -220,7 +217,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
             }
 
             // 1d5_, 5d4m2_, etc
-            return units.stream()
+            return Stream.of("d", "h", "m", "s")
                     .filter(unit -> !input.contains(unit))
                     .map(unit -> input + unit)
                     .collect(Collectors.toList());
