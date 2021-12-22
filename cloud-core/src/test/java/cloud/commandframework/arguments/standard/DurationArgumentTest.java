@@ -40,6 +40,10 @@ public class DurationArgumentTest {
         manager.executeCommand(new TestCommandSender(), "duration 2d").join();
 
         assertThat(storage[0]).isEqualTo(Duration.ofDays(2));
+
+        manager.executeCommand(new TestCommandSender(), "duration 999s").join();
+
+        assertThat(storage[0]).isEqualTo(Duration.ofSeconds(999));
     }
 
     @Test
@@ -47,6 +51,10 @@ public class DurationArgumentTest {
         manager.executeCommand(new TestCommandSender(), "duration 2d12h7m34s").join();
 
         assertThat(storage[0]).isEqualTo(Duration.ofDays(2).plusHours(12).plusMinutes(7).plusSeconds(34));
+
+        manager.executeCommand(new TestCommandSender(), "duration 700h75m1d999s").join();
+
+        assertThat(storage[0]).isEqualTo(Duration.ofDays(1).plusHours(700).plusMinutes(75).plusSeconds(999));
     }
 
     @Test
@@ -54,6 +62,11 @@ public class DurationArgumentTest {
         Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(
                 new TestCommandSender(),
                 "duration d"
+        ).join());
+
+        Assertions.assertThrows(CompletionException.class, () -> manager.executeCommand(
+                new TestCommandSender(),
+                "duration 1x"
         ).join());
     }
 
