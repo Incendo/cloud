@@ -19,7 +19,7 @@ object Versions {
     const val adventureApi = "4.9.3"
     const val adventurePlatform = "4.0.1"
     const val paperApi = "1.16.5-R0.1-SNAPSHOT"
-    const val velocityApi = "1.1.0"
+    const val velocityApi = "3.1.0"
     const val spongeApi7 = "7.3.0"
     const val jetbrainsAnnotations = "23.0.0"
     const val guava = "21.0-jre"
