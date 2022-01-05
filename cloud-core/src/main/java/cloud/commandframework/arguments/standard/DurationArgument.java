@@ -47,6 +47,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 
+/**
+ * Parses <code>java.time.Duration</code> from a <code>1d2h3m4s</code> format.
+ * @param <C> Command sender type
+ * @since 1.7.0
+ */
 @SuppressWarnings("unused")
 public final class DurationArgument<C> extends CommandArgument<C, Duration> {
 
@@ -80,6 +85,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
      * @param name Name of the component
      * @param <C>  Command sender type
      * @return Created builder
+     * @since 1.7.0
      */
     public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
@@ -91,6 +97,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created component
+     * @since 1.7.0
      */
     public static <C> @NonNull CommandArgument<C, Duration> of(final @NonNull String name) {
         return DurationArgument.<C>newBuilder(name).asRequired().build();
@@ -102,6 +109,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
      * @param name Component name
      * @param <C>  Command sender type
      * @return Created component
+     * @since 1.7.0
      */
     public static <C> @NonNull CommandArgument<C, Duration> optional(final @NonNull String name) {
         return DurationArgument.<C>newBuilder(name).asOptional().build();
@@ -114,6 +122,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
      * @param defaultDuration Default duration
      * @param <C>             Command sender type
      * @return Created component
+     * @since 1.7.0
      */
     public static <C> @NonNull CommandArgument<C, Duration> optional(
             final @NonNull String name,
@@ -133,6 +142,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
          * Builder a new boolean component
          *
          * @return Constructed component
+         * @since 1.7.0
          */
         @Override
         public @NonNull DurationArgument<C> build() {
@@ -144,6 +154,11 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
     }
 
 
+    /**
+     * Represents a duration parser.
+     * @since 1.7.0
+     * @param <C> Command sender type
+     */
     public static final class DurationParser<C> implements ArgumentParser<C, Duration> {
 
         @Override
@@ -193,6 +208,10 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
             return ArgumentParseResult.success(duration);
         }
 
+        /**
+         * Provides suggestions for Durations.
+         * @since 1.7.0
+         */
         @Override
         @SuppressWarnings("MixedMutabilityReturnType")
         public @NonNull List<@NonNull String> suggestions(
@@ -225,7 +244,8 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
     }
 
     /**
-     * Duration parse exception
+     * Represents a duration parse exception.
+     * @since 1.7.0
      */
     public static final class DurationParseException extends ParserException {
 
@@ -237,6 +257,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
          *
          * @param input   String input
          * @param context Command context
+         * @since 1.7.0
          */
         public DurationParseException(
                 final @NonNull String input,
@@ -255,6 +276,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
          * Get the supplied input
          *
          * @return String value
+         * @since 1.7.0
          */
         public @NonNull String getInput() {
             return this.input;
