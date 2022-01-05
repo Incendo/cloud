@@ -91,6 +91,10 @@ public final class StandardCaptionKeys {
      * Variables: {input}
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_COLOR = of("argument.parse.failure.color");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_DURATION = of("argument.parse.failure.duration");
 
     private StandardCaptionKeys() {
     }
