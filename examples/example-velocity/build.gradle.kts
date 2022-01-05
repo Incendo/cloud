@@ -3,6 +3,10 @@ plugins {
     id("cloud.example-conventions")
 }
 
+indra {
+    javaVersions().target(11) // Velocity 3 requires Java 11
+}
+
 val velocityRunClasspath by configurations.creating {
     attributes {
         attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class, Usage.JAVA_RUNTIME))
@@ -35,7 +39,9 @@ tasks {
         group = "cloud"
         description = "Spin up a Velocity server environment"
         standardInput = System.`in`
-        javaLauncher.set(project.javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(11)) })
+        if (JavaVersion.current() < JavaVersion.VERSION_11) {
+            javaLauncher.set(project.javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(11)) })
+        }
 
         inputs.files(pluginJar)
 
@@ -64,5 +70,5 @@ dependencies {
     api(project(":cloud-minecraft-extras"))
     api(project(":cloud-annotations"))
     annotationProcessor(compileOnly("com.velocitypowered", "velocity-api", Versions.velocityApi))
-    velocityRunClasspath("com.velocitypowered", "velocity-proxy", "3.0.0")
+    velocityRunClasspath("com.velocitypowered", "velocity-proxy", Versions.velocityApi)
 }
