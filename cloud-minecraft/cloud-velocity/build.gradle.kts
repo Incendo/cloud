@@ -1,3 +1,7 @@
+java {
+    disableAutoTargetJvm()
+}
+
 dependencies {
     api(projects.cloudCore)
     api(projects.cloudBrigadier)
