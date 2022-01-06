@@ -31,6 +31,7 @@ import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.ByteArgument;
 import cloud.commandframework.arguments.standard.CharArgument;
 import cloud.commandframework.arguments.standard.DoubleArgument;
+import cloud.commandframework.arguments.standard.DurationArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
@@ -43,6 +44,7 @@ import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -163,6 +165,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             return new BooleanArgument.BooleanParser<>(liberal);
         });
         this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDArgument.UUIDParser<>());
+        this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationArgument.DurationParser<>());
     }
 
     private static boolean isPrimitive(final @NonNull TypeToken<?> type) {
