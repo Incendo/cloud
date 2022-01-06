@@ -165,7 +165,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             return new BooleanArgument.BooleanParser<>(liberal);
         });
         this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDArgument.UUIDParser<>());
-        this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationArgument.DurationParser<>());
+        this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationArgument.Parser<>());
     }
 
     private static boolean isPrimitive(final @NonNull TypeToken<?> type) {
