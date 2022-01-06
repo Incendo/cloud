@@ -159,7 +159,6 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
                         commandContext
                 ));
             }
-            inputQueue.remove();
 
             final OfflinePlayer player = Bukkit.getOfflinePlayer(input);
 
@@ -167,6 +166,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
                 return ArgumentParseResult.failure(new OfflinePlayerParseException(input, commandContext));
             }
 
+            inputQueue.remove();
             return ArgumentParseResult.success(player);
         }
 

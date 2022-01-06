@@ -154,7 +154,6 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
                         commandContext
                 ));
             }
-            inputQueue.remove();
 
             List<Entity> entities;
             try {
@@ -177,6 +176,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
                 ));
             }
 
+            inputQueue.remove();
             return ArgumentParseResult.success(new SingleEntitySelector(input, entities));
         }
 

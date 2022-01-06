@@ -141,6 +141,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
                 return ArgumentParseResult.failure(new CharParseException(input, commandContext));
             }
 
+            inputQueue.remove();
             return ArgumentParseResult.success(input.charAt(0));
         }
 

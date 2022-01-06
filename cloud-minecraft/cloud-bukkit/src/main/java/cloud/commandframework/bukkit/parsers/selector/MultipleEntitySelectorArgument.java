@@ -148,7 +148,6 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
                         commandContext
                 ));
             }
-            inputQueue.remove();
 
             List<Entity> entities;
             try {
@@ -162,6 +161,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
                 ));
             }
 
+            inputQueue.remove();
             return ArgumentParseResult.success(new MultipleEntitySelector(input, entities));
         }
 
