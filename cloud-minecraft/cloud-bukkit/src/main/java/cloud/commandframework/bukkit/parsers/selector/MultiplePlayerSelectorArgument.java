@@ -144,7 +144,6 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                         commandContext
                 ));
             }
-            inputQueue.remove();
 
             if (!commandContext.get(BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES).contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
@@ -154,6 +153,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                 if (player == null) {
                     return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
                 }
+                inputQueue.remove();
                 return ArgumentParseResult.success(new MultiplePlayerSelector(input, ImmutableList.of(player)));
             }
 
@@ -180,6 +180,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                 }
             }
 
+            inputQueue.remove();
             return ArgumentParseResult.success(new MultiplePlayerSelector(input, entities));
         }
 
