@@ -211,7 +211,7 @@ Here are some projects that are using cloud:
 - [Incendo/bot](https://github.com/Incendo/bot): IRC bot for #incendo on esper.net
 - [Incendo/ban](https://github.com/Incendo/ban): Velocity punishment suite
 - [broccolai/tickets](https://github.com/broccolai/tickets): Minecraft ticket system
-- [pl3xgaming/Pl3xMap](https://github.com/pl3xgaming/Pl3xMap): Minimalistic and lightweight world map viewer for Paper servers
+- [jpenilla/squaremap](https://github.com/jpenilla/squaremap): Minimalistic and lightweight world map viewer for Minecraft servers
 - [bergerhealer/TrainCarts](https://github.com/bergerhealer/TrainCarts): Minecraft plugin that links carts together to form trains you can control
 - [PEXPlugins/PermissionsEx](https://github.com/PEXPlugins/PermissionsEx): Minecraft permissions plugin
 
