@@ -46,13 +46,12 @@ import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-
 /**
- * Parses <code>java.time.Duration</code> from a <code>1d2h3m4s</code> format.
- * @param <C> Command sender type
+ * Parses {@link Duration} from a <code>1d2h3m4s</code> format.
+ *
+ * @param <C> sender type
  * @since 1.7.0
  */
-@SuppressWarnings("unused")
 public final class DurationArgument<C> extends CommandArgument<C, Duration> {
 
     /**
@@ -71,7 +70,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         super(
                 required,
                 name,
-                new DurationArgument.DurationParser<>(),
+                new Parser<>(),
                 defaultValue,
                 Duration.class,
                 suggestionsProvider,
@@ -80,74 +79,112 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
-     * @param name Name of the component
-     * @param <C>  Command sender type
-     * @return Created builder
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new builder
      * @since 1.7.0
      */
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
     /**
-     * Create a new required command component
+     * Create a new required {@link DurationArgument}.
      *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created component
+     * @param name argument name
+     * @param <C>  sender type
+     * @return built argument
      * @since 1.7.0
      */
-    public static <C> @NonNull CommandArgument<C, Duration> of(final @NonNull String name) {
-        return DurationArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull DurationArgument<C> of(final @NonNull String name) {
+        return DurationArgument.<C>builder(name).asRequired().build();
     }
 
     /**
-     * Create a new optional command component
+     * Create a new optional {@link DurationArgument}.
      *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created component
+     * @param name argument name
+     * @param <C>  sender type
+     * @return built argument
      * @since 1.7.0
      */
-    public static <C> @NonNull CommandArgument<C, Duration> optional(final @NonNull String name) {
-        return DurationArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull DurationArgument<C> optional(final @NonNull String name) {
+        return DurationArgument.<C>builder(name).asOptional().build();
     }
 
     /**
-     * Create a new required command component with a default value
+     * Create a new optional {@link DurationArgument} with the specified default value.
      *
-     * @param name            Component name
-     * @param defaultDuration Default duration
-     * @param <C>             Command sender type
-     * @return Created component
+     * @param name            argument name
+     * @param defaultDuration default duration
+     * @param <C>             sender type
+     * @return built argument
      * @since 1.7.0
      */
-    public static <C> @NonNull CommandArgument<C, Duration> optional(
+    public static <C> @NonNull DurationArgument<C> optional(
             final @NonNull String name,
             final @NonNull String defaultDuration
     ) {
-        return DurationArgument.<C>newBuilder(name).asOptionalWithDefault(defaultDuration).build();
+        return DurationArgument.<C>builder(name).asOptionalWithDefault(defaultDuration).build();
+    }
+
+    /**
+     * Create a new optional {@link DurationArgument} with the specified default value.
+     *
+     * @param name            argument name
+     * @param defaultDuration default duration
+     * @param <C>             sender type
+     * @return built argument
+     * @since 1.7.0
+     */
+    public static <C> @NonNull DurationArgument<C> optional(
+            final @NonNull String name,
+            final @NonNull Duration defaultDuration
+    ) {
+        return DurationArgument.<C>builder(name).asOptionalWithDefault(defaultDuration).build();
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Duration> {
+    /**
+     * Builder for {@link DurationArgument}.
+     *
+     * @param <C> sender type
+     * @since 1.7.0
+     */
+    public static final class Builder<C> extends TypedBuilder<C, Duration, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(Duration.class, name);
         }
 
         /**
-         * Builder a new boolean component
+         * Sets the command argument to be optional, with the specified default value.
          *
-         * @return Constructed component
+         * @param defaultValue default value
+         * @return this builder
+         * @see CommandArgument.Builder#asOptionalWithDefault(String)
+         * @since 1.7.0
+         */
+        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Duration defaultValue) {
+            return this.asOptionalWithDefault(defaultValue.getSeconds() + "s");
+        }
+
+        /**
+         * Create a new {@link DurationArgument} from this builder.
+         *
+         * @return built argument
          * @since 1.7.0
          */
         @Override
         public @NonNull DurationArgument<C> build() {
-            return new DurationArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                    this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new DurationArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
 
@@ -155,11 +192,12 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
 
 
     /**
-     * Represents a duration parser.
+     * Parser for {@link Duration}.
+     *
+     * @param <C> sender type
      * @since 1.7.0
-     * @param <C> Command sender type
      */
-    public static final class DurationParser<C> implements ArgumentParser<C, Duration> {
+    public static final class Parser<C> implements ArgumentParser<C, Duration> {
 
         @Override
         public @NonNull ArgumentParseResult<Duration> parse(
@@ -208,12 +246,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
             return ArgumentParseResult.success(duration);
         }
 
-        /**
-         * Provides suggestions for Durations.
-         * @since 1.7.0
-         */
         @Override
-        @SuppressWarnings("MixedMutabilityReturnType")
         public @NonNull List<@NonNull String> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
@@ -244,7 +277,8 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
     }
 
     /**
-     * Represents a duration parse exception.
+     * Failure exception for {@link Parser}.
+     *
      * @since 1.7.0
      */
     public static final class DurationParseException extends ParserException {
@@ -253,10 +287,10 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         private final String input;
 
         /**
-         * Construct a new Duration parse exception
+         * Construct a new {@link DurationParseException}.
          *
-         * @param input   String input
-         * @param context Command context
+         * @param input   input string
+         * @param context command context
          * @since 1.7.0
          */
         public DurationParseException(
@@ -264,7 +298,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                 final @NonNull CommandContext<?> context
         ) {
             super(
-                    DurationArgument.DurationParser.class,
+                    Parser.class,
                     context,
                     StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_DURATION,
                     CaptionVariable.of("input", input)
@@ -273,9 +307,9 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         }
 
         /**
-         * Get the supplied input
+         * Get the supplied input string.
          *
-         * @return String value
+         * @return input string
          * @since 1.7.0
          */
         public @NonNull String getInput() {
