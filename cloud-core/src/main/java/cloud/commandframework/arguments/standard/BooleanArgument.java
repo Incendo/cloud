@@ -181,14 +181,15 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
                         commandContext
                 ));
             }
-            inputQueue.remove();
 
             if (!this.liberal) {
                 if (input.equalsIgnoreCase("true")) {
+                    inputQueue.remove();
                     return ArgumentParseResult.success(true);
                 }
 
                 if (input.equalsIgnoreCase("false")) {
+                    inputQueue.remove();
                     return ArgumentParseResult.success(false);
                 }
 
@@ -198,10 +199,12 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
             final String uppercaseInput = input.toUpperCase();
 
             if (LIBERAL_TRUE.contains(uppercaseInput)) {
+                inputQueue.remove();
                 return ArgumentParseResult.success(true);
             }
 
             if (LIBERAL_FALSE.contains(uppercaseInput)) {
+                inputQueue.remove();
                 return ArgumentParseResult.success(false);
             }
 

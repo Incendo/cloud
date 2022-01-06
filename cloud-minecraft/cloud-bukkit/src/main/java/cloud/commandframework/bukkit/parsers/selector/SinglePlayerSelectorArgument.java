@@ -150,7 +150,6 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                         commandContext
                 ));
             }
-            inputQueue.remove();
 
             if (!commandContext.get(BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES).contains(
                     CloudBukkitCapabilities.BRIGADIER)) {
@@ -160,6 +159,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                 if (player == null) {
                     return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
                 }
+                inputQueue.remove();
                 return ArgumentParseResult.success(new SinglePlayerSelector(input, ImmutableList.of(player)));
             }
 
@@ -194,6 +194,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                 ));
             }
 
+            inputQueue.remove();
             return ArgumentParseResult.success(new SinglePlayerSelector(input, entities));
         }
 

@@ -151,7 +151,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
                         commandContext
                 ));
             }
-            inputQueue.remove();
 
             Player player = Bukkit.getPlayer(input);
 
@@ -159,6 +158,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
                 return ArgumentParseResult.failure(new PlayerParseException(input, commandContext));
             }
 
+            inputQueue.remove();
             return ArgumentParseResult.success(player);
         }
 
