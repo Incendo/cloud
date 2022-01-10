@@ -23,9 +23,8 @@
 //
 package cloud.commandframework.sponge.data;
 
-import org.spongepowered.api.item.inventory.ItemStack;
-
 import java.util.function.Predicate;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 /**
  * A {@link Predicate} for {@link ItemStack ItemStacks}, parsed from user input.

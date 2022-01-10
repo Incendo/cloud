@@ -25,7 +25,6 @@ package cloud.commandframework.sponge.annotation.specifier;
 
 import cloud.commandframework.sponge.argument.Vector2dArgument;
 import cloud.commandframework.sponge.argument.Vector3dArgument;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

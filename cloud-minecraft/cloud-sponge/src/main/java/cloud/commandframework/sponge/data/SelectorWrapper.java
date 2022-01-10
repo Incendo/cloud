@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.sponge.data;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.command.selector.Selector;
-
 import java.util.Collection;
 import java.util.Collections;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.command.selector.Selector;
 
 /**
  * Cloud wrapper for parsed {@link org.spongepowered.api.command.selector.Selector Selectors} and their results.

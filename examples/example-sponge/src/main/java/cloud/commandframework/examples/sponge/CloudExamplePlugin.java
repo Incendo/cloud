@@ -60,6 +60,8 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import io.leangen.geantyref.TypeToken;
+import java.util.Optional;
+import java.util.function.Function;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -94,9 +96,6 @@ import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 import static net.kyori.adventure.text.Component.newline;
 import static net.kyori.adventure.text.Component.space;

@@ -28,19 +28,18 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.commands.arguments.ColorArgument;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
-import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.commands.arguments.ColorArgument;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 
 /**
  * An argument for parsing {@link NamedTextColor NamedTextColors}.

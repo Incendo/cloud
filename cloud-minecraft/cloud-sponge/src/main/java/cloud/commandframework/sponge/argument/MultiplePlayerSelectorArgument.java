@@ -33,6 +33,11 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import cloud.commandframework.sponge.data.MultiplePlayerSelector;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
@@ -43,12 +48,6 @@ import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * Argument for selecting one or more {@link Player Players} using a {@link Selector}.

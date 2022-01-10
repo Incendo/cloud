@@ -36,6 +36,14 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCaptionKeys;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
@@ -49,15 +57,6 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.user.UserManager;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * Argument for parsing {@link User} {@link UUID UUIDs} in the {@link UserManager} from

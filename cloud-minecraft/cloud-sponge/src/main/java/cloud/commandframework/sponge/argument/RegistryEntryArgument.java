@@ -32,6 +32,13 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCaptionKeys;
 import io.leangen.geantyref.TypeToken;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
@@ -45,14 +52,6 @@ import org.spongepowered.api.registry.RegistryHolder;
 import org.spongepowered.api.registry.RegistryReference;
 import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * An argument for retrieving values from any of Sponge's {@link Registry Registries}.

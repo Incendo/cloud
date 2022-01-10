@@ -33,6 +33,11 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import cloud.commandframework.sponge.data.MultipleEntitySelector;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.selector.EntitySelector;
@@ -42,12 +47,6 @@ import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.entity.Entity;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * Argument for selecting one or more {@link Entity Entities} using a {@link Selector}.

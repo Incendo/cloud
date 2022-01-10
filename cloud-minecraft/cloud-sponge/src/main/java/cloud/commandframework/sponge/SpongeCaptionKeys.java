@@ -24,11 +24,10 @@
 package cloud.commandframework.sponge;
 
 import cloud.commandframework.captions.Caption;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link Caption} instances for messages in cloud-sponge.

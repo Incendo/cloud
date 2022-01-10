@@ -28,12 +28,11 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
 import com.google.inject.util.Types;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.command.CommandCause;
-
 import java.lang.reflect.Type;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.command.CommandCause;
 
 /**
  * Injection module that allows for {@link SpongeCommandManager} to be injectable.

@@ -31,6 +31,9 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.Coordinates;
 import net.minecraft.commands.arguments.coordinates.Vec2Argument;
@@ -40,10 +43,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.math.vector.Vector2d;
-
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
 
 /**
  * Argument for parsing {@link Vector2d} from relative, absolute, or local coordinates.

@@ -33,6 +33,12 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import cloud.commandframework.sponge.data.GameProfileCollection;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import net.minecraft.commands.CommandSourceStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -41,13 +47,6 @@ import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.command.selector.Selector;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.common.profile.SpongeGameProfile;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * Argument for parsing a {@link Collection} of {@link GameProfile GameProfiles} from a

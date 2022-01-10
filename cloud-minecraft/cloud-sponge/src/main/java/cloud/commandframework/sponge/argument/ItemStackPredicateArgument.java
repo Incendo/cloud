@@ -34,6 +34,11 @@ import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import cloud.commandframework.sponge.data.ItemStackPredicate;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.item.ItemPredicateArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -41,12 +46,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
 
 /**
  * An argument for parsing {@link ItemStackPredicate ItemStackPredicates}.

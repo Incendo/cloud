@@ -30,6 +30,9 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -38,10 +41,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.common.adventure.SpongeAdventure;
-
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
 
 /**
  * An argument for parsing {@link Component Components} from json formatted text.

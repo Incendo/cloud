@@ -33,6 +33,10 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import cloud.commandframework.sponge.data.BlockPredicate;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
@@ -42,11 +46,6 @@ import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.common.util.VecHelper;
-
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
 
 /**
  * An argument for parsing {@link BlockPredicate BlockPredicates}.

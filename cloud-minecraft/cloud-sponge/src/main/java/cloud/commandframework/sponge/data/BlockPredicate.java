@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.sponge.data;
 
+import java.util.function.Predicate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
-
-import java.util.function.Predicate;
 
 /**
  * A {@link Predicate} for blocks in a {@link ServerWorld}, parsed from user input.

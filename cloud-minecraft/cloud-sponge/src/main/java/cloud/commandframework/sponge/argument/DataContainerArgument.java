@@ -30,6 +30,9 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
 import net.minecraft.commands.arguments.CompoundTagArgument;
 import net.minecraft.nbt.CompoundTag;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -38,10 +41,6 @@ import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.common.data.persistence.NBTTranslator;
-
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
 
 /**
  * Argument for parsing {@link DataContainer DataContainers} from

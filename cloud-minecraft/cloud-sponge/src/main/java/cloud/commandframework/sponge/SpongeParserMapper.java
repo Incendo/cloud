@@ -39,14 +39,13 @@ import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
-import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
+import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 
 import static java.util.Objects.requireNonNull;
 

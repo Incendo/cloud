@@ -29,6 +29,12 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import net.minecraft.commands.arguments.OperationArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -37,13 +43,6 @@ import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.registry.DefaultedRegistryReference;
 import org.spongepowered.api.registry.RegistryTypes;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * An argument for parsing {@link Operator Operators}.

@@ -25,12 +25,11 @@ package cloud.commandframework.sponge.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import java.lang.reflect.Field;
 import net.minecraft.resources.ResourceLocation;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
-
-import java.lang.reflect.Field;
 
 /**
  * Shared utilities for ResourceKey based arguments. Not API.

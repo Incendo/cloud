@@ -33,6 +33,10 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.data.ProtoItemStack;
 import cloud.commandframework.sponge.exception.ComponentMessageRuntimeException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
 import net.kyori.adventure.util.ComponentMessageThrowable;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
@@ -47,11 +51,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.registry.DefaultedRegistryReference;
 import org.spongepowered.common.data.persistence.NBTTranslator;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
 
 /**
  * An argument for parsing {@link ProtoItemStack ProtoItemStacks} from an {@link ItemType} identifier

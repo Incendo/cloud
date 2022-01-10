@@ -23,10 +23,9 @@
 //
 package cloud.commandframework.sponge.data;
 
+import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.profile.GameProfile;
-
-import java.util.Collection;
 
 /**
  * Cloud wrapper for a {@link Collection} of {@link GameProfile GameProfiles}.

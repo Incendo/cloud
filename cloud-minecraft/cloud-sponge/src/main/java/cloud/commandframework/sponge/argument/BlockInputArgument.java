@@ -31,6 +31,10 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.data.BlockInput;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Queue;
+import java.util.function.BiFunction;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -50,11 +54,6 @@ import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.common.data.persistence.NBTTranslator;
 import org.spongepowered.common.util.VecHelper;
 import org.spongepowered.common.world.SpongeBlockChangeFlag;
-
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Queue;
-import java.util.function.BiFunction;
 
 /**
  * An argument for parsing {@link BlockInput} from a {@link BlockState}
