@@ -74,6 +74,7 @@ import java.util.function.Function;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -124,6 +125,7 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
             final @NonNull Function<@NonNull CommandCause, @NonNull C> backwardsCauseMapper
     ) {
         super(commandExecutionCoordinator, new SpongeRegistrationHandler<C>());
+        this.checkLateCreation();
         this.pluginContainer = pluginContainer;
         ((SpongeRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
         this.causeMapper = causeMapper;
@@ -132,6 +134,16 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
         this.registerCommandPreProcessor(new SpongeCommandPreprocessor<>(this));
         this.registerParsers();
         this.setCaptionRegistry(new SpongeCaptionRegistry<>());
+    }
+
+    private void checkLateCreation() {
+        // Not the most accurate check, but will at least catch creation attempted after the server has started
+        if (!Sponge.isServerAvailable()) {
+            return;
+        }
+        throw new IllegalStateException(
+                "SpongeCommandManager must be created before the first firing of RegisterCommandEvent. (created too late)"
+        );
     }
 
     private void registerParsers() {
