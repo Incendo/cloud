@@ -89,6 +89,11 @@ public final class BukkitCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE = of(
             "argument.parse.failure.location.mixed_local_absolute");
+    /**
+     * Variables: {input}
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_POTION_EFFECT_TYPE = of(
+            "argument.parse.failure.potion_effect_type");
 
     private BukkitCaptionKeys() {
     }
