@@ -174,46 +174,45 @@ final class CloudSpongeCommand<C> implements Command.Raw {
 
     @Override
     public boolean canExecute(final @NonNull CommandCause cause) {
-        final CommandTree.Node<CommandArgument<C, ?>> rootNode = this.commandManager.getCommandTree().getNamedNode(this.label);
         return this.commandManager.hasPermission(
                 this.commandManager.backwardsCauseMapper().apply(cause),
-                (CommandPermission) rootNode.getNodeMeta().getOrDefault("permission", Permission.empty())
+                (CommandPermission) this.namedNode().getNodeMeta().getOrDefault("permission", Permission.empty())
         );
     }
 
     @Override
     public Optional<Component> shortDescription(final CommandCause cause) {
-        // todo
-        return Optional.of(text("short desc!"));
+        return Optional.of(this.usage());
     }
 
     @Override
     public Optional<Component> extendedDescription(final CommandCause cause) {
-        // todo
-        return Optional.of(text("long desc!"));
+        return Optional.of(this.usage());
     }
 
     @Override
     public Optional<Component> help(final @NonNull CommandCause cause) {
-        // todo
-        return Raw.super.help(cause);
+        return Optional.of(this.usage());
     }
 
     @Override
     public Component usage(final CommandCause cause) {
-        return text(this.commandManager.getCommandSyntaxFormatter().apply(
-                Collections.emptyList(),
-                this.commandManager.getCommandTree().getNamedNode(this.label)
-        ));
+        return this.usage();
+    }
+
+    private Component usage() {
+        return text(this.commandManager.getCommandSyntaxFormatter().apply(Collections.emptyList(), this.namedNode()));
+    }
+
+    private CommandTree.Node<CommandArgument<C, ?>> namedNode() {
+        return this.commandManager.getCommandTree().getNamedNode(this.label);
     }
 
     @Override
     public CommandTreeNode.Root commandTree() {
         final CommandTreeNode<CommandTreeNode.Root> root = CommandTreeNode.root();
 
-        final CommandTree.Node<CommandArgument<C, ?>> cloud = this.commandManager
-                .getCommandTree()
-                .getNamedNode(this.label);
+        final CommandTree.Node<CommandArgument<C, ?>> cloud = this.namedNode();
 
         if (cloud.isLeaf() || cloud.getValue().getOwningCommand() != null) {
             root.executable();
