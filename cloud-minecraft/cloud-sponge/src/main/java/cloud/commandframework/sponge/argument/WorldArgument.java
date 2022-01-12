@@ -161,7 +161,7 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
                 final @NonNull String input
         ) {
             return Sponge.server().worldManager().worlds().stream().flatMap(world -> {
-                if (world.key().namespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
+                if (!input.isEmpty() && world.key().namespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
                     return Stream.of(world.key().value(), world.key().asString());
                 }
                 return Stream.of(world.key().asString());
