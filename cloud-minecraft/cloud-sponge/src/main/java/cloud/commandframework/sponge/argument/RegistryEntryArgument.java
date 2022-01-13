@@ -59,7 +59,7 @@ import org.spongepowered.api.registry.RegistryTypes;
  * @param <C> sender type
  * @param <V> value type
  */
-public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { // todo: should we return a RegistryEntry<V>?
+public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
 
     private RegistryEntryArgument(
             final boolean required,
@@ -500,7 +500,7 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
                 final @NonNull String input
         ) {
             return this.registry(commandContext).streamEntries().flatMap(entry -> {
-                if (entry.key().namespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
+                if (!input.isEmpty() && entry.key().namespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
                     return Stream.of(entry.key().value(), entry.key().asString());
                 }
                 return Stream.of(entry.key().asString());
@@ -523,8 +523,8 @@ public final class RegistryEntryArgument<C, V> extends CommandArgument<C, V> { /
             } else if (this.registryType.equals(RegistryTypes.POTION_EFFECT_TYPE)) {
                 return CommandTreeNodeTypes.MOB_EFFECT.get().createNode();
             } else if (this.registryType.equals(RegistryTypes.WORLD_TYPE)) {
-                // todo: should we use custom suggestions? sponge seems to include non-vanilla dimension types in it's registry.
-                return CommandTreeNodeTypes.DIMENSION.get().createNode();
+                return CommandTreeNodeTypes.DIMENSION.get().createNode()
+                        .customCompletions(); // Sponge adds custom types (?)
             }
             return CommandTreeNodeTypes.RESOURCE_LOCATION.get().createNode().customCompletions();
         }
