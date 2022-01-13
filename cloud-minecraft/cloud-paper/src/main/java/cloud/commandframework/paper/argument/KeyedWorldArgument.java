@@ -219,13 +219,14 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
                 return this.parser.suggestions(commandContext, input);
             }
 
-            final List<String> completions = new ArrayList<>();
-            for (final World world : Bukkit.getWorlds()) {
-                if (world.getKey().getNamespace().equals(NamespacedKey.MINECRAFT)) {
-                    completions.add(world.getKey().getKey());
-                } else {
-                    completions.add(world.getKey().toString());
+            final List<World> worlds = Bukkit.getWorlds();
+            final List<String> completions = new ArrayList<>(worlds.size() * 2);
+            for (final World world : worlds) {
+                final NamespacedKey key = world.getKey();
+                if (!input.isEmpty() && key.getNamespace().equals(NamespacedKey.MINECRAFT_NAMESPACE)) {
+                    completions.add(key.getKey());
                 }
+                completions.add(key.getNamespace() + ':' + key.getKey());
             }
             return completions;
         }
