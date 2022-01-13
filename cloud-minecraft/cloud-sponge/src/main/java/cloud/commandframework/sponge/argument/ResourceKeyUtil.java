@@ -26,6 +26,7 @@ package cloud.commandframework.sponge.argument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import net.minecraft.resources.ResourceLocation;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -43,11 +44,14 @@ final class ResourceKeyUtil {
 
     static {
         try {
-            // todo: use an accessor
-            final Field errorInvalidResourceLocationField = ResourceLocation.class.getDeclaredField("ERROR_INVALID");
+            // ERROR_INVALID (todo: use accessor)
+            final Field errorInvalidResourceLocationField = Arrays.stream(ResourceLocation.class.getDeclaredFields())
+                    .filter(it -> it.getType().equals(SimpleCommandExceptionType.class))
+                    .findFirst()
+                    .orElseThrow(IllegalStateException::new);
             errorInvalidResourceLocationField.setAccessible(true);
             ERROR_INVALID_RESOURCE_LOCATION = (SimpleCommandExceptionType) errorInvalidResourceLocationField.get(null);
-        } catch (final ReflectiveOperationException ex) {
+        } catch (final Exception ex) {
             throw new RuntimeException("Couldn't access ERROR_INVALID command exception type.", ex);
         }
     }

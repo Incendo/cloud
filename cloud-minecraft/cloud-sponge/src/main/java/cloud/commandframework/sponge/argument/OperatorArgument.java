@@ -29,13 +29,12 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import net.minecraft.commands.arguments.OperationArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.parameter.managed.operator.Operator;
@@ -140,11 +139,12 @@ public final class OperatorArgument<C> extends CommandArgument<C, Operator> {
 
         static {
             try {
-                // todo: use an accessor (Sponge has one but we don't have a good way of using it)
-                final Field errorInvalidOperationField = OperationArgument.class
-                        .getDeclaredField("ERROR_INVALID_OPERATION");
-                errorInvalidOperationField.setAccessible(true);
-                ERROR_INVALID_OPERATION = (SimpleCommandExceptionType) errorInvalidOperationField.get(null);
+                // todo: fix in a better way
+                final Class<?> spongeAccessor =
+                        Class.forName("org.spongepowered.common.accessor.commands.arguments.OperationArgumentAccessor");
+                final Method get = spongeAccessor.getDeclaredMethod("accessor$ERROR_INVALID_OPERATION");
+                get.setAccessible(true);
+                ERROR_INVALID_OPERATION = (SimpleCommandExceptionType) get.invoke(null);
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException("Couldn't access ERROR_INVALID_OPERATION command exception type.", ex);
             }

@@ -30,6 +30,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
@@ -127,12 +128,14 @@ public final class WorldArgument<C> extends CommandArgument<C, ServerWorld> {
 
         static {
             try {
-                // todo: use an accessor
-                final Field errorInvalidValueField = DimensionArgument.class
-                        .getDeclaredField("ERROR_INVALID_VALUE");
+                // ERROR_INVALID_VALUE (todo: use accessor)
+                final Field errorInvalidValueField = Arrays.stream(DimensionArgument.class.getDeclaredFields())
+                        .filter(f -> f.getType().equals(DynamicCommandExceptionType.class))
+                        .findFirst()
+                        .orElseThrow(IllegalStateException::new);
                 errorInvalidValueField.setAccessible(true);
                 ERROR_INVALID_VALUE = (DynamicCommandExceptionType) errorInvalidValueField.get(null);
-            } catch (final ReflectiveOperationException ex) {
+            } catch (final Exception ex) {
                 throw new RuntimeException("Couldn't access ERROR_INVALID_VALUE command exception type.", ex);
             }
         }
