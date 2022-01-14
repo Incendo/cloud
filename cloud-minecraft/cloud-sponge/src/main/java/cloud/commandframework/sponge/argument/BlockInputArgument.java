@@ -32,6 +32,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.data.BlockInput;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -200,15 +201,15 @@ public final class BlockInputArgument<C> extends CommandArgument<C, BlockInput> 
 
         private static final class BlockInputImpl implements BlockInput {
 
-            private static final Field COMPOUND_TAG_FIELD;
+            // todo: use accessor
+            private static final Field COMPOUND_TAG_FIELD =
+                    Arrays.stream(net.minecraft.commands.arguments.blocks.BlockInput.class.getDeclaredFields())
+                            .filter(f -> f.getType().equals(CompoundTag.class))
+                            .findFirst()
+                            .orElseThrow(IllegalStateException::new);
 
             static {
-                try {
-                    COMPOUND_TAG_FIELD = net.minecraft.commands.arguments.blocks.BlockInput.class.getDeclaredField("tag");
-                    COMPOUND_TAG_FIELD.setAccessible(true);
-                } catch (final ReflectiveOperationException ex) {
-                    throw new RuntimeException(ex);
-                }
+                COMPOUND_TAG_FIELD.setAccessible(true);
             }
 
             private final net.minecraft.commands.arguments.blocks.BlockInput blockInput;
