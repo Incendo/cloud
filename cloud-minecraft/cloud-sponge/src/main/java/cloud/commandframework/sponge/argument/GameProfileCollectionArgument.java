@@ -35,6 +35,7 @@ import cloud.commandframework.sponge.data.GameProfileCollection;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 import net.minecraft.commands.CommandSourceStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.DefaultQualifier;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNode;
 import org.spongepowered.api.command.registrar.tree.CommandTreeNodeTypes;
 import org.spongepowered.api.command.selector.Selector;
@@ -129,12 +131,7 @@ public final class GameProfileCollectionArgument<C> extends CommandArgument<C, G
                     }
                     final List<SpongeGameProfile> result = profiles.stream()
                             .map(SpongeGameProfile::of).collect(Collectors.toList());
-                    return ArgumentParseResult.success(new GameProfileCollection() {
-                        @Override
-                        public @NonNull Collection<@NonNull GameProfile> gameProfiles() {
-                            return Collections.unmodifiableCollection(result);
-                        }
-                    });
+                    return ArgumentParseResult.success(new GameProfileCollectionImpl(Collections.unmodifiableCollection(result)));
                 });
 
         @Override
@@ -180,6 +177,82 @@ public final class GameProfileCollectionArgument<C> extends CommandArgument<C, G
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
+        }
+
+    }
+
+    @DefaultQualifier(NonNull.class)
+    private static final class GameProfileCollectionImpl implements GameProfileCollection {
+
+        private final Collection<GameProfile> backing;
+
+        private GameProfileCollectionImpl(final Collection<GameProfile> backing) {
+            this.backing = backing;
+        }
+
+        @Override
+        public int size() {
+            return this.backing.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return this.backing.isEmpty();
+        }
+
+        @Override
+        public boolean contains(final Object o) {
+            return this.backing.contains(o);
+        }
+
+        @Override
+        public Iterator<GameProfile> iterator() {
+            return this.backing.iterator();
+        }
+
+        @Override
+        public Object[] toArray() {
+            return this.backing.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(final T[] a) {
+            return this.backing.toArray(a);
+        }
+
+        @Override
+        public boolean add(final GameProfile gameProfile) {
+            return this.backing.add(gameProfile);
+        }
+
+        @Override
+        public boolean remove(final Object o) {
+            return this.backing.remove(o);
+        }
+
+        @Override
+        public boolean containsAll(final Collection<?> c) {
+            return this.backing.containsAll(c);
+        }
+
+        @Override
+        public boolean addAll(final Collection<? extends GameProfile> c) {
+            return this.backing.addAll(c);
+        }
+
+        @Override
+        public boolean removeAll(final Collection<?> c) {
+            return this.backing.removeAll(c);
+        }
+
+        @Override
+        public boolean retainAll(final Collection<?> c) {
+            return this.backing.retainAll(c);
+        }
+
+        @Override
+        public void clear() {
+            this.backing.clear();
         }
 
     }

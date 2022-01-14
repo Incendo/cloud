@@ -24,21 +24,13 @@
 package cloud.commandframework.sponge.data;
 
 import java.util.Collection;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.profile.GameProfile;
 
 /**
- * Cloud wrapper for a {@link Collection} of {@link GameProfile GameProfiles}.
+ * Cloud result type for a {@link Collection} of {@link GameProfile GameProfiles}.
+ *
+ * <p>A successfully parsed result will always contain at least {@code 1} element.</p>
  */
-public interface GameProfileCollection {
-
-    /**
-     * Get the wrapped {@link Collection} of {@link GameProfile GameProfiles}.
-     *
-     * <p>A successfully parsed result will always contain at least {@code 1} element.</p>
-     *
-     * @return a {@link Collection} of {@link GameProfile GameProfiles}
-     */
-    @NonNull Collection<@NonNull GameProfile> gameProfiles();
+public interface GameProfileCollection extends Collection<GameProfile> {
 
 }
