@@ -12,7 +12,7 @@ dependencies {
 }
 
 sponge {
-    apiVersion("8.0.0-SNAPSHOT")
+    apiVersion("8.0.0")
     plugin("cloud-example-sponge") {
         loader {
             name(PluginLoaders.JAVA_PLAIN)

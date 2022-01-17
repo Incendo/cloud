@@ -33,6 +33,7 @@ import cloud.commandframework.sponge.NodeSupplyingArgumentParser;
 import cloud.commandframework.sponge.SpongeCommandContextKeys;
 import cloud.commandframework.sponge.data.GameProfileCollection;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -182,7 +183,8 @@ public final class GameProfileCollectionArgument<C> extends CommandArgument<C, G
     }
 
     @DefaultQualifier(NonNull.class)
-    private static final class GameProfileCollectionImpl implements GameProfileCollection {
+    private static final class GameProfileCollectionImpl extends AbstractCollection<GameProfile>
+            implements GameProfileCollection {
 
         private final Collection<GameProfile> backing;
 
@@ -196,63 +198,13 @@ public final class GameProfileCollectionArgument<C> extends CommandArgument<C, G
         }
 
         @Override
-        public boolean isEmpty() {
-            return this.backing.isEmpty();
-        }
-
-        @Override
-        public boolean contains(final Object o) {
-            return this.backing.contains(o);
-        }
-
-        @Override
         public Iterator<GameProfile> iterator() {
             return this.backing.iterator();
         }
 
         @Override
-        public Object[] toArray() {
-            return this.backing.toArray();
-        }
-
-        @Override
-        public <T> T[] toArray(final T[] a) {
-            return this.backing.toArray(a);
-        }
-
-        @Override
         public boolean add(final GameProfile gameProfile) {
             return this.backing.add(gameProfile);
-        }
-
-        @Override
-        public boolean remove(final Object o) {
-            return this.backing.remove(o);
-        }
-
-        @Override
-        public boolean containsAll(final Collection<?> c) {
-            return this.backing.containsAll(c);
-        }
-
-        @Override
-        public boolean addAll(final Collection<? extends GameProfile> c) {
-            return this.backing.addAll(c);
-        }
-
-        @Override
-        public boolean removeAll(final Collection<?> c) {
-            return this.backing.removeAll(c);
-        }
-
-        @Override
-        public boolean retainAll(final Collection<?> c) {
-            return this.backing.retainAll(c);
-        }
-
-        @Override
-        public void clear() {
-            this.backing.clear();
         }
 
     }

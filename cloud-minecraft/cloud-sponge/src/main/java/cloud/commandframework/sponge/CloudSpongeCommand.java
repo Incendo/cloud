@@ -60,7 +60,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.RED;
 
 final class CloudSpongeCommand<C> implements Command.Raw {
 
-    private static final Component NULL = Component.text("null");
+    private static final Component NULL = text("null");
     private static final Component MESSAGE_INTERNAL_ERROR =
             text("An internal error occurred while attempting to perform this command.", RED);
     private static final Component MESSAGE_NO_PERMS =
@@ -102,7 +102,7 @@ final class CloudSpongeCommand<C> implements Command.Raw {
                     cloudSender,
                     InvalidSyntaxException.class,
                     (InvalidSyntaxException) throwable,
-                    (c, e) -> audience.sendMessage(Component.text().append(
+                    (c, e) -> audience.sendMessage(text().append(
                             text("Invalid Command Syntax. Correct command syntax is: ", RED),
                             text("/" + e.getCorrectSyntax(), GRAY)
                     ).build())
@@ -133,7 +133,7 @@ final class CloudSpongeCommand<C> implements Command.Raw {
                     cloudSender,
                     ArgumentParseException.class,
                     (ArgumentParseException) throwable,
-                    (c, e) -> audience.sendMessage(Component.text().append(
+                    (c, e) -> audience.sendMessage(text().append(
                             text("Invalid Command Argument: ", RED),
                             getMessage(throwable.getCause()).colorIfAbsent(GRAY)
                     ).build())
