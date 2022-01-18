@@ -38,6 +38,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import org.apiguardian.api.API;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -162,9 +163,15 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     @API(status = API.Status.STABLE)
     public static final class BooleanParser<C> implements ArgumentParser<C, Boolean> {
 
+        private static final List<String> STRICT = Arrays.asList("TRUE", "FALSE");
         private static final List<String> LIBERAL = Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF");
         private static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");
         private static final List<String> LIBERAL_FALSE = Arrays.asList("FALSE", "NO", "OFF");
+
+        public static final List<String> STRICT_LOWER = STRICT
+                .stream().map(String::toLowerCase).collect(Collectors.toList());
+        public static final List<String> LIBERAL_LOWER = LIBERAL
+                .stream().map(String::toLowerCase).collect(Collectors.toList());
 
         private final boolean liberal;
 
@@ -225,10 +232,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
                 final @NonNull String input
         ) {
             if (!this.liberal) {
-                return Arrays.asList("TRUE", "FALSE");
+                return STRICT_LOWER;
             }
 
-            return LIBERAL;
+            return LIBERAL_LOWER;
         }
 
         @Override
