@@ -32,6 +32,8 @@ import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -168,9 +170,9 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         private static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");
         private static final List<String> LIBERAL_FALSE = Arrays.asList("FALSE", "NO", "OFF");
 
-        public static final List<String> STRICT_LOWER = STRICT
+        private static final List<String> STRICT_LOWER = STRICT
                 .stream().map(String::toLowerCase).collect(Collectors.toList());
-        public static final List<String> LIBERAL_LOWER = LIBERAL
+        private static final List<String> LIBERAL_LOWER = LIBERAL
                 .stream().map(String::toLowerCase).collect(Collectors.toList());
 
         private final boolean liberal;
