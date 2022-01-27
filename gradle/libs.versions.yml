@@ -4,7 +4,7 @@ metadata:
     - plugins
 
 plugins:
-  com.github.johnrengelman.shadow: 7.1.1
+  com.github.johnrengelman.shadow: 7.1.2
   com.github.ben-manes.versions: 0.36.0
   org.jlleitschuh.gradle.ktlint: &ktlint 10.2.0
 
