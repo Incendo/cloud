@@ -34,11 +34,12 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
-import org.apiguardian.api.API;
 import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -169,9 +170,9 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         private static final List<String> LIBERAL_FALSE = Arrays.asList("FALSE", "NO", "OFF");
 
         private static final List<String> STRICT_LOWER = STRICT
-                .stream().map(String::toLowerCase).collect(Collectors.toList());
+                .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
         private static final List<String> LIBERAL_LOWER = LIBERAL
-                .stream().map(String::toLowerCase).collect(Collectors.toList());
+                .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
 
         private final boolean liberal;
 
