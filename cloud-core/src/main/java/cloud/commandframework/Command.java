@@ -1112,9 +1112,9 @@ public class Command<C> {
 
         /**
          * Make the current command be a proxy of the supplied command. This means that
-         * all of the proxied commands variable command arguments will be inserted into this
+         * all of the proxied command's variable command arguments will be inserted into this
          * builder instance, in the order they are declared in the proxied command. Furthermore,
-         * the proxied commands command handler will be showed by the command that is currently
+         * the proxied command's command handler will be shown by the command that is currently
          * being built. If the current command builder does not have a permission node set, this
          * too will be copied.
          *
