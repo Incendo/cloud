@@ -45,8 +45,8 @@ import kotlin.reflect.KClass
  * @since 1.3.0
  */
 public class MutableCommandBuilder<C : Any>(
-        commandBuilder: Command.Builder<C>,
-        private val commandManager: CommandManager<C>,
+    commandBuilder: Command.Builder<C>,
+    private val commandManager: CommandManager<C>,
 ) {
     /**
      * The command builder that is being mutated by this [MutableCommandBuilder] instance.
