@@ -36,8 +36,11 @@ import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -141,18 +144,62 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
     public static final class Parser<C> implements ArgumentParser<C, BlockPredicate> {
 
         private static final Class<?> TAG_CONTAINER_CLASS;
+        private static final @Nullable Field REGISTRY_REGISTRY;
+        private static final @Nullable Method REGISTRY_GET;
+        private static final @Nullable Object BLOCK_REGISTRY_RESOURCE_LOCATION;
 
         static {
+            Class<?> tagContainerClass;
             if (CraftBukkitReflection.MAJOR_REVISION > 12 && CraftBukkitReflection.MAJOR_REVISION < 16) {
-                TAG_CONTAINER_CLASS = CraftBukkitReflection.needNMSClass("TagRegistry");
+                tagContainerClass = CraftBukkitReflection.needNMSClass("TagRegistry");
+                REGISTRY_REGISTRY = null;
+                REGISTRY_GET = null;
+                BLOCK_REGISTRY_RESOURCE_LOCATION = null;
             } else {
-                TAG_CONTAINER_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
-                        () -> "Couldn't find TagContainer class",
+                tagContainerClass = CraftBukkitReflection.firstNonNullOrNull(
                         CraftBukkitReflection.findNMSClass("ITagRegistry"),
                         CraftBukkitReflection.findMCClass("tags.ITagRegistry"),
                         CraftBukkitReflection.findMCClass("tags.TagContainer")
                 );
+                if (tagContainerClass == null) {
+                    tagContainerClass = CraftBukkitReflection.firstNonNullOrThrow(
+                            () -> "Registry",
+                            CraftBukkitReflection.findMCClass("core.IRegistry"),
+                            CraftBukkitReflection.findMCClass("core.Registry")
+                    );
+                    final Class<?> tagContainerClassFinal = tagContainerClass;
+                    REGISTRY_REGISTRY = Arrays.stream(tagContainerClass.getDeclaredFields())
+                            .filter(it -> it.getType().equals(tagContainerClassFinal))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalStateException("Could not find Registry Registry field"));
+                    REGISTRY_REGISTRY.setAccessible(true);
+                    final Class<?> resourceLocationClass = CraftBukkitReflection.firstNonNullOrThrow(
+                            () -> "ResourceLocation class",
+                            CraftBukkitReflection.findMCClass("resources.ResourceLocation"),
+                            CraftBukkitReflection.findMCClass("resources.MinecraftKey")
+                    );
+                    REGISTRY_GET = Arrays.stream(tagContainerClass.getDeclaredMethods())
+                            .filter(it -> it.getParameterCount() == 1
+                                    && it.getParameterTypes()[0].equals(resourceLocationClass)
+                                    && it.getReturnType().equals(Object.class))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalStateException("Could not find Registry#get(ResourceLocation)"));
+                    final Constructor<?> resourceLocationCtr = CraftBukkitReflection.needConstructor(
+                            resourceLocationClass,
+                            String.class
+                    );
+                    try {
+                        BLOCK_REGISTRY_RESOURCE_LOCATION = resourceLocationCtr.newInstance("block");
+                    } catch (final ReflectiveOperationException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    REGISTRY_REGISTRY = null;
+                    REGISTRY_GET = null;
+                    BLOCK_REGISTRY_RESOURCE_LOCATION = null;
+                }
             }
+            TAG_CONTAINER_CLASS = tagContainerClass;
         }
 
         private static final Class<?> CRAFT_WORLD_CLASS = CraftBukkitReflection.needOBCClass("CraftWorld");
@@ -206,8 +253,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                 .filter(it -> it.getReturnType().equals(MINECRAFT_SERVER_CLASS) && it.getParameterCount() == 0)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Could not find CommandSourceStack#getServer."));
-        private static final Method GET_TAG_REGISTRY_METHOD = CraftBukkitReflection.firstNonNullOrThrow(
-                () -> "getTags method on MinecraftServer",
+        private static final @Nullable Method GET_TAG_REGISTRY_METHOD = CraftBukkitReflection.firstNonNullOrNull(
                 CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTagRegistry"),
                 CraftBukkitReflection.findMethod(MINECRAFT_SERVER_CLASS, "getTags"),
                 CraftBukkitReflection.streamMethods(MINECRAFT_SERVER_CLASS)
@@ -239,7 +285,15 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                 final Object commandSourceStack = ctx.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
                 try {
                     final Object server = GET_SERVER_METHOD.invoke(commandSourceStack);
-                    final Object tagRegistry = GET_TAG_REGISTRY_METHOD.invoke(server);
+                    final Object tagRegistry;
+                    if (GET_TAG_REGISTRY_METHOD != null) {
+                        tagRegistry = GET_TAG_REGISTRY_METHOD.invoke(server);
+                    } else {
+                        Objects.requireNonNull(REGISTRY_GET, "REGISTRY_GET");
+                        Objects.requireNonNull(REGISTRY_REGISTRY, "REGISTRY_REGISTRY");
+                        final Object registryRegistry = REGISTRY_REGISTRY.get(null);
+                        tagRegistry = REGISTRY_GET.invoke(registryRegistry, BLOCK_REGISTRY_RESOURCE_LOCATION);
+                    }
                     final Predicate<Object> predicate = (Predicate<Object>) CREATE_PREDICATE_METHOD.invoke(result, tagRegistry);
                     return ArgumentParseResult.success(new BlockPredicateImpl(predicate));
                 } catch (final ReflectiveOperationException ex) {
