@@ -38,6 +38,7 @@ import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.LongArgument;
+import cloud.commandframework.arguments.standard.PseudoEnumArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
@@ -205,6 +206,18 @@ public final class CloudBrigadierManager<C, S> {
         }, builder -> builder.toConstant(BoolArgumentType.bool()));
         /* Map String properly to StringArgumentType */
         this.registerMapping(new TypeToken<StringArgument.StringParser<C>>() {
+        }, builder -> builder.cloudSuggestions().to(argument -> {
+            switch (argument.getStringMode()) {
+                case QUOTED:
+                    return StringArgumentType.string();
+                case GREEDY:
+                    return StringArgumentType.greedyString();
+                default:
+                    return StringArgumentType.word();
+            }
+        }));
+        /* Map PseudoEnum propertly to StringArgumentType */
+        this.registerMapping(new TypeToken<PseudoEnumArgument.PseudoEnumParser<C>>() {
         }, builder -> builder.cloudSuggestions().to(argument -> {
             switch (argument.getStringMode()) {
                 case QUOTED:
