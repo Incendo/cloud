@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fix incorrect inputQueue usage in some default argument types
-- Bukkit: Update for 1.18.2
+
+### Changed
+- Bukkit: Update for Minecraft 1.18.2
 
 ## [1.6.1]
 
