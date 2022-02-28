@@ -1,10 +1,8 @@
 import ca.stellardrift.build.configurate.ConfigFormats
 import ca.stellardrift.build.configurate.catalog.PolyglotVersionCatalogExtension
 
-enableFeaturePreview("VERSION_CATALOGS")
-
 plugins {
-    id("ca.stellardrift.polyglot-version-catalogs") version "5.0.0"
+    id("ca.stellardrift.polyglot-version-catalogs") version "5.0.1"
 }
 
 extensions.configure<PolyglotVersionCatalogExtension> {
