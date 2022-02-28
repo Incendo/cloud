@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "cloud.commandframework"
-version = "1.6.2-SNAPSHOT"
+version = "1.6.2"
 description = "Command framework and dispatcher for the JVM"
 
 subprojects {

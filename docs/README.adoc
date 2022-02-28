@@ -2,7 +2,7 @@
 Alexander Söderberg <contact@alexander-soderberg.com>
 v0.1.0, 2020-12-30
 :sectnums:
-:cloud-version: 1.6.1
+:cloud-version: 1.6.2
 :toc: left
 :toclevels: 4
 :icons: font
