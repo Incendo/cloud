@@ -133,7 +133,7 @@ public fun <C : Any> Command.Builder<C>.senderType(type: KClass<out C>): Command
  * Create a new [MutableCommandBuilder].
  *
  * @param commandManager the command manager, which will own this command.
- * @since 1.6.2
+ * @since 1.6.3
  */
 public fun <C : Any> Command.Builder<C>.toMutable(
     commandManager: CommandManager<C>
@@ -144,7 +144,7 @@ public fun <C : Any> Command.Builder<C>.toMutable(
  *
  * @param commandManager the command manager, which will own this command.
  * @param lambda receiver lambda, which will be invoked on the new builder.
- * @since 1.6.2
+ * @since 1.6.3
  */
 public fun <C : Any> Command.Builder<C>.mutate(
     commandManager: CommandManager<C>,
