@@ -9,8 +9,6 @@ signing {
 }
 
 indra {
-    publishSnapshotsTo("incendo", "https://repo.incendo.org/content/repositories/snapshots/")
-
     github("Incendo", "cloud") {
         ci(true)
     }
