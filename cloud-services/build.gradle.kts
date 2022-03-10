@@ -1,3 +1,7 @@
+plugins {
+    id("cloud.base-conventions")
+}
+
 dependencies {
-    api("io.leangen.geantyref", "geantyref", Versions.geantyref)
+    api(libs.geantyref)
 }

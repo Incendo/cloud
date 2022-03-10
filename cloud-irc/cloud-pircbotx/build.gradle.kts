@@ -1,4 +1,8 @@
+plugins {
+    id("cloud.base-conventions")
+}
+
 dependencies {
     api(projects.cloudCore)
-    implementation("com.github.pircbotx", "pircbotx", Versions.pircbotx)
+    implementation(libs.pircbotx)
 }

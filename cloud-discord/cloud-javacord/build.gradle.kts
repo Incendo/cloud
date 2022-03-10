@@ -1,4 +1,8 @@
+plugins {
+    id("cloud.base-conventions")
+}
+
 dependencies {
     api(projects.cloudCore)
-    implementation("org.javacord", "javacord", Versions.javacord)
+    implementation(libs.javacord)
 }
