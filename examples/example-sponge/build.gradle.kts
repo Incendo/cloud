@@ -2,7 +2,7 @@ import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
 
 plugins {
-    id("org.spongepowered.gradle.plugin") version "2.0.0"
+    id("org.spongepowered.gradle.plugin") version "2.0.1"
     id("com.github.johnrengelman.shadow")
 }
 
