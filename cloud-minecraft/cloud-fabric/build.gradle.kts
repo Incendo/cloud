@@ -2,6 +2,7 @@ import net.fabricmc.loom.task.AbstractRunTask
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
+    id("cloud.base-conventions")
     id("quiet-fabric-loom") version "0.11-SNAPSHOT"
 }
 
@@ -40,19 +41,21 @@ tasks {
 }
 
 dependencies {
-    minecraft("com.mojang", "minecraft", Versions.fabricMc)
+    minecraft(libs.fabricMinecraft)
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc", "fabric-loader", Versions.fabricLoader)
-    modImplementation(fabricApi.module("fabric-command-api-v1", Versions.fabricApi))
-    modImplementation(fabricApi.module("fabric-lifecycle-events-v1", Versions.fabricApi))
+    modImplementation(libs.fabricLoader)
+    modImplementation(fabricApi.module("fabric-command-api-v1", libs.versions.fabricApi.get()))
+    modImplementation(fabricApi.module("fabric-lifecycle-events-v1", libs.versions.fabricApi.get()))
 
-    modApi(include("me.lucko", "fabric-permissions-api", "0.1-SNAPSHOT"))
+    modImplementation(libs.fabricPermissionsApi)
+    include(libs.fabricPermissionsApi)
 
     api(include(projects.cloudCore)!!)
     api(include(projects.cloudBrigadier)!!)
     api(include(projects.cloudServices)!!)
 
-    api(include("io.leangen.geantyref", "geantyref", Versions.geantyref))
+    api(libs.geantyref)
+    include(libs.geantyref)
 }
 
 /* set up a testmod source set */

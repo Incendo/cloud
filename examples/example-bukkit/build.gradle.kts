@@ -12,12 +12,12 @@ dependencies {
     implementation(project(":cloud-annotations"))
     implementation(project(":cloud-minecraft-extras"))
     /* Extras */
-    implementation("me.lucko", "commodore", Versions.commodore) {
+    implementation(libs.commodore) {
         isTransitive = false
     }
-    implementation("net.kyori", "adventure-platform-bukkit", Versions.adventurePlatform)
+    implementation(libs.adventurePlatformBukkit)
     /* Bukkit */
-    compileOnly("org.bukkit", "bukkit", Versions.bukkit)
+    compileOnly(libs.bukkit)
 }
 
 tasks {

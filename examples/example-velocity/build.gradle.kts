@@ -69,6 +69,7 @@ dependencies {
     api(project(":cloud-velocity"))
     api(project(":cloud-minecraft-extras"))
     api(project(":cloud-annotations"))
-    annotationProcessor(compileOnly("com.velocitypowered", "velocity-api", Versions.velocityApi))
-    velocityRunClasspath("com.velocitypowered", "velocity-proxy", Versions.velocityApi)
+    annotationProcessor(libs.velocityApi)
+    compileOnly(libs.velocityApi)
+    velocityRunClasspath("com.velocitypowered", "velocity-proxy", libs.versions.velocityApi.get())
 }
