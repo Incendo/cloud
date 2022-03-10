@@ -46,13 +46,13 @@ Cloud is available through https://search.maven.org/search?q=cloud.commandframew
 </dependency>
 ----
 
-If you want to use snapshot builds, then they are available via our snapshot repository:
+If you want to use snapshot builds, then they are available the Sonatype snapshots repository:
 
 [source,xml]
 ----
 <repository>
- <id>incendo-snapshots</id>
- <url>https://repo.incendo.org/content/repositories/snapshots</url>
+ <id>sonatype-snapshots</id>
+ <url>https://oss.sonatype.org/content/repositories/snapshots</url>
 </repository>
 ----
 
