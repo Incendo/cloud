@@ -1,7 +1,11 @@
+plugins {
+    id("cloud.base-conventions")
+}
+
 dependencies {
     api(projects.cloudBukkit)
-    compileOnly("com.destroystokyo.paper", "paper-api", Versions.paperApi)
-    compileOnly("com.destroystokyo.paper", "paper-mojangapi", Versions.paperApi)
-    compileOnly("org.jetbrains", "annotations", Versions.jetbrainsAnnotations)
-    compileOnly("com.google.guava", "guava", Versions.guava)
+    compileOnly(libs.paperApi)
+    compileOnly(libs.paperMojangApi)
+    compileOnly(libs.jetbrainsAnnotations)
+    compileOnly(libs.guava)
 }

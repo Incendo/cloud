@@ -1,4 +1,8 @@
+plugins {
+    id("cloud.base-conventions")
+}
+
 dependencies {
     api(projects.cloudCore)
-    compileOnly("org.spongepowered", "spongeapi", Versions.spongeApi7)
+    compileOnly(libs.spongeApi7)
 }

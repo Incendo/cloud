@@ -1,4 +1,8 @@
+plugins {
+    id("cloud.base-conventions")
+}
+
 dependencies {
     api(projects.cloudCore)
-    compileOnly("org.cloudburstmc", "cloudburst-server", Versions.cloudburst)
+    compileOnly(libs.cloudburst)
 }

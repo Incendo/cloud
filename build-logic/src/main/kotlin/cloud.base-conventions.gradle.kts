@@ -16,7 +16,7 @@ indra {
         testWith(8, 11, 17)
     }
 
-    checkstyle("9.0")
+    checkstyle(libs.versions.checkstyle.get())
 }
 
 /* Disable checkstyle on tests */
@@ -93,13 +93,13 @@ repositories {
 }
 
 dependencies {
-    compileOnlyApi("org.checkerframework", "checker-qual", Versions.checkerQual)
-    testImplementation("org.junit.jupiter", "junit-jupiter-engine", Versions.jupiterEngine)
-    testImplementation("org.mockito", "mockito-core", Versions.mockitoCore)
-    testImplementation("org.mockito.kotlin", "mockito-kotlin", Versions.mockitoKotlin)
-    testImplementation("com.google.truth", "truth", Versions.truth)
-    testImplementation("com.google.truth.extensions", "truth-java8-extension", Versions.truth)
-    errorprone("com.google.errorprone", "error_prone_core", Versions.errorprone)
+    compileOnlyApi(libs.checkerQual)
+    testImplementation(libs.jupiterEngine)
+    testImplementation(libs.mockitoCore)
+    testImplementation(libs.mockitoKotlin)
+    testImplementation(libs.truth)
+    testImplementation(libs.truthJava8)
+    errorprone(libs.errorproneCore)
     // Silences compiler warnings from guava using errorprone
-    compileOnly("com.google.errorprone", "error_prone_annotations", Versions.errorprone)
+    compileOnly(libs.errorproneAnnotations)
 }

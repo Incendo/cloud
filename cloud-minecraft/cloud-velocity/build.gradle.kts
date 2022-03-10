@@ -1,3 +1,7 @@
+plugins {
+    id("cloud.base-conventions")
+}
+
 java {
     disableAutoTargetJvm()
 }
@@ -5,5 +9,5 @@ java {
 dependencies {
     api(projects.cloudCore)
     api(projects.cloudBrigadier)
-    compileOnly("com.velocitypowered", "velocity-api", Versions.velocityApi)
+    compileOnly(libs.velocityApi)
 }
