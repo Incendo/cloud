@@ -47,6 +47,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
@@ -295,9 +296,10 @@ public final class MinecraftHelp<C> {
      * @param recipient Recipient
      */
     public void queryCommands(
-            final @NonNull String rawQuery,
+            @Nullable String rawQuery,
             final @NonNull C recipient
     ) {
+        rawQuery = rawQuery == null ? "" : rawQuery;
         final String[] splitQuery = rawQuery.split(" ");
         int page;
         String query;
