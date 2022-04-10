@@ -589,7 +589,7 @@ let's call it `/game warp me <warp>` but you feel like it's a little too verbose
 
 To create a command proxy you can use
 https://javadoc.commandframework.cloud/cloud/commandframework/Command.Builder.html#proxies(cloud.commandframework.Command)[Command.Builder#proxies(Command)].
-Please not the documentation of the method, which reads:
+Please note the documentation of the method, which reads:
 
 > Make the current command be a proxy of the supplied command.
 This means that all of the proxied commands variable command arguments will be inserted into this builder instance,
