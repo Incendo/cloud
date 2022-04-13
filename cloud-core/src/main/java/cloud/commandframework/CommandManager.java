@@ -35,7 +35,9 @@ import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.captions.CaptionRegistry;
+import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
+import cloud.commandframework.captions.SimpleCaptionVariableReplacementHandler;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.StandardCommandContextFactory;
@@ -96,6 +98,7 @@ public abstract class CommandManager<C> {
     private final CommandTree<C> commandTree;
     private final CommandSuggestionEngine<C> commandSuggestionEngine;
 
+    private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
     private CommandRegistrationHandler commandRegistrationHandler;
@@ -238,6 +241,26 @@ public abstract class CommandManager<C> {
      */
     public @NonNull CommandManager<C> command(final Command.@NonNull Builder<C> command) {
         return this.command(command.manager(this).build());
+    }
+
+    /**
+     * Get the caption variable replacement handler
+     *
+     * @return the caption variable replacement handler
+     */
+    public @NonNull CaptionVariableReplacementHandler getCaptionVariableReplacementHandler() {
+        return this.captionVariableReplacementHandler;
+    }
+
+    /**
+     * Set the caption variable replacement handler
+     *
+     * @param captionVariableReplacementHandler new replacement handler
+     */
+    public void setCaptionVariableReplacementHandler(
+            @NonNull final CaptionVariableReplacementHandler captionVariableReplacementHandler
+    ) {
+        this.captionVariableReplacementHandler = captionVariableReplacementHandler;
     }
 
     /**
