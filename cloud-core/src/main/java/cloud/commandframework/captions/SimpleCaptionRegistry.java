@@ -64,6 +64,10 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
      */
     public static final String ARGUMENT_PARSE_FAILURE_UUID = "'{input}' is not a valid UUID";
     /**
+     * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_REGEX = "'{input}' does not match '{pattern}'";
+    /**
      * Default caption for {@link StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG}
      */
     public static final String ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG = "Unknown flag '{flag}'";
@@ -122,6 +126,10 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
         this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_UUID,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_UUID
+        );
+        this.registerMessageFactory(
+                StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_REGEX,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_REGEX
         );
         this.registerMessageFactory(
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG,
