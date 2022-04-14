@@ -244,21 +244,21 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the caption variable replacement handler
+     * Get the caption variable replacement handler.
      *
      * @return the caption variable replacement handler
      */
-    public @NonNull CaptionVariableReplacementHandler getCaptionVariableReplacementHandler() {
+    public @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler() {
         return this.captionVariableReplacementHandler;
     }
 
     /**
-     * Set the caption variable replacement handler
+     * Sets the caption variable replacement handler.
      *
      * @param captionVariableReplacementHandler new replacement handler
      */
-    public void setCaptionVariableReplacementHandler(
-            @NonNull final CaptionVariableReplacementHandler captionVariableReplacementHandler
+    public void captionVariableReplacementHandler(
+            final @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler
     ) {
         this.captionVariableReplacementHandler = captionVariableReplacementHandler;
     }
@@ -478,7 +478,7 @@ public abstract class CommandManager<C> {
      * @param aliases     Command aliases
      * @return Builder instance
      * @deprecated for removal since 1.4.0. Use {@link #commandBuilder(String, CommandMeta, ArgumentDescription, String...)}
-     *      instead.
+     *         instead.
      */
     @Deprecated
     public Command.@NonNull Builder<C> commandBuilder(
