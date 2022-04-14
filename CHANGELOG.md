@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- Fix missing caption registration for the regex caption
+- Fix missing caption registration for the regex caption ([#351](https://github.com/Incendo/cloud/pull/351))
 
 ## [1.6.2]
 
