@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- The command manager specifies the caption replacement handler
+- Allow for setting a custom `CaptionVariableReplacementHandler` on the command manager ([#352](https://github.com/Incendo/cloud/pull/352))
 
 ## [1.6.2]
 
