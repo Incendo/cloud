@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Allow for setting a custom `CaptionVariableReplacementHandler` on the command manager ([#352](https://github.com/Incendo/cloud/pull/352))
 
+### Fixed
+- Fix missing caption registration for the regex caption ([#351](https://github.com/Incendo/cloud/pull/351))
+
 ## [1.6.2]
 
 ### Fixed
