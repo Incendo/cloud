@@ -41,17 +41,26 @@ tasks {
 }
 
 spotless {
-  java {
-    licenseHeaderFile(rootProject.file("HEADER"))
-    importOrderFile(rootProject.file(".spotless/cloud.importorder"))
-    indentWithSpaces(4)
-    trimTrailingWhitespace()
-  }
-  kotlin {
-    licenseHeaderFile(rootProject.file("HEADER"))
-    indentWithSpaces(4)
-    trimTrailingWhitespace()
-  }
+    java {
+        licenseHeaderFile(rootProject.file("HEADER"))
+        importOrderFile(rootProject.file(".spotless/cloud.importorder"))
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    kotlin {
+        licenseHeaderFile(rootProject.file("HEADER"))
+        indentWithSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    format("configs") {
+        target("**/*.yml", "**/*.yaml", "**/*.json")
+        targetExclude("run/**")
+        indentWithSpaces(2)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }
 
 repositories {
