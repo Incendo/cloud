@@ -38,11 +38,16 @@ import cloud.commandframework.fabric.data.SinglePlayerSelector;
 import cloud.commandframework.fabric.internal.EntitySelectorAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentMessageAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentPartAccess;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -59,6 +64,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Parsers for Vanilla command argument types.
@@ -68,6 +74,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class FabricArgumentParsers {
 
     private FabricArgumentParsers() {
+    }
+
+    /**
+     * A parser that wraps Brigadier argument types which need a {@link CommandBuildContext}
+     * @param <C> sender type
+     * @param <V> argument value type
+     * @param factory factory that creates these arguments
+     * @return the parser
+     */
+    public static <C, V> @NonNull ArgumentParser<C, V> contextual(final @NonNull Function<CommandBuildContext, ArgumentType<V>> factory) {
+        return new WrappedBrigadierParser<>(new ContextualArgumentTypeProvider<>(factory));
     }
 
     /**
@@ -501,6 +518,69 @@ public final class FabricArgumentParsers {
         @Override
         public @NonNull Collection<ServerPlayer> get() {
             return this.selectedPlayers;
+        }
+
+    }
+
+    @ApiStatus.Internal
+    public static final class ContextualArgumentTypeProvider<V> implements Supplier<ArgumentType<V>> {
+        private static final ThreadLocal<CommandBuildContext> BUILD_CONTEXT = new ThreadLocal<>();
+        private static final Set<ContextualArgumentTypeProvider<?>> INSTANCES = Collections.newSetFromMap(new WeakHashMap<>());
+
+        private final Function<CommandBuildContext, ArgumentType<V>> provider;
+        private volatile ArgumentType<V> provided;
+
+        /**
+         * Temporarily expose a command build context to this provider.
+         *
+         * <p>This will clear any cached state from existing providers.</p>
+         *
+         * @param ctx the context
+         * @param action an action to perform while the context is exposed
+         * @since 1.7.0
+         */
+        public static void withBuildContext(
+            final CommandBuildContext ctx,
+            final Runnable action
+        ) {
+            BUILD_CONTEXT.set(ctx);
+            synchronized (INSTANCES) {
+                // todo: separate instances between client/multiple server instances
+                for (final ContextualArgumentTypeProvider<?> provider : INSTANCES) {
+                    provider.provided = null;
+                }
+            }
+
+            try {
+                action.run();
+            } finally {
+                BUILD_CONTEXT.remove();
+            }
+        }
+
+        ContextualArgumentTypeProvider(final @NonNull Function<CommandBuildContext, ArgumentType<V>> provider) {
+            this.provider = provider;
+            synchronized (INSTANCES) {
+                INSTANCES.add(this);
+            }
+        }
+
+        @Override
+        public ArgumentType<V> get() {
+            ArgumentType<V> provided = this.provided;
+            if (provided == null) {
+                synchronized (this) {
+                    if (this.provided == null) {
+                        final CommandBuildContext ctx = BUILD_CONTEXT.get();
+                        if (ctx == null) {
+                            throw new IllegalStateException("No build context was available while trying to compute an argument type");
+                        }
+                        provided = this.provider.apply(ctx);
+                        this.provided = provided;
+                    }
+                }
+            }
+            return provided;
         }
 
     }

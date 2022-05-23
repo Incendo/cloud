@@ -25,6 +25,7 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -33,11 +34,12 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands.CommandSelection;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -81,7 +83,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         // Redirects only work for nodes with children, but break the top argument-less command.
         // Manually adding the root command after setting the redirect doesn't fix it.
         // (See https://github.com/Mojang/brigadier/issues/46) Manually clone the node instead.
-        LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder
+        final LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder
                 .<S>literal(alias)
                 .requires(destination.getRequirement())
                 .forward(
@@ -150,21 +152,27 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
             return this.registeredCommands.add((Command<C>) command);
         }
 
-        private void registerAllCommands(final CommandDispatcher<CommandSourceStack> dispatcher, final boolean isDedicated) {
+        private void registerAllCommands(
+            final CommandDispatcher<CommandSourceStack> dispatcher,
+            final CommandBuildContext access,
+            final Commands.CommandSelection side
+        ) {
             this.commandManager().registrationCalled();
-            for (final Command<C> command : this.registeredCommands) {
-                /* Only register commands in the declared environment */
-                final CommandSelection env = command.getCommandMeta().getOrDefault(
-                        FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
-                        CommandSelection.ALL
-                );
+            FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(access, () -> {
+                for (final Command<C> command : this.registeredCommands) {
+                    /* Only register commands in the declared environment */
+                    final Commands.CommandSelection env = command.getCommandMeta().getOrDefault(
+                            FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
+                            Commands.CommandSelection.ALL
+                    );
 
-                if ((env == CommandSelection.INTEGRATED && isDedicated)
-                        || (env == CommandSelection.DEDICATED && !isDedicated)) {
-                    continue;
+                    if ((env == Commands.CommandSelection.INTEGRATED && !side.includeIntegrated)
+                            || (env == Commands.CommandSelection.DEDICATED && !side.includeDedicated)) {
+                        continue;
+                    }
+                    this.registerCommand(dispatcher.getRoot(), command);
                 }
-                this.registerCommand(dispatcher.getRoot(), command);
-            }
+            });
         }
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {

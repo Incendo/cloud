@@ -8,6 +8,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.ow2.asm:asm:9.3")
     implementation(libs.indraCommon)
     implementation(libs.indraPublishingSonatype)
     implementation(libs.gradleTestLogger)
