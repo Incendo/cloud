@@ -28,8 +28,8 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.permission.PredicatePermission;
 import java.util.function.Function;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -165,7 +165,8 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
             if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 return allowOnMultiplayer;
             }
-            return Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers();
+            return Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers()
+              || Minecraft.getInstance().getSingleplayerServer().getWorldData().getAllowCommands();
         };
     }
 
@@ -198,7 +199,8 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
             if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 return allowOnMultiplayer;
             }
-            return !Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers();
+            return !Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers()
+              && !Minecraft.getInstance().getSingleplayerServer().getWorldData().getAllowCommands();
         };
     }
 

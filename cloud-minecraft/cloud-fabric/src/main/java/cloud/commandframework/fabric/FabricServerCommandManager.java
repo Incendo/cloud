@@ -40,11 +40,11 @@ import cloud.commandframework.meta.CommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -121,7 +121,7 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
                         null,
                         4,
                         "",
-                        TextComponent.EMPTY,
+                        Component.empty(),
                         null,
                         null
                 )

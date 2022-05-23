@@ -25,7 +25,6 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -54,7 +53,7 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(ItemArgument.item()),
+                FabricArgumentParsers.contextual(ItemArgument::item),
                 defaultValue,
                 ItemInput.class,
                 suggestionsProvider,

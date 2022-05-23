@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static java.util.Objects.requireNonNull;
@@ -53,7 +54,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
 
     public static final String COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER = "_cloud_brigadier_native_sender";
 
-    private final ArgumentType<T> nativeType;
+    private final Supplier<ArgumentType<T>> nativeType;
     private final int expectedArgumentCount;
 
     /**
@@ -63,6 +64,16 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
      * @since 1.5.0
      */
     public WrappedBrigadierParser(final ArgumentType<T> nativeType) {
+        this(() -> nativeType, DEFAULT_ARGUMENT_COUNT);
+    }
+
+    /**
+     * Create an argument parser based on a brigadier command.
+     *
+     * @param nativeType the native command type, computed lazily
+     * @since 1.7.0
+     */
+    public WrappedBrigadierParser(final Supplier<ArgumentType<T>> nativeType) {
         this(nativeType, DEFAULT_ARGUMENT_COUNT);
     }
 
@@ -74,10 +85,25 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
      * @since 1.5.0
      */
     public WrappedBrigadierParser(
-            final ArgumentType<T> nativeType,
+        final ArgumentType<T> nativeType,
+        final int expectedArgumentCount
+    ) {
+        this(() -> nativeType, expectedArgumentCount);
+    }
+
+    /**
+     * Create an argument parser based on a brigadier command.
+     *
+     * @param nativeType            the native command type provider, calculated lazily
+     * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
+     * @since 1.7.0
+     */
+    public WrappedBrigadierParser(
+            final Supplier<ArgumentType<T>> nativeType,
             final int expectedArgumentCount
     ) {
-        this.nativeType = requireNonNull(nativeType, "brigadierType");
+        requireNonNull(nativeType, "brigadierType");
+        this.nativeType = nativeType;
         this.expectedArgumentCount = expectedArgumentCount;
     }
 
@@ -88,7 +114,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
      * @since 1.5.0
      */
     public ArgumentType<T> getNativeArgument() {
-        return this.nativeType;
+        return this.nativeType.get();
     }
 
     @Override
@@ -109,7 +135,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
 
         // Then try to parse
         try {
-            return ArgumentParseResult.success(this.nativeType.parse(reader));
+            return ArgumentParseResult.success(this.nativeType.get().parse(reader));
         } catch (final CommandSyntaxException ex) {
             return ArgumentParseResult.failure(ex);
         } finally {
@@ -142,7 +168,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
                 false
         );
 
-        final CompletableFuture<Suggestions> result = this.nativeType.listSuggestions(
+        final CompletableFuture<Suggestions> result = this.nativeType.get().listSuggestions(
                 reverseMappedContext,
                 new SuggestionsBuilder(input, 0)
         );

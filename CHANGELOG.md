@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Paper: Improved KeyedWorldArgument suggestions ([#334](https://github.com/Incendo/cloud/pull/334))
 - Minecraft: Support sender-aware description decorators in MinecraftHelp ([#354](https://github.com/Incendo/cloud/pull/354))
 
+### Changed
+- Fabric: Updated for 1.19 (and now only supports 1.19)
+
 ## [1.6.2]
 
 ### Fixed

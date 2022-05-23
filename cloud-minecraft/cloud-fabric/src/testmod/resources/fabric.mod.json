@@ -28,8 +28,8 @@
 
   "depends": {
     "fabricloader": ">=0.7.4",
-    "fabric-command-api-v1": "*",
-    "minecraft": ">=1.14",
+    "fabric-command-api-v2": "*",
+    "minecraft": ">1.18.2",
     "cloud": "*"
   }
 }
