@@ -51,6 +51,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
     private final Parameter[] parameters;
     private final MethodHandle methodHandle;
     private final AnnotationAccessor annotationAccessor;
+    private final AnnotationParser<C> annotationParser;
 
     /**
      * Constructs a new method command execution handler
@@ -65,6 +66,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         this.methodHandle = MethodHandles.lookup().unreflect(context.method).bindTo(context.instance);
         this.parameters = context.method.getParameters();
         this.annotationAccessor = AnnotationAccessor.of(context.method);
+        this.annotationParser = context.annotationParser();
     }
 
     /**
@@ -123,10 +125,11 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                 }
             } else if (parameter.isAnnotationPresent(Flag.class)) {
                 final Flag flag = parameter.getAnnotation(Flag.class);
+                final String flagName = this.annotationParser.processString(flag.value());
                 if (parameter.getType() == boolean.class) {
-                    arguments.add(flagContext.isPresent(flag.value()));
+                    arguments.add(flagContext.isPresent(flagName));
                 } else {
-                    arguments.add(flagContext.getValue(flag.value(), null));
+                    arguments.add(flagContext.getValue(flagName, null));
                 }
             } else {
                 if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
@@ -205,18 +208,20 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         private final Map<String, CommandArgument<C, ?>> commandArguments;
         private final Method method;
         private final ParameterInjectorRegistry<C> injectorRegistry;
+        private final AnnotationParser<C> annotationParser;
 
         CommandMethodContext(
                 final @NonNull Object instance,
                 final @NonNull Map<@NonNull String, @NonNull CommandArgument<@NonNull C, @NonNull ?>> commandArguments,
                 final @NonNull Method method,
-                final @NonNull ParameterInjectorRegistry<C> injectorRegistry
+                final @NonNull AnnotationParser<C> annotationParser
         ) {
             this.instance = instance;
             this.commandArguments = commandArguments;
             this.method = method;
             this.method.setAccessible(true);
-            this.injectorRegistry = injectorRegistry;
+            this.injectorRegistry = annotationParser.getParameterInjectorRegistry();
+            this.annotationParser = annotationParser;
         }
 
         /**
@@ -257,6 +262,16 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
          */
         public final @NonNull ParameterInjectorRegistry<C> injectorRegistry() {
             return this.injectorRegistry;
+        }
+
+        /**
+         * The annotation parser
+         *
+         * @return Annotation parser
+         * @since 1.7.0
+         */
+        public @NonNull AnnotationParser<C> annotationParser() {
+            return this.annotationParser;
         }
 
     }

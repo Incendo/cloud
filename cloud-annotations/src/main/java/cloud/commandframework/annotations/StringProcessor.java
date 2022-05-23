@@ -23,29 +23,43 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class TestCommandManager extends CommandManager<TestCommandSender> {
+/**
+ * Processor that intercepts all cloud annotation strings.
+ *
+ * @since 1.7.0
+ */
+@FunctionalInterface
+public interface StringProcessor {
 
-    public TestCommandManager() {
-        super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
+    /**
+     * Returns a string processor that simply returns the input string.
+     *
+     * @return no-op string processor
+     */
+    static @NonNull StringProcessor noOp() {
+        return new NoOpStringProcessor();
     }
 
-    @Override
-    public final SimpleCommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
-    }
+    /**
+     * Processes the {@code input} string and returns the processed result.
+     * <p>
+     * This should always return a non-{@code null} result. If the input string
+     * isn't applicable to the processor implementation, the original string should
+     * be returned.
+     *
+     * @param input the input string
+     * @return the processed string
+     */
+    @NonNull String processString(@NonNull String input);
 
-    @Override
-    public final boolean hasPermission(
-            final TestCommandSender sender,
-            final String permission
-    ) {
-        return !permission.equalsIgnoreCase("no");
-    }
 
+    final class NoOpStringProcessor implements StringProcessor {
+
+        @Override
+        public @NonNull String processString(final @NonNull String input) {
+            return input;
+        }
+    }
 }
-

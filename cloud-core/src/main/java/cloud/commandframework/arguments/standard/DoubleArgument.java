@@ -279,6 +279,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     }
 
 
+    @SuppressWarnings("serial")
     public static final class DoubleParseException extends NumberParseException {
 
         private static final long serialVersionUID = 1764554911581976586L;

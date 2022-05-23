@@ -97,6 +97,7 @@ dependencies {
     testImplementation(libs.jupiterEngine)
     testImplementation(libs.mockitoCore)
     testImplementation(libs.mockitoKotlin)
+    testImplementation(libs.mockitoJupiter)
     testImplementation(libs.truth)
     testImplementation(libs.truthJava8)
     errorprone(libs.errorproneCore)

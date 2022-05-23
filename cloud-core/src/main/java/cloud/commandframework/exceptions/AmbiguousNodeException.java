@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * is being inserted into a {@link CommandTree} and an ambiguity
  * is detected.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "serial"})
 public final class AmbiguousNodeException extends IllegalStateException {
 
     private static final long serialVersionUID = -200207173805584709L;
