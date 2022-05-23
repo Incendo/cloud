@@ -5,7 +5,7 @@ import org.cadixdev.gradle.licenser.header.HeaderStyle
 plugins {
     id("net.kyori.indra")
     id("net.kyori.indra.checkstyle")
-    id("net.kyori.indra.license-header")
+    id("com.diffplug.spotless")
     id("net.ltgt.errorprone")
 }
 
@@ -40,10 +40,18 @@ tasks {
     }
 }
 
-license {
-    header(rootProject.file("HEADER"))
-    style["java"] = HeaderStyle.DOUBLE_SLASH.format
-    style["kt"] = HeaderStyle.DOUBLE_SLASH.format
+spotless {
+  java {
+    licenseHeaderFile(rootProject.file("HEADER"))
+    importOrderFile(rootProject.file(".spotless/cloud.importorder"))
+    indentWithSpaces(4)
+    trimTrailingWhitespace()
+  }
+  kotlin {
+    licenseHeaderFile(rootProject.file("HEADER"))
+    indentWithSpaces(4)
+    trimTrailingWhitespace()
+  }
 }
 
 repositories {
