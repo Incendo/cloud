@@ -60,4 +60,3 @@ final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler
     }
 
 }
-

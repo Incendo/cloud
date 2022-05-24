@@ -6,7 +6,7 @@ metadata:
 plugins:
   com.github.johnrengelman.shadow: 7.1.2
   com.github.ben-manes.versions: 0.42.0
-  org.jlleitschuh.gradle.ktlint: &ktlint 10.2.1
+  com.diffplug.spotless: &spotless 6.6.1
 
 versions:
   checkstyle: 9.0
@@ -59,7 +59,7 @@ versions:
   gradleTestLogger: 3.1.0
   gradleErrorprone: 2.0.2
   licenser: 0.6.1
-  ktlint: *ktlint
+  spotless: *spotless
 
 dependencies:
   checkerQual:
@@ -244,10 +244,10 @@ dependencies:
     group: org.jetbrains.dokka
     name: dokka-gradle-plugin
     version: { ref: dokka }
-  gradleKtlint:
-    group: org.jlleitschuh.gradle
-    name: ktlint-gradle
-    version: { ref: ktlint }
+  spotless:
+    group: com.diffplug.spotless
+    name: spotless-plugin-gradle
+    version: { ref: spotless }
 
 bundles:
   coroutines:
