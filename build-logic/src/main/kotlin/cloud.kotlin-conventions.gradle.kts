@@ -5,7 +5,6 @@ plugins {
     id("cloud.base-conventions")
     kotlin("jvm")
     id("org.jetbrains.dokka")
-    id("org.jlleitschuh.gradle.ktlint")
 }
 
 kotlin {
@@ -37,6 +36,12 @@ tasks {
         kotlinOptions {
             jvmTarget = "1.8"
         }
+    }
+}
+
+spotless {
+    kotlin {
+        ktlint()
     }
 }
 

@@ -25,12 +25,12 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.util.TestUtils.createManager;
 

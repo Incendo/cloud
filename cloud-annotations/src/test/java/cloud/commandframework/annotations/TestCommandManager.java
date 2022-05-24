@@ -48,4 +48,3 @@ public class TestCommandManager extends CommandManager<TestCommandSender> {
     }
 
 }
-
