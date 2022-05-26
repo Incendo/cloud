@@ -97,7 +97,7 @@ public final class MinecraftHelp<C> {
     private BiFunction<C, String, String> stringMessageProvider = (sender, key) -> this.messageMap.get(key);
     private MessageProvider<C> messageProvider =
             (sender, key, args) -> text(this.stringMessageProvider.apply(sender, key));
-    private Function<String, Component> descriptionDecorator = Component::text;
+    private BiFunction<C, String, Component> descriptionDecorator = (sender, description) -> Component.text(description);
     private HelpColors colors = DEFAULT_HELP_COLORS;
     private int headerFooterLength = DEFAULT_HEADER_FOOTER_LENGTH;
     private int maxResultsPerPage = DEFAULT_MAX_RESULTS_PER_PAGE;
@@ -206,6 +206,18 @@ public final class MinecraftHelp<C> {
      * @since 1.4.0
      */
     public void descriptionDecorator(final @NonNull Function<@NonNull String, @NonNull Component> decorator) {
+        this.descriptionDecorator = (sender, description) -> decorator.apply(description);
+    }
+
+    /**
+     * Set the description decorator which will turn command and argument description strings into components.
+     * <p>
+     * The default decorator simply calls {@link Component#text(String)}
+     *
+     * @param decorator description decorator
+     * @since 1.7.0
+     */
+    public void descriptionDecorator(final @NonNull BiFunction<@NonNull C, @NonNull String, @NonNull Component> decorator) {
         this.descriptionDecorator = decorator;
     }
 
@@ -390,7 +402,7 @@ public final class MinecraftHelp<C> {
                     } else if (helpEntry.getDescription().isEmpty()) {
                         description = this.messageProvider.provide(sender, MESSAGE_CLICK_TO_SHOW_HELP);
                     } else {
-                        description = this.descriptionDecorator.apply(helpEntry.getDescription());
+                        description = this.descriptionDecorator.apply(sender, helpEntry.getDescription());
                     }
 
                     final boolean lastBranch =
@@ -480,7 +492,7 @@ public final class MinecraftHelp<C> {
         } else if (helpTopic.getDescription().isEmpty()) {
             topicDescription = this.messageProvider.provide(sender, MESSAGE_NO_DESCRIPTION);
         } else {
-            topicDescription = this.descriptionDecorator.apply(helpTopic.getDescription());
+            topicDescription = this.descriptionDecorator.apply(sender, helpTopic.getDescription());
         }
 
         final boolean hasArguments = helpTopic.getCommand().getArguments().size() > 1;
@@ -526,7 +538,7 @@ public final class MinecraftHelp<C> {
                 final ArgumentDescription description = component.getArgumentDescription();
                 if (!description.isEmpty()) {
                     textComponent.append(text(" - ", this.colors.accent));
-                    textComponent.append(this.formatDescription(description).colorIfAbsent(this.colors.text));
+                    textComponent.append(this.formatDescription(sender, description).colorIfAbsent(this.colors.text));
                 }
 
                 audience.sendMessage(textComponent);
@@ -535,11 +547,11 @@ public final class MinecraftHelp<C> {
         audience.sendMessage(this.footer(sender));
     }
 
-    private Component formatDescription(final ArgumentDescription description) {
+    private Component formatDescription(final C sender, final ArgumentDescription description) {
         if (description instanceof RichDescription) {
             return ((RichDescription) description).getContents();
         } else {
-            return this.descriptionDecorator.apply(description.getDescription());
+            return this.descriptionDecorator.apply(sender, description.getDescription());
         }
     }
 
