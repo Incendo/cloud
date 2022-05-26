@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Annotations: Annotation string processors ([#353](https://github.com/Incendo/cloud/pull/353))
+
 ### Fixed
 - Fix missing caption registration for the regex caption ([#351](https://github.com/Incendo/cloud/pull/351))
 

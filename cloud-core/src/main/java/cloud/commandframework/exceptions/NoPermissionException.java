@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Exception thrown when a command sender misses a permission required
  * to execute a {@link Command}
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "serial"})
 public class NoPermissionException extends CommandParseException {
 
     private static final long serialVersionUID = 7103413337750692843L;

@@ -279,6 +279,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     }
 
 
+    @SuppressWarnings("serial")
     public static final class ShortParseException extends NumberParseException {
 
         private static final long serialVersionUID = -478674263339091032L;

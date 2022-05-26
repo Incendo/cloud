@@ -21,39 +21,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.exceptions;
+package cloud.commandframework.annotations;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Thrown when a {@link CommandArgument}
- * that is registered as a leaf node, does not contain an owning {@link Command}
+ * Processor that intercepts all cloud annotation strings.
+ *
+ * @since 1.7.0
  */
-@SuppressWarnings({"unused", "serial"})
-public final class NoCommandInLeafException extends IllegalStateException {
-
-    private static final long serialVersionUID = 3373529875213310821L;
-    private final CommandArgument<?, ?> commandArgument;
+@FunctionalInterface
+public interface StringProcessor {
 
     /**
-     * Create a new no command in leaf exception instance
+     * Returns a string processor that simply returns the input string.
      *
-     * @param commandArgument Command argument that caused the exception
+     * @return no-op string processor
      */
-    public NoCommandInLeafException(final @NonNull CommandArgument<?, ?> commandArgument) {
-        super(String.format("Leaf node '%s' does not have associated owning command", commandArgument.getName()));
-        this.commandArgument = commandArgument;
+    static @NonNull StringProcessor noOp() {
+        return new NoOpStringProcessor();
     }
 
     /**
-     * Get the command argument
+     * Processes the {@code input} string and returns the processed result.
+     * <p>
+     * This should always return a non-{@code null} result. If the input string
+     * isn't applicable to the processor implementation, the original string should
+     * be returned.
      *
-     * @return Command argument
+     * @param input the input string
+     * @return the processed string
      */
-    public @NonNull CommandArgument<?, ?> getCommandArgument() {
-        return this.commandArgument;
-    }
+    @NonNull String processString(@NonNull String input);
 
+
+    final class NoOpStringProcessor implements StringProcessor {
+
+        @Override
+        public @NonNull String processString(final @NonNull String input) {
+            return input;
+        }
+    }
 }

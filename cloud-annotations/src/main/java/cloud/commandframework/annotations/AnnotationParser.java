@@ -96,6 +96,8 @@ public final class AnnotationParser<C> {
     private final MetaFactory metaFactory;
     private final FlagExtractor flagExtractor;
 
+    private StringProcessor stringProcessor;
+
     /**
      * Construct a new annotation parser
      *
@@ -118,12 +120,12 @@ public final class AnnotationParser<C> {
         this.preprocessorMappers = new HashMap<>();
         this.builderModifiers = new HashMap<>();
         this.commandMethodFactories = new HashMap<>();
-        this.flagExtractor = new FlagExtractor(manager);
+        this.flagExtractor = new FlagExtractor(manager, this);
         this.registerAnnotationMapper(CommandDescription.class, d ->
-                ParserParameters.single(StandardParameters.DESCRIPTION, d.value()));
+                ParserParameters.single(StandardParameters.DESCRIPTION, this.processString(d.value())));
         this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(
-                annotation.value(),
-                Caption.of(annotation.failureCaption())
+                this.processString(annotation.value()),
+                Caption.of(this.processString(annotation.failureCaption()))
         ));
         this.getParameterInjectorRegistry().registerInjector(
                 String[].class,
@@ -131,6 +133,7 @@ public final class AnnotationParser<C> {
                         ? null
                         : context.getRawInput().toArray(new String[0])
         );
+        this.stringProcessor = StringProcessor.noOp();
     }
 
     @SuppressWarnings("unchecked")
@@ -274,6 +277,48 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Returns the string processor used by this parser.
+     *
+     * @return the string processor
+     * @since 1.7.0
+     */
+    public @NonNull StringProcessor stringProcessor() {
+        return this.stringProcessor;
+    }
+
+    /**
+     * Replaces the string processor of this parser.
+     *
+     * @param stringProcessor the new string processor
+     * @since 1.7.0
+     */
+    public void stringProcessor(final @NonNull StringProcessor stringProcessor) {
+        this.stringProcessor = stringProcessor;
+    }
+
+    /**
+     * Processes the {@code input} string and returns the processed result.
+     *
+     * @param input the input string
+     * @return the processed string
+     * @since 1.7.0
+     */
+    public @NonNull String processString(final @NonNull String input) {
+        return this.stringProcessor().processString(input);
+    }
+
+    /**
+     * Processes the input {@code strings} and returns the processed result.
+     *
+     * @param strings the input strings
+     * @return the processed strings
+     * @since 1.7.0
+     */
+    public @NonNull String[] processStrings(final @NonNull String[] strings) {
+        return Arrays.stream(strings).map(this::processString).toArray(String[]::new);
+    }
+
+    /**
      * Scan a class instance of {@link CommandMethod} annotations and attempt to
      * compile them into {@link Command} instances
      *
@@ -336,7 +381,7 @@ public final class AnnotationParser<C> {
             }
             try {
                 this.manager.getParserRegistry().registerSuggestionProvider(
-                        suggestions.value(),
+                        this.processString(suggestions.value()),
                         new MethodSuggestionsProvider<>(instance, method)
                 );
             } catch (final Exception e) {
@@ -367,15 +412,16 @@ public final class AnnotationParser<C> {
                 ));
             }
             try {
+                final String suggestions = this.processString(parser.suggestions());
                 final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
-                if (parser.suggestions().isEmpty()) {
+                if (suggestions.isEmpty()) {
                     suggestionsProvider = (context, input) -> Collections.emptyList();
                 } else {
-                    suggestionsProvider = this.manager.getParserRegistry().getSuggestionProvider(parser.suggestions())
+                    suggestionsProvider = this.manager.getParserRegistry().getSuggestionProvider(suggestions)
                             .orElseThrow(() -> new NullPointerException(
                                     String.format(
                                             "Cannot find the suggestions provider with name '%s'",
-                                            parser.suggestions()
+                                            suggestions
                                     )
                             ));
                 }
@@ -386,14 +432,15 @@ public final class AnnotationParser<C> {
                 );
                 final Function<ParserParameters, ArgumentParser<C, ?>> parserFunction =
                         parameters -> methodArgumentParser;
-                if (parser.name().isEmpty()) {
+                final String name = this.processString(parser.name());
+                if (name.isEmpty()) {
                     this.manager.getParserRegistry().registerParserSupplier(
                             TypeToken.get(method.getGenericReturnType()),
                             parserFunction
                     );
                 } else {
                     this.manager.getParserRegistry().registerNamedParserSupplier(
-                            parser.name(),
+                            name,
                             parserFunction
                     );
                 }
@@ -410,12 +457,12 @@ public final class AnnotationParser<C> {
     ) {
         final AnnotationAccessor classAnnotations = AnnotationAccessor.of(instance.getClass());
         final CommandMethod classCommandMethod = classAnnotations.annotation(CommandMethod.class);
-        final String syntaxPrefix = classCommandMethod == null ? "" : (classCommandMethod.value() + " ");
+        final String syntaxPrefix = classCommandMethod == null ? "" : (this.processString(classCommandMethod.value()) + " ");
         final Collection<Command<C>> commands = new ArrayList<>();
         for (final CommandMethodPair commandMethodPair : methodPairs) {
             final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
             final Method method = commandMethodPair.getMethod();
-            final String syntax = syntaxPrefix + commandMethod.value();
+            final String syntax = syntaxPrefix + this.processString(commandMethod.value());
             final List<SyntaxFragment> tokens = this.syntaxParser.apply(syntax);
             /* Determine command name */
             final String commandToken = syntax.split(" ")[0].split("\\|")[0];
@@ -438,9 +485,10 @@ public final class AnnotationParser<C> {
             final Map<CommandArgument<C, ?>, String> argumentDescriptions = new HashMap<>();
             /* Go through all annotated parameters and build up the argument tree */
             for (final ArgumentParameterPair argumentPair : arguments) {
+                final String argumentName = this.processString(argumentPair.argumentName());
                 final CommandArgument<C, ?> argument = this.buildArgument(
                         method,
-                        this.findSyntaxFragment(tokens, argumentPair.argumentName()),
+                        this.findSyntaxFragment(tokens, argumentName),
                         argumentPair
                 );
                 commandArguments.put(argument.getName(), argument);
@@ -482,7 +530,7 @@ public final class AnnotationParser<C> {
 
             final CommandPermission commandPermission = getMethodOrClassAnnotation(method, CommandPermission.class);
             if (commandPermission != null) {
-                builder = builder.permission(commandPermission.value());
+                builder = builder.permission(this.processString(commandPermission.value()));
             }
 
             if (commandMethod.requiredSender() != Object.class) {
@@ -496,7 +544,7 @@ public final class AnnotationParser<C> {
                         instance,
                         commandArguments,
                         method,
-                        this.getParameterInjectorRegistry()
+                        this /* annotationParser */
                 );
 
                 /* Create the command execution handler */
@@ -542,7 +590,7 @@ public final class AnnotationParser<C> {
             /* Check if we need to construct a proxy */
             if (method.isAnnotationPresent(ProxiedBy.class)) {
                 final ProxiedBy proxyAnnotation = method.getAnnotation(ProxiedBy.class);
-                final String proxy = proxyAnnotation.value();
+                final String proxy = this.processString(proxyAnnotation.value());
                 if (proxy.contains(" ")) {
                     throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
                 }
@@ -605,16 +653,17 @@ public final class AnnotationParser<C> {
                             )));
         }
         /* Check whether or not the corresponding method parameter actually exists */
+        final String argumentName = this.processString(argumentPair.argumentName());
         if (syntaxFragment == null || syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
             throw new IllegalArgumentException(String.format(
                     "Invalid command argument '%s' in method '%s': "
-                            + "Missing syntax mapping", argumentPair.argumentName(), method.getName()));
+                            + "Missing syntax mapping", argumentName, method.getName()));
         }
         final Argument argument = argumentPair.getArgument();
         /* Create the argument builder */
         @SuppressWarnings("rawtypes") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
                 parameter.getType(),
-                argumentPair.argumentName()
+                argumentName
         );
         /* Set the argument requirement status */
         if (syntaxFragment.getArgumentMode() == ArgumentMode.OPTIONAL) {
