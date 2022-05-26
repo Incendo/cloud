@@ -23,11 +23,11 @@
 //
 package cloud.commandframework.annotations;
 
-import static com.google.common.truth.Truth.assertThat;
-
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+
+import static com.google.common.truth.Truth.assertThat;
 
 class NoOpStringProcessorTest {
 
