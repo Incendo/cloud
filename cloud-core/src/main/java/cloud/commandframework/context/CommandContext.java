@@ -52,8 +52,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public final class CommandContext<C> {
 
-    private final CaptionVariableReplacementHandler captionVariableReplacementHandler =
-            new SimpleCaptionVariableReplacementHandler();
+    private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
     private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = new HashMap<>();
     private final FlagContext flagContext = FlagContext.create();
     private final Map<CloudKey<?>, Object> internalStorage = new HashMap<>();
@@ -104,6 +103,7 @@ public final class CommandContext<C> {
         this.commandSender = commandSender;
         this.suggestions = suggestions;
         this.captionRegistry = captionRegistry;
+        this.captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
         this.commandManager = null;
     }
 
@@ -124,6 +124,7 @@ public final class CommandContext<C> {
         this.suggestions = suggestions;
         this.commandManager = commandManager;
         this.captionRegistry = commandManager.getCaptionRegistry();
+        this.captionVariableReplacementHandler = commandManager.captionVariableReplacementHandler();
     }
 
     /**

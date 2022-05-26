@@ -35,7 +35,9 @@ import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
 import cloud.commandframework.captions.CaptionRegistry;
+import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
+import cloud.commandframework.captions.SimpleCaptionVariableReplacementHandler;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.StandardCommandContextFactory;
@@ -96,6 +98,7 @@ public abstract class CommandManager<C> {
     private final CommandTree<C> commandTree;
     private final CommandSuggestionEngine<C> commandSuggestionEngine;
 
+    private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
     private CommandRegistrationHandler commandRegistrationHandler;
@@ -238,6 +241,28 @@ public abstract class CommandManager<C> {
      */
     public @NonNull CommandManager<C> command(final Command.@NonNull Builder<C> command) {
         return this.command(command.manager(this).build());
+    }
+
+    /**
+     * Get the caption variable replacement handler.
+     *
+     * @return the caption variable replacement handler
+     * @since 1.7.0
+     */
+    public @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler() {
+        return this.captionVariableReplacementHandler;
+    }
+
+    /**
+     * Sets the caption variable replacement handler.
+     *
+     * @param captionVariableReplacementHandler new replacement handler
+     * @since 1.7.0
+     */
+    public void captionVariableReplacementHandler(
+            final @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler
+    ) {
+        this.captionVariableReplacementHandler = captionVariableReplacementHandler;
     }
 
     /**
@@ -455,7 +480,7 @@ public abstract class CommandManager<C> {
      * @param aliases     Command aliases
      * @return Builder instance
      * @deprecated for removal since 1.4.0. Use {@link #commandBuilder(String, CommandMeta, ArgumentDescription, String...)}
-     *      instead.
+     *         instead.
      */
     @Deprecated
     public Command.@NonNull Builder<C> commandBuilder(
