@@ -247,6 +247,7 @@ public abstract class CommandManager<C> {
      * Get the caption variable replacement handler.
      *
      * @return the caption variable replacement handler
+     * @since 1.7.0
      */
     public @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler() {
         return this.captionVariableReplacementHandler;
@@ -256,6 +257,7 @@ public abstract class CommandManager<C> {
      * Sets the caption variable replacement handler.
      *
      * @param captionVariableReplacementHandler new replacement handler
+     * @since 1.7.0
      */
     public void captionVariableReplacementHandler(
             final @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler
