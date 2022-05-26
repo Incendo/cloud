@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fix missing caption registration for the regex caption ([#351](https://github.com/Incendo/cloud/pull/351))
+- Fix NPE thrown on empty command tree ([#337](https://github.com/Incendo/cloud/issues/337))
 
 ### Changed
 - Minecraft: Support sender-aware description decorators in MinecraftHelp ([#354](https://github.com/Incendo/cloud/pull/354))
