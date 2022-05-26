@@ -290,6 +290,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     /**
      * Byte parse exception
      */
+    @SuppressWarnings("serial")
     public static final class ByteParseException extends NumberParseException {
 
         private static final long serialVersionUID = -4724241304872989208L;

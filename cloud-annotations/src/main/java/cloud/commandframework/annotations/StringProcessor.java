@@ -21,24 +21,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.services.mock;
+package cloud.commandframework.annotations;
 
-public final class DefaultMockService implements MockService {
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-    @Override
-    public MockResult handle(final MockContext mockContext)
-            throws Exception {
-        if (mockContext.getString().equals("pls throw exception")) {
-            throw new TotallyIntentionalException();
+/**
+ * Processor that intercepts all cloud annotation strings.
+ *
+ * @since 1.7.0
+ */
+@FunctionalInterface
+public interface StringProcessor {
+
+    /**
+     * Returns a string processor that simply returns the input string.
+     *
+     * @return no-op string processor
+     */
+    static @NonNull StringProcessor noOp() {
+        return new NoOpStringProcessor();
+    }
+
+    /**
+     * Processes the {@code input} string and returns the processed result.
+     * <p>
+     * This should always return a non-{@code null} result. If the input string
+     * isn't applicable to the processor implementation, the original string should
+     * be returned.
+     *
+     * @param input the input string
+     * @return the processed string
+     */
+    @NonNull String processString(@NonNull String input);
+
+
+    final class NoOpStringProcessor implements StringProcessor {
+
+        @Override
+        public @NonNull String processString(final @NonNull String input) {
+            return input;
         }
-        return new MockResult(32);
     }
-
-
-    public static class TotallyIntentionalException extends Exception {
-
-        private static final long serialVersionUID = -6277471288867949574L;
-
-    }
-
 }

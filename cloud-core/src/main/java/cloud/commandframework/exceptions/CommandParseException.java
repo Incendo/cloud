@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Exception thrown when parsing user input into a command
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "serial"})
 public class CommandParseException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -2415981126382517435L;

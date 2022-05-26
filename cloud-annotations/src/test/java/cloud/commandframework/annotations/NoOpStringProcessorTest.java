@@ -21,7 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-/**
- * Command tests
- */
-package cloud.commandframework;
+package cloud.commandframework.annotations;
+
+import static com.google.common.truth.Truth.assertThat;
+
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
+
+class NoOpStringProcessorTest {
+
+    @Test
+    void ProcessString_AnyInput_ReturnsOriginalInput() {
+        // Will force the input string to be scrambled 10 times.
+        for (int i = 0; i < 10; i++) {
+            // Arrange
+            final StringProcessor stringProcessor = StringProcessor.noOp();
+            final String input = ThreadLocalRandom.current().ints().mapToObj(Integer::toString).limit(32).collect(Collectors.joining());
+
+            // Act
+            final String output = stringProcessor.processString(input);
+
+            // Assert
+            assertThat(input).isEqualTo(output);
+        }
+    }
+}

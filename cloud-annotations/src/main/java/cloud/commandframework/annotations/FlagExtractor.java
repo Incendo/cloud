@@ -45,9 +45,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNull CommandFlag<?>>> {
 
     private final CommandManager<?> commandManager;
+    private final AnnotationParser<?> annotationParser;
 
-    FlagExtractor(final @NonNull CommandManager<?> commandManager) {
+    FlagExtractor(
+            final @NonNull CommandManager<?> commandManager,
+            final @NonNull AnnotationParser<?> annotationParser
+    ) {
         this.commandManager = commandManager;
+        this.annotationParser = annotationParser;
     }
 
     @Override
@@ -59,11 +64,12 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                 continue;
             }
             final Flag flag = parameter.getAnnotation(Flag.class);
+            final String flagName = this.annotationParser.processString(flag.value());
             final CommandFlag.Builder<Void> builder = this.commandManager
-                    .flagBuilder(flag.value())
-                    .withDescription(ArgumentDescription.of(flag.description()))
-                    .withAliases(flag.aliases())
-                    .withPermission(Permission.of(flag.permission()));
+                    .flagBuilder(this.annotationParser.processString(flagName))
+                    .withDescription(ArgumentDescription.of(this.annotationParser.processString(flag.description())))
+                    .withAliases(this.annotationParser.processStrings(flag.aliases()))
+                    .withPermission(Permission.of(this.annotationParser.processString(flag.permission())));
             if (parameter.getType().equals(boolean.class)) {
                 flags.add(builder.build());
             } else {
@@ -71,28 +77,30 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                 final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
                 final ParserRegistry<?> registry = this.commandManager.getParserRegistry();
                 final ArgumentParser<?, ?> parser;
-                if (flag.parserName().isEmpty()) {
+                final String parserName = this.annotationParser.processString(flag.parserName());
+                if (parserName.isEmpty()) {
                     parser = registry.createParser(token, registry.parseAnnotations(token, annotations))
                             .orElse(null);
                 } else {
-                    parser = registry.createParser(flag.parserName(), registry.parseAnnotations(token, annotations))
+                    parser = registry.createParser(parserName, registry.parseAnnotations(token, annotations))
                             .orElse(null);
                 }
                 if (parser == null) {
                     throw new IllegalArgumentException(
                             String.format("Cannot find parser for type '%s' for flag '%s' in method '%s'",
-                                    parameter.getType().getCanonicalName(), flag.value(), method.getName()
+                                    parameter.getType().getCanonicalName(), flagName, method.getName()
                             ));
                 }
                 final BiFunction<?, @NonNull String, @NonNull List<String>> suggestionProvider;
-                if (!flag.suggestions().isEmpty()) {
-                    suggestionProvider = registry.getSuggestionProvider(flag.suggestions()).orElse(null);
+                final String suggestions = this.annotationParser.processString(flag.suggestions());
+                if (!suggestions.isEmpty()) {
+                    suggestionProvider = registry.getSuggestionProvider(suggestions).orElse(null);
                 } else {
                     suggestionProvider = null;
                 }
                 final CommandArgument.Builder argumentBuilder0 = CommandArgument.ofType(
                         parameter.getType(),
-                        flag.value()
+                        flagName
                 );
                 final CommandArgument.Builder argumentBuilder = argumentBuilder0.asRequired()
                         .manager(this.commandManager)

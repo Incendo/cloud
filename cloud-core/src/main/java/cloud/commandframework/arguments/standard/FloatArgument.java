@@ -274,6 +274,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     }
 
 
+    @SuppressWarnings("serial")
     public static final class FloatParseException extends NumberParseException {
 
         private static final long serialVersionUID = -1162983846751812292L;

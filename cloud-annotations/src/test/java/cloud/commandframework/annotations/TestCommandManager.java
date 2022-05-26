@@ -30,7 +30,7 @@ import cloud.commandframework.meta.SimpleCommandMeta;
 
 public class TestCommandManager extends CommandManager<TestCommandSender> {
 
-    protected TestCommandManager() {
+    public TestCommandManager() {
         super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
     }
 
@@ -48,4 +48,3 @@ public class TestCommandManager extends CommandManager<TestCommandSender> {
     }
 
 }
-
