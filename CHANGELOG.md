@@ -7,14 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Allow for setting a custom `CaptionVariableReplacementHandler` on the command manager ([#352](https://github.com/Incendo/cloud/pull/352))
+- Core: Allow for setting a custom `CaptionVariableReplacementHandler` on the command manager ([#352](https://github.com/Incendo/cloud/pull/352))
+- Core: Add `DurationArgument` for parsing `java.time.Duration` ([#330](https://github.com/Incendo/cloud/pull/330)) 
 - Annotations: Annotation string processors ([#353](https://github.com/Incendo/cloud/pull/353))
 
 ### Fixed
-- Fix missing caption registration for the regex caption ([#351](https://github.com/Incendo/cloud/pull/351))
-- Fix NPE thrown on empty command tree ([#337](https://github.com/Incendo/cloud/issues/337))
+- Core: Fix missing caption registration for the regex caption ([#351](https://github.com/Incendo/cloud/pull/351))
+- Core: Fix NPE thrown on empty command tree ([#337](https://github.com/Incendo/cloud/issues/337))
+- Annotations: Fix MutableCommandBuilder Java/Kotlin interoperability issues ([#342](https://github.com/Incendo/cloud/issues/342))
 
 ### Changed
+- Paper: Improved KeyedWorldArgument suggestions ([#334](https://github.com/Incendo/cloud/pull/334))
 - Minecraft: Support sender-aware description decorators in MinecraftHelp ([#354](https://github.com/Incendo/cloud/pull/354))
 
 ## [1.6.2]
