@@ -130,6 +130,28 @@ public fun <C : Any> Command.Builder<C>.senderType(type: KClass<out C>): Command
     senderType(type.java)
 
 /**
+ * Create a new [MutableCommandBuilder].
+ *
+ * @param commandManager the command manager, which will own this command.
+ * @since 1.7.0
+ */
+public fun <C : Any> Command.Builder<C>.toMutable(
+    commandManager: CommandManager<C>
+): MutableCommandBuilder<C> = MutableCommandBuilder(this, commandManager)
+
+/**
+ * Create a new [MutableCommandBuilder] and invoke the provided receiver lambda on it.
+ *
+ * @param commandManager the command manager, which will own this command.
+ * @param lambda receiver lambda, which will be invoked on the new builder.
+ * @since 1.7.0
+ */
+public fun <C : Any> Command.Builder<C>.mutate(
+    commandManager: CommandManager<C>,
+    lambda: MutableCommandBuilder<C>.() -> Unit
+): MutableCommandBuilder<C> = MutableCommandBuilder(this, commandManager).also(lambda)
+
+/**
  * Get a [Description], defaulting to [Description.empty]
  *
  * @param description description string
