@@ -132,6 +132,19 @@ public final class CommandTree<C> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> args
     ) {
+        // Special case for empty command trees.
+        if (this.internalTree.isLeaf() && this.internalTree.value == null) {
+            return Pair.of(
+                    null,
+                    new NoSuchCommandException(
+                        commandContext.getSender(),
+                        new ArrayList<>(),
+                        this.stringOrEmpty(args.peek()
+                    )
+                )
+            );
+        }
+
         final Pair<@Nullable Command<C>, @Nullable Exception> pair = this.parseCommand(
                 new ArrayList<>(),
                 commandContext,
