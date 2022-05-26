@@ -29,6 +29,7 @@ import cloud.commandframework.context.CommandContext;
 import java.util.Arrays;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@SuppressWarnings("serial")
 public class ParserException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -4409795575435072170L;

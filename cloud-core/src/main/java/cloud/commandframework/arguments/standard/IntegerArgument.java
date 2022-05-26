@@ -337,6 +337,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
     }
 
 
+    @SuppressWarnings("serial")
     public static final class IntegerParseException extends NumberParseException {
 
         private static final long serialVersionUID = -6933923056628373853L;

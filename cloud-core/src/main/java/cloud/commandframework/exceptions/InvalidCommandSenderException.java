@@ -32,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Exception thrown when an invalid command sender tries to execute a command
  */
+@SuppressWarnings("serial")
 public final class InvalidCommandSenderException extends CommandParseException {
 
     private static final long serialVersionUID = 7372142477529875598L;

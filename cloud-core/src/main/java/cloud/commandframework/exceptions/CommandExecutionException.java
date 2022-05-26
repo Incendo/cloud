@@ -32,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @since 1.2.0
  */
+@SuppressWarnings("serial")
 public class CommandExecutionException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -4785446899438294661L;

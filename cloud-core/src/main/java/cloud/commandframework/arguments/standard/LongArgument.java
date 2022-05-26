@@ -282,6 +282,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     }
 
 
+    @SuppressWarnings("serial")
     public static final class LongParseException extends NumberParseException {
 
         private static final long serialVersionUID = 4366856282301198232L;

@@ -23,28 +23,27 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.meta.SimpleCommandMeta;
+import static com.google.common.truth.Truth.assertThat;
 
-public class TestCommandManager extends CommandManager<TestCommandSender> {
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
 
-    public TestCommandManager() {
-        super(CommandExecutionCoordinator.simpleCoordinator(), CommandRegistrationHandler.nullCommandRegistrationHandler());
+class NoOpStringProcessorTest {
+
+    @Test
+    void ProcessString_AnyInput_ReturnsOriginalInput() {
+        // Will force the input string to be scrambled 10 times.
+        for (int i = 0; i < 10; i++) {
+            // Arrange
+            final StringProcessor stringProcessor = StringProcessor.noOp();
+            final String input = ThreadLocalRandom.current().ints().mapToObj(Integer::toString).limit(32).collect(Collectors.joining());
+
+            // Act
+            final String output = stringProcessor.processString(input);
+
+            // Assert
+            assertThat(input).isEqualTo(output);
+        }
     }
-
-    @Override
-    public final SimpleCommandMeta createDefaultCommandMeta() {
-        return SimpleCommandMeta.empty();
-    }
-
-    @Override
-    public final boolean hasPermission(
-            final TestCommandSender sender,
-            final String permission
-    ) {
-        return !permission.equalsIgnoreCase("no");
-    }
-
 }
