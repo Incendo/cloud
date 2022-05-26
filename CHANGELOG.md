@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Allow for setting a custom `CaptionVariableReplacementHandler` on the command manager ([#352](https://github.com/Incendo/cloud/pull/352))
 - Annotations: Annotation string processors ([#353](https://github.com/Incendo/cloud/pull/353))
 
 ### Fixed
