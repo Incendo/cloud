@@ -39,11 +39,22 @@ import kotlin.reflect.KClass
  * A mutable [Command.Builder] wrapper, providing functions to assist in creating commands using the
  * Kotlin builder DSL style
  *
+ * @property commandBuilder the command builder the mutate
+ * @property commandManager the command manager which will own this command
+ * @constructor Create a new [MutableCommandBuilder]
  * @since 1.3.0
  */
-public class MutableCommandBuilder<C : Any> {
-    private val commandManager: CommandManager<C>
-    private var commandBuilder: Command.Builder<C>
+public class MutableCommandBuilder<C : Any>(
+    commandBuilder: Command.Builder<C>,
+    private val commandManager: CommandManager<C>,
+) {
+    /**
+     * The command builder that is being mutated by this [MutableCommandBuilder] instance.
+     *
+     * This is public so that this can be returned to a command builder for interop with java apis.
+     */
+    public var commandBuilder: Command.Builder<C> = commandBuilder
+        private set
 
     /**
      * Create a new [MutableCommandBuilder]
@@ -64,10 +75,7 @@ public class MutableCommandBuilder<C : Any> {
         description: Description = Description.empty(),
         aliases: Array<String> = emptyArray(),
         commandManager: CommandManager<C>
-    ) {
-        this.commandManager = commandManager
-        this.commandBuilder = commandManager.commandBuilder(name, description, *aliases)
-    }
+    ) : this(commandManager.commandBuilder(name, description, *aliases), commandManager)
 
     /**
      * Create a new [MutableCommandBuilder]
@@ -83,10 +91,7 @@ public class MutableCommandBuilder<C : Any> {
         description: ArgumentDescription = ArgumentDescription.empty(),
         aliases: Array<String> = emptyArray(),
         commandManager: CommandManager<C>
-    ) {
-        this.commandManager = commandManager
-        this.commandBuilder = commandManager.commandBuilder(name, description, *aliases)
-    }
+    ) : this(commandManager.commandBuilder(name, description, *aliases), commandManager)
 
     /**
      * Create a new [MutableCommandBuilder] and invoke the provided receiver lambda on it
@@ -131,11 +136,6 @@ public class MutableCommandBuilder<C : Any> {
         lambda: MutableCommandBuilder<C>.() -> Unit
     ) : this(name, description, aliases, commandManager) {
         lambda(this)
-    }
-
-    private constructor(commandManager: CommandManager<C>, commandBuilder: Command.Builder<C>) {
-        this.commandManager = commandManager
-        this.commandBuilder = commandBuilder
     }
 
     /**
@@ -184,7 +184,7 @@ public class MutableCommandBuilder<C : Any> {
      * @since 1.3.0
      */
     public fun copy(): MutableCommandBuilder<C> =
-        MutableCommandBuilder(this.commandManager, this.commandBuilder)
+        MutableCommandBuilder(this.commandBuilder, this.commandManager)
 
     /**
      * Make a new copy of this [MutableCommandBuilder] and invoke the provided receiver lambda on it
