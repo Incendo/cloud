@@ -23,44 +23,62 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
-import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.services.types.ConsumerService;
+import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.util.TestUtils.createManager;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class CommandPostProcessorTest {
+@SuppressWarnings("unchecked")
+class CommandPostProcessorTest {
 
-    private static final boolean[] state = new boolean[]{false};
-    private static CommandManager<TestCommandSender> manager;
+    private CommandManager<TestCommandSender> commandManager;
 
-    @BeforeAll
-    static void newTree() {
-        manager = createManager();
-        manager.command(manager.commandBuilder("test", SimpleCommandMeta.empty())
-                .handler(c -> state[0] = true)
-                .build());
-        manager.registerCommandPostProcessor(new SamplePostprocessor());
+    @BeforeEach
+    void setup() {
+        this.commandManager = createManager();
     }
 
     @Test
-    void testPreprocessing() {
-        manager.executeCommand(new TestCommandSender(), "test").join();
-        Assertions.assertFalse(state[0]);
+    void testPostProcessing() {
+        // Arrange
+        final CommandPostprocessor<TestCommandSender> postprocessor = spy(new SamplePostprocessor());
+        this.commandManager.registerCommandPostProcessor(postprocessor);
+
+        final CommandExecutionHandler<TestCommandSender> executionHandler = mock(CommandExecutionHandler.class);
+        when(executionHandler.executeFuture(any())).thenReturn(CompletableFuture.completedFuture(null));
+
+        this.commandManager.command(
+                this.commandManager.commandBuilder("test")
+                        .handler(executionHandler)
+                        .build()
+        );
+
+        // Act
+        this.commandManager.executeCommand(new TestCommandSender(), "test").join();
+
+        // Assert
+        verify(executionHandler, never()).executeFuture(notNull());
+        verify(postprocessor).accept(notNull());
     }
 
-    static final class SamplePostprocessor implements CommandPostprocessor<TestCommandSender> {
+    static class SamplePostprocessor implements CommandPostprocessor<TestCommandSender> {
 
         @Override
         public void accept(final @NonNull CommandPostprocessingContext<TestCommandSender> context) {
             ConsumerService.interrupt();
         }
-
     }
-
 }
