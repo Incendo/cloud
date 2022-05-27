@@ -59,7 +59,6 @@ versions:
   indra: 2.1.1
   gradleTestLogger: 3.1.0
   gradleErrorprone: 2.0.2
-  licenser: 0.6.1
   spotless: *spotless
 
 dependencies:
@@ -229,10 +228,6 @@ dependencies:
     group: net.kyori
     name: indra-publishing-sonatype
     version: { ref: indra }
-  licenser:
-    group: gradle.plugin.org.cadixdev.gradle
-    name: licenser
-    version: { ref: licenser }
   gradleTestLogger:
     group: com.adarshr
     name: gradle-test-logger-plugin
