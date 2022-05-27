@@ -45,6 +45,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
     modImplementation(libs.fabricLoader)
     modImplementation(fabricApi.module("fabric-command-api-v2", libs.versions.fabricApi.get()))
+    modImplementation(fabricApi.module("fabric-networking-api-v1", libs.versions.fabricApi.get()))
     modImplementation(fabricApi.module("fabric-lifecycle-events-v1", libs.versions.fabricApi.get()))
 
     modImplementation(libs.fabricPermissionsApi)

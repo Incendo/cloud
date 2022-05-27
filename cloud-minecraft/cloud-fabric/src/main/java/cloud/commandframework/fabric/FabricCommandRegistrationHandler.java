@@ -32,15 +32,22 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.RegistryAccess;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -53,6 +60,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <S> native sender type
  */
 abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionProvider> implements CommandRegistrationHandler {
+
     private @MonotonicNonNull FabricCommandManager<C, S> commandManager;
 
     void initialize(final FabricCommandManager<C, S> manager) {
@@ -73,7 +81,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
      *
      * @param alias       the command alias
      * @param destination the destination node
-     * @param <S> brig sender type
+     * @param <S>         brig sender type
      * @return the built node
      */
     private static <S> LiteralCommandNode<S> buildRedirect(
@@ -99,15 +107,72 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
     }
 
     static class Client<C> extends FabricCommandRegistrationHandler<C, FabricClientCommandSource> {
+
+        private final Set<Command<?>> registeredCommands = ConcurrentHashMap.newKeySet();
+        private final Set<CommandNode<FabricClientCommandSource>> registeredNodes =
+                Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
+        private volatile boolean connected = false;
+
         @Override
         void initialize(final FabricCommandManager<C, FabricClientCommandSource> manager) {
             super.initialize(manager);
+            ClientPlayConnectionEvents.JOIN.register(this::onJoin);
+            ClientPlayConnectionEvents.DISCONNECT.register(this::onDisconnect);
+        }
+
+        private void onJoin(
+                final ClientPacketListener connection,
+                final PacketSender packetSender,
+                final Minecraft minecraft
+        ) {
+            this.connected = true;
+            this.registerCommands(connection.registryAccess());
+        }
+
+        private void onDisconnect(
+                final ClientPacketListener connection,
+                final Minecraft minecraft
+        ) {
+            this.connected = false;
+            final Set<CommandNode<FabricClientCommandSource>> remove = Collections.newSetFromMap(new IdentityHashMap<>());
+            remove.addAll(this.registeredNodes);
+            this.registeredNodes.clear();
+            for (final CommandNode<?> node : remove) {
+                ClientCommandManager.DISPATCHER.getRoot().getChildren().remove(node);
+            }
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public boolean registerCommand(final @NonNull Command<?> cmd) {
-            final Command<C> command = (Command<C>) cmd;
+            this.registeredCommands.add(cmd);
+            if (this.connected) {
+                final ClientPacketListener connection = Minecraft.getInstance().getConnection();
+                if (connection == null) {
+                    throw new IllegalStateException("Expected connection to be present but it wasn't!");
+                }
+                FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                        new CommandBuildContext(connection.registryAccess()),
+                        () -> this.registerClientCommand((Command<C>) cmd)
+                );
+            }
+            return true;
+        }
+
+        @SuppressWarnings("unchecked")
+        public void registerCommands(final RegistryAccess registryAccess) {
+            FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                    new CommandBuildContext(registryAccess),
+                    () -> {
+                        for (final Command<?> command : this.registeredCommands) {
+                            this.registerClientCommand((Command<C>) command);
+                        }
+                    }
+            );
+        }
+
+        @SuppressWarnings("unchecked")
+        private void registerClientCommand(final Command<C> command) {
             final RootCommandNode<FabricClientCommandSource> rootNode = ClientCommandManager.DISPATCHER.getRoot();
             final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
             final CommandNode<FabricClientCommandSource> baseNode = this
@@ -129,15 +194,18 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                     );
 
             rootNode.addChild(baseNode);
+            this.registeredNodes.add(baseNode);
 
             for (final String alias : first.getAlternativeAliases()) {
-                rootNode.addChild(buildRedirect(alias, baseNode));
+                final LiteralCommandNode<FabricClientCommandSource> node = buildRedirect(alias, baseNode);
+                rootNode.addChild(node);
+                this.registeredNodes.add(node);
             }
-            return true;
         }
     }
 
     static class Server<C> extends FabricCommandRegistrationHandler<C, CommandSourceStack> {
+
         private final Set<Command<C>> registeredCommands = ConcurrentHashMap.newKeySet();
 
         @Override
@@ -186,7 +254,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                             perm
                     ),
                     true,
-                    new FabricExecutor<>(this.commandManager(), CommandSourceStack::getTextName, CommandSourceStack::sendFailure));
+                    new FabricExecutor<>(this.commandManager(), CommandSourceStack::getTextName, CommandSourceStack::sendFailure)
+            );
 
             dispatcher.addChild(baseNode);
 
@@ -194,5 +263,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 dispatcher.addChild(buildRedirect(alias, baseNode));
             }
         }
+
     }
+
 }

@@ -27,11 +27,13 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricClientCommandManager;
+import cloud.commandframework.fabric.argument.ItemInputArgument;
 import cloud.commandframework.meta.CommandMeta;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.realmsclient.RealmsMainScreen;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -46,9 +48,11 @@ import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.synchronization.ArgumentUtils;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public final class FabricClientExample implements ClientModInitializer {
@@ -108,6 +112,19 @@ public final class FabricClientExample implements ClientModInitializer {
         commandManager.command(base.literal("requires_cheats")
                 .permission(FabricClientCommandManager.cheatsAllowed(false))
                 .handler(ctx -> ctx.getSender().sendFeedback(Component.literal("Cheats are enabled!"))));
+
+        // Test argument which requires CommandBuildContext/RegistryAccess
+        commandManager.command(base.literal("show_item")
+                .argument(ItemInputArgument.of("item"))
+                .handler(ctx -> {
+                    try {
+                        ctx.getSender().sendFeedback(
+                                ctx.<ItemInput>get("item").createItemStack(1, false).getDisplayName()
+                        );
+                    } catch (final CommandSyntaxException ex) {
+                        ctx.getSender().sendError(ComponentUtils.fromMessage(ex.getRawMessage()));
+                    }
+                }));
     }
 
     private static void disconnectClient(final @NonNull Minecraft client) {

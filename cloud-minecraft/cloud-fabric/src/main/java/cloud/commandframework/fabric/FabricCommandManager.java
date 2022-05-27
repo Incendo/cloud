@@ -176,27 +176,17 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerConstantNativeParserSupplier(OperationArgument.Operation.class, OperationArgument.operation());
         this.registerConstantNativeParserSupplier(ParticleOptions.class, ParticleArgument.particle());
         this.registerConstantNativeParserSupplier(AngleArgument.SingleAngle.class, AngleArgument.angle());
-        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {
-        }, SwizzleArgument.swizzle());
+        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {}, SwizzleArgument.swizzle());
         this.registerConstantNativeParserSupplier(ResourceLocation.class, ResourceLocationArgument.id());
-        this.registerConstantNativeParserSupplier(
-                EntityAnchorArgument.Anchor.class,
-                EntityAnchorArgument.anchor()
-        );
+        this.registerConstantNativeParserSupplier(EntityAnchorArgument.Anchor.class, EntityAnchorArgument.anchor());
         this.registerConstantNativeParserSupplier(MinMaxBounds.Ints.class, RangeArgument.intRange());
         this.registerConstantNativeParserSupplier(MinMaxBounds.Doubles.class, RangeArgument.floatRange());
         this.registerContextualNativeParserSupplier(ItemInput.class, ItemArgument::item);
+        this.registerContextualNativeParserSupplier(BlockPredicateArgument.Result.class, BlockPredicateArgument::blockPredicate);
 
         /* Wrapped/Constant Brigadier types, mapped value type */
-        this.registerContextualNativeParserSupplier(
-                BlockPredicateArgument.Result.class,
-                BlockPredicateArgument::blockPredicate
-        );
         this.registerConstantNativeParserSupplier(MessageArgument.Message.class, MessageArgument.message());
-        this.getParserRegistry().registerParserSupplier(
-                TypeToken.get(MinecraftTime.class),
-                params -> FabricArgumentParsers.time()
-        );
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(MinecraftTime.class), params -> FabricArgumentParsers.time());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
