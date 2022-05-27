@@ -2,8 +2,8 @@ import net.fabricmc.loom.task.AbstractRunTask
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
-    id("cloud.base-conventions")
     id("quiet-fabric-loom") version "0.11-SNAPSHOT"
+    id("cloud.base-conventions")
 }
 
 tasks {
