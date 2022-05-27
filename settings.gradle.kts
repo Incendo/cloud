@@ -3,10 +3,9 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven("https://maven.fabricmc.net")
+        maven("https://maven.fabricmc.net/")
         maven("https://maven.quiltmc.org/repository/release/")
         maven("https://repo.jpenilla.xyz/snapshots/")
-        mavenLocal()
     }
     includeBuild("build-logic")
 }
