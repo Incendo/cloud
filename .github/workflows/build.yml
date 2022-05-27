@@ -28,6 +28,11 @@ jobs:
           java-version: 17
       - name: Build
         run: ./gradlew build
+      - name : Test Summary
+        uses : EnricoMi/publish-unit-test-result-action@v1
+        with :
+          files : "**/build/test-results/test/TEST-*.xml"
+        if : always()
       - name: Determine Status
         run: |
           if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
