@@ -1,6 +1,5 @@
 import net.kyori.indra.repository.sonatypeSnapshots
 import net.ltgt.gradle.errorprone.errorprone
-import org.cadixdev.gradle.licenser.header.HeaderStyle
 
 plugins {
     id("net.kyori.indra")
