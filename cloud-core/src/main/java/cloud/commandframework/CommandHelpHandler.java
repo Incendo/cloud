@@ -190,8 +190,7 @@ public final class CommandHelpHandler<C> {
 
         /* Traverse command to find the most specific help topic */
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.getCommandTree()
-                .getNamedNode(availableCommandLabels.iterator()
-                        .next());
+                .getNamedNode(availableCommandLabels.iterator().next());
 
         final List<CommandArgument<C, ?>> traversedNodes = new LinkedList<>();
         CommandTree.Node<CommandArgument<C, ?>> head = node;
@@ -349,6 +348,34 @@ public final class CommandHelpHandler<C> {
             return this.description;
         }
 
+        @Override
+        public String toString() {
+            return "VerboseHelpEntry{"
+                    + "command=" + this.command
+                    + ", syntaxString='" + this.syntaxString + '\''
+                    + ", description='" + this.description + '\''
+                    + '}';
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final VerboseHelpEntry<?> that = (VerboseHelpEntry<?>) o;
+            return this.command.equals(that.command)
+                    && this.syntaxString.equals(that.syntaxString)
+                    && this.description.equals(that.description);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.command, this.syntaxString, this.description);
+        }
+
     }
 
     /**
@@ -380,6 +407,30 @@ public final class CommandHelpHandler<C> {
          */
         public boolean isEmpty() {
             return this.getEntries().isEmpty();
+        }
+
+        @Override
+        public String toString() {
+            return "IndexHelpTopic{"
+                    + "entries=" + this.entries
+                    + '}';
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final IndexHelpTopic<?> that = (IndexHelpTopic<?>) o;
+            return this.entries.equals(that.entries);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.entries);
         }
 
     }
@@ -419,6 +470,31 @@ public final class CommandHelpHandler<C> {
             return this.description;
         }
 
+        @Override
+        public String toString() {
+            return "VerboseHelpTopic{"
+                    + "command=" + this.command
+                    + ", description='" +this.description + '\''
+                    + '}';
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final VerboseHelpTopic<?> that = (VerboseHelpTopic<?>) o;
+            return this.command.equals(that.command) && this.description.equals(that.description);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.command, this.description);
+        }
+
     }
 
 
@@ -456,6 +532,31 @@ public final class CommandHelpHandler<C> {
          */
         public @NonNull List<@NonNull String> getChildSuggestions() {
             return this.childSuggestions;
+        }
+
+        @Override
+        public String toString() {
+            return "MultiHelpTopic{"
+                    + "longestPath='" + this.longestPath + '\''
+                    + ", childSuggestions=" + this.childSuggestions
+                    + '}';
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final MultiHelpTopic<?> that = (MultiHelpTopic<?>) o;
+            return this.longestPath.equals(that.longestPath) && this.childSuggestions.equals(that.childSuggestions);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.longestPath, this.childSuggestions);
         }
 
     }
