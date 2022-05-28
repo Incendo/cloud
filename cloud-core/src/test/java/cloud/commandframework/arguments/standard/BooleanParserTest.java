@@ -65,6 +65,8 @@ class BooleanParserTest {
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(expectedResult);
+
+        assertThat(input).isEmpty();
     }
 
     static Stream<Arguments> Parse_NonLiberal_ValidInputs_SuccessfulParse_Source() {
@@ -92,6 +94,8 @@ class BooleanParserTest {
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(expectedResult);
+
+        assertThat(input).isEmpty();
     }
 
     static Stream<Arguments> Parse_Liberal_ValidInputs_SuccessfulParse_Source() {
@@ -107,7 +111,7 @@ class BooleanParserTest {
 
     @ParameterizedTest
     @ValueSource(booleans = { true, false })
-    void Parse_InvalidInput_FailedParse(final boolean liberal) {
+    void Parse_NonBooleanInput_FailedParse(final boolean liberal) {
         // Arrange
         final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(liberal);
 
