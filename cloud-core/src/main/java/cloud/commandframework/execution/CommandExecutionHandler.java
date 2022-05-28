@@ -25,7 +25,10 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -37,6 +40,35 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 @FunctionalInterface
 public interface CommandExecutionHandler<C> {
+
+    /**
+     * Returns a {@link CommandExecutionHandler} that does nothing (no-op).
+     *
+     * @param <C> Command sender type
+     * @return command execution handler that does nothing
+     * @since 1.7.0
+     */
+    static <C> @NonNull CommandExecutionHandler<C> noOpCommandExecutionHandler() {
+        return new NullCommandExecutionHandler<>();
+    }
+
+    /**
+     * Returns a {@link CommandExecutionHandler} that delegates the given
+     * {@code handlers} in sequence.
+     * <p>
+     * If any handler in the chain throws an exception, then no subsequent
+     * handlers will be invoked.
+     *
+     * @param handlers The handlers to delegate to
+     * @param <C>      Command sender type
+     * @return multicast-delegate command execution handler
+     * @since 1.7.0
+     */
+    static <C> @NonNull CommandExecutionHandler<C> delegatingExecutionHandler(
+            final List<CommandExecutionHandler<C>> handlers
+    ) {
+        return new MulticastDelegateFutureCommandExecutionHandler<>(handlers);
+    }
 
     /**
      * Handle command execution
@@ -98,6 +130,48 @@ public interface CommandExecutionHandler<C> {
         CompletableFuture<@Nullable Void> executeFuture(
                 @NonNull CommandContext<C> commandContext
         );
+
+    }
+
+    /**
+     * Delegates to other handlers.
+     *
+     * @param <C> Command sender type
+     * @see #delegatingExecutionHandler(List)
+     * @since 1.7.0
+     */
+    final class MulticastDelegateFutureCommandExecutionHandler<C> implements FutureCommandExecutionHandler<C> {
+
+        private final List<CommandExecutionHandler<C>> handlers;
+
+        private MulticastDelegateFutureCommandExecutionHandler(
+                final @NonNull List<@NonNull CommandExecutionHandler<C>> handlers
+        ) {
+            this.handlers = Collections.unmodifiableList(handlers);
+        }
+
+        @Override
+        public CompletableFuture<@Nullable Void> executeFuture(
+                @NonNull final CommandContext<C> commandContext
+        ) {
+            @MonotonicNonNull CompletableFuture<@Nullable Void> composedHandler = null;
+
+            if (this.handlers.isEmpty()) {
+                composedHandler = CompletableFuture.completedFuture(null);
+            } else {
+                for (final CommandExecutionHandler<C> handler : this.handlers) {
+                    if (composedHandler == null) {
+                        composedHandler = handler.executeFuture(commandContext);
+                    } else {
+                        composedHandler = composedHandler.thenCompose(
+                                ignore -> handler.executeFuture(commandContext)
+                        );
+                    }
+                }
+            }
+
+            return composedHandler;
+        }
 
     }
 
