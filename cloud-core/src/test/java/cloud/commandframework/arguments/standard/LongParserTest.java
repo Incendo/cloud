@@ -115,7 +115,7 @@ class LongParserTest {
     }
 
     @Test
-    void Parse_NonBooleanInput_FailedParse() {
+    void Parse_NonLongInput_FailedParse() {
         // Arrange
         final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
                 LongArgument.LongParser.DEFAULT_MINIMUM,

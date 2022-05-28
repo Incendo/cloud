@@ -115,7 +115,7 @@ class ByteParserTest {
     }
 
     @Test
-    void Parse_NonBooleanInput_FailedParse() {
+    void Parse_NonByteInput_FailedParse() {
         // Arrange
         final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
                 ByteArgument.ByteParser.DEFAULT_MINIMUM,

@@ -115,7 +115,7 @@ class ShortParserTest {
     }
 
     @Test
-    void Parse_NonBooleanInput_FailedParse() {
+    void Parse_NonShortInput_FailedParse() {
         // Arrange
         final ShortArgument.ShortParser<TestCommandSender> parser = new ShortArgument.ShortParser<>(
                 ShortArgument.ShortParser.DEFAULT_MINIMUM,

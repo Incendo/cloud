@@ -115,7 +115,7 @@ class IntegerParserTest {
     }
 
     @Test
-    void Parse_NonBooleanInput_FailedParse() {
+    void Parse_NonIntegerInput_FailedParse() {
         // Arrange
         final IntegerArgument.IntegerParser<TestCommandSender> parser = new IntegerArgument.IntegerParser<>(
                 IntegerArgument.IntegerParser.DEFAULT_MINIMUM,

@@ -31,6 +31,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -330,6 +331,23 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         @Override
         public @NonNull String getNumberType() {
             return "float";
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final FloatParseException that = (FloatParseException) o;
+            return this.parser.equals(that.parser);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.parser);
         }
 
     }
