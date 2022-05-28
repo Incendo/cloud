@@ -39,7 +39,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class ByteParserTest {
+class LongParserTest {
 
     @Mock
     private CommandContext<TestCommandSender> context;
@@ -47,23 +47,23 @@ class ByteParserTest {
     @Test
     void Parse_NoMinMax_SuccessfulParse() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
+                LongArgument.LongParser.DEFAULT_MINIMUM,
+                LongArgument.LongParser.DEFAULT_MAXIMUM
         );
 
-        final byte byteInput = (byte) ThreadLocalRandom.current().nextInt(Byte.MAX_VALUE);
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(Byte.toString(byteInput));
+        final long longInput = ThreadLocalRandom.current().nextLong();
+        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(Long.toString(longInput));
 
         // Act
-        final ArgumentParseResult<Byte> result = parser.parse(
+        final ArgumentParseResult<Long> result = parser.parse(
                 this.context,
                 input
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(byteInput);
+        assertThat(result.getParsedValue()).hasValue(longInput);
 
         assertThat(input).isEmpty();
     }
@@ -71,19 +71,19 @@ class ByteParserTest {
     @Test
     void Parse_ValueBelowMin_FailedParse() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                (byte) 5 /* min */,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
+                5L /* min */,
+                LongArgument.LongParser.DEFAULT_MAXIMUM
         );
 
         // Act
-        final ArgumentParseResult<Byte> result = parser.parse(
+        final ArgumentParseResult<Long> result = parser.parse(
                 this.context,
                 ArgumentTestHelper.linkedListOf("4")
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteArgument.ByteParseException(
+        assertThat(result.getFailure()).hasValue(new LongArgument.LongParseException(
                 "4",
                 parser,
                 this.context
@@ -94,19 +94,19 @@ class ByteParserTest {
     @Test
     void Parse_ValueAboveMax_FailedParse() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                (byte) 5 /* max */
+        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
+                LongArgument.LongParser.DEFAULT_MINIMUM,
+                5L /* max */
         );
 
         // Act
-        final ArgumentParseResult<Byte> result = parser.parse(
+        final ArgumentParseResult<Long> result = parser.parse(
                 this.context,
                 ArgumentTestHelper.linkedListOf("6")
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteArgument.ByteParseException(
+        assertThat(result.getFailure()).hasValue(new LongArgument.LongParseException(
                 "6",
                 parser,
                 this.context
@@ -117,19 +117,19 @@ class ByteParserTest {
     @Test
     void Parse_NonBooleanInput_FailedParse() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
+                LongArgument.LongParser.DEFAULT_MINIMUM,
+                LongArgument.LongParser.DEFAULT_MAXIMUM
         );
 
         // Act
-        final ArgumentParseResult<Byte> result = parser.parse(
+        final ArgumentParseResult<Long> result = parser.parse(
                 this.context,
                 ArgumentTestHelper.linkedListOf("cow")
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new ByteArgument.ByteParseException(
+        assertThat(result.getFailure()).hasValue(new LongArgument.LongParseException(
                 "cow",
                 parser,
                 this.context
@@ -140,14 +140,14 @@ class ByteParserTest {
     @Test
     void Suggestions_EmptyInput_ExpectedSuggestions() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
+                LongArgument.LongParser.DEFAULT_MINIMUM,
+                LongArgument.LongParser.DEFAULT_MAXIMUM
         );
 
         final List<String> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Byte.toString((byte) i));
+            expectedSuggestions.add(Long.toString((long) i));
         }
 
         // Act
@@ -163,14 +163,14 @@ class ByteParserTest {
     @Test
     void Suggestions_NegativeSignInput_ExpectedSuggestions() {
         // Arrange
-        final ByteArgument.ByteParser<TestCommandSender> parser = new ByteArgument.ByteParser<>(
-                ByteArgument.ByteParser.DEFAULT_MINIMUM,
-                ByteArgument.ByteParser.DEFAULT_MAXIMUM
+        final LongArgument.LongParser<TestCommandSender> parser = new LongArgument.LongParser<>(
+                LongArgument.LongParser.DEFAULT_MINIMUM,
+                LongArgument.LongParser.DEFAULT_MAXIMUM
         );
 
         final List<String> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Byte.toString((byte) -i));
+            expectedSuggestions.add(Long.toString((long) -i));
         }
 
         // Act
