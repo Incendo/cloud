@@ -60,6 +60,7 @@ versions:
   gradleTestLogger: 3.1.0
   gradleErrorprone: 2.0.2
   spotless: *spotless
+  revapi: 1.7.0
 
 dependencies:
   checkerQual:
@@ -252,6 +253,10 @@ dependencies:
     group: com.diffplug.spotless
     name: spotless-plugin-gradle
     version: { ref: spotless }
+  revapi:
+    group: com.palantir.gradle.revapi
+    name: gradle-revapi
+    version: { ref: revapi }
 
 bundles:
   coroutines:
