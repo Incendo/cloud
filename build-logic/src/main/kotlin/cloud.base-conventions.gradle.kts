@@ -111,6 +111,7 @@ repositories {
 dependencies {
     compileOnlyApi(libs.checkerQual)
     testImplementation(libs.jupiterEngine)
+    testImplementation(libs.jupiterParams)
     testImplementation(libs.mockitoCore)
     testImplementation(libs.mockitoKotlin)
     testImplementation(libs.mockitoJupiter)
