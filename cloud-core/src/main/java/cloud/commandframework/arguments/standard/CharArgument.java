@@ -33,6 +33,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -184,6 +185,23 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
          */
         public @NonNull String getInput() {
             return this.input;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final CharParseException that = (CharParseException) o;
+            return this.input.equals(that.input);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.input);
         }
 
     }

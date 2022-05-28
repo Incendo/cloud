@@ -199,6 +199,10 @@ dependencies:
     group: org.junit.jupiter
     name: junit-jupiter-engine
     version: { ref: jupiterEngine }
+  jupiterParams:
+    group: org.junit.jupiter
+    name: junit-jupiter-params
+    version: { ref: jupiterEngine }
   mockitoCore:
     group: org.mockito
     name: mockito-core
