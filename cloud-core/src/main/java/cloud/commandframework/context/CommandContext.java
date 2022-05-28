@@ -50,7 +50,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
-public final class CommandContext<C> {
+public class CommandContext<C> {
 
     private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
     private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = new HashMap<>();

@@ -33,6 +33,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -190,6 +191,23 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
          */
         public String getInput() {
             return this.input;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null ||this.getClass() != o.getClass()) {
+                return false;
+            }
+            final UUIDParseException that = (UUIDParseException) o;
+            return this.input.equals(that.input);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.input);
         }
 
     }

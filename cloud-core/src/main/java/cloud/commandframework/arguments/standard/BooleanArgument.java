@@ -34,6 +34,7 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -163,7 +164,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         /**
          * Construct a new boolean parser
          *
-         * @param liberal Whether or not it'll accept boolean-esque strings, or just booleans
+         * @param liberal Whether it'll accept boolean-esque strings, or just booleans
          */
         public BooleanParser(final boolean liberal) {
             this.liberal = liberal;
@@ -244,7 +245,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          * Construct a new boolean parse exception
          *
          * @param input   Input
-         * @param liberal Whether or not the parser allows truthy and falsy values, or strictly true/false
+         * @param liberal Whether the parser allows truthy and falsy values, or strictly true/false
          * @param context Command context
          */
         public BooleanParseException(
@@ -268,7 +269,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          *
          * @return String value
          */
-        public String getInput() {
+        public @NonNull String getInput() {
             return this.input;
         }
 
@@ -279,6 +280,23 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          */
         public boolean isLiberal() {
             return this.liberal;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final BooleanParseException that = (BooleanParseException) o;
+            return this.liberal == that.liberal && this.input.equals(that.input);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.input, this.liberal);
         }
 
     }
