@@ -997,6 +997,16 @@ public class Command<C> {
         }
 
         /**
+         * Returns the current command execution handler.
+         *
+         * @return the current handler
+         * @since 1.7.0
+         */
+        public @NonNull CommandExecutionHandler<C> handler() {
+            return this.commandExecutionHandler;
+        }
+
+        /**
          * Specify a required sender type
          *
          * @param senderType Required sender type
