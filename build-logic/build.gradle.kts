@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.gradleKotlinJvm)
     implementation(libs.gradleDokka)
     implementation(libs.spotless)
+    implementation(libs.revapi)
 
     // https://github.com/gradle/gradle/issues/15383#issuecomment-779893192
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
