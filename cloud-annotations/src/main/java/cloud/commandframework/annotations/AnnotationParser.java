@@ -30,6 +30,7 @@ import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
+import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.suggestions.MethodSuggestionsProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
@@ -48,16 +49,21 @@ import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,6 +72,8 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -319,12 +327,63 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
+     *
+     * @return Collection of parsed commands
+     * @throws Exception re-throws all encountered exceptions.
+     * @since 1.7.0
+     * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
+     */
+    public @NonNull Collection<@NonNull Command<C>> parseContainers() throws Exception {
+        final List<Command<C>> commands = new LinkedList<>();
+
+        final List<String> classes;
+        try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream(CommandContainerProcessor.PATH)) {
+            if (stream == null) {
+                return Collections.emptyList();
+            }
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                classes = reader.lines().distinct().collect(Collectors.toList());
+            }
+        }
+
+        for (final String className : classes) {
+            final Class<?> commandContainer = Class.forName(className);
+
+            // We now have the class, and we now just need to decide what constructor to invoke.
+            // We first try to find a constructor which takes in the parser.
+            @MonotonicNonNull Object instance;
+            try {
+                instance = commandContainer.getConstructor(AnnotationParser.class).newInstance(this);
+            } catch (final NoSuchMethodException ignored) {
+                try {
+                    // Then we try to find a no-arg constructor.
+                    instance = commandContainer.getConstructor().newInstance();
+                } catch (final NoSuchMethodException e) {
+                    // If neither are found, we panic!
+                    throw new IllegalStateException(
+                            String.format(
+                                    "Command container %s has no valid constructors",
+                                    commandContainer
+                            ),
+                            e
+                    );
+                }
+            }
+            commands.addAll(this.parse(instance));
+        }
+
+        return Collections.unmodifiableList(commands);
+    }
+
+    /**
      * Scan a class instance of {@link CommandMethod} annotations and attempt to
-     * compile them into {@link Command} instances
+     * compile them into {@link Command} instances.
      *
      * @param instance Instance to scan
      * @param <T>      Type of the instance
-     * @return Collection of parsed annotations
+     * @return Collection of parsed commands
      */
     @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
     public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {

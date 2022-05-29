@@ -5,4 +5,6 @@ plugins {
 
 dependencies {
     implementation(projects.cloudCore)
+
+    testImplementation(libs.compileTesting)
 }

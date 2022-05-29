@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Core: Add delegating command execution handlers ([#363](https://github.com/Incendo/cloud/pull/363))
 - Core: Add `builder()` getter to `Command.Builder` ([#363](https://github.com/Incendo/cloud/pull/363))
 - Annotations: Annotation string processors ([#353](https://github.com/Incendo/cloud/pull/353))
+- Annotations: `@CommandContainer` annotation processing 
 
 ### Fixed
 - Core: Fix missing caption registration for the regex caption ([#351](https://github.com/Incendo/cloud/pull/351))
