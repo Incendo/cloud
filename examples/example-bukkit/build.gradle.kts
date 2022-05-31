@@ -18,6 +18,8 @@ dependencies {
     implementation(libs.adventurePlatformBukkit)
     /* Bukkit */
     compileOnly(libs.bukkit)
+    /* Annotation processing */
+    annotationProcessor(project(":cloud-annotations"))
 }
 
 tasks {

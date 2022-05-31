@@ -235,6 +235,12 @@ public final class ExamplePlugin extends JavaPlugin {
         // Parse all @CommandMethod-annotated methods
         //
         this.annotationParser.parse(this);
+        // Parse all @CommandContainer-annotated classes
+        try {
+            this.annotationParser.parseContainers();
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
         //
         // Base command builder
         //
