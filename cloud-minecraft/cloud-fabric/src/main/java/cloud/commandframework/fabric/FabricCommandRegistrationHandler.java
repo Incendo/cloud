@@ -32,22 +32,20 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
-import java.util.Collections;
-import java.util.IdentityHashMap;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.core.RegistryAccess;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -108,75 +106,60 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
     static class Client<C> extends FabricCommandRegistrationHandler<C, FabricClientCommandSource> {
 
-        private final Set<Command<?>> registeredCommands = ConcurrentHashMap.newKeySet();
-        private final Set<CommandNode<FabricClientCommandSource>> registeredNodes =
-                Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
-        private volatile boolean connected = false;
+        private final Set<Command<C>> registeredCommands = ConcurrentHashMap.newKeySet();
+        private volatile boolean registerEventFired = false;
 
         @Override
         void initialize(final FabricCommandManager<C, FabricClientCommandSource> manager) {
             super.initialize(manager);
-            ClientPlayConnectionEvents.JOIN.register(this::onJoin);
-            ClientPlayConnectionEvents.DISCONNECT.register(this::onDisconnect);
-        }
-
-        private void onJoin(
-                final ClientPacketListener connection,
-                final PacketSender packetSender,
-                final Minecraft minecraft
-        ) {
-            this.connected = true;
-            this.registerCommands(connection.registryAccess());
-        }
-
-        private void onDisconnect(
-                final ClientPacketListener connection,
-                final Minecraft minecraft
-        ) {
-            this.connected = false;
-            final Set<CommandNode<FabricClientCommandSource>> remove = Collections.newSetFromMap(new IdentityHashMap<>());
-            remove.addAll(this.registeredNodes);
-            this.registeredNodes.clear();
-            for (final CommandNode<?> node : remove) {
-                ClientCommandManager.DISPATCHER.getRoot().getChildren().remove(node);
-            }
+            ClientCommandRegistrationCallback.EVENT.register(this::registerCommands);
+            ClientPlayConnectionEvents.DISCONNECT.register(($, $$) -> this.registerEventFired = false);
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public boolean registerCommand(final @NonNull Command<?> cmd) {
-            this.registeredCommands.add(cmd);
-            if (this.connected) {
+        public boolean registerCommand(final @NonNull Command<?> command) {
+            this.registeredCommands.add((Command<C>) command);
+            if (this.registerEventFired) {
                 final ClientPacketListener connection = Minecraft.getInstance().getConnection();
                 if (connection == null) {
                     throw new IllegalStateException("Expected connection to be present but it wasn't!");
                 }
+                final CommandDispatcher<FabricClientCommandSource> dispatcher = ClientCommandManager.getActiveDispatcher();
+                if (dispatcher == null) {
+                    throw new IllegalStateException("Expected an active dispatcher!");
+                }
                 FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
                         new CommandBuildContext(connection.registryAccess()),
-                        () -> this.registerClientCommand((Command<C>) cmd)
+                        () -> this.registerClientCommand(dispatcher, (Command<C>) command)
                 );
             }
             return true;
         }
 
-        @SuppressWarnings("unchecked")
-        public void registerCommands(final RegistryAccess registryAccess) {
+        public void registerCommands(
+            final CommandDispatcher<FabricClientCommandSource> dispatcher,
+            final CommandBuildContext commandBuildContext
+        ) {
+            this.registerEventFired = true;
             FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
-                    new CommandBuildContext(registryAccess),
+                    commandBuildContext,
                     () -> {
-                        for (final Command<?> command : this.registeredCommands) {
-                            this.registerClientCommand((Command<C>) command);
+                        for (final Command<C> command : this.registeredCommands) {
+                            this.registerClientCommand(dispatcher, command);
                         }
                     }
             );
         }
 
         @SuppressWarnings("unchecked")
-        private void registerClientCommand(final Command<C> command) {
-            final RootCommandNode<FabricClientCommandSource> rootNode = ClientCommandManager.DISPATCHER.getRoot();
+        private void registerClientCommand(
+            final CommandDispatcher<FabricClientCommandSource> dispatcher,
+            final Command<C> command
+        ) {
+            final RootCommandNode<FabricClientCommandSource> rootNode = dispatcher.getRoot();
             final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
-            final CommandNode<FabricClientCommandSource> baseNode = this
-                    .commandManager()
+            final CommandNode<FabricClientCommandSource> baseNode = this.commandManager()
                     .brigadierManager()
                     .createLiteralCommandNode(
                             first.getName(),
@@ -194,12 +177,9 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                     );
 
             rootNode.addChild(baseNode);
-            this.registeredNodes.add(baseNode);
 
             for (final String alias : first.getAlternativeAliases()) {
-                final LiteralCommandNode<FabricClientCommandSource> node = buildRedirect(alias, baseNode);
-                rootNode.addChild(node);
-                this.registeredNodes.add(node);
+                rootNode.addChild(buildRedirect(alias, baseNode));
             }
         }
     }
