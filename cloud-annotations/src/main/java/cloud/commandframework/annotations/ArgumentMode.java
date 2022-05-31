@@ -23,7 +23,12 @@
 //
 package cloud.commandframework.annotations;
 
-enum ArgumentMode {
+/**
+ * The mode of an argument.
+ * <p>
+ * Public since 1.7.0.
+ */
+public enum ArgumentMode {
     LITERAL,
     OPTIONAL,
     REQUIRED

@@ -26,7 +26,10 @@ package cloud.commandframework.annotations;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class SyntaxFragment {
+/**
+ * Public since 1.7.0.
+ */
+public final class SyntaxFragment {
 
     private final String major;
     private final List<String> minor;
@@ -42,15 +45,34 @@ final class SyntaxFragment {
         this.argumentMode = argumentMode;
     }
 
-    @NonNull String getMajor() {
+    /**
+     * Returns the major portion of the fragment.
+     * <p>
+     * This is likely the name of an argument, or a string literal.
+     *
+     * @return the major part of the fragment
+     */
+    public @NonNull String getMajor() {
         return this.major;
     }
 
-    @NonNull List<@NonNull String> getMinor() {
+    /**
+     * Returns the minor part of the fragment.
+     * <p>
+     * This is likely a list of aliases.
+     *
+     * @return the minor part of the fragment.
+     */
+    public @NonNull List<@NonNull String> getMinor() {
         return this.minor;
     }
 
-    @NonNull ArgumentMode getArgumentMode() {
+    /**
+     * Returns the argument mode.
+     *
+     * @return the argument mode
+     */
+    public @NonNull ArgumentMode getArgumentMode() {
         return this.argumentMode;
     }
 

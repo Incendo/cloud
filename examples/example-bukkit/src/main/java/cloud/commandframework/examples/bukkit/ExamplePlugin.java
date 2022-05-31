@@ -456,7 +456,7 @@ public final class ExamplePlugin extends JavaPlugin {
 
     @CommandMethod("example help [query]")
     @CommandDescription("Help menu")
-    private void commandHelp(
+    public void commandHelp(
             final @NonNull CommandSender sender,
             final @Argument("query") @Greedy String query
     ) {
@@ -467,7 +467,7 @@ public final class ExamplePlugin extends JavaPlugin {
     @CommandMethod("example clear")
     @CommandDescription("Clear your inventory")
     @CommandPermission("example.clear")
-    private void commandClear(final @NonNull Player player) {
+    public void commandClear(final @NonNull Player player) {
         player.getInventory().clear();
         this.bukkitAudiences.player(player)
                 .sendMessage(Identity.nil(), text("Your inventory has been cleared", NamedTextColor.GOLD));
@@ -475,7 +475,7 @@ public final class ExamplePlugin extends JavaPlugin {
 
     @CommandMethod("example give <material> <amount>")
     @CommandDescription("Give yourself an item")
-    private void commandGive(
+    public void commandGive(
             final @NonNull Player player,
             final @NonNull @Argument("material") Material material,
             final @Argument("amount") int number,
@@ -507,7 +507,7 @@ public final class ExamplePlugin extends JavaPlugin {
 
     @CommandMethod("example pay <money>")
     @CommandDescription("Command to test the preprocessing system")
-    private void commandPay(
+    public void commandPay(
             final @NonNull CommandSender sender,
             final @Argument("money") @Regex(value = "(?=.*?\\d)^\\$?(([1-9]\\d{0,2}(,\\d{3})*)|\\d+)?(\\.\\d{1,2})?$",
                     failureCaption = "regex.money") String money
@@ -520,7 +520,7 @@ public final class ExamplePlugin extends JavaPlugin {
     }
 
     @CommandMethod("example teleport complex <location>")
-    private void teleportComplex(
+    public void teleportComplex(
             final @NonNull Player sender,
             final @NonNull @Argument("location") Location location
     ) {
