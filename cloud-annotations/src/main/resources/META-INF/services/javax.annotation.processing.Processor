@@ -1,1 +1,2 @@
 cloud.commandframework.annotations.processing.CommandContainerProcessor
+cloud.commandframework.annotations.processing.CommandMethodProcessor

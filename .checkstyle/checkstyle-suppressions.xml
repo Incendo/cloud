@@ -5,4 +5,5 @@
 <suppressions>
     <suppress checks="(?:(?:Member|Method)Name|DesignForExtension|Javadoc.*)" files=".*[\\/]mixin[\\/].*"/>
     <suppress checks="(?:Javadoc.*)" files=".*[\\/]bukkit[\\/]internal[\\/].*"/>
+    <suppress checks="(?:Javadoc.*)" files=".*[\\/]example-.*[\\/].*"/>
 </suppressions>

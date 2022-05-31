@@ -33,9 +33,11 @@ import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Parses command syntax into syntax fragments
+ * Parses command syntax into syntax fragments.
+ * <p>
+ * Public since 1.7.0.
  */
-final class SyntaxParser implements Function<@NonNull String, @NonNull List<@NonNull SyntaxFragment>> {
+public final class SyntaxParser implements Function<@NonNull String, @NonNull List<@NonNull SyntaxFragment>> {
 
     private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile("([A-Za-z0-9\\-_]+)(|([A-Za-z0-9\\-_]+))*")
             .asPredicate();
@@ -72,5 +74,4 @@ final class SyntaxParser implements Function<@NonNull String, @NonNull List<@Non
         }
         return syntaxFragments;
     }
-
 }
