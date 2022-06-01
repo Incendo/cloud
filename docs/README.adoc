@@ -31,7 +31,7 @@ another way of declaring commands.
 This document will not cover every specific detail of Cloud. Instead, the purpose of
 this document is to give an introduction to various Cloud concepts and explain how they
 can be used to build useful commands. It is very recommended to read the
-https://javadoc.commandframework.cloud[JavaDocs] and use them as the primary source of information.
+https://javadoc.io/doc/cloud.commandframework[JavaDocs] and use them as the primary source of information.
 
 == Getting Started
 
@@ -125,7 +125,7 @@ in section 3.6.
 
 The command manager is used to register commands, create builders, change command settings, etc.
 More information can be found in the CommandManager
-https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html[JavaDoc].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/CommandManager.html[JavaDoc].
 
 === Commands
 
@@ -181,7 +181,7 @@ builder = builder.literal(
 ----
 
 Literals may also be created using the
-https://javadoc.commandframework.cloud/cloud/commandframework/arguments/StaticArgument.html[StaticArgument]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/StaticArgument.html[StaticArgument]
 class.
 
 ==== Standard
@@ -272,9 +272,9 @@ Compound arguments are a special type of arguments that consists of multiple oth
 By default, 2 or 3 arguments may be used in a compound argument.
 
 The methods for creating compounds arguments can be found in CommandManager, or in the
-https://javadoc.commandframework.cloud/cloud/commandframework/arguments/compound/ArgumentPair.html[ArgumentPair]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/compound/ArgumentPair.html[ArgumentPair]
 or
-https://javadoc.commandframework.cloud/cloud/commandframework/arguments/compound/ArgumentTriplet.html[ArgumentTriplet]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/compound/ArgumentTriplet.html[ArgumentTriplet]
 classes.
 
 In general, they need a tuple of names, and a tuple of argument types. They can also
@@ -331,14 +331,14 @@ WARNING: If the read string(s) isn't popped from the queue, then the command eng
 send an error message to the command sender.
 
 It is highly recommended to make use of
-https://javadoc.commandframework.cloud/cloud/commandframework/exceptions/parsing/ParserException.html[ParserException]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/exceptions/parsing/ParserException.html[ParserException]
 when returning a failed result. This allows for integration with the Cloud caption system (refer to the section on Exception
 Handling for more information).
 
 You should - in most cases - register your parser to the
-https://javadoc.commandframework.cloud/cloud/commandframework/arguments/parser/ParserRegistry.html[ParserRegistry]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/parser/ParserRegistry.html[ParserRegistry]
 which you can access using
-https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#getParserRegistry()[CommandManager#getParserRegistry()].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/CommandManager.html#getParserRegistry()[CommandManager#getParserRegistry()].
 If you are registering a parser that shouldn't be the default for the
 argument type, then it is recommended to register a named parser.
 If your parser is not registered to the parser registry, it will
@@ -350,14 +350,14 @@ These parameters can be used together with the annotation system
 to differentiate between different parsers and also change parser
 settings. In order to create these parameters you can create
 an annotation mapper using
-https://javadoc.commandframework.cloud/cloud/commandframework/arguments/parser/ParserRegistry.html#registerAnnotationMapper(java.lang.Class,java.util.function.BiFunction)[ParserRegistry#registerAnnotationMapper].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/parser/ParserRegistry.html#registerAnnotationMapper(java.lang.Class,java.util.function.BiFunction)[ParserRegistry#registerAnnotationMapper].
 
 Here's an example of how a UUID parser can be created and registered:
 
 [title=Example UUID parser]
 ====
 This example is taken from
-https://github.com/Incendo/cloud/blob/master/cloud-core/src/main/java/cloud/commandframework/arguments/standard/UUIDArgument.java[UUIDArgument.java]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/standard/UUIDArgument.html[UUIDArgument.java]
 , which also includes a custom exception and argument builder.
 It's a good reference class for custom arguments, as it does
 not contain any complicated logic.
@@ -473,7 +473,7 @@ is a good example of a preprocessor that allows you to add regular
 expression checking to your arguments.
 
 Argument preprocessors can be applied to created arguments using
-https://javadoc.commandframework.cloud/cloud/commandframework/arguments/CommandArgument.html#addPreprocessor(java.util.function.BiFunction)[CommandArgument#addPreprocessor].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/CommandArgument.html#addPreprocessor(java.util.function.BiFunction)(java.util.function.BiFunction)[CommandArgument#addPreprocessor].
 
 === Suggestions
 
@@ -497,11 +497,11 @@ public @NonNull List<@NonNull String> suggestions(
 
 or by specifying a suggestion function in a command argument builder
 using
-https://javadoc.commandframework.cloud/cloud/commandframework/arguments/CommandArgument.Builder.html#withSuggestionsProvider(java.util.function.BiFunction)[CommandArgument.Builder#withSuggestionProvider].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/CommandArgument.Builder.html#withSuggestionsProvider(java.util.function.BiFunction)[CommandArgument.Builder#withSuggestionProvider].
 
 You also register a standalone suggestions to the parser registry,
 using
-https://javadoc.commandframework.cloud/cloud/commandframework/arguments/parser/ParserRegistry.html#registerSuggestionProvider(java.lang.String,java.util.function.BiFunction)[ParserRegistry#registerSuggestionProvider].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/arguments/parser/ParserRegistry.html#registerSuggestionProvider(java.lang.String,java.util.function.BiFunction)[ParserRegistry#registerSuggestionProvider].
 Registering a named suggestion provider allows it to be used in
 annotated command methods, or retrieved using `ParserRegistry#getSuggestionProvider`.
 
@@ -588,7 +588,7 @@ let's call it `/game warp me <warp>` but you feel like it's a little too verbose
 `/warpme <warp>` command proxy that gets forwarded to the original command.
 
 To create a command proxy you can use
-https://javadoc.commandframework.cloud/cloud/commandframework/Command.Builder.html#proxies(cloud.commandframework.Command)[Command.Builder#proxies(Command)].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/Command.Builder.html#proxies(cloud.commandframework.Command)[Command.Builder#proxies(Command)].
 Please not the documentation of the method, which reads:
 
 > Make the current command be a proxy of the supplied command.
@@ -613,23 +613,23 @@ This can be for several reasons, such as:
 - The input provided to a command argument cannot be parsed (ArgumentParseException)
 
 Generally, the command managers are highly encouraged to make use of
-https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#handleException(C,java.lang.Class,E,java.util.function.BiConsumer)[CommandManager#handleException],
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/CommandManager.html#handleException(C,java.lang.Class,E,java.util.function.BiConsumer)[CommandManager#handleException],
 in which case you may override the exception handling by using
-https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#registerExceptionHandler(java.lang.Class,java.util.function.BiConsumer)[CommandManager#registerExceptionHandler].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/CommandManager.html#registerExceptionHandler(java.lang.Class,java.util.function.BiConsumer)[CommandManager#registerExceptionHandler].
 
 ArgumentParseException is a special case which makes use of the internal caption
 system. (Nearly) all argument parsers in cloud will throw
-https://javadoc.commandframework.cloud/cloud/commandframework/exceptions/parsing/ParserException.html[ParserException]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/exceptions/parsing/ParserException.html[ParserException]
 on
 invalid input, in which case you are able to override the exception message by
 configuring the manager's
-https://javadoc.commandframework.cloud/cloud/commandframework/captions/CaptionRegistry.html[CaptionRegistry].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/captions/CaptionRegistry.html[CaptionRegistry].
 By default, cloud uses a
-https://javadoc.commandframework.cloud/cloud/commandframework/captions/FactoryDelegatingCaptionRegistry.html[FactoryDelegatingCaptionRegistry],
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/captions/FactoryDelegatingCaptionRegistry.html[FactoryDelegatingCaptionRegistry],
 which allows you
 to override the exception handling per caption key. All standard caption keys can
 be found in
-https://javadoc.commandframework.cloud/cloud/commandframework/captions/StandardCaptionKeys.html[StandardCaptionKeys].
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/captions/StandardCaptionKeys.html[StandardCaptionKeys].
 Some platform adapters have their own caption key classes as well.
 
 The caption keys have JavaDoc that list their replacement variables. The message
@@ -856,7 +856,7 @@ would be the command sender object, or the command object. Command method
 parameters that aren't arguments are referred to as _injected values_.
 
 Injected values can be registered in the
-https://javadoc.commandframework.cloud/cloud/commandframework/annotations/injection/ParameterInjectorRegistry.html[ParameterInjectorRegistry],
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/annotations/injection/ParameterInjectorRegistry.html[ParameterInjectorRegistry],
 which is available in the command manager. You register a parameter injector for a specific
 type (class), which is essentially a function mapping the command context and an annotation accessor to an injectable value.
 
@@ -1026,9 +1026,9 @@ You can check whether the running server supports Brigadier, by using `bukkitCom
 `cloud-bukkit` has plenty of Bukkit-specific parsers. These are easiest found
 via the JavaDocs:
 
-- https://javadoc.commandframework.cloud/cloud/commandframework/bukkit/parsers/package-summary.html
-- https://javadoc.commandframework.cloud/cloud/commandframework/bukkit/parsers/location/package-summary.html
-- https://javadoc.commandframework.cloud/cloud/commandframework/bukkit/parsers/selector/package-summary.html
+- https://javadoc.io/doc/cloud.commandframework/cloud-bukkit/latest/cloud/commandframework/bukkit/parsers/package-summary.html
+- https://javadoc.io/doc/cloud.commandframework/cloud-bukkit/latest/cloud/commandframework/bukkit/parsers/location/package-summary.html
+- https://javadoc.io/doc/cloud.commandframework/cloud-bukkit/latest/cloud/commandframework/bukkit/parsers/selector/package-summary.html
 
 Many of these are pre-mapped to serializable Brigadier argument types.
 
@@ -1063,7 +1063,7 @@ The `cloud-minecraft-extras` module contains additional opinionated features for
 Included in minecraft-extras are prebuilt handlers for `ArgumentParseException`, `InvalidCommandSenderException`, `InvalidSyntaxException`, and `NoPermissionException`. These handlers provide improved aesthetics on exception messages, and allow for custom decoration of the messages, for example with a prefix.
 
 Use these exception handlers by creating a new instance of
-https://javadoc.commandframework.cloud/cloud/commandframework/minecraft/extras/MinecraftExceptionHandler.html[`MinecraftExceptionHandler`],
+https://javadoc.io/doc/cloud.commandframework/cloud-minecraft-extras/latest/cloud/commandframework/minecraft/extras/MinecraftExceptionHandler.html[`MinecraftExceptionHandler`],
 applying the handlers and decorator you wish to use, and then applying the handlers to the manager.
 
 [title=Usage of the MinecraftExceptionHandler class]
@@ -1086,7 +1086,7 @@ new MinecraftExceptionHandler<CommandSender>()
 minecraft-extras includes a utility for generating attractive help menus for your minecraft projects. These help menus include hover and click elements, pagination of results, and customization of colors and text.
 
 To use the minecraft-extras help menu, first create an instance of
-https://javadoc.commandframework.cloud/cloud/commandframework/minecraft/extras/MinecraftHelp.html[`MinecraftHelp`],
+https://javadoc.io/doc/cloud.commandframework/cloud-minecraft-extras/latest/cloud/commandframework/minecraft/extras/MinecraftHelp.html[`MinecraftHelp`],
 like so:
 
 [source,java]
@@ -1117,9 +1117,9 @@ manager.command(
 
 Something developers may find desirable as well is to use a custom suggestion provider for the query argument, and to suggest syntax strings gotten from a blank query to `CommandHelpHandler#queryHelp`
 (see
-https://javadoc.commandframework.cloud/cloud/commandframework/CommandManager.html#getCommandHelpHandler()[CommandManager#getCommandHelpHandler]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/CommandManager.html#getCommandHelpHandler()[CommandManager#getCommandHelpHandler]
 and
-https://javadoc.commandframework.cloud/cloud/commandframework/CommandHelpHandler.html#queryHelp(C,java.lang.String)[CommandHelpHandler#queryHelp]
+https://javadoc.io/doc/cloud.commandframework/cloud-core/latest/cloud/commandframework/CommandHelpHandler.html#queryHelp(C,java.lang.String)[CommandHelpHandler#queryHelp]
 ).
 
 ==== Brigadier
