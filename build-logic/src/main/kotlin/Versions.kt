@@ -28,7 +28,7 @@ object Versions {
     const val fabricApi = "0.31.0+1.16"
 
     // IRC DEPENDENCIES
-    const val pircbotx = "83a4c22e80"
+    const val pircbotx = "479835f008"
 
     // TEST DEPENDENCIES
     const val jupiterEngine = "5.8.1"
