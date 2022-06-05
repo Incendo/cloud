@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.util.TestUtils.createManager;
+import static com.google.common.truth.Truth.assertThat;
 
 public class CommandSuggestionsTest {
 
@@ -392,6 +394,107 @@ public class CommandSuggestionsTest {
         final String input6 = "literal_with_variable vici ";
         final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
         Assertions.assertEquals(Collections.singletonList("later"), suggestions6);
+    }
+
+    @Test
+    void testFlagYieldingGreedyStringFollowedByFlagArgument() {
+        // Arrange
+        final CommandManager<TestCommandSender> manager = createManager();
+        manager.command(
+                manager.commandBuilder("command")
+                        .argument(
+                                StringArgument.<TestCommandSender>newBuilder("string")
+                                        .greedyFlagYielding()
+                                        .withSuggestionsProvider((context, input) -> Collections.singletonList("hello"))
+                                        .build()
+                        ).flag(manager.flagBuilder("flag").withAliases("f").build())
+                        .flag(manager.flagBuilder("flag2").build())
+        );
+
+        // Act
+        final List<String> suggestions1 = manager.suggest(
+                new TestCommandSender(),
+                "command "
+        );
+        final List<String> suggestions2 = manager.suggest(
+                new TestCommandSender(),
+                "command hel"
+        );
+        final List<String> suggestions3 = manager.suggest(
+                new TestCommandSender(),
+                "command hello --"
+        );
+        final List<String> suggestions4 = manager.suggest(
+                new TestCommandSender(),
+                "command hello --f"
+        );
+        final List<String> suggestions5 = manager.suggest(
+                new TestCommandSender(),
+                "command hello -f"
+        );
+        final List<String> suggestions6 = manager.suggest(
+                new TestCommandSender(),
+                "command hello -"
+        );
+
+        // Assert
+        assertThat(suggestions1).containsExactly("hello");
+        assertThat(suggestions2).containsExactly("hello");
+        assertThat(suggestions3).containsExactly("--flag", "--flag2");
+        assertThat(suggestions4).containsExactly("--flag", "--flag2");
+        assertThat(suggestions5).containsExactly("-f");
+        assertThat(suggestions6).containsExactly("hello");
+    }
+
+    @Test
+    void testFlagYieldingStringArrayFollowedByFlagArgument() {
+        // Arrange
+        final CommandManager<TestCommandSender> manager = createManager();
+        manager.command(
+                manager.commandBuilder("command")
+                        .argument(
+                                StringArrayArgument.of(
+                                        "array",
+                                        true,
+                                        (context, input) -> Collections.emptyList()
+                                )
+                        ).flag(manager.flagBuilder("flag").withAliases("f").build())
+                        .flag(manager.flagBuilder("flag2").build())
+        );
+
+        // Act
+        final List<String> suggestions1 = manager.suggest(
+                new TestCommandSender(),
+                "command "
+        );
+        final List<String> suggestions2 = manager.suggest(
+                new TestCommandSender(),
+                "command hello"
+        );
+        final List<String> suggestions3 = manager.suggest(
+                new TestCommandSender(),
+                "command hello --"
+        );
+        final List<String> suggestions4 = manager.suggest(
+                new TestCommandSender(),
+                "command hello --f"
+        );
+        final List<String> suggestions5 = manager.suggest(
+                new TestCommandSender(),
+                "command hello -f"
+        );
+        final List<String> suggestions6 = manager.suggest(
+                new TestCommandSender(),
+                "command hello -"
+        );
+
+        // Assert
+        assertThat(suggestions1).isEmpty();
+        assertThat(suggestions2).isEmpty();
+        assertThat(suggestions3).containsExactly("--flag", "--flag2");
+        assertThat(suggestions4).containsExactly("--flag", "--flag2");
+        assertThat(suggestions5).containsExactly("-f");
+        assertThat(suggestions6).isEmpty();
     }
 
     public enum TestEnum {

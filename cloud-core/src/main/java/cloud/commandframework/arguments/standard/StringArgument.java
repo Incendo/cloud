@@ -167,6 +167,18 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
     /**
+     * Create a new required command argument with the 'greedy flag yielding' parsing mode
+     *
+     * @param name Argument name
+     * @param <C>  Command sender type
+     * @return Created argument
+     * @since 1.7.0
+     */
+    public static <C> @NonNull CommandArgument<C, String> greedyFlagYielding(final @NonNull String name) {
+        return of(name, StringMode.GREEDY_FLAG_YIELDING);
+    }
+
+    /**
      * Create a new required command argument with the 'quoted' parsing mode
      *
      * @param name Argument name
@@ -189,8 +201,14 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
     public enum StringMode {
         SINGLE,
+        QUOTED,
         GREEDY,
-        QUOTED
+        /**
+         * Greedy string that will consume the input until a flag is present.
+         *
+         * @since 1.7.0
+         */
+        GREEDY_FLAG_YIELDING
     }
 
 
@@ -221,6 +239,17 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          */
         public @NonNull @This Builder<C> greedy() {
             this.stringMode = StringMode.GREEDY;
+            return this;
+        }
+
+        /**
+         * Greedy string that will consume the input until a flag is present.
+         *
+         * @return Builder instance
+         * @since 1.7.0
+         */
+        public @NonNull @This Builder<C> greedyFlagYielding() {
+            this.stringMode = StringMode.GREEDY_FLAG_YIELDING;
             return this;
         }
 
@@ -274,7 +303,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
 
+    @SuppressWarnings("UnnecessaryLambda")
     public static final class StringParser<C> implements ArgumentParser<C, String> {
+
+        private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
 
         private final StringMode stringMode;
         private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
@@ -388,6 +420,13 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
                 if (string == null) {
                     break;
+                }
+
+                if (this.stringMode == StringMode.GREEDY_FLAG_YIELDING) {
+                    // The pattern requires a leading space.
+                    if (FLAG_PATTERN.matcher(string).matches()) {
+                        break;
+                    }
                 }
 
                 sj.add(string);

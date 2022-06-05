@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.annotations.specifier.FlagYielding;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.specifier.Liberal;
 import cloud.commandframework.annotations.specifier.Quoted;
@@ -104,6 +105,10 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 Liberal.class,
                 (liberal, typeToken) -> ParserParameters.single(StandardParameters.LIBERAL, true)
         );
+        this.<FlagYielding, String>registerAnnotationMapper(
+                FlagYielding.class,
+                (flagYielding, typeToken) -> ParserParameters.single(StandardParameters.FLAG_YIELDING, true)
+        );
 
         /* Register standard types */
         this.registerParserSupplier(TypeToken.get(Byte.class), options ->
@@ -137,10 +142,13 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                         (double) options.get(StandardParameters.RANGE_MAX, Double.POSITIVE_INFINITY)
                 ));
         this.registerParserSupplier(TypeToken.get(Character.class), options -> new CharArgument.CharacterParser<>());
-        this.registerParserSupplier(TypeToken.get(String[].class), options -> new StringArrayArgument.StringArrayParser<>());
+        this.registerParserSupplier(TypeToken.get(String[].class), options ->
+                new StringArrayArgument.StringArrayParser<>(options.get(StandardParameters.FLAG_YIELDING, false))
+        );
         /* Make this one less awful */
         this.registerParserSupplier(TypeToken.get(String.class), options -> {
             final boolean greedy = options.get(StandardParameters.GREEDY, false);
+            final boolean greedyFlagAware = options.get(StandardParameters.FLAG_YIELDING, false);
             final boolean quoted = options.get(StandardParameters.QUOTED, false);
             if (greedy && quoted) {
                 throw new IllegalArgumentException(
@@ -150,6 +158,8 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final StringArgument.StringMode stringMode;
             if (greedy) {
                 stringMode = StringArgument.StringMode.GREEDY;
+            } else if (greedyFlagAware) {
+                stringMode = StringArgument.StringMode.GREEDY_FLAG_YIELDING;
             } else if (quoted) {
                 stringMode = StringArgument.StringMode.QUOTED;
             } else {

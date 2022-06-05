@@ -57,8 +57,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
-    private static final Pattern FLAG_ALIAS_PATTERN = Pattern.compile(" -(?<name>([A-Za-z]+))");
     private static final Pattern FLAG_PRIMARY_PATTERN = Pattern.compile(" --(?<name>([A-Za-z]+))");
+    private static final Pattern FLAG_ALIAS_PATTERN = Pattern.compile(" -(?<name>([A-Za-z]+))");
 
     /**
      * Dummy object that indicates that flags were parsed successfully
@@ -125,13 +125,13 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         /**
          * Parse command input to figure out what flag is currently being
          * typed at the end of the input queue. If no flag value is being
-         * inputed, returns {@link Optional#empty()}.<br>
+         * inputted, returns {@link Optional#empty()}.<br>
          * <br>
          * Will consume all but the last element from the input queue.
          *
          * @param commandContext Command context
          * @param inputQueue The input queue of arguments
-         * @return current flag being typed, or <i>empty()</i> if none is
+         * @return current flag being typed, or {@code empty()} if none is
          */
         public @NonNull Optional<String> parseCurrentFlag(
                 final @NonNull CommandContext<@NonNull C> commandContext,

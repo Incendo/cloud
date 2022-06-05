@@ -60,6 +60,16 @@ public final class StandardParameters {
      */
     public static final ParserParameter<Boolean> GREEDY = create("greedy", TypeToken.get(Boolean.class));
     /**
+     * Indicates that an argument should stop parsing when encountering a potential flag.
+     *
+     * @since 1.7.0
+     * @see cloud.commandframework.annotations.specifier.FlagYielding
+     */
+    public static final ParserParameter<Boolean> FLAG_YIELDING = create(
+            "flag_yielding",
+            TypeToken.get(Boolean.class)
+    );
+    /**
      * Indicates that a string argument should be quoted.
      *
      * @since 1.5.0

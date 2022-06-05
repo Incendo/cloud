@@ -28,9 +28,6 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -40,50 +37,18 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class StringArrayParserTest {
-
-    private StringArrayArgument.StringArrayParser<TestCommandSender> parser;
+class StringParserTest {
 
     @Mock
     private CommandContext<TestCommandSender> context;
 
-    @BeforeEach
-    void setup() {
-        this.parser = new StringArrayArgument.StringArrayParser<>();
-    }
-
-    @Test
-    void Parse_RandomInput_CapturesAll() {
-        // Arrange
-        final LinkedList<String> input = new LinkedList<>();
-        for (int i = 0; i < 10; i++) {
-            input.add(
-                    ThreadLocalRandom.current()
-                            .ints()
-                            .mapToObj(Integer::toString)
-                            .limit(32)
-                            .collect(Collectors.joining())
-            );
-        }
-        final LinkedList<String> inputCopy = new LinkedList<>(input);
-
-        // Act
-        final ArgumentParseResult<String[]> result = this.parser.parse(
-                this.context,
-                input
-        );
-
-        // Assert
-        assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(inputCopy.toArray(new String[0]));
-
-        assertThat(input).isEmpty();
-    }
-
     @Test
     void Parse_GreedyFlagAwareLongFormFlag_EndsAfterFlag() {
         // Arrange
-        final StringArrayArgument.StringArrayParser<TestCommandSender> parser = new StringArrayArgument.StringArrayParser<>(true);
+        final StringArgument.StringParser<TestCommandSender> parser = new StringArgument.StringParser<>(
+                StringArgument.StringMode.GREEDY_FLAG_YIELDING,
+                (context, input) -> Collections.emptyList()
+        );
         final LinkedList<String> input = ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",
@@ -96,14 +61,14 @@ class StringArrayParserTest {
         );
 
         // Act
-        final ArgumentParseResult<String[]> result = parser.parse(
+        final ArgumentParseResult<String> result = parser.parse(
                 this.context,
                 input
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(new String[] {"this", "is", "a", "string"});
+        assertThat(result.getParsedValue()).hasValue("this is a string");
 
         assertThat(input).containsExactly("--flag", "more", "flag", "content");
     }
@@ -111,7 +76,10 @@ class StringArrayParserTest {
     @Test
     void Parse_GreedyFlagAwareShortFormFlag_EndsAfterFlag() {
         // Arrange
-        final StringArrayArgument.StringArrayParser<TestCommandSender> parser = new StringArrayArgument.StringArrayParser<>(true);
+        final StringArgument.StringParser<TestCommandSender> parser = new StringArgument.StringParser<>(
+                StringArgument.StringMode.GREEDY_FLAG_YIELDING,
+                (context, input) -> Collections.emptyList()
+        );
         final LinkedList<String> input = ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",
@@ -124,14 +92,14 @@ class StringArrayParserTest {
         );
 
         // Act
-        final ArgumentParseResult<String[]> result = parser.parse(
+        final ArgumentParseResult<String> result = parser.parse(
                 this.context,
                 input
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(new String[] {"this", "is", "a", "string"});
+        assertThat(result.getParsedValue()).hasValue("this is a string");
 
         assertThat(input).containsExactly("-f", "-l", "-a", "-g");
     }
