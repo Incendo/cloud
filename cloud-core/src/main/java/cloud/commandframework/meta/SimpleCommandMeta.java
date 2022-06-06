@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * A simple immutable string-string map containing command meta
@@ -163,7 +164,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @param commandMeta Existing instance
          * @return Builder instance
          */
-        public @NonNull Builder with(final @NonNull CommandMeta commandMeta) {
+        public @NonNull @This Builder with(final @NonNull CommandMeta commandMeta) {
             if (commandMeta instanceof SimpleCommandMeta) {
                 this.map.putAll(((SimpleCommandMeta) commandMeta).metaMap);
             } else {
@@ -181,7 +182,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @deprecated For removal since 1.3.0, use {@link #with(Key, Object) the typesafe alternative} instead
          */
         @Deprecated
-        public @NonNull Builder with(
+        public @NonNull @This Builder with(
                 final @NonNull String key,
                 final @NonNull String value
         ) {
@@ -198,7 +199,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @return Builder instance
          * @since 1.3.0
          */
-        public <V> @NonNull Builder with(
+        public <V> @NonNull @This Builder with(
                 final @NonNull Key<V> key,
                 final @NonNull V value
         ) {

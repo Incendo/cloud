@@ -41,6 +41,7 @@ import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
 public final class StringArgument<C> extends CommandArgument<C, String> {
@@ -208,7 +209,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @param stringMode String mode to parse with
          * @return Builder instance
          */
-        private @NonNull Builder<C> withMode(final @NonNull StringMode stringMode) {
+        private @NonNull @This Builder<C> withMode(final @NonNull StringMode stringMode) {
             this.stringMode = stringMode;
             return this;
         }
@@ -218,7 +219,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          *
          * @return Builder instance
          */
-        public @NonNull Builder<C> greedy() {
+        public @NonNull @This Builder<C> greedy() {
             this.stringMode = StringMode.GREEDY;
             return this;
         }
@@ -228,7 +229,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          *
          * @return Builder instance
          */
-        public @NonNull Builder<C> single() {
+        public @NonNull @This Builder<C> single() {
             this.stringMode = StringMode.SINGLE;
             return this;
         }
@@ -238,7 +239,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          *
          * @return Builder instance
          */
-        public @NonNull Builder<C> quoted() {
+        public @NonNull @This Builder<C> quoted() {
             this.stringMode = StringMode.QUOTED;
             return this;
         }
@@ -250,7 +251,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @return Builder instance
          */
         @Override
-        public @NonNull Builder<C> withSuggestionsProvider(
+        public @NonNull @This Builder<C> withSuggestionsProvider(
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
                         @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
         ) {

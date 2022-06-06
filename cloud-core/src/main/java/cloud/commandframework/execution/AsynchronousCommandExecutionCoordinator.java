@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Execution coordinator parses and/or executes commands on a separate thread from the calling thread
@@ -141,7 +142,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          *
          * @return Builder instance
          */
-        public @NonNull Builder<C> withSynchronousParsing() {
+        public @NonNull @This Builder<C> withSynchronousParsing() {
             this.synchronizeParsing = true;
             return this;
         }
@@ -151,19 +152,19 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
          *
          * @return Builder instance
          */
-        public @NonNull Builder<C> withAsynchronousParsing() {
+        public @NonNull @This Builder<C> withAsynchronousParsing() {
             this.synchronizeParsing = false;
             return this;
         }
 
         /**
          * Specify an executor that will be used to coordinate tasks.
-         * By default the executor uses {@link java.util.concurrent.ForkJoinPool#commonPool()}
+         * By default, the executor uses {@link java.util.concurrent.ForkJoinPool#commonPool()}
          *
          * @param executor Executor to use
          * @return Builder instance
          */
-        public @NonNull Builder<C> withExecutor(final @NonNull Executor executor) {
+        public @NonNull @This Builder<C> withExecutor(final @NonNull Executor executor) {
             this.executor = executor;
             return this;
         }

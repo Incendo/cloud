@@ -77,6 +77,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * The manager is responsible for command registration, parsing delegation, etc.
@@ -222,7 +223,7 @@ public abstract class CommandManager<C> {
      * @return The command manager instance. This is returned so that these method calls may be chained. This will always
      *         return {@code this}.
      */
-    public @NonNull CommandManager<C> command(final @NonNull Command<C> command) {
+    public @NonNull @This CommandManager<C> command(final @NonNull Command<C> command) {
         if (!(this.transitionIfPossible(RegistrationState.BEFORE_REGISTRATION, RegistrationState.REGISTERING)
                 || this.isCommandRegistrationAllowed())) {
             throw new IllegalStateException("Unable to register commands because the manager is no longer in a registration "
