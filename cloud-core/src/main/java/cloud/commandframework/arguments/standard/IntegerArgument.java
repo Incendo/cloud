@@ -40,6 +40,7 @@ import java.util.TreeSet;
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
 public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
@@ -151,7 +152,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          * @param min Minimum value
          * @return Builder instance
          */
-        public @NonNull Builder<C> withMin(final int min) {
+        public @NonNull @This Builder<C> withMin(final int min) {
             this.min = min;
             return this;
         }
@@ -162,7 +163,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          * @param max Maximum value
          * @return Builder instance
          */
-        public @NonNull Builder<C> withMax(final int max) {
+        public @NonNull @This Builder<C> withMax(final int max) {
             this.max = max;
             return this;
         }

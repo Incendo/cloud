@@ -44,6 +44,7 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * A argument that belongs to a command
@@ -378,7 +379,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param preprocessor Preprocessor
      * @return {@code this}
      */
-    public @NonNull CommandArgument<C, T> addPreprocessor(
+    public @NonNull @This CommandArgument<C, T> addPreprocessor(
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
                     @NonNull ArgumentParseResult<Boolean>> preprocessor
     ) {
@@ -595,7 +596,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @param manager Command manager
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> manager(final @NonNull CommandManager<C> manager) {
+        public @NonNull @This Builder<@NonNull C, @NonNull T> manager(final @NonNull CommandManager<C> manager) {
             this.manager = manager;
             return this;
         }
@@ -609,7 +610,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          *
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> asRequired() {
+        public @NonNull @This Builder<@NonNull C, @NonNull T> asRequired() {
             this.required = true;
             return this;
         }
@@ -623,7 +624,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          *
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> asOptional() {
+        public @NonNull @This Builder<@NonNull C, @NonNull T> asOptional() {
             this.required = false;
             return this;
         }
@@ -638,7 +639,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @param defaultValue Default value that will be used if none was supplied
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> asOptionalWithDefault(final @NonNull String defaultValue) {
+        public @NonNull @This Builder<@NonNull C, @NonNull T> asOptionalWithDefault(final @NonNull String defaultValue) {
             this.defaultValue = defaultValue;
             this.required = false;
             return this;
@@ -650,7 +651,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @param parser Argument parser
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> withParser(final @NonNull ArgumentParser<@NonNull C, @NonNull T> parser) {
+        public @NonNull @This Builder<@NonNull C, @NonNull T> withParser(final @NonNull ArgumentParser<@NonNull C, @NonNull T> parser) {
             this.parser = Objects.requireNonNull(parser, "Parser may not be null");
             return this;
         }
@@ -661,7 +662,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @param suggestionsProvider Suggestions provider
          * @return Builder instance
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
+        public @NonNull @This Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
                         @NonNull String, @NonNull List<String>> suggestionsProvider
         ) {
@@ -678,7 +679,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @return Builder instance
          * @since 1.4.0
          */
-        public @NonNull Builder<@NonNull C, @NonNull T> withDefaultDescription(
+        public @NonNull @This Builder<@NonNull C, @NonNull T> withDefaultDescription(
                 final @NonNull ArgumentDescription defaultDescription
         ) {
             this.defaultDescription = Objects.requireNonNull(defaultDescription, "Default description may not be null");

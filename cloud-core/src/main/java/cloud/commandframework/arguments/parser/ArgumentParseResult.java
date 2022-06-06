@@ -26,6 +26,7 @@ package cloud.commandframework.arguments.parser;
 import java.util.Optional;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Result of the parsing done by a {@link ArgumentParser}
@@ -135,7 +136,7 @@ public abstract class ArgumentParseResult<T> {
         }
 
         @Override
-        public @NonNull ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
+        public @NonNull @This ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
             return this;
         }
 

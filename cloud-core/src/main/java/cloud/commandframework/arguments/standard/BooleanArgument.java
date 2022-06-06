@@ -39,6 +39,7 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
 public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
@@ -129,7 +130,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
          * @param liberal liberal value
          * @return Builder instance
          */
-        public @NonNull Builder<C> withLiberal(final boolean liberal) {
+        public @NonNull @This Builder<C> withLiberal(final boolean liberal) {
             this.liberal = liberal;
             return this;
         }

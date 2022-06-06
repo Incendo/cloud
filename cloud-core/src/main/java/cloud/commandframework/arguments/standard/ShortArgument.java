@@ -36,6 +36,7 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
 public final class ShortArgument<C> extends CommandArgument<C, Short> {
@@ -136,7 +137,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @param min Minimum value
          * @return Builder instance
          */
-        public @NonNull Builder<C> withMin(final short min) {
+        public @NonNull @This Builder<C> withMin(final short min) {
             this.min = min;
             return this;
         }
@@ -147,7 +148,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @param max Maximum value
          * @return Builder instance
          */
-        public @NonNull Builder<C> withMax(final short max) {
+        public @NonNull @This Builder<C> withMax(final short max) {
             this.max = max;
             return this;
         }
