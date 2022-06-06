@@ -29,6 +29,7 @@ import cloud.commandframework.keys.SimpleCloudKey;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Predicate;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -38,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @since 1.4.0
  */
 @FunctionalInterface
+@API(status = API.Status.STABLE, since = "1.4.0")
 public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolder<Void> {
 
     /**

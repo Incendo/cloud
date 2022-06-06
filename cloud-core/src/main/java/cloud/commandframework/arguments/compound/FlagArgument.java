@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -55,6 +56,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
     private static final Pattern FLAG_PRIMARY_PATTERN = Pattern.compile(" --(?<name>([A-Za-z]+))");
@@ -105,6 +107,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class FlagArgumentParser<C> implements ArgumentParser<C, Object> {
 
         private final CommandFlag<?>[] flags;
@@ -289,6 +292,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
             return this.suggestions(commandContext, input);
         }
 
+
         /**
          * Helper class to parse the command input queue into flags
          * and flag values. On failure the intermediate results
@@ -472,9 +476,11 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         }
     }
 
+
     /**
      * Flag parse exception
      */
+    @API(status = API.Status.STABLE)
     public static final class FlagParseException extends ParserException {
 
         private static final long serialVersionUID = -7725389394142868549L;
@@ -513,9 +519,11 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
     }
 
+
     /**
      * Reasons for which flag parsing may fail
      */
+    @API(status = API.Status.STABLE)
     public enum FailureReason {
 
         UNKNOWN_FLAG(StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_FLAG_UNKNOWN_FLAG),

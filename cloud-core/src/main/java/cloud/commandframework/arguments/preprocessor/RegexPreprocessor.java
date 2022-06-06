@@ -33,6 +33,7 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -41,6 +42,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  */
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
         @NonNull ArgumentParseResult<Boolean>> {
 
@@ -113,6 +115,7 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
      * Exception thrown when input fails regex matching in {@link RegexPreprocessor}
      */
     @SuppressWarnings("serial")
+    @API(status = API.Status.STABLE)
     public static final class RegexValidationException extends IllegalArgumentException {
 
         private static final long serialVersionUID = 747826566058072233L;

@@ -24,6 +24,7 @@
 package cloud.commandframework.types.tuples;
 
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -33,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <V> Second type
  * @param <W> Third type
  */
+@API(status = API.Status.STABLE)
 public class Triplet<U, V, W> implements Tuple {
 
     private final U first;

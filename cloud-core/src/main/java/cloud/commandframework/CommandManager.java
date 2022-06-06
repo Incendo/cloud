@@ -75,6 +75,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -84,6 +85,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public abstract class CommandManager<C> {
 
     private final Map<Class<? extends Exception>, BiConsumer<C, ? extends Exception>> exceptionHandlers = new HashMap<>();
@@ -250,6 +252,7 @@ public abstract class CommandManager<C> {
      * @return the caption variable replacement handler
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler() {
         return this.captionVariableReplacementHandler;
     }
@@ -260,6 +263,7 @@ public abstract class CommandManager<C> {
      * @param captionVariableReplacementHandler new replacement handler
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public void captionVariableReplacementHandler(
             final @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler
     ) {
@@ -363,6 +367,7 @@ public abstract class CommandManager<C> {
      * @deprecated Use {@link #setCaptionRegistry(CaptionRegistry)} These methods are identical.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED)
     public final void registerDefaultCaptions(final @NonNull CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
     }
@@ -392,9 +397,11 @@ public abstract class CommandManager<C> {
      * @param description Description for the root literal
      * @param meta        Command meta
      * @return Builder instance
-     * @deprecated for removal since 1.4.0. Use {@link #commandBuilder(String, Collection, Description, CommandMeta)} instead.
+     * @deprecated for removal since 1.4.0. Use
+     *         {@link #commandBuilder(String, Collection, ArgumentDescription, CommandMeta)} instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull Collection<String> aliases,
@@ -421,6 +428,7 @@ public abstract class CommandManager<C> {
      * @return Builder instance
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull Collection<String> aliases,
@@ -484,6 +492,7 @@ public abstract class CommandManager<C> {
      *         instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull CommandMeta meta,
@@ -510,6 +519,7 @@ public abstract class CommandManager<C> {
      * @return Builder instance
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull CommandMeta meta,
@@ -575,6 +585,7 @@ public abstract class CommandManager<C> {
      * @deprecated for removal since 1.4.0. Use {@link #commandBuilder(String, ArgumentDescription, String...)} instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull Description description,
@@ -603,6 +614,7 @@ public abstract class CommandManager<C> {
      * @see #createDefaultCommandMeta() Default command meta creation
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull ArgumentDescription description,
@@ -943,6 +955,7 @@ public abstract class CommandManager<C> {
      * @return Command execution coordinator
      * @since 1.6.0
      */
+    @API(status = API.Status.STABLE, since = "1.6.0")
     public @NonNull CommandExecutionCoordinator<C> commandExecutionCoordinator() {
         return this.commandExecutionCoordinator;
     }
@@ -955,6 +968,7 @@ public abstract class CommandManager<C> {
      * @throws IllegalStateException if the manager is in any state but {@code in} or {@code out}
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     protected final void transitionOrThrow(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
         if (!this.transitionIfPossible(in, out)) {
             throw new IllegalStateException("Command manager was in state " + this.state.get() + ", while we were expecting a state "
@@ -970,6 +984,7 @@ public abstract class CommandManager<C> {
      * @return {@code true} if the state transition was successful, or the manager was already in the desired state
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     protected final boolean transitionIfPossible(final @NonNull RegistrationState in, final @NonNull RegistrationState out) {
         return this.state.compareAndSet(in, out) || this.state.get() == out;
     }
@@ -981,6 +996,7 @@ public abstract class CommandManager<C> {
      * @throws IllegalStateException if the manager is not in the expected state
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     protected final void requireState(final @NonNull RegistrationState expected) {
         if (this.state.get() != expected) {
             throw new IllegalStateException("This operation required the commands manager to be in state " + expected + ", but it "
@@ -995,6 +1011,7 @@ public abstract class CommandManager<C> {
      * @throws IllegalStateException if the manager is not in the expected state
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     protected final void lockRegistration() {
         if (this.getRegistrationState() == RegistrationState.BEFORE_REGISTRATION) {
             this.transitionOrThrow(RegistrationState.BEFORE_REGISTRATION, RegistrationState.AFTER_REGISTRATION);
@@ -1011,6 +1028,7 @@ public abstract class CommandManager<C> {
      * @return The current state
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public final @NonNull RegistrationState getRegistrationState() {
         return this.state.get();
     }
@@ -1024,9 +1042,11 @@ public abstract class CommandManager<C> {
      * @return {@code true} if the registration is allowed, else {@code false}
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public boolean isCommandRegistrationAllowed() {
         return this.getSetting(ManagerSettings.ALLOW_UNSAFE_REGISTRATION) || this.state.get() != RegistrationState.AFTER_REGISTRATION;
     }
+
 
     /**
      * Configurable command related settings
@@ -1034,6 +1054,7 @@ public abstract class CommandManager<C> {
      * @see CommandManager#setSetting(ManagerSettings, boolean) Set a manager setting
      * @see CommandManager#getSetting(ManagerSettings) Get a manager setting
      */
+    @API(status = API.Status.STABLE)
     public enum ManagerSettings {
         /**
          * Do not create a compound permission and do not look greedily
@@ -1057,6 +1078,7 @@ public abstract class CommandManager<C> {
          *
          * @since 1.2.0
          */
+        @API(status = API.Status.STABLE, since = "1.2.0")
         ALLOW_UNSAFE_REGISTRATION,
 
         /**
@@ -1064,14 +1086,17 @@ public abstract class CommandManager<C> {
          *
          * @since 1.2.0
          */
+        @API(status = API.Status.STABLE, since = "1.2.0")
         OVERRIDE_EXISTING_COMMANDS
     }
+
 
     /**
      * The point in the registration lifecycle for this commands manager
      *
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public enum RegistrationState {
         /**
          * The point when no commands have been registered yet.

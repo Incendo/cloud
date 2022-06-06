@@ -24,6 +24,7 @@
 package cloud.commandframework.types.tuples;
 
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -34,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <W> Third type
  * @param <X> Fourth type
  */
+@API(status = API.Status.STABLE)
 public class Quartet<U, V, W, X> implements Tuple {
 
     private final U first;

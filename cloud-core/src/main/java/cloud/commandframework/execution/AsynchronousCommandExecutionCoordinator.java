@@ -36,6 +36,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -45,6 +46,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExecutionCoordinator<C> {
 
     private final CommandManager<C> commandManager;
@@ -128,6 +130,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> {
 
         private Executor executor = null;

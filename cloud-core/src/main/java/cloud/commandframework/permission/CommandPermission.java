@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static java.util.Objects.requireNonNull;
@@ -34,6 +35,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * A command permission representation.
  */
+@API(status = API.Status.STABLE)
 public interface CommandPermission {
 
     /**
@@ -58,6 +60,7 @@ public interface CommandPermission {
      * @return a new {@code or} permission
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     default @NonNull CommandPermission or(final @NonNull CommandPermission other) {
         requireNonNull(other, "other");
         final Set<CommandPermission> permission = new HashSet<>(2);
@@ -73,6 +76,7 @@ public interface CommandPermission {
      * @return a new {@code or} permission
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     default @NonNull CommandPermission or(final @NonNull CommandPermission @NonNull... other) {
         requireNonNull(other, "other");
         final Set<CommandPermission> permission = new HashSet<>(other.length + 1);
@@ -88,6 +92,7 @@ public interface CommandPermission {
      * @return a new {@code and} permission
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     default @NonNull CommandPermission and(final @NonNull CommandPermission other) {
         requireNonNull(other, "other");
         final Set<CommandPermission> permission = new HashSet<>(2);
@@ -103,6 +108,7 @@ public interface CommandPermission {
      * @return a new {@code and} permission
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     default @NonNull CommandPermission and(final @NonNull CommandPermission @NonNull... other) {
         requireNonNull(other, "other");
         final Set<CommandPermission> permission = new HashSet<>(other.length + 1);

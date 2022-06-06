@@ -24,11 +24,13 @@
 package cloud.commandframework.arguments.parser;
 
 import io.leangen.geantyref.TypeToken;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Common parser parameters used when resolving types in the {@link ParserRegistry}
  */
+@API(status = API.Status.STABLE)
 public final class StandardParameters {
 
     /**
@@ -65,6 +67,7 @@ public final class StandardParameters {
      * @since 1.7.0
      * @see cloud.commandframework.annotations.specifier.FlagYielding
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public static final ParserParameter<Boolean> FLAG_YIELDING = create(
             "flag_yielding",
             TypeToken.get(Boolean.class)
@@ -74,12 +77,14 @@ public final class StandardParameters {
      *
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "1.5.0")
     public static final ParserParameter<Boolean> QUOTED = create("quoted", TypeToken.get(Boolean.class));
     /**
      * Indicates that a boolean argument should be liberal.
      *
      * @since 1.6.0
      */
+    @API(status = API.Status.STABLE, since = "1.6.0")
     public static final ParserParameter<Boolean> LIBERAL = create("liberal", TypeToken.get(Boolean.class));
 
     private StandardParameters() {

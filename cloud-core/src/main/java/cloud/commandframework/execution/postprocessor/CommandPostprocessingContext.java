@@ -26,6 +26,7 @@ package cloud.commandframework.execution.postprocessor;
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -33,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public final class CommandPostprocessingContext<C> {
 
     private final CommandContext<@NonNull C> commandContext;

@@ -25,8 +25,10 @@ package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@API(status = API.Status.STABLE)
 public class ArgumentParseException extends CommandParseException {
 
     private static final long serialVersionUID = -4385446899439587461L;
@@ -39,6 +41,7 @@ public class ArgumentParseException extends CommandParseException {
      * @param commandSender Command sender
      * @param currentChain  Chain leading up to the exception
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public ArgumentParseException(
             final @NonNull Throwable throwable,
             final @NonNull Object commandSender,

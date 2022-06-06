@@ -26,11 +26,13 @@ package cloud.commandframework.permission;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link cloud.commandframework.arguments.CommandArgument} permission
  */
+@API(status = API.Status.STABLE)
 public final class Permission implements CommandPermission {
 
     /**

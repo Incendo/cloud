@@ -23,11 +23,13 @@
 //
 package cloud.commandframework.types.tuples;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Tuple type
  */
+@API(status = API.Status.STABLE)
 public interface Tuple {
 
     /**

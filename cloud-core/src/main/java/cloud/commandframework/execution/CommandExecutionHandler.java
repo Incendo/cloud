@@ -28,6 +28,7 @@ import cloud.commandframework.context.CommandContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -39,6 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 @FunctionalInterface
+@API(status = API.Status.STABLE)
 public interface CommandExecutionHandler<C> {
 
     /**
@@ -48,6 +50,7 @@ public interface CommandExecutionHandler<C> {
      * @return command execution handler that does nothing
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     static <C> @NonNull CommandExecutionHandler<C> noOpCommandExecutionHandler() {
         return new NullCommandExecutionHandler<>();
     }
@@ -64,6 +67,7 @@ public interface CommandExecutionHandler<C> {
      * @return multicast-delegate command execution handler
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     static <C> @NonNull CommandExecutionHandler<C> delegatingExecutionHandler(
             final List<CommandExecutionHandler<C>> handlers
     ) {
@@ -84,6 +88,7 @@ public interface CommandExecutionHandler<C> {
      * @return future that completes when the command has finished execution
      * @since 1.6.0
      */
+    @API(status = API.Status.STABLE, since = "1.6.0")
     default CompletableFuture<@Nullable Void> executeFuture(@NonNull CommandContext<C> commandContext) {
         final CompletableFuture<Void> future = new CompletableFuture<>();
         try {
@@ -101,6 +106,7 @@ public interface CommandExecutionHandler<C> {
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     class NullCommandExecutionHandler<C> implements CommandExecutionHandler<C> {
 
         @Override
@@ -117,6 +123,7 @@ public interface CommandExecutionHandler<C> {
      * @since 1.6.0
      */
     @FunctionalInterface
+    @API(status = API.Status.STABLE, since = "1.6.0")
     interface FutureCommandExecutionHandler<C> extends CommandExecutionHandler<C> {
 
         @Override
@@ -140,6 +147,7 @@ public interface CommandExecutionHandler<C> {
      * @see #delegatingExecutionHandler(List)
      * @since 1.7.0
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.7.0")
     final class MulticastDelegateFutureCommandExecutionHandler<C> implements FutureCommandExecutionHandler<C> {
 
         private final List<CommandExecutionHandler<C>> handlers;

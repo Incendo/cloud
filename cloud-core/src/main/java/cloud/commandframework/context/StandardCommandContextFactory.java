@@ -25,9 +25,11 @@ package cloud.commandframework.context;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.captions.CaptionRegistry;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("deprecation")
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class StandardCommandContextFactory<C> implements CommandContextFactory<C> {
 
     @Override

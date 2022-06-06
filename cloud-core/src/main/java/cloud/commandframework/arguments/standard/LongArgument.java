@@ -34,11 +34,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class LongArgument<C> extends CommandArgument<C, Long> {
 
     private final long min;
@@ -125,6 +127,8 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         return this.max;
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, Long> {
 
         private long min = LongParser.DEFAULT_MINIMUM;
@@ -164,6 +168,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public @NonNull Builder<C> asOptionalWithDefault(final long defaultValue) {
             return (Builder<C>) this.asOptionalWithDefault(Long.toString(defaultValue));
         }
@@ -177,6 +182,8 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
 
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class LongParser<C> implements ArgumentParser<C, Long> {
 
         /**
@@ -184,6 +191,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final long DEFAULT_MINIMUM = Long.MIN_VALUE;
 
         /**
@@ -191,6 +199,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final long DEFAULT_MAXIMUM = Long.MAX_VALUE;
 
         private final long min;
@@ -253,6 +262,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @return whether the parser has a maximum set
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public boolean hasMax() {
             return this.max != DEFAULT_MAXIMUM;
         }
@@ -264,6 +274,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @return whether the parser has a maximum set
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public boolean hasMin() {
             return this.min != DEFAULT_MINIMUM;
         }
@@ -285,6 +296,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
 
 
     @SuppressWarnings("serial")
+    @API(status = API.Status.STABLE)
     public static final class LongParseException extends NumberParseException {
 
         private static final long serialVersionUID = 4366856282301198232L;
@@ -301,6 +313,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @deprecated use {@link #LongParseException(String, LongParser, CommandContext)} instead
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.5.0")
         public LongParseException(
                 final @NonNull String input,
                 final long min,
@@ -318,6 +331,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
          * @param commandContext command context
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public LongParseException(
                 final @NonNull String input,
                 final @NonNull LongParser<?> parser,

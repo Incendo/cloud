@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -52,6 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> sender type
  * @since 1.7.0
  */
+@API(status = API.Status.STABLE, since = "1.7.0")
 public final class DurationArgument<C> extends CommandArgument<C, Duration> {
 
     /**
@@ -153,6 +155,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
      * @param <C> sender type
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public static final class Builder<C> extends TypedBuilder<C, Duration, Builder<C>> {
 
         private Builder(final @NonNull String name) {
@@ -197,6 +200,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
      * @param <C> sender type
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public static final class Parser<C> implements ArgumentParser<C, Duration> {
 
         @Override
@@ -281,6 +285,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
      *
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public static final class DurationParseException extends ParserException {
 
         private static final long serialVersionUID = 7632293268451349508L;

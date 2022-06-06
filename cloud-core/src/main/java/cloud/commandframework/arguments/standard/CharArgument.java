@@ -36,10 +36,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class CharArgument<C> extends CommandArgument<C, Character> {
 
     private CharArgument(
@@ -102,6 +104,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, Character> {
 
         private Builder(final @NonNull String name) {
@@ -123,6 +126,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class CharacterParser<C> implements ArgumentParser<C, Character> {
 
         @Override
@@ -157,6 +161,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
     /**
      * Char parse exception
      */
+    @API(status = API.Status.STABLE)
     public static final class CharParseException extends ParserException {
 
         private static final long serialVersionUID = 6458851071584278854L;

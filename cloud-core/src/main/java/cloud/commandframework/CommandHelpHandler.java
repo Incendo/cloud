@@ -36,9 +36,11 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@API(status = API.Status.STABLE)
 public final class CommandHelpHandler<C> {
 
     private final CommandManager<C> commandManager;
@@ -289,6 +291,7 @@ public final class CommandHelpHandler<C> {
         return false;
     }
 
+
     /**
      * Something that can be returned as the result of a help query
      * <p>
@@ -301,10 +304,13 @@ public final class CommandHelpHandler<C> {
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.STABLE)
     public interface HelpTopic<C> {
 
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class VerboseHelpEntry<C> {
 
         private final Command<C> command;
@@ -378,11 +384,13 @@ public final class CommandHelpHandler<C> {
 
     }
 
+
     /**
      * Index of available commands
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.STABLE)
     public static final class IndexHelpTopic<C> implements HelpTopic<C> {
 
         private final List<VerboseHelpEntry<C>> entries;
@@ -441,6 +449,7 @@ public final class CommandHelpHandler<C> {
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.STABLE)
     public static final class VerboseHelpTopic<C> implements HelpTopic<C> {
 
         private final Command<C> command;
@@ -503,6 +512,7 @@ public final class CommandHelpHandler<C> {
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.STABLE)
     public static final class MultiHelpTopic<C> implements HelpTopic<C> {
 
         private final String longestPath;

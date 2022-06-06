@@ -25,6 +25,7 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandTree;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -34,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 @FunctionalInterface
+@API(status = API.Status.STABLE)
 public interface CommandSyntaxFormatter<C> {
 
     /**

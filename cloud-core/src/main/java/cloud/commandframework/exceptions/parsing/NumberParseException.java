@@ -26,8 +26,10 @@ package cloud.commandframework.exceptions.parsing;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@API(status = API.Status.STABLE)
 public abstract class NumberParseException extends ParserException {
 
     private static final long serialVersionUID = 3018775374056029797L;

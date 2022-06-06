@@ -24,6 +24,7 @@
 package cloud.commandframework.captions;
 
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -31,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public interface FactoryDelegatingCaptionRegistry<C> extends CaptionRegistry<C> {
 
     /**

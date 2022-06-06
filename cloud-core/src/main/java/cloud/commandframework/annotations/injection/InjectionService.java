@@ -27,6 +27,7 @@ import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.services.types.Service;
 import cloud.commandframework.types.tuples.Triplet;
+import org.apiguardian.api.API;
 
 /**
  * Service that can be registered to the {@link ParameterInjectorRegistry} in order to provide
@@ -37,6 +38,7 @@ import cloud.commandframework.types.tuples.Triplet;
  * @since 1.4.0
  */
 @FunctionalInterface
+@API(status = API.Status.STABLE, since = "1.4.0")
 public interface InjectionService<C> extends
         Service<Triplet<CommandContext<C>, Class<?>, AnnotationAccessor>, Object> {
 

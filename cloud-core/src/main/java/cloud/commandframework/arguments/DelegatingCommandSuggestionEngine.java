@@ -32,6 +32,7 @@ import cloud.commandframework.services.State;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -39,6 +40,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class DelegatingCommandSuggestionEngine<C> implements CommandSuggestionEngine<C> {
 
     private static final List<String> SINGLE_EMPTY_SUGGESTION = Collections.unmodifiableList(Collections.singletonList(""));

@@ -25,6 +25,7 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public final class DelegatingCommandSuggestionEngineFactory<C> {
 
     private final CommandManager<C> commandManager;

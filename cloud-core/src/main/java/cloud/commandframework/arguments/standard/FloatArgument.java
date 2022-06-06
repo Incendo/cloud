@@ -34,11 +34,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
     private final float min;
@@ -125,6 +127,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         return this.max;
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, Float> {
 
         private float min = FloatParser.DEFAULT_MINIMUM;
@@ -164,6 +168,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public @NonNull Builder<C> asOptionalWithDefault(final float defaultValue) {
             return (Builder<C>) this.asOptionalWithDefault(Float.toString(defaultValue));
         }
@@ -177,6 +182,8 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class FloatParser<C> implements ArgumentParser<C, Float> {
 
         /**
@@ -184,6 +191,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final float DEFAULT_MINIMUM = Float.NEGATIVE_INFINITY;
 
         /**
@@ -191,6 +199,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final float DEFAULT_MAXIMUM = Float.POSITIVE_INFINITY;
 
         private final float min;
@@ -258,6 +267,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          * @return whether the parser has a maximum set
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public boolean hasMax() {
             return this.max != DEFAULT_MAXIMUM;
         }
@@ -269,6 +279,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          * @return whether the parser has a maximum set
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public boolean hasMin() {
             return this.min != DEFAULT_MINIMUM;
         }
@@ -277,6 +288,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
 
     @SuppressWarnings("serial")
+    @API(status = API.Status.STABLE)
     public static final class FloatParseException extends NumberParseException {
 
         private static final long serialVersionUID = -1162983846751812292L;
@@ -293,6 +305,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          * @deprecated use {@link #FloatParseException(String, FloatParser, CommandContext)} instead
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.5.0")
         public FloatParseException(
                 final @NonNull String input,
                 final float min,
@@ -310,6 +323,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
          * @param commandContext command context
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public FloatParseException(
                 final @NonNull String input,
                 final @NonNull FloatParser<?> parser,

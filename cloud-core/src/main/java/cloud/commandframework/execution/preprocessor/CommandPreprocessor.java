@@ -24,6 +24,7 @@
 package cloud.commandframework.execution.preprocessor;
 
 import cloud.commandframework.services.types.ConsumerService;
+import org.apiguardian.api.API;
 
 /**
  * Command preprocessor that gets to act on command input
@@ -34,6 +35,7 @@ import cloud.commandframework.services.types.ConsumerService;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public interface CommandPreprocessor<C> extends ConsumerService<CommandPreprocessingContext<C>> {
 
 }

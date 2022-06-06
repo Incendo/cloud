@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.parser;
 
 import java.util.Optional;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
@@ -33,6 +34,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  *
  * @param <T> Parser return type
  */
+@API(status = API.Status.STABLE)
 public abstract class ArgumentParseResult<T> {
 
     private ArgumentParseResult() {
@@ -75,6 +77,7 @@ public abstract class ArgumentParseResult<T> {
      * @return a new result if successful, otherwise a failure
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "1.5.0")
     public abstract <U> @NonNull ArgumentParseResult<U> mapParsedValue(Function<T, U> mapper);
 
     /**
@@ -85,6 +88,7 @@ public abstract class ArgumentParseResult<T> {
      * @return a new result if successful, otherwise a failure
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "1.5.0")
     public abstract <U> @NonNull ArgumentParseResult<U> flatMapParsedValue(Function<T, ArgumentParseResult<U>> mapper);
 
     /**
@@ -101,6 +105,7 @@ public abstract class ArgumentParseResult<T> {
      * @return if this is a failure, a transformed result, otherwise this
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "1.5.0")
     public abstract @NonNull ArgumentParseResult<T> mapFailure(Function<Throwable, Throwable> mapper);
 
 
@@ -160,13 +165,13 @@ public abstract class ArgumentParseResult<T> {
 
         @Override
         @SuppressWarnings("unchecked")
-        public @NonNull <U> ArgumentParseResult<U> mapParsedValue(final Function<T, U> mapper) {
+        public @NonNull <U> @This ArgumentParseResult<U> mapParsedValue(final Function<T, U> mapper) {
             return (ArgumentParseResult<U>) this;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public @NonNull <U> ArgumentParseResult<U> flatMapParsedValue(final Function<T, ArgumentParseResult<U>> mapper) {
+        public @NonNull <U> @This ArgumentParseResult<U> flatMapParsedValue(final Function<T, ArgumentParseResult<U>> mapper) {
             return (ArgumentParseResult<U>) this;
         }
 

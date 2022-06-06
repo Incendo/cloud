@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @deprecated to become package-private since 1.4.0. Use {@link ArgumentDescription} instead.
  */
 @Deprecated
+@API(status = API.Status.DEPRECATED, since = "1.4.0")
 public final class Description implements ArgumentDescription {
 
     /**

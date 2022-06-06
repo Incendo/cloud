@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -42,6 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public final class StaticArgument<C> extends CommandArgument<C, String> {
 
     private StaticArgument(final boolean required, final @NonNull String name, final @NonNull String... aliases) {

@@ -37,10 +37,12 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     private UUIDArgument(
@@ -103,6 +105,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, UUID> {
 
         private Builder(final @NonNull String name) {
@@ -128,6 +131,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class UUIDParser<C> implements ArgumentParser<C, UUID> {
 
         @Override
@@ -160,6 +164,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class UUIDParseException extends ParserException {
 
         private static final long serialVersionUID = 6399602590976540023L;

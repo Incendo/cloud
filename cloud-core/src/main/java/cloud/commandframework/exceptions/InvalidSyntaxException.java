@@ -25,12 +25,14 @@ package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Exception sent when a command sender inputs invalid command syntax
  */
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public class InvalidSyntaxException extends CommandParseException {
 
     private static final long serialVersionUID = -4183356059293785202L;
@@ -43,6 +45,7 @@ public class InvalidSyntaxException extends CommandParseException {
      * @param commandSender Sender that sent the command
      * @param currentChain  Chain leading up to issue
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public InvalidSyntaxException(
             final @NonNull String correctSyntax,
             final @NonNull Object commandSender,

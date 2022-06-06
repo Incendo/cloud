@@ -25,8 +25,10 @@ package cloud.commandframework.permission;
 
 import cloud.commandframework.keys.CloudKey;
 import java.util.function.Predicate;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class WrappingPredicatePermission<C> implements PredicatePermission<C> {
 
     private final CloudKey<Void> key;

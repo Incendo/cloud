@@ -29,9 +29,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class AnnotatedElementAccessor implements AnnotationAccessor {
 
     private final AnnotatedElement element;

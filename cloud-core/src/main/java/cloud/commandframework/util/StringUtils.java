@@ -23,11 +23,13 @@
 //
 package cloud.commandframework.util;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * String utilities
  */
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class StringUtils {
 
     private StringUtils() {

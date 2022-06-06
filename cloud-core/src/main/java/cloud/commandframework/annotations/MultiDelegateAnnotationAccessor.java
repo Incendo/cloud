@@ -28,9 +28,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class MultiDelegateAnnotationAccessor implements AnnotationAccessor {
 
     private final AnnotationAccessor[] accessors;

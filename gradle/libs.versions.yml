@@ -14,6 +14,7 @@ versions:
   errorprone: 2.9.0
   geantyref: 1.3.13
   jmh: 1.27
+  apiguardian: 1.1.2
 
   # integration
   guice: 4.2.3
@@ -88,6 +89,10 @@ dependencies:
     group: org.openjdk.jmh
     name: jmh-generator-annprocess
     version: { ref: jmh }
+  apiguardian:
+    group: org.apiguardian
+    name: apiguardian-api
+    version: { ref: apiguardian }
 
   # integration
   guice:

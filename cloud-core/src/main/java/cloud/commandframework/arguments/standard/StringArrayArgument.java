@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,6 +45,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
 
     private StringArrayArgument(
@@ -95,6 +97,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      * @return Created argument
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public static <C> @NonNull StringArrayArgument<C> of(
             final @NonNull String name,
             final boolean flagYielding,
@@ -140,6 +143,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      * @return Created argument
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public static <C> @NonNull StringArrayArgument<C> optional(
             final @NonNull String name,
             final boolean flagYielding,
@@ -160,6 +164,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.STABLE)
     public static final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
 
         private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
@@ -179,6 +184,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
          * @param flagYielding Whether the parser should stop parsing when encountering a potential flag
          * @since 1.7.0
          */
+        @API(status = API.Status.STABLE, since = "1.7.0")
         public StringArrayParser(final boolean flagYielding) {
             this.flagYielding = flagYielding;
         }

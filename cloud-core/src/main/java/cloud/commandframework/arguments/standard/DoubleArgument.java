@@ -34,11 +34,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
     private final double min;
@@ -125,6 +127,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         return this.max;
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, Double> {
 
         private double min = DoubleParser.DEFAULT_MINIMUM;
@@ -164,6 +168,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public @NonNull Builder<C> asOptionalWithDefault(final double defaultValue) {
             return (Builder<C>) this.asOptionalWithDefault(Double.toString(defaultValue));
         }
@@ -182,6 +187,8 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class DoubleParser<C> implements ArgumentParser<C, Double> {
 
         /**
@@ -189,6 +196,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final double DEFAULT_MINIMUM = Double.NEGATIVE_INFINITY;
 
         /**
@@ -196,6 +204,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final double DEFAULT_MAXIMUM = Double.POSITIVE_INFINITY;
 
         private final double min;
@@ -282,6 +291,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
 
     @SuppressWarnings("serial")
+    @API(status = API.Status.STABLE)
     public static final class DoubleParseException extends NumberParseException {
 
         private static final long serialVersionUID = 1764554911581976586L;

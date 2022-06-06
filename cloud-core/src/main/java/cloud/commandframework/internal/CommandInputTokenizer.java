@@ -25,6 +25,7 @@ package cloud.commandframework.internal;
 
 import java.util.LinkedList;
 import java.util.StringTokenizer;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * at every blank space. If the input string ends with a blank space, a trailing
  * empty string will be added to the token list
  */
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class CommandInputTokenizer {
 
     private static final String DELIMITER = " ";

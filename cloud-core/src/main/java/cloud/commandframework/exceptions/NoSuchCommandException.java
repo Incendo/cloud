@@ -25,6 +25,7 @@ package cloud.commandframework.exceptions;
 
 import cloud.commandframework.arguments.CommandArgument;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * a command that doesn't exist
  */
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class NoSuchCommandException extends CommandParseException {
 
     private static final long serialVersionUID = -7775865652882764771L;
@@ -44,6 +46,7 @@ public final class NoSuchCommandException extends CommandParseException {
      * @param currentChain  Chain leading up to the exception
      * @param command       Entered command (following the command chain)
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public NoSuchCommandException(
             final @NonNull Object commandSender,
             final @NonNull List<CommandArgument<?, ?>> currentChain,
