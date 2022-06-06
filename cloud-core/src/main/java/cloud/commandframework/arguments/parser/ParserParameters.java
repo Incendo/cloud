@@ -26,11 +26,13 @@ package cloud.commandframework.arguments.parser;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Collection of {@link ParserParameter parameter}-{@link Object object} pairs
  */
+@API(status = API.Status.STABLE)
 public final class ParserParameters {
 
     private final Map<ParserParameter<?>, Object> internalMap = new HashMap<>();

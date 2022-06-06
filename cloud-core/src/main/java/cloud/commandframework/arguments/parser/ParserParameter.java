@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.parser;
 
 import io.leangen.geantyref.TypeToken;
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <T> Type required by the parameter
  */
+@API(status = API.Status.STABLE)
 public class ParserParameter<T> {
 
     private final String key;

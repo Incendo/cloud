@@ -38,11 +38,13 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
     private static final int MAX_SUGGESTIONS_INCREMENT = 10;
@@ -137,6 +139,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         return this.max;
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, Integer> {
 
         private int min = IntegerParser.DEFAULT_MINIMUM;
@@ -176,6 +180,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public @NonNull Builder<C> asOptionalWithDefault(final int defaultValue) {
             return (Builder<C>) this.asOptionalWithDefault(Integer.toString(defaultValue));
         }
@@ -189,6 +194,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class IntegerParser<C> implements ArgumentParser<C, Integer> {
 
         /**
@@ -196,6 +203,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final int DEFAULT_MINIMUM = Integer.MIN_VALUE;
 
         /**
@@ -203,6 +211,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final int DEFAULT_MAXIMUM = Integer.MAX_VALUE;
 
         private final int min;
@@ -340,6 +349,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
 
     @SuppressWarnings("serial")
+    @API(status = API.Status.STABLE)
     public static final class IntegerParseException extends NumberParseException {
 
         private static final long serialVersionUID = -6933923056628373853L;
@@ -356,6 +366,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          * @deprecated use {@link #IntegerParseException(String, IntegerParser, CommandContext)} instead
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.5.0")
         public IntegerParseException(
                 final @NonNull String input,
                 final int min,
@@ -373,6 +384,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
          * @param commandContext command context
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public IntegerParseException(
                 final @NonNull String input,
                 final @NonNull IntegerParser<?> parser,

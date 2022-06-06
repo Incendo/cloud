@@ -34,11 +34,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE, since = "1.5.0")
 public final class ShortArgument<C> extends CommandArgument<C, Short> {
 
     private final short min;
@@ -122,6 +124,8 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         return this.max;
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, Short> {
 
         private short min = ShortParser.DEFAULT_MINIMUM;
@@ -161,6 +165,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public @NonNull Builder<C> asOptionalWithDefault(final short defaultValue) {
             return (Builder<C>) this.asOptionalWithDefault(Short.toString(defaultValue));
         }
@@ -174,6 +179,8 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
 
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class ShortParser<C> implements ArgumentParser<C, Short> {
 
         /**
@@ -181,6 +188,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final short DEFAULT_MINIMUM = Short.MIN_VALUE;
 
         /**
@@ -188,6 +196,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final short DEFAULT_MAXIMUM = Short.MAX_VALUE;
 
         private final short min;
@@ -263,6 +272,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @return whether the parser has a maximum set
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public boolean hasMax() {
             return this.max != DEFAULT_MAXIMUM;
         }
@@ -274,6 +284,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @return whether the parser has a maximum set
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public boolean hasMin() {
             return this.min != DEFAULT_MINIMUM;
         }
@@ -282,6 +293,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
 
 
     @SuppressWarnings("serial")
+    @API(status = API.Status.STABLE, since = "1.5.0")
     public static final class ShortParseException extends NumberParseException {
 
         private static final long serialVersionUID = -478674263339091032L;
@@ -298,6 +310,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @deprecated use {@link #ShortParseException(String, ShortParser, CommandContext)} instead
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.5.0")
         public ShortParseException(
                 final @NonNull String input,
                 final short min,
@@ -315,6 +328,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
          * @param commandContext command context
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public ShortParseException(
                 final @NonNull String input,
                 final @NonNull ShortParser<?> parser,

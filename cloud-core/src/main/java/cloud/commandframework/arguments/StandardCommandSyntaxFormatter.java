@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import java.util.Iterator;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -42,6 +43,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
 
     /**
@@ -132,6 +134,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
     /**
      * Instance that is used when building command syntax
      */
+    @API(status = API.Status.STABLE)
     public static class FormattingInstance {
 
         private final StringBuilder builder;

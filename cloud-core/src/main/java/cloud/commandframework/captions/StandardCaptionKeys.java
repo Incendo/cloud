@@ -26,11 +26,13 @@ package cloud.commandframework.captions;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link Caption} instances for messages in cloud-core
  */
+@API(status = API.Status.STABLE)
 public final class StandardCaptionKeys {
 
     private static final Collection<Caption> RECOGNIZED_CAPTIONS = new LinkedList<>();

@@ -26,9 +26,11 @@ package cloud.commandframework.meta;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class SimpleKey<V> implements CommandMeta.Key<V> {
 
     private final @NonNull TypeToken<V> valueType;

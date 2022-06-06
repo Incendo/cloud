@@ -26,12 +26,14 @@ package cloud.commandframework.exceptions;
 import cloud.commandframework.arguments.CommandArgument;
 import java.util.Collections;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Exception thrown when parsing user input into a command
  */
 @SuppressWarnings({"unused", "serial"})
+@API(status = API.Status.STABLE)
 public class CommandParseException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -2415981126382517435L;
@@ -44,6 +46,7 @@ public class CommandParseException extends IllegalArgumentException {
      * @param commandSender Sender who executed the command
      * @param currentChain  Chain leading up to the exception
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     protected CommandParseException(
             final @NonNull Object commandSender,
             final @NonNull List<CommandArgument<?, ?>> currentChain

@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.execution.postprocessor;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -31,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class AcceptingCommandPostprocessor<C> implements CommandPostprocessor<C> {
 
     /**

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -40,6 +41,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public interface ParserRegistry<C> {
 
     /**
@@ -130,6 +132,7 @@ public interface ParserRegistry<C> {
      * @see #getSuggestionProvider(String) Get a suggestion provider
      * @since 1.1.0
      */
+    @API(status = API.Status.STABLE, since = "1.1.0")
     void registerSuggestionProvider(
             @NonNull String name,
             @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
@@ -144,6 +147,7 @@ public interface ParserRegistry<C> {
      * @see #registerSuggestionProvider(String, BiFunction) Register a suggestion provider
      * @since 1.1.0
      */
+    @API(status = API.Status.STABLE, since = "1.1.0")
     @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
             @NonNull String name
     );

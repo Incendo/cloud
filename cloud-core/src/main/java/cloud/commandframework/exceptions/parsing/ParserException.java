@@ -27,9 +27,11 @@ import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import java.util.Arrays;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("serial")
+@API(status = API.Status.STABLE)
 public class ParserException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -4409795575435072170L;
@@ -64,6 +66,7 @@ public class ParserException extends IllegalArgumentException {
      * @return The caption
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public @NonNull Caption errorCaption() {
         return this.errorCaption;
     }
@@ -75,6 +78,7 @@ public class ParserException extends IllegalArgumentException {
      * @return The caption variables
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public @NonNull CaptionVariable @NonNull [] captionVariables() {
         return Arrays.copyOf(this.captionVariables, this.captionVariables.length);
     }

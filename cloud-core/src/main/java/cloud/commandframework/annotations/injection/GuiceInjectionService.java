@@ -28,6 +28,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.types.tuples.Triplet;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -37,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  * @since 1.4.0
  */
+@API(status = API.Status.STABLE, since = "1.4.0")
 public final class GuiceInjectionService<C> implements InjectionService<C> {
 
     private final Injector injector;

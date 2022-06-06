@@ -37,11 +37,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
 
     private final boolean liberal;
@@ -116,6 +118,8 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         return this.liberal;
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, Boolean> {
 
         private boolean liberal = false;
@@ -154,6 +158,8 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
 
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class BooleanParser<C> implements ArgumentParser<C, Boolean> {
 
         private static final List<String> LIBERAL = Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF");
@@ -236,6 +242,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     /**
      * Boolean parse exception
      */
+    @API(status = API.Status.STABLE)
     public static final class BooleanParseException extends ParserException {
 
         private static final long serialVersionUID = -2688852086944850025L;

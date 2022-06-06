@@ -24,6 +24,7 @@
 package cloud.commandframework.types.tuples;
 
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <U> First type
  * @param <V> Second type
  */
+@API(status = API.Status.STABLE)
 public class Pair<U, V> implements Tuple {
 
     private final U first;

@@ -25,6 +25,7 @@ package cloud.commandframework.keys;
 
 import io.leangen.geantyref.TypeToken;
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -35,6 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <T> Key type
  * @since 1.4.0
  */
+@API(status = API.Status.STABLE, since = "1.4.0")
 public final class SimpleCloudKey<@NonNull T> implements CloudKey<T> {
 
     private final String name;

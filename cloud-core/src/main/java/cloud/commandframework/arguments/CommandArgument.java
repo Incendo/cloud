@@ -42,6 +42,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -53,6 +54,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @param <T> The type that the argument parses into
  */
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>, CloudKeyHolder<T> {
 
     /**
@@ -126,6 +128,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param argumentPreprocessors Argument preprocessors
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -219,6 +222,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultDescription    Default description to use when registering
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -265,6 +269,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultDescription    Default description to use when registering
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -281,7 +286,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     /**
      * Construct a new command argument
      *
-     * @param required  Whether or not the argument is required
+     * @param required  Whether the argument is required
      * @param name      The argument name
      * @param parser    The argument parser
      * @param valueType Type produced by the parser
@@ -417,8 +422,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      *
      * @return Owning command
      */
-    @Nullable
-    public Command<C> getOwningCommand() {
+    public @Nullable Command<C> getOwningCommand() {
         return this.owningCommand;
     }
 
@@ -537,7 +541,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     }
 
     /**
-     * Check whether or not the argument has been used in a command
+     * Check whether the argument has been used in a command
      *
      * @return {@code true} if the argument has been used in a command, else {@code false}
      */
@@ -559,6 +563,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param <C> Command sender type
      * @param <T> Argument value type
      */
+    @API(status = API.Status.STABLE)
     public static class Builder<C, T> {
 
         private final TypeToken<T> valueType;
@@ -679,6 +684,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @return Builder instance
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public @NonNull @This Builder<@NonNull C, @NonNull T> withDefaultDescription(
                 final @NonNull ArgumentDescription defaultDescription
         ) {
@@ -753,6 +759,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param <B> the subclass type
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "1.5.0")
     public abstract static class TypedBuilder<C, T, B extends Builder<C, T>> extends Builder<C, T> {
 
         protected TypedBuilder(

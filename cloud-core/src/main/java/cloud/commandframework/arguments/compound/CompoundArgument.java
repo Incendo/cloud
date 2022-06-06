@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -42,6 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @param <O> Output type
  */
+@API(status = API.Status.STABLE)
 public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, O> {
 
     private final Tuple types;

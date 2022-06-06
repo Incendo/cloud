@@ -34,11 +34,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class ByteArgument<C> extends CommandArgument<C, Byte> {
 
     private final byte min;
@@ -125,6 +127,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         return this.max;
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, Byte> {
 
         private byte min = ByteParser.DEFAULT_MINIMUM;
@@ -164,6 +168,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public @NonNull Builder<C> asOptionalWithDefault(final byte defaultValue) {
             return (Builder<C>) this.asOptionalWithDefault(Byte.toString(defaultValue));
         }
@@ -182,6 +187,8 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
 
     }
 
+
+    @API(status = API.Status.STABLE)
     public static final class ByteParser<C> implements ArgumentParser<C, Byte> {
 
         /**
@@ -189,6 +196,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final byte DEFAULT_MINIMUM = Byte.MIN_VALUE;
 
         /**
@@ -196,6 +204,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          *
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public static final byte DEFAULT_MAXIMUM = Byte.MAX_VALUE;
 
         private final byte min;
@@ -271,6 +280,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @return whether the parser has a maximum set
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public boolean hasMax() {
             return this.max != DEFAULT_MAXIMUM;
         }
@@ -282,6 +292,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @return whether the parser has a maximum set
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public boolean hasMin() {
             return this.min != DEFAULT_MINIMUM;
         }
@@ -309,6 +320,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @deprecated use {@link #ByteParseException(String, ByteParser, CommandContext)} instead
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.5.0")
         public ByteParseException(
                 final @NonNull String input,
                 final byte min,
@@ -326,6 +338,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
          * @param context command context
          * @since 1.5.0
          */
+        @API(status = API.Status.STABLE, since = "1.5.0")
         public ByteParseException(
                 final @NonNull String input,
                 final @NonNull ByteParser<?> parser,

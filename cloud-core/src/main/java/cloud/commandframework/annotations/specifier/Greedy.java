@@ -27,12 +27,14 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.apiguardian.api.API;
 
 /**
  * Annotation used to make {@link cloud.commandframework.arguments.standard.StringArgument string arguments} greedy
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
+@API(status = API.Status.STABLE)
 public @interface Greedy {
 
 }

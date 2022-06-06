@@ -27,6 +27,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.Collections;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -35,6 +36,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @since 1.2.0
  */
+@API(status = API.Status.STABLE, since = "1.2.0")
 public interface AnnotationAccessor {
 
     /**
@@ -43,6 +45,7 @@ public interface AnnotationAccessor {
      * @return Empty annotation accessor
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     static @NonNull AnnotationAccessor empty() {
         return new NullAnnotationAccessor();
     }
@@ -67,6 +70,7 @@ public interface AnnotationAccessor {
      * @return Annotation accessor that delegates to the given accessors (using their natural ordering)
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     static @NonNull AnnotationAccessor of(final @NonNull AnnotationAccessor@NonNull... accessors) {
         return new MultiDelegateAnnotationAccessor(accessors);
     }
@@ -95,6 +99,7 @@ public interface AnnotationAccessor {
      *
      * @since 1.3.0
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.3.0")
     final class NullAnnotationAccessor implements AnnotationAccessor {
 
         @Override

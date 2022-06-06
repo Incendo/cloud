@@ -26,13 +26,15 @@ package cloud.commandframework.execution;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.LinkedList;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Command suggestions processor that checks the input queue head and filters based on that
+ * Command suggestion processor that checks the input queue head and filters based on that
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
 
     @Override

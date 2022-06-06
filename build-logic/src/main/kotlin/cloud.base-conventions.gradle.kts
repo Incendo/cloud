@@ -110,6 +110,8 @@ repositories {
 
 dependencies {
     compileOnlyApi(libs.checkerQual)
+    compileOnlyApi(libs.apiguardian)
+
     testImplementation(libs.jupiterEngine)
     testImplementation(libs.jupiterParams)
     testImplementation(libs.mockitoCore)

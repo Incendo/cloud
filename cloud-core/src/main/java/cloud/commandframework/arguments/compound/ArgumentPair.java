@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -40,6 +41,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <V> Second argument type
  * @param <O> Output type
  */
+@API(status = API.Status.STABLE)
 public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O> {
 
     /**
@@ -104,7 +106,9 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
         return new ArgumentPairIntermediaryBuilder<>(true, name, names, Pair.of(firstParser, secondaryParser), types);
     }
 
+
     @SuppressWarnings("ALL")
+    @API(status = API.Status.STABLE)
     public static final class ArgumentPairIntermediaryBuilder<C, U, V> {
 
         private final boolean required;

@@ -25,6 +25,7 @@ package cloud.commandframework.context;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.captions.CaptionRegistry;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender
  */
+@API(status = API.Status.STABLE)
 public interface CommandContextFactory<C> {
 
     /**
@@ -44,6 +46,7 @@ public interface CommandContextFactory<C> {
      * @deprecated Provide a command manager instead of a caption registry
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.3.0")
     @NonNull CommandContext<C> create(
             boolean suggestions,
             @NonNull C sender,
@@ -59,6 +62,7 @@ public interface CommandContextFactory<C> {
      * @return Command context
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     @NonNull CommandContext<C> create(
             boolean suggestions,
             @NonNull C sender,

@@ -25,6 +25,7 @@ package cloud.commandframework.annotations.injection;
 
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.context.CommandContext;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -37,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @since 1.2.0
  */
 @FunctionalInterface
+@API(status = API.Status.STABLE, since = "1.2.0")
 public interface ParameterInjector<C, T> {
 
     /**

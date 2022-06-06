@@ -24,11 +24,13 @@
 package cloud.commandframework.captions;
 
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This is a reference to a caption and does not contain any message itself
  */
+@API(status = API.Status.STABLE)
 public final class Caption {
 
     private final String key;

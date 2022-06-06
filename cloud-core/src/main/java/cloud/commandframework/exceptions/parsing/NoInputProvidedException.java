@@ -25,6 +25,7 @@ package cloud.commandframework.exceptions.parsing;
 
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @since 1.1.0
  */
+@API(status = API.Status.STABLE, since = "1.1.0")
 public class NoInputProvidedException extends ParserException {
 
     private static final long serialVersionUID = 3485754951593709559L;
