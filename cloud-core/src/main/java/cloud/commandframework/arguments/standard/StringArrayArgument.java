@@ -29,9 +29,11 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -48,12 +50,13 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
             final boolean required,
             final @NonNull String name,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription defaultDescription,
+            final boolean flagYielding
     ) {
         super(
                 required,
                 name,
-                new StringArrayParser<>(),
+                new StringArrayParser<>(flagYielding),
                 "",
                 TypeToken.get(String[].class),
                 suggestionsProvider,
@@ -74,10 +77,35 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
             final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
     ) {
         return new StringArrayArgument<>(
-                true,
+                true /* required */,
                 name,
                 suggestionsProvider,
-                ArgumentDescription.empty()
+                ArgumentDescription.empty(),
+                false /* flagYielding */
+        );
+    }
+
+    /**
+     * Create a new required string array argument
+     *
+     * @param name                Argument name
+     * @param flagYielding        Whether the parser should stop parsing when encountering a potential flag
+     * @param suggestionsProvider Suggestions provider
+     * @param <C>                 Command sender type
+     * @return Created argument
+     * @since 1.7.0
+     */
+    public static <C> @NonNull StringArrayArgument<C> of(
+            final @NonNull String name,
+            final boolean flagYielding,
+            final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+    ) {
+        return new StringArrayArgument<>(
+                true /* required */,
+                name,
+                suggestionsProvider,
+                ArgumentDescription.empty(),
+                flagYielding
         );
     }
 
@@ -94,10 +122,35 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
             final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
     ) {
         return new StringArrayArgument<>(
-                false,
+                false /* required */,
                 name,
                 suggestionsProvider,
-                ArgumentDescription.empty()
+                ArgumentDescription.empty(),
+                false /* flagYielding */
+        );
+    }
+
+    /**
+     * Create a new optional string array argument
+     *
+     * @param name                Argument name
+     * @param flagYielding        Whether the parser should stop parsing when encountering a potential flag
+     * @param suggestionsProvider Suggestions provider
+     * @param <C>                 Command sender type
+     * @return Created argument
+     * @since 1.7.0
+     */
+    public static <C> @NonNull StringArrayArgument<C> optional(
+            final @NonNull String name,
+            final boolean flagYielding,
+            final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+    ) {
+        return new StringArrayArgument<>(
+                false /* required */,
+                name,
+                suggestionsProvider,
+                ArgumentDescription.empty(),
+                flagYielding
         );
     }
 
@@ -109,16 +162,54 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      */
     public static final class StringArrayParser<C> implements ArgumentParser<C, String[]> {
 
+        private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
+
+        private final boolean flagYielding;
+
+        /**
+         * Construct a new string array parser.
+         */
+        public StringArrayParser() {
+            this.flagYielding = false;
+        }
+
+        /**
+         * Construct a new string array parser.
+         *
+         * @param flagYielding Whether the parser should stop parsing when encountering a potential flag
+         * @since 1.7.0
+         */
+        public StringArrayParser(final boolean flagYielding) {
+            this.flagYielding = flagYielding;
+        }
+
         @Override
         public @NonNull ArgumentParseResult<String @NonNull []> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
-            final String[] result = new String[inputQueue.size()];
-            for (int i = 0; i < result.length; i++) {
-                result[i] = inputQueue.remove();
+            if (this.flagYielding) {
+                final List<String> result = new LinkedList<>();
+                final int size = inputQueue.size();
+
+                for (int i = 0; i < size; i++) {
+                    final String string = inputQueue.peek();
+                    if (string == null || FLAG_PATTERN.matcher(string).matches()) {
+                        break;
+                    }
+                    inputQueue.remove();
+
+                    result.add(string);
+                }
+
+                return ArgumentParseResult.success(result.toArray(new String[0]));
+            } else {
+                final String[] result = new String[inputQueue.size()];
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = inputQueue.remove();
+                }
+                return ArgumentParseResult.success(result);
             }
-            return ArgumentParseResult.success(result);
         }
 
     }
