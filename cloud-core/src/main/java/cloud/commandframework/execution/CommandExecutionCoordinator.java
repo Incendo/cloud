@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,6 +45,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public abstract class CommandExecutionCoordinator<C> {
 
     private final CommandTree<C> commandTree;
@@ -95,6 +97,7 @@ public abstract class CommandExecutionCoordinator<C> {
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public static final class SimpleCoordinator<C> extends
             CommandExecutionCoordinator<C> {
 

@@ -25,6 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -33,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.3.0
  */
+@API(status = API.Status.STABLE, since = "1.3.0")
 public final class CommandComponent<C> {
 
     private final CommandArgument<C, ?> argument;
@@ -68,6 +70,7 @@ public final class CommandComponent<C> {
      * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public @NonNull Description getDescription() {
         if (this.description instanceof Description) {
             return (Description) this.description;
@@ -82,6 +85,7 @@ public final class CommandComponent<C> {
      * @return command component description
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public @NonNull ArgumentDescription getArgumentDescription() {
         return this.description;
     }
@@ -120,6 +124,7 @@ public final class CommandComponent<C> {
      * @deprecated for removal since 1.4.0. Use {@link #of(CommandArgument, ArgumentDescription)} instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public static <C> @NonNull CommandComponent<C> of(
             final @NonNull CommandArgument<C, ?> commandArgument,
             final @NonNull Description commandDescription

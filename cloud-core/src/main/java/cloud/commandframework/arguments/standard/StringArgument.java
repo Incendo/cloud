@@ -40,10 +40,12 @@ import java.util.StringJoiner;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class StringArgument<C> extends CommandArgument<C, String> {
 
     private static final Pattern QUOTED_DOUBLE = Pattern.compile("\"(?<inner>(?:[^\"\\\\]|\\\\.)*)\"");
@@ -174,6 +176,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @return Created argument
      * @since 1.7.0
      */
+    @API(status = API.Status.STABLE, since = "1.7.0")
     public static <C> @NonNull CommandArgument<C, String> greedyFlagYielding(final @NonNull String name) {
         return of(name, StringMode.GREEDY_FLAG_YIELDING);
     }
@@ -199,6 +202,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public enum StringMode {
         SINGLE,
         QUOTED,
@@ -208,10 +212,12 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          *
          * @since 1.7.0
          */
+        @API(status = API.Status.STABLE, since = "1.7.0")
         GREEDY_FLAG_YIELDING
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> extends CommandArgument.Builder<C, String> {
 
         private StringMode stringMode = StringMode.SINGLE;
@@ -248,6 +254,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @return Builder instance
          * @since 1.7.0
          */
+        @API(status = API.Status.STABLE, since = "1.7.0")
         public @NonNull @This Builder<C> greedyFlagYielding() {
             this.stringMode = StringMode.GREEDY_FLAG_YIELDING;
             return this;
@@ -304,6 +311,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
 
     @SuppressWarnings("UnnecessaryLambda")
+    @API(status = API.Status.STABLE)
     public static final class StringParser<C> implements ArgumentParser<C, String> {
 
         private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
@@ -461,6 +469,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class StringParseException extends ParserException {
 
         private static final long serialVersionUID = -8903115465005472945L;

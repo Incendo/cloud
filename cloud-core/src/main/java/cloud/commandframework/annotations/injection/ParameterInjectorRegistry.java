@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -46,6 +47,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @since 1.2.0
  */
 @SuppressWarnings("ALL")
+@API(status = API.Status.STABLE, since = "1.2.0")
 public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
 
     private volatile int injectorCount = 0;
@@ -124,6 +126,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @since 1.4.0
      */
     @SuppressWarnings("EmptyCatch")
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <@NonNull T> @NonNull Optional<T> getInjectable(
             final @NonNull Class<T> clazz,
             final @NonNull CommandContext<C> context,
@@ -145,6 +148,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * @param service Service implementation
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public void registerInjectionService(final InjectionService<C> service) {
         this.servicePipeline.registerServiceImplementation(new TypeToken<InjectionService<C>>() {
         }, service, Collections.emptyList());

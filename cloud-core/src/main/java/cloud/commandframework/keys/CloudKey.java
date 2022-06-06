@@ -24,6 +24,7 @@
 package cloud.commandframework.keys;
 
 import io.leangen.geantyref.TypeToken;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <T> The type of the key
  * @since 1.4.0
  */
+@API(status = API.Status.STABLE, since = "1.4.0")
 public interface CloudKey<T> {
 
     /**

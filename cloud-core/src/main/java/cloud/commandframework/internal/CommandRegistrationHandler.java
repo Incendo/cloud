@@ -24,6 +24,7 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.Command;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * the target platform does not have its own concept of commands
  */
 @FunctionalInterface
+@API(status = API.Status.STABLE)
 public interface CommandRegistrationHandler {
 
     /**
@@ -52,6 +54,8 @@ public interface CommandRegistrationHandler {
      */
     boolean registerCommand(@NonNull Command<?> command);
 
+
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     final class NullCommandRegistrationHandler implements CommandRegistrationHandler {
 
         private NullCommandRegistrationHandler() {

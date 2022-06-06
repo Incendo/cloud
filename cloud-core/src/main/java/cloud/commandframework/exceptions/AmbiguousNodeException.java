@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import java.util.Iterator;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -37,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * is detected.
  */
 @SuppressWarnings({"unused", "serial"})
+@API(status = API.Status.STABLE)
 public final class AmbiguousNodeException extends IllegalStateException {
 
     private static final long serialVersionUID = -200207173805584709L;
@@ -51,6 +53,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      * @param ambiguousNode Node that caused exception
      * @param children      All children of the parent
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public AmbiguousNodeException(
             final @Nullable CommandArgument<?, ?> parentNode,
             final @NonNull CommandArgument<?, ?> ambiguousNode,

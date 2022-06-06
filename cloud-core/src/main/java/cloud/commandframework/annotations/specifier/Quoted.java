@@ -27,6 +27,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.apiguardian.api.API;
 
 /**
  * Annotation used to set the parsing mode of a {@link cloud.commandframework.arguments.standard.StringArgument string
@@ -36,6 +37,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
+@API(status = API.Status.STABLE, since = "1.5.0")
 public @interface Quoted {
 
 }

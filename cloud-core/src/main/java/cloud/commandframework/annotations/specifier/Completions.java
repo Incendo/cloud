@@ -28,12 +28,14 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.apiguardian.api.API;
 
 /**
  * Command completions, separated by "," or ", "
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
+@API(status = API.Status.STABLE)
 public @interface Completions {
 
     /**

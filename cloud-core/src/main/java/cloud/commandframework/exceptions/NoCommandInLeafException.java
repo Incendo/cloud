@@ -25,6 +25,7 @@ package cloud.commandframework.exceptions;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * that is registered as a leaf node, does not contain an owning {@link Command}
  */
 @SuppressWarnings({"unused", "serial"})
+@API(status = API.Status.STABLE)
 public final class NoCommandInLeafException extends IllegalStateException {
 
     private static final long serialVersionUID = 3373529875213310821L;
@@ -42,6 +44,7 @@ public final class NoCommandInLeafException extends IllegalStateException {
      *
      * @param commandArgument Command argument that caused the exception
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public NoCommandInLeafException(final @NonNull CommandArgument<?, ?> commandArgument) {
         super(String.format("Leaf node '%s' does not have associated owning command", commandArgument.getName()));
         this.commandArgument = commandArgument;

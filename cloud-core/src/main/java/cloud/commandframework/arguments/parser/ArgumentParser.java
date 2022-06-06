@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static java.util.Objects.requireNonNull;
@@ -39,6 +40,7 @@ import static java.util.Objects.requireNonNull;
  * @param <T> Value type
  */
 @FunctionalInterface
+@API(status = API.Status.STABLE)
 public interface ArgumentParser<C, T> {
 
     /**
@@ -99,12 +101,13 @@ public interface ArgumentParser<C, T> {
      * @return a derived parser.
      * @since 1.5.0
      */
+    @API(status = API.Status.STABLE, since = "1.5.0")
     default <O> @NonNull ArgumentParser<C, O> map(final BiFunction<CommandContext<C>, T, ArgumentParseResult<O>> mapper) {
         return new MappedArgumentParser<>(this, requireNonNull(mapper, "mapper"));
     }
 
     /**
-     * Check whether or not this argument parser is context free. A context free
+     * Check whether this argument parser is context free. A context free
      * parser will not use the provided command context, and so supports impromptu parsing
      *
      * @return {@code true} if the parser is context free, else {@code false}
@@ -120,6 +123,7 @@ public interface ArgumentParser<C, T> {
      * @return The number of arguments tha the parser expects
      * @since 1.1.0
      */
+    @API(status = API.Status.STABLE, since = "1.1.0")
     default int getRequestedArgumentCount() {
         return DEFAULT_ARGUMENT_COUNT;
     }

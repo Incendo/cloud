@@ -26,12 +26,14 @@ package cloud.commandframework.arguments.flags;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Flag value mappings
  */
+@API(status = API.Status.STABLE)
 public final class FlagContext {
 
     /**
@@ -99,6 +101,7 @@ public final class FlagContext {
      *         else {@code false}
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public boolean isPresent(final @NonNull CommandFlag<Void> flag) {
         return this.isPresent(flag.getName());
     }
@@ -111,6 +114,7 @@ public final class FlagContext {
      * @return Optional containing stored value if present
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public <T> @NonNull Optional<T> getValue(
             final @NonNull String name
     ) {
@@ -130,6 +134,7 @@ public final class FlagContext {
      * @return Optional containing stored value if present
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @NonNull Optional<T> getValue(
             final @NonNull CommandFlag<T> flag
     ) {
@@ -160,6 +165,7 @@ public final class FlagContext {
      * @return Stored value, or the supplied default value
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @Nullable T getValue(
             final @NonNull CommandFlag<T> name,
             final @Nullable T defaultValue
@@ -176,6 +182,7 @@ public final class FlagContext {
      * @return whether the flag is present
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public boolean hasFlag(
             final @NonNull String name
     ) {
@@ -191,6 +198,7 @@ public final class FlagContext {
      * @return whether the flag is present
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public boolean hasFlag(
             final @NonNull CommandFlag<?> flag
     ) {
@@ -206,6 +214,7 @@ public final class FlagContext {
      * @return whether the flag is present
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public boolean contains(final @NonNull String name) {
         return this.hasFlag(name);
     }
@@ -219,6 +228,7 @@ public final class FlagContext {
      * @return whether the flag is present
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public boolean contains(final @NonNull CommandFlag<?> flag) {
         return this.hasFlag(flag);
     }
@@ -232,6 +242,7 @@ public final class FlagContext {
      * @since 1.3.0
      */
     @SuppressWarnings("TypeParameterUnusedInFormals")
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public <T> @Nullable T get(
             final @NonNull String name
     ) {
@@ -246,6 +257,7 @@ public final class FlagContext {
      * @return Stored value if present, else {@code null}
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @Nullable T get(
             final @NonNull CommandFlag<T> flag
     ) {

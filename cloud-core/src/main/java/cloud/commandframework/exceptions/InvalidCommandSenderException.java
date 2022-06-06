@@ -26,6 +26,7 @@ package cloud.commandframework.exceptions;
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -33,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Exception thrown when an invalid command sender tries to execute a command
  */
 @SuppressWarnings("serial")
+@API(status = API.Status.STABLE)
 public final class InvalidCommandSenderException extends CommandParseException {
 
     private static final long serialVersionUID = 7372142477529875598L;
@@ -46,6 +48,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @param requiredSender The sender type that is required
      * @param currentChain   Chain leading up to the exception
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public InvalidCommandSenderException(
             final @NonNull Object commandSender,
             final @NonNull Class<?> requiredSender,
@@ -63,6 +66,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @param command        Command
      * @since 1.4.0
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.4.0")
     public InvalidCommandSenderException(
             final @NonNull Object commandSender,
             final @NonNull Class<?> requiredSender,
@@ -98,6 +102,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
      * @return Command
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public @Nullable Command<?> getCommand() {
         return this.command;
     }

@@ -23,11 +23,13 @@
 //
 package cloud.commandframework.types.tuples;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Dynamic sized tuple backed by a {@code Object[]}
  */
+@API(status = API.Status.STABLE)
 public final class DynamicTuple implements Tuple {
 
     private final Object[] internalArray;

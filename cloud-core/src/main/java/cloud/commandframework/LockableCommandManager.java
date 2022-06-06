@@ -27,6 +27,7 @@ import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -42,6 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @deprecated Use a normal {@link CommandManager}'s registration state instead
  */
 @Deprecated
+@API(status = API.Status.DEPRECATED, since = "1.2.0")
 public abstract class LockableCommandManager<C> extends CommandManager<C> {
 
     /**

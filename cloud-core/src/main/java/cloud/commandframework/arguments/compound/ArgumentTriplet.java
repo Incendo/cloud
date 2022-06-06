@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -41,6 +42,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <W> Third argument type
  * @param <O> Output type
  */
+@API(status = API.Status.STABLE)
 public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, V, W>, C, O> {
 
     /**
@@ -115,7 +117,9 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
         );
     }
 
+
     @SuppressWarnings("ALL")
+    @API(status = API.Status.STABLE)
     public static final class ArgumentTripletIntermediaryBuilder<C, U, V, W> {
 
         private final boolean required;

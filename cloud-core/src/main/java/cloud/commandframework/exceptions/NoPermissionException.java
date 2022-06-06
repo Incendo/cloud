@@ -27,6 +27,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.permission.CommandPermission;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -34,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * to execute a {@link Command}
  */
 @SuppressWarnings({"unused", "serial"})
+@API(status = API.Status.STABLE)
 public class NoPermissionException extends CommandParseException {
 
     private static final long serialVersionUID = 7103413337750692843L;
@@ -46,6 +48,7 @@ public class NoPermissionException extends CommandParseException {
      * @param commandSender     Command sender
      * @param currentChain      Chain leading up to the exception
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public NoPermissionException(
             final @NonNull CommandPermission missingPermission,
             final @NonNull Object commandSender,

@@ -27,8 +27,10 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull CommandContext<C>,
         @NonNull String, @NonNull List<String>> {
 

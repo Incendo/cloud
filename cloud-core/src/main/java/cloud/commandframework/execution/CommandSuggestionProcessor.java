@@ -26,6 +26,7 @@ package cloud.commandframework.execution;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.List;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -33,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public interface CommandSuggestionProcessor<C> extends
         BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<String>, @NonNull List<String>> {
 

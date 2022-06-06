@@ -23,11 +23,13 @@
 //
 package cloud.commandframework.captions;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Simple implementation of {@link CaptionVariableReplacementHandler}
  */
+@API(status = API.Status.STABLE)
 public final class SimpleCaptionVariableReplacementHandler implements CaptionVariableReplacementHandler {
 
     @Override

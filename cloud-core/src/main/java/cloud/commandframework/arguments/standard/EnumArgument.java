@@ -38,6 +38,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -48,6 +49,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <E> Enum type
  */
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
     protected EnumArgument(
@@ -129,6 +131,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class Builder<C, E extends Enum<E>> extends CommandArgument.Builder<C, E> {
 
         private final Class<E> enumClass;
@@ -148,6 +151,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class EnumParser<C, E extends Enum<E>> implements ArgumentParser<C, E> {
 
         private final Class<E> enumClass;
@@ -202,6 +206,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class EnumParseException extends ParserException {
 
         private static final long serialVersionUID = 3465389578951428862L;

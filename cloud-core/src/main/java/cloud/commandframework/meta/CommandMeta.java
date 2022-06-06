@@ -30,6 +30,7 @@ import io.leangen.geantyref.TypeToken;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -41,6 +42,7 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * Appropriate use for command meta would be fixed state, such as command descriptions.
  */
+@API(status = API.Status.STABLE)
 public abstract class CommandMeta {
 
     private static final Key<String> LEGACY_HIDDEN = Key.of(String.class, "hidden");
@@ -74,6 +76,7 @@ public abstract class CommandMeta {
      * @deprecated for removal since 1.3.0, see typesafe variant at {@link #get(Key)} instead
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.3.0")
     public abstract @NonNull Optional<String> getValue(@NonNull String key);
 
     /**
@@ -85,6 +88,7 @@ public abstract class CommandMeta {
      * @deprecated for removal since 1.3.0, see typesafe variant at {@link #getOrDefault(Key, Object)} instead
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.3.0")
     public abstract @NonNull String getOrDefault(@NonNull String key, @NonNull String defaultValue);
 
     /**
@@ -95,6 +99,7 @@ public abstract class CommandMeta {
      * @return Optional that may contain the associated value
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public abstract <V> @NonNull Optional<V> get(@NonNull Key<V> key);
 
     /**
@@ -106,6 +111,7 @@ public abstract class CommandMeta {
      * @return Value, or default value
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public abstract <V> @NonNull V getOrDefault(@NonNull Key<V> key, @NonNull V defaultValue);
 
     /**
@@ -115,6 +121,7 @@ public abstract class CommandMeta {
      * @deprecated for removal since 1.3.0, use {@link #getAllValues()} instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.3.0")
     public abstract @NonNull Map<@NonNull String, @NonNull String> getAll();
 
     /**
@@ -123,7 +130,9 @@ public abstract class CommandMeta {
      * @return Copy of meta map
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public abstract @NonNull Map<@NonNull String, @NonNull ?> getAllValues();
+
 
     /**
      * A key into the metadata map.
@@ -131,6 +140,7 @@ public abstract class CommandMeta {
      * @param <V> value type
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public interface Key<V> extends CloudKey<V> {
 
         /**

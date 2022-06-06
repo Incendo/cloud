@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static java.util.Objects.requireNonNull;
@@ -33,6 +34,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @since 1.4.0
  */
+@API(status = API.Status.STABLE, since = "1.4.0")
 public interface ArgumentDescription {
 
     /**

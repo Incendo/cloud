@@ -24,6 +24,7 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.context.CommandContext;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -31,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public class CommandResult<C> {
 
     private final CommandContext<C> commandContext;

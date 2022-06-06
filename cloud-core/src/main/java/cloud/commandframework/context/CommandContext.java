@@ -42,6 +42,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -50,6 +51,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public class CommandContext<C> {
 
     private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
@@ -71,6 +73,7 @@ public class CommandContext<C> {
      * @deprecated Provide a command manager instead of a caption registry
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.3.0")
     public CommandContext(final @NonNull C commandSender, final @NonNull CaptionRegistry<C> captionRegistry) {
         this(false, commandSender, captionRegistry);
     }
@@ -82,6 +85,7 @@ public class CommandContext<C> {
      * @param commandManager Command manager
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public CommandContext(final @NonNull C commandSender, final @NonNull CommandManager<C> commandManager) {
         this(false, commandSender, commandManager);
     }
@@ -89,12 +93,13 @@ public class CommandContext<C> {
     /**
      * Create a new command context instance
      *
-     * @param suggestions     Whether or not the context is created for command suggestions
+     * @param suggestions     Whether the context is created for command suggestions
      * @param commandSender   Sender of the command
      * @param captionRegistry Caption registry
      * @deprecated Provide a command manager instead of a caption registry
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.3.0")
     public CommandContext(
             final boolean suggestions,
             final @NonNull C commandSender,
@@ -110,11 +115,12 @@ public class CommandContext<C> {
     /**
      * Create a new command context instance
      *
-     * @param suggestions    Whether or not the context is created for command suggestions
+     * @param suggestions    Whether the context is created for command suggestions
      * @param commandSender  Sender of the command
      * @param commandManager Command manager
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public CommandContext(
             final boolean suggestions,
             final @NonNull C commandSender,
@@ -160,6 +166,7 @@ public class CommandContext<C> {
      * @return Command sender
      * @since 1.6.0
      */
+    @API(status = API.Status.STABLE, since = "1.6.0")
     public boolean hasPermission(final @NonNull CommandPermission permission) {
         return this.commandManager.hasPermission(this.commandSender, permission);
     }
@@ -171,6 +178,7 @@ public class CommandContext<C> {
      * @return Command sender
      * @since 1.6.0
      */
+    @API(status = API.Status.STABLE, since = "1.6.0")
     public boolean hasPermission(final @NonNull String permission) {
         return this.commandManager.hasPermission(this.commandSender, permission);
     }
@@ -229,6 +237,7 @@ public class CommandContext<C> {
      * @param <T>       Value type
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> void store(final @NonNull CloudKeyHolder<T> keyHolder, final @NonNull T value) {
         this.internalStorage.put(keyHolder.getKey(), value);
     }
@@ -244,6 +253,7 @@ public class CommandContext<C> {
      * @param <T>   Value type
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public <T> void set(final @NonNull String key, final @Nullable T value) {
         if (value != null) {
             this.store(key, value);
@@ -263,6 +273,7 @@ public class CommandContext<C> {
      * @param <T>   Value type
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> void set(final @NonNull CloudKey<T> key, final @Nullable T value) {
         if (value != null) {
             this.store(key, value);
@@ -278,6 +289,7 @@ public class CommandContext<C> {
      * @return Whether the context has a value for the provided key
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public boolean contains(final @NonNull String key) {
         return this.contains(SimpleCloudKey.of(key));
     }
@@ -289,6 +301,7 @@ public class CommandContext<C> {
      * @return Whether the context has a value for the provided key
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public boolean contains(final @NonNull CloudKey<?> key) {
         return this.internalStorage.containsKey(key);
     }
@@ -299,6 +312,7 @@ public class CommandContext<C> {
      * @return An immutable copy of this command context as a map
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public @NonNull Map<@NonNull String, @Nullable ?> asMap() {
         final Map<String, Object> values = new HashMap<>();
         this.internalStorage.forEach((key, value) -> values.put(key.getName(), value));
@@ -332,6 +346,7 @@ public class CommandContext<C> {
      * @return Value
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @NonNull Optional<T> getOptional(final @NonNull CloudKey<T> key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
@@ -365,6 +380,7 @@ public class CommandContext<C> {
      * @since 1.4.0
      */
     @SuppressWarnings("unused")
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @NonNull Optional<T> getOptional(final @NonNull CloudKeyHolder<T> keyHolder) {
         final Object value = this.internalStorage.get(keyHolder.getKey());
         if (value != null) {
@@ -390,6 +406,7 @@ public class CommandContext<C> {
      * @param key Key to remove
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public void remove(final @NonNull CloudKey<?> key) {
         this.internalStorage.remove(key);
     }
@@ -423,6 +440,7 @@ public class CommandContext<C> {
      * @since 1.4.0
      */
     @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @NonNull T get(final @NonNull CloudKey<T> key) {
         final Object value = this.internalStorage.get(key);
         if (value == null) {
@@ -454,6 +472,7 @@ public class CommandContext<C> {
      * @throws NullPointerException If no such value is stored
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @NonNull T get(final @NonNull CloudKeyHolder<T> keyHolder) {
         return this.get(keyHolder.getKey());
     }
@@ -497,6 +516,7 @@ public class CommandContext<C> {
      * @return Argument, or supplied default value
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @Nullable T getOrDefault(
             final @NonNull CloudKey<T> key,
             final @Nullable T defaultValue
@@ -513,6 +533,7 @@ public class CommandContext<C> {
      * @return Argument, or supplied default value
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public <T> @Nullable T getOrSupplyDefault(
             final @NonNull String key,
             final @NonNull Supplier<@Nullable T> defaultSupplier
@@ -529,6 +550,7 @@ public class CommandContext<C> {
      * @return Argument, or supplied default value
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @Nullable T getOrSupplyDefault(
             final @NonNull CloudKey<T> key,
             final @NonNull Supplier<@Nullable T> defaultSupplier
@@ -551,6 +573,7 @@ public class CommandContext<C> {
      * @return {@link #getRawInput()} joined with {@code " "} as the delimiter
      * @since 1.1.0
      */
+    @API(status = API.Status.STABLE, since = "1.1.0")
     public @NonNull String getRawInputJoined() {
         return String.join(" ", this.getRawInput());
     }
@@ -593,6 +616,7 @@ public class CommandContext<C> {
      * @return Currently parsing {@link CommandArgument} or {@code null}
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public @Nullable CommandArgument<C, ?> getCurrentArgument() {
         return this.currentArgument;
     }
@@ -605,6 +629,7 @@ public class CommandContext<C> {
      * @param argument Currently parsing {@link CommandArgument} or {@code null}
      * @since 1.2.0
      */
+    @API(status = API.Status.STABLE, since = "1.2.0")
     public void setCurrentArgument(final @Nullable CommandArgument<C, ?> argument) {
         this.currentArgument = argument;
     }
@@ -618,7 +643,7 @@ public class CommandContext<C> {
      * @return Optional that may contain the created value
      * @since 1.3.0
      */
-    @SuppressWarnings("unchecked")
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public <@NonNull T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(
@@ -636,6 +661,7 @@ public class CommandContext<C> {
      * <p>
      * The times are measured in nanoseconds.
      */
+    @API(status = API.Status.STABLE)
     public static final class ArgumentTiming {
 
         private long start;
@@ -647,7 +673,7 @@ public class CommandContext<C> {
          *
          * @param start   Start time (in nanoseconds)
          * @param end     End time (in nanoseconds)
-         * @param success Whether or not the argument was parsed successfully
+         * @param success Whether the argument was parsed successfully
          */
         public ArgumentTiming(final long start, final long end, final boolean success) {
             this.start = start;
@@ -690,7 +716,7 @@ public class CommandContext<C> {
          * Set the end time
          *
          * @param end     End time (in nanoseconds)
-         * @param success Whether or not the argument was parsed successfully
+         * @param success Whether the argument was parsed successfully
          */
         public void setEnd(final long end, final boolean success) {
             this.end = end;
@@ -707,7 +733,7 @@ public class CommandContext<C> {
         }
 
         /**
-         * Check whether or not the value was parsed successfully
+         * Check whether the value was parsed successfully
          *
          * @return {@code true} if the value was parsed successfully, {@code false} if not
          */

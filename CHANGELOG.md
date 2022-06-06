@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Core: Add delegating command execution handlers ([#363](https://github.com/Incendo/cloud/pull/363))
 - Core: Add `builder()` getter to `Command.Builder` ([#363](https://github.com/Incendo/cloud/pull/363))
 - Core: Add flag yielding modes to `StringArgument` and `StringArrayArgument` ([#367](https://github.com/Incendo/cloud/pull/367))
+- Core: Add [apiguardian](https://github.com/apiguardian-team/apiguardian) `@API` annotations ([#368](https://github.com/Incendo/cloud/pull/368))
 - Annotations: Annotation string processors ([#353](https://github.com/Incendo/cloud/pull/353))
 - Annotations: `@CommandContainer` annotation processing ([#364](https://github.com/Incendo/cloud/pull/364))
 - Annotations: `@CommandMethod` annotation processing for compile-time validation ([#365](https://github.com/Incendo/cloud/pull/365))

@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -43,6 +44,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <T> Command argument type. {@link Void} is used when no argument is present.
  */
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public final class CommandFlag<T> {
 
     private final @NonNull String name;
@@ -101,6 +103,7 @@ public final class CommandFlag<T> {
      * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public cloud.commandframework.@NonNull Description getDescription() {
         if (this.description instanceof cloud.commandframework.Description) {
             return ((cloud.commandframework.Description) this.description);
@@ -115,6 +118,7 @@ public final class CommandFlag<T> {
      * @return Flag description
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public @NonNull ArgumentDescription getArgumentDescription() {
         return this.description;
     }
@@ -134,6 +138,7 @@ public final class CommandFlag<T> {
      * @return Command permission, or {@code null}
      * @since 1.6.0
      */
+    @API(status = API.Status.STABLE, since = "1.6.0")
     public CommandPermission permission() {
         return this.permission;
     }
@@ -161,6 +166,7 @@ public final class CommandFlag<T> {
     }
 
 
+    @API(status = API.Status.STABLE)
     public static final class Builder<T> {
 
         private final String name;
@@ -227,6 +233,7 @@ public final class CommandFlag<T> {
          * @deprecated for removal since 1.4.0. Use {@link #withDescription(ArgumentDescription)} instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.4.0")
         public Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
             return this.withDescription((ArgumentDescription) description);
         }
@@ -238,6 +245,7 @@ public final class CommandFlag<T> {
          * @return New builder instance
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public Builder<T> withDescription(final @NonNull ArgumentDescription description) {
             return new Builder<>(this.name, this.aliases, description, this.permission, this.commandArgument);
         }
@@ -271,6 +279,7 @@ public final class CommandFlag<T> {
          * @return New builder instance
          * @since 1.6.0
          */
+        @API(status = API.Status.STABLE, since = "1.6.0")
         public Builder<T> withPermission(final @NonNull CommandPermission permission) {
             return new Builder<>(this.name, this.aliases, this.description, permission, this.commandArgument);
         }

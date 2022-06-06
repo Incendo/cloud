@@ -23,11 +23,13 @@
 //
 package cloud.commandframework.captions;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Utility that replaces variables in captions
  */
+@API(status = API.Status.STABLE)
 public interface CaptionVariableReplacementHandler {
 
     /**

@@ -48,6 +48,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -56,6 +57,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
+@API(status = API.Status.STABLE)
 public class Command<C> {
 
     private final List<@NonNull CommandComponent<C>> components;
@@ -75,6 +77,7 @@ public class Command<C> {
      * @param commandMeta             Command meta instance
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -118,6 +121,7 @@ public class Command<C> {
      * @param commandMeta             Command meta instance
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -136,6 +140,7 @@ public class Command<C> {
      * @param commandMeta             Command meta instance
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -157,6 +162,7 @@ public class Command<C> {
      * @see #Command(List, CommandExecutionHandler, Class, CommandPermission, CommandMeta)
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED)
     public Command(
             final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -178,6 +184,7 @@ public class Command<C> {
      * @see #Command(List, CommandExecutionHandler, Class, CommandMeta)
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED)
     public Command(
             final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -198,6 +205,7 @@ public class Command<C> {
      * @see #Command(List, CommandExecutionHandler, CommandPermission, CommandMeta)
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED)
     public Command(
             final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -231,6 +239,7 @@ public class Command<C> {
      * @deprecated for removal since 1.4.0. Use {@link #newBuilder(String, CommandMeta, ArgumentDescription, String...)} instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String commandName,
             final @NonNull CommandMeta commandMeta,
@@ -252,6 +261,7 @@ public class Command<C> {
      * @return Command builder
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String commandName,
             final @NonNull CommandMeta commandMeta,
@@ -314,6 +324,7 @@ public class Command<C> {
      * @return Copy of the command component array. This List is mutable
      * @since 1.3.0
      */
+    @API(status = API.Status.STABLE, since = "1.3.0")
     public @NonNull List<CommandComponent<@NonNull C>> getComponents() {
         return new ArrayList<>(this.components);
     }
@@ -364,6 +375,7 @@ public class Command<C> {
      *             Use {@link #getArguments()} and search in that, instead.
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED)
     public @NonNull String getArgumentDescription(final @NonNull CommandArgument<C, ?> argument) {
         for (final CommandComponent<C> component : this.components) {
             if (component.getArgument().equals(argument)) {
@@ -384,7 +396,7 @@ public class Command<C> {
     }
 
     /**
-     * Check whether or not the command is hidden
+     * Check whether the command is hidden
      *
      * @return {@code true} if the command is hidden, {@code false} if not
      */
@@ -399,6 +411,7 @@ public class Command<C> {
      *
      * @param <C> Command sender type
      */
+    @API(status = API.Status.STABLE)
     public static final class Builder<C> {
 
         private final CommandMeta commandMeta;
@@ -435,6 +448,7 @@ public class Command<C> {
          * @return required sender type
          * @since 1.3.0
          */
+        @API(status = API.Status.STABLE, since = "1.3.0")
         public @Nullable Class<? extends C> senderType() {
             return this.senderType;
         }
@@ -447,6 +461,7 @@ public class Command<C> {
          * @return required permission
          * @since 1.3.0
          */
+        @API(status = API.Status.STABLE, since = "1.3.0")
         public @NonNull CommandPermission commandPermission() {
             return this.commandPermission;
         }
@@ -460,6 +475,7 @@ public class Command<C> {
          * @deprecated for removal since 1.2.0, use the typesafe variant at {@link #meta(CommandMeta.Key, Object)} instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.2.0")
         public @NonNull Builder<C> meta(final @NonNull String key, final @NonNull String value) {
             final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
             return new Builder<>(
@@ -482,6 +498,7 @@ public class Command<C> {
          * @return New builder instance using the inserted meta key-value pair
          * @since 1.3.0
          */
+        @API(status = API.Status.STABLE, since = "1.3.0")
         public <V> @NonNull Builder<C> meta(final CommandMeta.@NonNull Key<V> key, final @NonNull V value) {
             final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
             return new Builder<>(
@@ -539,6 +556,7 @@ public class Command<C> {
          * @deprecated for removal since 1.4.0. Use {@link #literal(String, ArgumentDescription, String...)} instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.4.0")
         public @NonNull Builder<C> literal(
                 final @NonNull String main,
                 final @NonNull Description description,
@@ -556,6 +574,7 @@ public class Command<C> {
          * @return New builder instance with the modified command chain
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public @NonNull Builder<C> literal(
                 final @NonNull String main,
                 final @NonNull ArgumentDescription description,
@@ -597,6 +616,7 @@ public class Command<C> {
          * @deprecated for removal since 1.4.0. Use {@link #argument(CommandArgument, ArgumentDescription)} instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.4.0")
         public <T> @NonNull Builder<C> argument(
                 final @NonNull CommandArgument<C, T> argument,
                 final @NonNull Description description
@@ -613,6 +633,7 @@ public class Command<C> {
          * @return New builder instance with the command argument inserted into the argument list
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public <T> @NonNull Builder<C> argument(
                 final @NonNull CommandArgument<C, T> argument,
                 final @NonNull ArgumentDescription description
@@ -646,6 +667,7 @@ public class Command<C> {
          * @deprecated for removal since 1.4.0. Use {@link #argument(CommandArgument.Builder, ArgumentDescription)} instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.4.0")
         public <T> @NonNull Builder<C> argument(
                 final CommandArgument.@NonNull Builder<C, T> builder,
                 final @NonNull Description description
@@ -663,6 +685,7 @@ public class Command<C> {
          * @return New builder instance with the command argument inserted into the argument list
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public <T> @NonNull Builder<C> argument(
                 final CommandArgument.@NonNull Builder<C, T> builder,
                 final @NonNull ArgumentDescription description
@@ -723,6 +746,7 @@ public class Command<C> {
          * @deprecated for removal since 1.4.0. Use {@link #argumentPair(String, Pair, Pair, ArgumentDescription)} instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.4.0")
         public <U, V> @NonNull Builder<C> argumentPair(
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
@@ -750,6 +774,7 @@ public class Command<C> {
          * @return Builder instance with the argument inserted
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public <U, V> @NonNull Builder<C> argumentPair(
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
@@ -785,6 +810,7 @@ public class Command<C> {
          *     {@link #argumentPair(String, TypeToken, Pair, Pair, BiFunction, ArgumentDescription)} instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.4.0")
         public <U, V, O> @NonNull Builder<C> argumentPair(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -817,6 +843,7 @@ public class Command<C> {
          * @return Builder instance with the argument inserted
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public <U, V, O> @NonNull Builder<C> argumentPair(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -855,6 +882,7 @@ public class Command<C> {
          *     instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.4.0")
         public <U, V, W> @NonNull Builder<C> argumentTriplet(
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
@@ -883,6 +911,7 @@ public class Command<C> {
          * @return Builder instance with the argument inserted
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public <U, V, W> @NonNull Builder<C> argumentTriplet(
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
@@ -919,6 +948,7 @@ public class Command<C> {
          *      {@link #argumentTriplet(String, TypeToken, Triplet, Triplet, BiFunction, ArgumentDescription)} instead.
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.4.0")
         public <U, V, W, O> @NonNull Builder<C> argumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -959,6 +989,7 @@ public class Command<C> {
          * @return Builder instance with the argument inserted
          * @since 1.4.0
          */
+        @API(status = API.Status.STABLE, since = "1.4.0")
         public <U, V, W, O> @NonNull Builder<C> argumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
@@ -1002,6 +1033,7 @@ public class Command<C> {
          * @return the current handler
          * @since 1.7.0
          */
+        @API(status = API.Status.STABLE, since = "1.7.0")
         public @NonNull CommandExecutionHandler<C> handler() {
             return this.commandExecutionHandler;
         }

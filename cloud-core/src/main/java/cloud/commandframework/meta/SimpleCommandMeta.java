@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
@@ -37,6 +38,7 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * A simple immutable string-string map containing command meta
  */
 @SuppressWarnings("unused")
+@API(status = API.Status.STABLE)
 public class SimpleCommandMeta extends CommandMeta {
 
     private final Map<String, Object> metaMap;
@@ -148,9 +150,11 @@ public class SimpleCommandMeta extends CommandMeta {
         return Objects.hashCode(this.metaMap);
     }
 
+
     /**
      * Builder for {@link SimpleCommandMeta}
      */
+    @API(status = API.Status.STABLE)
     public static final class Builder {
 
         private final Map<String, Object> map = new HashMap<>();
@@ -182,6 +186,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @deprecated For removal since 1.3.0, use {@link #with(Key, Object) the typesafe alternative} instead
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.3.0")
         public @NonNull @This Builder with(
                 final @NonNull String key,
                 final @NonNull String value
@@ -199,6 +204,7 @@ public class SimpleCommandMeta extends CommandMeta {
          * @return Builder instance
          * @since 1.3.0
          */
+        @API(status = API.Status.STABLE, since = "1.3.0")
         public <V> @NonNull @This Builder with(
                 final @NonNull Key<V> key,
                 final @NonNull V value

@@ -24,6 +24,7 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.context.CommandContext;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -33,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @since 1.2.0
  */
 @SuppressWarnings("serial")
+@API(status = API.Status.STABLE, since = "1.2.0")
 public class CommandExecutionException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -4785446899438294661L;
@@ -43,6 +45,7 @@ public class CommandExecutionException extends IllegalArgumentException {
      *
      * @param cause Exception thrown during the execution of a command handler
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public CommandExecutionException(final @NonNull Throwable cause) {
         this(cause, null);
     }
@@ -54,6 +57,7 @@ public class CommandExecutionException extends IllegalArgumentException {
      * @param commandContext Command context
      * @since 1.4.0
      */
+    @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*", since = "1.4.0")
     public CommandExecutionException(final @NonNull Throwable cause, final @Nullable CommandContext<?> commandContext) {
         super(cause);
         this.commandContext = commandContext;
@@ -65,6 +69,7 @@ public class CommandExecutionException extends IllegalArgumentException {
      * @return Command
      * @since 1.4.0
      */
+    @API(status = API.Status.STABLE, since = "1.4.0")
     public @Nullable CommandContext<?> getCommandContext() {
         return this.commandContext;
     }

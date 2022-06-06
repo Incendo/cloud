@@ -29,11 +29,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Accepts as long as at least one of the permissions is accepted
  */
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class OrPermission implements CommandPermission {
 
     private final Set<CommandPermission> permissions;
