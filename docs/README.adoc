@@ -37,6 +37,7 @@ https://javadoc.io/doc/cloud.commandframework[JavaDocs] and use them as the prim
 
 Cloud is available through https://search.maven.org/search?q=cloud.commandframework[Maven Central].
 
+*Maven*
 [source,xml,subs="attributes,verbatim"]
 ----
 <dependency>
@@ -44,6 +45,18 @@ Cloud is available through https://search.maven.org/search?q=cloud.commandframew
     <artifactId>cloud-core</artifactId>
     <version>{cloud-version}</version>
 </dependency>
+----
+
+*Gradle (Groovy)*
+[source,groovy,subs="attributes,verbatim"]
+----
+implementation 'cloud.commandframework:cloud-core:{cloud-version}'
+----
+
+*Gradle (Kotlin)*
+[source,kotlin,subs="attributes,verbatim"]
+----
+implementation("cloud.commandframework:cloud-core:{cloud-version}")
 ----
 
 If you want to use snapshot builds, then they are available the Sonatype snapshots repository:
@@ -699,6 +712,58 @@ Annotations allow for an alternative way of declaring commands in cloud. Instead
 using builders, commands consist of annotated instance methods. Command arguments will be bound to the
 method parameters, instead of being retrieved through the command context.
 
+NOTE: Since version 1.7.0, `cloud-annotations` will now also perform
+annotation processing, verifying that `@CommandMethod` annotated methods
+have valid signatures, etc.
+
+=== Install
+
+In order to use the annotation parser & annotation processor, you need to
+add `cloud-annotations` as a dependency:
+
+*Maven*
+[source,xml,subs="attributes,verbatim"]
+----
+<dependency>
+    <groupId>cloud.commandframework</groupId>
+    <artifactId>cloud-annotations</artifactId>
+    <version>{cloud-version}</version>
+</dependency>
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <annotationProcessorPaths>
+                    <path>
+                        <groupId>cloud.commandframework</groupId>
+                        <artifactId>cloud-annotations</artifactId>
+                        <version>{cloud-version}</version>
+                    </path>
+                </annotationProcessorPaths>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+----
+
+*Gradle (Groovy)*
+[source,groovy,subs="attributes,verbatim"]
+----
+implementation 'cloud.commandframework:cloud-annotations:{cloud-version}'
+annotationProcessor 'cloud.commandframework:cloud-annotations:{cloud-version}'
+----
+
+*Gradle (Kotlin)*
+[source,kotlin,subs="attributes,verbatim"]
+----
+implementation("cloud.commandframework:cloud-annotations:{cloud-version}")
+annotationProcessor("cloud.commandframework:cloud-annotations:{cloud-version}")
+----
+
+
 === Annotation Parser
 
 In order to work with annotated command methods you need to construct an annotation parser.
@@ -952,6 +1017,9 @@ annotationParser.registerPreprocessorMapper(
     annotation -> yourPreProcessor
 );
 ----
+
+=== @CommandContainer
+TODO
 
 == Kotlin DSL
 TODO
