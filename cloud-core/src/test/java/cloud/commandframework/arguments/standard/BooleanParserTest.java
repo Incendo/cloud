@@ -148,8 +148,8 @@ class BooleanParserTest {
 
     static Stream<Arguments> Suggestions_ExpectedSuggestions_Source() {
         return Stream.of(
-                Arguments.arguments(false, ArgumentTestHelper.linkedListOf("TRUE", "FALSE")),
-                Arguments.arguments(true, ArgumentTestHelper.linkedListOf("TRUE", "YES", "ON", "FALSE", "NO", "OFF"))
+                Arguments.arguments(false, ArgumentTestHelper.linkedListOf("true", "false")),
+                Arguments.arguments(true, ArgumentTestHelper.linkedListOf("true", "yes", "on", "false", "no", "off"))
         );
     }
 }
