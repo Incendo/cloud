@@ -953,6 +953,29 @@ public final class CommandTree<C> {
         return null;
     }
 
+    void deleteRecursively(final @NonNull Node<@Nullable CommandArgument<C, ?>> node) {
+        for (final Node<@Nullable CommandArgument<C, ?>> child : new ArrayList<>(node.children)) {
+            this.deleteRecursively(child);
+        }
+
+        // We need to remove it from the tree.
+        this.removeNode(node);
+    }
+
+    private boolean removeNode(final @NonNull Node<@Nullable CommandArgument<C, ?>> node) {
+        if (node.isLeaf()) {
+            if (this.getRootNodes().contains(node)) {
+                this.internalTree.removeChild(node);
+            } else {
+                return node.getParent().removeChild(node);
+            }
+        } else {
+            throw new IllegalStateException(String.format("Cannot delete intermediate node '%s'", node));
+        }
+
+        return false;
+    }
+
     /**
      * Get the command manager
      *
@@ -971,7 +994,7 @@ public final class CommandTree<C> {
 
         private final Map<String, Object> nodeMeta = new HashMap<>();
         private final List<Node<T>> children = new LinkedList<>();
-        private final T value;
+        private T value;
         private Node<T> parent;
 
         private Node(final @Nullable T value) {
@@ -1000,6 +1023,10 @@ public final class CommandTree<C> {
                 }
             }
             return null;
+        }
+
+        private boolean removeChild(final @NonNull Node<T> child) {
+            return this.children.remove(child);
         }
 
         /**

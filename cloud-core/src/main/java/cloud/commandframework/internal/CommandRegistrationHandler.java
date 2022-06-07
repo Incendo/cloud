@@ -24,6 +24,7 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.arguments.StaticArgument;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -54,6 +55,15 @@ public interface CommandRegistrationHandler {
      */
     boolean registerCommand(@NonNull Command<?> command);
 
+    /**
+     * Requests that the given {@code rootCommand} should be unregistered.
+     *
+     * @param rootCommand The command to delete
+     * @since 1.7.0
+     */
+    default void unregisterRootCommand(final @NonNull StaticArgument<?> rootCommand) {
+    }
+
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     final class NullCommandRegistrationHandler implements CommandRegistrationHandler {
@@ -66,6 +76,9 @@ public interface CommandRegistrationHandler {
             return true;
         }
 
+        @Override
+        public void unregisterRootCommand(final @NonNull StaticArgument<?> rootCommand) {
+        }
     }
 
 }

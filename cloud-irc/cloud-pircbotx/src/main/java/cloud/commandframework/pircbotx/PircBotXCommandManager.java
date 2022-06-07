@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.pircbotx;
 
+import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.captions.Caption;
@@ -114,6 +115,9 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
                 TypeToken.get(User.class),
                 parameters -> new UserArgument.UserArgumentParser<>()
         );
+
+        // No "native" command system means that we can delete commands just fine.
+        this.registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
     }
 
     @Override
