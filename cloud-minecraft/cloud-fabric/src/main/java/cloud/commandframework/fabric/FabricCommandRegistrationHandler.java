@@ -130,6 +130,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 }
                 FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
                         new CommandBuildContext(connection.registryAccess()),
+                        true,
+                        false,
                         () -> this.registerClientCommand(dispatcher, (Command<C>) command)
                 );
             }
@@ -143,6 +145,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
             this.registerEventFired = true;
             FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
                     commandBuildContext,
+                    true,
+                    true,
                     () -> {
                         for (final Command<C> command : this.registeredCommands) {
                             this.registerClientCommand(dispatcher, command);
@@ -205,21 +209,26 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
             final Commands.CommandSelection side
         ) {
             this.commandManager().registrationCalled();
-            FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(access, () -> {
-                for (final Command<C> command : this.registeredCommands) {
-                    /* Only register commands in the declared environment */
-                    final Commands.CommandSelection env = command.getCommandMeta().getOrDefault(
-                            FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
-                            Commands.CommandSelection.ALL
-                    );
+            FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                access,
+                false,
+                true,
+                () -> {
+                    for (final Command<C> command : this.registeredCommands) {
+                        /* Only register commands in the declared environment */
+                        final Commands.CommandSelection env = command.getCommandMeta().getOrDefault(
+                                FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
+                                Commands.CommandSelection.ALL
+                        );
 
-                    if ((env == Commands.CommandSelection.INTEGRATED && !side.includeIntegrated)
-                            || (env == Commands.CommandSelection.DEDICATED && !side.includeDedicated)) {
-                        continue;
+                        if ((env == Commands.CommandSelection.INTEGRATED && !side.includeIntegrated)
+                                || (env == Commands.CommandSelection.DEDICATED && !side.includeDedicated)) {
+                            continue;
+                        }
+                        this.registerCommand(dispatcher.getRoot(), command);
                     }
-                    this.registerCommand(dispatcher.getRoot(), command);
                 }
-            });
+            );
         }
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {

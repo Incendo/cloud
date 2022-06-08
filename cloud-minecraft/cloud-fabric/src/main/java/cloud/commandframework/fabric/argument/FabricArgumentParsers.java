@@ -524,58 +524,85 @@ public final class FabricArgumentParsers {
 
     @ApiStatus.Internal
     public static final class ContextualArgumentTypeProvider<V> implements Supplier<ArgumentType<V>> {
-        private static final ThreadLocal<CommandBuildContext> BUILD_CONTEXT = new ThreadLocal<>();
-        private static final Set<ContextualArgumentTypeProvider<?>> INSTANCES = Collections.newSetFromMap(new WeakHashMap<>());
+        private static final ThreadLocal<ThreadLocalContext> CONTEXT = new ThreadLocal<>();
+        private static final Set<ContextualArgumentTypeProvider<?>> CLIENT_COMMAND_INSTANCES =
+            Collections.newSetFromMap(new WeakHashMap<>());
+        private static final Set<ContextualArgumentTypeProvider<?>> SERVER_COMMAND_INSTANCES =
+            Collections.newSetFromMap(new WeakHashMap<>());
 
         private final Function<CommandBuildContext, ArgumentType<V>> provider;
         private volatile ArgumentType<V> provided;
 
         /**
-         * Temporarily expose a command build context to this provider.
-         *
-         * <p>This will clear any cached state from existing providers.</p>
+         * Temporarily expose a command build context to providers called from this thread.
          *
          * @param ctx the context
+         * @param clientCommands whether this is for client commands
+         * @param resetExisting whether to clear cached state from existing provider instances for this command type
          * @param action an action to perform while the context is exposed
          * @since 1.7.0
          */
         public static void withBuildContext(
             final CommandBuildContext ctx,
+            final boolean clientCommands,
+            final boolean resetExisting,
             final Runnable action
         ) {
-            BUILD_CONTEXT.set(ctx);
-            synchronized (INSTANCES) {
-                // todo: separate instances between client/multiple server instances
-                for (final ContextualArgumentTypeProvider<?> provider : INSTANCES) {
-                    provider.provided = null;
-                }
-            }
+            CONTEXT.set(new ThreadLocalContext(clientCommands, ctx));
 
             try {
+                if (resetExisting) {
+                    final Set<ContextualArgumentTypeProvider<?>> instances = instances(clientCommands);
+                    synchronized (instances) {
+                        for (final ContextualArgumentTypeProvider<?> contextualArgumentTypeProvider : instances) {
+                            contextualArgumentTypeProvider.provided = null;
+                        }
+                    }
+                }
+
                 action.run();
             } finally {
-                BUILD_CONTEXT.remove();
+                CONTEXT.remove();
+            }
+        }
+
+        private static Set<ContextualArgumentTypeProvider<?>> instances(final boolean clientCommands) {
+            return clientCommands ? CLIENT_COMMAND_INSTANCES : SERVER_COMMAND_INSTANCES;
+        }
+
+        private static final class ThreadLocalContext {
+            private final boolean clientCommnads;
+            private final CommandBuildContext commandBuildContext;
+
+            private ThreadLocalContext(final boolean clientCommands, final CommandBuildContext commandBuildContext) {
+                this.clientCommnads = clientCommands;
+                this.commandBuildContext = commandBuildContext;
             }
         }
 
         ContextualArgumentTypeProvider(final @NonNull Function<CommandBuildContext, ArgumentType<V>> provider) {
             this.provider = provider;
-            synchronized (INSTANCES) {
-                INSTANCES.add(this);
-            }
         }
 
         @Override
         public ArgumentType<V> get() {
+            final ThreadLocalContext ctx = CONTEXT.get();
+
+            if (ctx != null) {
+                final Set<ContextualArgumentTypeProvider<?>> instances = instances(ctx.clientCommnads);
+                synchronized (instances) {
+                    instances.add(this);
+                }
+            }
+
             ArgumentType<V> provided = this.provided;
             if (provided == null) {
                 synchronized (this) {
                     if (this.provided == null) {
-                        final CommandBuildContext ctx = BUILD_CONTEXT.get();
                         if (ctx == null) {
                             throw new IllegalStateException("No build context was available while trying to compute an argument type");
                         }
-                        provided = this.provider.apply(ctx);
+                        provided = this.provider.apply(ctx.commandBuildContext);
                         this.provided = provided;
                     }
                 }
