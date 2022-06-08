@@ -35,13 +35,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * An argument parsing an unbounded {@link net.minecraft.advancements.critereon.MinMaxBounds.Floats float range}, in the form
+ * An argument parsing an unbounded {@link net.minecraft.advancements.critereon.MinMaxBounds.Doubles double range}, in the form
  * {@code [min]..[max]}, where both lower and upper bounds are optional.
  *
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds.Floats> {
+public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds.Doubles> {
 
     FloatRangeArgument(
             final boolean required,
@@ -55,7 +55,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds
                 name,
                 new WrappedBrigadierParser<>(RangeArgument.floatRange()),
                 defaultValue,
-                MinMaxBounds.Floats.class,
+                MinMaxBounds.Doubles.class,
                 suggestionsProvider,
                 defaultDescription
         );
@@ -108,7 +108,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds
      */
     public static <C> @NonNull FloatRangeArgument<C> optional(
             final @NonNull String name,
-            final MinMaxBounds.@NonNull Floats defaultValue
+            final MinMaxBounds.@NonNull Doubles defaultValue
     ) {
         return FloatRangeArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
     }
@@ -120,10 +120,10 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, MinMaxBounds.Floats, Builder<C>> {
+    public static final class Builder<C> extends TypedBuilder<C, MinMaxBounds.Doubles, Builder<C>> {
 
         Builder(final @NonNull String name) {
-            super(MinMaxBounds.Floats.class, name);
+            super(MinMaxBounds.Doubles.class, name);
         }
 
         /**
@@ -151,7 +151,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds
          * @see CommandArgument.Builder#asOptionalWithDefault(String)
          * @since 1.5.0
          */
-        public @NonNull Builder<C> asOptionalWithDefault(final MinMaxBounds.@NonNull Floats defaultValue) {
+        public @NonNull Builder<C> asOptionalWithDefault(final MinMaxBounds.@NonNull Doubles defaultValue) {
             final StringBuilder value = new StringBuilder(6);
             if (defaultValue.getMin() != null) {
                 value.append(defaultValue.getMin());

@@ -52,16 +52,14 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.item.ItemInput;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
@@ -86,13 +84,13 @@ public final class FabricExample implements ModInitializer {
                 .argument(name)
                 .argument(hugs)
                 .handler(ctx -> {
-                    ctx.getSender().sendSuccess(new TextComponent("Hello, ")
+                    ctx.getSender().sendSuccess(Component.literal("Hello, ")
                             .append(ctx.get(name))
                             .append(", hope you're doing well!")
                             .withStyle(style -> style.withColor(TextColor.fromRgb(0xAA22BB))), false);
 
-                    ctx.getSender().sendSuccess(new TextComponent("Cloud would like to give you ")
-                            .append(new TextComponent(String.valueOf(ctx.get(hugs)))
+                    ctx.getSender().sendSuccess(Component.literal("Cloud would like to give you ")
+                            .append(Component.literal(String.valueOf(ctx.get(hugs)))
                                     .withStyle(style -> style.withColor(TextColor.fromRgb(0xFAB3DA))))
                             .append(" hug(s) <3")
                             .withStyle(style -> style.withBold(true)), false);
@@ -109,15 +107,13 @@ public final class FabricExample implements ModInitializer {
                     final MultiplePlayerSelector selector = ctx.get(playerSelector);
                     final Collection<ServerPlayer> selected = selector.get();
                     selected.forEach(selectedPlayer ->
-                            selectedPlayer.sendMessage(
-                                    new TextComponent("Wave from ")
-                                            .withStyle(style -> style.withColor(ctx.get(textColor)))
-                                            .append(ctx.getSender().getDisplayName()),
-                                    ChatType.SYSTEM,
-                                    Util.NIL_UUID
+                            selectedPlayer.sendSystemMessage(
+                                Component.literal("Wave from ")
+                                    .withStyle(style -> style.withColor(ctx.get(textColor)))
+                                    .append(ctx.getSender().getDisplayName())
                             ));
                     ctx.getSender().sendSuccess(
-                            new TextComponent(String.format("Waved at %d players (%s)", selected.size(),
+                            Component.literal(String.format("Waved at %d players (%s)", selected.size(),
                                     selector.inputString()
                             )),
                             false
@@ -150,14 +146,14 @@ public final class FabricExample implements ModInitializer {
                     .map(ModContainer::getMetadata)
                     .sorted(Comparator.comparing(ModMetadata::getId))
                     .collect(Collectors.toList());
-            final TextComponent text = new TextComponent("");
-            text.append(new TextComponent("Loaded Mods")
+            final MutableComponent text = Component.literal("");
+            text.append(Component.literal("Loaded Mods")
                     .withStyle(style -> style.withColor(ChatFormatting.BLUE).applyFormat(ChatFormatting.BOLD)));
-            text.append(new TextComponent(String.format(" (%s)\n", modList.size()))
+            text.append(Component.literal(String.format(" (%s)\n", modList.size()))
                     .withStyle(style -> style.withColor(ChatFormatting.GRAY).applyFormat(ChatFormatting.ITALIC)));
             for (final ModMetadata mod : modList) {
                 text.append(
-                        new TextComponent("")
+                        Component.literal("")
                                 .withStyle(style -> style.withColor(ChatFormatting.WHITE)
                                         .withClickEvent(new ClickEvent(
                                                 ClickEvent.Action.SUGGEST_COMMAND,
@@ -165,17 +161,17 @@ public final class FabricExample implements ModInitializer {
                                         ))
                                         .withHoverEvent(new HoverEvent(
                                                 HoverEvent.Action.SHOW_TEXT,
-                                                new TextComponent("Click for more info")
+                                                Component.literal("Click for more info")
                                         )))
-                                .append(new TextComponent(mod.getName()).withStyle(style -> style.withColor(ChatFormatting.GREEN)))
-                                .append(new TextComponent(String.format(" (%s) ", mod.getId()))
+                                .append(Component.literal(mod.getName()).withStyle(style -> style.withColor(ChatFormatting.GREEN)))
+                                .append(Component.literal(String.format(" (%s) ", mod.getId()))
                                         .withStyle(style -> style
                                                 .withColor(ChatFormatting.GRAY)
                                                 .applyFormat(ChatFormatting.ITALIC)))
-                                .append(new TextComponent(String.format("v%s", mod.getVersion())))
+                                .append(Component.literal(String.format("v%s", mod.getVersion())))
                 );
                 if (modList.indexOf(mod) != modList.size() - 1) {
-                    text.append(new TextComponent(", ").withStyle(style -> style.withColor(ChatFormatting.GRAY)));
+                    text.append(Component.literal(", ").withStyle(style -> style.withColor(ChatFormatting.GRAY)));
                 }
             }
             ctx.getSender().sendSuccess(text, false);
@@ -204,23 +200,23 @@ public final class FabricExample implements ModInitializer {
         manager.command(mods.argument(modMetadata)
                 .handler(ctx -> {
                     final ModMetadata meta = ctx.get(modMetadata);
-                    final MutableComponent text = new TextComponent("")
-                            .append(new TextComponent(meta.getName())
+                    final MutableComponent text = Component.literal("")
+                            .append(Component.literal(meta.getName())
                                     .withStyle(style -> style.withColor(ChatFormatting.BLUE).applyFormat(ChatFormatting.BOLD)))
-                            .append(new TextComponent("\n modid: " + meta.getId()))
-                            .append(new TextComponent("\n version: " + meta.getVersion()))
-                            .append(new TextComponent("\n type: " + meta.getType()));
+                            .append(Component.literal("\n modid: " + meta.getId()))
+                            .append(Component.literal("\n version: " + meta.getVersion()))
+                            .append(Component.literal("\n type: " + meta.getType()));
 
                     if (!meta.getDescription().isEmpty()) {
-                        text.append(new TextComponent("\n description: " + meta.getDescription()));
+                        text.append(Component.literal("\n description: " + meta.getDescription()));
                     }
                     if (!meta.getAuthors().isEmpty()) {
-                        text.append(new TextComponent("\n authors: " + meta.getAuthors().stream()
+                        text.append(Component.literal("\n authors: " + meta.getAuthors().stream()
                                 .map(Person::getName)
                                 .collect(Collectors.joining(", "))));
                     }
                     if (!meta.getLicense().isEmpty()) {
-                        text.append(new TextComponent("\n license: " + String.join(", ", meta.getLicense())));
+                        text.append(Component.literal("\n license: " + String.join(", ", meta.getLicense())));
                     }
                     ctx.getSender().sendSuccess(
                             text,
