@@ -552,9 +552,8 @@ public final class FabricArgumentParsers {
 
             try {
                 if (resetExisting) {
-                    final Set<ContextualArgumentTypeProvider<?>> instances = instances(commandManager);
-                    synchronized (instances) {
-                        for (final ContextualArgumentTypeProvider<?> contextualArgumentTypeProvider : instances) {
+                    synchronized (INSTANCES) {
+                        for (final ContextualArgumentTypeProvider<?> contextualArgumentTypeProvider : instances(commandManager)) {
                             contextualArgumentTypeProvider.provided = null;
                         }
                     }
@@ -592,9 +591,8 @@ public final class FabricArgumentParsers {
             final ThreadLocalContext ctx = CONTEXT.get();
 
             if (ctx != null) {
-                final Set<ContextualArgumentTypeProvider<?>> instances = instances(ctx.commandManager);
-                synchronized (instances) {
-                    instances.add(this);
+                synchronized (INSTANCES) {
+                    instances(ctx.commandManager).add(this);
                 }
             }
 
