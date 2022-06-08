@@ -44,9 +44,9 @@ versions:
   velocityApi: 3.1.0
   spongeApi7: 7.3.0
   jetbrainsAnnotations: 23.0.0
-  fabricMinecraft: 1.16.5
-  fabricLoader: 0.13.3
-  fabricApi: 0.31.0+1.16
+  fabricMinecraft: 1.19
+  fabricLoader: 0.14.6
+  fabricApi: 0.55.2+1.19
   fabricPermissionsApi: 0.1-SNAPSHOT
 
   # testing

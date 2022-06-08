@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
+import cloud.commandframework.fabric.FabricCommandManager;
 import cloud.commandframework.fabric.data.Coordinates;
 import cloud.commandframework.fabric.data.Message;
 import cloud.commandframework.fabric.data.MinecraftTime;
@@ -38,11 +39,17 @@ import cloud.commandframework.fabric.data.SinglePlayerSelector;
 import cloud.commandframework.fabric.internal.EntitySelectorAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentMessageAccess;
 import cloud.commandframework.fabric.mixin.MessageArgumentPartAccess;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -59,6 +66,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Parsers for Vanilla command argument types.
@@ -68,6 +76,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class FabricArgumentParsers {
 
     private FabricArgumentParsers() {
+    }
+
+    /**
+     * A parser that wraps Brigadier argument types which need a {@link CommandBuildContext}
+     * @param <C> sender type
+     * @param <V> argument value type
+     * @param factory factory that creates these arguments
+     * @return the parser
+     */
+    public static <C, V> @NonNull ArgumentParser<C, V> contextual(final @NonNull Function<CommandBuildContext, ArgumentType<V>> factory) {
+        return new WrappedBrigadierParser<>(new ContextualArgumentTypeProvider<>(factory));
     }
 
     /**
@@ -501,6 +520,96 @@ public final class FabricArgumentParsers {
         @Override
         public @NonNull Collection<ServerPlayer> get() {
             return this.selectedPlayers;
+        }
+
+    }
+
+    @ApiStatus.Internal
+    public static final class ContextualArgumentTypeProvider<V> implements Supplier<ArgumentType<V>> {
+        private static final ThreadLocal<ThreadLocalContext> CONTEXT = new ThreadLocal<>();
+        private static final Map<FabricCommandManager<?, ?>, Set<ContextualArgumentTypeProvider<?>>> INSTANCES =
+            new WeakHashMap<>();
+
+        private final Function<CommandBuildContext, ArgumentType<V>> provider;
+        private volatile ArgumentType<V> provided;
+
+        /**
+         * Temporarily expose a command build context to providers called from this thread.
+         *
+         * @param ctx the context
+         * @param commandManager command manager to use
+         * @param resetExisting whether to clear cached state from existing provider instances for this command type
+         * @param action an action to perform while the context is exposed
+         * @since 1.7.0
+         */
+        public static void withBuildContext(
+            final FabricCommandManager<?, ?> commandManager,
+            final CommandBuildContext ctx,
+            final boolean resetExisting,
+            final Runnable action
+        ) {
+            final ThreadLocalContext context = new ThreadLocalContext(commandManager, ctx);
+            CONTEXT.set(context);
+
+            try {
+                if (resetExisting) {
+                    synchronized (INSTANCES) {
+                        for (final ContextualArgumentTypeProvider<?> contextualArgumentTypeProvider : context.instances()) {
+                            contextualArgumentTypeProvider.provided = null;
+                        }
+                    }
+                }
+
+                action.run();
+            } finally {
+                CONTEXT.remove();
+            }
+        }
+
+        private static final class ThreadLocalContext {
+            private final FabricCommandManager<?, ?> commandManager;
+            private final CommandBuildContext commandBuildContext;
+
+            private ThreadLocalContext(
+                    final FabricCommandManager<?, ?> commandManager,
+                    final CommandBuildContext commandBuildContext
+            ) {
+                this.commandManager = commandManager;
+                this.commandBuildContext = commandBuildContext;
+            }
+
+            private Set<ContextualArgumentTypeProvider<?>> instances() {
+                return INSTANCES.computeIfAbsent(this.commandManager, $ -> Collections.newSetFromMap(new WeakHashMap<>()));
+            }
+        }
+
+        ContextualArgumentTypeProvider(final @NonNull Function<CommandBuildContext, ArgumentType<V>> provider) {
+            this.provider = provider;
+        }
+
+        @Override
+        public ArgumentType<V> get() {
+            final ThreadLocalContext ctx = CONTEXT.get();
+
+            if (ctx != null) {
+                synchronized (INSTANCES) {
+                    ctx.instances().add(this);
+                }
+            }
+
+            ArgumentType<V> provided = this.provided;
+            if (provided == null) {
+                synchronized (this) {
+                    if (this.provided == null) {
+                        if (ctx == null) {
+                            throw new IllegalStateException("No build context was available while trying to compute an argument type");
+                        }
+                        provided = this.provider.apply(ctx.commandBuildContext);
+                        this.provided = provided;
+                    }
+                }
+            }
+            return provided;
         }
 
     }

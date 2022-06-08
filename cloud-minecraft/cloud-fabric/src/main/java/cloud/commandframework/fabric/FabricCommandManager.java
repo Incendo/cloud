@@ -40,7 +40,6 @@ import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.permission.PredicatePermission;
 import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.serialization.Codec;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
@@ -56,16 +55,13 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.AngleArgument;
 import net.minecraft.commands.arguments.ColorArgument;
 import net.minecraft.commands.arguments.CompoundTagArgument;
-import net.minecraft.commands.arguments.DimensionArgument;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.commands.arguments.EntitySummonArgument;
-import net.minecraft.commands.arguments.ItemEnchantmentArgument;
 import net.minecraft.commands.arguments.MessageArgument;
-import net.minecraft.commands.arguments.MobEffectArgument;
 import net.minecraft.commands.arguments.NbtPathArgument;
 import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.commands.arguments.ObjectiveCriteriaArgument;
@@ -73,12 +69,12 @@ import net.minecraft.commands.arguments.OperationArgument;
 import net.minecraft.commands.arguments.ParticleArgument;
 import net.minecraft.commands.arguments.RangeArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.ResourceOrTagLocationArgument;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument;
 import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
-import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -180,64 +176,26 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerConstantNativeParserSupplier(OperationArgument.Operation.class, OperationArgument.operation());
         this.registerConstantNativeParserSupplier(ParticleOptions.class, ParticleArgument.particle());
         this.registerConstantNativeParserSupplier(AngleArgument.SingleAngle.class, AngleArgument.angle());
-        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {
-        }, SwizzleArgument.swizzle());
+        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {}, SwizzleArgument.swizzle());
         this.registerConstantNativeParserSupplier(ResourceLocation.class, ResourceLocationArgument.id());
-        this.registerConstantNativeParserSupplier(
-                EntityAnchorArgument.Anchor.class,
-                EntityAnchorArgument.anchor()
-        );
+        this.registerConstantNativeParserSupplier(EntityAnchorArgument.Anchor.class, EntityAnchorArgument.anchor());
         this.registerConstantNativeParserSupplier(MinMaxBounds.Ints.class, RangeArgument.intRange());
-        this.registerConstantNativeParserSupplier(MinMaxBounds.Floats.class, RangeArgument.floatRange());
-        this.registerConstantNativeParserSupplier(ItemInput.class, ItemArgument.item());
+        this.registerConstantNativeParserSupplier(MinMaxBounds.Doubles.class, RangeArgument.floatRange());
+        this.registerContextualNativeParserSupplier(ItemInput.class, ItemArgument::item);
+        this.registerContextualNativeParserSupplier(BlockPredicateArgument.Result.class, BlockPredicateArgument::blockPredicate);
 
         /* Wrapped/Constant Brigadier types, mapped value type */
-        this.registerConstantNativeParserSupplier(
-                BlockPredicateArgument.Result.class,
-                BlockPredicateArgument.blockPredicate()
-        );
         this.registerConstantNativeParserSupplier(MessageArgument.Message.class, MessageArgument.message());
-        this.getParserRegistry().registerParserSupplier(
-                TypeToken.get(MinecraftTime.class),
-                params -> FabricArgumentParsers.time()
-        );
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(MinecraftTime.class), params -> FabricArgumentParsers.time());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void registerRegistryEntryMappings() {
         this.brigadierManager.registerMapping(
-                new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {
-                },
-                builder -> builder.to(argument -> {
-                            /* several registries have specialized argument types, so let's use those where possible */
-                            final ResourceKey<? extends Registry<?>> registry = argument.registryKey();
-                            if (registry.equals(Registry.ENTITY_TYPE_REGISTRY)) {
-                                return EntitySummonArgument.id();
-                            } else if (registry.equals(Registry.ENCHANTMENT_REGISTRY)) {
-                                return ItemEnchantmentArgument.enchantment();
-                            } else if (registry.equals(Registry.MOB_EFFECT_REGISTRY)) {
-                                return MobEffectArgument.effect();
-                            } else if (registry.equals(Registry.DIMENSION_REGISTRY)) {
-                                return DimensionArgument.dimension();
-                            }
-                            return ResourceLocationArgument.id();
-                        }
-                ).suggestedBy((argument, useCloud) -> {
-                    /* A few other registries have client-side suggestion providers but no argument type */
-                    /* Type parameters are messed up here for some reason */
-                    final ResourceKey<? extends Registry<?>> registry = argument.registryKey();
-                    if (registry.equals(Registry.SOUND_EVENT_REGISTRY)) {
-                        return (SuggestionProvider<S>) SuggestionProviders.AVAILABLE_SOUNDS;
-                    } else if (registry.equals(Registry.BIOME_REGISTRY)) {
-                        return (SuggestionProvider<S>) SuggestionProviders.AVAILABLE_BIOMES;
-                    } else if (registry.equals(Registry.ENTITY_TYPE_REGISTRY)
-                            || registry.equals(Registry.ENCHANTMENT_REGISTRY)
-                            || registry.equals(Registry.MOB_EFFECT_REGISTRY)
-                            || registry.equals(Registry.DIMENSION_REGISTRY)) {
-                        return null; /* for types with their own argument type, use Brigadier */
-                    }
-                    return useCloud; /* use cloud suggestions for anything else */
-                })
+            new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {},
+            builder -> {
+                builder.to(argument -> ResourceOrTagLocationArgument.<Object>resourceOrTag((ResourceKey) argument.registryKey()));
+            }
         );
 
         /* Find all fields of RegistryKey<? extends Registry<?>> and register those */
@@ -290,6 +248,21 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                     params -> new RegistryEntryArgument.Parser(key)
             );
         }
+    }
+
+    /**
+     * Register a parser supplier for a brigadier type that has no options and whose output can be directly used.
+     *
+     * @param type     the Java type to map
+     * @param argument a function providing the Brigadier parser given a build context
+     * @param <T>      value type
+     * @since 1.7.0
+     */
+    final <T> void registerContextualNativeParserSupplier(
+        final @NonNull Class<T> type,
+        final @NonNull Function<CommandBuildContext, @NonNull ArgumentType<T>> argument
+    ) {
+        this.getParserRegistry().registerParserSupplier(TypeToken.get(type),  params -> FabricArgumentParsers.contextual(argument));
     }
 
     /**

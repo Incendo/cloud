@@ -25,6 +25,7 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -33,11 +34,16 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
-import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands.CommandSelection;
+import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -51,6 +57,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <S> native sender type
  */
 abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionProvider> implements CommandRegistrationHandler {
+
     private @MonotonicNonNull FabricCommandManager<C, S> commandManager;
 
     void initialize(final FabricCommandManager<C, S> manager) {
@@ -71,7 +78,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
      *
      * @param alias       the command alias
      * @param destination the destination node
-     * @param <S> brig sender type
+     * @param <S>         brig sender type
      * @return the built node
      */
     private static <S> LiteralCommandNode<S> buildRedirect(
@@ -81,7 +88,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         // Redirects only work for nodes with children, but break the top argument-less command.
         // Manually adding the root command after setting the redirect doesn't fix it.
         // (See https://github.com/Mojang/brigadier/issues/46) Manually clone the node instead.
-        LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder
+        final LiteralArgumentBuilder<S> builder = LiteralArgumentBuilder
                 .<S>literal(alias)
                 .requires(destination.getRequirement())
                 .forward(
@@ -97,19 +104,65 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
     }
 
     static class Client<C> extends FabricCommandRegistrationHandler<C, FabricClientCommandSource> {
+
+        private final Set<Command<C>> registeredCommands = ConcurrentHashMap.newKeySet();
+        private volatile boolean registerEventFired = false;
+
         @Override
         void initialize(final FabricCommandManager<C, FabricClientCommandSource> manager) {
             super.initialize(manager);
+            ClientCommandRegistrationCallback.EVENT.register(this::registerCommands);
+            ClientPlayConnectionEvents.DISCONNECT.register(($, $$) -> this.registerEventFired = false);
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public boolean registerCommand(final @NonNull Command<?> cmd) {
-            final Command<C> command = (Command<C>) cmd;
-            final RootCommandNode<FabricClientCommandSource> rootNode = ClientCommandManager.DISPATCHER.getRoot();
+        public boolean registerCommand(final @NonNull Command<?> command) {
+            this.registeredCommands.add((Command<C>) command);
+            if (this.registerEventFired) {
+                final ClientPacketListener connection = Minecraft.getInstance().getConnection();
+                if (connection == null) {
+                    throw new IllegalStateException("Expected connection to be present but it wasn't!");
+                }
+                final CommandDispatcher<FabricClientCommandSource> dispatcher = ClientCommandManager.getActiveDispatcher();
+                if (dispatcher == null) {
+                    throw new IllegalStateException("Expected an active dispatcher!");
+                }
+                FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                        this.commandManager(),
+                        new CommandBuildContext(connection.registryAccess()),
+                        false,
+                        () -> this.registerClientCommand(dispatcher, (Command<C>) command)
+                );
+            }
+            return true;
+        }
+
+        public void registerCommands(
+            final CommandDispatcher<FabricClientCommandSource> dispatcher,
+            final CommandBuildContext commandBuildContext
+        ) {
+            this.registerEventFired = true;
+            FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                    this.commandManager(),
+                    commandBuildContext,
+                    true,
+                    () -> {
+                        for (final Command<C> command : this.registeredCommands) {
+                            this.registerClientCommand(dispatcher, command);
+                        }
+                    }
+            );
+        }
+
+        @SuppressWarnings("unchecked")
+        private void registerClientCommand(
+            final CommandDispatcher<FabricClientCommandSource> dispatcher,
+            final Command<C> command
+        ) {
+            final RootCommandNode<FabricClientCommandSource> rootNode = dispatcher.getRoot();
             final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
-            final CommandNode<FabricClientCommandSource> baseNode = this
-                    .commandManager()
+            final CommandNode<FabricClientCommandSource> baseNode = this.commandManager()
                     .brigadierManager()
                     .createLiteralCommandNode(
                             first.getName(),
@@ -131,11 +184,11 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
             for (final String alias : first.getAlternativeAliases()) {
                 rootNode.addChild(buildRedirect(alias, baseNode));
             }
-            return true;
         }
     }
 
     static class Server<C> extends FabricCommandRegistrationHandler<C, CommandSourceStack> {
+
         private final Set<Command<C>> registeredCommands = ConcurrentHashMap.newKeySet();
 
         @Override
@@ -150,21 +203,32 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
             return this.registeredCommands.add((Command<C>) command);
         }
 
-        private void registerAllCommands(final CommandDispatcher<CommandSourceStack> dispatcher, final boolean isDedicated) {
+        private void registerAllCommands(
+            final CommandDispatcher<CommandSourceStack> dispatcher,
+            final CommandBuildContext access,
+            final Commands.CommandSelection side
+        ) {
             this.commandManager().registrationCalled();
-            for (final Command<C> command : this.registeredCommands) {
-                /* Only register commands in the declared environment */
-                final CommandSelection env = command.getCommandMeta().getOrDefault(
-                        FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
-                        CommandSelection.ALL
-                );
+            FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                    this.commandManager(),
+                access,
+                true,
+                () -> {
+                    for (final Command<C> command : this.registeredCommands) {
+                        /* Only register commands in the declared environment */
+                        final Commands.CommandSelection env = command.getCommandMeta().getOrDefault(
+                                FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
+                                Commands.CommandSelection.ALL
+                        );
 
-                if ((env == CommandSelection.INTEGRATED && isDedicated)
-                        || (env == CommandSelection.DEDICATED && !isDedicated)) {
-                    continue;
+                        if ((env == Commands.CommandSelection.INTEGRATED && !side.includeIntegrated)
+                                || (env == Commands.CommandSelection.DEDICATED && !side.includeDedicated)) {
+                            continue;
+                        }
+                        this.registerCommand(dispatcher.getRoot(), command);
+                    }
                 }
-                this.registerCommand(dispatcher.getRoot(), command);
-            }
+            );
         }
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
@@ -178,7 +242,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                             perm
                     ),
                     true,
-                    new FabricExecutor<>(this.commandManager(), CommandSourceStack::getTextName, CommandSourceStack::sendFailure));
+                    new FabricExecutor<>(this.commandManager(), CommandSourceStack::getTextName, CommandSourceStack::sendFailure)
+            );
 
             dispatcher.addChild(baseNode);
 
@@ -186,5 +251,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 dispatcher.addChild(buildRedirect(alias, baseNode));
             }
         }
+
     }
+
 }
