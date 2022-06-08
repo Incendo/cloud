@@ -548,12 +548,13 @@ public final class FabricArgumentParsers {
             final boolean resetExisting,
             final Runnable action
         ) {
-            CONTEXT.set(new ThreadLocalContext(commandManager, ctx));
+            final ThreadLocalContext context = new ThreadLocalContext(commandManager, ctx);
+            CONTEXT.set(context);
 
             try {
                 if (resetExisting) {
                     synchronized (INSTANCES) {
-                        for (final ContextualArgumentTypeProvider<?> contextualArgumentTypeProvider : instances(commandManager)) {
+                        for (final ContextualArgumentTypeProvider<?> contextualArgumentTypeProvider : context.instances()) {
                             contextualArgumentTypeProvider.provided = null;
                         }
                     }
@@ -563,10 +564,6 @@ public final class FabricArgumentParsers {
             } finally {
                 CONTEXT.remove();
             }
-        }
-
-        private static Set<ContextualArgumentTypeProvider<?>> instances(final FabricCommandManager<?, ?> manager) {
-            return INSTANCES.computeIfAbsent(manager, $ -> Collections.newSetFromMap(new WeakHashMap<>()));
         }
 
         private static final class ThreadLocalContext {
@@ -580,6 +577,10 @@ public final class FabricArgumentParsers {
                 this.commandManager = commandManager;
                 this.commandBuildContext = commandBuildContext;
             }
+
+            private Set<ContextualArgumentTypeProvider<?>> instances() {
+                return INSTANCES.computeIfAbsent(this.commandManager, $ -> Collections.newSetFromMap(new WeakHashMap<>()));
+            }
         }
 
         ContextualArgumentTypeProvider(final @NonNull Function<CommandBuildContext, ArgumentType<V>> provider) {
@@ -592,7 +593,7 @@ public final class FabricArgumentParsers {
 
             if (ctx != null) {
                 synchronized (INSTANCES) {
-                    instances(ctx.commandManager).add(this);
+                    ctx.instances().add(this);
                 }
             }
 
