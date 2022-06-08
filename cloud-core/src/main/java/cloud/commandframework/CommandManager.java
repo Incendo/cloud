@@ -439,7 +439,8 @@ public abstract class CommandManager<C> {
         // Mark the command for deletion.
         final CommandTree.Node<@Nullable CommandArgument<C, ?>> node = this.commandTree.getNamedNode(rootCommand);
         if (node == null) {
-            throw new IllegalArgumentException(String.format("No root command named '%s' exists", rootCommand));
+            // If the node doesn't exist, we don't really need to delete it...
+            return;
         }
 
         // The registration handler gets to act before we destruct the command.

@@ -29,7 +29,11 @@ import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapp
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import com.mojang.brigadier.tree.RootCommandNode;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.List;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 import org.bukkit.Bukkit;
@@ -74,6 +78,11 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         this.registerWithCommodore(label, (Command<C>) command);
     }
 
+    @Override
+    protected void unregisterExternal(final @NonNull String label) {
+        this.unregisterWithCommodore(label);
+    }
+
     protected @NonNull CloudBrigadierManager brigadierManager() {
         return this.brigadierManager;
     }
@@ -84,6 +93,11 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     ) {
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
                 .createLiteralCommandNode(label, command, (o, p) -> {
+                    // We need to check that the command still exists...
+                    if (this.commandManager.getCommandTree().getNamedNode(label) == null) {
+                        return false;
+                    }
+
                     final CommandSender sender = this.commodore.getBukkitSender(o);
                     return this.commandManager.hasPermission(this.commandManager.getCommandSenderMapper().apply(sender), p);
                 }, false, o -> 1);
@@ -92,6 +106,35 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             this.mergeChildren(existingNode, literalCommandNode);
         } else {
             this.commodore.register(literalCommandNode);
+        }
+    }
+
+    private void unregisterWithCommodore(
+            final @NonNull String label
+    ) {
+        final CommandNode node = this.commodore.getDispatcher().findNode(Collections.singletonList(label));
+        if (node == null) {
+            return;
+        }
+
+        try {
+            final Class<? extends Commodore> commodoreImpl = (Class<? extends Commodore>) Class.forName("me.lucko.commodore.CommodoreImpl");
+
+            final Method removeChild = commodoreImpl.getDeclaredMethod("removeChild", RootCommandNode.class, String.class);
+            removeChild.setAccessible(true);
+
+            removeChild.invoke(
+                    null /* static method */,
+                    this.commodore.getDispatcher().getRoot(),
+                    node.getName()
+            );
+
+            final Field registeredNodes = commodoreImpl.getDeclaredField("registeredNodes");
+            registeredNodes.setAccessible(true);
+
+            ((List<LiteralCommandNode<?>>) registeredNodes.get(this.commodore)).remove(node);
+        } catch (final Exception e) {
+            throw new RuntimeException(String.format("Failed to unregister command '%s' with commodore", label), e);
         }
     }
 

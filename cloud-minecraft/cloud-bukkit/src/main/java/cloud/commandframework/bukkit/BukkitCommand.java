@@ -37,13 +37,16 @@ import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
+import org.apiguardian.api.API;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class BukkitCommand<C> extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
@@ -57,6 +60,8 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     private final CommandArgument<C, ?> command;
     private final BukkitCommandManager<C> manager;
     private final Command<C> cloudCommand;
+
+    private boolean disabled;
 
     BukkitCommand(
             final @NonNull String label,
@@ -77,6 +82,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         if (this.command.getOwningCommand() != null) {
             this.setPermission(this.command.getOwningCommand().getCommandPermission().toString());
         }
+        this.disabled = false;
     }
 
     @Override
@@ -191,22 +197,38 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     @Override
     public @NonNull String getUsage() {
         return this.manager.getCommandSyntaxFormatter().apply(
-                Collections.singletonList(this.namedNode().getValue()),
+                Collections.singletonList(Objects.requireNonNull(this.namedNode().getValue())),
                 this.namedNode()
         );
     }
 
     @Override
     public boolean testPermissionSilent(final @NonNull CommandSender target) {
-        final CommandPermission permission = (CommandPermission) this.namedNode()
+        final CommandTree.Node<CommandArgument<C, ?>> node = this.namedNode();
+        if (this.disabled || node == null) {
+            return false;
+        }
+
+        final CommandPermission permission = (CommandPermission) node
                 .getNodeMeta()
                 .getOrDefault("permission", Permission.empty());
 
         return this.manager.hasPermission(this.manager.getCommandSenderMapper().apply(target), permission);
     }
 
-    private CommandTree.Node<CommandArgument<C, ?>> namedNode() {
-        return this.manager.getCommandTree().getNamedNode(this.command.getName());
+    @API(status = API.Status.INTERNAL, since = "1.7.0")
+    void disable() {
+        this.disabled = true;
     }
 
+    @Override
+    public boolean isRegistered() {
+        // This allows us to prevent the command from showing
+        // in Bukkit help topics.
+        return !this.disabled;
+    }
+
+    private CommandTree.@Nullable Node<CommandArgument<C, ?>> namedNode() {
+        return this.manager.getCommandTree().getNamedNode(this.command.getName());
+    }
 }

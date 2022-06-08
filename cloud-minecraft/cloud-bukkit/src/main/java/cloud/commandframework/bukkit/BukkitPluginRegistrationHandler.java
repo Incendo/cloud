@@ -37,10 +37,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.entity.Player;
 import org.bukkit.help.GenericCommandHelpTopic;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -53,7 +55,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
     private BukkitCommandManager<C> bukkitCommandManager;
     private CommandMap commandMap;
 
-    BukkitPluginRegistrationHandler() {
+    protected BukkitPluginRegistrationHandler() {
     }
 
     final void initialize(final @NonNull BukkitCommandManager<C> bukkitCommandManager) throws Exception {
@@ -93,7 +95,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
 
         if (this.bukkitCommandManager.getSetting(CommandManager.ManagerSettings.OVERRIDE_EXISTING_COMMANDS)) {
             this.bukkitCommands.remove(label);
-            aliases.forEach(alias -> this.bukkitCommands.remove(alias));
+            aliases.forEach(this.bukkitCommands::remove);
         }
 
         final Set<String> newAliases = new HashSet<>();
@@ -126,6 +128,46 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         return true;
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public final void unregisterRootCommand(
+            final @NonNull StaticArgument<?> rootCommand
+    ) {
+        final org.bukkit.command.Command registeredCommand = this.registeredCommands.get(rootCommand);
+        if (registeredCommand == null) {
+            return;
+        }
+        ((BukkitCommand<C>) registeredCommand).disable();
+
+        final List<String> aliases = new ArrayList<>(rootCommand.getAlternativeAliases());
+        final Set<String> registeredAliases = new HashSet<>();
+
+        for (final String alias : aliases) {
+            registeredAliases.add(this.getNamespacedLabel(alias));
+            if (this.bukkitCommandOrAliasExists(alias)) {
+                registeredAliases.add(alias);
+            }
+        }
+
+        if (this.bukkitCommandExists(rootCommand.getName())) {
+            registeredAliases.add(rootCommand.getName());
+        }
+        registeredAliases.add(this.getNamespacedLabel(rootCommand.getName()));
+
+        this.bukkitCommands.remove(rootCommand.getName());
+        this.bukkitCommands.remove(this.getNamespacedLabel(rootCommand.getName()));
+
+        this.recognizedAliases.removeAll(registeredAliases);
+        if (this.bukkitCommandManager.getSplitAliases()) {
+            registeredAliases.forEach(this::unregisterExternal);
+        }
+
+        this.registeredCommands.remove(rootCommand);
+
+        // Once the command has been unregistered, we need to refresh the command list for all online players.
+        Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+    }
+
     private @NonNull String getNamespacedLabel(final @NonNull String label) {
         return String.format("%s:%s", this.bukkitCommandManager.getOwningPlugin().getName(), label).toLowerCase();
     }
@@ -145,6 +187,10 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             final @NonNull Command<?> command,
             final @NonNull BukkitCommand<C> bukkitCommand
     ) {
+    }
+
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    protected void unregisterExternal(final @NonNull String label) {
     }
 
     /**

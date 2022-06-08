@@ -963,14 +963,10 @@ public final class CommandTree<C> {
     }
 
     private boolean removeNode(final @NonNull Node<@Nullable CommandArgument<C, ?>> node) {
-        if (node.isLeaf()) {
-            if (this.getRootNodes().contains(node)) {
-                this.internalTree.removeChild(node);
-            } else {
-                return node.getParent().removeChild(node);
-            }
+        if (this.getRootNodes().contains(node)) {
+            this.internalTree.removeChild(node);
         } else {
-            throw new IllegalStateException(String.format("Cannot delete intermediate node '%s'", node));
+            return node.getParent().removeChild(node);
         }
 
         return false;

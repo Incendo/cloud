@@ -27,6 +27,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 
@@ -47,4 +48,10 @@ final class CloudBukkitListener<C> implements Listener {
         this.bukkitCommandManager.lockIfBrigadierCapable();
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    void onPluginDisable(final @NonNull PluginDisableEvent event) {
+        if (event.getPlugin().equals(this.bukkitCommandManager.getOwningPlugin())) {
+            this.bukkitCommandManager.rootCommands().forEach(this.bukkitCommandManager::deleteRootCommand);
+        }
+    }
 }
