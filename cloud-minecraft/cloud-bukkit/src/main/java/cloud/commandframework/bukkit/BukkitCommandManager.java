@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.bukkit;
 
+import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
@@ -55,6 +56,7 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.apiguardian.api.API;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -126,6 +128,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         final BukkitSynchronizer bukkitSynchronizer = new BukkitSynchronizer(owningPlugin);
         this.taskFactory = new TaskFactory(bukkitSynchronizer);
 
+        /* Register capabilities */
+        CloudBukkitCapabilities.CAPABLE.forEach(this::registerCapability);
+
         /* Register Bukkit Preprocessor */
         this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
 
@@ -157,7 +162,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
 
         /* Register MC 1.13+ parsers */
-        if (this.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+        if (this.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
             this.registerParserSupplierFor(ItemStackPredicateArgument.class);
             this.registerParserSupplierFor(BlockPredicateArgument.class);
         }
@@ -256,7 +261,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *                                   will contain the reason for this.
      */
     protected final void checkBrigadierCompatibility() throws BrigadierFailureException {
-        if (!this.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+        if (!this.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
             throw new BrigadierFailureException(
                     BrigadierFailureReason.VERSION_TOO_LOW,
                     new IllegalArgumentException(
@@ -271,7 +276,10 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      *
      * @param capability Capability
      * @return {@code true} if the manager has the given capability, else {@code false}
+     * @deprecated for removal since 1.7.0. Use the new standard {@link #hasCapability(CloudCapability)} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public final boolean queryCapability(final @NonNull CloudBukkitCapabilities capability) {
         return capability.capable();
     }
@@ -371,7 +379,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     final void lockIfBrigadierCapable() {
-        if (this.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+        if (this.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
             this.lockRegistration();
         }
     }

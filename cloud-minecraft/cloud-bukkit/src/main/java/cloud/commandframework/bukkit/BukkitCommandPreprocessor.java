@@ -27,7 +27,6 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -40,7 +39,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
     private final BukkitCommandManager<C> commandManager;
-    private final Set<CloudBukkitCapabilities> bukkitCapabilities;
     private final @Nullable BukkitBackwardsBrigadierSenderMapper<C, ?> mapper;
 
     /**
@@ -50,8 +48,8 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
      */
     BukkitCommandPreprocessor(final @NonNull BukkitCommandManager<C> commandManager) {
         this.commandManager = commandManager;
-        this.bukkitCapabilities = commandManager.queryCapabilities();
-        if (this.bukkitCapabilities.contains(CloudBukkitCapabilities.BRIGADIER)) {
+
+        if (this.commandManager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
             this.mapper = new BukkitBackwardsBrigadierSenderMapper<>(this.commandManager);
         } else {
             this.mapper = null;
@@ -76,7 +74,7 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
         );
         context.getCommandContext().store(
                 BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES,
-                this.bukkitCapabilities
+                this.commandManager.queryCapabilities()
         );
     }
 

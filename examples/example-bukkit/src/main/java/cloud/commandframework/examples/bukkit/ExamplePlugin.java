@@ -160,13 +160,13 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // Register Brigadier mappings
         //
-        if (this.manager.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+        if (this.manager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
             this.manager.registerBrigadier();
         }
         //
         // Register asynchronous completions
         //
-        if (this.manager.queryCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
+        if (this.manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             ((PaperCommandManager<CommandSender>) this.manager).registerAsynchronousCompletions();
         }
         //
@@ -386,7 +386,7 @@ public final class ExamplePlugin extends JavaPlugin {
         );
 
         // Commands using MC 1.13+ argument types
-        if (this.manager.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
+        if (this.manager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
             new Mc113(this.manager).registerCommands();
         }
 
