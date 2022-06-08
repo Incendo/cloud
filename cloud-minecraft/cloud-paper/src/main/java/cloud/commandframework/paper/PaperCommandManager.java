@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.paper;
 
+import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitCommandManager;
@@ -120,7 +121,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
     public void registerBrigadier() throws BrigadierFailureException {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.checkBrigadierCompatibility();
-        if (!this.queryCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
+        if (!this.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             super.registerBrigadier();
         } else {
             try {
@@ -153,11 +154,11 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * is up to the caller to guarantee that such is the case
      *
      * @throws IllegalStateException when the server does not support asynchronous completions.
-     * @see #queryCapability(CloudBukkitCapabilities) Check if the capability is present
+     * @see #hasCapability(CloudCapability) Check if the capability is present
      */
     public void registerAsynchronousCompletions() throws IllegalStateException {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
-        if (!this.queryCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
+        if (!this.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             throw new IllegalStateException("Failed to register asynchronous command completion listener.");
         }
         Bukkit.getServer().getPluginManager().registerEvents(

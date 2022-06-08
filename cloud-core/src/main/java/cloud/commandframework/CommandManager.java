@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.CommandSuggestionEngine;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.DelegatingCommandSuggestionEngineFactory;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
+import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
@@ -66,15 +67,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -100,6 +104,7 @@ public abstract class CommandManager<C> {
     private final CommandExecutionCoordinator<C> commandExecutionCoordinator;
     private final CommandTree<C> commandTree;
     private final CommandSuggestionEngine<C> commandSuggestionEngine;
+    private final Set<CloudCapability> capabilities = new HashSet<>();
 
     private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
@@ -297,6 +302,40 @@ public abstract class CommandManager<C> {
         return this.commandRegistrationHandler;
     }
 
+    /**
+     * Registers the given {@code capability}.
+     *
+     * @param capability the capability
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    protected final void registerCapability(final @NonNull CloudCapability capability) {
+        this.capabilities.add(capability);
+    }
+
+    /**
+     * Checks whether the cloud implementation has the given {@code capability}.
+     *
+     * @param capability the capability
+     * @return {@code true} if the implementation has the {@code capability}, {@code false} if not
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public boolean hasCapability(final @NonNull CloudCapability capability) {
+        return this.capabilities.contains(capability);
+    }
+
+    /**
+     * Returns an unmodifiable snapshot of the currently registered {@link CloudCapability capabilities}.
+     *
+     * @return the currently registered capabilities
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull Collection<@NonNull CloudCapability> capabilities() {
+        return Collections.unmodifiableSet(new HashSet<>(this.capabilities));
+    }
+
     protected final void setCommandRegistrationHandler(final @NonNull CommandRegistrationHandler commandRegistrationHandler) {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.commandRegistrationHandler = commandRegistrationHandler;
@@ -381,6 +420,55 @@ public abstract class CommandManager<C> {
      * @return {@code true} if the sender has the permission, else {@code false}
      */
     public abstract boolean hasPermission(@NonNull C sender, @NonNull String permission);
+
+    /**
+     * Deletes the given {@code rootCommand}.
+     * <p>
+     * This will delete all chains that originate at the root command.
+     *
+     * @param rootCommand The root command to delete
+     * @throws CloudCapability.CloudCapabilityMissingException If {@link CloudCapability.StandardCapabilities#ROOT_COMMAND_DELETION} is missing
+     * @since 1.7.0
+     */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.7.0")
+    public void deleteRootCommand(final @NonNull String rootCommand) throws CloudCapability.CloudCapabilityMissingException {
+        if (!this.hasCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION)) {
+            throw new CloudCapability.CloudCapabilityMissingException(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
+        }
+
+        // Mark the command for deletion.
+        final CommandTree.Node<@Nullable CommandArgument<C, ?>> node = this.commandTree.getNamedNode(rootCommand);
+        if (node == null) {
+            throw new IllegalArgumentException(String.format("No root command named '%s' exists", rootCommand));
+        }
+
+        // The registration handler gets to act before we destruct the command.
+        this.commandRegistrationHandler.unregisterRootCommand((StaticArgument<?>) node.getValue());
+
+        // We then delete it from the tree.
+        this.commandTree.deleteRecursively(node);
+
+        // And lastly we re-build the entire tree.
+        this.commandTree.verifyAndRegister();
+    }
+
+    /**
+     * Returns all root command names.
+     *
+     * @return Root command names.
+     * @since 1.7.0
+     */
+    @SuppressWarnings("unchecked")
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull Collection<@NonNull String> rootCommands() {
+        return this.commandTree.getRootNodes()
+                .stream()
+                .map(CommandTree.Node::getValue)
+                .filter(arg -> arg instanceof StaticArgument)
+                .map(arg -> (StaticArgument<C>) arg)
+                .map(StaticArgument::getName)
+                .collect(Collectors.toList());
+    }
 
     /**
      * Create a new command builder. This will also register the creating manager in the command

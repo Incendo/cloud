@@ -23,15 +23,17 @@
 //
 package cloud.commandframework.bukkit;
 
+import cloud.commandframework.CloudCapability;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Capabilities for the Bukkit module
  */
-public enum CloudBukkitCapabilities {
+public enum CloudBukkitCapabilities implements CloudCapability {
     BRIGADIER(CraftBukkitReflection.classExists("com.mojang.brigadier.tree.CommandNode")
     && CraftBukkitReflection.findOBCClass("command.BukkitCommandWrapper") != null),
 
@@ -55,5 +57,10 @@ public enum CloudBukkitCapabilities {
 
     boolean capable() {
         return this.capable;
+    }
+
+    @Override
+    public @NonNull String toString() {
+        return name();
     }
 }

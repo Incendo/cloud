@@ -25,10 +25,12 @@ package cloud.commandframework.javacord;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.javacord.api.listener.message.MessageCreateListener;
 
 final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler {
 
@@ -59,4 +61,15 @@ final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler
         return true;
     }
 
+    @Override
+    public void unregisterRootCommand(
+            final @NonNull StaticArgument<?> rootCommand
+    ) {
+        final JavacordCommand<C> command = this.registeredCommands.get(rootCommand);
+        if (command == null) {
+            return;
+        }
+
+        this.javacordCommandManager.getDiscordApi().removeListener(MessageCreateListener.class, command);
+    }
 }

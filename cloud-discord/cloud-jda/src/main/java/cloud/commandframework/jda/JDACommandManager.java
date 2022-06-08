@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.jda;
 
+import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
@@ -117,6 +118,9 @@ public class JDACommandManager<C> extends CommandManager<C> {
                 new RoleArgument.RoleParser<>(
                         new HashSet<>(Arrays.asList(RoleArgument.ParserMode.values()))
                 ));
+
+        // No "native" command system means that we can delete commands just fine.
+        this.registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
     }
 
     /**

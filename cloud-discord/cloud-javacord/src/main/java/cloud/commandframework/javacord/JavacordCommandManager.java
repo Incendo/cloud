@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.javacord;
 
+import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
@@ -77,6 +78,8 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
 
         this.commandPrefixMapper = commandPrefixMapper;
         this.commandPermissionMapper = commandPermissionMapper;
+
+        this.registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
     }
 
     @Override
