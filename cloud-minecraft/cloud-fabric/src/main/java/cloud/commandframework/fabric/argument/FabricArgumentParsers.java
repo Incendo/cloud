@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
+import cloud.commandframework.fabric.FabricCommandManager;
 import cloud.commandframework.fabric.data.Coordinates;
 import cloud.commandframework.fabric.data.Message;
 import cloud.commandframework.fabric.data.MinecraftTime;
@@ -43,6 +44,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Function;
@@ -525,10 +527,8 @@ public final class FabricArgumentParsers {
     @ApiStatus.Internal
     public static final class ContextualArgumentTypeProvider<V> implements Supplier<ArgumentType<V>> {
         private static final ThreadLocal<ThreadLocalContext> CONTEXT = new ThreadLocal<>();
-        private static final Set<ContextualArgumentTypeProvider<?>> CLIENT_COMMAND_INSTANCES =
-            Collections.newSetFromMap(new WeakHashMap<>());
-        private static final Set<ContextualArgumentTypeProvider<?>> SERVER_COMMAND_INSTANCES =
-            Collections.newSetFromMap(new WeakHashMap<>());
+        private static final Map<FabricCommandManager<?, ?>, Set<ContextualArgumentTypeProvider<?>>> INSTANCES =
+            new WeakHashMap<>();
 
         private final Function<CommandBuildContext, ArgumentType<V>> provider;
         private volatile ArgumentType<V> provided;
@@ -537,22 +537,22 @@ public final class FabricArgumentParsers {
          * Temporarily expose a command build context to providers called from this thread.
          *
          * @param ctx the context
-         * @param clientCommands whether this is for client commands
+         * @param commandManager command manager to use
          * @param resetExisting whether to clear cached state from existing provider instances for this command type
          * @param action an action to perform while the context is exposed
          * @since 1.7.0
          */
         public static void withBuildContext(
+            final FabricCommandManager<?, ?> commandManager,
             final CommandBuildContext ctx,
-            final boolean clientCommands,
             final boolean resetExisting,
             final Runnable action
         ) {
-            CONTEXT.set(new ThreadLocalContext(clientCommands, ctx));
+            CONTEXT.set(new ThreadLocalContext(commandManager, ctx));
 
             try {
                 if (resetExisting) {
-                    final Set<ContextualArgumentTypeProvider<?>> instances = instances(clientCommands);
+                    final Set<ContextualArgumentTypeProvider<?>> instances = instances(commandManager);
                     synchronized (instances) {
                         for (final ContextualArgumentTypeProvider<?> contextualArgumentTypeProvider : instances) {
                             contextualArgumentTypeProvider.provided = null;
@@ -566,16 +566,19 @@ public final class FabricArgumentParsers {
             }
         }
 
-        private static Set<ContextualArgumentTypeProvider<?>> instances(final boolean clientCommands) {
-            return clientCommands ? CLIENT_COMMAND_INSTANCES : SERVER_COMMAND_INSTANCES;
+        private static Set<ContextualArgumentTypeProvider<?>> instances(final FabricCommandManager<?, ?> manager) {
+            return INSTANCES.computeIfAbsent(manager, $ -> Collections.newSetFromMap(new WeakHashMap<>()));
         }
 
         private static final class ThreadLocalContext {
-            private final boolean clientCommnads;
+            private final FabricCommandManager<?, ?> commandManager;
             private final CommandBuildContext commandBuildContext;
 
-            private ThreadLocalContext(final boolean clientCommands, final CommandBuildContext commandBuildContext) {
-                this.clientCommnads = clientCommands;
+            private ThreadLocalContext(
+                    final FabricCommandManager<?, ?> commandManager,
+                    final CommandBuildContext commandBuildContext
+            ) {
+                this.commandManager = commandManager;
                 this.commandBuildContext = commandBuildContext;
             }
         }
@@ -589,7 +592,7 @@ public final class FabricArgumentParsers {
             final ThreadLocalContext ctx = CONTEXT.get();
 
             if (ctx != null) {
-                final Set<ContextualArgumentTypeProvider<?>> instances = instances(ctx.clientCommnads);
+                final Set<ContextualArgumentTypeProvider<?>> instances = instances(ctx.commandManager);
                 synchronized (instances) {
                     instances.add(this);
                 }

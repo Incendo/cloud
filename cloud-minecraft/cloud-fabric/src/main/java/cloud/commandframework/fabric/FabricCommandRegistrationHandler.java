@@ -129,8 +129,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                     throw new IllegalStateException("Expected an active dispatcher!");
                 }
                 FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                        this.commandManager(),
                         new CommandBuildContext(connection.registryAccess()),
-                        true,
                         false,
                         () -> this.registerClientCommand(dispatcher, (Command<C>) command)
                 );
@@ -144,8 +144,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         ) {
             this.registerEventFired = true;
             FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                    this.commandManager(),
                     commandBuildContext,
-                    true,
                     true,
                     () -> {
                         for (final Command<C> command : this.registeredCommands) {
@@ -210,8 +210,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         ) {
             this.commandManager().registrationCalled();
             FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
+                    this.commandManager(),
                 access,
-                false,
                 true,
                 () -> {
                     for (final Command<C> command : this.registeredCommands) {
