@@ -70,7 +70,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final @NonNull String defaultValue,
             final @NonNull TypeToken<V> valueType,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 required,

@@ -32,33 +32,36 @@ import static java.util.Objects.requireNonNull;
 /**
  * A description for a {@link CommandArgument}
  *
+ * @param <C> Command sender type
  * @since 1.4.0
  */
 @API(status = API.Status.STABLE, since = "1.4.0")
-public interface ArgumentDescription {
+public interface ArgumentDescription<C> {
 
     /**
      * Get an empty command description.
      *
+     * @param <C> Command sender type
      * @return Command description
      */
     @SuppressWarnings("deprecation")
-    static @NonNull ArgumentDescription empty() {
-        return Description.EMPTY;
+    static <C> @NonNull ArgumentDescription<C> empty() {
+        return Description.empty();
     }
 
     /**
      * Create a command description instance.
      *
      * @param string Command description
+     * @param <C> Command sender type
      * @return Created command description
      */
     @SuppressWarnings("deprecation")
-    static @NonNull ArgumentDescription of(final @NonNull String string) {
+    static <C> @NonNull ArgumentDescription<C> of(final @NonNull String string) {
         if (requireNonNull(string, "string").isEmpty()) {
-            return Description.EMPTY;
+            return Description.empty();
         } else {
-            return new Description(string);
+            return new Description<>(string);
         }
     }
 
@@ -70,12 +73,33 @@ public interface ArgumentDescription {
     @NonNull String getDescription();
 
     /**
+     * Get the plain-text description for a command sender.
+     *
+     * @param commandSender the command sender
+     * @return Command description
+     */
+    default @NonNull String getDescription(final @NonNull C commandSender) {
+        return this.getDescription();
+    }
+
+    /**
      * Get whether or not this description contains contents.
      *
      * @return if this description is empty or not
      */
     default boolean isEmpty() {
         return this.getDescription().isEmpty();
+    }
+
+
+    /**
+     * Get whether or not this description contains contents for a command sender.
+     *
+     * @param commandSender the command sender
+     * @return if this description is empty or not
+     */
+    default boolean isEmpty(final @NonNull C commandSender) {
+        return this.getDescription(commandSender).isEmpty();
     }
 
 }

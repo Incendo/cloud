@@ -30,16 +30,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * {@link CommandArgument} description
  *
+ * @param <C> Command sender type
  * @deprecated to become package-private since 1.4.0. Use {@link ArgumentDescription} instead.
  */
 @Deprecated
 @API(status = API.Status.DEPRECATED, since = "1.4.0")
-public final class Description implements ArgumentDescription {
+public final class Description<C> implements ArgumentDescription<C> {
 
     /**
      * Empty command description
      */
-    static final Description EMPTY = new Description("");
+    static final Description<?> EMPTY = new Description<>("");
 
     private final String description;
 
@@ -50,24 +51,27 @@ public final class Description implements ArgumentDescription {
     /**
      * Get an empty command description
      *
+     * @param <C> Command sender type
      * @return Command description
      * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#empty()}
      */
     @Deprecated
-    public static @NonNull Description empty() {
-        return EMPTY;
+    @SuppressWarnings("unchecked")
+    public static <C> @NonNull Description<C> empty() {
+        return (Description<C>) EMPTY;
     }
 
     /**
      * Create a command description instance
      *
      * @param string Command description
+     * @param <C> Command sender type
      * @return Created command description
      * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#of(String)}
      */
     @Deprecated
-    public static @NonNull Description of(final @NonNull String string) {
-        return new Description(string);
+    public static <C> @NonNull Description<C> of(final @NonNull String string) {
+        return new Description<>(string);
     }
 
     /**

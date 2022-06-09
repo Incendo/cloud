@@ -494,10 +494,10 @@ public abstract class CommandManager<C> {
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull Collection<String> aliases,
-            final @NonNull Description description,
+            final @NonNull Description<C> description,
             final @NonNull CommandMeta meta
     ) {
-        return this.commandBuilder(name, aliases, (ArgumentDescription) description, meta);
+        return this.commandBuilder(name, aliases, (ArgumentDescription<C>) description, meta);
     }
 
     /**
@@ -521,7 +521,7 @@ public abstract class CommandManager<C> {
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull Collection<String> aliases,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final @NonNull CommandMeta meta
     ) {
         return Command.<C>newBuilder(
@@ -585,10 +585,10 @@ public abstract class CommandManager<C> {
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull CommandMeta meta,
-            final @NonNull Description description,
+            final @NonNull Description<C> description,
             final @NonNull String... aliases
     ) {
-        return this.commandBuilder(name, meta, (ArgumentDescription) description, aliases);
+        return this.commandBuilder(name, meta, (ArgumentDescription<C>) description, aliases);
     }
 
     /**
@@ -612,7 +612,7 @@ public abstract class CommandManager<C> {
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull CommandMeta meta,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final @NonNull String... aliases
     ) {
         return Command.<C>newBuilder(
@@ -677,10 +677,10 @@ public abstract class CommandManager<C> {
     @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
-            final @NonNull Description description,
+            final @NonNull Description<C> description,
             final @NonNull String... aliases
     ) {
-        return this.commandBuilder(name, (ArgumentDescription) description, aliases);
+        return this.commandBuilder(name, (ArgumentDescription<C>) description, aliases);
     }
 
     /**
@@ -706,7 +706,7 @@ public abstract class CommandManager<C> {
     @API(status = API.Status.STABLE, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final @NonNull String... aliases
     ) {
         return Command.<C>newBuilder(

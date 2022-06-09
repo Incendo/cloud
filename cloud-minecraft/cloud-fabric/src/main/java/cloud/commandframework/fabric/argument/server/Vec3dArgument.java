@@ -49,7 +49,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final boolean centerIntegers
     ) {
         super(

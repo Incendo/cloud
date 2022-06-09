@@ -48,7 +48,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 required,

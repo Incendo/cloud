@@ -38,7 +38,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class CommandComponent<C> {
 
     private final CommandArgument<C, ?> argument;
-    private final ArgumentDescription description;
+    private final ArgumentDescription<C> description;
 
     /**
      * Initializes a new CommandComponent
@@ -48,7 +48,7 @@ public final class CommandComponent<C> {
      */
     private CommandComponent(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
+            final @NonNull ArgumentDescription<C> commandDescription
     ) {
         this.argument = commandArgument;
         this.description = commandDescription;
@@ -71,11 +71,11 @@ public final class CommandComponent<C> {
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public @NonNull Description getDescription() {
+    public @NonNull Description<C> getDescription() {
         if (this.description instanceof Description) {
-            return (Description) this.description;
+            return (Description<C>) this.description;
         } else {
-            return new Description(this.description.getDescription());
+            return new Description<>(this.description.getDescription());
         }
     }
 
@@ -86,7 +86,7 @@ public final class CommandComponent<C> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @NonNull ArgumentDescription getArgumentDescription() {
+    public @NonNull ArgumentDescription<C> getArgumentDescription() {
         return this.description;
     }
 
@@ -127,9 +127,9 @@ public final class CommandComponent<C> {
     @API(status = API.Status.DEPRECATED, since = "1.4.0")
     public static <C> @NonNull CommandComponent<C> of(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull Description commandDescription
+            final @NonNull Description<C> commandDescription
     ) {
-        return new CommandComponent<C>(commandArgument, commandDescription);
+        return new CommandComponent<>(commandArgument, commandDescription);
     }
 
     /**
@@ -142,8 +142,8 @@ public final class CommandComponent<C> {
      */
     public static <C> @NonNull CommandComponent<C> of(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
+            final @NonNull ArgumentDescription<C> commandDescription
     ) {
-        return new CommandComponent<C>(commandArgument, commandDescription);
+        return new CommandComponent<>(commandArgument, commandDescription);
     }
 }

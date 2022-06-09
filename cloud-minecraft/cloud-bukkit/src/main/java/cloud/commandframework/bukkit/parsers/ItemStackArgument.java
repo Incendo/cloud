@@ -72,7 +72,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(required, name, new Parser<>(), defaultValue, ProtoItemStack.class, suggestionsProvider, defaultDescription);
     }

@@ -46,7 +46,7 @@ public final class ObjectiveCriteriaArgument<C> extends CommandArgument<C, Objec
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 required,

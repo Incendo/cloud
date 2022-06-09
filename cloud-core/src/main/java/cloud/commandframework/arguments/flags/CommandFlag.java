@@ -49,7 +49,7 @@ public final class CommandFlag<T> {
 
     private final @NonNull String name;
     private final @NonNull String @NonNull [] aliases;
-    private final @NonNull ArgumentDescription description;
+    private final @NonNull ArgumentDescription<?> description;
     private final @NonNull CommandPermission permission;
 
     private final @Nullable CommandArgument<?, T> commandArgument;
@@ -57,7 +57,7 @@ public final class CommandFlag<T> {
     private CommandFlag(
             final @NonNull String name,
             final @NonNull String @NonNull [] aliases,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<?> description,
             final @NonNull CommandPermission permission,
             final @Nullable CommandArgument<?, T> commandArgument
     ) {
@@ -104,9 +104,9 @@ public final class CommandFlag<T> {
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public cloud.commandframework.@NonNull Description getDescription() {
+    public cloud.commandframework.@NonNull Description<?> getDescription() {
         if (this.description instanceof cloud.commandframework.Description) {
-            return ((cloud.commandframework.Description) this.description);
+            return ((cloud.commandframework.Description<?>) this.description);
         } else {
             return cloud.commandframework.Description.of(this.description.getDescription());
         }
@@ -119,7 +119,7 @@ public final class CommandFlag<T> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @NonNull ArgumentDescription getArgumentDescription() {
+    public @NonNull ArgumentDescription<?> getArgumentDescription() {
         return this.description;
     }
 
@@ -171,14 +171,14 @@ public final class CommandFlag<T> {
 
         private final String name;
         private final String[] aliases;
-        private final ArgumentDescription description;
+        private final ArgumentDescription<?> description;
         private final CommandPermission permission;
         private final CommandArgument<?, T> commandArgument;
 
         private Builder(
                 final @NonNull String name,
                 final @NonNull String[] aliases,
-                final @NonNull ArgumentDescription description,
+                final @NonNull ArgumentDescription<?> description,
                 final @NonNull CommandPermission permission,
                 final @Nullable CommandArgument<?, T> commandArgument
         ) {
@@ -234,8 +234,8 @@ public final class CommandFlag<T> {
          */
         @Deprecated
         @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
-            return this.withDescription((ArgumentDescription) description);
+        public Builder<T> withDescription(final cloud.commandframework.@NonNull Description<?> description) {
+            return this.withDescription((ArgumentDescription<?>) description);
         }
 
         /**
@@ -246,7 +246,7 @@ public final class CommandFlag<T> {
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
-        public Builder<T> withDescription(final @NonNull ArgumentDescription description) {
+        public Builder<T> withDescription(final @NonNull ArgumentDescription<?> description) {
             return new Builder<>(this.name, this.aliases, description, this.permission, this.commandArgument);
         }
 

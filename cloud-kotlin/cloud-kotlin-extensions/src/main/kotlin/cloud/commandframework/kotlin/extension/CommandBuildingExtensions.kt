@@ -46,7 +46,7 @@ import kotlin.reflect.KClass
 )
 public fun <C : Any> CommandManager<C>.commandBuilder(
     name: String,
-    description: Description = Description.empty(),
+    description: Description<C> = Description.empty(),
     aliases: Array<String> = emptyArray(),
     lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> = MutableCommandBuilder(name, description, aliases, this, lambda)
@@ -62,7 +62,7 @@ public fun <C : Any> CommandManager<C>.commandBuilder(
  */
 public fun <C : Any> CommandManager<C>.commandBuilder(
     name: String,
-    description: ArgumentDescription = ArgumentDescription.empty(),
+    description: ArgumentDescription<C> = ArgumentDescription.empty(),
     aliases: Array<String> = emptyArray(),
     lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> = MutableCommandBuilder(name, description, aliases, this, lambda)
@@ -84,7 +84,7 @@ public fun <C : Any> CommandManager<C>.commandBuilder(
 )
 public fun <C : Any> CommandManager<C>.buildAndRegister(
     name: String,
-    description: Description = Description.empty(),
+    description: Description<C> = Description.empty(),
     aliases: Array<String> = emptyArray(),
     lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> = commandBuilder(name, description, aliases, lambda).register()
@@ -101,7 +101,7 @@ public fun <C : Any> CommandManager<C>.buildAndRegister(
  */
 public fun <C : Any> CommandManager<C>.buildAndRegister(
     name: String,
-    description: ArgumentDescription = ArgumentDescription.empty(),
+    description: ArgumentDescription<C> = ArgumentDescription.empty(),
     aliases: Array<String> = emptyArray(),
     lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> = commandBuilder(name, description, aliases, lambda).register()
@@ -163,7 +163,7 @@ public fun <C : Any> Command.Builder<C>.mutate(
     message = "Use interface variant that allows for rich text",
     replaceWith = ReplaceWith("argumentDescription(description)")
 )
-public fun description(description: String = ""): Description =
+public fun <C : Any> description(description: String = ""): Description<C> =
     if (description.isEmpty()) Description.empty() else Description.of(description)
 
 /**
@@ -173,5 +173,5 @@ public fun description(description: String = ""): Description =
  * @return the description
  * @since 1.4.0
  */
-public fun argumentDescription(description: String = ""): ArgumentDescription =
+public fun <C : Any> argumentDescription(description: String = ""): ArgumentDescription<C> =
     if (description.isEmpty()) ArgumentDescription.empty() else ArgumentDescription.of(description)
