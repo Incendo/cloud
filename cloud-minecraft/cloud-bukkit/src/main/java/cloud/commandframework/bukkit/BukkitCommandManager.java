@@ -130,6 +130,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
 
         /* Register capabilities */
         CloudBukkitCapabilities.CAPABLE.forEach(this::registerCapability);
+        this.registerCapability(CloudCapability.StandardCapabilities.ROOT_COMMAND_DELETION);
 
         /* Register Bukkit Preprocessor */
         this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
