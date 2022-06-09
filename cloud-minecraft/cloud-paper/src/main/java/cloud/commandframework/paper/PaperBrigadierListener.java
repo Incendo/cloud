@@ -79,16 +79,24 @@ class PaperBrigadierListener<C> implements Listener {
 
         final CommandTree<C> commandTree = this.paperCommandManager.getCommandTree();
 
-        String label = event.getCommandLabel();
-        if (label.contains(":")) {
-            label = label.split(Pattern.quote(":"))[1];
+        final String label;
+        if (event.getCommandLabel().contains(":")) {
+            label = event.getCommandLabel().split(Pattern.quote(":"))[1];
+        } else {
+            label = event.getCommandLabel();
         }
 
         final CommandTree.Node<CommandArgument<C, ?>> node = commandTree.getNamedNode(label);
         if (node == null) {
             return;
         }
+
         final BiPredicate<BukkitBrigadierCommandSource, CommandPermission> permissionChecker = (s, p) -> {
+            // We need to check that the command still exists...
+            if (commandTree.getNamedNode(label) == null) {
+                return false;
+            }
+
             final C sender = this.paperCommandManager.getCommandSenderMapper().apply(s.getBukkitSender());
             return this.paperCommandManager.hasPermission(sender, p);
         };

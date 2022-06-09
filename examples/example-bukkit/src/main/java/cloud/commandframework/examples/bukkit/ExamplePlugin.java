@@ -35,6 +35,7 @@ import cloud.commandframework.annotations.Confirmation;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.annotations.specifier.Greedy;
+import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
@@ -51,6 +52,7 @@ import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.SimpleCaptionRegistry;
+import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
@@ -71,6 +73,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -454,7 +457,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 }));
     }
 
-    @CommandMethod("example help [query]")
+    @CommandMethod("example|e|ex help [query]")
     @CommandDescription("Help menu")
     public void commandHelp(
             final @NonNull CommandSender sender,
@@ -526,6 +529,36 @@ public final class ExamplePlugin extends JavaPlugin {
     ) {
         this.manager.taskRecipe().begin(location).synchronous((@NonNull TaskConsumer<Location>) sender::teleport)
                 .execute(() -> sender.sendMessage("You have been teleported!"));
+    }
+
+    @CommandMethod("removeall")
+    public void removeAll(
+            final @NonNull CommandSender sender
+    ) {
+        this.manager.rootCommands().forEach(this.manager::deleteRootCommand);
+        sender.sendMessage("All root commands have been deleted :)");
+    }
+
+    @CommandMethod("removesingle <command>")
+    public void removeSingle(
+            final @NonNull CommandSender sender,
+            final @Argument(value = "command", suggestions = "commands") String command
+    ) {
+        this.manager.deleteRootCommand(command);
+        sender.sendMessage("Deleted the root command :)");
+    }
+
+    @Suggestions("commands")
+    public List<String> commands(
+            final @NonNull CommandContext<CommandSender> context,
+            final @NonNull String input
+    ) {
+        return new ArrayList<>(this.manager.rootCommands());
+    }
+
+    @CommandMethod("disableme")
+    public void disableMe() {
+        this.getServer().getPluginManager().disablePlugin(this);
     }
 
 
