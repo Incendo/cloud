@@ -551,7 +551,7 @@ public final class MinecraftHelp<C> {
         if (description instanceof RichDescription) {
             return ((RichDescription<C>) description).getContents();
         } else {
-            return this.descriptionDecorator.apply(sender, description.getDescription());
+            return this.descriptionDecorator.apply(sender, description.getDescription(sender));
         }
     }
 
