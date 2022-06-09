@@ -30,15 +30,18 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ItemStackPredicate;
+import cloud.commandframework.bukkit.internal.CommandBuildContextSupplier;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.StringRange;
 import io.leangen.geantyref.TypeToken;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -151,8 +154,7 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
                 CraftBukkitReflection.findMCClass("commands.arguments.item.ArgumentItemPredicate$b"),
                 CraftBukkitReflection.findMCClass("commands.arguments.item.ItemPredicateArgument$Result")
         );
-        private static final Method CREATE_PREDICATE_METHOD = CraftBukkitReflection.firstNonNullOrThrow(
-                () -> "ItemPredicateArgument$Result#create",
+        private static final @Nullable Method CREATE_PREDICATE_METHOD = CraftBukkitReflection.firstNonNullOrNull(
                 CraftBukkitReflection.findMethod(
                         ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
                         "create",
@@ -184,11 +186,22 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
 
         @SuppressWarnings("unchecked")
         private ArgumentParser<C, ItemStackPredicate> createParser() throws ReflectiveOperationException {
-            return new WrappedBrigadierParser<C, Object>(
-                    (ArgumentType<Object>) ARGUMENT_ITEM_PREDICATE_CLASS.getConstructor().newInstance()
-            ).map((ctx, result) -> {
+            final Constructor<?> ctr = ARGUMENT_ITEM_PREDICATE_CLASS.getDeclaredConstructors()[0];
+            final ArgumentType<Object> inst;
+            if (ctr.getParameterCount() == 0) {
+                inst = (ArgumentType<Object>) ctr.newInstance();
+            } else {
+                // 1.19+
+                inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
+            }
+            return new WrappedBrigadierParser<C, Object>(inst).map((ctx, result) -> {
+                if (result instanceof Predicate) {
+                    // 1.19+
+                    return ArgumentParseResult.success(new ItemStackPredicateImpl((Predicate<Object>) result));
+                }
                 final Object commandSourceStack = ctx.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
                 final com.mojang.brigadier.context.CommandContext<Object> dummy = createDummyContext(ctx, commandSourceStack);
+                Objects.requireNonNull(CREATE_PREDICATE_METHOD, "ItemPredicateArgument$Result#create");
                 try {
                     final Predicate<Object> predicate = (Predicate<Object>) CREATE_PREDICATE_METHOD.invoke(result, dummy);
                     return ArgumentParseResult.success(new ItemStackPredicateImpl(predicate));
