@@ -26,6 +26,7 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.bukkit.internal.CommandBuildContextSupplier;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
@@ -88,12 +89,12 @@ public final class BukkitBrigadierMapper<C> {
         this.mapSimpleNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
         }, "item_enchantment");
         /* Map Item arguments */
-        this.mapSimpleNMS(new TypeToken<ItemStackArgument.Parser<C>>() {
+        this.mapSimpleContextNMS(new TypeToken<ItemStackArgument.Parser<C>>() {
         }, "item_stack");
-        this.mapSimpleNMS(new TypeToken<ItemStackPredicateArgument.Parser<C>>() {
+        this.mapSimpleContextNMS(new TypeToken<ItemStackPredicateArgument.Parser<C>>() {
         }, "item_predicate");
         /* Map Block arguments */
-        this.mapSimpleNMS(new TypeToken<BlockPredicateArgument.Parser<C>>() {
+        this.mapSimpleContextNMS(new TypeToken<BlockPredicateArgument.Parser<C>>() {
         }, "block_predicate");
         /* Map Entity Selectors */
         this.mapNMS(new TypeToken<SingleEntitySelectorArgument.SingleEntitySelectorParser<C>>() {
@@ -158,11 +159,35 @@ public final class BukkitBrigadierMapper<C> {
 
     /**
      * Attempt to register a mapping between a cloud argument parser type and an NMS brigadier argument type which
+     * has a single-arg constructor taking CommandBuildContext.
+     *
+     * @param type       Type to map
+     * @param <T>        argument parser type
+     * @param argumentId registry id of argument type
+     * @since 1.7.0
+     */
+    public <T extends ArgumentParser<C, ?>> void mapSimpleContextNMS(
+            final @NonNull TypeToken<T> type,
+            final @NonNull String argumentId
+    ) {
+        this.mapNMS(type, () -> {
+            try {
+                return (ArgumentType<?>) MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft(argumentId))
+                        .getDeclaredConstructors()[0]
+                        .newInstance(CommandBuildContextSupplier.commandBuildContext());
+            } catch (final ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * Attempt to register a mapping between a cloud argument parser type and an NMS brigadier argument type which
      * has a no-args constructor.
      *
      * @param type       Type to map
      * @param <T>        argument parser type
-     * @param argumentId network id of argument type
+     * @param argumentId registry id of argument type
      * @since 1.5.0
      */
     public <T extends ArgumentParser<C, ?>> void mapSimpleNMS(
@@ -176,9 +201,9 @@ public final class BukkitBrigadierMapper<C> {
      * Attempt to register a mapping between a cloud argument parser type and an NMS brigadier argument type which
      * has a no-args constructor.
      *
-     * @param type       Type to map
-     * @param <T>        argument parser type
-     * @param argumentId network id of argument type
+     * @param type                Type to map
+     * @param <T>                 argument parser type
+     * @param argumentId          registry id of argument type
      * @param useCloudSuggestions whether to use cloud suggestions
      * @since 1.6.0
      */

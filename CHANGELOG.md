@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Annotations: `@CommandMethod` annotation processing for compile-time validation ([#365](https://github.com/Incendo/cloud/pull/365))
 - Add root command deletion support (core/pircbotx/javacord/jda/bukkit/paper) ([#369](https://github.com/Incendo/cloud/pull/369),
   [#371](https://github.com/Incendo/cloud/pull/371))
+- Bukkit/Paper: Full support for Minecraft 1.19
 
 ### Fixed
 - Core: Fix missing caption registration for the regex caption ([#351](https://github.com/Incendo/cloud/pull/351))

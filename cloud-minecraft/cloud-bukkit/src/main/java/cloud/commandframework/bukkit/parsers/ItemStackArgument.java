@@ -30,11 +30,13 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
+import cloud.commandframework.bukkit.internal.CommandBuildContextSupplier;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.context.CommandContext;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -179,7 +181,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
     }
 
     private static @Nullable Class<?> findItemInputClass() {
-        final Class<?>[] classes = new Class<?>[] {
+        final Class<?>[] classes = new Class<?>[]{
                 CraftBukkitReflection.findNMSClass("ArgumentPredicateItemStack"),
                 CraftBukkitReflection.findMCClass("commands.arguments.item.ArgumentPredicateItemStack"),
                 CraftBukkitReflection.findMCClass("commands.arguments.item.ItemInput")
@@ -228,6 +230,10 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                 CraftBukkitReflection.findField(ITEM_INPUT_CLASS, "c"),
                 CraftBukkitReflection.findField(ITEM_INPUT_CLASS, "tag")
         );
+        private static final Class<?> HOLDER_CLASS = CraftBukkitReflection.findMCClass("core.Holder");
+        private static final @Nullable Method VALUE_METHOD = HOLDER_CLASS == null
+                ? null
+                : CraftBukkitReflection.needMethod(HOLDER_CLASS, "value");
 
         private final ArgumentParser<C, ProtoItemStack> parser;
 
@@ -241,9 +247,16 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
 
         @SuppressWarnings("unchecked")
         private ArgumentParser<C, ProtoItemStack> createParser() throws ReflectiveOperationException {
-            return new WrappedBrigadierParser<C, Object>(
-                    (ArgumentType<Object>) ARGUMENT_ITEM_STACK_CLASS.getConstructor().newInstance()
-            ).map((ctx, itemInput) -> ArgumentParseResult.success(new ModernProtoItemStack(itemInput)));
+            final Constructor<?> ctr = ARGUMENT_ITEM_STACK_CLASS.getDeclaredConstructors()[0];
+            final ArgumentType<Object> inst;
+            if (ctr.getParameterCount() == 0) {
+                inst = (ArgumentType<Object>) ctr.newInstance();
+            } else {
+                // 1.19+
+                inst = (ArgumentType<Object>) ctr.newInstance(CommandBuildContextSupplier.commandBuildContext());
+            }
+            return new WrappedBrigadierParser<C, Object>(inst)
+                    .map((ctx, itemInput) -> ArgumentParseResult.success(new ModernProtoItemStack(itemInput)));
         }
 
         @Override
@@ -272,7 +285,11 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
             ModernProtoItemStack(final @NonNull Object itemInput) {
                 this.itemInput = itemInput;
                 try {
-                    this.material = (Material) GET_MATERIAL_METHOD.invoke(null, ITEM_FIELD.get(itemInput));
+                    Object item = ITEM_FIELD.get(itemInput);
+                    if (HOLDER_CLASS != null && HOLDER_CLASS.isInstance(item)) {
+                        item = VALUE_METHOD.invoke(item);
+                    }
+                    this.material = (Material) GET_MATERIAL_METHOD.invoke(null, item);
                     final Object compoundTag = COMPOUND_TAG_FIELD.get(itemInput);
                     if (compoundTag != null) {
                         this.snbt = compoundTag.toString();
