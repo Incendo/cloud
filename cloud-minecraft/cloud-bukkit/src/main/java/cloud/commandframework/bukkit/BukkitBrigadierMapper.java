@@ -159,7 +159,8 @@ public final class BukkitBrigadierMapper<C> {
 
     /**
      * Attempt to register a mapping between a cloud argument parser type and an NMS brigadier argument type which
-     * has a single-arg constructor taking CommandBuildContext.
+     * has a single-arg constructor taking CommandBuildContext. Will fall back to behavior
+     * of {@link #mapSimpleNMS(TypeToken, String)} on older versions.
      *
      * @param type       Type to map
      * @param <T>        argument parser type
@@ -170,11 +171,14 @@ public final class BukkitBrigadierMapper<C> {
             final @NonNull TypeToken<T> type,
             final @NonNull String argumentId
     ) {
+        final Constructor<?> ctr = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft(argumentId))
+                .getDeclaredConstructors()[0];
         this.mapNMS(type, () -> {
+            final Object[] args = ctr.getParameterCount() == 1
+                    ? new Object[]{CommandBuildContextSupplier.commandBuildContext()}
+                    : new Object[]{};
             try {
-                return (ArgumentType<?>) MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft(argumentId))
-                        .getDeclaredConstructors()[0]
-                        .newInstance(CommandBuildContextSupplier.commandBuildContext());
+                return (ArgumentType<?>) ctr.newInstance(args);
             } catch (final ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }
