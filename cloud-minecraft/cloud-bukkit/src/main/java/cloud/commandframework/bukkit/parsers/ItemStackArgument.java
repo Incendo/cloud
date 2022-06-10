@@ -233,7 +233,11 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         private static final Class<?> HOLDER_CLASS = CraftBukkitReflection.findMCClass("core.Holder");
         private static final @Nullable Method VALUE_METHOD = HOLDER_CLASS == null
                 ? null
-                : CraftBukkitReflection.needMethod(HOLDER_CLASS, "value");
+                : CraftBukkitReflection.firstNonNullOrThrow(
+                        () -> "Couldn't find Holder#value",
+                        CraftBukkitReflection.findMethod(HOLDER_CLASS, "value"),
+                        CraftBukkitReflection.findMethod(HOLDER_CLASS, "a")
+                );
 
         private final ArgumentParser<C, ProtoItemStack> parser;
 
