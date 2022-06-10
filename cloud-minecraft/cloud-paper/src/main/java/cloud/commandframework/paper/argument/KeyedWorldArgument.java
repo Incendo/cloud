@@ -154,7 +154,6 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
     /**
@@ -230,7 +229,5 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
             }
             return completions;
         }
-
     }
-
 }

@@ -148,5 +148,4 @@ public final class ExampleBot {
                     textChannel.sendMessage(user.getName() + " kicked").complete();
                 }));
     }
-
 }

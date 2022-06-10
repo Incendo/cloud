@@ -115,5 +115,4 @@ public final class StandardCaptionKeys {
     public static @NonNull Collection<@NonNull Caption> getStandardCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
-
 }

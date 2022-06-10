@@ -72,5 +72,4 @@ public class CommandParseException extends IllegalArgumentException {
     public @NonNull List<@NonNull CommandArgument<?, ?>> getCurrentChain() {
         return Collections.unmodifiableList(this.currentChain);
     }
-
 }

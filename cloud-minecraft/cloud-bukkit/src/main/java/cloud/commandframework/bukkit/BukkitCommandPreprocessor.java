@@ -77,5 +77,4 @@ final class BukkitCommandPreprocessor<C> implements CommandPreprocessor<C> {
                 this.commandManager.queryCapabilities()
         );
     }
-
 }

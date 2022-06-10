@@ -49,9 +49,9 @@ public abstract class CommandMeta {
     public static final Key<String> DESCRIPTION = Key.of(String.class, "description");
     public static final Key<String> LONG_DESCRIPTION = Key.of(String.class, "long-description");
     public static final Key<Boolean> HIDDEN = Key.of(
-        Boolean.class,
-        "cloud:hidden",
-        meta -> Boolean.valueOf(meta.getOrDefault(LEGACY_HIDDEN, "false"))
+            Boolean.class,
+            "cloud:hidden",
+            meta -> Boolean.valueOf(meta.getOrDefault(LEGACY_HIDDEN, "false"))
     );
 
     /**
@@ -147,8 +147,8 @@ public abstract class CommandMeta {
          * Create a new metadata key.
          *
          * @param type the value type
-         * @param key the name for the key
-         * @param <T> the value type
+         * @param key  the name for the key
+         * @param <T>  the value type
          * @return a new key
          */
         static <T> @NonNull Key<T> of(final @NonNull Class<T> type, final @NonNull String key) {
@@ -157,9 +157,9 @@ public abstract class CommandMeta {
             }
 
             return new SimpleKey<>(
-                TypeToken.get(requireNonNull(type, "type")),
-                requireNonNull(key, "key"),
-                null
+                    TypeToken.get(requireNonNull(type, "type")),
+                    requireNonNull(key, "key"),
+                    null
             );
         }
 
@@ -167,31 +167,32 @@ public abstract class CommandMeta {
          * Create a new metadata key.
          *
          * @param type the value type
-         * @param key the name for the key
-         * @param <T> the value type
+         * @param key  the name for the key
+         * @param <T>  the value type
          * @return a new key
          */
         static <T> @NonNull Key<T> of(final @NonNull TypeToken<T> type, final @NonNull String key) {
             return new SimpleKey<>(
-                requireNonNull(type, "type"),
-                requireNonNull(key, "key"),
-                null
+                    requireNonNull(type, "type"),
+                    requireNonNull(key, "key"),
+                    null
             );
         }
 
         /**
          * Create a new metadata key.
          *
-         * @param type the value type
-         * @param key the name for the key
+         * @param type               the value type
+         * @param key                the name for the key
          * @param fallbackDerivation A function that will be called if no value is present for the key
-         * @param <T> the value type
+         * @param <T>                the value type
          * @return a new key
          */
         static <T> @NonNull Key<T> of(
                 final @NonNull Class<T> type,
                 final @NonNull String key,
-                final @NonNull Function<@NonNull CommandMeta, @Nullable T> fallbackDerivation) {
+                final @NonNull Function<@NonNull CommandMeta, @Nullable T> fallbackDerivation
+        ) {
             return new SimpleKey<>(
                     TypeToken.get(requireNonNull(type, "type")),
                     requireNonNull(key, "key"),
@@ -202,10 +203,10 @@ public abstract class CommandMeta {
         /**
          * Create a new metadata key.
          *
-         * @param type the value type
-         * @param key the name for the key
+         * @param type               the value type
+         * @param key                the name for the key
          * @param fallbackDerivation A function that will be called if no value is present for the key
-         * @param <T> the value type
+         * @param <T>                the value type
          * @return a new key
          */
         static <T> @NonNull Key<T> of(
@@ -238,7 +239,8 @@ public abstract class CommandMeta {
          *
          * @return the key type
          */
-        @Override @NonNull String getName();
+        @Override
+        @NonNull String getName();
 
         /**
          * Get a function that can be used to compute a fallback based on existing meta.
@@ -248,7 +250,5 @@ public abstract class CommandMeta {
          * @return the fallback derivation
          */
         @Nullable Function<@NonNull CommandMeta, @Nullable V> getFallbackDerivation();
-
     }
-
 }

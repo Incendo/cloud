@@ -601,7 +601,5 @@ public final class ExamplePlugin extends JavaPlugin {
          * @return Required game mode
          */
         GameMode value();
-
     }
-
 }

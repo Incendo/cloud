@@ -173,7 +173,6 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
             }
             return ArgumentParseResult.success(result);
         }
-
     }
 
     /**
@@ -216,7 +215,6 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull PlayerTeam defaultValue) {
             return this.asOptionalWithDefault(defaultValue.getName());
         }
-
     }
 
     /**
@@ -239,7 +237,5 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
                     CaptionVariable.of("input", input)
             );
         }
-
     }
-
 }

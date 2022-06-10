@@ -107,7 +107,5 @@ public class ParameterInjectorRegistryTest {
         protected void configure() {
             bind(Integer.class).toInstance(INJECTED_INTEGER);
         }
-
     }
-
 }

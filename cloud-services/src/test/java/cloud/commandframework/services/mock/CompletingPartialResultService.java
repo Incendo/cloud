@@ -41,5 +41,4 @@ public class CompletingPartialResultService implements MockPartialResultService 
         }
         return map;
     }
-
 }

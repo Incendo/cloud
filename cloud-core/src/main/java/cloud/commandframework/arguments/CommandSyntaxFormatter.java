@@ -53,5 +53,4 @@ public interface CommandSyntaxFormatter<C> {
             @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
             CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
     );
-
 }

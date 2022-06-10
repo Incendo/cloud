@@ -122,5 +122,4 @@ public final class ParserParameters {
     public @NonNull Map<@NonNull ParserParameter<?>, @NonNull Object> getAll() {
         return Collections.unmodifiableMap(this.internalMap);
     }
-
 }

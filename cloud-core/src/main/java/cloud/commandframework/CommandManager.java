@@ -1210,5 +1210,4 @@ public abstract class CommandManager<C> {
          */
         AFTER_REGISTRATION
     }
-
 }

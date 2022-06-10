@@ -49,5 +49,4 @@ public final class TaskFactory {
     public @NonNull TaskRecipe recipe() {
         return new TaskRecipe(this.synchronizer);
     }
-
 }

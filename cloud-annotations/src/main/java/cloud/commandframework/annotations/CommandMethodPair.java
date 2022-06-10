@@ -46,5 +46,4 @@ final class CommandMethodPair {
     @NonNull CommandMethod getCommandMethod() {
         return this.commandMethod;
     }
-
 }

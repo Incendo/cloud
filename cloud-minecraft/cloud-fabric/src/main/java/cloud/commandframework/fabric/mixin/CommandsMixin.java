@@ -38,5 +38,4 @@ public class CommandsMixin {
     private StringReader cloud$newStringReader(final String arguments) {
         return new CloudStringReader(arguments);
     }
-
 }

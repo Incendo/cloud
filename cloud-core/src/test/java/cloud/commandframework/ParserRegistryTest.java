@@ -101,8 +101,8 @@ public class ParserRegistryTest {
         parserParameters.store(StandardParameters.RANGE_MAX, RANGE_MAX);
 
         final ArgumentParser<TestCommandSender, ?> parser = parserRegistry.createParser(
-            parsedType,
-            parserParameters
+                parsedType,
+                parserParameters
         ).orElseThrow(() -> new NullPointerException("No parser found"));
 
         assertThat(parser).isInstanceOf(IntegerArgument.IntegerParser.class);
@@ -143,5 +143,4 @@ public class ParserRegistryTest {
         // Then
         assertThat(parserOptional).isPresent();
     }
-
 }

@@ -41,7 +41,7 @@ public @interface Argument {
      * The name of the argument that this parameter is bound to.
      * This value must be overridden unless you have explicitly enabled
      * the preservation of parameter names in your compiler options.
-     *
+     * <p>
      * If the parameter names are preserved and the name of the bound
      * argument is the same as the parameter name, the default value
      * may be used.
@@ -86,5 +86,4 @@ public @interface Argument {
      * @return Argument description
      */
     @NonNull String description() default "";
-
 }

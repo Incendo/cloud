@@ -54,5 +54,4 @@ public class CommandResult<C> {
     public @NonNull CommandContext<C> getCommandContext() {
         return this.commandContext;
     }
-
 }

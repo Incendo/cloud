@@ -48,5 +48,4 @@ public @interface Suggestions {
      * @return Suggestions provider name
      */
     @NonNull String value();
-
 }

@@ -31,5 +31,4 @@ public class AnnotatedMethodTest {
     public MockService.MockResult handle(final MockService.MockContext context) {
         return new MockService.MockResult(context.getString().length());
     }
-
 }

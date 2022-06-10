@@ -39,5 +39,4 @@ public class MultipleEntitySelector extends EntitySelector {
     ) {
         super(selector, entities);
     }
-
 }

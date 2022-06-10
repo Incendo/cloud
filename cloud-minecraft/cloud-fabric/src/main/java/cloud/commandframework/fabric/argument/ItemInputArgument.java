@@ -108,7 +108,6 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
      */
     public static <C> @NonNull ItemInputArgument<C> optional(final @NonNull String name, final @NonNull ItemStack defaultValue) {
         return ItemInputArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
-
     }
 
     /**
@@ -157,7 +156,5 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
             }
             return this.asOptionalWithDefault(serializedDefault);
         }
-
     }
-
 }

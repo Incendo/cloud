@@ -37,7 +37,7 @@ final class MultiDelegateAnnotationAccessor implements AnnotationAccessor {
 
     private final AnnotationAccessor[] accessors;
 
-    MultiDelegateAnnotationAccessor(final @NonNull AnnotationAccessor@NonNull... accessors) {
+    MultiDelegateAnnotationAccessor(final @NonNull AnnotationAccessor @NonNull... accessors) {
         this.accessors = accessors;
     }
 
@@ -61,5 +61,4 @@ final class MultiDelegateAnnotationAccessor implements AnnotationAccessor {
         }
         return Collections.unmodifiableCollection(annotationList);
     }
-
 }

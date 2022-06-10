@@ -53,5 +53,4 @@ final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull Comm
                 this.parser.getClass().getCanonicalName()
         );
     }
-
 }

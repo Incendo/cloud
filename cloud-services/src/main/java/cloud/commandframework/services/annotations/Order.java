@@ -42,5 +42,4 @@ public @interface Order {
      * @return Priority
      */
     ExecutionOrder value() default ExecutionOrder.SOON;
-
 }

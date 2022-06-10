@@ -292,7 +292,5 @@ public final class CommandFlag<T> {
         public @NonNull CommandFlag<T> build() {
             return new CommandFlag<>(this.name, this.aliases, this.description, this.permission, this.commandArgument);
         }
-
     }
-
 }

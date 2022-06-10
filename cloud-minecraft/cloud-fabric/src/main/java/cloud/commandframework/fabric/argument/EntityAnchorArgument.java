@@ -38,7 +38,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> the sender type
  * @since 1.5.0
  */
-public final class EntityAnchorArgument<C> extends CommandArgument<C, net.minecraft.commands.arguments.EntityAnchorArgument.Anchor> {
+public final class EntityAnchorArgument<C> extends
+        CommandArgument<C, net.minecraft.commands.arguments.EntityAnchorArgument.Anchor> {
 
     EntityAnchorArgument(
             final boolean required,
@@ -117,7 +118,8 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, net.minecr
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, net.minecraft.commands.arguments.EntityAnchorArgument.Anchor, Builder<C>> {
+    public static final class Builder<C> extends
+            TypedBuilder<C, net.minecraft.commands.arguments.EntityAnchorArgument.Anchor, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.class, name);
@@ -149,10 +151,9 @@ public final class EntityAnchorArgument<C> extends CommandArgument<C, net.minecr
          * @since 1.5.0
          */
         public @NonNull Builder<C> asOptionalWithDefault(
-                final net.minecraft.commands.arguments.EntityAnchorArgument.@NonNull Anchor defaultValue) {
+                final net.minecraft.commands.arguments.EntityAnchorArgument.@NonNull Anchor defaultValue
+        ) {
             return this.asOptionalWithDefault(defaultValue.name());
         }
-
     }
-
 }

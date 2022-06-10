@@ -32,5 +32,4 @@ public class DefaultSideEffectService implements MockSideEffectService {
         mockPlayer.setHealth(0);
         return State.ACCEPTED;
     }
-
 }

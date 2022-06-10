@@ -59,5 +59,4 @@ public final class DynamicTuple implements Tuple {
         System.arraycopy(this.internalArray, 0, newArray, 0, this.internalArray.length);
         return newArray;
     }
-
 }

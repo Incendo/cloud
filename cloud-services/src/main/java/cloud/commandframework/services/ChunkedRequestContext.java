@@ -99,5 +99,4 @@ public abstract class ChunkedRequestContext<@NonNull Context, @NonNull Result> {
             return this.requests.isEmpty();
         }
     }
-
 }

@@ -155,7 +155,5 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
                     defaultValue.getZ()
             ));
         }
-
     }
-
 }

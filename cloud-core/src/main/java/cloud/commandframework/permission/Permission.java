@@ -105,5 +105,4 @@ public final class Permission implements CommandPermission {
     public int hashCode() {
         return Objects.hash(this.getPermission());
     }
-
 }

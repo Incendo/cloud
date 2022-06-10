@@ -124,7 +124,5 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                     this.getDefaultDescription()
             );
         }
-
     }
-
 }

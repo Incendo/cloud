@@ -43,7 +43,7 @@ public final class CommandComponent<C> {
     /**
      * Initializes a new CommandComponent
      *
-     * @param commandArgument Command Component Argument
+     * @param commandArgument    Command Component Argument
      * @param commandDescription Command Component Description
      */
     private CommandComponent(
@@ -111,14 +111,15 @@ public final class CommandComponent<C> {
     @Override
     public @NonNull String toString() {
         return String.format("%s{argument=%s,description=%s}", this.getClass().getSimpleName(),
-                this.argument, this.description);
+                this.argument, this.description
+        );
     }
 
     /**
      * Creates a new CommandComponent with the provided argument and description
      *
-     * @param <C> Command sender type
-     * @param commandArgument Command Component Argument
+     * @param <C>                Command sender type
+     * @param commandArgument    Command Component Argument
      * @param commandDescription Command Component Description
      * @return new CommandComponent
      * @deprecated for removal since 1.4.0. Use {@link #of(CommandArgument, ArgumentDescription)} instead.
@@ -135,8 +136,8 @@ public final class CommandComponent<C> {
     /**
      * Creates a new CommandComponent with the provided argument and description
      *
-     * @param <C> Command sender type
-     * @param commandArgument Command Component Argument
+     * @param <C>                Command sender type
+     * @param commandArgument    Command Component Argument
      * @param commandDescription Command Component Description
      * @return new CommandComponent
      */

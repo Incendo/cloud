@@ -110,7 +110,7 @@ class BooleanParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = { true, false })
+    @ValueSource(booleans = {true, false})
     void Parse_NonBooleanInput_FailedParse(final boolean liberal) {
         // Arrange
         final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(liberal);

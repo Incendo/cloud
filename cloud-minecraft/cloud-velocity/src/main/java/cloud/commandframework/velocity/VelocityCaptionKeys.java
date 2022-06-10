@@ -65,5 +65,4 @@ public final class VelocityCaptionKeys {
     public static @NonNull Collection<@NonNull Caption> getVelocityCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
-
 }

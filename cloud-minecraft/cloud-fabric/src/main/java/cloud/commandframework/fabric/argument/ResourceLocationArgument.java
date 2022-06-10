@@ -152,7 +152,5 @@ public final class ResourceLocationArgument<C> extends CommandArgument<C, Resour
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ResourceLocation defaultValue) {
             return this.asOptionalWithDefault(defaultValue.toString());
         }
-
     }
-
 }

@@ -192,7 +192,6 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     this.isolationLevel
             );
         }
-
     }
 
 
@@ -343,7 +342,6 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 return ArgumentParseResult.success(user);
             }
         }
-
     }
 
 
@@ -369,7 +367,6 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         public final @NonNull String getInput() {
             return this.input;
         }
-
     }
 
 
@@ -390,7 +387,6 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         public @NonNull String getMessage() {
             return String.format("Too many users found for '%s'.", getInput());
         }
-
     }
 
 
@@ -411,7 +407,5 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         public @NonNull String getMessage() {
             return String.format("User not found for '%s'.", getInput());
         }
-
     }
-
 }

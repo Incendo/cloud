@@ -141,7 +141,6 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
                     new LinkedList<>()
             );
         }
-
     }
 
 
@@ -246,7 +245,5 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
         public int getRequestedArgumentCount() {
             return EXPECTED_PARAMETER_COUNT;
         }
-
     }
-
 }

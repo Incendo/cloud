@@ -113,5 +113,4 @@ public abstract class NumberParseException extends ParserException {
     public Number getMax() {
         return this.max;
     }
-
 }

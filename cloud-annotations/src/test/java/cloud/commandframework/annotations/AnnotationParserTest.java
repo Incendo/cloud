@@ -273,7 +273,6 @@ class AnnotationParserTest {
         public void annotatedMethod() {
             System.out.println("kekw");
         }
-
     }
 
     @CommandPermission("some.permission")
@@ -292,7 +291,6 @@ class AnnotationParserTest {
         @AnnotatedAnnotation
         public static void annotatedMethod() {
         }
-
     }
 
 
@@ -324,7 +322,6 @@ class AnnotationParserTest {
         public String toString() {
             return this.value;
         }
-
     }
 
 
@@ -340,7 +337,6 @@ class AnnotationParserTest {
         public String toString() {
             return this.value;
         }
-
     }
 
 
@@ -354,7 +350,6 @@ class AnnotationParserTest {
          * @return Integer argument name
          */
         String value() default "number";
-
     }
 
 
@@ -373,7 +368,5 @@ class AnnotationParserTest {
         @CommandMethod(COMMAND_ALIASES + " sub2")
         public void commandThree() {
         }
-
     }
-
 }

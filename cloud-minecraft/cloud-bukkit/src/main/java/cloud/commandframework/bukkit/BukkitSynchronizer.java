@@ -79,5 +79,4 @@ public final class BukkitSynchronizer implements TaskSynchronizer {
         this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () -> future.complete(function.apply(input)));
         return future;
     }
-
 }

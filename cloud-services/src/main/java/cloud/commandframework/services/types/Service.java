@@ -72,5 +72,4 @@ public interface Service<Context, Result> extends Function<@NonNull Context, @Nu
     default @Nullable ExecutionOrder order() {
         return null;
     }
-
 }

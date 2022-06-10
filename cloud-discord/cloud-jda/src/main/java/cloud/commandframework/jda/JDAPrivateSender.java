@@ -61,5 +61,4 @@ public class JDAPrivateSender extends JDACommandSender {
     public @NonNull PrivateChannel getPrivateChannel() {
         return this.channel;
     }
-
 }

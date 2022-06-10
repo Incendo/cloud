@@ -32,5 +32,4 @@ public class MockResultConsumer implements SideEffectService<MockService.MockRes
     public State handle(final MockService.MockResult mockResultConsumer) {
         return State.ACCEPTED;
     }
-
 }

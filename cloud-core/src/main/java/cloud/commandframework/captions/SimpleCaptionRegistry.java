@@ -187,5 +187,4 @@ public class SimpleCaptionRegistry<C> implements FactoryDelegatingCaptionRegistr
     ) {
         this.messageFactories.put(caption, messageFactory);
     }
-
 }

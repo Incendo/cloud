@@ -116,5 +116,4 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
         }
         return flags;
     }
-
 }

@@ -75,5 +75,4 @@ public final class SyntaxFragment {
     public @NonNull ArgumentMode getArgumentMode() {
         return this.argumentMode;
     }
-
 }

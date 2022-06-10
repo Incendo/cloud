@@ -50,5 +50,4 @@ public class Location2D extends Location {
     public static @NonNull Location2D from(final @Nullable World world, final double x, final double z) {
         return new Location2D(world, x, z);
     }
-
 }

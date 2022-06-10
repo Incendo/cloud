@@ -139,8 +139,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         }
 
         public void registerCommands(
-            final CommandDispatcher<FabricClientCommandSource> dispatcher,
-            final CommandBuildContext commandBuildContext
+                final CommandDispatcher<FabricClientCommandSource> dispatcher,
+                final CommandBuildContext commandBuildContext
         ) {
             this.registerEventFired = true;
             FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
@@ -157,8 +157,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         @SuppressWarnings("unchecked")
         private void registerClientCommand(
-            final CommandDispatcher<FabricClientCommandSource> dispatcher,
-            final Command<C> command
+                final CommandDispatcher<FabricClientCommandSource> dispatcher,
+                final Command<C> command
         ) {
             final RootCommandNode<FabricClientCommandSource> rootNode = dispatcher.getRoot();
             final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
@@ -204,36 +204,35 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         }
 
         private void registerAllCommands(
-            final CommandDispatcher<CommandSourceStack> dispatcher,
-            final CommandBuildContext access,
-            final Commands.CommandSelection side
+                final CommandDispatcher<CommandSourceStack> dispatcher,
+                final CommandBuildContext access,
+                final Commands.CommandSelection side
         ) {
             this.commandManager().registrationCalled();
             FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
                     this.commandManager(),
-                access,
-                true,
-                () -> {
-                    for (final Command<C> command : this.registeredCommands) {
-                        /* Only register commands in the declared environment */
-                        final Commands.CommandSelection env = command.getCommandMeta().getOrDefault(
-                                FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
-                                Commands.CommandSelection.ALL
-                        );
+                    access,
+                    true,
+                    () -> {
+                        for (final Command<C> command : this.registeredCommands) {
+                            /* Only register commands in the declared environment */
+                            final Commands.CommandSelection env = command.getCommandMeta().getOrDefault(
+                                    FabricServerCommandManager.META_REGISTRATION_ENVIRONMENT,
+                                    Commands.CommandSelection.ALL
+                            );
 
-                        if ((env == Commands.CommandSelection.INTEGRATED && !side.includeIntegrated)
-                                || (env == Commands.CommandSelection.DEDICATED && !side.includeDedicated)) {
-                            continue;
+                            if ((env == Commands.CommandSelection.INTEGRATED && !side.includeIntegrated)
+                                    || (env == Commands.CommandSelection.DEDICATED && !side.includeDedicated)) {
+                                continue;
+                            }
+                            this.registerCommand(dispatcher.getRoot(), command);
                         }
-                        this.registerCommand(dispatcher.getRoot(), command);
                     }
-                }
             );
         }
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
-            @SuppressWarnings("unchecked")
-            final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
+            @SuppressWarnings("unchecked") final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
             final CommandNode<CommandSourceStack> baseNode = this.commandManager().brigadierManager().createLiteralCommandNode(
                     first.getName(),
                     command,
@@ -251,7 +250,5 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 dispatcher.addChild(buildRedirect(alias, baseNode));
             }
         }
-
     }
-
 }

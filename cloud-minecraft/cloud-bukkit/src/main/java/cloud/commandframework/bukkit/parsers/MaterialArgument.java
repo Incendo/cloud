@@ -54,7 +54,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
-            ) {
+    ) {
         super(required, name, new MaterialParser<>(), defaultValue, Material.class, suggestionsProvider, defaultDescription);
     }
 
@@ -122,7 +122,6 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
     public static final class MaterialParser<C> implements ArgumentParser<C, Material> {
@@ -160,7 +159,6 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
             }
             return completions;
         }
-
     }
 
 
@@ -196,7 +194,5 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
         public @NonNull String getInput() {
             return this.input;
         }
-
     }
-
 }

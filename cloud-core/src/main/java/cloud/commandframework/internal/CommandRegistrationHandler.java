@@ -80,5 +80,4 @@ public interface CommandRegistrationHandler {
         public void unregisterRootCommand(final @NonNull StaticArgument<?> rootCommand) {
         }
     }
-
 }

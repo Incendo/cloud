@@ -36,6 +36,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 @Beta
 public final class RegistryReflection {
+
     public static final @Nullable Field REGISTRY_REGISTRY;
     public static final @Nullable Method REGISTRY_GET;
 

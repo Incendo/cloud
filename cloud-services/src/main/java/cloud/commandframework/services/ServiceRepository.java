@@ -147,12 +147,10 @@ public final class ServiceRepository<Context, Response> {
         @Override
         public int compareTo(final @NonNull ServiceWrapper<T> other) {
             return Comparator.<ServiceWrapper<T>>comparingInt(
-                    wrapper -> wrapper.isDefaultImplementation()
-                            ? Integer.MIN_VALUE
-                            : Integer.MAX_VALUE).thenComparingInt(wrapper -> wrapper.executionOrder.ordinal())
+                            wrapper -> wrapper.isDefaultImplementation()
+                                    ? Integer.MIN_VALUE
+                                    : Integer.MAX_VALUE).thenComparingInt(wrapper -> wrapper.executionOrder.ordinal())
                     .thenComparingInt(wrapper -> wrapper.registrationOrder).compare(this, other);
         }
-
     }
-
 }

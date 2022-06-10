@@ -98,5 +98,4 @@ public final class LocationCoordinate {
     public String toString() {
         return String.format("LocationCoordinate{type=%s, coordinate=%f}", this.type.name().toLowerCase(), this.coordinate);
     }
-
 }

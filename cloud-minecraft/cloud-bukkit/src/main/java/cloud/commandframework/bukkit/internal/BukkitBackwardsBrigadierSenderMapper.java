@@ -56,5 +56,4 @@ public final class BukkitBackwardsBrigadierSenderMapper<C, S> implements Functio
             throw new RuntimeException(e);
         }
     }
-
 }

@@ -140,7 +140,6 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
                     this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -187,7 +186,6 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
 
             return output;
         }
-
     }
 
 
@@ -226,7 +224,5 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
         public @NonNull String getInput() {
             return this.input;
         }
-
     }
-
 }

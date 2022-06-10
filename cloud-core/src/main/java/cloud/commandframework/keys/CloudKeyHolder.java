@@ -42,5 +42,4 @@ public interface CloudKeyHolder<T> {
      * @return Identifying key.
      */
     @NonNull CloudKey<T> getKey();
-
 }

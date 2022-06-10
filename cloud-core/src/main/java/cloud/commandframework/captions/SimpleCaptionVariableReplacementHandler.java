@@ -43,5 +43,4 @@ public final class SimpleCaptionVariableReplacementHandler implements CaptionVar
         }
         return replacedString;
     }
-
 }

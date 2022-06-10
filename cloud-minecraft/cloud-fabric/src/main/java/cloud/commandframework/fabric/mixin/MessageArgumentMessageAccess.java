@@ -29,5 +29,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(MessageArgument.Message.class)
 public interface MessageArgumentMessageAccess {
-    @Accessor("parts") MessageArgument.Part[] accessor$parts();
+
+    @Accessor("parts")
+    MessageArgument.Part[] accessor$parts();
 }

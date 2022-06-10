@@ -26,7 +26,6 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -103,7 +102,7 @@ class StringArrayParserTest {
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(new String[] {"this", "is", "a", "string"});
+        assertThat(result.getParsedValue()).hasValue(new String[]{"this", "is", "a", "string"});
 
         assertThat(input).containsExactly("--flag", "more", "flag", "content");
     }
@@ -131,7 +130,7 @@ class StringArrayParserTest {
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(new String[] {"this", "is", "a", "string"});
+        assertThat(result.getParsedValue()).hasValue(new String[]{"this", "is", "a", "string"});
 
         assertThat(input).containsExactly("-f", "-l", "-a", "-g");
     }

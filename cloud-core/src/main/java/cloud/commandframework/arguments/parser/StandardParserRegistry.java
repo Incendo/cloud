@@ -247,9 +247,9 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         if (producer == null) {
             /* Give enums special treatment */
             if (GenericTypeReflector.isSuperType(Enum.class, actualType.getType())) {
-                @SuppressWarnings("rawtypes")
-                final EnumArgument.EnumParser enumArgument
-                        = new EnumArgument.EnumParser(GenericTypeReflector.erase(actualType.getType()));
+                @SuppressWarnings("rawtypes") final EnumArgument.EnumParser enumArgument = new EnumArgument.EnumParser(
+                        GenericTypeReflector.erase(actualType.getType())
+                );
                 return Optional.of(enumArgument);
             }
             return Optional.empty();
@@ -359,7 +359,6 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             }
             return parserParameters;
         }
-
     }
 
 
@@ -370,7 +369,5 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         public @NonNull ParserParameters apply(final @NonNull Greedy greedy, final @NonNull TypeToken<?> typeToken) {
             return ParserParameters.single(StandardParameters.GREEDY, true);
         }
-
     }
-
 }

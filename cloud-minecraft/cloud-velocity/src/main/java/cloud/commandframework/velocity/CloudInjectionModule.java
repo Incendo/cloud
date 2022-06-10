@@ -110,5 +110,4 @@ public final class CloudInjectionModule<C> extends AbstractModule {
         final Key backwardsCommandSenderMapperFunctionKey = Key.get(backwardsCommandSenderMapperFunction);
         this.bind(backwardsCommandSenderMapperFunctionKey).toInstance(this.backwardsCommandSenderMapper);
     }
-
 }

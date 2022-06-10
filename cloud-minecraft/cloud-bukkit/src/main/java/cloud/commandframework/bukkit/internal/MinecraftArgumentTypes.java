@@ -95,11 +95,13 @@ public final class MinecraftArgumentTypes {
     }
 
     private interface ArgumentTypeGetter {
+
         Class<? extends ArgumentType<?>> getClassByKey(@NonNull NamespacedKey key) throws IllegalArgumentException;
     }
 
     @SuppressWarnings("unchecked")
     private static final class ArgumentTypeGetterImpl implements MinecraftArgumentTypes.ArgumentTypeGetter {
+
         private final Object argumentRegistry;
         private final Map<?, ?> byClassMap;
 
@@ -129,6 +131,7 @@ public final class MinecraftArgumentTypes {
 
     @SuppressWarnings("unchecked")
     private static final class LegacyArgumentTypeGetter implements ArgumentTypeGetter {
+
         private static final Constructor<?> MINECRAFT_KEY_CONSTRUCTOR;
         private static final Method ARGUMENT_REGISTRY_GET_BY_KEY_METHOD;
         private static final Field BY_CLASS_MAP_FIELD;
@@ -201,5 +204,4 @@ public final class MinecraftArgumentTypes {
             }
         }
     }
-
 }

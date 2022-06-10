@@ -31,5 +31,4 @@ public class SecondaryMockSideEffectService implements MockSideEffectService {
     public State handle(final MockPlayer mockPlayer) {
         return null;
     }
-
 }

@@ -49,9 +49,15 @@ class CommandHelpHandlerTest {
     @BeforeAll
     static void setup() {
         manager = createManager();
-        final SimpleCommandMeta meta1 = SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "Command with only literals").build();
+        final SimpleCommandMeta meta1 = SimpleCommandMeta
+                .builder()
+                .with(CommandMeta.DESCRIPTION, "Command with only literals")
+                .build();
         manager.command(manager.commandBuilder("test", meta1).literal("this").literal("thing").build());
-        final SimpleCommandMeta meta2 = SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "Command with variables").build();
+        final SimpleCommandMeta meta2 = SimpleCommandMeta
+                .builder()
+                .with(CommandMeta.DESCRIPTION, "Command with variables")
+                .build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
                 argument(IntegerArgument.of("int"), ArgumentDescription.of("A number")).build());
         manager.command(manager.commandBuilder("test").argument(StringArgument.of("potato")));
@@ -129,7 +135,8 @@ class CommandHelpHandlerTest {
          * List all commands from /test int, which should show only:
          * - /test int <int>
          */
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.getCommandHelpHandler(predicate).queryHelp("test int");
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.getCommandHelpHandler(predicate).queryHelp(
+                "test int");
         Assertions.assertTrue(query3 instanceof CommandHelpHandler.VerboseHelpTopic);
         Assertions.assertEquals(Collections.singletonList("test int <int>"), getSortedSyntaxStrings(query3));
 
@@ -249,5 +256,4 @@ class CommandHelpHandlerTest {
                     Collections.singletonList(component.getArgument()), null), description);
         }
     }
-
 }

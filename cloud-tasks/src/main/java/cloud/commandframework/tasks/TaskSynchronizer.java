@@ -72,5 +72,4 @@ public interface TaskSynchronizer {
      * @return Future that completes with the output
      */
     <I, O> CompletableFuture<O> runAsynchronous(@NonNull I input, @NonNull TaskFunction<I, O> function);
-
 }

@@ -147,7 +147,6 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
                     this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -202,7 +201,6 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         public boolean isContextFree() {
             return true;
         }
-
     }
 
 
@@ -278,7 +276,5 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         public int hashCode() {
             return Objects.hash(this.input, this.enumClass);
         }
-
     }
-
 }

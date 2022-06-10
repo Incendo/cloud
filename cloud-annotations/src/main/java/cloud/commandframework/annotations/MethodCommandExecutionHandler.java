@@ -273,7 +273,5 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         public @NonNull AnnotationParser<C> annotationParser() {
             return this.annotationParser;
         }
-
     }
-
 }

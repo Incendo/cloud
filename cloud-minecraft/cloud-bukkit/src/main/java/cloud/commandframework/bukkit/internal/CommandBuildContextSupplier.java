@@ -65,5 +65,4 @@ public final class CommandBuildContextSupplier {
             throw new RuntimeException(e);
         }
     }
-
 }

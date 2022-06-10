@@ -55,8 +55,16 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
-            ) {
-        super(required, name, new EnchantmentParser<>(), defaultValue, Enchantment.class, suggestionsProvider, defaultDescription);
+    ) {
+        super(
+                required,
+                name,
+                new EnchantmentParser<>(),
+                defaultValue,
+                Enchantment.class,
+                suggestionsProvider,
+                defaultDescription
+        );
     }
 
     /**
@@ -123,7 +131,6 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
     public static final class EnchantmentParser<C> implements ArgumentParser<C, Enchantment> {
@@ -177,7 +184,6 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
             }
             return completions;
         }
-
     }
 
 
@@ -213,7 +219,5 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
         public @NonNull String getInput() {
             return this.input;
         }
-
     }
-
 }

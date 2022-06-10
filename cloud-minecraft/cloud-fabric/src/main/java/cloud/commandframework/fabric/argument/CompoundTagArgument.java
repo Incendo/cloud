@@ -152,7 +152,5 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull CompoundTag defaultValue) {
             return this.asOptionalWithDefault(defaultValue.toString());
         }
-
     }
-
 }

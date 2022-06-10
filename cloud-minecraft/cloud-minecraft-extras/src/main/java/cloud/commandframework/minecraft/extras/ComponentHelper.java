@@ -70,5 +70,4 @@ final class ComponentHelper {
         }
         return length;
     }
-
 }

@@ -40,5 +40,4 @@ public final class BukkitCaptionRegistryFactory<C> {
     public @NonNull BukkitCaptionRegistry<C> create() {
         return new BukkitCaptionRegistry<>();
     }
-
 }

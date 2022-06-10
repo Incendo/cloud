@@ -43,5 +43,4 @@ public @interface CommandDescription {
      * @return Command syntax
      */
     @NonNull String value() default "";
-
 }

@@ -71,7 +71,7 @@ public interface AnnotationAccessor {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    static @NonNull AnnotationAccessor of(final @NonNull AnnotationAccessor@NonNull... accessors) {
+    static @NonNull AnnotationAccessor of(final @NonNull AnnotationAccessor @NonNull... accessors) {
         return new MultiDelegateAnnotationAccessor(accessors);
     }
 
@@ -104,14 +104,12 @@ public interface AnnotationAccessor {
 
         @Override
         public <A extends Annotation> @Nullable A annotation(final @NonNull Class<A> clazz) {
-           return null;
+            return null;
         }
 
         @Override
         public @NonNull Collection<@NonNull Annotation> annotations() {
             return Collections.emptyList();
         }
-
     }
-
 }

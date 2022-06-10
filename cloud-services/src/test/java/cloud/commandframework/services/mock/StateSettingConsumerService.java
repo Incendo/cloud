@@ -29,5 +29,4 @@ public class StateSettingConsumerService implements MockConsumerService {
     public void accept(final MockService.MockContext mockContext) {
         mockContext.setState("");
     }
-
 }

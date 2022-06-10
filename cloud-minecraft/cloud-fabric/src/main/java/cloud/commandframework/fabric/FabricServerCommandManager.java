@@ -201,5 +201,4 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
         final CommandSourceStack source = this.backwardsCommandSourceMapper().apply(sender);
         return Permissions.check(source, permission, source.getServer().getOperatorUserPermissionLevel());
     }
-
 }

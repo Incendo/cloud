@@ -42,5 +42,4 @@ final class BukkitPlayerSender extends BukkitCommandSender {
     public @NonNull Player asPlayer() {
         return (Player) this.getInternalSender();
     }
-
 }

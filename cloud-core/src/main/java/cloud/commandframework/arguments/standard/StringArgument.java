@@ -306,7 +306,6 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     this.getDefaultValue(), this.suggestionsProvider, this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -465,7 +464,6 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         public @NonNull StringMode getStringMode() {
             return this.stringMode;
         }
-
     }
 
 
@@ -517,7 +515,5 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         public @NonNull StringMode getStringMode() {
             return this.stringMode;
         }
-
     }
-
 }

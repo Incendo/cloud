@@ -42,5 +42,4 @@ public final class SimpleCaptionRegistryFactory<C> {
     public @NonNull SimpleCaptionRegistry<C> create() {
         return new SimpleCaptionRegistry<>();
     }
-
 }

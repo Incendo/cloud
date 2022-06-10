@@ -51,5 +51,4 @@ public final class StringUtils {
         }
         return occurrences;
     }
-
 }

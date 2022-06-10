@@ -74,7 +74,9 @@ public class CommandMethodProcessorTest {
 
         // Assert
         assertThat(compilation).failed();
-        assertThat(compilation).hadErrorContaining("Required argument 'required' cannot succeed an optional argument (commandMethod)");
+        assertThat(compilation).hadErrorContaining(
+                "Required argument 'required' cannot succeed an optional argument (commandMethod)"
+        );
     }
 
     @Test

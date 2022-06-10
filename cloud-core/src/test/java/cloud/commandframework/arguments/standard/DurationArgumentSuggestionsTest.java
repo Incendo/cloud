@@ -86,6 +86,4 @@ public class DurationArgumentSuggestionsTest {
         final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
         Assertions.assertEquals(Collections.emptyList(), suggestions8);
     }
-
-
 }

@@ -94,10 +94,13 @@ public class CommandSuggestionsTest {
 
         manager.command(manager.commandBuilder("flags3")
                 .flag(manager.flagBuilder("compound")
-                        .withArgument(ArgumentTriplet.of(manager, "triplet",
-                                Triplet.of("x", "y", "z"),
-                                Triplet.of(int.class, int.class, int.class))
-                                .simple()))
+                        .withArgument(
+                                ArgumentTriplet.of(manager, "triplet",
+                                        Triplet.of("x", "y", "z"),
+                                        Triplet.of(int.class, int.class, int.class)
+                                ).simple()
+                        )
+                )
                 .flag(manager.flagBuilder("presence").withAliases("p"))
                 .flag(manager.flagBuilder("single")
                         .withArgument(IntegerArgument.of("value"))));
@@ -501,5 +504,4 @@ public class CommandSuggestionsTest {
         FOO,
         BAR
     }
-
 }

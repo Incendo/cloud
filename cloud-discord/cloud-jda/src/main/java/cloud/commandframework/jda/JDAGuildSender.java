@@ -73,5 +73,4 @@ public class JDAGuildSender extends JDACommandSender {
     public @NonNull TextChannel getTextChannel() {
         return this.channel;
     }
-
 }

@@ -41,7 +41,6 @@ import cloud.commandframework.meta.CommandMeta;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;

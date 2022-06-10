@@ -108,9 +108,9 @@ public final class FabricExample implements ModInitializer {
                     final Collection<ServerPlayer> selected = selector.get();
                     selected.forEach(selectedPlayer ->
                             selectedPlayer.sendSystemMessage(
-                                Component.literal("Wave from ")
-                                    .withStyle(style -> style.withColor(ctx.get(textColor)))
-                                    .append(ctx.getSender().getDisplayName())
+                                    Component.literal("Wave from ")
+                                            .withStyle(style -> style.withColor(ctx.get(textColor)))
+                                            .append(ctx.getSender().getDisplayName())
                             ));
                     ctx.getSender().sendSuccess(
                             Component.literal(String.format("Waved at %d players (%s)", selected.size(),
@@ -163,7 +163,9 @@ public final class FabricExample implements ModInitializer {
                                                 HoverEvent.Action.SHOW_TEXT,
                                                 Component.literal("Click for more info")
                                         )))
-                                .append(Component.literal(mod.getName()).withStyle(style -> style.withColor(ChatFormatting.GREEN)))
+                                .append(Component
+                                        .literal(mod.getName())
+                                        .withStyle(style -> style.withColor(ChatFormatting.GREEN)))
                                 .append(Component.literal(String.format(" (%s) ", mod.getId()))
                                         .withStyle(style -> style
                                                 .withColor(ChatFormatting.GRAY)
@@ -251,5 +253,4 @@ public final class FabricExample implements ModInitializer {
                     player.teleportToWithTicket(pos.getMinBlockX(), 128, pos.getMinBlockZ());
                 }));
     }
-
 }

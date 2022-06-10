@@ -43,5 +43,4 @@ final class BukkitConsoleSender extends BukkitCommandSender {
     public @NonNull Player asPlayer() {
         throw new UnsupportedOperationException("Cannot convert console to player");
     }
-
 }

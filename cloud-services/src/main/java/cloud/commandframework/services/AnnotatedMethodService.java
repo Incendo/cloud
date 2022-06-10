@@ -96,5 +96,4 @@ class AnnotatedMethodService<Context, Result> implements Service<Context, Result
     public int hashCode() {
         return Objects.hash(this.methodHandle);
     }
-
 }

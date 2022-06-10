@@ -152,7 +152,5 @@ public final class ObjectiveCriteriaArgument<C> extends CommandArgument<C, Objec
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ObjectiveCriteria defaultValue) {
             return this.asOptionalWithDefault(defaultValue.getName());
         }
-
     }
-
 }

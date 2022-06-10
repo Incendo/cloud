@@ -162,7 +162,5 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
             }
             return this.asOptionalWithDefault(value.toString());
         }
-
     }
-
 }

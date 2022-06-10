@@ -128,5 +128,4 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
     public @NonNull Plugin getOwningPlugin() {
         return this.owningPlugin;
     }
-
 }

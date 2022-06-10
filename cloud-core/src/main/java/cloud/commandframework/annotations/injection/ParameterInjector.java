@@ -51,5 +51,4 @@ public interface ParameterInjector<C, T> {
      *         by this particular injector
      */
     @Nullable T create(@NonNull CommandContext<C> context, @NonNull AnnotationAccessor annotationAccessor);
-
 }

@@ -294,7 +294,5 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
         public void appendBlankSpace() {
             this.builder.append(' ');
         }
-
     }
-
 }

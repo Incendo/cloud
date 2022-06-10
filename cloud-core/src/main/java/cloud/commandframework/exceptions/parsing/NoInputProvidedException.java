@@ -54,5 +54,4 @@ public class NoInputProvidedException extends ParserException {
                 StandardCaptionKeys.ARGUMENT_PARSE_FAILURE_NO_INPUT_PROVIDED
         );
     }
-
 }

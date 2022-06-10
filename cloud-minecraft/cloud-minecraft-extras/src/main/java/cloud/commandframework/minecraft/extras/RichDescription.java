@@ -38,6 +38,7 @@ import static java.util.Objects.requireNonNull;
  * @since 1.4.0
  */
 public final class RichDescription implements ArgumentDescription {
+
     private static final RichDescription EMPTY = new RichDescription(Component.empty());
 
     private final Component contents;
@@ -87,7 +88,7 @@ public final class RichDescription implements ArgumentDescription {
     /**
      * Create a rich description pointing to a translation key.
      *
-     * @param key the translation key
+     * @param key  the translation key
      * @param args the arguments to use with the translation key
      * @return a new rich description
      */
@@ -105,7 +106,7 @@ public final class RichDescription implements ArgumentDescription {
      * {@inheritDoc}
      *
      * @deprecated to discourage use. A plain serialization is a somewhat expensive and lossy operation, use
-     *      {@link #getContents()} instead.
+     *         {@link #getContents()} instead.
      */
     @Override
     @Deprecated
@@ -127,5 +128,4 @@ public final class RichDescription implements ArgumentDescription {
     public boolean isEmpty() {
         return Component.empty().equals(this.contents);
     }
-
 }

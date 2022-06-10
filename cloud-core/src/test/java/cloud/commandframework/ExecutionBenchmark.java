@@ -60,7 +60,6 @@ public class ExecutionBenchmark {
         }
         manager.command(builder.build());
         literalChain = literalBuilder.toString();
-
     }
 
     @TearDown
@@ -72,5 +71,4 @@ public class ExecutionBenchmark {
     public void testCommandParsing() {
         manager.executeCommand(new TestCommandSender(), literalChain).join();
     }
-
 }

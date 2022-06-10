@@ -179,7 +179,6 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
                     this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -283,7 +282,6 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         public boolean hasMin() {
             return this.min != DEFAULT_MINIMUM;
         }
-
     }
 
 
@@ -364,7 +362,5 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         public int hashCode() {
             return Objects.hash(this.parser);
         }
-
     }
-
 }

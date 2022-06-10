@@ -184,7 +184,6 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
                     this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -296,7 +295,6 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         public boolean hasMin() {
             return this.min != DEFAULT_MINIMUM;
         }
-
     }
 
 
@@ -379,7 +377,5 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         public int hashCode() {
             return Objects.hash(this.parser);
         }
-
     }
-
 }

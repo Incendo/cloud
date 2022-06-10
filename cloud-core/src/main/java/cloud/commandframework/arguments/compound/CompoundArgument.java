@@ -174,7 +174,5 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
             final int argument = commandContext.getOrDefault("__parsing_argument__", 1) - 1;
             return ((ArgumentParser<C, ?>) this.parsers[argument]).suggestions(commandContext, input);
         }
-
     }
-
 }

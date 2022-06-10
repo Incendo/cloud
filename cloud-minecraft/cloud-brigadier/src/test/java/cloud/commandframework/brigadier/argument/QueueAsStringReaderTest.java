@@ -94,5 +94,4 @@ public class QueueAsStringReaderTest {
 
         assertEquals(words("pig"), contents);
     }
-
 }

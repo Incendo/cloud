@@ -42,5 +42,4 @@ public interface CaptionRegistry<C> {
      * @return Caption
      */
     @NonNull String getCaption(@NonNull Caption caption, @NonNull C sender);
-
 }

@@ -89,5 +89,4 @@ public final class CommandPostprocessingContext<C> {
     public int hashCode() {
         return Objects.hash(this.getCommandContext(), this.getCommand());
     }
-
 }

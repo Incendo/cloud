@@ -343,7 +343,7 @@ class CommandTreeTest {
         // Act
         assertThrows(
                 CompletionException.class, () ->
-                this.commandManager.executeCommand(new TestCommandSender(), "flags --test test2").join()
+                        this.commandManager.executeCommand(new TestCommandSender(), "flags --test test2").join()
         );
     }
 
@@ -454,11 +454,16 @@ class CommandTreeTest {
 
         // Verify built command has the repeat argument twice
         List<CommandArgument<TestCommandSender, ?>> args = command.getArguments();
-        assertThat(args.size()).isEqualTo(4);;
-        assertThat(args.get(0).getName()).isEqualTo("repeatingargscommand");;
-        assertThat(args.get(1).getName()).isEqualTo("repeat");;
-        assertThat(args.get(2).getName()).isEqualTo("middle");;
-        assertThat(args.get(3).getName()).isEqualTo("repeat");;
+        assertThat(args.size()).isEqualTo(4);
+        ;
+        assertThat(args.get(0).getName()).isEqualTo("repeatingargscommand");
+        ;
+        assertThat(args.get(1).getName()).isEqualTo("repeat");
+        ;
+        assertThat(args.get(2).getName()).isEqualTo("middle");
+        ;
+        assertThat(args.get(3).getName()).isEqualTo("repeat");
+        ;
 
         // Register
         this.commandManager.command(command);
@@ -492,8 +497,10 @@ class CommandTreeTest {
                 new LinkedList<>(Arrays.asList("literalwithvariable", "argthatdoesnotmatch"))
         );
         assertThat(variableResult.getSecond()).isNull();
-        assertThat(variableResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");;
-        assertThat(variableResult.getFirst().getArguments().get(1).getName()).isEqualTo("variable");;
+        assertThat(variableResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");
+        ;
+        assertThat(variableResult.getFirst().getArguments().get(1).getName()).isEqualTo("variable");
+        ;
 
         /* Try parsing with the main name literal, which should match the literal command */
         final Pair<Command<TestCommandSender>, Exception> literalResult = this.commandManager.getCommandTree().parse(
@@ -501,8 +508,10 @@ class CommandTreeTest {
                 new LinkedList<>(Arrays.asList("literalwithvariable", "literal"))
         );
         assertThat(literalResult.getSecond()).isNull();
-        assertThat(literalResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");;
-        assertThat(literalResult.getFirst().getArguments().get(1).getName()).isEqualTo("literal");;
+        assertThat(literalResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");
+        ;
+        assertThat(literalResult.getFirst().getArguments().get(1).getName()).isEqualTo("literal");
+        ;
 
         /* Try parsing with the alias of the literal, which should match the literal command */
         final Pair<Command<TestCommandSender>, Exception> literalAliasResult = this.commandManager.getCommandTree().parse(
@@ -510,8 +519,10 @@ class CommandTreeTest {
                 new LinkedList<>(Arrays.asList("literalwithvariable", "literalalias"))
         );
         assertThat(literalAliasResult.getSecond()).isNull();
-        assertThat(literalAliasResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");;
-        assertThat(literalAliasResult.getFirst().getArguments().get(1).getName()).isEqualTo("literal");;
+        assertThat(literalAliasResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");
+        ;
+        assertThat(literalAliasResult.getFirst().getArguments().get(1).getName()).isEqualTo("literal");
+        ;
     }
 
     @Test

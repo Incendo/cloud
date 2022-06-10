@@ -52,16 +52,16 @@ final class SpongePluginRegistrationHandler<C> implements CommandRegistrationHan
         }
 
         final CloudCommandCallable<C> callable = new CloudCommandCallable<>(
-            commandArgument,
-            (Command<C>) command,
-            this.manager);
+                commandArgument,
+                (Command<C>) command,
+                this.manager
+        );
         this.registeredCommands.put(commandArgument, callable);
 
         return Sponge.getGame().getCommandManager().register(
-            this.manager.getOwningPlugin(),
-            callable,
-            ImmutableList.copyOf(commandArgument.getAliases())
+                this.manager.getOwningPlugin(),
+                callable,
+                ImmutableList.copyOf(commandArgument.getAliases())
         ).isPresent();
     }
-
 }

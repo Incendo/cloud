@@ -88,5 +88,4 @@ public class ParserParameter<T> {
     public final int hashCode() {
         return Objects.hash(this.key, this.expectedType);
     }
-
 }

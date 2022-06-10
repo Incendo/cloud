@@ -75,9 +75,9 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         }
         final C sender = this.manager.getCommandSenderMapper().apply(commandSender);
         this.manager.executeCommand(
-                sender,
-                builder.toString()
-        )
+                        sender,
+                        builder.toString()
+                )
                 .whenComplete((commandResult, throwable) -> {
                     if (throwable != null) {
                         if (throwable instanceof CompletionException) {
@@ -180,5 +180,4 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
                 builder.toString()
         );
     }
-
 }

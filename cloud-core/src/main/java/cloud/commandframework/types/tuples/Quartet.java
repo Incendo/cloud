@@ -152,5 +152,4 @@ public class Quartet<U, V, W, X> implements Tuple {
         array[3] = this.fourth;
         return array;
     }
-
 }

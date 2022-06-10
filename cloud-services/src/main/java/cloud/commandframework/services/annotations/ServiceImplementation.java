@@ -50,5 +50,4 @@ public @interface ServiceImplementation {
      * @return Service to implement
      */
     Class<? extends Service<?, ?>> value();
-
 }

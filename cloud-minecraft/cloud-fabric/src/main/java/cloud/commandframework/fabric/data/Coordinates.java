@@ -112,5 +112,4 @@ public interface Coordinates {
     interface ColumnCoordinates extends Coordinates {
 
     }
-
 }

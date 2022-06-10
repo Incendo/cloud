@@ -315,5 +315,4 @@ public final class BukkitBrigadierMapper<C> {
     ) {
         this.brigadierManager.registerDefaultArgumentTypeSupplier(type, argumentTypeSupplier);
     }
-
 }

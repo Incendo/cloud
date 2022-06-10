@@ -51,5 +51,4 @@ public interface CloudKey<T> {
      * @return The type of the key value.
      */
     @NonNull TypeToken<@NonNull T> getType();
-
 }

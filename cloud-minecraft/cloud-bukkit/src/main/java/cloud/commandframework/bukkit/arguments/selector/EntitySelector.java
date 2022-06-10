@@ -76,5 +76,4 @@ public abstract class EntitySelector {
     public boolean hasAny() {
         return !this.entities.isEmpty();
     }
-
 }

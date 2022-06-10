@@ -42,5 +42,4 @@ public @interface CommandPermission {
      * @return Command permission
      */
     @NonNull String value() default "";
-
 }

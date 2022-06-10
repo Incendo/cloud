@@ -116,5 +116,4 @@ public class Pair<U, V> implements Tuple {
         array[1] = this.second;
         return array;
     }
-
 }

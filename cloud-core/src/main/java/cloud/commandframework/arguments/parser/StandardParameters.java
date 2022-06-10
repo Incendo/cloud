@@ -64,8 +64,8 @@ public final class StandardParameters {
     /**
      * Indicates that an argument should stop parsing when encountering a potential flag.
      *
-     * @since 1.7.0
      * @see cloud.commandframework.annotations.specifier.FlagYielding
+     * @since 1.7.0
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public static final ParserParameter<Boolean> FLAG_YIELDING = create(
@@ -96,5 +96,4 @@ public final class StandardParameters {
     ) {
         return new ParserParameter<>(key, expectedType);
     }
-
 }

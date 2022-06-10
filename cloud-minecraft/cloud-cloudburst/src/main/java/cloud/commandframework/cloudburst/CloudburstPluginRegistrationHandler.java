@@ -66,5 +66,4 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
         Server.getInstance().getCommandRegistry().register(plugin, cloudburstCommand);
         return true;
     }
-
 }

@@ -179,7 +179,6 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
                     this.max, this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -291,7 +290,6 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         ) {
             return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
         }
-
     }
 
 
@@ -372,7 +370,5 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         public int hashCode() {
             return Objects.hash(this.parser);
         }
-
     }
-
 }

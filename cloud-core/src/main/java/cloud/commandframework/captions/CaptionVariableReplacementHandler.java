@@ -40,5 +40,4 @@ public interface CaptionVariableReplacementHandler {
      * @return Transformed message
      */
     @NonNull String replaceVariables(@NonNull String string, @NonNull CaptionVariable... variables);
-
 }

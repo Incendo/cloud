@@ -91,5 +91,4 @@ public class DurationArgumentTest {
                 "duration 1x"
         ).join());
     }
-
 }

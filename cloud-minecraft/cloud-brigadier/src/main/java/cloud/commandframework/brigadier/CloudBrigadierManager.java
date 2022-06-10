@@ -357,7 +357,6 @@ public final class CloudBrigadierManager<C, S> {
         final BrigadierMapping.BuilderImpl<C, K, S> builder = new BrigadierMapping.BuilderImpl<>();
         configurer.accept(builder);
         this.mappers.put(GenericTypeReflector.erase(parserType.getType()), builder.build());
-
     }
 
     /**
@@ -569,11 +568,11 @@ public final class CloudBrigadierManager<C, S> {
             );
             final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions()
                     ? (context, builder) -> this.buildSuggestions(
-                            context,
-                            root.getParent(),
-                            root.getValue(),
-                            builder
-                    ) : pair.getSecond();
+                    context,
+                    root.getParent(),
+                    root.getValue(),
+                    builder
+            ) : pair.getSecond();
             argumentBuilder = RequiredArgumentBuilder
                     .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getFirst())
                     .suggests(provider)
@@ -665,5 +664,4 @@ public final class CloudBrigadierManager<C, S> {
 
         return suggestionsBuilder.buildFuture();
     }
-
 }

@@ -178,14 +178,14 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         this(
-            required,
-            name,
-            parser,
-            defaultValue,
-            valueType,
-            suggestionsProvider,
-            ArgumentDescription.empty(),
-            argumentPreprocessors
+                required,
+                name,
+                parser,
+                defaultValue,
+                valueType,
+                suggestionsProvider,
+                ArgumentDescription.empty(),
+                argumentPreprocessors
         );
     }
 
@@ -219,7 +219,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultValue        Default value used when no value is provided by the command sender
      * @param valueType           Type produced by the parser
      * @param suggestionsProvider Suggestions provider
-     * @param defaultDescription    Default description to use when registering
+     * @param defaultDescription  Default description to use when registering
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -266,7 +266,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultValue        Default value used when no value is provided by the command sender
      * @param valueType           Type produced by the parser
      * @param suggestionsProvider Suggestions provider
-     * @param defaultDescription    Default description to use when registering
+     * @param defaultDescription  Default description to use when registering
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -748,7 +748,6 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         protected final @NonNull TypeToken<T> getValueType() {
             return this.valueType;
         }
-
     }
 
     /**
@@ -837,7 +836,5 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             super.withSuggestionsProvider(suggestionsProvider);
             return this.self();
         }
-
     }
-
 }

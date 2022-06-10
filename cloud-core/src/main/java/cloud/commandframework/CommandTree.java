@@ -139,11 +139,10 @@ public final class CommandTree<C> {
             return Pair.of(
                     null,
                     new NoSuchCommandException(
-                        commandContext.getSender(),
-                        new ArrayList<>(),
-                        this.stringOrEmpty(args.peek()
+                            commandContext.getSender(),
+                            new ArrayList<>(),
+                            this.stringOrEmpty(args.peek())
                     )
-                )
             );
         }
 
@@ -304,10 +303,10 @@ public final class CommandTree<C> {
         if (!commandQueue.isEmpty()) {
             final String literal = commandQueue.peek();
             final boolean matchesLiteral = children.stream()
-                .filter(n -> n.getValue() instanceof StaticArgument)
-                .map(n -> (StaticArgument<?>) n.getValue())
-                .flatMap(arg -> Stream.concat(Stream.of(arg.getName()), arg.getAliases().stream()))
-                .anyMatch(arg -> arg.equals(literal));
+                    .filter(n -> n.getValue() instanceof StaticArgument)
+                    .map(n -> (StaticArgument<?>) n.getValue())
+                    .flatMap(arg -> Stream.concat(Stream.of(arg.getName()), arg.getAliases().stream()))
+                    .anyMatch(arg -> arg.equals(literal));
 
             if (matchesLiteral) {
                 return Pair.of(null, null);
@@ -381,8 +380,8 @@ public final class CommandTree<C> {
                         return Pair.of(null, new InvalidSyntaxException(
                                 this.commandManager.getCommandSyntaxFormatter()
                                         .apply(Objects.requireNonNull(
-                                                child.getValue()
-                                                        .getOwningCommand())
+                                                        child.getValue()
+                                                                .getOwningCommand())
                                                 .getArguments(), child),
                                 commandContext.getSender(), this.getChain(root)
                                 .stream()
@@ -849,8 +848,8 @@ public final class CommandTree<C> {
         }
 
         // List of child nodes that are static arguments, with fixed values
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-        final List<Node<StaticArgument<?>>> childStaticArguments = node.children.stream()
+        @SuppressWarnings({"rawtypes", "unchecked"}) final List<Node<StaticArgument<?>>> childStaticArguments = node.children
+                .stream()
                 .filter(n -> n.getValue() instanceof StaticArgument)
                 .map(n -> (Node<StaticArgument<?>>) ((Node) n))
                 .collect(Collectors.toList());
@@ -1091,7 +1090,5 @@ public final class CommandTree<C> {
         public String toString() {
             return "Node{value=" + this.value + '}';
         }
-
     }
-
 }

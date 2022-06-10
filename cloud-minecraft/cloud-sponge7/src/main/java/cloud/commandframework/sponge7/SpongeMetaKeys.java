@@ -48,5 +48,4 @@ public final class SpongeMetaKeys {
             Text.class,
             "cloud:sponge7/rich_long_description"
     );
-
 }

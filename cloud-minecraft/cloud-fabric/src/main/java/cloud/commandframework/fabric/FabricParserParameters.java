@@ -50,5 +50,4 @@ public final class FabricParserParameters {
     ) {
         return new ParserParameter<>(key, expectedType);
     }
-
 }

@@ -58,5 +58,4 @@ public interface PartialResultService<Context, Result, Chunked extends ChunkedRe
      * @return Map of request-result pairs
      */
     @NonNull Map<@NonNull Context, @NonNull Result> handleRequests(@NonNull List<Context> requests);
-
 }

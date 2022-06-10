@@ -166,7 +166,5 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
             }
             return this.asOptionalWithDefault(builder.toString());
         }
-
     }
-
 }

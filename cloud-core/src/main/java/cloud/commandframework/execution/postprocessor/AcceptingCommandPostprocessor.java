@@ -44,5 +44,4 @@ public final class AcceptingCommandPostprocessor<C> implements CommandPostproces
     public void accept(final @NonNull CommandPostprocessingContext<C> context) {
         context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
     }
-
 }

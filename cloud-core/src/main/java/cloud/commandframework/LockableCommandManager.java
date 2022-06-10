@@ -73,5 +73,4 @@ public abstract class LockableCommandManager<C> extends CommandManager<C> {
     protected final void lockWrites() {
         this.lockRegistration();
     }
-
 }

@@ -50,5 +50,4 @@ public interface Message {
      * @since 1.5.0
      */
     @NonNull Component contents();
-
 }

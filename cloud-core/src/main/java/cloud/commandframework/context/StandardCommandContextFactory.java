@@ -57,5 +57,4 @@ public final class StandardCommandContextFactory<C> implements CommandContextFac
                 commandManager
         );
     }
-
 }

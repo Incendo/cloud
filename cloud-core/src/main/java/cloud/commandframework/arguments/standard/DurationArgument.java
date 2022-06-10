@@ -190,7 +190,6 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -277,7 +276,6 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                     .map(unit -> input + unit)
                     .collect(Collectors.toList());
         }
-
     }
 
     /**
@@ -320,7 +318,5 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         public @NonNull String getInput() {
             return this.input;
         }
-
     }
-
 }

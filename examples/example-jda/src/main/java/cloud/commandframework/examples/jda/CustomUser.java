@@ -79,5 +79,4 @@ public abstract class CustomUser {
     public final @NonNull MessageChannel getChannel() {
         return this.channel;
     }
-
 }

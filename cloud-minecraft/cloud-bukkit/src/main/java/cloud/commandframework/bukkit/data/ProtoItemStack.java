@@ -61,5 +61,4 @@ public interface ProtoItemStack {
      */
     @NonNull ItemStack createItemStack(int stackSize, boolean respectMaximumStackSize)
             throws IllegalArgumentException;
-
 }

@@ -157,7 +157,6 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                     this.modes
             );
         }
-
     }
 
 
@@ -269,7 +268,6 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
             return ArgumentParseResult.success(channel);
         }
-
     }
 
 
@@ -295,7 +293,6 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
         public final @NonNull String getInput() {
             return this.input;
         }
-
     }
 
 
@@ -316,7 +313,6 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
         public @NonNull String getMessage() {
             return String.format("Too many channels found for '%s'.", getInput());
         }
-
     }
 
 
@@ -337,7 +333,5 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
         public @NonNull String getMessage() {
             return String.format("Channel not found for '%s'.", getInput());
         }
-
     }
-
 }

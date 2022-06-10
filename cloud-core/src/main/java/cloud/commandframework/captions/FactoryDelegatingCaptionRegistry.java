@@ -45,5 +45,4 @@ public interface FactoryDelegatingCaptionRegistry<C> extends CaptionRegistry<C> 
             @NonNull Caption caption,
             @NonNull BiFunction<Caption, C, String> factory
     );
-
 }

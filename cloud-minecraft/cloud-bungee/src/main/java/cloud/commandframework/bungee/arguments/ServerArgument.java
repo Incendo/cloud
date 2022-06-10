@@ -135,7 +135,6 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
                     new LinkedList<>()
             );
         }
-
     }
 
     public static final class ServerParser<C> implements ArgumentParser<C, ServerInfo> {
@@ -172,7 +171,6 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
         ) {
             return new ArrayList<>(commandContext.<ProxyServer>get("ProxyServer").getServers().keySet());
         }
-
     }
 
     public static final class ServerParseException extends ParserException {
@@ -190,7 +188,5 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
                     CaptionVariable.of("input", input)
             );
         }
-
     }
-
 }

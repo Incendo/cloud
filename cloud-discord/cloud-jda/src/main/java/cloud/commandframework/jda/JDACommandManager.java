@@ -193,5 +193,4 @@ public class JDACommandManager<C> extends CommandManager<C> {
     public final @NonNull CommandMeta createDefaultCommandMeta() {
         return SimpleCommandMeta.empty();
     }
-
 }

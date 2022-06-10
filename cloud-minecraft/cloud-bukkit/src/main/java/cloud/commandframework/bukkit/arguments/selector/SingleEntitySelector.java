@@ -57,5 +57,4 @@ public final class SingleEntitySelector extends MultipleEntitySelector {
         }
         return this.getEntities().get(0);
     }
-
 }

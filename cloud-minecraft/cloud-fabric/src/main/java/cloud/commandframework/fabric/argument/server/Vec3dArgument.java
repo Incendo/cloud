@@ -237,7 +237,5 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
                     this.centerIntegers()
             );
         }
-
     }
-
 }

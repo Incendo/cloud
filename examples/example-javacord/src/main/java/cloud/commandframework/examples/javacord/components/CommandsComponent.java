@@ -100,5 +100,4 @@ public class CommandsComponent {
         Preconditions.checkNotNull(this.commandManager, "Command Manager has not been initialized yet");
         return this.commandManager;
     }
-
 }

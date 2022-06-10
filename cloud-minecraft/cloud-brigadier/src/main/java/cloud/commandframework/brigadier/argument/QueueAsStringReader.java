@@ -28,6 +28,7 @@ import java.util.Deque;
 import java.util.Queue;
 
 final class QueueAsStringReader extends StringReader {
+
     private boolean closed;
     private final Queue<String> input;
 
@@ -65,5 +66,4 @@ final class QueueAsStringReader extends StringReader {
             }
         }
     }
-
 }

@@ -52,5 +52,4 @@ final class PaperBrigadierMapper<C> {
             }, "resource_location", true);
         }
     }
-
 }

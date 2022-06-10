@@ -64,5 +64,4 @@ public final class MethodSuggestionsProvider<C> implements BiFunction<CommandCon
             throw new RuntimeException(t);
         }
     }
-
 }

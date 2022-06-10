@@ -85,5 +85,4 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
     ) {
         return this.suggestionProvider.apply(commandContext, input);
     }
-
 }

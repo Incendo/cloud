@@ -68,5 +68,4 @@ public interface CommandContextFactory<C> {
             @NonNull C sender,
             @NonNull CommandManager<C> commandManager
     );
-
 }

@@ -164,7 +164,14 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
 
     @Override
     public final int hashCode() {
-        return Objects.hash(this.getFirst(), this.getSecond(), this.getThird(), this.getFourth(), this.getFifth(), this.getSixth());
+        return Objects.hash(
+                this.getFirst(),
+                this.getSecond(),
+                this.getThird(),
+                this.getFourth(),
+                this.getFifth(),
+                this.getSixth()
+        );
     }
 
     @Override
@@ -190,5 +197,4 @@ public class Sextet<U, V, W, X, Y, Z> implements Tuple {
         array[5] = this.sixth;
         return array;
     }
-
 }

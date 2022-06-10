@@ -47,7 +47,6 @@ public interface MockService extends Service<MockService.MockContext, MockServic
         public void setState(final String state) {
             this.state = state;
         }
-
     }
 
     class MockResult {
@@ -61,7 +60,5 @@ public interface MockService extends Service<MockService.MockContext, MockServic
         public int getInteger() {
             return this.integer;
         }
-
     }
-
 }

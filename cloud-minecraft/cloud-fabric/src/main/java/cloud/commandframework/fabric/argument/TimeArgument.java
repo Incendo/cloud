@@ -151,7 +151,5 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull MinecraftTime defaultValue) {
             return this.asOptionalWithDefault(defaultValue.toString());
         }
-
     }
-
 }

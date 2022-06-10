@@ -136,7 +136,6 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                     this.getDefaultDescription()
             );
         }
-
     }
 
     /**
@@ -177,7 +176,6 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         ) {
             return this.parser.suggestions(commandContext, input);
         }
-
     }
 
     private static @Nullable Class<?> findItemInputClass() {
@@ -332,9 +330,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                     throw new RuntimeException(e);
                 }
             }
-
         }
-
     }
 
     private static final class LegacyParser<C> implements ArgumentParser<C, ProtoItemStack> {
@@ -391,9 +387,6 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                 }
                 return new ItemStack(this.material, stackSize);
             }
-
         }
-
     }
-
 }

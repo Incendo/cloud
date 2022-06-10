@@ -86,7 +86,5 @@ public interface ConsumerService<Context>
         public synchronized Throwable initCause(final Throwable cause) {
             return this;
         }
-
     }
-
 }

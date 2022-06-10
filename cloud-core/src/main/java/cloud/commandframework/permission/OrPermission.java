@@ -97,5 +97,4 @@ public final class OrPermission implements CommandPermission {
     public int hashCode() {
         return Objects.hash(this.getPermissions());
     }
-
 }

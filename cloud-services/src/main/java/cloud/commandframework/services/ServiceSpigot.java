@@ -166,5 +166,4 @@ public final class ServiceSpigot<Context, Result> {
     public @NonNull CompletableFuture<ServicePump<Result>> forwardAsynchronously() {
         return this.getResultAsynchronously().thenApply(this.pipeline::pump);
     }
-
 }

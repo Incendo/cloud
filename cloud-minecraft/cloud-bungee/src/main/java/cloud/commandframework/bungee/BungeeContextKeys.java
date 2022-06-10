@@ -46,5 +46,4 @@ public final class BungeeContextKeys {
 
     private BungeeContextKeys() {
     }
-
 }

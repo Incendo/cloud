@@ -180,7 +180,6 @@ public final class TaskRecipe {
             this.execute(() -> {
             });
         }
-
     }
 
     /**
@@ -234,7 +233,5 @@ public final class TaskRecipe {
             this.execute(() -> {
             });
         }
-
     }
-
 }

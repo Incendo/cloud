@@ -116,5 +116,4 @@ public interface CommandPermission {
         permission.addAll(Arrays.asList(other));
         return AndPermission.of(permission);
     }
-
 }

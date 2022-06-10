@@ -45,5 +45,4 @@ public interface Tuple {
      * @return Created array
      */
     @NonNull Object @NonNull [] toArray();
-
 }

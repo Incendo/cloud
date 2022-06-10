@@ -44,6 +44,7 @@ public interface StringReaderAsQueue extends Queue<String> {
 
     /**
      * Given an existing Brigadier {@code StringReader}, get a view of it as a {@link Queue}
+     *
      * @param reader the input reader
      * @return a view of the contents of the reader as a {@link Queue} split by word.
      */
@@ -205,5 +206,4 @@ public interface StringReaderAsQueue extends Queue<String> {
     default void clear() { // consume all
         this.getOriginal().setCursor(this.getOriginal().getTotalLength());
     }
-
 }

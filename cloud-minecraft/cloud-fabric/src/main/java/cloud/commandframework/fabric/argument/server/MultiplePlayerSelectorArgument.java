@@ -124,7 +124,5 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                     this.getDefaultDescription()
             );
         }
-
     }
-
 }

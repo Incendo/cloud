@@ -96,5 +96,4 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
             @NonNull CommandSourceStack source,
             @NonNull I value
     );
-
 }

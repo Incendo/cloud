@@ -119,5 +119,4 @@ public class ExampleApplication {
         this.discordApiComponent.shutdown();
         System.exit(0);
     }
-
 }

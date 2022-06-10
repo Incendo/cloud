@@ -110,7 +110,5 @@ public final class SelectorParseException extends ParserException {
         public @NonNull Caption getCaption() {
             return this.caption;
         }
-
     }
-
 }

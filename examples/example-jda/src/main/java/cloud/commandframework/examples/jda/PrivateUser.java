@@ -40,7 +40,11 @@ public final class PrivateUser extends CustomUser {
      * @param user    User that sent the message
      * @param channel Text channel that the message was sent in
      */
-    public PrivateUser(final @Nullable MessageReceivedEvent event, final @NonNull User user, final @NonNull PrivateChannel channel) {
+    public PrivateUser(
+            final @Nullable MessageReceivedEvent event,
+            final @NonNull User user,
+            final @NonNull PrivateChannel channel
+    ) {
         super(event, user, channel);
         this.privateChannel = channel;
     }
@@ -53,5 +57,4 @@ public final class PrivateUser extends CustomUser {
     public @NonNull PrivateChannel getPrivateChannel() {
         return this.privateChannel;
     }
-
 }

@@ -140,7 +140,5 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
                     this.getDefaultDescription()
             );
         }
-
     }
-
 }

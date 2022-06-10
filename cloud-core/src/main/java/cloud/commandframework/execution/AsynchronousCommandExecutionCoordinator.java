@@ -181,7 +181,5 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
         public @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> build() {
             return tree -> new AsynchronousCommandExecutionCoordinator<>(this.executor, this.synchronizeParsing, tree);
         }
-
     }
-
 }

@@ -38,7 +38,5 @@ public final class DefaultMockService implements MockService {
     public static class TotallyIntentionalException extends Exception {
 
         private static final long serialVersionUID = -6277471288867949574L;
-
     }
-
 }

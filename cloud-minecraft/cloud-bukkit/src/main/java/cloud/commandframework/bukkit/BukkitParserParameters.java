@@ -61,5 +61,4 @@ public final class BukkitParserParameters {
     ) {
         return new ParserParameter<>(key, expectedType);
     }
-
 }

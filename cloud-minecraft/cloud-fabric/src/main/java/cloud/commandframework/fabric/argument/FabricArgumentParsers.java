@@ -80,8 +80,9 @@ public final class FabricArgumentParsers {
 
     /**
      * A parser that wraps Brigadier argument types which need a {@link CommandBuildContext}
-     * @param <C> sender type
-     * @param <V> argument value type
+     *
+     * @param <C>     sender type
+     * @param <V>     argument value type
      * @param factory factory that creates these arguments
      * @return the parser
      */
@@ -132,7 +133,8 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      */
     public static <C> @NonNull ArgumentParser<C, Coordinates.CoordinatesXZ> vec2(final boolean centerIntegers) {
-        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(new Vec2Argument(centerIntegers))
+        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(new Vec2Argument(
+                centerIntegers))
                 .map(FabricArgumentParsers::mapToCoordinates);
     }
 
@@ -144,7 +146,8 @@ public final class FabricArgumentParsers {
      * @return a parser instance
      */
     public static <C> @NonNull ArgumentParser<C, Coordinates> vec3(final boolean centerIntegers) {
-        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(Vec3Argument.vec3(centerIntegers))
+        return new WrappedBrigadierParser<C, net.minecraft.commands.arguments.coordinates.Coordinates>(Vec3Argument.vec3(
+                centerIntegers))
                 .map(FabricArgumentParsers::mapToCoordinates);
     }
 
@@ -271,7 +274,6 @@ public final class FabricArgumentParsers {
     private interface CommandSyntaxExceptionThrowingParseResultSupplier<O> {
 
         @NonNull ArgumentParseResult<O> result() throws CommandSyntaxException;
-
     }
 
     private static <O> @NonNull ArgumentParseResult<O> handleCommandSyntaxExceptionAsFailure(
@@ -341,7 +343,6 @@ public final class FabricArgumentParsers {
         public @NonNull Component contents() {
             return this.contents;
         }
-
     }
 
     static final class CoordinatesImpl implements Coordinates,
@@ -389,7 +390,6 @@ public final class FabricArgumentParsers {
         public net.minecraft.commands.arguments.coordinates.@NonNull Coordinates wrappedCoordinates() {
             return this.posArgument;
         }
-
     }
 
     static final class SingleEntitySelectorImpl implements SingleEntitySelector {
@@ -422,7 +422,6 @@ public final class FabricArgumentParsers {
         public @NonNull Entity getSingle() {
             return this.selectedEntity;
         }
-
     }
 
     static final class MultipleEntitySelectorImpl implements MultipleEntitySelector {
@@ -455,7 +454,6 @@ public final class FabricArgumentParsers {
         public @NonNull Collection<Entity> get() {
             return this.selectedEntities;
         }
-
     }
 
     static final class SinglePlayerSelectorImpl implements SinglePlayerSelector {
@@ -488,7 +486,6 @@ public final class FabricArgumentParsers {
         public @NonNull ServerPlayer getSingle() {
             return this.selectedPlayer;
         }
-
     }
 
     static final class MultiplePlayerSelectorImpl implements MultiplePlayerSelector {
@@ -521,14 +518,14 @@ public final class FabricArgumentParsers {
         public @NonNull Collection<ServerPlayer> get() {
             return this.selectedPlayers;
         }
-
     }
 
     @ApiStatus.Internal
     public static final class ContextualArgumentTypeProvider<V> implements Supplier<ArgumentType<V>> {
+
         private static final ThreadLocal<ThreadLocalContext> CONTEXT = new ThreadLocal<>();
         private static final Map<FabricCommandManager<?, ?>, Set<ContextualArgumentTypeProvider<?>>> INSTANCES =
-            new WeakHashMap<>();
+                new WeakHashMap<>();
 
         private final Function<CommandBuildContext, ArgumentType<V>> provider;
         private volatile ArgumentType<V> provided;
@@ -536,17 +533,17 @@ public final class FabricArgumentParsers {
         /**
          * Temporarily expose a command build context to providers called from this thread.
          *
-         * @param ctx the context
+         * @param ctx            the context
          * @param commandManager command manager to use
-         * @param resetExisting whether to clear cached state from existing provider instances for this command type
-         * @param action an action to perform while the context is exposed
+         * @param resetExisting  whether to clear cached state from existing provider instances for this command type
+         * @param action         an action to perform while the context is exposed
          * @since 1.7.0
          */
         public static void withBuildContext(
-            final FabricCommandManager<?, ?> commandManager,
-            final CommandBuildContext ctx,
-            final boolean resetExisting,
-            final Runnable action
+                final FabricCommandManager<?, ?> commandManager,
+                final CommandBuildContext ctx,
+                final boolean resetExisting,
+                final Runnable action
         ) {
             final ThreadLocalContext context = new ThreadLocalContext(commandManager, ctx);
             CONTEXT.set(context);
@@ -567,6 +564,7 @@ public final class FabricArgumentParsers {
         }
 
         private static final class ThreadLocalContext {
+
             private final FabricCommandManager<?, ?> commandManager;
             private final CommandBuildContext commandBuildContext;
 
@@ -602,7 +600,8 @@ public final class FabricArgumentParsers {
                 synchronized (this) {
                     if (this.provided == null) {
                         if (ctx == null) {
-                            throw new IllegalStateException("No build context was available while trying to compute an argument type");
+                            throw new IllegalStateException(
+                                    "No build context was available while trying to compute an argument type");
                         }
                         provided = this.provider.apply(ctx.commandBuildContext);
                         this.provided = provided;
@@ -611,7 +610,5 @@ public final class FabricArgumentParsers {
             }
             return provided;
         }
-
     }
-
 }

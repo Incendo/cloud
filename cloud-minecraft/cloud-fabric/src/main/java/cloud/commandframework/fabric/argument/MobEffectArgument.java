@@ -153,7 +153,5 @@ public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull MobEffect defaultValue) {
             return this.asOptionalWithDefault(Registry.MOB_EFFECT.getKey(defaultValue).toString());
         }
-
     }
-
 }

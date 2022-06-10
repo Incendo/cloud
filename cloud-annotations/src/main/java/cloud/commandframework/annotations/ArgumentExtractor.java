@@ -47,5 +47,4 @@ class ArgumentExtractor implements Function<@NonNull Method, @NonNull Collection
         }
         return arguments;
     }
-
 }

@@ -73,5 +73,4 @@ public final class FabricCaptionKeys {
     public static @NonNull Collection<@NonNull Caption> fabricCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
-
 }

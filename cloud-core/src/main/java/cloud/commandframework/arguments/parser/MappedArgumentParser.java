@@ -41,6 +41,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 @API(status = API.Status.STABLE, since = "1.5.0")
 public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O> {
+
     private final ArgumentParser<C, I> base;
     private final BiFunction<CommandContext<C>, I, ArgumentParseResult<O>> mapper;
 
@@ -119,5 +120,4 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O>
                 + "base=" + this.base + ','
                 + "mapper=" + this.mapper + '}';
     }
-
 }

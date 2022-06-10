@@ -77,5 +77,4 @@ public interface ArgumentDescription {
     default boolean isEmpty() {
         return this.getDescription().isEmpty();
     }
-
 }

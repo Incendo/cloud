@@ -168,7 +168,5 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
         public @NonNull String getPattern() {
             return this.pattern;
         }
-
     }
-
 }

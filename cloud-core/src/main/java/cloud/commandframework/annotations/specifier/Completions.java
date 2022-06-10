@@ -44,5 +44,4 @@ public @interface Completions {
      * @return Command completions
      */
     String value() default "";
-
 }

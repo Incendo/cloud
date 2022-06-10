@@ -412,9 +412,9 @@ public final class MinecraftHelp<C> {
                             .append(text("   "))
                             .append(lastBranch ? this.lastBranch() : this.branch())
                             .append(this.highlight(text(
-                                    String.format(" /%s", helpEntry.getSyntaxString()),
-                                    this.colors.highlight
-                                    ))
+                                                    String.format(" /%s", helpEntry.getSyntaxString()),
+                                                    this.colors.highlight
+                                            ))
                                             .hoverEvent(description.color(this.colors.text))
                                             .clickEvent(runCommand(this.commandPrefix + " " + helpEntry.getSyntaxString()))
                             )
@@ -688,11 +688,11 @@ public final class MinecraftHelp<C> {
     ) {
         return this.highlight(
                 this.messageProvider.provide(
-                        sender,
-                        MESSAGE_PAGE_OUT_OF_RANGE,
-                        String.valueOf(attemptedPage),
-                        String.valueOf(maxPages)
-                )
+                                sender,
+                                MESSAGE_PAGE_OUT_OF_RANGE,
+                                String.valueOf(attemptedPage),
+                                String.valueOf(maxPages)
+                        )
                         .color(this.colors.text)
                         .replaceText(config -> {
                             config.matchLiteral("<page>");
@@ -717,7 +717,6 @@ public final class MinecraftHelp<C> {
          * @return component
          */
         @NonNull Component provide(@NonNull C sender, @NonNull String key, @NonNull String... args);
-
     }
 
     /**
@@ -809,7 +808,5 @@ public final class MinecraftHelp<C> {
         ) {
             return new HelpColors(primary, highlight, alternateHighlight, text, accent);
         }
-
     }
-
 }

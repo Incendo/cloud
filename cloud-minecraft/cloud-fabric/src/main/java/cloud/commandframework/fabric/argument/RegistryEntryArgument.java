@@ -277,7 +277,6 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         public ResourceKey<? extends Registry<?>> registryKey() {
             return this.registryIdent;
         }
-
     }
 
     /**
@@ -333,7 +332,6 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         public @NonNull Builder<C, V> asOptionalWithDefault(final @NonNull ResourceKey<V> defaultValue) {
             return this.asOptionalWithDefault(defaultValue.location().toString());
         }
-
     }
 
     /**
@@ -358,7 +356,5 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                     CaptionVariable.of("registry", registry.toString())
             );
         }
-
     }
-
 }

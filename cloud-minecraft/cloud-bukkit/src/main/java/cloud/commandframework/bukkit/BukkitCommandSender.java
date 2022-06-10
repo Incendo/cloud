@@ -127,5 +127,4 @@ public abstract class BukkitCommandSender {
     public void sendMessage(final @NonNull String message) {
         this.internalSender.sendMessage(message);
     }
-
 }

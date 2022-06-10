@@ -149,7 +149,5 @@ public final class NbtTagArgument<C> extends CommandArgument<C, Tag> {
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Tag defaultValue) {
             return this.asOptionalWithDefault(defaultValue.toString());
         }
-
     }
-
 }

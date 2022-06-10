@@ -133,7 +133,6 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
                     this.getDefaultDescription()
             );
         }
-
     }
 
     /**
@@ -261,9 +260,7 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
                     throw new RuntimeException(ex);
                 }
             }
-
         }
-
     }
 
     /**
@@ -279,5 +276,4 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
                 params -> new ItemStackPredicateArgument.Parser<>()
         );
     }
-
 }

@@ -200,7 +200,5 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
                     this.parserTriplet, mapper, TypeToken.get(clazz)
             );
         }
-
     }
-
 }
