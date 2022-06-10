@@ -51,7 +51,6 @@ enum AnnotatedMethodServiceFactory {
                         method.getName(), instance.getClass().getCanonicalName(),
                         method.getParameterCount()
                 ));
-
             }
             map.put(
                     new AnnotatedMethodService<>(instance, method),
@@ -60,5 +59,4 @@ enum AnnotatedMethodServiceFactory {
         }
         return map;
     }
-
 }

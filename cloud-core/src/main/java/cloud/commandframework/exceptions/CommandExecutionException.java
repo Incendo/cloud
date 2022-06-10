@@ -53,7 +53,7 @@ public class CommandExecutionException extends IllegalArgumentException {
     /**
      * Exception thrown when there is an exception during execution of a command handler
      *
-     * @param cause Exception thrown during the execution of a command handler
+     * @param cause          Exception thrown during the execution of a command handler
      * @param commandContext Command context
      * @since 1.4.0
      */
@@ -73,5 +73,4 @@ public class CommandExecutionException extends IllegalArgumentException {
     public @Nullable CommandContext<?> getCommandContext() {
         return this.commandContext;
     }
-
 }

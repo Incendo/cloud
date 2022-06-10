@@ -227,3 +227,6 @@ gradle-app.setting
 
 /run/
 /cloud-minecraft/cloud-fabric/run/
+
+# MacOS
+**/.DS_Store

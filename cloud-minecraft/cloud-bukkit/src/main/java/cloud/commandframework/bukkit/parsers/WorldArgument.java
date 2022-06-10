@@ -123,7 +123,6 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -155,7 +154,6 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         public @NonNull List<String> suggestions(final @NonNull CommandContext<C> commandContext, final @NonNull String input) {
             return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
         }
-
     }
 
 
@@ -191,7 +189,5 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         public @NonNull String getInput() {
             return this.input;
         }
-
     }
-
 }

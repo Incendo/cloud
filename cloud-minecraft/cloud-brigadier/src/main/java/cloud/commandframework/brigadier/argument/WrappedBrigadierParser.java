@@ -85,8 +85,8 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
      * @since 1.5.0
      */
     public WrappedBrigadierParser(
-        final ArgumentType<T> nativeType,
-        final int expectedArgumentCount
+            final ArgumentType<T> nativeType,
+            final int expectedArgumentCount
     ) {
         this(() -> nativeType, expectedArgumentCount);
     }
@@ -191,5 +191,4 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
     public int getRequestedArgumentCount() {
         return this.expectedArgumentCount;
     }
-
 }

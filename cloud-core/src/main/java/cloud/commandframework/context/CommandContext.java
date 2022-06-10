@@ -454,7 +454,7 @@ public class CommandContext<C> {
      * if there's no value associated with the given argument
      *
      * @param keyHolder Holder of the identifying key
-     * @param <T>      Argument type
+     * @param <T>       Argument type
      * @return Stored value
      * @throws NullPointerException If no such value is stored
      */
@@ -467,7 +467,7 @@ public class CommandContext<C> {
      * if there's no value associated with the given argument
      *
      * @param keyHolder Holder of the identifying key
-     * @param <T>      Argument type
+     * @param <T>       Argument type
      * @return Stored value
      * @throws NullPointerException If no such value is stored
      * @since 1.4.0
@@ -740,7 +740,5 @@ public class CommandContext<C> {
         public boolean wasSuccess() {
             return this.success;
         }
-
     }
-
 }

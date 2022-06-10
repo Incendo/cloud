@@ -124,7 +124,5 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
                     this.getDefaultDescription()
             );
         }
-
     }
-
 }

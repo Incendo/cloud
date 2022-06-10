@@ -209,8 +209,8 @@ public class SimpleCommandMeta extends CommandMeta {
                 final @NonNull Key<V> key,
                 final @NonNull V value
         ) {
-           this.map.put(key.getName(), value);
-           return this;
+            this.map.put(key.getName(), value);
+            return this;
         }
 
         /**
@@ -221,7 +221,5 @@ public class SimpleCommandMeta extends CommandMeta {
         public @NonNull SimpleCommandMeta build() {
             return new SimpleCommandMeta(this.map, false);
         }
-
     }
-
 }

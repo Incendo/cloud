@@ -217,7 +217,5 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
                 return ArgumentParseResult.success(result);
             }
         }
-
     }
-
 }

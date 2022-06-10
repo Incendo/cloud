@@ -69,10 +69,10 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
     @Inject
     @SuppressWarnings("unchecked")
     public SpongeCommandManager(
-        final @NonNull PluginContainer container,
-        final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-        final Function<CommandSource, C> forwardMapper,
-        final Function<C, CommandSource> reverseMapper
+            final @NonNull PluginContainer container,
+            final @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final Function<CommandSource, C> forwardMapper,
+            final Function<C, CommandSource> reverseMapper
     ) {
         super(commandExecutionCoordinator, new SpongePluginRegistrationHandler<>());
         this.owningPlugin = requireNonNull(container, "container");
@@ -112,5 +112,4 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
     final PluginContainer getOwningPlugin() {
         return this.owningPlugin;
     }
-
 }

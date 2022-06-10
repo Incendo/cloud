@@ -53,5 +53,4 @@ final class AnnotatedElementAccessor implements AnnotationAccessor {
     public @NonNull Collection<@NonNull Annotation> annotations() {
         return Collections.unmodifiableCollection(Arrays.asList(this.element.getAnnotations()));
     }
-
 }

@@ -68,5 +68,4 @@ public final class CaptionVariable {
     public @NonNull String getValue() {
         return this.value;
     }
-
 }

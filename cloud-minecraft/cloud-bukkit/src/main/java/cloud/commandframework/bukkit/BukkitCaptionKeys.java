@@ -128,5 +128,4 @@ public final class BukkitCaptionKeys {
     public static @NonNull Collection<@NonNull Caption> getBukkitCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
-
 }

@@ -116,5 +116,4 @@ public class JavacordCommandSender {
     public CompletableFuture<Message> sendSuccessMessage(final @Nullable String message) {
         return this.sendMessage(":white_check_mark: " + message);
     }
-
 }

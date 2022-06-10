@@ -112,7 +112,6 @@ public interface CommandExecutionHandler<C> {
         @Override
         public void execute(final @NonNull CommandContext<C> commandContext) {
         }
-
     }
 
     /**
@@ -137,7 +136,6 @@ public interface CommandExecutionHandler<C> {
         CompletableFuture<@Nullable Void> executeFuture(
                 @NonNull CommandContext<C> commandContext
         );
-
     }
 
     /**
@@ -180,7 +178,5 @@ public interface CommandExecutionHandler<C> {
 
             return composedHandler;
         }
-
     }
-
 }

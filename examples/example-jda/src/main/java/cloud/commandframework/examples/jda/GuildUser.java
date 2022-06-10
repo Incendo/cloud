@@ -41,7 +41,11 @@ public final class GuildUser extends CustomUser {
      * @param member  Guild member that sent the message
      * @param channel Text channel that the message was sent in
      */
-    public GuildUser(final @Nullable MessageReceivedEvent event, final @NonNull Member member, final @NonNull TextChannel channel) {
+    public GuildUser(
+            final @Nullable MessageReceivedEvent event,
+            final @NonNull Member member,
+            final @NonNull TextChannel channel
+    ) {
         super(event, member.getUser(), channel);
         this.member = member;
         this.channel = channel;
@@ -64,5 +68,4 @@ public final class GuildUser extends CustomUser {
     public @NonNull TextChannel getTextChannel() {
         return this.channel;
     }
-
 }

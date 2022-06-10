@@ -58,5 +58,4 @@ public final class NoCommandInLeafException extends IllegalStateException {
     public @NonNull CommandArgument<?, ?> getCommandArgument() {
         return this.commandArgument;
     }
-
 }

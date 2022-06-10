@@ -66,7 +66,5 @@ public class AnnotationAccessorTest {
     private @interface Qualifier {
 
         String value();
-
     }
-
 }

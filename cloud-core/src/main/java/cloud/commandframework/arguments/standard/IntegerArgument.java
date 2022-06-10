@@ -191,7 +191,6 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
                     this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -344,7 +343,6 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         ) {
             return getSuggestions(this.min, this.max, input);
         }
-
     }
 
 
@@ -425,7 +423,5 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         public int hashCode() {
             return Objects.hash(this.parser);
         }
-
     }
-
 }

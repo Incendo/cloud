@@ -82,8 +82,9 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         final String label = commandArgument.getName();
         final String namespacedLabel = this.getNamespacedLabel(label);
 
-        @SuppressWarnings("unchecked")
-        final List<String> aliases = new ArrayList<>(((StaticArgument<C>) commandArgument).getAlternativeAliases());
+        @SuppressWarnings("unchecked") final List<String> aliases = new ArrayList<>(
+                ((StaticArgument<C>) commandArgument).getAlternativeAliases()
+        );
 
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
                 label,
@@ -226,5 +227,4 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         }
         return command != null;
     }
-
 }

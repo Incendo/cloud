@@ -118,7 +118,9 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         }
 
         try {
-            final Class<? extends Commodore> commodoreImpl = (Class<? extends Commodore>) Class.forName("me.lucko.commodore.CommodoreImpl");
+            final Class<? extends Commodore> commodoreImpl = (Class<? extends Commodore>) Class.forName(
+                    "me.lucko.commodore.CommodoreImpl"
+            );
 
             final Method removeChild = commodoreImpl.getDeclaredMethod("removeChild", RootCommandNode.class, String.class);
             removeChild.setAccessible(true);
@@ -148,5 +150,4 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             }
         }
     }
-
 }

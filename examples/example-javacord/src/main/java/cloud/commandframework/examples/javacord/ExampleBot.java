@@ -57,5 +57,4 @@ public final class ExampleBot {
 
         SimplixInstaller.instance().install(Platform.STANDALONE);
     }
-
 }

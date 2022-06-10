@@ -48,5 +48,4 @@ public final class FabricCommandContextKeys {
             "cloud:fabric_command_source",
             TypeToken.get(SharedSuggestionProvider.class)
     );
-
 }

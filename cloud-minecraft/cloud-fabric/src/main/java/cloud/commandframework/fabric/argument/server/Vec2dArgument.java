@@ -236,7 +236,5 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
                     this.centerIntegers()
             );
         }
-
     }
-
 }

@@ -41,5 +41,4 @@ public final class CloudStringReader extends StringReader {
     public CloudStringReader(final String input) {
         super(input);
     }
-
 }

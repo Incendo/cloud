@@ -117,7 +117,8 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, net.minecraft.commands.arguments.AngleArgument.SingleAngle, Builder<C>> {
+    public static final class Builder<C> extends
+            TypedBuilder<C, net.minecraft.commands.arguments.AngleArgument.SingleAngle, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(net.minecraft.commands.arguments.AngleArgument.SingleAngle.class, name);
@@ -151,7 +152,5 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
         public @NonNull Builder<C> asOptionalWithDefault(final float defaultValue) {
             return this.asOptionalWithDefault(Float.toString(defaultValue));
         }
-
     }
-
 }

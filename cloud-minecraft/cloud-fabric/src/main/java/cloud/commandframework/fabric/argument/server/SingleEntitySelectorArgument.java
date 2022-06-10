@@ -124,7 +124,5 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
                     this.getDefaultDescription()
             );
         }
-
     }
-
 }

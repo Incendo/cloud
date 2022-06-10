@@ -136,7 +136,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
                     new LinkedList<>()
             );
         }
-
     }
 
 
@@ -183,7 +182,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
         public boolean isContextFree() {
             return true;
         }
-
     }
 
 
@@ -202,7 +200,5 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
                     CaptionVariable.of("input", input)
             );
         }
-
     }
-
 }

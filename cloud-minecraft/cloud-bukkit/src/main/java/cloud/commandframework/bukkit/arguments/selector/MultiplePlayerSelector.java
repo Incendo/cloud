@@ -63,5 +63,4 @@ public class MultiplePlayerSelector extends MultipleEntitySelector {
     public final @NonNull List<@NonNull Player> getPlayers() {
         return Collections.unmodifiableList(this.players);
     }
-
 }

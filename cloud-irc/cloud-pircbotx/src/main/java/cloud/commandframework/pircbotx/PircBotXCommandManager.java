@@ -146,5 +146,4 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
     final @NonNull Function<User, C> getUserMapper() {
         return this.userMapper;
     }
-
 }

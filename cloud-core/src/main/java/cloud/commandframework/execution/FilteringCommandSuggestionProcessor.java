@@ -56,5 +56,4 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         }
         return suggestions;
     }
-
 }

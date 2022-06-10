@@ -50,5 +50,4 @@ public interface BlockPredicate extends Predicate<Block> {
      * @since 1.5.0
      */
     @NonNull BlockPredicate loadChunks();
-
 }

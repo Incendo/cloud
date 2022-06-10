@@ -52,5 +52,4 @@ public final class PipelineException extends RuntimeException {
     public PipelineException(final @NonNull String message, final @NonNull Exception cause) {
         super(message, cause);
     }
-
 }

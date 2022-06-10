@@ -127,7 +127,6 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
                     this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -179,7 +178,5 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
             inputQueue.remove();
             return ArgumentParseResult.success(new SingleEntitySelector(input, entities));
         }
-
     }
-
 }

@@ -73,7 +73,7 @@ public abstract class ArgumentParseResult<T> {
      * If this result is successful, transform the output value.
      *
      * @param mapper the transformation
-     * @param <U> the result type
+     * @param <U>    the result type
      * @return a new result if successful, otherwise a failure
      * @since 1.5.0
      */
@@ -84,7 +84,7 @@ public abstract class ArgumentParseResult<T> {
      * If this result is successful, transform the output value, returning another parse result.
      *
      * @param mapper the transformation
-     * @param <U> the result type
+     * @param <U>    the result type
      * @return a new result if successful, otherwise a failure
      * @since 1.5.0
      */
@@ -132,7 +132,7 @@ public abstract class ArgumentParseResult<T> {
 
         @Override
         public @NonNull <U> ArgumentParseResult<U> flatMapParsedValue(final Function<T, ArgumentParseResult<U>> mapper) {
-             return mapper.apply(this.value);
+            return mapper.apply(this.value);
         }
 
         @Override
@@ -144,7 +144,6 @@ public abstract class ArgumentParseResult<T> {
         public @NonNull @This ArgumentParseResult<T> mapFailure(final Function<Throwable, Throwable> mapper) {
             return this;
         }
-
     }
 
     private static final class ParseFailure<T> extends ArgumentParseResult<T> {
@@ -185,5 +184,4 @@ public abstract class ArgumentParseResult<T> {
             return new ParseFailure<>(mapper.apply(this.failure));
         }
     }
-
 }

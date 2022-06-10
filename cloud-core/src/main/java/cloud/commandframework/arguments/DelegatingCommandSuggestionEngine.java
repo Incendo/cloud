@@ -87,5 +87,4 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
         }
         return suggestions;
     }
-
 }

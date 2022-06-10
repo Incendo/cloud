@@ -454,7 +454,5 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                     this.getCause() == null ? "" : this.getCause().getMessage()
             );
         }
-
     }
-
 }

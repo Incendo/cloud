@@ -106,5 +106,4 @@ public final class SimpleCloudKey<@NonNull T> implements CloudKey<T> {
     public String toString() {
         return this.name;
     }
-
 }

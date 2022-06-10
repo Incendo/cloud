@@ -33,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.util.Objects.requireNonNull;
 
 final class BrigadierMapping<C, K extends ArgumentParser<C, ?>, S> {
+
     private final boolean cloudSuggestions;
     private final BrigadierMappingBuilder.@Nullable SuggestionProviderSupplier<K, S> suggestionsOverride;
     private final @Nullable Function<K, ? extends ArgumentType<?>> mapper;
@@ -67,11 +68,15 @@ final class BrigadierMapping<C, K extends ArgumentParser<C, ?>, S> {
         }
         return this.suggestionsOverride == null
                 ? null
-                : (SuggestionProvider<S>) this.suggestionsOverride.provide(commandArgument, CloudBrigadierManager.delegateSuggestions());
+                : (SuggestionProvider<S>) this.suggestionsOverride.provide(
+                        commandArgument,
+                        CloudBrigadierManager.delegateSuggestions()
+                );
     }
 
 
     static final class BuilderImpl<C, K extends ArgumentParser<C, ?>, S> implements BrigadierMappingBuilder<K, S> {
+
         private Function<K, ? extends ArgumentType<?>> mapper;
         private boolean cloudSuggestions = false;
         private SuggestionProviderSupplier<K, S> suggestionsOverride;
@@ -118,6 +123,5 @@ final class BrigadierMapping<C, K extends ArgumentParser<C, ?>, S> {
         public BrigadierMapping<C, K, S> build() {
             return new BrigadierMapping<>(this.cloudSuggestions, this.suggestionsOverride, this.mapper);
         }
-
     }
 }

@@ -81,5 +81,4 @@ public class NoPermissionException extends CommandParseException {
     public final synchronized Throwable initCause(final Throwable cause) {
         return this;
     }
-
 }

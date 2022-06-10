@@ -51,6 +51,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandContainer {
-    String ANNOTATION_PATH = "cloud.commandframework.annotations.processing.CommandContainer";
 
+    String ANNOTATION_PATH = "cloud.commandframework.annotations.processing.CommandContainer";
 }

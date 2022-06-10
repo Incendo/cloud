@@ -117,11 +117,11 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
      * {@link InjectionService injection services}, and not just the {@link ParameterInjector injectors}
      * registered using {@link #registerInjector(Class, ParameterInjector)}.
      *
-     * @param clazz Class of the to inject
-     * @param context The command context that requests the injection
+     * @param clazz              Class of the to inject
+     * @param context            The command context that requests the injection
      * @param annotationAccessor Annotation accessor for the injection. If the object is requested without access to annotations,
      *                           use {@link AnnotationAccessor#empty()}
-     * @param <T> Type to inject
+     * @param <T>                Type to inject
      * @return The injected value, if an injector was able to provide a value
      * @since 1.4.0
      */
@@ -153,5 +153,4 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
         this.servicePipeline.registerServiceImplementation(new TypeToken<InjectionService<C>>() {
         }, service, Collections.emptyList());
     }
-
 }

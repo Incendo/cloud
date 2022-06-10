@@ -51,5 +51,4 @@ public @interface ProxiedBy {
      * @return {@code true} if the proxying command should be hidden, {@code false} if not
      */
     boolean hidden() default false;
-
 }

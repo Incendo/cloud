@@ -121,7 +121,6 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
                     this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -164,7 +163,5 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
             inputQueue.remove();
             return ArgumentParseResult.success(new MultipleEntitySelector(input, entities));
         }
-
     }
-
 }

@@ -199,7 +199,6 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                     this.defaultNamespace
             );
         }
-
     }
 
     /**
@@ -286,7 +285,6 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
             }
             return ret;
         }
-
     }
 
 
@@ -348,7 +346,6 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
         public int hashCode() {
             return Objects.hash(this.input, this.errorCaption());
         }
-
     }
 
     /**
@@ -365,5 +362,4 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                         params.get(BukkitParserParameters.DEFAULT_NAMESPACE, NamespacedKey.MINECRAFT)
                 ));
     }
-
 }

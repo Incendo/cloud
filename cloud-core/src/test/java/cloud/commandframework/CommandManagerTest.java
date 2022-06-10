@@ -152,7 +152,7 @@ class CommandManagerTest {
         List<CommandArgument<TestCommandSender, ?>> arguments = command.getArguments();
         List<CommandComponent<TestCommandSender>> components = command.getComponents();
         assertThat(arguments.size()).isEqualTo(components.size());
-        assertThat(components.size()).isEqualTo(4);;
+        assertThat(components.size()).isEqualTo(4);
 
         // Arguments should exactly match the component getArgument() result, in same order
         for (int i = 0; i < components.size(); i++) {
@@ -161,10 +161,10 @@ class CommandManagerTest {
 
         // Argument configuration, we know component has the same argument so no need to test those
         // TODO: Aliases
-        assertThat(arguments.get(0).getName()).isEqualTo("component");;
-        assertThat(arguments.get(1).getName()).isEqualTo("literal");;
-        assertThat(arguments.get(2).getName()).isEqualTo("detail");;
-        assertThat(arguments.get(3).getName()).isEqualTo("argument");;
+        assertThat(arguments.get(0).getName()).isEqualTo("component");
+        assertThat(arguments.get(1).getName()).isEqualTo("literal");
+        assertThat(arguments.get(2).getName()).isEqualTo("detail");
+        assertThat(arguments.get(3).getName()).isEqualTo("argument");
 
         // Check argument is indeed a command argument
         assertThat(TypeToken.get(int.class)).isEqualTo(arguments.get(3).getValueType());
@@ -172,7 +172,7 @@ class CommandManagerTest {
         // Check description is set for all components, is empty when not specified
         assertThat(components.get(0).getArgumentDescription().getDescription()).isEmpty();
         assertThat(components.get(1).getArgumentDescription().getDescription()).isEmpty();
-        assertThat(components.get(2).getArgumentDescription().getDescription()).isEqualTo("detaildescription");;
-        assertThat(components.get(3).getArgumentDescription().getDescription()).isEqualTo("argumentdescription");;
+        assertThat(components.get(2).getArgumentDescription().getDescription()).isEqualTo("detaildescription");
+        assertThat(components.get(3).getArgumentDescription().getDescription()).isEqualTo("argumentdescription");
     }
 }

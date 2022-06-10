@@ -151,5 +151,4 @@ public final class MinecraftTime {
     public String toString() {
         return Long.toString(this.ticks);
     }
-
 }

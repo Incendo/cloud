@@ -44,7 +44,6 @@ public class MockChunkedRequest
         public String getName() {
             return this.name;
         }
-
     }
 
 
@@ -59,7 +58,5 @@ public class MockChunkedRequest
         public String getSound() {
             return this.sound;
         }
-
     }
-
 }

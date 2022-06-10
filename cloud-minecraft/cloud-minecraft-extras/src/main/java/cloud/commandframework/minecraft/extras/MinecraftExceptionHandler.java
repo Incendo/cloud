@@ -326,5 +326,4 @@ public final class MinecraftExceptionHandler<C> {
          */
         COMMAND_EXECUTION
     }
-
 }

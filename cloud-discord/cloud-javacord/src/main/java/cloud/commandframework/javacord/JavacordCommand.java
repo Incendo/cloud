@@ -173,5 +173,4 @@ public class JavacordCommand<C> implements MessageCreateListener {
                     throwable.printStackTrace();
                 });
     }
-
 }

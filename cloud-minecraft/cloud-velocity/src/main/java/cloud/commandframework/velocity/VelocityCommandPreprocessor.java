@@ -54,5 +54,4 @@ final class VelocityCommandPreprocessor<C> implements CommandPreprocessor<C> {
                 this.mgr.proxyServer()
         );
     }
-
 }

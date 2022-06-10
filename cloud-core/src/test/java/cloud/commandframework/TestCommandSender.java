@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TestCommandSender {
+
     private final Set<String> permissions = new HashSet<>();
 
     public TestCommandSender() {
@@ -48,5 +49,4 @@ public class TestCommandSender {
     public void removePermission(final String permission) {
         this.permissions.remove(permission);
     }
-
 }

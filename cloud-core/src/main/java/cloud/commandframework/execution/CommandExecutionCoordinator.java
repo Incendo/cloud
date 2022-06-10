@@ -141,7 +141,5 @@ public abstract class CommandExecutionCoordinator<C> {
             }
             return completableFuture;
         }
-
     }
-
 }

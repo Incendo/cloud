@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for {@link StringReaderAsQueue}
- *
+ * <p>
  * Most operations have 4 cases: 0 arguments, 1 argument, 2 arguments, and 3 or more arguments.
  * At that point every whitespace handling path should be exercised.
  */
@@ -162,7 +162,7 @@ class StringReaderAsQueueTest {
     @Test
     void testToArrayMultiple() {
         final Queue<String> elements = StringReaderAsQueue.from(new StringReader("one two three four"));
-        assertArrayEquals(new String[] { "one", "two", "three", "four" }, elements.toArray());
+        assertArrayEquals(new String[]{"one", "two", "three", "four"}, elements.toArray());
     }
 
     @Test
@@ -177,5 +177,4 @@ class StringReaderAsQueueTest {
             assertEquals(pair.getSecond(), StringReaderAsQueue.from(new StringReader(pair.getFirst())).size());
         });
     }
-
 }

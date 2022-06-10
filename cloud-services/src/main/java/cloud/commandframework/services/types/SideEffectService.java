@@ -49,5 +49,4 @@ public interface SideEffectService<Context> extends Service<Context, State> {
      */
     @Override
     @NonNull State handle(@NonNull Context context) throws Exception;
-
 }

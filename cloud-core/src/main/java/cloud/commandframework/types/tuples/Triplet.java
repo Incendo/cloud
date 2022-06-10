@@ -134,5 +134,4 @@ public class Triplet<U, V, W> implements Tuple {
         array[2] = this.third;
         return array;
     }
-
 }

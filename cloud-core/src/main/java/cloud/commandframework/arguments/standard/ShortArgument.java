@@ -176,7 +176,6 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
                     this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -288,7 +287,6 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         public boolean hasMin() {
             return this.min != DEFAULT_MINIMUM;
         }
-
     }
 
 
@@ -369,7 +367,5 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         public int hashCode() {
             return Objects.hash(this.parser);
         }
-
     }
-
 }

@@ -184,7 +184,6 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
                     this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -286,7 +285,6 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         public boolean hasMin() {
             return this.min != DEFAULT_MINIMUM;
         }
-
     }
 
 
@@ -365,7 +363,5 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         public int hashCode() {
             return Objects.hash(this.parser);
         }
-
     }
-
 }

@@ -162,7 +162,5 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds
             }
             return this.asOptionalWithDefault(value.toString());
         }
-
     }
-
 }

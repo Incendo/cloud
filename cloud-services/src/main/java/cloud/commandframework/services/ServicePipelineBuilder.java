@@ -59,5 +59,4 @@ public final class ServicePipelineBuilder {
         this.executor = Objects.requireNonNull(executor, "Executor may not be null");
         return this;
     }
-
 }

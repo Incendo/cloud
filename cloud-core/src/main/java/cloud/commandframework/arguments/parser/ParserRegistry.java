@@ -151,5 +151,4 @@ public interface ParserRegistry<C> {
     @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
             @NonNull String name
     );
-
 }

@@ -51,5 +51,4 @@ abstract class EntitySelectorParserMixin {
         final String inputString = this.reader.getString().substring(this.startPosition, this.reader.getCursor());
         ((EntitySelectorAccess) selector).inputString(inputString);
     }
-
 }

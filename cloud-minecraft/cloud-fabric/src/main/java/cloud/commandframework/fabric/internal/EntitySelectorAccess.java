@@ -40,5 +40,4 @@ public interface EntitySelectorAccess {
      * @param inputString input string
      */
     void inputString(@NonNull String inputString);
-
 }

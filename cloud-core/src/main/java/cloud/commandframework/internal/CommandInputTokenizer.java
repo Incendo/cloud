@@ -77,7 +77,5 @@ public final class CommandInputTokenizer {
         private @NonNull StringTokenizer createStringTokenizer() {
             return new StringTokenizer(CommandInputTokenizer.this.input, DELIMITER);
         }
-
     }
-
 }

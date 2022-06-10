@@ -70,5 +70,4 @@ public final class ServicePump<Context> {
     ) {
         return this.through(TypeToken.get(clazz));
     }
-
 }

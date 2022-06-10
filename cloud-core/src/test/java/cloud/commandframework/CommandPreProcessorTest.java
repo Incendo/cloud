@@ -84,7 +84,5 @@ public class CommandPreProcessorTest {
                 ConsumerService.interrupt();
             }
         }
-
     }
-
 }

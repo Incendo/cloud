@@ -52,6 +52,7 @@ final class StringReaderAsQueueImpl {
      * Extending variant is only implementable with Mixin, because of clashing return types on the two interfaces (on `peek`). */
 
     static final class Wrapping implements StringReaderAsQueue {
+
         private final StringReader original;
         private int nextSpaceIdx; /* the character before the start of a new word */
         private @Nullable String nextWord;
@@ -128,7 +129,5 @@ final class StringReaderAsQueueImpl {
             this.nextWord = null;
             this.nextSpaceIdx = -1;
         }
-
     }
-
 }

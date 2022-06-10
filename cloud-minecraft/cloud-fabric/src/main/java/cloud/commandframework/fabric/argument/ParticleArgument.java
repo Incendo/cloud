@@ -152,7 +152,5 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ParticleOptions defaultValue) {
             return this.asOptionalWithDefault(defaultValue.writeToString());
         }
-
     }
-
 }

@@ -191,7 +191,5 @@ public class CommandConfirmationManager<C> {
             /* Interrupt */
             ConsumerService.interrupt();
         }
-
     }
-
 }

@@ -100,5 +100,4 @@ public class ParserException extends IllegalArgumentException {
     public final @NonNull CommandContext<?> getContext() {
         return this.context;
     }
-
 }

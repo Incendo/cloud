@@ -49,5 +49,4 @@ public class JavacordPrivateSender extends JavacordCommandSender {
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "PrivateTextChannel not present even though message was sent in a private channel"));
     }
-
 }

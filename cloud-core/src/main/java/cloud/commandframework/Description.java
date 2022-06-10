@@ -89,5 +89,4 @@ public final class Description implements ArgumentDescription {
     public @NonNull String toString() {
         return this.description;
     }
-
 }

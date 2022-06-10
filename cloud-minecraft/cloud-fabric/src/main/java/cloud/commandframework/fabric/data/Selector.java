@@ -83,7 +83,5 @@ public interface Selector<V> {
          * @since 1.5.0
          */
         @NonNull V getSingle();
-
     }
-
 }

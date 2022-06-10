@@ -58,5 +58,4 @@ public final class SinglePlayerSelector extends MultiplePlayerSelector {
         }
         return this.getPlayers().get(0);
     }
-
 }

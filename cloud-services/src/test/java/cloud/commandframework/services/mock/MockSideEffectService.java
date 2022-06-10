@@ -42,7 +42,5 @@ public interface MockSideEffectService extends SideEffectService<MockSideEffectS
         public void setHealth(final int health) {
             this.health = health;
         }
-
     }
-
 }

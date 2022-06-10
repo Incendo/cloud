@@ -37,5 +37,4 @@ final class NativeAudienceProvider<C extends Audience> implements AudienceProvid
     public @NonNull Audience apply(@NonNull final C sender) {
         return sender;
     }
-
 }

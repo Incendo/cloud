@@ -73,5 +73,4 @@ public final class PermissionRegistry {
         this.permissions.putIfAbsent(userId, new HashSet<>());
         return this.permissions.get(userId);
     }
-
 }

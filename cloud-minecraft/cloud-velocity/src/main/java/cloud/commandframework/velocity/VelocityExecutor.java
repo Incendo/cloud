@@ -90,11 +90,11 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
                                                                     NamedTextColor.RED
                                                             )
                                                     ).append(
-                                                    Component.text(
-                                                            e.getCorrectSyntax(),
-                                                            NamedTextColor.GRAY
-                                                    )
-                                            ).build()
+                                                            Component.text(
+                                                                    e.getCorrectSyntax(),
+                                                                    NamedTextColor.GRAY
+                                                            )
+                                                    ).build()
                                     )
                     );
                 } else if (throwable instanceof InvalidCommandSenderException) {
@@ -169,5 +169,4 @@ final class VelocityExecutor<C> implements Command<CommandSource> {
             }
         };
     }
-
 }

@@ -60,6 +60,4 @@ public class FabricCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_TEAM_UNKNOWN
         );
     }
-
-
 }

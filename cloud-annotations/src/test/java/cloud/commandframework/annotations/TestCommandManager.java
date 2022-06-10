@@ -46,5 +46,4 @@ public class TestCommandManager extends CommandManager<TestCommandSender> {
     ) {
         return !permission.equalsIgnoreCase("no");
     }
-
 }

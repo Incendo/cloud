@@ -45,5 +45,4 @@ abstract class EntitySelectorMixin {
     public void cloud$inputString(final @NonNull String inputString) {
         this.inputString = inputString;
     }
-
 }

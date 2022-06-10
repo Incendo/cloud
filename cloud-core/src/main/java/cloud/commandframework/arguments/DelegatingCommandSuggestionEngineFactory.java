@@ -60,5 +60,4 @@ public final class DelegatingCommandSuggestionEngineFactory<C> {
                 this.commandTree
         );
     }
-
 }

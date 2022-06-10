@@ -51,5 +51,4 @@ final class BungeeCommandPreprocessor<C> implements CommandPreprocessor<C> {
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
         context.getCommandContext().store(BungeeContextKeys.PROXY_SERVER_KEY, this.mgr.getOwningPlugin().getProxy());
     }
-
 }

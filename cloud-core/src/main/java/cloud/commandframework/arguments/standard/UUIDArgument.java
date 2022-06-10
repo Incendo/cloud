@@ -127,7 +127,6 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -160,7 +159,6 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
         public boolean isContextFree() {
             return true;
         }
-
     }
 
 
@@ -203,7 +201,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
             if (this == o) {
                 return true;
             }
-            if (o == null ||this.getClass() != o.getClass()) {
+            if (o == null || this.getClass() != o.getClass()) {
                 return false;
             }
             final UUIDParseException that = (UUIDParseException) o;
@@ -214,7 +212,5 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
         public int hashCode() {
             return Objects.hash(this.input);
         }
-
     }
-
 }

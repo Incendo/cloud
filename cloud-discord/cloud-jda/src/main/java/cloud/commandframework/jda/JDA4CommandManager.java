@@ -76,5 +76,4 @@ public class JDA4CommandManager<C> extends JDACommandManager<C> {
                 backwardsCommandSenderMapper.andThen((sender) -> sender.getEvent().orElseThrow(IllegalStateException::new))
         );
     }
-
 }

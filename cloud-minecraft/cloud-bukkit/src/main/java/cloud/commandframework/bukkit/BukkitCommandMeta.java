@@ -42,5 +42,4 @@ public class BukkitCommandMeta extends SimpleCommandMeta {
     public BukkitCommandMeta(final @NonNull SimpleCommandMeta simpleCommandMeta) {
         super(simpleCommandMeta);
     }
-
 }

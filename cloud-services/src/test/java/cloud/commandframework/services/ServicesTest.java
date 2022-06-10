@@ -94,7 +94,6 @@ public class ServicesTest {
         Assertions.assertNotNull(
                 servicePipeline.pump(new MockService.MockContext("oi")).through(MockService.class)
                         .getResultAsynchronously().get());
-
     }
 
     @Test
@@ -281,13 +280,12 @@ public class ServicesTest {
         );
         servicePipeline.pump(new MockService.MockContext("pls throw exception"))
                 .through(MockService.class).getResult((result, throwable) -> {
-            Assertions.assertNotNull(throwable);
-            Assertions.assertEquals(
-                    DefaultMockService.TotallyIntentionalException.class,
-                    throwable.getClass()
-            );
-            Assertions.assertNull(result);
-        });
+                    Assertions.assertNotNull(throwable);
+                    Assertions.assertEquals(
+                            DefaultMockService.TotallyIntentionalException.class,
+                            throwable.getClass()
+                    );
+                    Assertions.assertNull(result);
+                });
     }
-
 }

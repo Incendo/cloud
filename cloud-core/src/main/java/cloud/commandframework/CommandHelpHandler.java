@@ -381,7 +381,6 @@ public final class CommandHelpHandler<C> {
         public int hashCode() {
             return Objects.hash(this.command, this.syntaxString, this.description);
         }
-
     }
 
 
@@ -440,7 +439,6 @@ public final class CommandHelpHandler<C> {
         public int hashCode() {
             return Objects.hash(this.entries);
         }
-
     }
 
 
@@ -483,7 +481,7 @@ public final class CommandHelpHandler<C> {
         public String toString() {
             return "VerboseHelpTopic{"
                     + "command=" + this.command
-                    + ", description='" +this.description + '\''
+                    + ", description='" + this.description + '\''
                     + '}';
         }
 
@@ -503,7 +501,6 @@ public final class CommandHelpHandler<C> {
         public int hashCode() {
             return Objects.hash(this.command, this.description);
         }
-
     }
 
 
@@ -568,7 +565,5 @@ public final class CommandHelpHandler<C> {
         public int hashCode() {
             return Objects.hash(this.longestPath, this.childSuggestions);
         }
-
     }
-
 }

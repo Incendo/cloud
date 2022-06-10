@@ -45,6 +45,7 @@ import org.checkerframework.framework.qual.DefaultQualifier;
 
 @DefaultQualifier(NonNull.class)
 final class Mc113 {
+
     private final BukkitCommandManager<CommandSender> manager;
 
     Mc113(final BukkitCommandManager<CommandSender> manager) {
@@ -98,5 +99,4 @@ final class Mc113 {
         ctx.getSender().sendMessage("result: " + predicate.test(
                 protoItemStack.createItemStack(1, true)));
     }
-
 }

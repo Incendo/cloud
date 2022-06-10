@@ -169,5 +169,4 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE
         );
     }
-
 }

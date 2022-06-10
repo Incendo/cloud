@@ -52,5 +52,4 @@ public @interface Regex {
      * @return Failure caption key
      */
     @NonNull String failureCaption() default "argument.parse.failure.regex";
-
 }

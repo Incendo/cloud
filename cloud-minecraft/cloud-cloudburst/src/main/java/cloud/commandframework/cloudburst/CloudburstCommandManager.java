@@ -117,7 +117,5 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
 
         private CloudListener() {
         }
-
     }
-
 }

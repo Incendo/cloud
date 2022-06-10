@@ -60,5 +60,4 @@ public class ArgumentParseException extends CommandParseException {
     public synchronized @NonNull Throwable getCause() {
         return this.cause;
     }
-
 }

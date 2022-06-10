@@ -35,7 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public enum CloudBukkitCapabilities implements CloudCapability {
     BRIGADIER(CraftBukkitReflection.classExists("com.mojang.brigadier.tree.CommandNode")
-    && CraftBukkitReflection.findOBCClass("command.BukkitCommandWrapper") != null),
+            && CraftBukkitReflection.findOBCClass("command.BukkitCommandWrapper") != null),
 
     NATIVE_BRIGADIER(CraftBukkitReflection.classExists(
             "com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent")),

@@ -126,7 +126,5 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
                     this.getDefaultDescription()
             );
         }
-
     }
-
 }

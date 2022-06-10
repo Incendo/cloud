@@ -45,9 +45,9 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
     /**
      * Create a new predicate permission
      *
-     * @param key Key that identifies the permission node
+     * @param key       Key that identifies the permission node
      * @param predicate Predicate that determines whether or not the sender has the permission
-     * @param <C> Command sender type
+     * @param <C>       Command sender type
      * @return Created permission node
      */
     static <C> PredicatePermission<C> of(final @NonNull CloudKey<Void> key, final @NonNull Predicate<C> predicate) {
@@ -72,5 +72,4 @@ public interface PredicatePermission<C> extends CommandPermission, CloudKeyHolde
     default @NonNull Collection<@NonNull CommandPermission> getPermissions() {
         return Collections.singleton(this);
     }
-
 }

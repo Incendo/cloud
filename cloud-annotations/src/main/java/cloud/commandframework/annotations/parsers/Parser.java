@@ -66,5 +66,4 @@ public @interface Parser {
      * @return The name of the suggestion provider, or {@code ""}
      */
     String suggestions() default "";
-
 }

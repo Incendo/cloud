@@ -133,7 +133,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
          * Will consume all but the last element from the input queue.
          *
          * @param commandContext Command context
-         * @param inputQueue The input queue of arguments
+         * @param inputQueue     The input queue of arguments
          * @return current flag being typed, or {@code empty()} if none is
          */
         public @NonNull Optional<String> parseCurrentFlag(
@@ -299,7 +299,10 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
          * can be obtained, which are used for providing suggestions.
          */
         private class FlagParser {
-            /** The current flag whose value is being parsed */
+
+            /**
+             * The current flag whose value is being parsed
+             */
             @SuppressWarnings("unused")
             private Optional<CommandFlag<?>> currentFlagBeingParsed = Optional.empty();
             /**
@@ -516,7 +519,6 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         public String getInput() {
             return this.input;
         }
-
     }
 
 
@@ -546,7 +548,5 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         public @NonNull Caption getCaption() {
             return this.caption;
         }
-
     }
-
 }

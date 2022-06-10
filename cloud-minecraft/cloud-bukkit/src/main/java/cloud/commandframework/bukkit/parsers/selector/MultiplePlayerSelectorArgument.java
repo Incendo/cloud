@@ -126,7 +126,6 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                     this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -201,7 +200,5 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
 
             return output;
         }
-
     }
-
 }

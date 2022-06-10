@@ -47,5 +47,4 @@ public class ExampleModule extends AbstractSimplixModule {
     public final @NonNull ScheduledExecutorService provideExecutorService() {
         return Executors.newScheduledThreadPool(0);
     }
-
 }

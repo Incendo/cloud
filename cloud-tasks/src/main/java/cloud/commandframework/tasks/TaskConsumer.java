@@ -39,5 +39,4 @@ public interface TaskConsumer<I> extends Consumer<@NonNull I>, TaskRecipeStep {
      */
     @Override
     void accept(@NonNull I input);
-
 }

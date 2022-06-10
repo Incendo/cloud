@@ -180,7 +180,5 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
         ) {
             return this.withMapper(TypeToken.get(clazz), mapper);
         }
-
     }
-
 }

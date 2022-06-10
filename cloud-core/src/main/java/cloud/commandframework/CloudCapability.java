@@ -39,7 +39,8 @@ public interface CloudCapability {
      *
      * @return the name of the capability
      */
-    @Override @NonNull String toString();
+    @Override
+    @NonNull String toString();
 
 
     /**

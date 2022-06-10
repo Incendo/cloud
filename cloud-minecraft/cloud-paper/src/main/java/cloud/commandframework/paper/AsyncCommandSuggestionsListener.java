@@ -72,5 +72,4 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         event.setCompletions(suggestions);
         event.setHandled(true);
     }
-
 }

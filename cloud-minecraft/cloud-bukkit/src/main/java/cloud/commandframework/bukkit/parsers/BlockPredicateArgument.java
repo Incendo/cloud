@@ -132,7 +132,6 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                     this.getDefaultDescription()
             );
         }
-
     }
 
     /**
@@ -325,9 +324,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                     }
                 };
             }
-
         }
-
     }
 
     /**
@@ -341,5 +338,4 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
         commandManager.getParserRegistry()
                 .registerParserSupplier(TypeToken.get(BlockPredicate.class), params -> new BlockPredicateArgument.Parser<>());
     }
-
 }

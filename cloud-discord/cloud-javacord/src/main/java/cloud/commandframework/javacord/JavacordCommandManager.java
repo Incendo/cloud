@@ -135,5 +135,4 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
     public @NonNull DiscordApi getDiscordApi() {
         return this.discordApi;
     }
-
 }

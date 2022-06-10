@@ -56,7 +56,6 @@ final class CommandPerformanceTest {
         }
         manager.command(builder.build());
         literalChain = literalBuilder.toString();
-
     }
 
     @Test
@@ -89,5 +88,4 @@ final class CommandPerformanceTest {
         final Collection<RunResult> results = new Runner(options).run();
         Assertions.assertFalse(results.isEmpty());
     }
-
 }

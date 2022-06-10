@@ -105,5 +105,4 @@ final class CloudListenerAdapter<C> extends ListenerAdapter {
                     }
                 });
     }
-
 }

@@ -166,7 +166,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
                 return allowOnMultiplayer;
             }
             return Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers()
-              || Minecraft.getInstance().getSingleplayerServer().getWorldData().getAllowCommands();
+                    || Minecraft.getInstance().getSingleplayerServer().getWorldData().getAllowCommands();
         };
     }
 
@@ -200,8 +200,7 @@ public final class FabricClientCommandManager<C> extends FabricCommandManager<C,
                 return allowOnMultiplayer;
             }
             return !Minecraft.getInstance().getSingleplayerServer().getPlayerList().isAllowCheatsForAllPlayers()
-              && !Minecraft.getInstance().getSingleplayerServer().getWorldData().getAllowCommands();
+                    && !Minecraft.getInstance().getSingleplayerServer().getWorldData().getAllowCommands();
         };
     }
-
 }

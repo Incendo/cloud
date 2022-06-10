@@ -62,7 +62,6 @@ public final class BukkitCommandMetaBuilder {
         public @NonNull BuilderStage2 withDescription(final @NonNull String description) {
             return new BuilderStage2(description);
         }
-
     }
 
 
@@ -82,7 +81,5 @@ public final class BukkitCommandMetaBuilder {
         public @NonNull BukkitCommandMeta build() {
             return new BukkitCommandMeta(CommandMeta.simple().with(CommandMeta.DESCRIPTION, this.description).build());
         }
-
     }
-
 }

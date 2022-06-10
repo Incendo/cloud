@@ -236,8 +236,8 @@ public final class FlagContext {
     /**
      * Get a flag value
      *
-     * @param name         Flag name
-     * @param <T>          Value type
+     * @param name Flag name
+     * @param <T>  Value type
      * @return Stored value if present, else {@code null}
      * @since 1.3.0
      */
@@ -252,8 +252,8 @@ public final class FlagContext {
     /**
      * Get a flag value
      *
-     * @param flag         Flag name
-     * @param <T>          Value type
+     * @param flag Flag name
+     * @param <T>  Value type
      * @return Stored value if present, else {@code null}
      * @since 1.4.0
      */
@@ -263,5 +263,4 @@ public final class FlagContext {
     ) {
         return this.getValue(flag).orElse(null);
     }
-
 }

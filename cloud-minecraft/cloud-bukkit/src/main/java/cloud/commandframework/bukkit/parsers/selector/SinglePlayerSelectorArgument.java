@@ -132,7 +132,6 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                     this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -215,7 +214,5 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
 
             return output;
         }
-
     }
-
 }

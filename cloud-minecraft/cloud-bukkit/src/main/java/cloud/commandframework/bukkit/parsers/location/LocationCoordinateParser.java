@@ -88,5 +88,4 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
                 )
         );
     }
-
 }

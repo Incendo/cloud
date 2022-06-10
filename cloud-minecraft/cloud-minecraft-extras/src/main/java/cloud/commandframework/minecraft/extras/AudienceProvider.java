@@ -55,5 +55,4 @@ public interface AudienceProvider<C> extends Function<@NonNull C, @NonNull Audie
     static <C extends Audience> AudienceProvider<C> nativeAudience() {
         return (AudienceProvider<C>) NativeAudienceProvider.INSTANCE;
     }
-
 }

@@ -214,7 +214,7 @@ public final class AnnotationParser<C> {
      * custom command method execution strategies.
      *
      * @param predicate The predicate that decides whether or not to apply the custom execution handler to the given method
-     * @param function The function that produces the command execution handler
+     * @param function  The function that produces the command execution handler
      * @since 1.6.0
      */
     public void registerCommandExecutionMethodFactory(
@@ -331,8 +331,8 @@ public final class AnnotationParser<C> {
      *
      * @return Collection of parsed commands
      * @throws Exception re-throws all encountered exceptions.
-     * @since 1.7.0
      * @see cloud.commandframework.annotations.processing.CommandContainer CommandContainer for more information.
+     * @since 1.7.0
      */
     public @NonNull Collection<@NonNull Command<C>> parseContainers() throws Exception {
         final List<Command<C>> commands = new LinkedList<>();
@@ -600,11 +600,11 @@ public final class AnnotationParser<C> {
             try {
                 final MethodCommandExecutionHandler.CommandMethodContext<C> context =
                         new MethodCommandExecutionHandler.CommandMethodContext<>(
-                        instance,
-                        commandArguments,
-                        method,
-                        this /* annotationParser */
-                );
+                                instance,
+                                commandArguments,
+                                method,
+                                this /* annotationParser */
+                        );
 
                 /* Create the command execution handler */
                 CommandExecutionHandler<C> commandExecutionHandler = new MethodCommandExecutionHandler<>(context);
@@ -635,8 +635,9 @@ public final class AnnotationParser<C> {
             /* Apply builder modifiers */
             for (final Annotation annotation
                     : AnnotationAccessor.of(classAnnotations, AnnotationAccessor.of(method)).annotations()) {
-                @SuppressWarnings("rawtypes")
-                final BiFunction builderModifier = this.builderModifiers.get(annotation.annotationType());
+                @SuppressWarnings("rawtypes") final BiFunction builderModifier = this.builderModifiers.get(
+                        annotation.annotationType()
+                );
                 if (builderModifier == null) {
                     continue;
                 }
@@ -774,5 +775,4 @@ public final class AnnotationParser<C> {
             @NonNull Function<@NonNull ? extends Annotation, @NonNull ParserParameters>> getAnnotationMappers() {
         return this.annotationMappers;
     }
-
 }

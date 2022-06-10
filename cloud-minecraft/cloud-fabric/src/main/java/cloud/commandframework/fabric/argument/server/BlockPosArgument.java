@@ -156,7 +156,5 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
                     defaultValue.getZ()
             ));
         }
-
     }
-
 }

@@ -118,7 +118,8 @@ public final class NbtPathArgument<C> extends CommandArgument<C, net.minecraft.c
      * @param <C> sender type
      * @since 1.5.0
      */
-    public static final class Builder<C> extends TypedBuilder<C, net.minecraft.commands.arguments.NbtPathArgument.NbtPath, Builder<C>> {
+    public static final class Builder<C> extends
+            TypedBuilder<C, net.minecraft.commands.arguments.NbtPathArgument.NbtPath, Builder<C>> {
 
         Builder(final @NonNull String name) {
             super(net.minecraft.commands.arguments.NbtPathArgument.NbtPath.class, name);
@@ -150,10 +151,9 @@ public final class NbtPathArgument<C> extends CommandArgument<C, net.minecraft.c
          * @since 1.5.0
          */
         public @NonNull Builder<C> asOptionalWithDefault(
-                final net.minecraft.commands.arguments.NbtPathArgument.@NonNull NbtPath defaultValue) {
+                final net.minecraft.commands.arguments.NbtPathArgument.@NonNull NbtPath defaultValue
+        ) {
             return this.asOptionalWithDefault(defaultValue.toString());
         }
-
     }
-
 }

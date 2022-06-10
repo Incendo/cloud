@@ -48,5 +48,4 @@ public interface CommandSuggestionEngine<C> {
             @NonNull CommandContext<C> context,
             @NonNull String input
     );
-
 }

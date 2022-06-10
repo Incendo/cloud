@@ -38,9 +38,9 @@ final class SimpleKey<V> implements CommandMeta.Key<V> {
     private final @Nullable Function<@NonNull CommandMeta, @Nullable V> derivationFunction;
 
     SimpleKey(
-        final @NonNull TypeToken<V> valueType,
-        final @NonNull String name,
-        final @Nullable Function<@NonNull CommandMeta, @Nullable V> derivationFunction
+            final @NonNull TypeToken<V> valueType,
+            final @NonNull String name,
+            final @Nullable Function<@NonNull CommandMeta, @Nullable V> derivationFunction
     ) {
         this.valueType = valueType;
         this.name = name;
@@ -80,5 +80,4 @@ final class SimpleKey<V> implements CommandMeta.Key<V> {
         return 7 * GenericTypeReflector.hashCode(this.valueType.getAnnotatedType())
                 + 31 * this.name.hashCode();
     }
-
 }

@@ -37,7 +37,12 @@ class NoOpStringProcessorTest {
         for (int i = 0; i < 10; i++) {
             // Arrange
             final StringProcessor stringProcessor = StringProcessor.noOp();
-            final String input = ThreadLocalRandom.current().ints().mapToObj(Integer::toString).limit(32).collect(Collectors.joining());
+            final String input = ThreadLocalRandom
+                    .current()
+                    .ints()
+                    .mapToObj(Integer::toString)
+                    .limit(32)
+                    .collect(Collectors.joining());
 
             // Act
             final String output = stringProcessor.processString(input);

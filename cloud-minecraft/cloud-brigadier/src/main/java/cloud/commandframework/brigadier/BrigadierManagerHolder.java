@@ -45,5 +45,4 @@ public interface BrigadierManagerHolder<C> {
      * @since 1.2.0
      */
     @Nullable CloudBrigadierManager<C, ?> brigadierManager();
-
 }

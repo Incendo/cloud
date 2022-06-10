@@ -114,7 +114,5 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
          * @since 1.5.0
          */
         @Nullable SuggestionProvider<? super S> provide(@NonNull K argument, SuggestionProvider<S> useCloud);
-
     }
-
 }

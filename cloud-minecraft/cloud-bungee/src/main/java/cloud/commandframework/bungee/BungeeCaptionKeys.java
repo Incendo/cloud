@@ -65,5 +65,4 @@ public final class BungeeCaptionKeys {
     public static @NonNull Collection<@NonNull Caption> getBungeeCaptionKeys() {
         return Collections.unmodifiableCollection(RECOGNIZED_CAPTIONS);
     }
-
 }

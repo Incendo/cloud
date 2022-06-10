@@ -87,5 +87,4 @@ public final class NoSuchCommandException extends CommandParseException {
     public synchronized Throwable initCause(final Throwable cause) {
         return this;
     }
-
 }

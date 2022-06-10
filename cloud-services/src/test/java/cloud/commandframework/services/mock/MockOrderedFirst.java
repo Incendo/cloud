@@ -33,5 +33,4 @@ public class MockOrderedFirst implements MockService {
     public MockResult handle(final MockContext mockContext) {
         return new MockResult(1);
     }
-
 }

@@ -131,7 +131,6 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                     new LinkedList<>()
             );
         }
-
     }
 
     public static final class ServerParser<C> implements ArgumentParser<C, RegisteredServer> {
@@ -172,7 +171,6 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                     .map(s -> s.getServerInfo().getName())
                     .collect(Collectors.toList());
         }
-
     }
 
     public static final class ServerParseException extends ParserException {
@@ -190,7 +188,5 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                     CaptionVariable.of("input", input)
             );
         }
-
     }
-
 }

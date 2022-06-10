@@ -148,7 +148,6 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                     this.modes
             );
         }
-
     }
 
 
@@ -260,7 +259,6 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
 
             return ArgumentParseResult.success(role);
         }
-
     }
 
 
@@ -286,7 +284,6 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
         public final @NonNull String getInput() {
             return this.input;
         }
-
     }
 
 
@@ -307,7 +304,6 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
         public @NonNull String getMessage() {
             return String.format("Too many roles found for '%s'.", getInput());
         }
-
     }
 
 
@@ -328,7 +324,5 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
         public @NonNull String getMessage() {
             return String.format("Role not found for '%s'.", getInput());
         }
-
     }
-
 }

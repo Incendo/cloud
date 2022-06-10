@@ -87,5 +87,6 @@ class Issue281 {
 
     @SuppressWarnings("serial")
     private static final class CustomException extends RuntimeException {
+
     }
 }

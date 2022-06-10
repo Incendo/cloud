@@ -170,5 +170,4 @@ public class Quintet<U, V, W, X, Y> implements Tuple {
         array[4] = this.fifth;
         return array;
     }
-
 }

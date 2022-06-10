@@ -36,5 +36,4 @@ public class SecondaryMockService implements MockService, Predicate<MockService.
     public boolean test(final MockContext mockContext) {
         return mockContext.getString().equalsIgnoreCase("potato");
     }
-
 }

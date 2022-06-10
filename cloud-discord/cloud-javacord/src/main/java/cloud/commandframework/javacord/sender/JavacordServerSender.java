@@ -62,5 +62,4 @@ public class JavacordServerSender extends JavacordCommandSender {
                 .orElseThrow(() -> new UnsupportedOperationException(
                         "Server not present even though message was sent on a server"));
     }
-
 }

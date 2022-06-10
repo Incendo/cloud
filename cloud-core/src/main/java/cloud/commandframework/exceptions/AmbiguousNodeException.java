@@ -108,5 +108,4 @@ public final class AmbiguousNodeException extends IllegalStateException {
         return stringBuilder.append(")")
                 .toString();
     }
-
 }

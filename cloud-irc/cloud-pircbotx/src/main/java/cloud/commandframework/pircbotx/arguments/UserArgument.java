@@ -124,7 +124,6 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -157,7 +156,6 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             }
             return ArgumentParseResult.success(user);
         }
-
     }
 
 
@@ -179,7 +177,5 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     )
             );
         }
-
     }
-
 }

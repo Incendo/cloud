@@ -212,7 +212,6 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
             suggestions.addAll(NamedTextColor.NAMES.keys());
             return suggestions;
         }
-
     }
 
 
@@ -231,7 +230,5 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
                     CaptionVariable.of("input", input)
             );
         }
-
     }
-
 }

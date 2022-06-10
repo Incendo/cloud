@@ -106,5 +106,4 @@ public final class InvalidCommandSenderException extends CommandParseException {
     public @Nullable Command<?> getCommand() {
         return this.command;
     }
-
 }

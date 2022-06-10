@@ -158,8 +158,8 @@ public class Command<C> {
      * @param senderType              Required sender type. May be {@code null}
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
-     * @deprecated Map does not allow for the same literal or variable argument name to repeat
      * @see #Command(List, CommandExecutionHandler, Class, CommandPermission, CommandMeta)
+     * @deprecated Map does not allow for the same literal or variable argument name to repeat
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED)
@@ -180,8 +180,8 @@ public class Command<C> {
      * @param commandExecutionHandler Execution handler
      * @param senderType              Required sender type. May be {@code null}
      * @param commandMeta             Command meta instance
-     * @deprecated Map does not allow for the same literal or variable argument name to repeat
      * @see #Command(List, CommandExecutionHandler, Class, CommandMeta)
+     * @deprecated Map does not allow for the same literal or variable argument name to repeat
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED)
@@ -201,8 +201,8 @@ public class Command<C> {
      * @param commandExecutionHandler Execution handler
      * @param commandPermission       Command permission
      * @param commandMeta             Command meta instance
-     * @deprecated Map does not allow for the same literal or variable argument name to repeat
      * @see #Command(List, CommandExecutionHandler, CommandPermission, CommandMeta)
+     * @deprecated Map does not allow for the same literal or variable argument name to repeat
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED)
@@ -372,7 +372,7 @@ public class Command<C> {
      * @return Argument description
      * @throws IllegalArgumentException If the command argument does not exist
      * @deprecated More than one matching command argument may exist per command.
-     *             Use {@link #getArguments()} and search in that, instead.
+     *         Use {@link #getArguments()} and search in that, instead.
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED)
@@ -807,7 +807,7 @@ public class Command<C> {
          * @param <O>         Output type
          * @return Builder instance with the argument inserted
          * @deprecated for removal since 1.4.0. Use
-         *     {@link #argumentPair(String, TypeToken, Pair, Pair, BiFunction, ArgumentDescription)} instead.
+         *         {@link #argumentPair(String, TypeToken, Pair, Pair, BiFunction, ArgumentDescription)} instead.
          */
         @Deprecated
         @API(status = API.Status.DEPRECATED, since = "1.4.0")
@@ -879,7 +879,7 @@ public class Command<C> {
          * @param <W>           Third type
          * @return Builder instance with the argument inserted
          * @deprecated for removal since 1.4.0. Use {@link #argumentTriplet(String, Triplet, Triplet, ArgumentDescription)}
-         *     instead.
+         *         instead.
          */
         @Deprecated
         @API(status = API.Status.DEPRECATED, since = "1.4.0")
@@ -945,7 +945,7 @@ public class Command<C> {
          * @param <O>           Output type
          * @return Builder instance with the argument inserted
          * @deprecated for removal since 1.4.0, use
-         *      {@link #argumentTriplet(String, TypeToken, Triplet, Triplet, BiFunction, ArgumentDescription)} instead.
+         *         {@link #argumentTriplet(String, TypeToken, Triplet, Triplet, BiFunction, ArgumentDescription)} instead.
          */
         @Deprecated
         @API(status = API.Status.DEPRECATED, since = "1.4.0")
@@ -1199,7 +1199,5 @@ public class Command<C> {
                     this.commandMeta
             );
         }
-
     }
-
 }

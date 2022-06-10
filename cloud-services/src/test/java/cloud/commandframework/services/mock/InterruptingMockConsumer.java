@@ -31,5 +31,4 @@ public class InterruptingMockConsumer implements MockConsumerService {
     public void accept(final MockService.MockContext mockContext) {
         ConsumerService.interrupt();
     }
-
 }

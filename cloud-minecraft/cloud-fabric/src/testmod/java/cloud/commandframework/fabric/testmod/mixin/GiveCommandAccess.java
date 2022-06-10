@@ -44,5 +44,4 @@ public interface GiveCommandAccess {
     ) {
         return Command.SINGLE_SUCCESS;
     }
-
 }

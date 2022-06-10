@@ -108,5 +108,4 @@ class PaperBrigadierListener<C> implements Listener {
                 permissionChecker
         ));
     }
-
 }

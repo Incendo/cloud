@@ -51,7 +51,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
-        ) {
+    ) {
         super(required, name, new CharacterParser<>(), defaultValue, Character.class, suggestionsProvider, defaultDescription);
     }
 
@@ -122,7 +122,6 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
                     this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -154,7 +153,6 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         public boolean isContextFree() {
             return true;
         }
-
     }
 
 
@@ -208,7 +206,5 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         public int hashCode() {
             return Objects.hash(this.input);
         }
-
     }
-
 }

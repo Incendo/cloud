@@ -148,5 +148,4 @@ public final class ExamplePlugin extends Plugin {
                         })
         );
     }
-
 }

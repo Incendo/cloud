@@ -165,7 +165,10 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerRegistryEntryMappings();
         brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {
         }, builder -> builder.toConstant(net.minecraft.commands.arguments.TeamArgument.team()));
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(PlayerTeam.class), params -> new TeamArgument.TeamParser<>());
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(PlayerTeam.class),
+                params -> new TeamArgument.TeamParser<>()
+        );
 
         /* Wrapped/Constant Brigadier types, native value type */
         this.registerConstantNativeParserSupplier(ChatFormatting.class, ColorArgument.color());
@@ -176,7 +179,8 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerConstantNativeParserSupplier(OperationArgument.Operation.class, OperationArgument.operation());
         this.registerConstantNativeParserSupplier(ParticleOptions.class, ParticleArgument.particle());
         this.registerConstantNativeParserSupplier(AngleArgument.SingleAngle.class, AngleArgument.angle());
-        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {}, SwizzleArgument.swizzle());
+        this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {
+        }, SwizzleArgument.swizzle());
         this.registerConstantNativeParserSupplier(ResourceLocation.class, ResourceLocationArgument.id());
         this.registerConstantNativeParserSupplier(EntityAnchorArgument.Anchor.class, EntityAnchorArgument.anchor());
         this.registerConstantNativeParserSupplier(MinMaxBounds.Ints.class, RangeArgument.intRange());
@@ -186,16 +190,20 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
 
         /* Wrapped/Constant Brigadier types, mapped value type */
         this.registerConstantNativeParserSupplier(MessageArgument.Message.class, MessageArgument.message());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(MinecraftTime.class), params -> FabricArgumentParsers.time());
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(MinecraftTime.class),
+                params -> FabricArgumentParsers.time()
+        );
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void registerRegistryEntryMappings() {
         this.brigadierManager.registerMapping(
-            new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {},
-            builder -> {
-                builder.to(argument -> ResourceOrTagLocationArgument.<Object>resourceOrTag((ResourceKey) argument.registryKey()));
-            }
+                new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {
+                },
+                builder -> {
+                    builder.to(argument -> ResourceOrTagLocationArgument.<Object>resourceOrTag((ResourceKey) argument.registryKey()));
+                }
         );
 
         /* Find all fields of RegistryKey<? extends Registry<?>> and register those */
@@ -259,10 +267,13 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
      * @since 1.7.0
      */
     final <T> void registerContextualNativeParserSupplier(
-        final @NonNull Class<T> type,
-        final @NonNull Function<CommandBuildContext, @NonNull ArgumentType<T>> argument
+            final @NonNull Class<T> type,
+            final @NonNull Function<CommandBuildContext, @NonNull ArgumentType<T>> argument
     ) {
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(type),  params -> FabricArgumentParsers.contextual(argument));
+        this.getParserRegistry().registerParserSupplier(
+                TypeToken.get(type),
+                params -> FabricArgumentParsers.contextual(argument)
+        );
     }
 
     /**
@@ -339,5 +350,4 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                 .apply(sender)
                 .hasPermission(permissionLevel);
     }
-
 }

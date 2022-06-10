@@ -49,6 +49,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 
 final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Command<S> {
+
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Component NEWLINE = Component.literal("\n");
@@ -192,5 +193,4 @@ final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Com
                         stackTrace
                 )));
     }
-
 }

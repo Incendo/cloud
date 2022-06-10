@@ -152,7 +152,5 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
             this.allAcceptedAliases.add(alias);
             this.alternativeAliases.add(alias);
         }
-
     }
-
 }

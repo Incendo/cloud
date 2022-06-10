@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface CommandMethod {
+
     String ANNOTATION_PATH = "cloud.commandframework.annotations.CommandMethod";
 
     /**
@@ -50,5 +51,4 @@ public @interface CommandMethod {
      * @return Required sender
      */
     @NonNull Class<?> requiredSender() default Object.class;
-
 }

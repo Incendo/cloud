@@ -55,5 +55,4 @@ public final class MinecraftExtrasMetaKeys {
 
     private MinecraftExtrasMetaKeys() {
     }
-
 }

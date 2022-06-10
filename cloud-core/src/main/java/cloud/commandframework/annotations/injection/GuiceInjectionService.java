@@ -51,7 +51,7 @@ public final class GuiceInjectionService<C> implements InjectionService<C> {
      * Create a new Guice injection service that wraps the given injector
      *
      * @param injector Injector to wrap
-     * @param <C> Command sender type
+     * @param <C>      Command sender type
      * @return the created injection service
      */
     public static <C> GuiceInjectionService<C> create(final @NonNull Injector injector) {
@@ -67,5 +67,4 @@ public final class GuiceInjectionService<C> implements InjectionService<C> {
         }
         return null;
     }
-
 }

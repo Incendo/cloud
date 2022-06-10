@@ -143,5 +143,4 @@ public final class FabricClientExample implements ClientModInitializer {
             client.setScreen(new JoinMultiplayerScreen(new TitleScreen()));
         }
     }
-
 }

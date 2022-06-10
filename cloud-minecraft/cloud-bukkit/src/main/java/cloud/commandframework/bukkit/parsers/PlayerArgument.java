@@ -132,7 +132,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -179,7 +178,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
             return output;
         }
-
     }
 
 
@@ -218,7 +216,5 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         public @NonNull String getInput() {
             return this.input;
         }
-
     }
-
 }

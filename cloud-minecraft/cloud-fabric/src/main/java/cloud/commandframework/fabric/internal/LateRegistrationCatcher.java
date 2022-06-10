@@ -49,5 +49,4 @@ public final class LateRegistrationCatcher implements ModInitializer {
     public static boolean hasServerAlreadyStarted() {
         return LateRegistrationCatcher.serverStartingCalled;
     }
-
 }

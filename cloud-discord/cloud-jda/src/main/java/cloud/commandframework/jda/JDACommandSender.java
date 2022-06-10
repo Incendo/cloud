@@ -102,5 +102,4 @@ public class JDACommandSender {
     public final @NonNull MessageChannel getChannel() {
         return this.channel;
     }
-
 }

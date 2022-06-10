@@ -44,5 +44,4 @@ public final class AcceptingCommandPreprocessor<C> implements CommandPreprocesso
     public void accept(final @NonNull CommandPreprocessingContext<C> context) {
         context.getCommandContext().store(PROCESSED_INDICATOR_KEY, "true");
     }
-
 }

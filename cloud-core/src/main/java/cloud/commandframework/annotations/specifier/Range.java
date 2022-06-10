@@ -53,5 +53,4 @@ public @interface Range {
      * @return String serialized number
      */
     @NonNull String max() default "";
-
 }

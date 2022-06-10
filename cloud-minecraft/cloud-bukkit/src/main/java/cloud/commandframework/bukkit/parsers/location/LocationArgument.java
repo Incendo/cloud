@@ -146,7 +146,6 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                     new LinkedList<>()
             );
         }
-
     }
 
 
@@ -303,7 +302,6 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
         public int getRequestedArgumentCount() {
             return EXPECTED_PARAMETER_COUNT;
         }
-
     }
 
 
@@ -348,9 +346,6 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
             public @NonNull Caption getCaption() {
                 return this.caption;
             }
-
         }
-
     }
-
 }

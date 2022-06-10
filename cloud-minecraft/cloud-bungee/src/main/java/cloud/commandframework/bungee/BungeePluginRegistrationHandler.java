@@ -60,5 +60,4 @@ final class BungeePluginRegistrationHandler<C> implements CommandRegistrationHan
                 .registerCommand(this.bungeeCommandManager.getOwningPlugin(), bungeeCommand);
         return true;
     }
-
 }

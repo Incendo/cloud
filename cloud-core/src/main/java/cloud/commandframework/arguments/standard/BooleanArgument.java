@@ -157,7 +157,6 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
                     this.getDefaultDescription()
             );
         }
-
     }
 
 
@@ -243,7 +242,6 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         public boolean isContextFree() {
             return true;
         }
-
     }
 
 
@@ -314,7 +312,5 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         public int hashCode() {
             return Objects.hash(this.input, this.liberal);
         }
-
     }
-
 }

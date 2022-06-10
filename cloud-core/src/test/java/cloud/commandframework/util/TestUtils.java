@@ -58,7 +58,6 @@ public final class TestUtils {
         ) {
             super(commandExecutionCoordinator, commandRegistrationHandler);
         }
-
     }
 
     /**
@@ -84,5 +83,4 @@ public final class TestUtils {
 
         return manager;
     }
-
 }

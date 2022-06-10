@@ -29,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class FabricCommandPreprocessor<C> implements CommandPreprocessor<C> {
 
-     private final FabricCommandManager<C, ?> manager;
+    private final FabricCommandManager<C, ?> manager;
 
     FabricCommandPreprocessor(final FabricCommandManager<C, ?> manager) {
         this.manager = manager;
@@ -38,9 +38,8 @@ final class FabricCommandPreprocessor<C> implements CommandPreprocessor<C> {
     @Override
     public void accept(@NonNull final CommandPreprocessingContext<C> context) {
         context.getCommandContext().store(
-            FabricCommandContextKeys.NATIVE_COMMAND_SOURCE,
-            this.manager.backwardsCommandSourceMapper().apply(context.getCommandContext().getSender())
+                FabricCommandContextKeys.NATIVE_COMMAND_SOURCE,
+                this.manager.backwardsCommandSourceMapper().apply(context.getCommandContext().getSender())
         );
     }
-
 }

@@ -118,5 +118,4 @@ class StringArgumentTest {
 
         assertThat(storage[0]).isEqualTo("greedy string content");
     }
-
 }

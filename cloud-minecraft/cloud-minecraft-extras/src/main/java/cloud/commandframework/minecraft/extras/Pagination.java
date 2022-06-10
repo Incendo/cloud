@@ -74,5 +74,4 @@ final class Pagination<T> {
 
         return Collections.unmodifiableList(renderedContent);
     }
-
 }

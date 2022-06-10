@@ -90,5 +90,4 @@ public final class CommandPreprocessingContext<C> {
     public int hashCode() {
         return Objects.hash(this.getCommandContext(), this.getInputQueue());
     }
-
 }

@@ -155,7 +155,5 @@ public final class NamedColorArgument<C> extends CommandArgument<C, ChatFormatti
             }
             return this.asOptionalWithDefault(defaultColor.toString());
         }
-
     }
-
 }

@@ -69,5 +69,4 @@ public class InvalidSyntaxException extends CommandParseException {
     public final String getMessage() {
         return String.format("Invalid command syntax. Correct syntax is: %s", this.correctSyntax);
     }
-
 }

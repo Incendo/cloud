@@ -55,5 +55,4 @@ class MetaFactory implements Function<@NonNull Method, @NonNull CommandMeta> {
         });
         return this.metaMapper.apply(parameters);
     }
-
 }

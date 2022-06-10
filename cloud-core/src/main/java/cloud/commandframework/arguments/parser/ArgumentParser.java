@@ -97,7 +97,7 @@ public interface ArgumentParser<C, T> {
      * Create a derived argument parser preserving all properties of this parser, but converting the output type.
      *
      * @param mapper the mapper to apply
-     * @param <O> the result type
+     * @param <O>    the result type
      * @return a derived parser.
      * @since 1.5.0
      */
@@ -127,5 +127,4 @@ public interface ArgumentParser<C, T> {
     default int getRequestedArgumentCount() {
         return DEFAULT_ARGUMENT_COUNT;
     }
-
 }

@@ -49,5 +49,4 @@ public interface TaskFunction<I, O> extends Function<@NonNull I, @NonNull O>, Ta
      */
     @Override
     @NonNull O apply(@NonNull I input);
-
 }

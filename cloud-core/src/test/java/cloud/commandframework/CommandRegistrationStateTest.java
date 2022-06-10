@@ -98,5 +98,4 @@ public class CommandRegistrationStateTest {
         manager.command(manager.commandBuilder("unsafe").handler(ctx -> {
         }));
     }
-
 }

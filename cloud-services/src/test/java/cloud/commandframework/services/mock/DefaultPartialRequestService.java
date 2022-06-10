@@ -38,5 +38,4 @@ public class DefaultPartialRequestService implements MockPartialResultService {
         }
         return map;
     }
-
 }
