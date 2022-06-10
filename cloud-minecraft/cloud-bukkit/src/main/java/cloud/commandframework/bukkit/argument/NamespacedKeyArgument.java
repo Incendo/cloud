@@ -299,7 +299,6 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
 
         private static final long serialVersionUID = -482592639358941441L;
         private final String input;
-        private final Caption caption;
 
         /**
          * Creates a new {@link NamespacedKeyParseException}.
@@ -320,14 +319,14 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                     caption,
                     CaptionVariable.of("input", input)
             );
-            this.caption = caption;
             this.input = input;
         }
 
         /**
-         * Get the input
+         * Gets the input string.
          *
-         * @return Input
+         * @return input
+         * @since 1.7.0
          */
         public @NonNull String getInput() {
             return this.input;
@@ -342,12 +341,12 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                 return false;
             }
             final NamespacedKeyParseException that = (NamespacedKeyParseException) o;
-            return this.input.equals(that.input) && this.caption.equals(that.caption);
+            return this.input.equals(that.input) && this.errorCaption().equals(that.errorCaption());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(this.input, this.caption);
+            return Objects.hash(this.input, this.errorCaption());
         }
 
     }
