@@ -44,6 +44,7 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
+import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
@@ -89,6 +90,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -393,6 +395,8 @@ public final class ExamplePlugin extends JavaPlugin {
             new Mc113(this.manager).registerCommands();
         }
 
+        this.registerNamespacedKeyUsingCommand();
+
         //
         // Create a Bukkit-like command
         //
@@ -454,6 +458,28 @@ public final class ExamplePlugin extends JavaPlugin {
                     final World world = ctx.get("world");
                     final Player sender = (Player) ctx.getSender();
                     this.getServer().getScheduler().runTask(this, () -> sender.teleport(world.getSpawnLocation()));
+                }));
+    }
+
+    private void registerNamespacedKeyUsingCommand() {
+        boolean nsk = true;
+        try {
+            Class.forName("org.bukkit.NamespacedKey");
+        } catch (final ClassNotFoundException e) {
+            nsk = false;
+        }
+
+        if (!nsk) {
+            return;
+        }
+
+        this.manager.command(this.manager.commandBuilder("example")
+                .literal("namespacedkey")
+                .argument(NamespacedKeyArgument.of("key"))
+                .handler(ctx -> {
+                    final NamespacedKey namespacedKey = ctx.get("key");
+                    final String key = namespacedKey.getNamespace() + ":" + namespacedKey.getKey();
+                    ctx.getSender().sendMessage("The key you typed is '" + key + "'.");
                 }));
     }
 
