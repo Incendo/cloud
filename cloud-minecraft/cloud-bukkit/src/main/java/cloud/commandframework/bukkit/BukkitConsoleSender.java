@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@Deprecated
 final class BukkitConsoleSender extends BukkitCommandSender {
 
     BukkitConsoleSender() {
