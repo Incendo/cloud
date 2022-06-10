@@ -83,6 +83,28 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE =
             "Cannot mix local and absolute coordinates. (either all coordinates use '^' or none do)";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE}
+     *
+     * @since 1.7.0
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE =
+            "Invalid namespace '{input}'. Must be [a-z0-9._-]";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY}
+     *
+     * @since 1.7.0
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY =
+            "Invalid key '{input}'. Must be [a-z0-9/._-]";
+    /**
+     * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY}
+     *
+     * @since 1.7.0
+     */
+    public static final String ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE =
+            "Invalid input '{input}', requires an explicit namespace.";
+
 
     protected BukkitCaptionRegistry() {
         super();
@@ -133,6 +155,18 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
         this.registerMessageFactory(
                 BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE,
                 (caption, sender) -> ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY
+        );
+        this.registerMessageFactory(
+                BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE,
+                (caption, sender) -> ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE
         );
     }
 

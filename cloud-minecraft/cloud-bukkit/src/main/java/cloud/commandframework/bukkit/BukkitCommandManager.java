@@ -26,13 +26,18 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
+import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
+import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
@@ -161,6 +166,18 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>());
         this.getParserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
                 new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
+
+        if (CraftBukkitReflection.classExists("org.bukkit.NamespacedKey")) {
+            this.registerParserSupplierFor(NamespacedKeyArgument.class);
+            this.getParserRegistry().registerAnnotationMapper(
+                    RequireExplicitNamespace.class,
+                    (annotation, type) -> ParserParameters.single(BukkitParserParameters.REQUIRE_EXPLICIT_NAMESPACE, true)
+            );
+            this.getParserRegistry().registerAnnotationMapper(
+                    DefaultNamespace.class,
+                    (annotation, type) -> ParserParameters.single(BukkitParserParameters.DEFAULT_NAMESPACE, annotation.value())
+            );
+        }
 
         /* Register MC 1.13+ parsers */
         if (this.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {

@@ -89,6 +89,27 @@ public final class BukkitCaptionKeys {
      */
     public static final Caption ARGUMENT_PARSE_FAILURE_LOCATION_MIXED_LOCAL_ABSOLUTE = of(
             "argument.parse.failure.location.mixed_local_absolute");
+    /**
+     * Variables: {input}
+     *
+     * @since 1.7.0
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NAMESPACE =
+            of("argument.parse.failure.namespacedkey.namespace");
+    /**
+     * Variables: {input}
+     *
+     * @since 1.7.0
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_KEY =
+            of("argument.parse.failure.namespacedkey.key");
+    /**
+     * Variables: {input}
+     *
+     * @since 1.7.0
+     */
+    public static final Caption ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE =
+            of("argument.parse.failure.namespacedkey.need_namespace");
 
     private BukkitCaptionKeys() {
     }
