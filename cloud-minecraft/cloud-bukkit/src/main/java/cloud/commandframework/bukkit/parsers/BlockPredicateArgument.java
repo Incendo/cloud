@@ -155,7 +155,8 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                         CraftBukkitReflection.findNMSClass("ITagRegistry"),
                         CraftBukkitReflection.findMCClass("tags.ITagRegistry"),
                         CraftBukkitReflection.findMCClass("tags.TagContainer"),
-                        String.class // fail
+                        CraftBukkitReflection.findMCClass("core.IRegistry"),
+                        CraftBukkitReflection.findMCClass("core.Registry")
                 );
             }
             TAG_CONTAINER_CLASS = tagContainerClass;
