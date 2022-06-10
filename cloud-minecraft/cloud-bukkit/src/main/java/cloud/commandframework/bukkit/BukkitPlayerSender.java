@@ -26,6 +26,7 @@ package cloud.commandframework.bukkit;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@Deprecated
 final class BukkitPlayerSender extends BukkitCommandSender {
 
     BukkitPlayerSender(final @NonNull Player player) {

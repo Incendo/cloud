@@ -29,7 +29,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Command sender that proxies {@link org.bukkit.command.CommandSender}
+ *
+ * @deprecated No longer used since pre 1.0.0
  */
+@Deprecated
 public abstract class BukkitCommandSender {
 
     private final org.bukkit.command.CommandSender internalSender;
