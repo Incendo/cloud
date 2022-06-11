@@ -40,6 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * <p>This is not API to any extent, and as such, may break, change, or be removed without any notice.</p>
  */
 @Beta
+@SuppressWarnings("EmptyCatch")
 public final class CraftBukkitReflection {
 
     private static final String PREFIX_NMS = "net.minecraft.server";
@@ -54,7 +55,13 @@ public final class CraftBukkitReflection {
         final String pkg = serverClass.getPackage().getName();
         final String nmsVersion = pkg.substring(pkg.lastIndexOf(".") + 1);
         if (!nmsVersion.contains("_")) {
-            MAJOR_REVISION = -1;
+            int fallbackVersion = -1;
+            try {
+                final Method getMinecraftVersion = serverClass.getDeclaredMethod("getMinecraftVersion");
+                fallbackVersion = Integer.parseInt(getMinecraftVersion.invoke(Bukkit.getServer()).toString().split("\\.")[1]);
+            } catch (final Exception ignored) {
+            }
+            MAJOR_REVISION = fallbackVersion;
         } else {
             MAJOR_REVISION = Integer.parseInt(nmsVersion.split("_")[1]);
         }
