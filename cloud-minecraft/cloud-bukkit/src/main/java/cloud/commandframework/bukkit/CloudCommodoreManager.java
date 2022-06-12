@@ -27,6 +27,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.context.CommandContext;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
@@ -34,12 +35,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
@@ -61,8 +62,10 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
                 commandManager
         ));
 
-        this.brigadierManager.brigadierSenderMapper(sender ->
-                this.commandManager.getCommandSenderMapper().apply(this.commodore.getBukkitSender(sender)));
+        this.brigadierManager.brigadierSenderMapper(sender -> {
+            final CommandSender bukkitSender = getBukkitSender(sender);
+            return this.commandManager.getCommandSenderMapper().apply(bukkitSender);
+        });
 
         new BukkitBrigadierMapper<>(this.commandManager, this.brigadierManager);
 
@@ -92,16 +95,19 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             final @NonNull Command<C> command
     ) {
         final LiteralCommandNode<?> literalCommandNode = this.brigadierManager
-                .createLiteralCommandNode(label, command, (o, p) -> {
+                .createLiteralCommandNode(label, command, (commandSourceStack, commandPermission) -> {
                     // We need to check that the command still exists...
                     if (this.commandManager.getCommandTree().getNamedNode(label) == null) {
                         return false;
                     }
 
-                    final CommandSender sender = this.commodore.getBukkitSender(o);
-                    return this.commandManager.hasPermission(this.commandManager.getCommandSenderMapper().apply(sender), p);
+                    final CommandSender bukkitSender = getBukkitSender(commandSourceStack);
+                    return this.commandManager.hasPermission(
+                            this.commandManager.getCommandSenderMapper().apply(bukkitSender),
+                            commandPermission
+                    );
                 }, false, o -> 1);
-        final CommandNode existingNode = this.commodore.getDispatcher().findNode(Collections.singletonList(label));
+        final CommandNode existingNode = this.getDispatcher().findNode(Collections.singletonList(label));
         if (existingNode != null) {
             this.mergeChildren(existingNode, literalCommandNode);
         } else {
@@ -112,35 +118,35 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
     private void unregisterWithCommodore(
             final @NonNull String label
     ) {
-        final CommandNode node = this.commodore.getDispatcher().findNode(Collections.singletonList(label));
+        final CommandDispatcher<?> dispatcher = this.getDispatcher();
+        final CommandNode node = dispatcher.findNode(Collections.singletonList(label));
         if (node == null) {
             return;
         }
 
         try {
-            final Class<? extends Commodore> commodoreImpl = (Class<? extends Commodore>) Class.forName(
-                    "me.lucko.commodore.CommodoreImpl"
-            );
+            final Class<?> commodoreImpl = this.commodore.getClass();
 
             final Method removeChild = commodoreImpl.getDeclaredMethod("removeChild", RootCommandNode.class, String.class);
             removeChild.setAccessible(true);
 
             removeChild.invoke(
                     null /* static method */,
-                    this.commodore.getDispatcher().getRoot(),
+                    dispatcher.getRoot(),
                     node.getName()
             );
 
-            final Field registeredNodes = commodoreImpl.getDeclaredField("registeredNodes");
-            registeredNodes.setAccessible(true);
+            final Field registeredNodesField = commodoreImpl.getDeclaredField("registeredNodes");
+            registeredNodesField.setAccessible(true);
 
-            ((List<LiteralCommandNode<?>>) registeredNodes.get(this.commodore)).remove(node);
+            final List<?> registeredNodes = (List<?>) registeredNodesField.get(this.commodore);
+            registeredNodes.remove(node);
         } catch (final Exception e) {
             throw new RuntimeException(String.format("Failed to unregister command '%s' with commodore", label), e);
         }
     }
 
-    private void mergeChildren(@Nullable final CommandNode<?> existingNode, @Nullable final CommandNode<?> node) {
+    private void mergeChildren(final CommandNode<?> existingNode, final CommandNode<?> node) {
         for (final CommandNode child : node.getChildren()) {
             final CommandNode<?> existingChild = existingNode.getChild(child.getName());
             if (existingChild == null) {
@@ -148,6 +154,27 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
             } else {
                 this.mergeChildren(existingChild, child);
             }
+        }
+    }
+
+    private CommandDispatcher<?> getDispatcher() {
+        try {
+            final Method getDispatcherMethod = this.commodore.getClass().getDeclaredMethod("getDispatcher");
+            getDispatcherMethod.setAccessible(true);
+            return (CommandDispatcher<?>) getDispatcherMethod.invoke(this.commodore);
+        } catch (final ReflectiveOperationException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static CommandSender getBukkitSender(final @NonNull Object commandSourceStack) {
+        Objects.requireNonNull(commandSourceStack, "commandSourceStack");
+        try {
+            final Method getBukkitSenderMethod = commandSourceStack.getClass().getDeclaredMethod("getBukkitSender");
+            getBukkitSenderMethod.setAccessible(true);
+            return (CommandSender) getBukkitSenderMethod.invoke(commandSourceStack);
+        } catch (final ReflectiveOperationException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
