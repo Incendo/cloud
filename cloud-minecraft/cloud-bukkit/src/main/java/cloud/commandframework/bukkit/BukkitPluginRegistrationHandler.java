@@ -165,8 +165,10 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
 
         this.registeredCommands.remove(rootCommand);
 
-        // Once the command has been unregistered, we need to refresh the command list for all online players.
-        Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+        if (this.bukkitCommandManager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
+            // Once the command has been unregistered, we need to refresh the command list for all online players.
+            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+        }
     }
 
     private @NonNull String getNamespacedLabel(final @NonNull String label) {
