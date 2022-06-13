@@ -48,6 +48,7 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -73,6 +74,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -100,7 +102,7 @@ public final class AnnotationParser<C> {
             builderModifiers;
     private final Map<Predicate<Method>, Function<MethodCommandExecutionHandler.CommandMethodContext<C>,
             MethodCommandExecutionHandler<C>>> commandMethodFactories;
-    private final Class<C> commandSenderClass;
+    private final TypeToken<C> commandSenderType;
     private final MetaFactory metaFactory;
     private final FlagExtractor flagExtractor;
 
@@ -121,7 +123,27 @@ public final class AnnotationParser<C> {
             final @NonNull Class<C> commandSenderClass,
             final @NonNull Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper
     ) {
-        this.commandSenderClass = commandSenderClass;
+        this(manager, TypeToken.get(commandSenderClass), metaMapper);
+    }
+
+    /**
+     * Construct a new annotation parser
+     *
+     * @param manager           Command manager instance
+     * @param commandSenderType Command sender type
+     * @param metaMapper        Function that is used to create {@link CommandMeta} instances from annotations on the
+     *                          command methods. These annotations will be mapped to
+     *                          {@link ParserParameter}. Mappers for the
+     *                          parser parameters can be registered using {@link #registerAnnotationMapper(Class, Function)}
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public AnnotationParser(
+            final @NonNull CommandManager<C> manager,
+            final @NonNull TypeToken<C> commandSenderType,
+            final @NonNull Function<@NonNull ParserParameters, @NonNull CommandMeta> metaMapper
+    ) {
+        this.commandSenderType = commandSenderType;
         this.manager = manager;
         this.metaFactory = new MetaFactory(this, metaMapper);
         this.annotationMappers = new HashMap<>();
@@ -581,7 +603,7 @@ public final class AnnotationParser<C> {
                 if (parameter.isAnnotationPresent(Argument.class)) {
                     continue;
                 }
-                if (this.commandSenderClass.isAssignableFrom(parameter.getType())) {
+                if (GenericTypeReflector.isSuperType(this.commandSenderType.getType(), parameter.getType())) {
                     senderType = (Class<? extends C>) parameter.getType();
                     break;
                 }
