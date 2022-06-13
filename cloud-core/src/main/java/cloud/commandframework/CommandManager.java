@@ -256,6 +256,7 @@ public abstract class CommandManager<C> {
      *
      * @return the caption variable replacement handler
      * @since 1.7.0
+     * @see #captionVariableReplacementHandler(CaptionVariableReplacementHandler)
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull CaptionVariableReplacementHandler captionVariableReplacementHandler() {
@@ -267,6 +268,7 @@ public abstract class CommandManager<C> {
      *
      * @param captionVariableReplacementHandler new replacement handler
      * @since 1.7.0
+     * @see #captionVariableReplacementHandler()
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public void captionVariableReplacementHandler(
@@ -279,8 +281,23 @@ public abstract class CommandManager<C> {
      * Get the command syntax formatter
      *
      * @return Command syntax formatter
+     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #commandSyntaxFormatter()} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public @NonNull CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
+        return this.commandSyntaxFormatter();
+    }
+
+    /**
+     * Returns the command syntax formatter.
+     *
+     * @return the syntax formatter
+     * @since 1.7.0
+     * @see #commandSyntaxFormatter(CommandSyntaxFormatter)
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter() {
         return this.commandSyntaxFormatter;
     }
 
@@ -288,8 +305,26 @@ public abstract class CommandManager<C> {
      * Set the command syntax formatter
      *
      * @param commandSyntaxFormatter New formatter
+     * @deprecated for removal since 1.7.0. Use the non-prefixed setter {@link #commandSyntaxFormatter(CommandSyntaxFormatter)}
+     *         instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public void setCommandSyntaxFormatter(final @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter) {
+        this.commandSyntaxFormatter(commandSyntaxFormatter);
+    }
+
+    /**
+     * Sets the command syntax formatter.
+     * <p>
+     * The command syntax formatter is used to format the command syntax hints that are used in help and error messages.
+     *
+     * @param commandSyntaxFormatter new formatter
+     * @since 1.7.0
+     * @see #commandSyntaxFormatter()
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public void commandSyntaxFormatter(final @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter) {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
     }
 
@@ -297,9 +332,40 @@ public abstract class CommandManager<C> {
      * Get the command registration handler
      *
      * @return Command registration handler
+     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #commandRegistrationHandler()} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public @NonNull CommandRegistrationHandler getCommandRegistrationHandler() {
+        return this.commandRegistrationHandler();
+    }
+
+    /**
+     * Returns the command registration handler.
+     * <p>
+     * The command registration handler is able to intercept newly created/deleted commands, in order to propagate
+     * these changes to the native command handler of the platform.
+     * <p>
+     * In platforms without a native command concept, this is likely to return
+     * {@link CommandRegistrationHandler#nullCommandRegistrationHandler()}.
+     *
+     * @return the command registration handler
+     * @since 1.7.0
+     */
+    public @NonNull CommandRegistrationHandler commandRegistrationHandler() {
         return this.commandRegistrationHandler;
+    }
+
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
+    protected final void setCommandRegistrationHandler(final @NonNull CommandRegistrationHandler commandRegistrationHandler) {
+        this.commandRegistrationHandler(commandRegistrationHandler);
+    }
+
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    protected final void commandRegistrationHandler(final @NonNull CommandRegistrationHandler commandRegistrationHandler) {
+        this.requireState(RegistrationState.BEFORE_REGISTRATION);
+        this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
     /**
@@ -307,6 +373,8 @@ public abstract class CommandManager<C> {
      *
      * @param capability the capability
      * @since 1.7.0
+     * @see #hasCapability(CloudCapability)
+     * @see #capabilities()
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     protected final void registerCapability(final @NonNull CloudCapability capability) {
@@ -319,6 +387,7 @@ public abstract class CommandManager<C> {
      * @param capability the capability
      * @return {@code true} if the implementation has the {@code capability}, {@code false} if not
      * @since 1.7.0
+     * @see #capabilities()
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public boolean hasCapability(final @NonNull CloudCapability capability) {
@@ -330,15 +399,11 @@ public abstract class CommandManager<C> {
      *
      * @return the currently registered capabilities
      * @since 1.7.0
+     * @see #hasCapability(CloudCapability)
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull Collection<@NonNull CloudCapability> capabilities() {
         return Collections.unmodifiableSet(new HashSet<>(this.capabilities));
-    }
-
-    protected final void setCommandRegistrationHandler(final @NonNull CommandRegistrationHandler commandRegistrationHandler) {
-        this.requireState(RegistrationState.BEFORE_REGISTRATION);
-        this.commandRegistrationHandler = commandRegistrationHandler;
     }
 
     /**
@@ -384,8 +449,23 @@ public abstract class CommandManager<C> {
      * Get the caption registry
      *
      * @return Caption registry
+     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #captionRegistry()} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public final @NonNull CaptionRegistry<C> getCaptionRegistry() {
+        return this.captionRegistry();
+    }
+
+    /**
+     * Returns the caption registry.
+     *
+     * @return the caption registry
+     * @since 1.7.0
+     * @see #captionRegistry(CaptionRegistry)
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public final @NonNull CaptionRegistry<C> captionRegistry() {
         return this.captionRegistry;
     }
 
@@ -394,8 +474,26 @@ public abstract class CommandManager<C> {
      * and so you may need to insert these captions yourself if you do decide to replace the caption registry.
      *
      * @param captionRegistry New caption registry
+     * @deprecated for removal since 1.7.0. Use the non-prefixed setter {@link #captionRegistry(CaptionRegistry)} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public final void setCaptionRegistry(final @NonNull CaptionRegistry<C> captionRegistry) {
+        this.captionRegistry(captionRegistry);
+    }
+
+    /**
+     * Replaces the caption registry.
+     * <p>
+     * Some platforms may inject their own captions into the default caption registry,
+     * and so you may need to insert these captions yourself, if you do decide to replace the caption registry.
+     *
+     * @param captionRegistry new caption registry.
+     * @see #captionRegistry()
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public final void captionRegistry(final @NonNull CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
     }
 
@@ -403,7 +501,7 @@ public abstract class CommandManager<C> {
      * Replace the default caption registry
      *
      * @param captionRegistry Caption registry to use
-     * @deprecated Use {@link #setCaptionRegistry(CaptionRegistry)} These methods are identical.
+     * @deprecated Use {@link #captionRegistry(CaptionRegistry)} These methods are identical.
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED)
@@ -782,8 +880,25 @@ public abstract class CommandManager<C> {
      * are doing
      *
      * @return Command tree
+     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #commandTree()} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public @NonNull CommandTree<C> getCommandTree() {
+        return this.commandTree();
+    }
+
+    /**
+     * Returns the internal command tree.
+     * <p>
+     * Be careful when accessing the command tree. Do not interact with it, unless you
+     * absolutely know what you're doing.
+     *
+     * @return the command tree
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull CommandTree<C> commandTree() {
         return this.commandTree;
     }
 
@@ -871,9 +986,24 @@ public abstract class CommandManager<C> {
      * Get the command suggestions processor instance currently used in this command manager
      *
      * @return Command suggestions processor
-     * @see #setCommandSuggestionProcessor(CommandSuggestionProcessor) Setting the suggestion processor
+     * @see #commandSuggestionProcessor(CommandSuggestionProcessor) Setting the suggestion processor
+     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #commandSuggestionProcessor()} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public @NonNull CommandSuggestionProcessor<C> getCommandSuggestionProcessor() {
+        return this.commandSuggestionProcessor();
+    }
+
+    /**
+     * Returns the command suggestion processor used in this command manager.
+     *
+     * @return the command suggestion processor
+     * @since 1.7.0
+     * @see #commandSuggestionProcessor(CommandSuggestionProcessor)
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor() {
         return this.commandSuggestionProcessor;
     }
 
@@ -883,8 +1013,27 @@ public abstract class CommandManager<C> {
      * before it's returned to the caller
      *
      * @param commandSuggestionProcessor New command suggestions processor
+     * @deprecated for removal since 1.7.0. Use the non-prefixed setter
+     * {@link #commandSuggestionProcessor(CommandSuggestionProcessor)} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public void setCommandSuggestionProcessor(final @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor) {
+        this.commandSuggestionProcessor(commandSuggestionProcessor);
+    }
+
+    /**
+     * Sets the command suggestion processor.
+     * <p>
+     * This will be called ever time {@link #suggest(Object, String)} is called, in order to process the list
+     * of suggestions before it's returned to the caller.
+     *
+     * @param commandSuggestionProcessor the new command sugesstion processor
+     * @since 1.7.0
+     * @see #commandSuggestionProcessor()
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public void commandSuggestionProcessor(final @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor) {
         this.commandSuggestionProcessor = commandSuggestionProcessor;
     }
 
@@ -900,8 +1049,31 @@ public abstract class CommandManager<C> {
      * should be registered in the constructor of the platform {@link CommandManager}
      *
      * @return Parser registry instance
+     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #parserRegistry()} instead.
      */
-    public ParserRegistry<C> getParserRegistry() {
+    @Deprecated
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull ParserRegistry<C> getParserRegistry() {
+        return this.parserRegistry();
+    }
+
+    /**
+     * Returns the parser registry intance.
+     * <p>
+     * The parser registry contains default mappings to {@link ArgumentParser argument parsers} and
+     * allows for the registryion of custom mappings. The parser registry also contains mappings between
+     * annotations and {@link ParserParameter}, which allows for the customization of parser settings by
+     * using annotations.
+     * <p>
+     * When creating a new parser type, it is highly recommended to register it in the parser registry.
+     * In particular, default parser types (shipped with cloud implementations) should be registered in the
+     * constructor of the platform {@link CommandManager}.
+     *
+     * @return the parser registry instance
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull ParserRegistry<C> parserRegistry() {
         return this.parserRegistry;
     }
 
@@ -914,7 +1086,6 @@ public abstract class CommandManager<C> {
     public final @NonNull ParameterInjectorRegistry<C> parameterInjectorRegistry() {
         return this.parameterInjectorRegistry;
     }
-
 
     /**
      * Get the exception handler for an exception type, if one has been registered
@@ -974,8 +1145,22 @@ public abstract class CommandManager<C> {
      * Get a collection containing all registered commands.
      *
      * @return Unmodifiable view of all registered commands
+     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #commands()} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public final @NonNull Collection<@NonNull Command<C>> getCommands() {
+        return this.commands();
+    }
+
+    /**
+     * Returns an unmodifiable view of all registered commands.
+     *
+     * @return unmodifiable view of all registered commands
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public final @NonNull Collection<@NonNull Command<C>> commands() {
         return Collections.unmodifiableCollection(this.commands);
     }
 
@@ -986,8 +1171,26 @@ public abstract class CommandManager<C> {
      *
      * @return Command help handler. A new instance will be created
      *         each time this method is called.
+     * @deprecated for removal since 1.7.0. Use {@link #createCommandHelpHandler()} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public final @NonNull CommandHelpHandler<C> getCommandHelpHandler() {
+        return this.createCommandHelpHandler();
+    }
+
+    /**
+     * Creates a new command help handler instance.
+     * <p>
+     * The command helper handler can be used to assist in the production of commad help menus, etc.
+     * <p>
+     * This command help handler instance will display all commands registered in this command manager.
+     *
+     * @return a new command helper handler instance
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public final @NonNull CommandHelpHandler<C> createCommandHelpHandler() {
         return new CommandHelpHandler<>(this, cmd -> true);
     }
 
@@ -1000,8 +1203,31 @@ public abstract class CommandManager<C> {
      *                         the help menu.
      * @return Command help handler. A new instance will be created
      *         each time this method is called.
+     * @deprecated for removal since 1.7.0. Use {@link #createCommandHelpHandler(Predicate)} instead.
      */
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public final @NonNull CommandHelpHandler<C> getCommandHelpHandler(
+            final @NonNull Predicate<Command<C>> commandPredicate
+    ) {
+        return this.createCommandHelpHandler(commandPredicate);
+    }
+
+    /**
+     * Creates a new command help handler instance.
+     * <p>
+     * The command helper handler can be used to assist in the production of commad help menus, etc.
+     * <p>
+     * A predicate can be specified to filter what commands
+     * registered in this command manager are visible in the help menu.
+     *
+     * @param commandPredicate predicate that filters what commands are displayed in
+     *                         the help menu.
+     * @return a new command helper handler instance
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public final @NonNull CommandHelpHandler<C> createCommandHelpHandler(
             final @NonNull Predicate<Command<C>> commandPredicate
     ) {
         return new CommandHelpHandler<>(this, commandPredicate);
@@ -1102,7 +1328,7 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     protected final void lockRegistration() {
-        if (this.getRegistrationState() == RegistrationState.BEFORE_REGISTRATION) {
+        if (this.registrationState() == RegistrationState.BEFORE_REGISTRATION) {
             this.transitionOrThrow(RegistrationState.BEFORE_REGISTRATION, RegistrationState.AFTER_REGISTRATION);
             return;
         }
@@ -1116,9 +1342,24 @@ public abstract class CommandManager<C> {
      *
      * @return The current state
      * @since 1.2.0
+     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #registrationState()} instead.
      */
-    @API(status = API.Status.STABLE, since = "1.2.0")
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.7.0")
     public final @NonNull RegistrationState getRegistrationState() {
+        return this.registrationState();
+    }
+
+    /**
+     * Returns the active registration state for this manager.
+     * <p>
+     * If the state is {@link RegistrationState#AFTER_REGISTRATION}, commands can no longer be registered.
+     *
+     * @return the current state
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public final @NonNull RegistrationState registrationState() {
         return this.state.get();
     }
 

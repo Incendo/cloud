@@ -35,7 +35,7 @@ public class CommandRegistrationStateTest {
     @Test
     void testInitialState() {
         final CommandManager<TestCommandSender> manager = createManager();
-        assertEquals(CommandManager.RegistrationState.BEFORE_REGISTRATION, manager.getRegistrationState());
+        assertEquals(CommandManager.RegistrationState.BEFORE_REGISTRATION, manager.registrationState());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class CommandRegistrationStateTest {
         manager.command(manager.commandBuilder("test").handler(ctx -> {
         }));
 
-        assertEquals(CommandManager.RegistrationState.REGISTERING, manager.getRegistrationState());
+        assertEquals(CommandManager.RegistrationState.REGISTERING, manager.registrationState());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class CommandRegistrationStateTest {
         manager.command(manager.commandBuilder("test2").handler(ctx -> {
         }));
 
-        assertEquals(CommandManager.RegistrationState.REGISTERING, manager.getRegistrationState());
+        assertEquals(CommandManager.RegistrationState.REGISTERING, manager.registrationState());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class CommandRegistrationStateTest {
         }));
         assertThrows(
                 IllegalStateException.class,
-                () -> manager.setCommandRegistrationHandler(CommandRegistrationHandler.nullCommandRegistrationHandler())
+                () -> manager.commandRegistrationHandler(CommandRegistrationHandler.nullCommandRegistrationHandler())
         );
     }
 

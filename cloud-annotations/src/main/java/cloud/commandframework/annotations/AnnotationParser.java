@@ -439,7 +439,7 @@ public final class AnnotationParser<C> {
                 ));
             }
             try {
-                this.manager.getParserRegistry().registerSuggestionProvider(
+                this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
                         new MethodSuggestionsProvider<>(instance, method)
                 );
@@ -476,7 +476,7 @@ public final class AnnotationParser<C> {
                 if (suggestions.isEmpty()) {
                     suggestionsProvider = (context, input) -> Collections.emptyList();
                 } else {
-                    suggestionsProvider = this.manager.getParserRegistry().getSuggestionProvider(suggestions)
+                    suggestionsProvider = this.manager.parserRegistry().getSuggestionProvider(suggestions)
                             .orElseThrow(() -> new NullPointerException(
                                     String.format(
                                             "Cannot find the suggestions provider with name '%s'",
@@ -493,12 +493,12 @@ public final class AnnotationParser<C> {
                         parameters -> methodArgumentParser;
                 final String name = this.processString(parser.name());
                 if (name.isEmpty()) {
-                    this.manager.getParserRegistry().registerParserSupplier(
+                    this.manager.parserRegistry().registerParserSupplier(
                             TypeToken.get(method.getGenericReturnType()),
                             parserFunction
                     );
                 } else {
-                    this.manager.getParserRegistry().registerNamedParserSupplier(
+                    this.manager.parserRegistry().registerNamedParserSupplier(
                             name,
                             parserFunction
                     );
@@ -687,12 +687,12 @@ public final class AnnotationParser<C> {
         final Parameter parameter = argumentPair.getParameter();
         final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
         final TypeToken<?> token = TypeToken.get(parameter.getParameterizedType());
-        final ParserParameters parameters = this.manager.getParserRegistry()
+        final ParserParameters parameters = this.manager.parserRegistry()
                 .parseAnnotations(token, annotations);
         /* Create the argument parser */
         final ArgumentParser<C, ?> parser;
         if (argumentPair.getArgument().parserName().isEmpty()) {
-            parser = this.manager.getParserRegistry()
+            parser = this.manager.parserRegistry()
                     .createParser(token, parameters)
                     .orElseThrow(() -> new IllegalArgumentException(
                             String.format("Parameter '%s' in method '%s' "
@@ -702,7 +702,7 @@ public final class AnnotationParser<C> {
                                     token.getType().getTypeName()
                             )));
         } else {
-            parser = this.manager.getParserRegistry()
+            parser = this.manager.parserRegistry()
                     .createParser(argumentPair.getArgument().parserName(), parameters)
                     .orElseThrow(() -> new IllegalArgumentException(
                             String.format("Parameter '%s' in method '%s' "
@@ -745,7 +745,7 @@ public final class AnnotationParser<C> {
         } else if (!argument.suggestions().isEmpty()) { /* Check whether or not a suggestion provider should be set */
             final String suggestionProviderName = argument.suggestions();
             final Optional<BiFunction<CommandContext<C>, String, List<String>>> suggestionsFunction =
-                    this.manager.getParserRegistry().getSuggestionProvider(suggestionProviderName);
+                    this.manager.parserRegistry().getSuggestionProvider(suggestionProviderName);
             argumentBuilder.withSuggestionsProvider(
                     suggestionsFunction.orElseThrow(() ->
                             new IllegalArgumentException(String.format(

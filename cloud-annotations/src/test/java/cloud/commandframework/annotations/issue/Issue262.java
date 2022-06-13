@@ -54,7 +54,7 @@ class Issue262 {
     @BeforeEach
     void setup() {
         this.manager = new TestCommandManager();
-        this.commandHelpHandler = this.manager.getCommandHelpHandler();
+        this.commandHelpHandler = this.manager.createCommandHelpHandler();
         this.annotationParser = new AnnotationParser<>(
                 this.manager,
                 TestCommandSender.class,

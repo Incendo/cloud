@@ -207,7 +207,7 @@ public final class CommandTree<C> {
                 } else {
                     /* Too many arguments. We have a unique path, so we can send the entire context */
                     return Pair.of(null, new InvalidSyntaxException(
-                            this.commandManager.getCommandSyntaxFormatter()
+                            this.commandManager.commandSyntaxFormatter()
                                     .apply(parsedArguments, root),
                             commandContext.getSender(), this.getChain(root)
                             .stream()
@@ -219,7 +219,7 @@ public final class CommandTree<C> {
             } else {
                 /* Too many arguments. We have a unique path, so we can send the entire context */
                 return Pair.of(null, new InvalidSyntaxException(
-                        this.commandManager.getCommandSyntaxFormatter()
+                        this.commandManager.commandSyntaxFormatter()
                                 .apply(parsedArguments, root),
                         commandContext.getSender(), this.getChain(root)
                         .stream()
@@ -278,7 +278,7 @@ public final class CommandTree<C> {
             }
             /* We know that there's no command and we also cannot match any of the children */
             return Pair.of(null, new InvalidSyntaxException(
-                    this.commandManager.getCommandSyntaxFormatter()
+                    this.commandManager.commandSyntaxFormatter()
                             .apply(parsedArguments, root),
                     commandContext.getSender(), this.getChain(root)
                     .stream()
@@ -378,7 +378,7 @@ public final class CommandTree<C> {
                         }
                         /* Not enough arguments */
                         return Pair.of(null, new InvalidSyntaxException(
-                                this.commandManager.getCommandSyntaxFormatter()
+                                this.commandManager.commandSyntaxFormatter()
                                         .apply(Objects.requireNonNull(
                                                         child.getValue()
                                                                 .getOwningCommand())
@@ -411,7 +411,7 @@ public final class CommandTree<C> {
                         }
                         /* Child does not have a command and so we cannot proceed */
                         return Pair.of(null, new InvalidSyntaxException(
-                                this.commandManager.getCommandSyntaxFormatter()
+                                this.commandManager.commandSyntaxFormatter()
                                         .apply(parsedArguments, root),
                                 commandContext.getSender(), this.getChain(root)
                                 .stream()
@@ -449,7 +449,7 @@ public final class CommandTree<C> {
                         } else {
                             /* Too many arguments. We have a unique path, so we can send the entire context */
                             return Pair.of(null, new InvalidSyntaxException(
-                                    this.commandManager.getCommandSyntaxFormatter()
+                                    this.commandManager.commandSyntaxFormatter()
                                             .apply(parsedArguments, child),
                                     commandContext.getSender(), this.getChain(root)
                                     .stream()
@@ -778,7 +778,7 @@ public final class CommandTree<C> {
                 throw new NoCommandInLeafException(leaf);
             } else {
                 final Command<C> owningCommand = leaf.getOwningCommand();
-                this.commandManager.getCommandRegistrationHandler().registerCommand(owningCommand);
+                this.commandManager.commandRegistrationHandler().registerCommand(owningCommand);
             }
         });
 

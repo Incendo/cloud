@@ -78,7 +78,7 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
         this.owningPlugin = requireNonNull(container, "container");
         this.forwardMapper = requireNonNull(forwardMapper, "forwardMapper");
         this.reverseMapper = requireNonNull(reverseMapper, "reverseMapper");
-        ((SpongePluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        ((SpongePluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
     }
 
     @Override

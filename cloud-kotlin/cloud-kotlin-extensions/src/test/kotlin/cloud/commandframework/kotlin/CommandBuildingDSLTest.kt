@@ -88,7 +88,7 @@ class CommandBuildingDSLTest {
         manager.executeCommand(SpecificCommandSender(), "kotlin dsl time bruh_moment")
 
         Assertions.assertEquals(
-            manager.commandHelpHandler.allCommands.map { it.syntaxString }.sorted(),
+            manager.createCommandHelpHandler().allCommands.map { it.syntaxString }.sorted(),
             setOf(
                 "kotlin dsl <moment>",
                 "kotlin dsl <moment> bruh_moment",

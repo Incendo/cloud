@@ -72,7 +72,7 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
         context.store("__raw_input__", new LinkedList<>(inputQueue));
         final List<String> suggestions;
         if (this.commandManager.preprocessContext(context, inputQueue) == State.ACCEPTED) {
-            suggestions = this.commandManager.getCommandSuggestionProcessor().apply(
+            suggestions = this.commandManager.commandSuggestionProcessor().apply(
                     new CommandPreprocessingContext<>(context, inputQueue),
                     this.commandTree.getSuggestions(
                             context,

@@ -136,50 +136,50 @@ public final class FabricServerCommandManager<C> extends FabricCommandManager<C,
     }
 
     private void registerParsers() {
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Message.class), params -> FabricArgumentParsers.message());
+        this.parserRegistry().registerParserSupplier(TypeToken.get(Message.class), params -> FabricArgumentParsers.message());
 
         // Location arguments
-        this.getParserRegistry().registerAnnotationMapper(
+        this.parserRegistry().registerAnnotationMapper(
                 Center.class,
                 (annotation, type) -> ParserParameters.single(FabricParserParameters.CENTER_INTEGERS, true)
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Coordinates.class),
                 params -> FabricArgumentParsers.vec3(params.get(
                         FabricParserParameters.CENTER_INTEGERS,
                         false
                 ))
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Coordinates.CoordinatesXZ.class),
                 params -> FabricArgumentParsers.vec2(params.get(
                         FabricParserParameters.CENTER_INTEGERS,
                         false
                 ))
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Coordinates.BlockCoordinates.class),
                 params -> FabricArgumentParsers.blockPos()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Coordinates.ColumnCoordinates.class),
                 params -> FabricArgumentParsers.columnPos()
         );
 
         // Entity selectors
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(SinglePlayerSelector.class),
                 params -> FabricArgumentParsers.singlePlayerSelector()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultiplePlayerSelector.class),
                 params -> FabricArgumentParsers.multiplePlayerSelector()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(SingleEntitySelector.class),
                 params -> FabricArgumentParsers.singleEntitySelector()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultipleEntitySelector.class),
                 params -> FabricArgumentParsers.multipleEntitySelector()
         );

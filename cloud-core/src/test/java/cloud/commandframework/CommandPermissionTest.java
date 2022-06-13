@@ -155,7 +155,7 @@ class CommandPermissionTest {
         @Override
         public boolean hasPermission(
                 final @NonNull TestCommandSender sender,
-                final String permission
+                final @NonNull String permission
         ) {
             if (permission.equalsIgnoreCase("first")) {
                 return true;

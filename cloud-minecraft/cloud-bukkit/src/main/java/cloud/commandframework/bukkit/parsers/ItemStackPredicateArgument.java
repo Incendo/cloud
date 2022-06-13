@@ -271,7 +271,7 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
      */
     @SuppressWarnings("unused")
     private static <C> void registerParserSupplier(final @NonNull BukkitCommandManager<C> commandManager) {
-        commandManager.getParserRegistry().registerParserSupplier(
+        commandManager.parserRegistry().registerParserSupplier(
                 TypeToken.get(ItemStackPredicate.class),
                 params -> new ItemStackPredicateArgument.Parser<>()
         );

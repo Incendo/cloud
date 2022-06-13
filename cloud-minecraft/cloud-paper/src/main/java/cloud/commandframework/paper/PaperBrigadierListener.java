@@ -77,7 +77,7 @@ class PaperBrigadierListener<C> implements Listener {
             return;
         }
 
-        final CommandTree<C> commandTree = this.paperCommandManager.getCommandTree();
+        final CommandTree<C> commandTree = this.paperCommandManager.commandTree();
 
         final String label;
         if (event.getCommandLabel().contains(":")) {

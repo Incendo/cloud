@@ -424,8 +424,8 @@ public final class ExamplePlugin extends JavaPlugin {
 
         /* Register a custom regex caption */
         final Caption moneyCaption = Caption.of("regex.money");
-        if (this.manager.getCaptionRegistry() instanceof SimpleCaptionRegistry) {
-            ((SimpleCaptionRegistry<CommandSender>) this.manager.getCaptionRegistry()).registerMessageFactory(
+        if (this.manager.captionRegistry() instanceof SimpleCaptionRegistry) {
+            ((SimpleCaptionRegistry<CommandSender>) this.manager.captionRegistry()).registerMessageFactory(
                     moneyCaption,
                     (sender, key) -> "'{input}' is not very cash money of you"
             );

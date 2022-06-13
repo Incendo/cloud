@@ -72,10 +72,10 @@ class AnnotationParserTest {
     void setup() {
         manager = new TestCommandManager();
         annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
-        manager.getParserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
+        manager.parserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
                 StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList("potato")));
         /* Register a suggestion provider */
-        manager.getParserRegistry().registerSuggestionProvider(
+        manager.parserRegistry().registerSuggestionProvider(
                 "some-name",
                 (context, input) -> NAMED_SUGGESTIONS
         );
@@ -156,7 +156,7 @@ class AnnotationParserTest {
     @Test
     void testAnnotatedSuggestionsProviders() {
         final BiFunction<CommandContext<TestCommandSender>, String, List<String>> suggestionsProvider =
-                this.manager.getParserRegistry().getSuggestionProvider("cows").orElse(null);
+                this.manager.parserRegistry().getSuggestionProvider("cows").orElse(null);
         Assertions.assertNotNull(suggestionsProvider);
         Assertions.assertTrue(suggestionsProvider.apply(new CommandContext<>(new TestCommandSender(), manager), "")
                 .contains("Stella"));
@@ -164,7 +164,7 @@ class AnnotationParserTest {
 
     @Test
     void testAnnotatedArgumentParser() {
-        final ArgumentParser<TestCommandSender, CustomType> parser = this.manager.getParserRegistry().createParser(
+        final ArgumentParser<TestCommandSender, CustomType> parser = this.manager.parserRegistry().createParser(
                 TypeToken.get(CustomType.class),
                 ParserParameters.empty()
         ).orElseThrow(() -> new NullPointerException("Could not find CustomType parser"));

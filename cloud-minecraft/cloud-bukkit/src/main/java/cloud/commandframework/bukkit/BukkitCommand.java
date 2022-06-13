@@ -196,7 +196,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public @NonNull String getUsage() {
-        return this.manager.getCommandSyntaxFormatter().apply(
+        return this.manager.commandSyntaxFormatter().apply(
                 Collections.singletonList(Objects.requireNonNull(this.namedNode().getValue())),
                 this.namedNode()
         );
@@ -229,6 +229,6 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     private CommandTree.@Nullable Node<CommandArgument<C, ?>> namedNode() {
-        return this.manager.getCommandTree().getNamedNode(this.command.getName());
+        return this.manager.commandTree().getNamedNode(this.command.getName());
     }
 }
