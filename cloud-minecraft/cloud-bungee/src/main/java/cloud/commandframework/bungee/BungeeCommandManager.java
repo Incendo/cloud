@@ -71,7 +71,7 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
             final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
     ) {
         super(commandExecutionCoordinator, new BungeePluginRegistrationHandler<>());
-        ((BungeePluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        ((BungeePluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
@@ -80,15 +80,15 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
         this.registerCommandPreProcessor(new BungeeCommandPreprocessor<>(this));
 
         /* Register Bungee Parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(ProxiedPlayer.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(ProxiedPlayer.class), parserParameters ->
                 new PlayerArgument.PlayerParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(ServerInfo.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(ServerInfo.class), parserParameters ->
                 new ServerArgument.ServerParser<>());
 
         /* Register default captions */
-        if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
+        if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
             final FactoryDelegatingCaptionRegistry<C> factoryDelegatingCaptionRegistry = (FactoryDelegatingCaptionRegistry<C>)
-                    this.getCaptionRegistry();
+                    this.captionRegistry();
             factoryDelegatingCaptionRegistry.registerMessageFactory(
                     BungeeCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
                     (context, key) -> ARGUMENT_PARSE_FAILURE_PLAYER

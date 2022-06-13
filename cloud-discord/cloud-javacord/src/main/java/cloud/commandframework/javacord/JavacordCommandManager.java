@@ -71,7 +71,7 @@ public class JavacordCommandManager<C> extends CommandManager<C> {
                     @NonNull String, @NonNull Boolean> commandPermissionMapper
     ) {
         super(commandExecutionCoordinator, new JavacordRegistrationHandler<>());
-        ((JavacordRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        ((JavacordRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.discordApi = discordApi;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;

@@ -61,7 +61,7 @@ public final class CommandHelpHandler<C> {
      */
     public @NonNull List<@NonNull VerboseHelpEntry<C>> getAllCommands() {
         final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
-        for (final Command<C> command : this.commandManager.getCommands()) {
+        for (final Command<C> command : this.commandManager.commands()) {
             /* Check command is not filtered */
             if (!this.commandPredicate.test(command)) {
                 continue;
@@ -71,7 +71,7 @@ public final class CommandHelpHandler<C> {
             final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
             syntaxHints.add(new VerboseHelpEntry<>(
                     command,
-                    this.commandManager.getCommandSyntaxFormatter()
+                    this.commandManager.commandSyntaxFormatter()
                             .apply(arguments, null),
                     description
             ));
@@ -89,10 +89,10 @@ public final class CommandHelpHandler<C> {
      */
     public @NonNull List<@NonNull String> getLongestSharedChains() {
         final List<String> chains = new ArrayList<>();
-        this.commandManager.getCommandTree().getRootNodes().forEach(node ->
+        this.commandManager.commandTree().getRootNodes().forEach(node ->
                 chains.add(Objects.requireNonNull(node.getValue())
                         .getName() + this.commandManager
-                        .getCommandSyntaxFormatter()
+                        .commandSyntaxFormatter()
                         .apply(
                                 Collections
                                         .emptyList(),
@@ -179,7 +179,7 @@ public final class CommandHelpHandler<C> {
                 final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
                 syntaxHints.add(new VerboseHelpEntry<>(
                         command,
-                        this.commandManager.getCommandSyntaxFormatter()
+                        this.commandManager.commandSyntaxFormatter()
                                 .apply(arguments, null),
                         description
                 ));
@@ -191,7 +191,7 @@ public final class CommandHelpHandler<C> {
         }
 
         /* Traverse command to find the most specific help topic */
-        final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.getCommandTree()
+        final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.commandTree()
                 .getNamedNode(availableCommandLabels.iterator().next());
 
         final List<CommandArgument<C, ?>> traversedNodes = new LinkedList<>();
@@ -240,7 +240,7 @@ public final class CommandHelpHandler<C> {
                         continue;
                     }
                 }
-                final String currentDescription = this.commandManager.getCommandSyntaxFormatter().apply(traversedNodes, null);
+                final String currentDescription = this.commandManager.commandSyntaxFormatter().apply(traversedNodes, null);
                 /* Attempt to parse the longest possible description for the children */
                 final List<String> childSuggestions = new LinkedList<>();
                 for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
@@ -258,7 +258,7 @@ public final class CommandHelpHandler<C> {
                             child.getValue().getOwningCommand().getCommandPermission()
                     )) {
                         traversedNodesSub.add(child.getValue());
-                        childSuggestions.add(this.commandManager.getCommandSyntaxFormatter().apply(traversedNodesSub, child));
+                        childSuggestions.add(this.commandManager.commandSyntaxFormatter().apply(traversedNodesSub, child));
                     }
                 }
                 return new MultiHelpTopic<>(currentDescription, childSuggestions);

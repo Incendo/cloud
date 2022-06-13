@@ -129,7 +129,7 @@ public class CommandContext<C> {
         this.commandSender = commandSender;
         this.suggestions = suggestions;
         this.commandManager = commandManager;
-        this.captionRegistry = commandManager.getCaptionRegistry();
+        this.captionRegistry = commandManager.captionRegistry();
         this.captionVariableReplacementHandler = commandManager.captionVariableReplacementHandler();
     }
 

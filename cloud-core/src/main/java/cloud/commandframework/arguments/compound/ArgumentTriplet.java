@@ -93,7 +93,7 @@ public class ArgumentTriplet<C, U, V, W, O> extends CompoundArgument<Triplet<U, 
             final @NonNull Triplet<@NonNull String, @NonNull String, @NonNull String> names,
             final @NonNull Triplet<@NonNull Class<U>, @NonNull Class<V>, @NonNull Class<W>> types
     ) {
-        final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
+        final ParserRegistry<C> parserRegistry = manager.parserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(
                 TypeToken.get(types.getFirst()),
                 ParserParameters.empty()

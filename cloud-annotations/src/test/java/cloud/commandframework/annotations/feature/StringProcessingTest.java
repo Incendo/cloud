@@ -97,7 +97,7 @@ class StringProcessingTest {
         this.annotationParser.parse(testClassA);
 
         // Assert
-        final List<Command<TestCommandSender>> commands = new ArrayList<>(this.commandManager.getCommands());
+        final List<Command<TestCommandSender>> commands = new ArrayList<>(this.commandManager.commands());
         assertThat(commands).hasSize(1);
 
         final Command<TestCommandSender> command = commands.get(0);

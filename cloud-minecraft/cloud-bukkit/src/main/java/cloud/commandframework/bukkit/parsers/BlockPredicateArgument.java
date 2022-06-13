@@ -335,7 +335,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
      */
     @SuppressWarnings("unused")
     private static <C> void registerParserSupplier(final @NonNull BukkitCommandManager<C> commandManager) {
-        commandManager.getParserRegistry()
+        commandManager.parserRegistry()
                 .registerParserSupplier(TypeToken.get(BlockPredicate.class), params -> new BlockPredicateArgument.Parser<>());
     }
 }

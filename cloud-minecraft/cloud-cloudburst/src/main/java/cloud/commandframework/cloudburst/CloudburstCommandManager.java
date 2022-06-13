@@ -65,7 +65,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
             final @NonNull Function<@NonNull C, @NonNull CommandSender> backwardsCommandSenderMapper
     ) {
         super(commandExecutionCoordinator, new CloudburstPluginRegistrationHandler<>());
-        ((CloudburstPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        ((CloudburstPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
         this.owningPlugin = owningPlugin;
@@ -95,7 +95,7 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
 
     @Override
     public final boolean isCommandRegistrationAllowed() {
-        return this.getRegistrationState() != RegistrationState.AFTER_REGISTRATION;
+        return this.registrationState() != RegistrationState.AFTER_REGISTRATION;
     }
 
     final @NonNull Function<@NonNull CommandSender, @NonNull C> getCommandSenderMapper() {

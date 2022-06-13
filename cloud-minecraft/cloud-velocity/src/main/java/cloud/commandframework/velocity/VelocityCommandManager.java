@@ -109,7 +109,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
             final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper
     ) {
         super(commandExecutionCoordinator, new VelocityPluginRegistrationHandler<>());
-        ((VelocityPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        ((VelocityPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.proxyServer = proxyServer;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
@@ -118,15 +118,15 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
         this.registerCommandPreProcessor(new VelocityCommandPreprocessor<>(this));
 
         /* Register Velocity Parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
                 new PlayerArgument.PlayerParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(RegisteredServer.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(RegisteredServer.class), parserParameters ->
                 new ServerArgument.ServerParser<>());
 
         /* Register default captions */
-        if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
+        if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
             final FactoryDelegatingCaptionRegistry<C> factoryDelegatingCaptionRegistry = (FactoryDelegatingCaptionRegistry<C>)
-                    this.getCaptionRegistry();
+                    this.captionRegistry();
             factoryDelegatingCaptionRegistry.registerMessageFactory(
                     VelocityCaptionKeys.ARGUMENT_PARSE_FAILURE_PLAYER,
                     (context, key) -> ARGUMENT_PARSE_FAILURE_PLAYER
@@ -163,7 +163,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     @SuppressWarnings("unchecked")
     @Override
     public @NonNull CloudBrigadierManager<C, CommandSource> brigadierManager() {
-        return ((VelocityPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).brigadierManager();
+        return ((VelocityPluginRegistrationHandler<C>) this.commandRegistrationHandler()).brigadierManager();
     }
 
     final @NonNull ProxyServer proxyServer() {

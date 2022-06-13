@@ -75,7 +75,7 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
             } else {
                 final TypeToken<?> token = TypeToken.get(parameter.getType());
                 final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
-                final ParserRegistry<?> registry = this.commandManager.getParserRegistry();
+                final ParserRegistry<?> registry = this.commandManager.parserRegistry();
                 final ArgumentParser<?, ?> parser;
                 final String parserName = this.annotationParser.processString(flag.parserName());
                 if (parserName.isEmpty()) {
