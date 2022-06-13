@@ -94,19 +94,19 @@ class CommandTreeTest {
         );
 
         // Act
-        final Pair<Command<TestCommandSender>, Exception> command1 = this.commandManager.getCommandTree().parse(
+        final Pair<Command<TestCommandSender>, Exception> command1 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("test", "one"))
         );
-        final Pair<Command<TestCommandSender>, Exception> command2 = this.commandManager.getCommandTree().parse(
+        final Pair<Command<TestCommandSender>, Exception> command2 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("test", "two"))
         );
-        final Pair<Command<TestCommandSender>, Exception> command3 = this.commandManager.getCommandTree().parse(
+        final Pair<Command<TestCommandSender>, Exception> command3 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("test", "opt"))
         );
-        final Pair<Command<TestCommandSender>, Exception> command4 = this.commandManager.getCommandTree().parse(
+        final Pair<Command<TestCommandSender>, Exception> command4 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("test", "opt", "12"))
         );
@@ -139,7 +139,7 @@ class CommandTreeTest {
         this.commandManager.command(command);
 
         // Act
-        final Command<TestCommandSender> result = this.commandManager.getCommandTree().parse(
+        final Command<TestCommandSender> result = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("other", "öpt", "12"))
         ).getFirst();
@@ -161,7 +161,7 @@ class CommandTreeTest {
         );
 
         // Act
-        final List<String> results = this.commandManager.getCommandTree().getSuggestions(
+        final List<String> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("test", ""))
         );
@@ -492,7 +492,7 @@ class CommandTreeTest {
         );
 
         /* Try parsing as a variable, which should match the variable command */
-        final Pair<Command<TestCommandSender>, Exception> variableResult = this.commandManager.getCommandTree().parse(
+        final Pair<Command<TestCommandSender>, Exception> variableResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("literalwithvariable", "argthatdoesnotmatch"))
         );
@@ -503,7 +503,7 @@ class CommandTreeTest {
         ;
 
         /* Try parsing with the main name literal, which should match the literal command */
-        final Pair<Command<TestCommandSender>, Exception> literalResult = this.commandManager.getCommandTree().parse(
+        final Pair<Command<TestCommandSender>, Exception> literalResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("literalwithvariable", "literal"))
         );
@@ -514,7 +514,7 @@ class CommandTreeTest {
         ;
 
         /* Try parsing with the alias of the literal, which should match the literal command */
-        final Pair<Command<TestCommandSender>, Exception> literalAliasResult = this.commandManager.getCommandTree().parse(
+        final Pair<Command<TestCommandSender>, Exception> literalAliasResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("literalwithvariable", "literalalias"))
         );

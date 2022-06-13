@@ -73,7 +73,7 @@ class CommandHelpHandlerTest {
     @Test
     void testVerboseHelp() {
         final List<CommandHelpHandler.VerboseHelpEntry<TestCommandSender>> syntaxHints
-                = manager.getCommandHelpHandler().getAllCommands();
+                = manager.createCommandHelpHandler().getAllCommands();
         final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry0 = syntaxHints.get(0);
         Assertions.assertEquals("test <potato>", entry0.getSyntaxString());
         final CommandHelpHandler.VerboseHelpEntry<TestCommandSender> entry1 = syntaxHints.get(1);
@@ -84,22 +84,22 @@ class CommandHelpHandlerTest {
 
     @Test
     void testLongestChains() {
-        final List<String> longestChains = manager.getCommandHelpHandler().getLongestSharedChains();
+        final List<String> longestChains = manager.createCommandHelpHandler().getLongestSharedChains();
         Assertions.assertEquals(Arrays.asList("test int|this|<potato>", "vec <<x> <y>>"), longestChains);
     }
 
     @Test
     void testHelpQuery() {
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query1 = manager.getCommandHelpHandler().queryHelp("");
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query1 = manager.createCommandHelpHandler().queryHelp("");
         Assertions.assertTrue(query1 instanceof CommandHelpHandler.IndexHelpTopic);
         this.printTopic("", query1);
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query2 = manager.getCommandHelpHandler().queryHelp("test");
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query2 = manager.createCommandHelpHandler().queryHelp("test");
         Assertions.assertTrue(query2 instanceof CommandHelpHandler.MultiHelpTopic);
         this.printTopic("test", query2);
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.getCommandHelpHandler().queryHelp("test int");
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.createCommandHelpHandler().queryHelp("test int");
         Assertions.assertTrue(query3 instanceof CommandHelpHandler.VerboseHelpTopic);
         this.printTopic("test int", query3);
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query4 = manager.getCommandHelpHandler().queryHelp("vec");
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query4 = manager.createCommandHelpHandler().queryHelp("vec");
         Assertions.assertTrue(query4 instanceof CommandHelpHandler.VerboseHelpTopic);
         this.printTopic("vec", query4);
     }
@@ -118,7 +118,7 @@ class CommandHelpHandlerTest {
          * - /test <potato>
          * - /test int <int>
          */
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query1 = manager.getCommandHelpHandler(predicate).queryHelp("");
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query1 = manager.createCommandHelpHandler(predicate).queryHelp("");
         Assertions.assertTrue(query1 instanceof CommandHelpHandler.IndexHelpTopic);
         Assertions.assertEquals(Arrays.asList("test <potato>", "test int <int>"), getSortedSyntaxStrings(query1));
 
@@ -127,7 +127,7 @@ class CommandHelpHandlerTest {
          * - /test <potato>
          * - /test int <int>
          */
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query2 = manager.getCommandHelpHandler(predicate).queryHelp("test");
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query2 = manager.createCommandHelpHandler(predicate).queryHelp("test");
         Assertions.assertTrue(query2 instanceof CommandHelpHandler.MultiHelpTopic);
         Assertions.assertEquals(Arrays.asList("test <potato>", "test int <int>"), getSortedSyntaxStrings(query2));
 
@@ -135,7 +135,7 @@ class CommandHelpHandlerTest {
          * List all commands from /test int, which should show only:
          * - /test int <int>
          */
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.getCommandHelpHandler(predicate).queryHelp(
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query3 = manager.createCommandHelpHandler(predicate).queryHelp(
                 "test int");
         Assertions.assertTrue(query3 instanceof CommandHelpHandler.VerboseHelpTopic);
         Assertions.assertEquals(Collections.singletonList("test int <int>"), getSortedSyntaxStrings(query3));
@@ -143,7 +143,7 @@ class CommandHelpHandlerTest {
         /*
          * List all commands from /vec, which should show none
          */
-        final CommandHelpHandler.HelpTopic<TestCommandSender> query4 = manager.getCommandHelpHandler(predicate).queryHelp("vec");
+        final CommandHelpHandler.HelpTopic<TestCommandSender> query4 = manager.createCommandHelpHandler(predicate).queryHelp("vec");
         Assertions.assertTrue(query4 instanceof CommandHelpHandler.IndexHelpTopic);
         Assertions.assertEquals(Collections.emptyList(), getSortedSyntaxStrings(query4));
     }
@@ -239,7 +239,7 @@ class CommandHelpHandlerTest {
     }
 
     private void printVerboseHelpTopic(final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> helpTopic) {
-        System.out.printf("└── Command: /%s\n", manager.getCommandSyntaxFormatter()
+        System.out.printf("└── Command: /%s\n", manager.commandSyntaxFormatter()
                 .apply(helpTopic.getCommand().getArguments(), null));
         System.out.printf("    ├── Description: %s\n", helpTopic.getDescription());
         System.out.println("    └── Args: ");
@@ -252,7 +252,7 @@ class CommandHelpHandlerTest {
                 description = ": " + description;
             }
 
-            System.out.printf("        %s %s%s\n", iterator.hasNext() ? "├──" : "└──", manager.getCommandSyntaxFormatter().apply(
+            System.out.printf("        %s %s%s\n", iterator.hasNext() ? "├──" : "└──", manager.commandSyntaxFormatter().apply(
                     Collections.singletonList(component.getArgument()), null), description);
         }
     }

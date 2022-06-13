@@ -356,7 +356,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
      */
     @SuppressWarnings("unused")
     private static <C> void registerParserSupplier(final @NonNull BukkitCommandManager<C> commandManager) {
-        commandManager.getParserRegistry()
+        commandManager.parserRegistry()
                 .registerParserSupplier(TypeToken.get(NamespacedKey.class), params -> new Parser<>(
                         params.has(BukkitParserParameters.REQUIRE_EXPLICIT_NAMESPACE),
                         params.get(BukkitParserParameters.DEFAULT_NAMESPACE, NamespacedKey.MINECRAFT)

@@ -152,10 +152,10 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.brigadierManager.backwardsBrigadierSenderMapper(this.backwardsCommandSourceMapper);
         this.brigadierManager.brigadierSenderMapper(this.commandSourceMapper);
         this.registerNativeBrigadierMappings(this.brigadierManager);
-        this.setCaptionRegistry(new FabricCaptionRegistry<>());
+        this.captionRegistry(new FabricCaptionRegistry<>());
         this.registerCommandPreProcessor(new FabricCommandPreprocessor<>(this));
 
-        ((FabricCommandRegistrationHandler<C, S>) this.getCommandRegistrationHandler()).initialize(this);
+        ((FabricCommandRegistrationHandler<C, S>) this.commandRegistrationHandler()).initialize(this);
     }
 
     private void registerNativeBrigadierMappings(final @NonNull CloudBrigadierManager<C, S> brigadier) {
@@ -165,7 +165,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerRegistryEntryMappings();
         brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {
         }, builder -> builder.toConstant(net.minecraft.commands.arguments.TeamArgument.team()));
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(PlayerTeam.class),
                 params -> new TeamArgument.TeamParser<>()
         );
@@ -190,7 +190,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
 
         /* Wrapped/Constant Brigadier types, mapped value type */
         this.registerConstantNativeParserSupplier(MessageArgument.Message.class, MessageArgument.message());
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MinecraftTime.class),
                 params -> FabricArgumentParsers.time()
         );
@@ -251,7 +251,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
             seenClasses.add(GenericTypeReflector.erase(valueType));
 
             /* and now, finally, we can register */
-            this.getParserRegistry().registerParserSupplier(
+            this.parserRegistry().registerParserSupplier(
                     TypeToken.get(valueType),
                     params -> new RegistryEntryArgument.Parser(key)
             );
@@ -270,7 +270,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
             final @NonNull Class<T> type,
             final @NonNull Function<CommandBuildContext, @NonNull ArgumentType<T>> argument
     ) {
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(type),
                 params -> FabricArgumentParsers.contextual(argument)
         );
@@ -300,7 +300,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
             final @NonNull TypeToken<T> type,
             final @NonNull ArgumentType<T> argument
     ) {
-        this.getParserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
+        this.parserRegistry().registerParserSupplier(type, params -> new WrappedBrigadierParser<>(argument));
     }
 
     @Override

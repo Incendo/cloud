@@ -125,7 +125,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     )
             throws Exception {
         super(commandExecutionCoordinator, new BukkitPluginRegistrationHandler<>());
-        ((BukkitPluginRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        ((BukkitPluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
@@ -141,39 +141,39 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         this.registerCommandPreProcessor(new BukkitCommandPreprocessor<>(this));
 
         /* Register Bukkit Parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(World.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(World.class), parserParameters ->
                 new WorldArgument.WorldParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Material.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(Material.class), parserParameters ->
                 new MaterialArgument.MaterialParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(Player.class), parserParameters ->
                 new PlayerArgument.PlayerParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(OfflinePlayer.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(OfflinePlayer.class), parserParameters ->
                 new OfflinePlayerArgument.OfflinePlayerParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(Enchantment.class), parserParameters ->
                 new EnchantmentArgument.EnchantmentParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(Location.class), parserParameters ->
                 new LocationArgument.LocationParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(Location2D.class), parserParameters ->
                 new Location2DArgument.Location2DParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
                 new ItemStackArgument.Parser<>());
         /* Register Entity Selector Parsers */
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(SinglePlayerSelector.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(SinglePlayerSelector.class), parserParameters ->
                 new SinglePlayerSelectorArgument.SinglePlayerSelectorParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(MultipleEntitySelector.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(MultipleEntitySelector.class), parserParameters ->
                 new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>());
-        this.getParserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
+        this.parserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
                 new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
 
         if (CraftBukkitReflection.classExists("org.bukkit.NamespacedKey")) {
             this.registerParserSupplierFor(NamespacedKeyArgument.class);
-            this.getParserRegistry().registerAnnotationMapper(
+            this.parserRegistry().registerAnnotationMapper(
                     RequireExplicitNamespace.class,
                     (annotation, type) -> ParserParameters.single(BukkitParserParameters.REQUIRE_EXPLICIT_NAMESPACE, true)
             );
-            this.getParserRegistry().registerAnnotationMapper(
+            this.parserRegistry().registerAnnotationMapper(
                     DefaultNamespace.class,
                     (annotation, type) -> ParserParameters.single(BukkitParserParameters.DEFAULT_NAMESPACE, annotation.value())
             );
@@ -191,7 +191,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 this.owningPlugin
         );
 
-        this.setCaptionRegistry(new BukkitCaptionRegistryFactory<C>().create());
+        this.captionRegistry(new BukkitCaptionRegistryFactory<C>().create());
     }
 
     /**
@@ -323,7 +323,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         try {
             final CloudCommodoreManager<C> cloudCommodoreManager = new CloudCommodoreManager<>(this);
             cloudCommodoreManager.initialize(this);
-            this.setCommandRegistrationHandler(cloudCommodoreManager);
+            this.commandRegistrationHandler(cloudCommodoreManager);
             this.setSplitAliases(true);
         } catch (final Throwable e) {
             throw new BrigadierFailureException(BrigadierFailureReason.COMMODORE_NOT_PRESENT, e);
@@ -337,8 +337,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      */
     @Override
     public @Nullable CloudBrigadierManager<C, ?> brigadierManager() {
-        if (this.getCommandRegistrationHandler() instanceof CloudCommodoreManager) {
-            return ((CloudCommodoreManager<C>) this.getCommandRegistrationHandler()).brigadierManager();
+        if (this.commandRegistrationHandler() instanceof CloudCommodoreManager) {
+            return ((CloudCommodoreManager<C>) this.commandRegistrationHandler()).brigadierManager();
         }
         return null;
     }

@@ -699,7 +699,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          */
         public @NonNull CommandArgument<@NonNull C, @NonNull T> build() {
             if (this.parser == null && this.manager != null) {
-                this.parser = this.manager.getParserRegistry().createParser(this.valueType, ParserParameters.empty())
+                this.parser = this.manager.parserRegistry().createParser(this.valueType, ParserParameters.empty())
                         .orElse(null);
             }
             if (this.parser == null) {

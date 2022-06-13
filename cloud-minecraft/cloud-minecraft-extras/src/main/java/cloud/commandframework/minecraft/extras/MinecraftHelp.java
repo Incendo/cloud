@@ -326,7 +326,7 @@ public final class MinecraftHelp<C> {
                 recipient,
                 query,
                 page,
-                this.commandManager.getCommandHelpHandler(this.commandFilter).queryHelp(recipient, query)
+                this.commandManager.createCommandHelpHandler(this.commandFilter).queryHelp(recipient, query)
         );
     }
 
@@ -471,7 +471,7 @@ public final class MinecraftHelp<C> {
         final Audience audience = this.getAudience(sender);
         audience.sendMessage(this.basicHeader(sender));
         audience.sendMessage(this.showingResults(sender, query));
-        final String command = this.commandManager.getCommandSyntaxFormatter()
+        final String command = this.commandManager.commandSyntaxFormatter()
                 .apply(helpTopic.getCommand().getArguments(), null);
         audience.sendMessage(text()
                 .append(this.lastBranch())
@@ -521,7 +521,7 @@ public final class MinecraftHelp<C> {
                 final CommandComponent<C> component = iterator.next();
                 final CommandArgument<C, ?> argument = component.getArgument();
 
-                final String syntax = this.commandManager.getCommandSyntaxFormatter()
+                final String syntax = this.commandManager.commandSyntaxFormatter()
                         .apply(Collections.singletonList(argument), null);
 
                 final TextComponent.Builder textComponent = text()

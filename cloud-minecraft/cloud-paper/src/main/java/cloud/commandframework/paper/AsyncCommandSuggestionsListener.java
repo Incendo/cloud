@@ -52,7 +52,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
 
         @SuppressWarnings("unchecked")
         final BukkitPluginRegistrationHandler<C> bukkitPluginRegistrationHandler =
-                (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.getCommandRegistrationHandler();
+                (BukkitPluginRegistrationHandler<C>) this.paperCommandManager.commandRegistrationHandler();
 
         /* Turn 'plugin:command arg1 arg2 ...' into 'plugin:command' */
         final String commandLabel = strippedBuffer.split(" ")[0];

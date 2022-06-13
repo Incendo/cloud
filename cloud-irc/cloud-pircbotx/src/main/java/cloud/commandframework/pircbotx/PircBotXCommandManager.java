@@ -104,14 +104,14 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
         this.commandPrefix = commandPrefix;
         this.userMapper = userMapper;
         this.pircBotX.getConfiguration().getListenerManager().addListener(new CloudListenerAdapter<>(this));
-        if (this.getCaptionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
-            ((FactoryDelegatingCaptionRegistry<C>) this.getCaptionRegistry()).registerMessageFactory(
+        if (this.captionRegistry() instanceof FactoryDelegatingCaptionRegistry) {
+            ((FactoryDelegatingCaptionRegistry<C>) this.captionRegistry()).registerMessageFactory(
                     ARGUMENT_PARSE_FAILURE_USER_KEY,
                     (caption, user) -> ARGUMENT_PARSE_FAILURE_USER
             );
         }
         this.registerCommandPreProcessor(context -> context.getCommandContext().store(PIRCBOTX_META_KEY, pircBotX));
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(User.class),
                 parameters -> new UserArgument.UserArgumentParser<>()
         );

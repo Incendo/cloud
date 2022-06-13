@@ -27,6 +27,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class TestCommandManager extends CommandManager<TestCommandSender> {
 
@@ -41,8 +42,8 @@ public class TestCommandManager extends CommandManager<TestCommandSender> {
 
     @Override
     public final boolean hasPermission(
-            final TestCommandSender sender,
-            final String permission
+            final @NonNull TestCommandSender sender,
+            final @NonNull String permission
     ) {
         return !permission.equalsIgnoreCase("no");
     }

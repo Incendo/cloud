@@ -90,7 +90,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
             final @NonNull Pair<@NonNull Class<U>,
                     @NonNull Class<V>> types
     ) {
-        final ParserRegistry<C> parserRegistry = manager.getParserRegistry();
+        final ParserRegistry<C> parserRegistry = manager.parserRegistry();
         final ArgumentParser<C, U> firstParser = parserRegistry.createParser(
                 TypeToken.get(types.getFirst()),
                 ParserParameters.empty()

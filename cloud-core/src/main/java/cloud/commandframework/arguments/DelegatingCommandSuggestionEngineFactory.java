@@ -46,7 +46,7 @@ public final class DelegatingCommandSuggestionEngineFactory<C> {
      */
     public DelegatingCommandSuggestionEngineFactory(final @NonNull CommandManager<C> commandManager) {
         this.commandManager = commandManager;
-        this.commandTree = commandManager.getCommandTree();
+        this.commandTree = commandManager.commandTree();
     }
 
     /**

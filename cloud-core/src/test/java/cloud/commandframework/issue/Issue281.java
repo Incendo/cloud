@@ -52,8 +52,8 @@ class Issue281 {
         ) {
             @Override
             public boolean hasPermission(
-                    @NonNull final TestCommandSender sender,
-                    @NonNull final String permission
+                    final @NonNull TestCommandSender sender,
+                    final @NonNull String permission
             ) {
                 return true;
             }

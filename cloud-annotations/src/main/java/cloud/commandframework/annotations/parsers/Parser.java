@@ -61,7 +61,7 @@ public @interface Parser {
      * <p>
      * For this to work, the suggestion needs to be registered in the parser registry. To do this, use
      * {@link cloud.commandframework.arguments.parser.ParserRegistry#registerSuggestionProvider(String, BiFunction)}.
-     * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#getParserRegistry()}.
+     * The registry instance can be retrieved using {@link cloud.commandframework.CommandManager#parserRegistry()}.
      *
      * @return The name of the suggestion provider, or {@code ""}
      */
