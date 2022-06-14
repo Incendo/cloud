@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -186,8 +187,8 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 final @NonNull String input
         ) {
             /* Check if we have a last flag stored */
-            final String lastArg = commandContext.getOrDefault(FLAG_META_KEY, "");
-            if (lastArg.isEmpty() || !lastArg.startsWith("-")) {
+            final String lastArg = Objects.requireNonNull(commandContext.getOrDefault(FLAG_META_KEY, ""));
+            if (!lastArg.startsWith("-")) {
                 final String rawInput = commandContext.getRawInputJoined();
                 /* Collection containing all used flags */
                 final List<CommandFlag<?>> usedFlags = new LinkedList<>();
@@ -220,38 +221,30 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 final List<String> strings = new LinkedList<>();
                 /* Recommend "primary" flags */
                 for (final CommandFlag<?> flag : this.flags) {
-                    if (usedFlags.contains(flag) || !commandContext.hasPermission(flag.permission())) {
+                    if (usedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
                         continue;
                     }
-                    strings.add(
-                            String.format(
-                                    "--%s",
-                                    flag.getName()
-                            )
-                    );
+                    if (!commandContext.hasPermission(flag.permission())) {
+                        continue;
+                    }
+
+                    strings.add(String.format("--%s", flag.getName()));
                 }
                 /* Recommend aliases */
                 final boolean suggestCombined = input.length() > 1 && input.charAt(0) == '-' && input.charAt(1) != '-';
                 for (final CommandFlag<?> flag : this.flags) {
-                    if (usedFlags.contains(flag) || !commandContext.hasPermission(flag.permission())) {
+                    if (usedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
                         continue;
                     }
+                    if (!commandContext.hasPermission(flag.permission())) {
+                        continue;
+                    }
+
                     for (final String alias : flag.getAliases()) {
                         if (suggestCombined && flag.getCommandArgument() == null) {
-                            strings.add(
-                                    String.format(
-                                            "%s%s",
-                                            input,
-                                            alias
-                                    )
-                            );
+                            strings.add(String.format("%s%s", input, alias));
                         } else {
-                            strings.add(
-                                    String.format(
-                                            "-%s",
-                                            alias
-                                    )
-                            );
+                            strings.add(String.format("-%s", alias));
                         }
                     }
                 }
@@ -348,31 +341,33 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                             final String flagName = string.substring(1);
                             if (flagName.length() > 1) {
                                 boolean oneAdded = false;
-                                /* This is a multi-alias flag, find all flags that apply */
-                                for (final CommandFlag<?> flag : FlagArgumentParser.this.flags) {
-                                    if (flag.getCommandArgument() != null) {
-                                        continue;
-                                    }
-                                    for (final String alias : flag.getAliases()) {
-                                        if (flagName.toLowerCase(Locale.ENGLISH).contains(alias.toLowerCase(Locale.ENGLISH))) {
-                                            if (parsedFlags.contains(flag)) {
-                                                return ArgumentParseResult.failure(new FlagParseException(
-                                                        string,
-                                                        FailureReason.DUPLICATE_FLAG,
-                                                        commandContext
-                                                ));
-                                            } else if (!commandContext.hasPermission(flag.permission())) {
-                                                return ArgumentParseResult.failure(new FlagParseException(
-                                                        string,
-                                                        FailureReason.NO_PERMISSION,
-                                                        commandContext
-                                                ));
-                                            }
-                                            parsedFlags.add(flag);
-                                            commandContext.flags().addPresenceFlag(flag);
-                                            oneAdded = true;
-                                            break;
+                                for (int i = 0; i < flagName.length(); i++) {
+                                    final String parsedFlag = Character.toString(flagName.charAt(i))
+                                            .toLowerCase(Locale.ENGLISH);
+                                    for (final CommandFlag<?> candidateFlag : FlagArgumentParser.this.flags) {
+                                        if (candidateFlag.getCommandArgument() != null) {
+                                            continue;
                                         }
+
+                                       if (candidateFlag.getAliases().contains(parsedFlag)) {
+                                           if (parsedFlags.contains(candidateFlag)
+                                                   && candidateFlag.mode() != CommandFlag.FlagMode.REPEATABLE) {
+                                               return ArgumentParseResult.failure(new FlagParseException(
+                                                       string,
+                                                       FailureReason.DUPLICATE_FLAG,
+                                                       commandContext
+                                               ));
+                                           } else if (!commandContext.hasPermission(candidateFlag.permission())) {
+                                               return ArgumentParseResult.failure(new FlagParseException(
+                                                       string,
+                                                       FailureReason.NO_PERMISSION,
+                                                       commandContext
+                                               ));
+                                           }
+                                           parsedFlags.add(candidateFlag);
+                                           commandContext.flags().addPresenceFlag(candidateFlag);
+                                           oneAdded = true;
+                                       }
                                     }
                                 }
                                 /* We need to parse at least one flag */
@@ -402,7 +397,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                                     FailureReason.UNKNOWN_FLAG,
                                     commandContext
                             ));
-                        } else if (parsedFlags.contains(currentFlag)) {
+                        } else if (parsedFlags.contains(currentFlag) && currentFlag.mode() != CommandFlag.FlagMode.REPEATABLE) {
                             return ArgumentParseResult.failure(new FlagParseException(
                                     string,
                                     FailureReason.DUPLICATE_FLAG,

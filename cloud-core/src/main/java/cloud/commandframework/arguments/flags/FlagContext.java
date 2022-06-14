@@ -23,7 +23,11 @@
 //
 package cloud.commandframework.arguments.flags;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apiguardian.api.API;
@@ -34,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Flag value mappings
  */
 @API(status = API.Status.STABLE)
+@SuppressWarnings({"rawtypes", "unchecked"})
 public final class FlagContext {
 
     /**
@@ -41,7 +46,7 @@ public final class FlagContext {
      */
     public static final Object FLAG_PRESENCE_VALUE = new Object();
 
-    private final Map<String, Object> flagValues;
+    private final Map<String, List> flagValues;
 
     private FlagContext() {
         this.flagValues = new HashMap<>();
@@ -62,7 +67,10 @@ public final class FlagContext {
      * @param flag Flag instance
      */
     public void addPresenceFlag(final @NonNull CommandFlag<?> flag) {
-        this.flagValues.put(flag.getName(), FLAG_PRESENCE_VALUE);
+        ((List<Object>) this.flagValues.computeIfAbsent(
+                flag.getName(),
+                $ -> new ArrayList<>()
+        )).add(FLAG_PRESENCE_VALUE);
     }
 
     /**
@@ -76,7 +84,36 @@ public final class FlagContext {
             final @NonNull CommandFlag<T> flag,
             final @NonNull T value
     ) {
-        this.flagValues.put(flag.getName(), value);
+        ((List<T>) this.flagValues.computeIfAbsent(
+                flag.getName(),
+                $ -> new ArrayList<>()
+        )).add(value);
+    }
+
+    /**
+     * Returns the number of values associated with the given {@code flag}.
+     *
+     * @param flag the flag
+     * @param <T>  the flag value type
+     * @return the number of values associated with the flag
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public <T> int count(final @NonNull CommandFlag<T> flag) {
+        return this.getAll(flag).size();
+    }
+
+    /**
+     * Returns the number of values associated with the given {@code flag}.
+     *
+     * @param flag the flag
+     * @param <T>  the flag value type
+     * @return the number of values associated with the flag
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public <T> int count(final @NonNull String flag) {
+        return this.getAll(flag).size();
     }
 
     /**
@@ -88,8 +125,8 @@ public final class FlagContext {
      *         else {@code false}
      */
     public boolean isPresent(final @NonNull String flag) {
-        final Object value = this.flagValues.get(flag);
-        return FLAG_PRESENCE_VALUE.equals(value);
+        final List value = this.flagValues.get(flag);
+        return value != null && !value.isEmpty();
     }
 
     /**
@@ -107,7 +144,12 @@ public final class FlagContext {
     }
 
     /**
-     * Get a flag value as an optional. Will be empty if the value is not present.
+     * Returns a flag value.
+     * <p>
+     * If using {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#SINGLE}
+     * then this returns the only value, if it has been specified. If using
+     * {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#REPEATABLE} then
+     * it'll return the first value.
      *
      * @param name Flag name
      * @param <T>  Value type
@@ -118,16 +160,20 @@ public final class FlagContext {
     public <T> @NonNull Optional<T> getValue(
             final @NonNull String name
     ) {
-        final Object value = this.flagValues.get(name);
-        if (value == null) {
+        final List value = this.flagValues.get(name);
+        if (value == null || value.isEmpty()) {
             return Optional.empty();
         }
-        @SuppressWarnings("unchecked") final T casted = (T) value;
-        return Optional.of(casted);
+        return Optional.of((T) value.get(0));
     }
 
     /**
-     * Get a flag value as an optional. Will be empty if the value is not present.
+     * Returns a flag value.
+     * <p>
+     * If using {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#SINGLE}
+     * then this returns the only value, if it has been specified. If using
+     * {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#REPEATABLE} then
+     * it'll return the first value.
      *
      * @param flag Flag type
      * @param <T>  Value type
@@ -142,7 +188,12 @@ public final class FlagContext {
     }
 
     /**
-     * Get a flag value
+     * Returns a flag value.
+     * <p>
+     * If using {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#SINGLE}
+     * then this returns the only value, if it has been specified. If using
+     * {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#REPEATABLE} then
+     * it'll return the first value.
      *
      * @param name         Flag name
      * @param defaultValue Default value
@@ -157,7 +208,12 @@ public final class FlagContext {
     }
 
     /**
-     * Get a flag value
+     * Returns a flag value.
+     * <p>
+     * If using {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#SINGLE}
+     * then this returns the only value, if it has been specified. If using
+     * {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#REPEATABLE} then
+     * it'll return the first value.
      *
      * @param name         Flag value
      * @param defaultValue Default value
@@ -234,7 +290,12 @@ public final class FlagContext {
     }
 
     /**
-     * Get a flag value
+     * Returns a flag value.
+     * <p>
+     * If using {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#SINGLE}
+     * then this returns the only value, if it has been specified. If using
+     * {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#REPEATABLE} then
+     * it'll return the first value.
      *
      * @param name Flag name
      * @param <T>  Value type
@@ -250,7 +311,12 @@ public final class FlagContext {
     }
 
     /**
-     * Get a flag value
+     * Returns a flag value.
+     * <p>
+     * If using {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#SINGLE}
+     * then this returns the only value, if it has been specified. If using
+     * {@link cloud.commandframework.arguments.flags.CommandFlag.FlagMode#REPEATABLE} then
+     * it'll return the first value.
      *
      * @param flag Flag name
      * @param <T>  Value type
@@ -262,5 +328,43 @@ public final class FlagContext {
             final @NonNull CommandFlag<T> flag
     ) {
         return this.getValue(flag).orElse(null);
+    }
+
+    /**
+     * Returns all supplied flag values for the given {@code flag}.
+     *
+     * @param flag the flag
+     * @param <T>  the flag value type
+     * @return unmodifiable view of all stored flag values, or {@link Collections#emptyList()}.
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public <T> @NonNull Collection<T> getAll(
+            final @NonNull CommandFlag<T> flag
+    ) {
+        final List values = this.flagValues.get(flag.getName());
+        if (values != null) {
+            return Collections.unmodifiableList((List<T>) values);
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * Returns all supplied flag values for the given {@code flag}.
+     *
+     * @param flag the flag
+     * @param <T>  the flag value type
+     * @return unmodifiable view of all stored flag values, or {@link Collections#emptyList()}.
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public <T> @NonNull Collection<T> getAll(
+            final @NonNull String flag
+    ) {
+        final List values = this.flagValues.get(flag);
+        if (values != null) {
+            return Collections.unmodifiableList((List<T>) values);
+        }
+        return Collections.emptyList();
     }
 }
