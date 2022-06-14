@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.permission.Permission;
+import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -65,15 +66,34 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
             }
             final Flag flag = parameter.getAnnotation(Flag.class);
             final String flagName = this.annotationParser.processString(flag.value());
-            final CommandFlag.Builder<Void> builder = this.commandManager
+
+            CommandFlag.Builder<Void> builder = this.commandManager
                     .flagBuilder(this.annotationParser.processString(flagName))
                     .withDescription(ArgumentDescription.of(this.annotationParser.processString(flag.description())))
                     .withAliases(this.annotationParser.processStrings(flag.aliases()))
                     .withPermission(Permission.of(this.annotationParser.processString(flag.permission())));
+            if (flag.repeatable()) {
+                builder = builder.asRepeatable();
+            }
+
             if (parameter.getType().equals(boolean.class)) {
                 flags.add(builder.build());
             } else {
-                final TypeToken<?> token = TypeToken.get(parameter.getType());
+                final TypeToken<?> token;
+                if (flag.repeatable() && Collection.class.isAssignableFrom(parameter.getType())) {
+                    token = TypeToken.get(GenericTypeReflector.getTypeParameter(
+                            parameter.getParameterizedType(),
+                            Collection.class.getTypeParameters()[0]
+                    ));
+                } else {
+                    token = TypeToken.get(parameter.getType());
+                }
+
+                if (token.equals(TypeToken.get(boolean.class))) {
+                    flags.add(builder.build());
+                    continue;
+                }
+
                 final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
                 final ParserRegistry<?> registry = this.commandManager.parserRegistry();
                 final ArgumentParser<?, ?> parser;

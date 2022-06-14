@@ -28,6 +28,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -94,4 +95,13 @@ public @interface Flag {
      * @since 1.6.0
      */
     @NonNull String permission() default "";
+
+    /**
+     * Whether the flag can be repeated.
+     *
+     * @return whether the flag can be repeated
+     * @since 1.7.0
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    boolean repeatable() default false;
 }
