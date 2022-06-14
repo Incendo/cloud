@@ -51,6 +51,7 @@ public final class CommandFlag<T> {
     private final @NonNull String @NonNull [] aliases;
     private final @NonNull ArgumentDescription description;
     private final @NonNull CommandPermission permission;
+    private final @NonNull FlagMode mode;
 
     private final @Nullable CommandArgument<?, T> commandArgument;
 
@@ -59,13 +60,15 @@ public final class CommandFlag<T> {
             final @NonNull String @NonNull [] aliases,
             final @NonNull ArgumentDescription description,
             final @NonNull CommandPermission permission,
-            final @Nullable CommandArgument<?, T> commandArgument
+            final @Nullable CommandArgument<?, T> commandArgument,
+            final @NonNull FlagMode mode
     ) {
         this.name = Objects.requireNonNull(name, "name cannot be null");
         this.aliases = Objects.requireNonNull(aliases, "aliases cannot be null");
         this.description = Objects.requireNonNull(description, "description cannot be null");
         this.permission = Objects.requireNonNull(permission, "permission cannot be null");
         this.commandArgument = commandArgument;
+        this.mode = Objects.requireNonNull(mode, "mode cannot be null");
     }
 
     /**
@@ -94,6 +97,16 @@ public final class CommandFlag<T> {
      */
     public @NonNull Collection<@NonNull String> getAliases() {
         return Arrays.asList(this.aliases);
+    }
+
+    /**
+     * Returns the {@link FlagMode mode} of this flag.
+     *
+     * @return the flag mode
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull FlagMode mode() {
+        return this.mode;
     }
 
     /**
@@ -174,23 +187,26 @@ public final class CommandFlag<T> {
         private final ArgumentDescription description;
         private final CommandPermission permission;
         private final CommandArgument<?, T> commandArgument;
+        private final FlagMode mode;
 
         private Builder(
                 final @NonNull String name,
                 final @NonNull String[] aliases,
                 final @NonNull ArgumentDescription description,
                 final @NonNull CommandPermission permission,
-                final @Nullable CommandArgument<?, T> commandArgument
+                final @Nullable CommandArgument<?, T> commandArgument,
+                final @NonNull FlagMode mode
         ) {
             this.name = name;
             this.aliases = aliases;
             this.description = description;
             this.permission = permission;
             this.commandArgument = commandArgument;
+            this.mode = mode;
         }
 
         private Builder(final @NonNull String name) {
-            this(name, new String[0], ArgumentDescription.empty(), Permission.empty(), null);
+            this(name, new String[0], ArgumentDescription.empty(), Permission.empty(), null, FlagMode.SINGLE);
         }
 
         /**
@@ -200,7 +216,7 @@ public final class CommandFlag<T> {
          * @param aliases Flag aliases
          * @return New builder instance
          */
-        public Builder<T> withAliases(final @NonNull String... aliases) {
+        public @NonNull Builder<T> withAliases(final @NonNull String... aliases) {
             final Set<String> filteredAliases = new HashSet<>();
             for (final String alias : aliases) {
                 if (alias.isEmpty()) {
@@ -221,7 +237,8 @@ public final class CommandFlag<T> {
                     filteredAliases.toArray(new String[0]),
                     this.description,
                     this.permission,
-                    this.commandArgument
+                    this.commandArgument,
+                    this.mode
             );
         }
 
@@ -234,7 +251,7 @@ public final class CommandFlag<T> {
          */
         @Deprecated
         @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
+        public @NonNull Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
             return this.withDescription((ArgumentDescription) description);
         }
 
@@ -246,8 +263,8 @@ public final class CommandFlag<T> {
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
-        public Builder<T> withDescription(final @NonNull ArgumentDescription description) {
-            return new Builder<>(this.name, this.aliases, description, this.permission, this.commandArgument);
+        public @NonNull Builder<T> withDescription(final @NonNull ArgumentDescription description) {
+            return new Builder<>(this.name, this.aliases, description, this.permission, this.commandArgument, this.mode);
         }
 
         /**
@@ -257,8 +274,8 @@ public final class CommandFlag<T> {
          * @param <N>      New argument type
          * @return New builder instance
          */
-        public <N> Builder<N> withArgument(final @NonNull CommandArgument<?, N> argument) {
-            return new Builder<>(this.name, this.aliases, this.description, this.permission, argument);
+        public <N> @NonNull Builder<N> withArgument(final @NonNull CommandArgument<?, N> argument) {
+            return new Builder<>(this.name, this.aliases, this.description, this.permission, argument, this.mode);
         }
 
         /**
@@ -268,7 +285,7 @@ public final class CommandFlag<T> {
          * @param <N>     New argument type
          * @return New builder instance
          */
-        public <N> Builder<N> withArgument(final CommandArgument.@NonNull Builder<?, N> builder) {
+        public <N> @NonNull Builder<N> withArgument(final CommandArgument.@NonNull Builder<?, N> builder) {
             return this.withArgument(builder.build());
         }
 
@@ -280,8 +297,26 @@ public final class CommandFlag<T> {
          * @since 1.6.0
          */
         @API(status = API.Status.STABLE, since = "1.6.0")
-        public Builder<T> withPermission(final @NonNull CommandPermission permission) {
-            return new Builder<>(this.name, this.aliases, this.description, permission, this.commandArgument);
+        public @NonNull Builder<T> withPermission(final @NonNull CommandPermission permission) {
+            return new Builder<>(this.name, this.aliases, this.description, permission, this.commandArgument, this.mode);
+        }
+
+        /**
+         * Marks the flag as {@link FlagMode#REPEATABLE}.
+         *
+         * @return new builder instance
+         * @since 1.7.0
+         */
+        @API(status = API.Status.STABLE, since = "1.7.0")
+        public @NonNull Builder<T> asRepeatable() {
+            return new Builder<>(
+                    this.name,
+                    this.aliases,
+                    this.description,
+                    this.permission,
+                    this.commandArgument,
+                    FlagMode.REPEATABLE
+            );
         }
 
         /**
@@ -290,7 +325,29 @@ public final class CommandFlag<T> {
          * @return Constructed instance
          */
         public @NonNull CommandFlag<T> build() {
-            return new CommandFlag<>(this.name, this.aliases, this.description, this.permission, this.commandArgument);
+            return new CommandFlag<>(
+                    this.name,
+                    this.aliases,
+                    this.description,
+                    this.permission,
+                    this.commandArgument,
+                    this.mode
+            );
         }
+    }
+
+
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public enum FlagMode {
+        /**
+         * Only a single value can be provided for the flag, and should be extracted
+         * using {@link FlagContext#get(CommandFlag)}.
+         */
+        SINGLE,
+        /**
+         * Multiple values can be provided for the flag, and sdhould be extracted
+         * using {@link FlagContext#getAll(CommandFlag)}.
+         */
+        REPEATABLE
     }
 }

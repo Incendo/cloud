@@ -126,8 +126,10 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
             } else if (parameter.isAnnotationPresent(Flag.class)) {
                 final Flag flag = parameter.getAnnotation(Flag.class);
                 final String flagName = this.annotationParser.processString(flag.value());
-                if (parameter.getType() == boolean.class) {
+                if (parameter.getType().equals(boolean.class)) {
                     arguments.add(flagContext.isPresent(flagName));
+                } else if (flag.repeatable() && parameter.getType().isAssignableFrom(List.class)) {
+                    arguments.add(flagContext.getAll(flagName));
                 } else {
                     arguments.add(flagContext.getValue(flagName, null));
                 }
