@@ -127,13 +127,13 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
         super(commandExecutionCoordinator, new SpongeRegistrationHandler<C>());
         this.checkLateCreation();
         this.pluginContainer = pluginContainer;
-        ((SpongeRegistrationHandler<C>) this.getCommandRegistrationHandler()).initialize(this);
+        ((SpongeRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
         this.causeMapper = causeMapper;
         this.backwardsCauseMapper = backwardsCauseMapper;
         this.parserMapper = new SpongeParserMapper<>();
         this.registerCommandPreProcessor(new SpongeCommandPreprocessor<>(this));
         this.registerParsers();
-        this.setCaptionRegistry(new SpongeCaptionRegistry<>());
+        this.captionRegistry(new SpongeCaptionRegistry<>());
     }
 
     private void checkLateCreation() {
@@ -147,95 +147,95 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
     }
 
     private void registerParsers() {
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(ComponentArgument.class),
                 params -> new ComponentArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(NamedTextColor.class),
                 params -> new NamedTextColorArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Operator.class),
                 params -> new OperatorArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(ServerWorld.class),
                 params -> new WorldArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(ProtoItemStack.class),
                 params -> new ProtoItemStackArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(ItemStackPredicate.class),
                 params -> new ItemStackPredicateArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(ResourceKey.class),
                 params -> new ResourceKeyArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(GameProfile.class),
                 params -> new GameProfileArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(GameProfileCollection.class),
                 params -> new GameProfileCollectionArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(BlockInputArgument.class),
                 params -> new BlockInputArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(BlockPredicate.class),
                 params -> new BlockPredicateArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(User.class),
                 params -> new UserArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(DataContainer.class),
                 params -> new DataContainerArgument.Parser<>()
         );
 
         // Position arguments
-        this.getParserRegistry().registerAnnotationMapper(
+        this.parserRegistry().registerAnnotationMapper(
                 Center.class,
                 (annotation, type) -> ParserParameters.single(SpongeParserParameters.CENTER_INTEGERS, true)
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Vector2d.class),
                 params -> new Vector2dArgument.Parser<>(params.get(SpongeParserParameters.CENTER_INTEGERS, false))
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Vector3d.class),
                 params -> new Vector3dArgument.Parser<>(params.get(SpongeParserParameters.CENTER_INTEGERS, false))
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Vector2i.class),
                 params -> new Vector2iArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(Vector3i.class),
                 params -> new Vector3iArgument.Parser<>()
         );
 
         // Entity selectors
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(SinglePlayerSelector.class),
                 params -> new SinglePlayerSelectorArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultiplePlayerSelector.class),
                 params -> new MultiplePlayerSelectorArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(SingleEntitySelector.class),
                 params -> new SingleEntitySelectorArgument.Parser<>()
         );
-        this.getParserRegistry().registerParserSupplier(
+        this.parserRegistry().registerParserSupplier(
                 TypeToken.get(MultipleEntitySelector.class),
                 params -> new MultipleEntitySelectorArgument.Parser<>()
         );
@@ -265,7 +265,7 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
             final DefaultedRegistryType<?> defaultedRegistryType = (DefaultedRegistryType<?>) registryType;
             final Type valueType = ((ParameterizedType) generic).getActualTypeArguments()[0];
 
-            this.getParserRegistry().registerParserSupplier(
+            this.parserRegistry().registerParserSupplier(
                     TypeToken.get(valueType),
                     params -> new RegistryEntryArgument.Parser<>(defaultedRegistryType)
             );
@@ -331,7 +331,7 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
             this.registrationCallbackListeners.forEach(listener -> listener.accept(this));
             this.registrationCallbackListeners.clear();
         }
-        if (this.getRegistrationState() != RegistrationState.AFTER_REGISTRATION) {
+        if (this.registrationState() != RegistrationState.AFTER_REGISTRATION) {
             this.lockRegistration();
         }
     }
@@ -351,7 +351,7 @@ public final class SpongeCommandManager<C> extends CommandManager<C> {
      * @param listener listener
      */
     public void addRegistrationCallbackListener(final @NonNull Consumer<@NonNull SpongeCommandManager<C>> listener) {
-        if (this.getRegistrationState() == RegistrationState.AFTER_REGISTRATION) {
+        if (this.registrationState() == RegistrationState.AFTER_REGISTRATION) {
             throw new IllegalStateException("The SpongeCommandManager is in the AFTER_REGISTRATION state!");
         }
         this.registrationCallbackListeners.add(listener);

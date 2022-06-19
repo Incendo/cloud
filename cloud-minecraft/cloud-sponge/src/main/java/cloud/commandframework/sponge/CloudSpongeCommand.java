@@ -201,11 +201,11 @@ final class CloudSpongeCommand<C> implements Command.Raw {
     }
 
     private Component usage() {
-        return text(this.commandManager.getCommandSyntaxFormatter().apply(Collections.emptyList(), this.namedNode()));
+        return text(this.commandManager.commandSyntaxFormatter().apply(Collections.emptyList(), this.namedNode()));
     }
 
     private CommandTree.Node<CommandArgument<C, ?>> namedNode() {
-        return this.commandManager.getCommandTree().getNamedNode(this.label);
+        return this.commandManager.commandTree().getNamedNode(this.label);
     }
 
     @Override

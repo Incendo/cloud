@@ -34,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * {@link Component} rather than a String. This allows formatted and localized
  * exception messages.
  */
+@SuppressWarnings("serial")
 public class ComponentMessageRuntimeException extends RuntimeException implements ComponentMessageThrowable {
 
     private static final long serialVersionUID = 2152146048432114275L;

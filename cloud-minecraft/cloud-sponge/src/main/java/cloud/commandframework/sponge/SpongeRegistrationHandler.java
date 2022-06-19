@@ -50,7 +50,7 @@ final class SpongeRegistrationHandler<C> implements CommandRegistrationHandler {
     @SuppressWarnings("unchecked")
     private void handleRegistrationEvent(final RegisterCommandEvent<Command.Raw> event) {
         this.commandManager.registrationCalled();
-        for (final CommandTree.Node<CommandArgument<C, ?>> node : this.commandManager.getCommandTree().getRootNodes()) {
+        for (final CommandTree.Node<CommandArgument<C, ?>> node : this.commandManager.commandTree().getRootNodes()) {
             final StaticArgument<C> value = requireNonNull((StaticArgument<C>) node.getValue());
             this.registerCommand(event, value);
         }
