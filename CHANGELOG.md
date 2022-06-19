@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.7.0]
 
 ### Added
 - Core: Allow for setting a custom `CaptionVariableReplacementHandler` on the command manager ([#352](https://github.com/Incendo/cloud/pull/352))
@@ -28,11 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Annotations: Fix MutableCommandBuilder Java/Kotlin interoperability issues ([#342](https://github.com/Incendo/cloud/issues/342))
 
 ### Changed
+- Fabric: Updated for Minecraft 1.19 (no longer supports older versions) ([#356](https://github.com/Incendo/cloud/pull/356))
 - Paper: Improved KeyedWorldArgument suggestions ([#334](https://github.com/Incendo/cloud/pull/334))
-- Minecraft: Support sender-aware description decorators in MinecraftHelp ([#354](https://github.com/Incendo/cloud/pull/354))
-
-### Changed
-- Fabric: Updated for Minecraft 1.19 (no longer supports older versions)
+- Minecraft-Extras: Support sender-aware description decorators in MinecraftHelp ([#354](https://github.com/Incendo/cloud/pull/354))
 
 ## [1.6.2]
 
