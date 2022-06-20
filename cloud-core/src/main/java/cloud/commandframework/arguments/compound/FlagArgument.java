@@ -483,6 +483,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
         private static final long serialVersionUID = -7725389394142868549L;
         private final String input;
+        private final FailureReason failureReason;
 
         /**
          * Construct a new flag parse exception
@@ -504,6 +505,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     CaptionVariable.of("flag", input)
             );
             this.input = input;
+            this.failureReason = failureReason;
         }
 
         /**
@@ -513,6 +515,17 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
          */
         public String getInput() {
             return this.input;
+        }
+
+        /**
+         * Get the reason why the flag parsing failed
+         *
+         * @return the failure reason
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        public @NonNull FailureReason failureReason() {
+            return this.failureReason;
         }
     }
 
