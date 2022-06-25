@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Core: Expose failure reason when flag parsing fails ([#380](https://github.com/Incendo/cloud/pull/380))
+
 ## [1.7.0]
 
 ### Added
