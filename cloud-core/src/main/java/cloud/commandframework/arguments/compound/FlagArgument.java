@@ -518,7 +518,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         }
 
         /**
-         * Get the reason why the flag parsing failed
+         * Returns the reason why the flag parsing failed.
          *
          * @return the failure reason
          * @since 1.8.0
