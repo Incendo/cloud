@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Core: Expose failure reason when flag parsing fails ([#380](https://github.com/Incendo/cloud/pull/380))
+- Minecraft-Extras: Expose the name of arguments to the help message provider ([#381](https://github.com/Incendo/cloud/pull/381))
 
 ## [1.7.0]
 

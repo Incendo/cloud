@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,6 +47,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static net.kyori.adventure.text.Component.space;
@@ -95,7 +97,7 @@ public final class MinecraftHelp<C> {
 
     private Predicate<Command<C>> commandFilter = c -> true;
     private BiFunction<C, String, String> stringMessageProvider = (sender, key) -> this.messageMap.get(key);
-    private MessageProvider<C> messageProvider =
+    private MessageProvider.NamedArguments<C> messageProvider =
             (sender, key, args) -> text(this.stringMessageProvider.apply(sender, key));
     private BiFunction<C, String, Component> descriptionDecorator = (sender, description) -> Component.text(description);
     private HelpColors colors = DEFAULT_HELP_COLORS;
@@ -255,8 +257,34 @@ public final class MinecraftHelp<C> {
      *
      * @param messageProvider The message provider to use
      * @since 1.4.0
+     * @deprecated prefer {@link #namedArgumentsMessageProvider(MessageProvider.NamedArguments)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public void messageProvider(final @NonNull MessageProvider<C> messageProvider) {
+        if (messageProvider instanceof MessageProvider.NamedArguments) {
+            this.namedArgumentsMessageProvider((MessageProvider.NamedArguments<C>) messageProvider);
+        } else {
+            this.messageProvider = (sender, key, args) -> messageProvider.provide(
+                    sender,
+                    key,
+                    args.values().toArray(new String[0]) // this only works properly for arguments which are used a single time...
+            );
+        }
+    }
+
+    /**
+     * Set a custom message provider function to be used for getting messages from keys.
+     * <p>
+     * The keys are constants in {@link MinecraftHelp}.
+     * <p>
+     * This version of the method which takes a {@link MessageProvider} will have priority over a message provider
+     * registered through {@link #setMessageProvider(BiFunction)}
+     *
+     * @param messageProvider The message provider to use
+     * @since 1.8.0
+     */
+    public void namedArgumentsMessageProvider(final MessageProvider.@NonNull NamedArguments<C> messageProvider) {
         this.messageProvider = messageProvider;
     }
 
@@ -686,13 +714,11 @@ public final class MinecraftHelp<C> {
             final int attemptedPage,
             final int maxPages
     ) {
+        final Map<String, String> args = new LinkedHashMap<>();
+        args.put("page", String.valueOf(attemptedPage));
+        args.put("max_pages", String.valueOf(maxPages));
         return this.highlight(
-                this.messageProvider.provide(
-                                sender,
-                                MESSAGE_PAGE_OUT_OF_RANGE,
-                                String.valueOf(attemptedPage),
-                                String.valueOf(maxPages)
-                        )
+                this.messageProvider.provide(sender, MESSAGE_PAGE_OUT_OF_RANGE, args)
                         .color(this.colors.text)
                         .replaceText(config -> {
                             config.matchLiteral("<page>");
@@ -705,6 +731,12 @@ public final class MinecraftHelp<C> {
         );
     }
 
+    /**
+     * Provides help menu messages. Prefer {@link NamedArguments}, this class is not deprecated
+     * to avoid unwanted warnings when using the aforementioned subclass.
+     *
+     * @param <C> sender type
+     */
     @FunctionalInterface
     public interface MessageProvider<C> {
 
@@ -715,8 +747,55 @@ public final class MinecraftHelp<C> {
          * @param key    message key (constants in {@link MinecraftHelp}
          * @param args   args
          * @return component
+         * @deprecated prefer {@link NamedArguments}
          */
+        @API(status = API.Status.DEPRECATED, since = "1.8.0")
+        @Deprecated
         @NonNull Component provide(@NonNull C sender, @NonNull String key, @NonNull String... args);
+
+        /**
+         * Improved version of {@link MessageProvider} providing names for message arguments.
+         *
+         * @param <C> sender type
+         */
+        @FunctionalInterface
+        @SuppressWarnings("FunctionalInterfaceMethodChanged")
+        interface NamedArguments<C> extends MessageProvider<C> {
+
+            @Override
+            default @NonNull Component provide(
+                    final @NonNull C sender,
+                    final @NonNull String key,
+                    final @NonNull String... args
+            ) {
+                throw new UnsupportedOperationException();
+            }
+
+            /**
+             * Creates a component from a command sender, key, and arguments
+             *
+             * @param sender command sender
+             * @param key    message key (constants in {@link MinecraftHelp}
+             * @param args   args
+             * @return component
+             */
+            @NonNull Component provide(
+                    @NonNull C sender,
+                    @NonNull String key,
+                    @NonNull Map<String, String> args
+            );
+
+            /**
+             * Creates a component from a command sender and key.
+             *
+             * @param sender command sender
+             * @param key    message key (constants in {@link MinecraftHelp}
+             * @return component
+             */
+            default @NonNull Component provide(final @NonNull C sender, final @NonNull String key) {
+                return this.provide(sender, key, Collections.emptyMap());
+            }
+        }
     }
 
     /**
