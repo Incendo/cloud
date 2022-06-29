@@ -25,6 +25,7 @@ package cloud.commandframework.sponge7;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -210,7 +211,8 @@ final class CloudCommandCallable<C> implements CommandCallable {
 
     @Override
     public Text getUsage(final @NonNull CommandSource source) {
-        return Text.of(this.manager.commandSyntaxFormatter().apply(
+        return Text.of(((CommandSyntaxFormatter.SenderAware<C>) this.manager.commandSyntaxFormatter()).apply(
+                this.manager.getCommandSourceMapper().apply(source),
                 Collections.emptyList(),
                 this.manager.commandTree().getNamedNode(this.command.getName())
         ));

@@ -53,4 +53,38 @@ public interface CommandSyntaxFormatter<C> {
             @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
             CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
     );
+
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
+    @FunctionalInterface
+    interface SenderAware<C> extends CommandSyntaxFormatter<C> {
+
+        @Override
+        default @NonNull String apply(
+                final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
+                final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
+        ) {
+            return this.apply(null, commandArguments, node);
+        }
+
+        /**
+         * Format the command arguments into a syntax string.
+         *
+         * @param sender           Command sender
+         * @param commandArguments Command arguments that have been unambiguously specified up until this point. This
+         *                         should include the "current" command, if such a command exists.
+         * @param node             The current command node. The children of this node will be appended onto the
+         *                         command syntax string, as long as an unambiguous path can be identified. The node
+         *                         itself will not be appended onto the syntax string. This can be set to {@code null} if
+         *                         no node is relevant at the point of formatting.
+         * @return formatted syntax string
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        @NonNull String apply(
+                @Nullable C sender,
+                @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
+                CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
+        );
+    }
 }

@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.CommandSuggestionEngine;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.DelegatingCommandSuggestionEngineFactory;
+import cloud.commandframework.arguments.LegacyAdapterCommandSyntaxFormatter;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -107,7 +108,7 @@ public abstract class CommandManager<C> {
     private final Set<CloudCapability> capabilities = new HashSet<>();
 
     private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
-    private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
+    private CommandSyntaxFormatter.SenderAware<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>(this);
     private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
     private CommandRegistrationHandler commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
@@ -290,7 +291,9 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Returns the command syntax formatter.
+     * Returns the command syntax formatter. The returned formatter is always a
+     * {@link cloud.commandframework.arguments.CommandSyntaxFormatter.SenderAware}, however
+     * the return type of this method cannot be changed without breaking semantic versioning.
      *
      * @return the syntax formatter
      * @since 1.7.0
@@ -325,7 +328,11 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public void commandSyntaxFormatter(final @NonNull CommandSyntaxFormatter<C> commandSyntaxFormatter) {
-        this.commandSyntaxFormatter = commandSyntaxFormatter;
+        if (!(commandSyntaxFormatter instanceof CommandSyntaxFormatter.SenderAware)) {
+            this.commandSyntaxFormatter = new LegacyAdapterCommandSyntaxFormatter<>(commandSyntaxFormatter);
+        } else {
+            this.commandSyntaxFormatter = (CommandSyntaxFormatter.SenderAware<C>) commandSyntaxFormatter;
+        }
     }
 
     /**

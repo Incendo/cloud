@@ -23,10 +23,12 @@
 //
 package cloud.commandframework.arguments;
 
+import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.permission.CommandPermission;
 import java.util.Iterator;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -44,7 +46,31 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
+public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter.SenderAware<C> {
+
+    private final @Nullable CommandManager<C> commandManager;
+
+    /**
+     * Create a new {@link StandardCommandSyntaxFormatter}.
+     *
+     * @param commandManager command manager
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public StandardCommandSyntaxFormatter(final CommandManager<C> commandManager) {
+        this.commandManager = commandManager;
+    }
+
+    /**
+     * Create a new {@link StandardCommandSyntaxFormatter}.
+     *
+     * @deprecated prefer {@link #StandardCommandSyntaxFormatter(CommandManager)}
+     */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public StandardCommandSyntaxFormatter() {
+        this.commandManager = null;
+    }
 
     /**
      * {@inheritDoc}
@@ -52,6 +78,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
     @Override
     @SuppressWarnings("unchecked")
     public final @NonNull String apply(
+            final @Nullable C sender,
             final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
             final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
     ) {
@@ -80,7 +107,21 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
         while (tail != null && !tail.isLeaf()) {
             if (tail.getChildren().size() > 1) {
                 formattingInstance.appendBlankSpace();
-                final Iterator<CommandTree.Node<CommandArgument<C, ?>>> childIterator = tail.getChildren().iterator();
+                final Iterator<CommandTree.Node<CommandArgument<C, ?>>> childIterator = tail.getChildren().stream()
+                        .filter(node0 -> {
+                            if (this.commandManager == null || sender == null) {
+                                return true;
+                            }
+                            final @Nullable CommandPermission permitted = this.commandManager.commandTree().isPermitted(
+                                    sender,
+                                    node0
+                            );
+                            if (permitted == null) {
+                                return true;
+                            }
+                            return this.commandManager.hasPermission(sender, permitted);
+                        })
+                        .iterator();
                 while (childIterator.hasNext()) {
                     final CommandTree.Node<CommandArgument<C, ?>> child = childIterator.next();
 
