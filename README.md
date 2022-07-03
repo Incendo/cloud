@@ -9,12 +9,11 @@
 ![build](https://github.com/Incendo/cloud/workflows/Java%20CI%20with%20Maven/badge.svg)
 [![central](https://maven-badges.herokuapp.com/maven-central/cloud.commandframework/cloud-core/badge.svg)](https://search.maven.org/search?q=cloud.commandframework)
 
-Cloud is a general-purpose Java command dispatcher &amp; framework. It allows programmers to define command chains that are then parsed and invoked from user-
-supplied string inputs, to execute pre-defined actions.
+Cloud is a general-purpose Java command dispatcher &amp; framework. It allows programmers to define command chains that are then parsed and invoked from user-supplied string inputs, to execute pre-defined actions.
 
-Cloud commands consist out of deterministic command chains where the arguments are strongly typed. When you write a command, you know exactly
-what type of data you will get to work with and you won't need to spend hours debugging command contexts while crying profusely. The experience
-of using the framework is like floating on a fluffy cloud in heaven. Its feature set is derived from Already existing Command Frameworks, while being less restrictive, opinionated and confusing.  
+Cloud commands consist out of deterministic chains of strongly typed arguments. When you define a command,
+you know exactly what type of data you're going to be working with, and you know that there will be no
+ambiguity at runtime. Cloud promotes writing reusable code, making it very easy to define new commands.
 
 Cloud allows for commands to be defined using builder patterns, like this:
 ```java
@@ -49,17 +48,12 @@ private void yourCommand(
     ));
 }
 ```
-to allow your users to use commands like `/command cloud 100`.
+depending on your preference.
 
-All this while allowing you to extend and modify the command experience. The framework supports custom (any) command sender
-types,
-argument types &amp; parsers,
-annotation mappers and preprocessors.
-Cloud also has an advanced command suggestion system, that allows for context aware
-command completion and suggestions.
-
-If using the annotation parsing system, you can create custom annotation mappers to use your own annotation bindings for
-command parsing, preprocessing, etc.
+Cloud is built to be very customisable, in order to fit your needs. You can inject handlers and processors
+along the entire command chain. If the pre-existing command parsers aren't enough for your needs, you're easily
+able to create your own parsers. If you use the annotation parsing system, you can also define your own annotations
+and register them to further customise the behaviour of the library.
 
 Cloud by default ships with implementations and mappings for the most common Minecraft server platforms, JDA and javacord for
 Discord bots and PircBotX for IRC.
@@ -78,7 +72,8 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 
 ## modules
 - **cloud-core**: Core module containing most of the cloud API, and shared implementations
-- **cloud-annotations**: Annotation processing code that allows you to use annotated methods rather than builders
+- **cloud-annotations**: Annotation parsing code that allows you to use annotated methods rather than builders - Now also 
+  includes several compile-time annotation processors
 - **cloud-services**: Services for Cloud
 - **cloud-minecraft/cloud-brigadier**: Brigadier mappings for cloud
 - **cloud-minecraft/cloud-bukkit**: Bukkit 1.8.8+ implementation of cloud
