@@ -123,7 +123,7 @@ class PaperBrigadierListener<C> implements Listener {
         ));
         if (SET_RAW != null) {
             try {
-                SET_RAW.invoke(true);
+                SET_RAW.invoke(event, true);
             } catch (final ReflectiveOperationException ex) {
                 throw new RuntimeException(ex);
             }
