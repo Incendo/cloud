@@ -31,6 +31,7 @@ import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapp
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.permission.CommandPermission;
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
+import java.lang.reflect.Method;
 import java.util.function.BiPredicate;
 import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
@@ -38,8 +39,22 @@ import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+@SuppressWarnings("deprecation") // Draft API
 class PaperBrigadierListener<C> implements Listener {
+    private static final @Nullable Method SET_RAW;
+
+    static {
+        @Nullable Method mth;
+        try {
+            mth = com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent.class
+                    .getDeclaredMethod("setRawCommand", boolean.class);
+        } catch (final NoSuchMethodException ex) {
+            mth = null;
+        }
+        SET_RAW = mth;
+    }
 
     private final CloudBrigadierManager<C, BukkitBrigadierCommandSource> brigadierManager;
     private final PaperCommandManager<C> paperCommandManager;
@@ -65,7 +80,6 @@ class PaperBrigadierListener<C> implements Listener {
     }
 
     @EventHandler
-    @SuppressWarnings("deprecation")
     public void onCommandRegister(
             final com.destroystokyo.paper.event.brigadier.
             @NonNull CommandRegisteredEvent<BukkitBrigadierCommandSource> event
@@ -107,5 +121,12 @@ class PaperBrigadierListener<C> implements Listener {
                 event.getBrigadierCommand(),
                 permissionChecker
         ));
+        if (SET_RAW != null) {
+            try {
+                SET_RAW.invoke(true);
+            } catch (final ReflectiveOperationException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 }
