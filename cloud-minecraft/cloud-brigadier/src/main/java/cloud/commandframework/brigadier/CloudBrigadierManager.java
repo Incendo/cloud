@@ -489,7 +489,7 @@ public final class CloudBrigadierManager<C, S> {
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
         for (final CommandTree.Node<CommandArgument<C, ?>> child : cloudCommand.getChildren()) {
-            constructedRoot.addChild(this.constructCommandNode(false, child, permissionChecker,
+            constructedRoot.addChild(this.constructCommandNode(true, child, permissionChecker,
                     executor, suggestionProvider
             ).build());
         }
