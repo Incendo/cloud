@@ -147,24 +147,25 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
                 CraftBukkitReflection.needOBCClass("inventory.CraftItemStack");
         private static final Class<?> ARGUMENT_ITEM_PREDICATE_CLASS =
                 MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("item_predicate"));
-        private static final Class<?> ARGUMENT_ITEM_PREDICATE_RESULT_CLASS = CraftBukkitReflection.firstNonNullOrThrow(
-                () -> "Couldn't find ItemPredicateArgument$Result class",
+        private static final Class<?> ARGUMENT_ITEM_PREDICATE_RESULT_CLASS = CraftBukkitReflection.firstNonNullOrNull(
                 CraftBukkitReflection.findNMSClass("ArgumentItemPredicate$b"),
                 CraftBukkitReflection.findMCClass("commands.arguments.item.ArgumentItemPredicate$b"),
                 CraftBukkitReflection.findMCClass("commands.arguments.item.ItemPredicateArgument$Result")
         );
-        private static final @Nullable Method CREATE_PREDICATE_METHOD = CraftBukkitReflection.firstNonNullOrNull(
-                CraftBukkitReflection.findMethod(
-                        ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
-                        "create",
-                        com.mojang.brigadier.context.CommandContext.class
-                ),
-                CraftBukkitReflection.findMethod(
-                        ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
-                        "a",
-                        com.mojang.brigadier.context.CommandContext.class
-                )
-        );
+        private static final @Nullable Method CREATE_PREDICATE_METHOD = ARGUMENT_ITEM_PREDICATE_RESULT_CLASS == null
+                ? null
+                : CraftBukkitReflection.firstNonNullOrNull(
+                        CraftBukkitReflection.findMethod(
+                                ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
+                                "create",
+                                com.mojang.brigadier.context.CommandContext.class
+                        ),
+                        CraftBukkitReflection.findMethod(
+                                ARGUMENT_ITEM_PREDICATE_RESULT_CLASS,
+                                "a",
+                                com.mojang.brigadier.context.CommandContext.class
+                        )
+                );
         private static final Method AS_NMS_COPY_METHOD =
                 CraftBukkitReflection.needMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
 
