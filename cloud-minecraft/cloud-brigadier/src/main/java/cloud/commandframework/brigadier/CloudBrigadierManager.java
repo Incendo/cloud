@@ -57,12 +57,16 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.ParsedCommandNode;
+import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -617,7 +621,7 @@ public final class CloudBrigadierManager<C, S> {
                     cloudSender,
                     this.commandManager
             );
-            command = command.substring(senderContext.getLastChild().getNodes().get(0).getRange().getStart());
+            command = command.substring(getNodes(senderContext.getLastChild()).get(0).getSecond().getStart());
         }
 
         /* Remove namespace */
@@ -663,5 +667,33 @@ public final class CloudBrigadierManager<C, S> {
         }
 
         return suggestionsBuilder.buildFuture();
+    }
+
+    /**
+     * Return type changed at some point, but information is essentially the same. This code works for both versions of the
+     * method.
+     *
+     * @param commandContext command context
+     * @param <S>            source type
+     * @return parsed nodes
+     */
+    private static <S> List<Pair<CommandNode<S>, StringRange>> getNodes(final com.mojang.brigadier.context.CommandContext<S> commandContext) {
+        try {
+            final Method getNodesMethod = commandContext.getClass().getDeclaredMethod("getNodes");
+            final Object nodes = getNodesMethod.invoke(commandContext);
+            if (nodes instanceof List) {
+                return ((List<ParsedCommandNode<S>>) nodes).stream()
+                        .map(n -> Pair.of(n.getNode(), n.getRange()))
+                        .collect(Collectors.toList());
+            } else if (nodes instanceof Map) {
+                return ((Map<CommandNode<S>, StringRange>) nodes).entrySet().stream()
+                        .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList());
+            } else {
+                throw new IllegalStateException();
+            }
+        } catch (final ReflectiveOperationException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
