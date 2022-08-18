@@ -677,7 +677,9 @@ public final class CloudBrigadierManager<C, S> {
      * @param <S>            source type
      * @return parsed nodes
      */
-    private static <S> List<Pair<CommandNode<S>, StringRange>> getNodes(final com.mojang.brigadier.context.CommandContext<S> commandContext) {
+    private static <S> List<Pair<CommandNode<S>, StringRange>> getNodes(
+            final com.mojang.brigadier.context.CommandContext<S> commandContext
+    ) {
         try {
             final Method getNodesMethod = commandContext.getClass().getDeclaredMethod("getNodes");
             final Object nodes = getNodesMethod.invoke(commandContext);
