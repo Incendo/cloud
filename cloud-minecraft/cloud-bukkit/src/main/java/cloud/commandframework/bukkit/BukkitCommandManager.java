@@ -273,7 +273,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     /**
-     * Check whether or not Brigadier can be used on the server instance
+     * Check whether Brigadier can be used on the server instance
      *
      * @throws BrigadierFailureException An exception is thrown if Brigadier isn't available. The exception
      *                                   will contain the reason for this.
@@ -320,6 +320,9 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     public void registerBrigadier() throws BrigadierFailureException {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.checkBrigadierCompatibility();
+        if (!this.hasCapability(CloudBukkitCapabilities.COMMODORE_BRIGADIER)) {
+            throw new BrigadierFailureException(BrigadierFailureReason.VERSION_TOO_HIGH);
+        }
         try {
             final CloudCommodoreManager<C> cloudCommodoreManager = new CloudCommodoreManager<>(this);
             cloudCommodoreManager.initialize(this);
@@ -408,6 +411,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     public enum BrigadierFailureReason {
         COMMODORE_NOT_PRESENT,
         VERSION_TOO_LOW,
+        VERSION_TOO_HIGH,
         PAPER_BRIGADIER_INITIALIZATION_FAILURE
     }
 

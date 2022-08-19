@@ -35,7 +35,7 @@ versions:
   guava: 21.0-jre
   brigadier: 1.0.17
   bukkit: 1.13.2-R0.1-SNAPSHOT
-  commodore: 2.0
+  commodore: 2.2
   bungeecord: 1.8-SNAPSHOT
   cloudburst: 1.0.0-SNAPSHOT
   adventureApi: 4.9.3
