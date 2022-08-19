@@ -40,7 +40,9 @@ public enum CloudBukkitCapabilities implements CloudCapability {
     NATIVE_BRIGADIER(CraftBukkitReflection.classExists(
             "com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent")),
 
-    COMMODORE_BRIGADIER(BRIGADIER.capable() && !NATIVE_BRIGADIER.capable()),
+    COMMODORE_BRIGADIER(BRIGADIER.capable()
+            && !NATIVE_BRIGADIER.capable()
+            && !CraftBukkitReflection.classExists("org.bukkit.entity.Warden")),
 
     ASYNCHRONOUS_COMPLETION(CraftBukkitReflection.classExists(
             "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent"));

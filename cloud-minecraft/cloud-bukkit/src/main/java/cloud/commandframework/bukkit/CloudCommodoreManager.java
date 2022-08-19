@@ -127,7 +127,12 @@ class CloudCommodoreManager<C> extends BukkitPluginRegistrationHandler<C> {
         try {
             final Class<?> commodoreImpl = this.commodore.getClass();
 
-            final Method removeChild = commodoreImpl.getDeclaredMethod("removeChild", RootCommandNode.class, String.class);
+            Method removeChild;
+            try {
+                removeChild = commodoreImpl.getDeclaredMethod("removeChild", RootCommandNode.class, String.class);
+            } catch (final NoSuchMethodException ex) {
+                removeChild = commodoreImpl.getSuperclass().getDeclaredMethod("removeChild", RootCommandNode.class, String.class);
+            }
             removeChild.setAccessible(true);
 
             removeChild.invoke(
