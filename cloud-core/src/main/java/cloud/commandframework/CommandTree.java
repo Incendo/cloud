@@ -952,23 +952,22 @@ public final class CommandTree<C> {
         return null;
     }
 
-    void deleteRecursively(final @NonNull Node<@Nullable CommandArgument<C, ?>> node) {
+    void deleteRecursively(final @NonNull Node<@Nullable CommandArgument<C, ?>> node, final boolean root) {
         for (final Node<@Nullable CommandArgument<C, ?>> child : new ArrayList<>(node.children)) {
-            this.deleteRecursively(child);
+            this.deleteRecursively(child, false);
         }
 
-        // We need to remove it from the tree.
-        this.removeNode(node);
+        this.removeNode(node, root);
     }
 
-    private boolean removeNode(final @NonNull Node<@Nullable CommandArgument<C, ?>> node) {
-        if (this.getRootNodes().contains(node)) {
-            this.internalTree.removeChild(node);
+    private boolean removeNode(final @NonNull Node<@Nullable CommandArgument<C, ?>> node, final boolean root) {
+        if (root) {
+            // root command node - remove it from the root tree
+            return this.internalTree.removeChild(node);
         } else {
+            // child node - remove it from the parent node
             return node.getParent().removeChild(node);
         }
-
-        return false;
     }
 
     /**
