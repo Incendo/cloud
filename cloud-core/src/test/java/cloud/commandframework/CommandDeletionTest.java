@@ -146,4 +146,29 @@ class CommandDeletionTest {
 
         assertThat(this.commandManager.commandTree().getRootNodes()).isEmpty();
     }
+
+    @Test
+    void deleteCommandWithSameArgumentNameAsRootCommand() {
+        // Arrange
+        this.commandManager.command(this.commandManager.commandBuilder("test").build());
+        this.commandManager.command(this.commandManager.commandBuilder("hello").literal("test").build());
+
+        // Pre-assert.
+        this.commandManager.executeCommand(new TestCommandSender(), "test").join();
+        this.commandManager.executeCommand(new TestCommandSender(), "hello test").join();
+
+        // Act
+        this.commandManager.deleteRootCommand("hello");
+
+        // Assert
+        this.commandManager.executeCommand(new TestCommandSender(), "test").join();
+        final CompletionException completionException = assertThrows(
+                CompletionException.class,
+                () -> this.commandManager.executeCommand(new TestCommandSender(), "hello").join()
+        );
+        assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
+
+        assertThat(this.commandManager.suggest(new TestCommandSender(), "")).contains("test");
+        assertThat(this.commandManager.commandTree().getRootNodes()).hasSize(1);
+    }
 }

@@ -545,7 +545,7 @@ public abstract class CommandManager<C> {
         this.commandRegistrationHandler.unregisterRootCommand((StaticArgument<?>) node.getValue());
 
         // We then delete it from the tree.
-        this.commandTree.deleteRecursively(node);
+        this.commandTree.deleteRecursively(node, true);
 
         // And lastly we re-build the entire tree.
         this.commandTree.verifyAndRegister();
