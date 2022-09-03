@@ -1,5 +1,9 @@
+plugins {
+    id("cloud.base-conventions")
+}
+
 dependencies {
-    api(project(":cloud-core"))
-    compileOnly(project(":cloud-annotations"))
-    compileOnly("net.dv8tion", "JDA", Versions.jdaSlashCommands)
+    api(projects.cloudCore)
+    compileOnly(libs.jda)
+    compileOnly(projects.cloudAnnotations)
 }
