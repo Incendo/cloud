@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,6 @@ class ComplexPrefixMatcherTest {
     void testBotMentionPrefix() {
         final ComplexPrefixMatcher<ComplexPrefixMatcherTest> prefixMatcher = new ComplexPrefixMatcher<>(
                 Collections.emptyList(),
-                Collections.emptyList(),
                 true,
                 "123"
         );
@@ -49,24 +48,9 @@ class ComplexPrefixMatcherTest {
     }
 
     @Test
-    void testSinglePrefixMatches() {
-        final ComplexPrefixMatcher<ComplexPrefixMatcherTest> prefixMatcher = new ComplexPrefixMatcher<>(
-                Collections.emptyList(),
-                Arrays.asList((c) -> "!", (c) -> "$", (c) -> "word "),
-                false,
-                null
-        );
-
-        assertEquals("abcd", prefixMatcher.apply(null, "!abcd"));
-        assertEquals("abcd", prefixMatcher.apply(null, "$abcd"));
-        assertEquals("abcd", prefixMatcher.apply(null, "word abcd"));
-    }
-
-    @Test
     void testMultiPrefixMatches() {
         final ComplexPrefixMatcher<ComplexPrefixMatcherTest> prefixMatcher = new ComplexPrefixMatcher<>(
                 Arrays.asList((c) -> Arrays.asList("!", "$", "word "), (c) -> Arrays.asList("ya ", "123_! ")),
-                Collections.emptyList(),
                 false,
                 null
         );
