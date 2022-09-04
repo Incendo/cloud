@@ -210,7 +210,8 @@ public final class EnhancedJDACommandManager<C> extends CommandManager<C> {
 
         final JDAGuildCommandSender guildSender = (JDAGuildCommandSender) jdaSender;
 
-        // TODO: 2022-09-04 Special permission handling for webhooks
+        // TODO: 2022-09-04 Special permission handling for webhooks (member will be null, but not user. It will be the default
+        //  user, because discord is a well designed and good platform)
         return guildSender.getMember().hasPermission(Permission.valueOf(permission));
     }
 
