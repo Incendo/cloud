@@ -28,37 +28,25 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 
 public final class ComplexPrefixMatcher<C> implements BiFunction<C, String, String> {
 
     private final @NonNull List<Function<C, List<String>>> prefixMappers;
-    private final @NonNull List<Function<C, String>> singlePrefixMappers;
     private final boolean enableBotMentionPrefix;
     private final @NonNull String botIdString;
 
     public ComplexPrefixMatcher(
-            final @NotNull List<Function<C, List<String>>> prefixMappers,
-            final @NotNull List<Function<C, String>> singlePrefixMappers,
+            final @NonNull List<Function<C, List<String>>> prefixMappers,
             final boolean enableBotMentionPrefix,
-            final @NotNull String botIdString
+            final @NonNull String botIdString
     ) {
         this.prefixMappers = prefixMappers;
-        this.singlePrefixMappers = singlePrefixMappers;
         this.enableBotMentionPrefix = enableBotMentionPrefix;
         this.botIdString = botIdString;
     }
 
     @Override
     public String apply(final C context, final String rawContent) {
-        for (final Function<C, String> prefixMapper : singlePrefixMappers) {
-            final String prefix = prefixMapper.apply(context);
-
-            if (rawContent.startsWith(prefix)) {
-                return rawContent.substring(prefix.length());
-            }
-        }
-
         for (final Function<C, List<String>> prefixMapper : prefixMappers) {
             final List<String> prefixes = prefixMapper.apply(context);
 

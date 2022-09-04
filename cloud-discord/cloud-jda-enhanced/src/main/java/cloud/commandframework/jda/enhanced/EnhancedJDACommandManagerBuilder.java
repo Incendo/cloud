@@ -49,7 +49,6 @@ public final class EnhancedJDACommandManagerBuilder<C> {
 
     private final @NonNull JDA jda;
     private final @NonNull List<Function<@NonNull C, @NonNull List<String>>> prefixMappers = new ArrayList<>();
-    private final @NonNull List<Function<@NonNull C, @NonNull String>> singlePrefixMappers = new ArrayList<>();
     private final @NonNull Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
     private final @NonNull Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
     private boolean botMentionPrefixEnabled = false;
@@ -101,17 +100,6 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return this;
     }
 
-    @SafeVarargs
-    @SuppressWarnings("varargs")
-    public final @NonNull EnhancedJDACommandManagerBuilder<C> addSinglePrefixMappers(
-            @NonNull final Function<C,
-                    @NonNull String>... singlePrefixMappers
-    ) {
-        Collections.addAll(this.singlePrefixMappers, singlePrefixMappers);
-
-        return this;
-    }
-
     public boolean isMessageCommandsEnabled() {
         return messageCommandsEnabled;
     }
@@ -129,10 +117,6 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return prefixMappers;
     }
 
-    public @NonNull List<Function<C, String>> getSinglePrefixMappers() {
-        return singlePrefixMappers;
-    }
-
     public @NonNull Function<JDACommandSender, C> getCommandSenderMapper() {
         return commandSenderMapper;
     }
@@ -145,8 +129,18 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return botMentionPrefixEnabled;
     }
 
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setBotMentionPrefixEnabled(final boolean botMentionPrefixEnabled) {
+        this.botMentionPrefixEnabled = botMentionPrefixEnabled;
+        return this;
+    }
+
     public boolean isDefaultPreprocessorsEnabled() {
         return defaultPreprocessorsEnabled;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultParsersEnabled(final boolean defaultParsersEnabled) {
+        this.defaultParsersEnabled = defaultParsersEnabled;
+        return this;
     }
 
     public @NonNull EnhancedJDACommandManager<C> build() throws InterruptedException {
@@ -167,7 +161,6 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         final ParserConfig<C> parserConfig = new ParserConfig<>(
                 new ComplexPrefixMatcher<>(
                         prefixMappers,
-                        singlePrefixMappers,
                         botMentionPrefixEnabled,
                         jda.getSelfUser().getId()
                 ),
@@ -189,13 +182,13 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return this;
     }
 
+    public boolean isRegisterCommandListener() {
+        return registerCommandListener;
+    }
+
     public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultPreprocessorsEnabled(final boolean defaultPreprocessorsEnabled) {
         this.defaultPreprocessorsEnabled = defaultPreprocessorsEnabled;
         return this;
-    }
-
-    public boolean isRegisterCommandListener() {
-        return registerCommandListener;
     }
 
     public boolean isDefaultParsersEnabled() {
@@ -213,16 +206,6 @@ public final class EnhancedJDACommandManagerBuilder<C> {
 
     public @NonNull EnhancedJDACommandManagerBuilder<C> setCaptionRegistry(@Nullable final CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
-        return this;
-    }
-
-    public @NonNull EnhancedJDACommandManagerBuilder<C> setBotMentionPrefixEnabled(final boolean botMentionPrefixEnabled) {
-        this.botMentionPrefixEnabled = botMentionPrefixEnabled;
-        return this;
-    }
-
-    public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultParsersEnabled(final boolean defaultParsersEnabled) {
-        this.defaultParsersEnabled = defaultParsersEnabled;
         return this;
     }
 
