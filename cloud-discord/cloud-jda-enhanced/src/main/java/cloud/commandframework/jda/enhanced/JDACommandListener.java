@@ -33,15 +33,10 @@ import cloud.commandframework.jda.enhanced.permission.BotJDAPermissionException;
 import cloud.commandframework.jda.enhanced.permission.UserJDAPermissionException;
 import cloud.commandframework.jda.enhanced.sender.JDACommandSender;
 import cloud.commandframework.jda.enhanced.sender.JDAMessageCommandSender;
-import java.util.List;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +82,11 @@ public final class JDACommandListener<C> extends ListenerAdapter {
             final @NonNull String contentRaw
     ) {
         final String commandContent = commandManager.getPrefixMatcher().apply(sender, contentRaw);
+
+        if (commandContent == null) { // command content is null when no valid prefix can be matched
+            return;
+        }
+
         final String prefix = contentRaw.substring(0, commandContent.length());
 
         this.commandManager.executeCommand(sender, commandContent)
@@ -95,102 +95,108 @@ public final class JDACommandListener<C> extends ListenerAdapter {
                         return;
                     }
 
-                    if (throwable instanceof InvalidSyntaxException) {
-                        this.commandManager.handleException(
-                                sender,
-                                InvalidSyntaxException.class,
-                                (InvalidSyntaxException) throwable,
-                                (c, e) -> this.sendMessage(
-                                        commandSender,
-                                        String.format(
-                                                "%s %s%s",
-                                                MESSAGE_INVALID_SYNTAX,
-                                                prefix,
-                                                ((InvalidSyntaxException) throwable).getCorrectSyntax()
-                                        )
-                                )
-                        );
-                    } else if (throwable instanceof InvalidCommandSenderException) {
-                        this.commandManager.handleException(
-                                sender,
-                                InvalidCommandSenderException.class,
-                                (InvalidCommandSenderException) throwable,
-                                (c, e) -> this.sendMessage(commandSender, throwable.getMessage())
-                        );
-                    } else if (throwable instanceof NoPermissionException) {
-                        this.commandManager.handleException(
-                                sender,
-                                NoPermissionException.class,
-                                (NoPermissionException) throwable,
-                                (c, e) -> this.sendMessage(commandSender, MESSAGE_NO_PERMS)
-                        );
-                    } else if (throwable instanceof NoSuchCommandException) {
-                        this.commandManager.handleException(
-                                sender,
-                                NoSuchCommandException.class,
-                                (NoSuchCommandException) throwable,
-                                (c, e) -> this.sendMessage(commandSender, MESSAGE_UNKNOWN_COMMAND)
-                        );
-                    } else if (throwable instanceof ArgumentParseException) {
-                        this.commandManager.handleException(
-                                sender,
-                                ArgumentParseException.class,
-                                (ArgumentParseException) throwable,
-                                (c, e) -> this.sendMessage(
-                                        commandSender,
-                                        "Invalid Command Argument: " + throwable.getCause().getMessage()
-                                )
-                        );
-                    } else if (throwable instanceof CommandExecutionException) {
-                        this.commandManager.handleException(
-                                sender,
-                                CommandExecutionException.class,
-                                (CommandExecutionException) throwable,
-                                (c, e) -> {
-                                    this.sendMessage(commandSender, MESSAGE_INTERNAL_ERROR);
-                                    logger.warn("Command execution exception", throwable);
-                                }
-                        );
-                    } else if (throwable instanceof BotJDAPermissionException) {
-                        this.commandManager.handleException(
-                                sender,
-                                BotJDAPermissionException.class,
-                                (BotJDAPermissionException) throwable,
-                                (c, e) -> this.sendMessage(commandSender, e.getMessage())
-                        );
-                    } else if (throwable instanceof UserJDAPermissionException) {
-                        this.commandManager.handleException(
-                                sender,
-                                UserJDAPermissionException.class,
-                                (UserJDAPermissionException) throwable,
-                                (c, e) -> this.sendMessage(commandSender, e.getMessage())
-                        );
-                    } else if (throwable instanceof Exception) {
-                        final Exception exception = (Exception) throwable;
-
-                        //noinspection unchecked
-                        this.commandManager.handleException(
-                                sender,
-                                (Class<Exception>) exception.getClass(),
-                                exception,
-                                (c, e) -> this.sendMessage(commandSender, e.getMessage())
-                        );
-                    }
+                    handleThrowable(prefix, sender, commandSender, throwable);
                 });
+    }
+
+    private void handleThrowable(
+            final @NonNull String prefix,
+            final @NonNull C sender,
+            final @NonNull JDACommandSender commandSender,
+            final @NonNull Throwable throwable
+    ) {
+        if (throwable instanceof InvalidSyntaxException) {
+            this.commandManager.handleException(
+                    sender,
+                    InvalidSyntaxException.class,
+                    (InvalidSyntaxException) throwable,
+                    (c, e) -> this.sendMessage(
+                            commandSender,
+                            String.format(
+                                    "%s %s%s",
+                                    MESSAGE_INVALID_SYNTAX,
+                                    prefix,
+                                    ((InvalidSyntaxException) throwable).getCorrectSyntax()
+                            )
+                    )
+            );
+        } else if (throwable instanceof InvalidCommandSenderException) {
+            this.commandManager.handleException(
+                    sender,
+                    InvalidCommandSenderException.class,
+                    (InvalidCommandSenderException) throwable,
+                    (c, e) -> this.sendMessage(commandSender, throwable.getMessage())
+            );
+        } else if (throwable instanceof NoPermissionException) {
+            this.commandManager.handleException(
+                    sender,
+                    NoPermissionException.class,
+                    (NoPermissionException) throwable,
+                    (c, e) -> this.sendMessage(commandSender, MESSAGE_NO_PERMS)
+            );
+        } else if (throwable instanceof NoSuchCommandException) {
+            this.commandManager.handleException(
+                    sender,
+                    NoSuchCommandException.class,
+                    (NoSuchCommandException) throwable,
+                    (c, e) -> this.sendMessage(commandSender, MESSAGE_UNKNOWN_COMMAND)
+            );
+        } else if (throwable instanceof ArgumentParseException) {
+            this.commandManager.handleException(
+                    sender,
+                    ArgumentParseException.class,
+                    (ArgumentParseException) throwable,
+                    (c, e) -> this.sendMessage(
+                            commandSender,
+                            "Invalid Command Argument: " + throwable.getCause().getMessage()
+                    )
+            );
+        } else if (throwable instanceof CommandExecutionException) {
+            this.commandManager.handleException(
+                    sender,
+                    CommandExecutionException.class,
+                    (CommandExecutionException) throwable,
+                    (c, e) -> {
+                        logger.warn(
+                                "Error ocurred while executing command for user {}",
+                                commandSender.getUser().getName(),
+                                throwable
+                        );
+
+                        this.sendMessage(commandSender, MESSAGE_INTERNAL_ERROR);
+                    }
+            );
+        } else if (throwable instanceof BotJDAPermissionException) {
+            this.commandManager.handleException(
+                    sender,
+                    BotJDAPermissionException.class,
+                    (BotJDAPermissionException) throwable,
+                    (c, e) -> this.sendMessage(commandSender, e.getMessage())
+            );
+        } else if (throwable instanceof UserJDAPermissionException) {
+            this.commandManager.handleException(
+                    sender,
+                    UserJDAPermissionException.class,
+                    (UserJDAPermissionException) throwable,
+                    (c, e) -> this.sendMessage(commandSender, e.getMessage())
+            );
+        } else if (throwable instanceof Exception) {
+            final Exception exception = (Exception) throwable;
+
+            logger.warn("Error ocurred while executing command for user {}", commandSender.getUser().getName(), throwable);
+
+            //noinspection unchecked
+            this.commandManager.handleException(
+                    sender,
+                    (Class<Exception>) exception.getClass(),
+                    exception,
+                    (c, e) -> this.sendMessage(commandSender, e.getMessage())
+            );
+        }
     }
 
     private void sendMessage(final @NonNull JDACommandSender sender, final @NonNull String message) {
         sender.getChannel().sendMessage(message).queue();
-    }
-
-    @Override
-    public void onSlashCommand(@NotNull final SlashCommandEvent event) {
-        if (slashCommandsDisabled) {
-            return;
-        }
-        List<String> args = event.getOptions().stream().map(OptionMapping::getAsString).collect(Collectors.toList());
-//        event.getSubcommandGroup()
-//        event.getOptions()
     }
 
     @Override
