@@ -26,7 +26,7 @@ package cloud.commandframework.jda.enhanced.internal;
 
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ParserConfig<C> {
 
@@ -35,7 +35,7 @@ public final class ParserConfig<C> {
     private final boolean enableMessageCommands;
 
     public ParserConfig(
-            @NonNull final BiFunction<@NonNull C, @NonNull String, @NonNull String> prefixMatcher,
+            @NonNull final BiFunction<@NonNull C, @NonNull String, @Nullable String> prefixMatcher,
             final boolean enableDefaultParsers,
             final boolean enableMessageCommands
     ) {
@@ -48,7 +48,7 @@ public final class ParserConfig<C> {
         return enableMessageCommands;
     }
 
-    public @NotNull BiFunction<C, String, String> getPrefixMatcher() {
+    public @NonNull BiFunction<@NonNull C, @NonNull String, @Nullable String> getPrefixMatcher() {
         return prefixMatcher;
     }
 

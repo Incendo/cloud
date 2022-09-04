@@ -126,7 +126,7 @@ public final class EnhancedJDACommandManager<C> extends CommandManager<C> {
         }
     }
 
-    public @NotNull BiFunction<C, String, String> getPrefixMatcher() {
+    public @NonNull BiFunction<@NonNull C, @NonNull String, @Nullable String> getPrefixMatcher() {
         return prefixMatcher;
     }
 
