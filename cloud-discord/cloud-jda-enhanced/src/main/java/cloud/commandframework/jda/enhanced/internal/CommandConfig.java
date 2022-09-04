@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,30 +30,30 @@ import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.jda.enhanced.sender.JDACommandSender;
 import cloud.commandframework.meta.CommandMeta;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class CommandConfig<C> {
+public final class CommandConfig<C> {
 
-    @NonNull
-    private final Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
-    @NonNull
-    private final Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
+    private @NonNull
+    final Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
+    private @NonNull
+    final Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
     private final boolean enableDefaultPreprocessors;
     private final boolean registerCommandListener;
-    @NonNull
-    private final Supplier<CommandMeta> commandMetaSupplier;
-    @Nullable
-    private final CommandSyntaxFormatter<C> commandSyntaxFormatter;
-    @NonNull
-    private final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
-    @NonNull
-    private final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator;
-    @Nullable
-    private final CaptionRegistry<C> captionRegistry;
+    private @NonNull
+    final Supplier<CommandMeta> commandMetaSupplier;
+    private @Nullable
+    final CommandSyntaxFormatter<C> commandSyntaxFormatter;
+    private @NonNull
+    final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
+    private @NonNull
+    final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator;
+    private @Nullable
+    final CaptionRegistry<C> captionRegistry;
 
     public CommandConfig(
             final @NonNull Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper,
@@ -112,5 +112,4 @@ public class CommandConfig<C> {
     public @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> getCommandExecutionCoordinator() {
         return commandExecutionCoordinator;
     }
-
 }

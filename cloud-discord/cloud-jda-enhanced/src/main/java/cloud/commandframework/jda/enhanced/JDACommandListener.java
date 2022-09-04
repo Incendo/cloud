@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -50,6 +52,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <C> Command sender type
  */
 public final class JDACommandListener<C> extends ListenerAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JDACommandListener.class);
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_INVALID_SYNTAX = "Invalid Command Syntax. Correct command syntax is:";
@@ -75,33 +79,6 @@ public final class JDACommandListener<C> extends ListenerAdapter {
         this.commandManager = commandManager;
         this.slashCommandsDisabled = !slashCommandsEnabled;
         this.messageCommandsDisabled = !messageCommandsEnabled;
-    }
-
-    @Override
-    public void onSlashCommand(@NotNull final SlashCommandEvent event) {
-        if (slashCommandsDisabled) {
-            return;
-        }
-        List<String> args = event.getOptions().stream().map(OptionMapping::getAsString).collect(Collectors.toList());
-//        event.getSubcommandGroup()
-//        event.getOptions()
-    }
-
-    @Override
-    public void onMessageReceived(final @NonNull MessageReceivedEvent event) {
-        if (messageCommandsDisabled) {
-            return;
-        }
-
-        final Message message = event.getMessage();
-        final JDAMessageCommandSender commandSender = JDACommandSender.of(event);
-        final C sender = this.commandManager.getCommandSenderMapper().apply(commandSender);
-
-        if (this.commandManager.getBotId() == event.getAuthor().getIdLong()) {
-            return;
-        }
-
-        attemptCommand(commandSender, sender, message.getContentRaw());
     }
 
     private void attemptCommand(
@@ -171,7 +148,7 @@ public final class JDACommandListener<C> extends ListenerAdapter {
                                 (CommandExecutionException) throwable,
                                 (c, e) -> {
                                     this.sendMessage(commandSender, MESSAGE_INTERNAL_ERROR);
-                                    throwable.getCause().printStackTrace();
+                                    logger.warn("Command execution exception", throwable);
                                 }
                         );
                     } else if (throwable instanceof BotJDAPermissionException) {
@@ -198,7 +175,6 @@ public final class JDACommandListener<C> extends ListenerAdapter {
                                 exception,
                                 (c, e) -> this.sendMessage(commandSender, e.getMessage())
                         );
-
                     }
                 });
     }
@@ -207,4 +183,30 @@ public final class JDACommandListener<C> extends ListenerAdapter {
         sender.getChannel().sendMessage(message).queue();
     }
 
+    @Override
+    public void onSlashCommand(@NotNull final SlashCommandEvent event) {
+        if (slashCommandsDisabled) {
+            return;
+        }
+        List<String> args = event.getOptions().stream().map(OptionMapping::getAsString).collect(Collectors.toList());
+//        event.getSubcommandGroup()
+//        event.getOptions()
+    }
+
+    @Override
+    public void onMessageReceived(final @NonNull MessageReceivedEvent event) {
+        if (messageCommandsDisabled) {
+            return;
+        }
+
+        final Message message = event.getMessage();
+        final JDAMessageCommandSender commandSender = JDACommandSender.of(event);
+        final C sender = this.commandManager.getCommandSenderMapper().apply(commandSender);
+
+        if (this.commandManager.getBotId() == event.getAuthor().getIdLong()) {
+            return;
+        }
+
+        attemptCommand(commandSender, sender, message.getContentRaw());
+    }
 }

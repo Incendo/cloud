@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -62,12 +63,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public final class EnhancedJDACommandManager<C> extends CommandManager<C> {
 
-    private final JDA jda;
+    private final @NonNull JDA jda;
     private final long botId;
-    private final BiFunction<@NonNull C, @NonNull String, @Nullable String> prefixMatcher;
-    private final BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
+    private final @NonNull BiFunction<@NonNull C, @NonNull String, @Nullable String> prefixMatcher;
+    private final @NonNull BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper;
     private final Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
-    private final Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
+    private final @NonNull Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
     private final @NonNull Supplier<CommandMeta> commandMetaSupplier;
 
     /**
@@ -126,6 +127,46 @@ public final class EnhancedJDACommandManager<C> extends CommandManager<C> {
         }
     }
 
+    public @NotNull BiFunction<C, String, String> getPrefixMatcher() {
+        return prefixMatcher;
+    }
+
+    /**
+     * Get the JDA instance
+     *
+     * @return JDA instance
+     */
+    public @NotNull JDA getJDA() {
+        return this.jda;
+    }
+
+    /**
+     * Get the command sender mapper
+     *
+     * @return Command sender mapper
+     */
+    public @NotNull Function<@NonNull JDACommandSender, @NonNull C> getCommandSenderMapper() {
+        return this.commandSenderMapper;
+    }
+
+    /**
+     * Get the backwards command sender plugin
+     *
+     * @return The backwards command sender mapper
+     */
+    public @NotNull Function<@NonNull C, @NonNull JDACommandSender> getBackwardsCommandSenderMapper() {
+        return this.backwardsCommandSenderMapper;
+    }
+
+    /**
+     * Get the bots discord id
+     *
+     * @return Bots discord id
+     */
+    public long getBotId() {
+        return this.botId;
+    }
+
     private void registerParsers() {
         /* Register JDA Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(User.class), parserParameters ->
@@ -152,19 +193,15 @@ public final class EnhancedJDACommandManager<C> extends CommandManager<C> {
     }
 
     @Override
-    public final @NonNull CommandMeta createDefaultCommandMeta() {
-        return commandMetaSupplier.get();
-    }
-
-    @Override
-    public final boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
+    public boolean hasPermission(final @NonNull C sender, final @NonNull String permission) {
         if (permission.isEmpty()) {
             return true;
         }
 
-        if (this.permissionMapper != null) {
-            return this.permissionMapper.apply(sender, permission);
-        }
+        // TODO: 2022-09-04 Permission Mapper
+//        if (this.permissionMapper != null) {
+//            return this.permissionMapper.apply(sender, permission);
+//        }
 
         final JDACommandSender jdaSender = this.backwardsCommandSenderMapper.apply(sender);
 
@@ -174,47 +211,12 @@ public final class EnhancedJDACommandManager<C> extends CommandManager<C> {
 
         final JDAGuildCommandSender guildSender = (JDAGuildCommandSender) jdaSender;
 
+        // TODO: 2022-09-04 Special permission handling for webhooks
         return guildSender.getMember().hasPermission(Permission.valueOf(permission));
     }
 
-    public BiFunction<C, String, String> getPrefixMatcher() {
-        return prefixMatcher;
+    @Override
+    public @NonNull CommandMeta createDefaultCommandMeta() {
+        return commandMetaSupplier.get();
     }
-
-    /**
-     * Get the JDA instance
-     *
-     * @return JDA instance
-     */
-    public final @NonNull JDA getJDA() {
-        return this.jda;
-    }
-
-    /**
-     * Get the command sender mapper
-     *
-     * @return Command sender mapper
-     */
-    public final @NonNull Function<@NonNull JDACommandSender, @NonNull C> getCommandSenderMapper() {
-        return this.commandSenderMapper;
-    }
-
-    /**
-     * Get the backwards command sender plugin
-     *
-     * @return The backwards command sender mapper
-     */
-    public final @NonNull Function<@NonNull C, @NonNull JDACommandSender> getBackwardsCommandSenderMapper() {
-        return this.backwardsCommandSenderMapper;
-    }
-
-    /**
-     * Get the bots discord id
-     *
-     * @return Bots discord id
-     */
-    public final long getBotId() {
-        return this.botId;
-    }
-
 }

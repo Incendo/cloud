@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,12 @@ package cloud.commandframework.jda.enhanced.internal;
 
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
-public class ParserConfig<C> {
+public final class ParserConfig<C> {
 
-    @NonNull
-    private final BiFunction<@NonNull C, @NonNull String, @NonNull String> prefixMatcher;
+    private @NonNull
+    final BiFunction<@NonNull C, @NonNull String, @NonNull String> prefixMatcher;
     private final boolean enableSlashCommands;
     private final boolean enableDefaultParsers;
     private final boolean enableMessageCommands;
@@ -51,7 +52,7 @@ public class ParserConfig<C> {
         return enableMessageCommands;
     }
 
-    public BiFunction<C, String, String> getPrefixMatcher() {
+    public @NotNull BiFunction<C, String, String> getPrefixMatcher() {
         return prefixMatcher;
     }
 
@@ -62,5 +63,4 @@ public class ParserConfig<C> {
     public boolean isEnableDefaultParsers() {
         return enableDefaultParsers;
     }
-
 }

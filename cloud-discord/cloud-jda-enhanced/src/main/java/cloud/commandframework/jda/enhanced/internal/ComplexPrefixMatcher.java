@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,19 +27,21 @@ package cloud.commandframework.jda.enhanced.internal;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
-public class ComplexPrefixMatcher<C> implements BiFunction<C, String, String> {
+public final class ComplexPrefixMatcher<C> implements BiFunction<C, String, String> {
 
-    private final List<Function<C, List<String>>> prefixMappers;
-    private final List<Function<C, String>> singlePrefixMappers;
+    private final @NonNull List<Function<C, List<String>>> prefixMappers;
+    private final @NonNull List<Function<C, String>> singlePrefixMappers;
     private final boolean enableBotMentionPrefix;
-    private final String botIdString;
+    private final @NonNull String botIdString;
 
     public ComplexPrefixMatcher(
-            final List<Function<C, List<String>>> prefixMappers,
-            final List<Function<C, String>> singlePrefixMappers,
+            final @NotNull List<Function<C, List<String>>> prefixMappers,
+            final @NotNull List<Function<C, String>> singlePrefixMappers,
             final boolean enableBotMentionPrefix,
-            final String botIdString
+            final @NotNull String botIdString
     ) {
         this.prefixMappers = prefixMappers;
         this.singlePrefixMappers = singlePrefixMappers;

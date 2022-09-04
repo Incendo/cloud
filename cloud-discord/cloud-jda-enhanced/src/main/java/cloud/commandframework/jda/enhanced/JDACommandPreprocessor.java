@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 final class JDACommandPreprocessor<C> implements CommandPreprocessor<C> {
 
-    private final EnhancedJDACommandManager<C> mgr;
+    private final @NonNull EnhancedJDACommandManager<C> mgr;
 
     /**
      * The JDA Command Preprocessor for storing JDA-specific contexts in the command contexts

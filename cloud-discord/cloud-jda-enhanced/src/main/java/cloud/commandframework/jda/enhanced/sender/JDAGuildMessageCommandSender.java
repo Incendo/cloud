@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,13 +30,11 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class JDAGuildMessageCommandSender implements JDAGuildCommandSender, JDAMessageCommandSender {
 
-    @NonNull
-    private final MessageReceivedEvent event;
+    private final @NonNull MessageReceivedEvent event;
 
     public JDAGuildMessageCommandSender(
             final @NonNull MessageReceivedEvent event
@@ -45,23 +43,23 @@ public final class JDAGuildMessageCommandSender implements JDAGuildCommandSender
     }
 
     @Override
-    public @NotNull MessageReceivedEvent getEvent() {
-        return event;
-    }
-
-    @Override
     public @NonNull User getUser() {
         return event.getAuthor();
     }
 
     @Override
-    public @NonNull TextChannel getChannel() {
-        return event.getTextChannel();
+    public @NonNull MessageReceivedEvent getEvent() {
+        return event;
     }
 
     @Override
     public @Nullable Member getMember() {
         return event.getMember();
+    }
+
+    @Override
+    public @NonNull TextChannel getChannel() {
+        return event.getTextChannel();
     }
 
     @Override

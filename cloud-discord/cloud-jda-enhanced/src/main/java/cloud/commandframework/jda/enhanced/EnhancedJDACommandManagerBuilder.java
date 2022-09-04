@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,36 +47,26 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EnhancedJDACommandManagerBuilder<C> {
 
-    @NonNull
-    private final JDA jda;
-    @NonNull
-    private final List<Function<@NonNull C, @NonNull List<String>>> prefixMappers = new ArrayList<>();
-    @NonNull
-    private final List<Function<@NonNull C, @NonNull String>> singlePrefixMappers = new ArrayList<>();
-    @NonNull
-    private final Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
-    @NonNull
-    private final Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
+    private final @NonNull JDA jda;
+    private final @NonNull List<Function<@NonNull C, @NonNull List<String>>> prefixMappers = new ArrayList<>();
+    private final @NonNull List<Function<@NonNull C, @NonNull String>> singlePrefixMappers = new ArrayList<>();
+    private final @NonNull Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
+    private final @NonNull Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
     private boolean botMentionPrefixEnabled = false;
     private boolean slashCommandsEnabled = true;
     private boolean messageCommandsEnabled = true;
     private boolean defaultPreprocessorsEnabled = true;
     private boolean defaultParsersEnabled = true;
     private boolean registerCommandListener = true;
-    @Nullable
-    private CommandSyntaxFormatter<C> commandSyntaxFormatter = null;
-    @Nullable
-    private CaptionRegistry<C> captionRegistry = null;
-    @NonNull
-    private BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper = (C c, String permission) -> false;
-    @NonNull
-    private Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator =
+    private @Nullable CommandSyntaxFormatter<C> commandSyntaxFormatter = null;
+    private @Nullable CaptionRegistry<C> captionRegistry = null;
+    private @NonNull BiFunction<@NonNull C, @NonNull String, @NonNull Boolean> permissionMapper = (C c, String permission) -> false;
+    private @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator =
             AsynchronousCommandExecutionCoordinator
                     .<C>newBuilder()
                     .withAsynchronousParsing()
                     .build();
-    @NonNull
-    private Supplier<CommandMeta> commandMetaSupplier = SimpleCommandMeta::empty;
+    private @NonNull Supplier<CommandMeta> commandMetaSupplier = SimpleCommandMeta::empty;
 
     private EnhancedJDACommandManagerBuilder(
             @NonNull final JDA jda,
@@ -102,19 +92,22 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return new EnhancedJDACommandManagerBuilder<>(jda, Function.identity(), Function.identity());
     }
 
-    @NonNull
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public final EnhancedJDACommandManagerBuilder<C> addPrefixMappers(@NonNull final Function<C, @NonNull List<String>>... prefixMappers) {
+    public final @NonNull EnhancedJDACommandManagerBuilder<C> addPrefixMappers(
+            @NonNull final Function<C, @NonNull List<String>>... prefixMappers
+    ) {
         Collections.addAll(this.prefixMappers, prefixMappers);
 
         return this;
     }
 
-    @NonNull
     @SafeVarargs
     @SuppressWarnings("varargs")
-    public final EnhancedJDACommandManagerBuilder<C> addSinglePrefixMappers(@NonNull final Function<C, @NonNull String>... singlePrefixMappers) {
+    public final @NonNull EnhancedJDACommandManagerBuilder<C> addSinglePrefixMappers(
+            @NonNull final Function<C,
+                    @NonNull String>... singlePrefixMappers
+    ) {
         Collections.addAll(this.singlePrefixMappers, singlePrefixMappers);
 
         return this;
@@ -129,28 +122,23 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return this;
     }
 
-    @NonNull
-    public JDA getJda() {
+    public @NonNull JDA getJda() {
         return jda;
     }
 
-    @NonNull
-    public List<Function<C, List<String>>> getPrefixMappers() {
+    public @NonNull List<Function<C, List<String>>> getPrefixMappers() {
         return prefixMappers;
     }
 
-    @NonNull
-    public List<Function<C, String>> getSinglePrefixMappers() {
+    public @NonNull List<Function<C, String>> getSinglePrefixMappers() {
         return singlePrefixMappers;
     }
 
-    @NonNull
-    public Function<JDACommandSender, C> getCommandSenderMapper() {
+    public @NonNull Function<JDACommandSender, C> getCommandSenderMapper() {
         return commandSenderMapper;
     }
 
-    @NonNull
-    public Function<C, JDACommandSender> getBackwardsCommandSenderMapper() {
+    public @NonNull Function<C, JDACommandSender> getBackwardsCommandSenderMapper() {
         return backwardsCommandSenderMapper;
     }
 
@@ -158,48 +146,7 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return botMentionPrefixEnabled;
     }
 
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setBotMentionPrefixEnabled(final boolean botMentionPrefixEnabled) {
-        this.botMentionPrefixEnabled = botMentionPrefixEnabled;
-        return this;
-    }
-
-    public boolean isSlashCommandsEnabled() {
-        return slashCommandsEnabled;
-    }
-
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setSlashCommandsEnabled(final boolean slashCommandsEnabled) {
-        this.slashCommandsEnabled = slashCommandsEnabled;
-        return this;
-    }
-
-    public boolean isDefaultPreprocessorsEnabled() {
-        return defaultPreprocessorsEnabled;
-    }
-
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setDefaultPreprocessorsEnabled(final boolean defaultPreprocessorsEnabled) {
-        this.defaultPreprocessorsEnabled = defaultPreprocessorsEnabled;
-        return this;
-    }
-
-    public boolean isDefaultParsersEnabled() {
-        return defaultParsersEnabled;
-    }
-
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setDefaultParsersEnabled(final boolean defaultParsersEnabled) {
-        this.defaultParsersEnabled = defaultParsersEnabled;
-        return this;
-    }
-
-    public boolean isRegisterCommandListener() {
-        return registerCommandListener;
-    }
-
-    @NonNull
-    public EnhancedJDACommandManager<C> build() throws InterruptedException {
+    public @NonNull EnhancedJDACommandManager<C> build() throws InterruptedException {
         jda.awaitReady();
 
         final CommandConfig<C> commandConfig = new CommandConfig<>(
@@ -229,72 +176,97 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return new EnhancedJDACommandManager<>(jda, commandConfig, parserConfig);
     }
 
-    @Nullable
-    public CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
+    public boolean isSlashCommandsEnabled() {
+        return slashCommandsEnabled;
+    }
+
+    public @Nullable CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
         return commandSyntaxFormatter;
     }
 
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setCaptionRegistry(@Nullable final CaptionRegistry<C> captionRegistry) {
-        this.captionRegistry = captionRegistry;
-        return this;
+    public boolean isDefaultPreprocessorsEnabled() {
+        return defaultPreprocessorsEnabled;
     }
 
-    @Nullable
-    public CaptionRegistry<C> getCaptionRegistry() {
-        return captionRegistry;
-    }
-
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setCommandExecutionCoordinator(
-            @NonNull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator
-    ) {
-        this.commandExecutionCoordinator = commandExecutionCoordinator;
-        return this;
-    }
-
-    @NonNull
-    public BiFunction<C, String, Boolean> getPermissionMapper() {
-        return permissionMapper;
-    }
-
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setCommandMetaSupplier(
-            @NonNull final Supplier<CommandMeta> commandMetaSupplier
-    ) {
-        this.commandMetaSupplier = commandMetaSupplier;
-        return this;
-    }
-
-    @NonNull
-    public Function<CommandTree<C>, CommandExecutionCoordinator<C>> getCommandExecutionCoordinator() {
-        return commandExecutionCoordinator;
-    }
-
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setCommandSyntaxFormatter(
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setCommandSyntaxFormatter(
             @Nullable final CommandSyntaxFormatter<C> commandSyntaxFormatter
     ) {
         this.commandSyntaxFormatter = commandSyntaxFormatter;
         return this;
     }
 
-    @NonNull
-    public Supplier<CommandMeta> getCommandMetaSupplier() {
-        return commandMetaSupplier;
+    public boolean isDefaultParsersEnabled() {
+        return defaultParsersEnabled;
     }
 
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setPermissionMapper(
+    public @Nullable CaptionRegistry<C> getCaptionRegistry() {
+        return captionRegistry;
+    }
+
+    public boolean isRegisterCommandListener() {
+        return registerCommandListener;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setCaptionRegistry(@Nullable final CaptionRegistry<C> captionRegistry) {
+        this.captionRegistry = captionRegistry;
+        return this;
+    }
+
+    public @NonNull BiFunction<C, String, Boolean> getPermissionMapper() {
+        return permissionMapper;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setPermissionMapper(
             @NonNull final BiFunction<C, String, Boolean> permissionMapper
     ) {
         this.permissionMapper = permissionMapper;
         return this;
     }
 
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> setRegisterCommandListener(final boolean registerCommandListener) {
+    public @NonNull Function<CommandTree<C>, CommandExecutionCoordinator<C>> getCommandExecutionCoordinator() {
+        return commandExecutionCoordinator;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setCommandExecutionCoordinator(
+            @NonNull final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator
+    ) {
+        this.commandExecutionCoordinator = commandExecutionCoordinator;
+        return this;
+    }
+
+    public @NonNull Supplier<CommandMeta> getCommandMetaSupplier() {
+        return commandMetaSupplier;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setCommandMetaSupplier(
+            @NonNull final Supplier<CommandMeta> commandMetaSupplier
+    ) {
+        this.commandMetaSupplier = commandMetaSupplier;
+        return this;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setBotMentionPrefixEnabled(final boolean botMentionPrefixEnabled) {
+        this.botMentionPrefixEnabled = botMentionPrefixEnabled;
+        return this;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultParsersEnabled(final boolean defaultParsersEnabled) {
+        this.defaultParsersEnabled = defaultParsersEnabled;
+        return this;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultPreprocessorsEnabled(final boolean defaultPreprocessorsEnabled) {
+        this.defaultPreprocessorsEnabled = defaultPreprocessorsEnabled;
+        return this;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setRegisterCommandListener(final boolean registerCommandListener) {
         this.registerCommandListener = registerCommandListener;
+        return this;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setSlashCommandsEnabled(final boolean slashCommandsEnabled) {
+        this.slashCommandsEnabled = slashCommandsEnabled;
         return this;
     }
 
@@ -303,8 +275,7 @@ public final class EnhancedJDACommandManagerBuilder<C> {
      *
      * @return The builder. Useful for chaining.
      */
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> withAsynchronousCoordinator() {
+    public @NonNull EnhancedJDACommandManagerBuilder<C> withAsynchronousCoordinator() {
         commandExecutionCoordinator = AsynchronousCommandExecutionCoordinator
                 .<C>newBuilder()
                 .withAsynchronousParsing()
@@ -318,8 +289,7 @@ public final class EnhancedJDACommandManagerBuilder<C> {
      *
      * @return The builder. Useful for chaining.
      */
-    @NonNull
-    public EnhancedJDACommandManagerBuilder<C> withSynchronousCoordinator() {
+    public @NonNull EnhancedJDACommandManagerBuilder<C> withSynchronousCoordinator() {
         commandExecutionCoordinator = CommandExecutionCoordinator.simpleCoordinator();
 
         return this;

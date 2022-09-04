@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,12 +32,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 public class JDAGuildSlashCommandSender implements JDAGuildCommandSender, JDASlashCommandSender {
 
-    @NonNull
-    private final SlashCommandEvent event;
+    private final @NonNull SlashCommandEvent event;
 
     public JDAGuildSlashCommandSender(
             final @NonNull SlashCommandEvent event
@@ -46,23 +44,23 @@ public class JDAGuildSlashCommandSender implements JDAGuildCommandSender, JDASla
     }
 
     @Override
-    public @NotNull SlashCommandEvent getEvent() {
-        return event;
-    }
-
-    @Override
     public @NonNull User getUser() {
         return event.getUser();
     }
 
     @Override
-    public @NonNull TextChannel getChannel() {
-        return event.getTextChannel();
+    public @NonNull SlashCommandEvent getEvent() {
+        return event;
     }
 
     @Override
     public @Nullable Member getMember() {
         return event.getMember();
+    }
+
+    @Override
+    public @NonNull TextChannel getChannel() {
+        return event.getTextChannel();
     }
 
     @Override

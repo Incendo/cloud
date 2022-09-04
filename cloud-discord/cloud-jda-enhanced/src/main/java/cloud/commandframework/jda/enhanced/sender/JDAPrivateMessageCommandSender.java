@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,10 @@ import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 
 public final class JDAPrivateMessageCommandSender implements JDAPrivateCommandSender, JDAMessageCommandSender {
 
-    private final MessageReceivedEvent event;
+    private final @NonNull MessageReceivedEvent event;
 
     public JDAPrivateMessageCommandSender(
             final @NonNull MessageReceivedEvent event
@@ -46,12 +45,12 @@ public final class JDAPrivateMessageCommandSender implements JDAPrivateCommandSe
     }
 
     @Override
-    public @NotNull MessageReceivedEvent getEvent() {
-        return event;
+    public @NonNull User getUser() {
+        return event.getAuthor();
     }
 
     @Override
-    public @NonNull User getUser() {
-        return event.getAuthor();
+    public @NonNull MessageReceivedEvent getEvent() {
+        return event;
     }
 }
