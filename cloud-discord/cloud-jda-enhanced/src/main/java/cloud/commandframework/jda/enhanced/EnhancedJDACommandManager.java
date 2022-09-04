@@ -95,7 +95,6 @@ public final class EnhancedJDACommandManager<C> extends CommandManager<C> {
         if (commandConfig.isRegisterCommandListener()) {
             jda.addEventListener(new JDACommandListener<>(
                     this,
-                    parserConfig.isEnableSlashCommands(),
                     parserConfig.isEnableMessageCommands()
             ));
         }

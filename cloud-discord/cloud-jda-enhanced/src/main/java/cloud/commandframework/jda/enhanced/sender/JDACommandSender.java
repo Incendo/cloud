@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -53,28 +52,6 @@ public interface JDACommandSender {
     }
 
     /**
-     * Create a JDA Command Sender from a {@link SlashCommandEvent}
-     *
-     * @param event Slash Command Event
-     * @return Constructed JDA Command Sender
-     */
-    @SuppressWarnings("ClassReferencesSubclass")
-    static @NonNull JDASlashCommandSender of(final @NonNull SlashCommandEvent event) {
-        if (event.getChannelType() == ChannelType.PRIVATE) {
-            return new JDAPrivateSlashCommandSender(event);
-        }
-
-        return new JDAGuildSlashCommandSender(event);
-    }
-
-    /**
-     * Get the user the command sender represents
-     *
-     * @return User that sent the message
-     */
-    @NonNull User getUser();
-
-    /**
      * Get the channel the user sent the message in
      *
      * @return Channel that the message was sent in
@@ -87,4 +64,11 @@ public interface JDACommandSender {
      * @return The event that triggered this command
      */
     @NonNull GenericEvent getEvent();
+
+    /**
+     * Get the user the command sender represents
+     *
+     * @return User that sent the message
+     */
+    @NonNull User getUser();
 }

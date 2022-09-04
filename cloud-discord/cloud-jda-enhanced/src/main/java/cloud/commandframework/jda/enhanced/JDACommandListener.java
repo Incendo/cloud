@@ -57,7 +57,6 @@ public final class JDACommandListener<C> extends ListenerAdapter {
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command";
 
     private final EnhancedJDACommandManager<C> commandManager;
-    private final boolean slashCommandsDisabled;
     private final boolean messageCommandsDisabled;
 
     /**
@@ -67,12 +66,10 @@ public final class JDACommandListener<C> extends ListenerAdapter {
      */
     public JDACommandListener(
             final @NonNull EnhancedJDACommandManager<C> commandManager,
-            final boolean slashCommandsEnabled,
             final boolean messageCommandsEnabled
     ) {
         super();
         this.commandManager = commandManager;
-        this.slashCommandsDisabled = !slashCommandsEnabled;
         this.messageCommandsDisabled = !messageCommandsEnabled;
     }
 

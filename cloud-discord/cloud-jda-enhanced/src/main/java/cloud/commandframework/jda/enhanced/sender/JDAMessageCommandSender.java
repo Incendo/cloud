@@ -34,5 +34,5 @@ public interface JDAMessageCommandSender extends JDACommandSender {
      *
      * @return The event that triggered this command
      */
-    public @NonNull MessageReceivedEvent getEvent();
+    @NonNull MessageReceivedEvent getEvent();
 }

@@ -30,20 +30,16 @@ import org.jetbrains.annotations.NotNull;
 
 public final class ParserConfig<C> {
 
-    private @NonNull
-    final BiFunction<@NonNull C, @NonNull String, @NonNull String> prefixMatcher;
-    private final boolean enableSlashCommands;
+    private final @NonNull BiFunction<@NonNull C, @NonNull String, @NonNull String> prefixMatcher;
     private final boolean enableDefaultParsers;
     private final boolean enableMessageCommands;
 
     public ParserConfig(
             @NonNull final BiFunction<@NonNull C, @NonNull String, @NonNull String> prefixMatcher,
-            final boolean enableSlashCommands,
             final boolean enableDefaultParsers,
             final boolean enableMessageCommands
     ) {
         this.prefixMatcher = prefixMatcher;
-        this.enableSlashCommands = enableSlashCommands;
         this.enableDefaultParsers = enableDefaultParsers;
         this.enableMessageCommands = enableMessageCommands;
     }
@@ -54,10 +50,6 @@ public final class ParserConfig<C> {
 
     public @NotNull BiFunction<C, String, String> getPrefixMatcher() {
         return prefixMatcher;
-    }
-
-    public boolean isEnableSlashCommands() {
-        return enableSlashCommands;
     }
 
     public boolean isEnableDefaultParsers() {

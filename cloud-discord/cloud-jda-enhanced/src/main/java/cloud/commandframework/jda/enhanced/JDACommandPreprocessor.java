@@ -29,7 +29,6 @@ import cloud.commandframework.jda.enhanced.sender.JDACommandSender;
 import cloud.commandframework.jda.enhanced.sender.JDAGuildCommandSender;
 import cloud.commandframework.jda.enhanced.sender.JDAMessageCommandSender;
 import cloud.commandframework.jda.enhanced.sender.JDAPrivateCommandSender;
-import cloud.commandframework.jda.enhanced.sender.JDASlashCommandSender;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -93,11 +92,6 @@ final class JDACommandPreprocessor<C> implements CommandPreprocessor<C> {
 
             context.getCommandContext().store("MessageReceivedEvent", messageSender.getEvent());
             context.getCommandContext().store("Message", messageSender.getEvent().getMessage());
-        } else if (sender instanceof JDASlashCommandSender) {
-            JDASlashCommandSender slashSender = (JDASlashCommandSender) sender;
-
-            context.getCommandContext().store("SlashCommandEvent", slashSender.getEvent());
-            context.getCommandContext().store("Interaction", slashSender.getEvent().getInteraction());
         }
     }
 }

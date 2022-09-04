@@ -53,7 +53,6 @@ public final class EnhancedJDACommandManagerBuilder<C> {
     private final @NonNull Function<@NonNull JDACommandSender, @NonNull C> commandSenderMapper;
     private final @NonNull Function<@NonNull C, @NonNull JDACommandSender> backwardsCommandSenderMapper;
     private boolean botMentionPrefixEnabled = false;
-    private boolean slashCommandsEnabled = true;
     private boolean messageCommandsEnabled = true;
     private boolean defaultPreprocessorsEnabled = true;
     private boolean defaultParsersEnabled = true;
@@ -146,6 +145,10 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return botMentionPrefixEnabled;
     }
 
+    public boolean isDefaultPreprocessorsEnabled() {
+        return defaultPreprocessorsEnabled;
+    }
+
     public @NonNull EnhancedJDACommandManager<C> build() throws InterruptedException {
         jda.awaitReady();
 
@@ -168,7 +171,6 @@ public final class EnhancedJDACommandManagerBuilder<C> {
                         botMentionPrefixEnabled,
                         jda.getSelfUser().getId()
                 ),
-                slashCommandsEnabled,
                 messageCommandsEnabled,
                 defaultParsersEnabled
         );
@@ -176,16 +178,8 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return new EnhancedJDACommandManager<>(jda, commandConfig, parserConfig);
     }
 
-    public boolean isSlashCommandsEnabled() {
-        return slashCommandsEnabled;
-    }
-
     public @Nullable CommandSyntaxFormatter<C> getCommandSyntaxFormatter() {
         return commandSyntaxFormatter;
-    }
-
-    public boolean isDefaultPreprocessorsEnabled() {
-        return defaultPreprocessorsEnabled;
     }
 
     public @NonNull EnhancedJDACommandManagerBuilder<C> setCommandSyntaxFormatter(
@@ -195,20 +189,40 @@ public final class EnhancedJDACommandManagerBuilder<C> {
         return this;
     }
 
-    public boolean isDefaultParsersEnabled() {
-        return defaultParsersEnabled;
-    }
-
-    public @Nullable CaptionRegistry<C> getCaptionRegistry() {
-        return captionRegistry;
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultPreprocessorsEnabled(final boolean defaultPreprocessorsEnabled) {
+        this.defaultPreprocessorsEnabled = defaultPreprocessorsEnabled;
+        return this;
     }
 
     public boolean isRegisterCommandListener() {
         return registerCommandListener;
     }
 
+    public boolean isDefaultParsersEnabled() {
+        return defaultParsersEnabled;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setRegisterCommandListener(final boolean registerCommandListener) {
+        this.registerCommandListener = registerCommandListener;
+        return this;
+    }
+
+    public @Nullable CaptionRegistry<C> getCaptionRegistry() {
+        return captionRegistry;
+    }
+
     public @NonNull EnhancedJDACommandManagerBuilder<C> setCaptionRegistry(@Nullable final CaptionRegistry<C> captionRegistry) {
         this.captionRegistry = captionRegistry;
+        return this;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setBotMentionPrefixEnabled(final boolean botMentionPrefixEnabled) {
+        this.botMentionPrefixEnabled = botMentionPrefixEnabled;
+        return this;
+    }
+
+    public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultParsersEnabled(final boolean defaultParsersEnabled) {
+        this.defaultParsersEnabled = defaultParsersEnabled;
         return this;
     }
 
@@ -242,31 +256,6 @@ public final class EnhancedJDACommandManagerBuilder<C> {
             @NonNull final Supplier<CommandMeta> commandMetaSupplier
     ) {
         this.commandMetaSupplier = commandMetaSupplier;
-        return this;
-    }
-
-    public @NonNull EnhancedJDACommandManagerBuilder<C> setBotMentionPrefixEnabled(final boolean botMentionPrefixEnabled) {
-        this.botMentionPrefixEnabled = botMentionPrefixEnabled;
-        return this;
-    }
-
-    public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultParsersEnabled(final boolean defaultParsersEnabled) {
-        this.defaultParsersEnabled = defaultParsersEnabled;
-        return this;
-    }
-
-    public @NonNull EnhancedJDACommandManagerBuilder<C> setDefaultPreprocessorsEnabled(final boolean defaultPreprocessorsEnabled) {
-        this.defaultPreprocessorsEnabled = defaultPreprocessorsEnabled;
-        return this;
-    }
-
-    public @NonNull EnhancedJDACommandManagerBuilder<C> setRegisterCommandListener(final boolean registerCommandListener) {
-        this.registerCommandListener = registerCommandListener;
-        return this;
-    }
-
-    public @NonNull EnhancedJDACommandManagerBuilder<C> setSlashCommandsEnabled(final boolean slashCommandsEnabled) {
-        this.slashCommandsEnabled = slashCommandsEnabled;
         return this;
     }
 
