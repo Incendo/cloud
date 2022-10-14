@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.testmod;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricClientCommandManager;
@@ -125,6 +126,11 @@ public final class FabricClientExample implements ClientModInitializer {
                         ctx.getSender().sendError(ComponentUtils.fromMessage(ex.getRawMessage()));
                     }
                 }));
+
+        commandManager.command(base.literal("flag_test")
+                .argument(StringArgument.optional("parameter"))
+                .flag(CommandFlag.newBuilder("flag").withAliases("f"))
+                .handler(ctx -> ctx.getSender().sendFeedback(Component.literal("Had flag: " + ctx.flags().isPresent("flag")))));
     }
 
     private static void disconnectClient(final @NonNull Minecraft client) {

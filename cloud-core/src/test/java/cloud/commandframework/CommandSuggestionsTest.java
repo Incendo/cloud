@@ -403,6 +403,7 @@ public class CommandSuggestionsTest {
     void testFlagYieldingGreedyStringFollowedByFlagArgument() {
         // Arrange
         final CommandManager<TestCommandSender> manager = createManager();
+        manager.setSetting(CommandManager.ManagerSettings.ALLOW_FLAGS_EVERYWHERE, true);
         manager.command(
                 manager.commandBuilder("command")
                         .argument(
@@ -441,7 +442,7 @@ public class CommandSuggestionsTest {
         );
 
         // Assert
-        assertThat(suggestions1).containsExactly("hello");
+        assertThat(suggestions1).containsExactly("hello", "--flag", "--flag2", "-f");
         assertThat(suggestions2).containsExactly("hello");
         assertThat(suggestions3).containsExactly("--flag", "--flag2");
         assertThat(suggestions4).containsExactly("--flag", "--flag2");
@@ -453,6 +454,7 @@ public class CommandSuggestionsTest {
     void testFlagYieldingStringArrayFollowedByFlagArgument() {
         // Arrange
         final CommandManager<TestCommandSender> manager = createManager();
+        manager.setSetting(CommandManager.ManagerSettings.ALLOW_FLAGS_EVERYWHERE, true);
         manager.command(
                 manager.commandBuilder("command")
                         .argument(
@@ -492,7 +494,7 @@ public class CommandSuggestionsTest {
         );
 
         // Assert
-        assertThat(suggestions1).isEmpty();
+        assertThat(suggestions1).containsExactly("--flag", "--flag2", "-f");
         assertThat(suggestions2).isEmpty();
         assertThat(suggestions3).containsExactly("--flag", "--flag2");
         assertThat(suggestions4).containsExactly("--flag", "--flag2");

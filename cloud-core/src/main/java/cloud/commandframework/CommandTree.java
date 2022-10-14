@@ -339,7 +339,8 @@ public final class CommandTree<C> {
                 ));
             }
             if (child.getValue() != null) {
-                if (commandQueue.isEmpty()) {
+                // Flag arguments need to be skipped over, so that further defaults are handled
+                if (commandQueue.isEmpty() && !(child.getValue() instanceof FlagArgument)) {
                     if (child.getValue().hasDefaultValue()) {
                         commandQueue.add(child.getValue().getDefaultValue());
                     } else if (!child.getValue().isRequired()) {
@@ -603,14 +604,14 @@ public final class CommandTree<C> {
              * Use the flag argument parser to deduce what flag is being suggested right now
              * If empty, then no flag value is being typed, and the different flag options should
              * be suggested instead.
-             *
-             * Note: the method parseCurrentFlag() will remove all but the last element from
-             * the queue!
              */
             @SuppressWarnings("unchecked")
             FlagArgument.FlagArgumentParser<C> parser = (FlagArgument.FlagArgumentParser<C>) child.getValue().getParser();
             Optional<String> lastFlag = parser.parseCurrentFlag(commandContext, commandQueue);
             lastFlag.ifPresent(s -> commandContext.store(FlagArgument.FLAG_META_KEY, s));
+            if (!lastFlag.isPresent()) {
+                commandContext.remove(FlagArgument.FLAG_META_KEY);
+            }
         } else if (GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
             while (commandQueue.size() > 1) {
                 commandQueue.remove();
@@ -628,8 +629,7 @@ public final class CommandTree<C> {
         if (commandQueue.isEmpty()) {
             return Collections.emptyList();
         } else if (child.isLeaf() && commandQueue.size() < 2) {
-            commandContext.setCurrentArgument(child.getValue());
-            return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.peek());
+            return this.directSuggestions(commandContext, child, commandQueue.peek());
         } else if (child.isLeaf()) {
             if (child.getValue() instanceof CompoundArgument) {
                 final String last = ((LinkedList<String>) commandQueue).getLast();
@@ -638,8 +638,7 @@ public final class CommandTree<C> {
             }
             return Collections.emptyList();
         } else if (commandQueue.peek().isEmpty()) {
-            commandContext.setCurrentArgument(child.getValue());
-            return child.getValue().getSuggestionsProvider().apply(commandContext, commandQueue.remove());
+            return this.directSuggestions(commandContext, child, commandQueue.peek());
         }
 
         // Store original input command queue before the parsers below modify it
@@ -670,8 +669,7 @@ public final class CommandTree<C> {
         commandQueue.addAll(commandQueueOriginal);
 
         // Fallback: use suggestion provider of argument
-        commandContext.setCurrentArgument(child.getValue());
-        return child.getValue().getSuggestionsProvider().apply(commandContext, this.stringOrEmpty(commandQueue.peek()));
+        return this.directSuggestions(commandContext, child, commandQueue.peek());
     }
 
     private @NonNull String stringOrEmpty(final @Nullable String string) {
@@ -679,6 +677,31 @@ public final class CommandTree<C> {
             return "";
         }
         return string;
+    }
+
+    private @NonNull List<@NonNull String> directSuggestions(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull Node<@NonNull CommandArgument<C, ?>> current,
+            final @NonNull String text) {
+        CommandArgument<C, ?> argument = Objects.requireNonNull(current.getValue());
+
+        commandContext.setCurrentArgument(argument);
+        List<String> suggestions = argument.getSuggestionsProvider().apply(commandContext, text);
+
+        // When suggesting a flag, potentially suggest following nodes too
+        if (argument instanceof FlagArgument
+                && !current.getChildren().isEmpty() // Has children
+                && !text.startsWith("-") // Not a flag
+                && !commandContext.getOptional(FlagArgument.FLAG_META_KEY).isPresent()) {
+            suggestions = new ArrayList<>(suggestions);
+            for (final Node<CommandArgument<C, ?>> child : current.getChildren()) {
+                argument = Objects.requireNonNull(child.getValue());
+                commandContext.setCurrentArgument(argument);
+                suggestions.addAll(argument.getSuggestionsProvider().apply(commandContext, text));
+            }
+        }
+
+        return suggestions;
     }
 
     /**
@@ -690,7 +713,15 @@ public final class CommandTree<C> {
     public void insertCommand(final @NonNull Command<C> command) {
         synchronized (this.commandLock) {
             Node<CommandArgument<C, ?>> node = this.internalTree;
-            for (final CommandArgument<C, ?> argument : command.getArguments()) {
+            FlagArgument<C> flags = command.flagArgument();
+
+            List<CommandArgument<C, ?>> nonFlagArguments = command.nonFlagArguments();
+
+            int flagStartIdx = this.flagStartIndex(nonFlagArguments, flags);
+
+            for (int i = 0; i < nonFlagArguments.size(); i++) {
+                final CommandArgument<C, ?> argument = nonFlagArguments.get(i);
+
                 Node<CommandArgument<C, ?>> tempNode = node.getChild(argument);
                 if (tempNode == null) {
                     tempNode = node.addChild(argument);
@@ -704,7 +735,12 @@ public final class CommandTree<C> {
                 }
                 tempNode.setParent(node);
                 node = tempNode;
+
+                if (i >= flagStartIdx) {
+                    node = node.addChild(flags);
+                }
             }
+
             if (node.getValue() != null) {
                 if (node.getValue().getOwningCommand() != null) {
                     throw new IllegalStateException(String.format(
@@ -717,6 +753,25 @@ public final class CommandTree<C> {
             // Verify the command structure every time we add a new command
             this.verifyAndRegister();
         }
+    }
+
+    private int flagStartIndex(final List<CommandArgument<C, ?>> arguments, final FlagArgument<C> flags) {
+        // Do not append flags
+        if (flags == null) {
+            return Integer.MAX_VALUE;
+        }
+
+        // Append flags before the first non-static argument
+        if (this.commandManager.getSetting(CommandManager.ManagerSettings.ALLOW_FLAGS_EVERYWHERE)) {
+            for (int i = 1; i < arguments.size(); i++) {
+                if (!(arguments.get(i) instanceof StaticArgument)) {
+                    return i - 1;
+                }
+            }
+        }
+
+        // Append flags after the last argument
+        return arguments.size() - 1;
     }
 
     private @Nullable CommandPermission isPermitted(

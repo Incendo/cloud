@@ -62,6 +62,7 @@ public class Command<C> {
 
     private final List<@NonNull CommandComponent<C>> components;
     private final List<@NonNull CommandArgument<C, ?>> arguments;
+    private final @Nullable FlagArgument<C> flagArgument;
     private final CommandExecutionHandler<C> commandExecutionHandler;
     private final Class<? extends C> senderType;
     private final CommandPermission commandPermission;
@@ -78,6 +79,7 @@ public class Command<C> {
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
+    @SuppressWarnings("unchecked")
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -90,6 +92,14 @@ public class Command<C> {
         if (this.components.isEmpty()) {
             throw new IllegalArgumentException("At least one command component is required");
         }
+
+        this.flagArgument =
+                this.arguments.stream()
+                        .filter(ca -> ca instanceof FlagArgument)
+                        .map(ca -> (FlagArgument<C>) ca)
+                        .findFirst()
+                        .orElse(null);
+
         // Enforce ordering of command arguments
         boolean foundOptional = false;
         for (final CommandArgument<C, ?> argument : this.arguments) {
@@ -316,6 +326,32 @@ public class Command<C> {
      */
     public @NonNull List<CommandArgument<@NonNull C, @NonNull ?>> getArguments() {
         return new ArrayList<>(this.arguments);
+    }
+
+    /**
+     * Return a mutable copy of the command arguments, ignoring flag arguments.
+     *
+     * @return argument list
+     * @since 1.8.0
+     */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
+    public @NonNull List<CommandArgument<@NonNull C, @NonNull ?>> nonFlagArguments() {
+        List<CommandArgument<C, ?>> arguments = new ArrayList<>(this.arguments);
+        if (this.flagArgument != null) {
+            arguments.remove(this.flagArgument);
+        }
+        return arguments;
+    }
+
+    /**
+     * Returns the flag argument for this command, or null if no flags are supported.
+     *
+     * @return flag argument or null
+     * @since 1.8.0
+     */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
+    public @Nullable FlagArgument<@NonNull C> flagArgument() {
+        return this.flagArgument;
     }
 
     /**
