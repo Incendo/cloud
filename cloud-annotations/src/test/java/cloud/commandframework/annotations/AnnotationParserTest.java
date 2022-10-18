@@ -93,6 +93,7 @@ class AnnotationParserTest {
         commands = new ArrayList<>();
         commands.addAll(annotationParser.parse(this));
         commands.addAll(annotationParser.parse(new ClassCommandMethod()));
+        commands.addAll(annotationParser.parse(new ChildCommandMethod()));
     }
 
     @Test
@@ -108,6 +109,8 @@ class AnnotationParserTest {
         manager.executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\"").join();
         manager.executeCommand(new TestCommandSender(), "parserflagcommand -s \"Hello World\" -o This is a test").join();
         manager.executeCommand(new TestCommandSender(), "class method").join();
+        manager.executeCommand(new TestCommandSender(), "parent-method").join();
+        manager.executeCommand(new TestCommandSender(), "child-method").join();
     }
 
     @Test
@@ -272,6 +275,22 @@ class AnnotationParserTest {
         @CommandMethod("method")
         public void annotatedMethod() {
             System.out.println("kekw");
+        }
+    }
+
+    private static abstract class SuperCommandMethod {
+
+        @CommandMethod("parent-method")
+        public void parent() {
+            System.out.println("Hello");
+        }
+    }
+
+    private static class ChildCommandMethod extends SuperCommandMethod {
+
+        @CommandMethod("child-method")
+        public void child() {
+            System.out.println("Hello world");
         }
     }
 

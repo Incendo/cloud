@@ -414,7 +414,7 @@ public final class AnnotationParser<C> {
         /* Then register all parsers */
         this.parseParsers(instance);
         /* Then construct commands from @CommandMethod annotated classes */
-        final Method[] methods = instance.getClass().getDeclaredMethods();
+        final Method[] methods = instance.getClass().getMethods();
         final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
         for (final Method method : methods) {
             final CommandMethod commandMethod = method.getAnnotation(CommandMethod.class);
