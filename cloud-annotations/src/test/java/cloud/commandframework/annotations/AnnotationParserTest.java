@@ -113,6 +113,7 @@ class AnnotationParserTest {
         manager.executeCommand(new TestCommandSender(), "child-method").join();
         manager.executeCommand(new TestCommandSender(), "override-method").join();
         manager.executeCommand(new TestCommandSender(), "child-method-with-parent-signature").join();
+        manager.executeCommand(new TestCommandSender(), "default-interface-method").join();
     }
 
     @Test
@@ -285,33 +286,42 @@ class AnnotationParserTest {
 
         @SuppressWarnings("UnusedMethod")
         @CommandMethod("parent-method")
-        private void parent() {
+        private void parentMethod() {
             System.out.println("Hello from parent");
         }
 
         @CommandMethod("override-method")
-        public void override() {
+        public void overrideMethod() {
             throw new UnsupportedOperationException("Failed to use the override command method");
         }
     }
 
 
-    private static class ChildCommandMethod extends ParentCommandMethod {
+    private interface InterfaceCommandMethod {
+
+        @CommandMethod("default-interface-method")
+        default void defaultMethod() {
+            System.out.println("Hello from interface");
+        }
+    }
+
+
+    private static class ChildCommandMethod extends ParentCommandMethod implements InterfaceCommandMethod {
 
         @CommandMethod("child-method")
-        public void child() {
+        public void childMethod() {
             System.out.println("Hello from child");
         }
 
         @Override
         @CommandMethod("override-method")
-        public void override() {
+        public void overrideMethod() {
             System.out.println("Hello from override");
         }
 
         @SuppressWarnings("UnusedMethod")
         @CommandMethod("child-method-with-parent-signature")
-        private void parent() {
+        private void parentMethod() {
             System.out.println("Hello derklaro");
         }
     }

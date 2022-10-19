@@ -224,7 +224,18 @@ public final class AnnotationParser<C> {
     static @NonNull List<Method> getAllDeclaredMethods(final Class<?> clazz) {
         final List<Method> methods = new ArrayList<>();
         final Set<MethodSignature> signatures = new HashSet<>();
-        for (Class<?> current = clazz; current != null; current = current.getSuperclass()) {
+        final List<Class<?>> classes = new ArrayList<>();
+        classes.add(clazz);
+        for (int i = 0; i < classes.size(); i++) {
+            final Class<?> current = classes.get(i);
+            if (current.getSuperclass() != null) {
+                classes.add(current.getSuperclass());
+            }
+            for (final Class<?> inter : current.getInterfaces()) {
+                if (!classes.contains(inter)) {
+                    classes.add(inter);
+                }
+            }
             for (final Method method : current.getDeclaredMethods()) {
                 if (Modifier.isPrivate(method.getModifiers()) || signatures.add(new MethodSignature(method))) {
                     methods.add(method);
