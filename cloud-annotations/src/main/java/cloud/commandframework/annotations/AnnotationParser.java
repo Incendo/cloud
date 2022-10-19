@@ -221,6 +221,19 @@ public final class AnnotationParser<C> {
         return getMethodOrClassAnnotation(method, clazz) != null;
     }
 
+    static @NonNull List<Method> getAllDeclaredMethods(final Class<?> clazz) {
+        final List<Method> methods = new ArrayList<>();
+        final Set<MethodSignature> signatures = new HashSet<>();
+        for (Class<?> current = clazz; current != null; current = current.getSuperclass()) {
+            for (final Method method : current.getDeclaredMethods()) {
+                if (Modifier.isPrivate(method.getModifiers()) || signatures.add(new MethodSignature(method))) {
+                    methods.add(method);
+                }
+            }
+        }
+        return methods;
+    }
+
     /**
      * Returns the command manager that was used to create this parser
      *
@@ -414,7 +427,7 @@ public final class AnnotationParser<C> {
         /* Then register all parsers */
         this.parseParsers(instance);
         /* Then construct commands from @CommandMethod annotated classes */
-        final Method[] methods = instance.getClass().getMethods();
+        final List<Method> methods = getAllDeclaredMethods(instance.getClass());
         final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
         for (final Method method : methods) {
             final CommandMethod commandMethod = method.getAnnotation(CommandMethod.class);

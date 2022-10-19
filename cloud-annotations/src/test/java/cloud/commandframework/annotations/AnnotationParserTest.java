@@ -111,6 +111,8 @@ class AnnotationParserTest {
         manager.executeCommand(new TestCommandSender(), "class method").join();
         manager.executeCommand(new TestCommandSender(), "parent-method").join();
         manager.executeCommand(new TestCommandSender(), "child-method").join();
+        manager.executeCommand(new TestCommandSender(), "override-method").join();
+        manager.executeCommand(new TestCommandSender(), "child-method-with-parent-signature").join();
     }
 
     @Test
@@ -278,21 +280,42 @@ class AnnotationParserTest {
         }
     }
 
-    private static abstract class SuperCommandMethod {
 
+    private static abstract class ParentCommandMethod {
+
+        @SuppressWarnings("UnusedMethod")
         @CommandMethod("parent-method")
-        public void parent() {
-            System.out.println("Hello");
+        private void parent() {
+            System.out.println("Hello from parent");
+        }
+
+        @CommandMethod("override-method")
+        public void override() {
+            throw new UnsupportedOperationException("Failed to use the override command method");
         }
     }
 
-    private static class ChildCommandMethod extends SuperCommandMethod {
+
+    private static class ChildCommandMethod extends ParentCommandMethod {
 
         @CommandMethod("child-method")
         public void child() {
-            System.out.println("Hello world");
+            System.out.println("Hello from child");
+        }
+
+        @Override
+        @CommandMethod("override-method")
+        public void override() {
+            System.out.println("Hello from override");
+        }
+
+        @SuppressWarnings("UnusedMethod")
+        @CommandMethod("child-method-with-parent-signature")
+        private void parent() {
+            System.out.println("Hello derklaro");
         }
     }
+
 
     @CommandPermission("some.permission")
     @Target(ElementType.METHOD)
