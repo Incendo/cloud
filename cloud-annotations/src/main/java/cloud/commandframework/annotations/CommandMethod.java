@@ -24,6 +24,7 @@
 package cloud.commandframework.annotations;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -32,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Used to declare a class method as a command method
  */
+@Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface CommandMethod {
