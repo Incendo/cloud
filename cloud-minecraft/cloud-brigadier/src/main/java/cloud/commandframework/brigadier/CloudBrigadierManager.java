@@ -684,9 +684,7 @@ public final class CloudBrigadierManager<C, S> {
             final Method getNodesMethod = commandContext.getClass().getDeclaredMethod("getNodes");
             final Object nodes = getNodesMethod.invoke(commandContext);
             if (nodes instanceof List) {
-                return ((List<ParsedCommandNode<S>>) nodes).stream()
-                        .map(n -> Pair.of(n.getNode(), n.getRange()))
-                        .collect(Collectors.toList());
+                return ParsedCommandNodeHandler.toPairList((List) nodes);
             } else if (nodes instanceof Map) {
                 return ((Map<CommandNode<S>, StringRange>) nodes).entrySet().stream()
                         .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
@@ -697,5 +695,18 @@ public final class CloudBrigadierManager<C, S> {
         } catch (final ReflectiveOperationException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    // Inner class to prevent attempting to load ParsedCommandNode when it doesn't exist
+    private static final class ParsedCommandNodeHandler {
+        private ParsedCommandNodeHandler() {
+        }
+
+        private static <S> List<Pair<CommandNode<S>, StringRange>> toPairList(List<?> nodes) {
+            return ((List<ParsedCommandNode<S>>) nodes).stream()
+                    .map(n -> Pair.of(n.getNode(), n.getRange()))
+                    .collect(Collectors.toList());
+        }
+
     }
 }
