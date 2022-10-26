@@ -57,6 +57,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.DefaultQualifier;
@@ -294,17 +295,17 @@ final class SelectorUtils {
     }
 
     static final class EntitySelectorWrapper {
-        private static volatile @Nullable Methods methods;
+        private static volatile @MonotonicNonNull Methods methods;
 
         private final CommandContext<?> commandContext;
         private final Object selector;
 
         private static final class Methods {
-            private Method getBukkitEntity;
-            private Method entity;
-            private Method player;
-            private Method entities;
-            private Method players;
+            private @MonotonicNonNull Method getBukkitEntity;
+            private @MonotonicNonNull Method entity;
+            private @MonotonicNonNull Method player;
+            private @MonotonicNonNull Method entities;
+            private @MonotonicNonNull Method players;
 
             Methods(final CommandContext<?> commandContext, final Object selector) {
                 final Object nativeSender = commandContext.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
@@ -360,11 +361,11 @@ final class SelectorUtils {
                         }
                     }
                 }
-                Objects.requireNonNull(this.getBukkitEntity);
-                Objects.requireNonNull(this.player);
-                Objects.requireNonNull(this.entity);
-                Objects.requireNonNull(this.players);
-                Objects.requireNonNull(this.entities);
+                Objects.requireNonNull(this.getBukkitEntity, "Failed to locate getBukkitEntity method");
+                Objects.requireNonNull(this.player, "Failed to locate findPlayer method");
+                Objects.requireNonNull(this.entity, "Failed to locate findEntity method");
+                Objects.requireNonNull(this.players, "Failed to locate findPlayers method");
+                Objects.requireNonNull(this.entities, "Failed to locate findEntities method");
             }
 
             private static @Nullable Method findGetBukkitEntityMethod(final Class<?> returnType) {
