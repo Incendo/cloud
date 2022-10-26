@@ -39,7 +39,9 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -56,6 +58,7 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
 
     private final Supplier<ArgumentType<T>> nativeType;
     private final int expectedArgumentCount;
+    private final @Nullable ParseFunction<T> parse;
 
     /**
      * Create an argument parser based on a brigadier command.
@@ -102,9 +105,27 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
             final Supplier<ArgumentType<T>> nativeType,
             final int expectedArgumentCount
     ) {
+        this(nativeType, expectedArgumentCount, null);
+    }
+
+    /**
+     * Create an argument parser based on a brigadier command.
+     *
+     * @param nativeType            the native command type provider, calculated lazily
+     * @param expectedArgumentCount the number of arguments the brigadier type is expected to consume
+     * @param parse special function to replace {@link ArgumentType#parse(StringReader)} (for CraftBukkit weirdness)
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public WrappedBrigadierParser(
+            final Supplier<ArgumentType<T>> nativeType,
+            final int expectedArgumentCount,
+            final @Nullable ParseFunction<T> parse
+    ) {
         requireNonNull(nativeType, "brigadierType");
         this.nativeType = nativeType;
         this.expectedArgumentCount = expectedArgumentCount;
+        this.parse = parse;
     }
 
     /**
@@ -135,7 +156,10 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
 
         // Then try to parse
         try {
-            return ArgumentParseResult.success(this.nativeType.get().parse(reader));
+            final T result = this.parse != null
+                    ? this.parse.apply(this.nativeType.get(), reader)
+                    : this.nativeType.get().parse(reader);
+            return ArgumentParseResult.success(result);
         } catch (final CommandSyntaxException ex) {
             return ArgumentParseResult.failure(ex);
         } finally {
@@ -190,5 +214,25 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
     @Override
     public int getRequestedArgumentCount() {
         return this.expectedArgumentCount;
+    }
+
+    /**
+     * Function which can call {@link ArgumentType#parse(StringReader)} or another method.
+     *
+     * @param <T> result type
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    @FunctionalInterface
+    public interface ParseFunction<T> {
+        /**
+         * Apply the parse function.
+         *
+         * @param type argument type
+         * @param reader string reader
+         * @return result
+         * @throws CommandSyntaxException on failure
+         */
+        T apply(ArgumentType<T> type, StringReader reader) throws CommandSyntaxException;
     }
 }

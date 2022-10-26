@@ -25,18 +25,12 @@ package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.bukkit.BukkitCommandContextKeys;
-import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.BiFunction;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -67,9 +61,25 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
-    public static <C> SingleEntitySelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new SingleEntitySelectorArgument.Builder<>(name);
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new builder
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
@@ -79,8 +89,8 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> of(final @NonNull String name) {
-        return SingleEntitySelectorArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull SingleEntitySelectorArgument<C> of(final @NonNull String name) {
+        return SingleEntitySelectorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -90,8 +100,8 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> optional(final @NonNull String name) {
-        return SingleEntitySelectorArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull SingleEntitySelectorArgument<C> optional(final @NonNull String name) {
+        return SingleEntitySelectorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -102,15 +112,15 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SingleEntitySelector> optional(
+    public static <C> @NonNull SingleEntitySelectorArgument<C> optional(
             final @NonNull String name,
             final @NonNull String defaultEntitySelector
     ) {
-        return SingleEntitySelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
+        return SingleEntitySelectorArgument.<C>builder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, SingleEntitySelector> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, SingleEntitySelector, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(SingleEntitySelector.class, name);
@@ -123,60 +133,32 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
          */
         @Override
         public @NonNull SingleEntitySelectorArgument<C> build() {
-            return new SingleEntitySelectorArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                    this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new SingleEntitySelectorArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
     }
 
 
-    public static final class SingleEntitySelectorParser<C> implements ArgumentParser<C, SingleEntitySelector> {
+    public static final class SingleEntitySelectorParser<C> extends SelectorUtils.EntitySelectorParser<C, SingleEntitySelector> {
+
+        /**
+         * Creates a new {@link SingleEntitySelectorParser}.
+         */
+        public SingleEntitySelectorParser() {
+            super(true);
+        }
 
         @Override
-        public @NonNull ArgumentParseResult<SingleEntitySelector> parse(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+        public SingleEntitySelector mapResult(
+                final @NonNull String input,
+                final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
         ) {
-            if (!commandContext.get(BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES).contains(
-                    CloudBukkitCapabilities.BRIGADIER)) {
-                return ArgumentParseResult.failure(new SelectorParseException(
-                        "",
-                        commandContext,
-                        SelectorParseException.FailureReason.UNSUPPORTED_VERSION,
-                        SingleEntitySelectorParser.class
-                ));
-            }
-            final String input = inputQueue.peek();
-            if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        SingleEntitySelectorParser.class,
-                        commandContext
-                ));
-            }
-
-            List<Entity> entities;
-            try {
-                entities = Bukkit.selectEntities(commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER), input);
-            } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new SelectorParseException(
-                        input,
-                        commandContext,
-                        SelectorParseException.FailureReason.MALFORMED_SELECTOR,
-                        SingleEntitySelectorParser.class
-                ));
-            }
-
-            if (entities.size() > 1) {
-                return ArgumentParseResult.failure(new SelectorParseException(
-                        input,
-                        commandContext,
-                        SelectorParseException.FailureReason.TOO_MANY_ENTITIES,
-                        SingleEntitySelectorParser.class
-                ));
-            }
-
-            inputQueue.remove();
-            return ArgumentParseResult.success(new SingleEntitySelector(input, entities));
+            return new SingleEntitySelector(input, Collections.singletonList(wrapper.singleEntity()));
         }
     }
 }
