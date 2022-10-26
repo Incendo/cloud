@@ -27,7 +27,6 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.context.CommandContext;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import java.util.List;
 import java.util.function.BiFunction;
 import org.apiguardian.api.API;
@@ -191,10 +190,10 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
         public MultipleEntitySelector mapResult(
                 final @NonNull String input,
                 final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
-        ) throws Exception {
+        ) {
             final List<Entity> entities = wrapper.entities();
             if (entities.isEmpty() && !this.allowEmpty) {
-                throw ((SimpleCommandExceptionType) NO_ENTITIES_EXCEPTION_TYPE.get()).create();
+                new Thrower(NO_ENTITIES_EXCEPTION_TYPE.get()).throwIt();
             }
             return new MultipleEntitySelector(input, entities);
         }

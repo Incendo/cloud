@@ -139,6 +139,19 @@ final class SelectorUtils {
 
         private final @Nullable ArgumentParser<C, T> modernParser;
 
+        // Hide brigadier references in inner class
+        protected static final class Thrower {
+            private final Object type;
+
+            Thrower(final Object simpleCommandExceptionType) {
+                this.type = simpleCommandExceptionType;
+            }
+
+            void throwIt() {
+                throw rethrow(((SimpleCommandExceptionType) this.type).create());
+            }
+        }
+
         protected SelectorParser(
                 final boolean single,
                 final boolean playersOnly

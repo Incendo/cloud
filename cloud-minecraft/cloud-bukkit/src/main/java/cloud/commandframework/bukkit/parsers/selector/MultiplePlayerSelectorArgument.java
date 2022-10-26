@@ -30,7 +30,6 @@ import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
 import com.google.common.collect.ImmutableList;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -197,10 +196,10 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         public MultiplePlayerSelector mapResult(
                 final @NonNull String input,
                 final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
-        ) throws Exception {
+        ) {
             final List<Player> players = wrapper.players();
             if (players.isEmpty() && !this.allowEmpty) {
-                throw ((SimpleCommandExceptionType) NO_PLAYERS_EXCEPTION_TYPE.get()).create();
+                new Thrower(NO_PLAYERS_EXCEPTION_TYPE.get()).throwIt();
             }
             return new MultiplePlayerSelector(input, new ArrayList<>(players));
         }
