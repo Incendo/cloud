@@ -26,21 +26,17 @@ package cloud.commandframework.bukkit.parsers.selector;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.bukkit.BukkitCommandContextKeys;
-import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import com.google.common.collect.ImmutableList;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -48,6 +44,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, MultiplePlayerSelector> {
 
     private MultiplePlayerSelectorArgument(
+            final boolean allowEmpty,
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
@@ -55,7 +52,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new MultiplePlayerSelectorParser<>(), defaultValue, MultiplePlayerSelector.class,
+        super(required, name, new MultiplePlayerSelectorParser<>(allowEmpty), defaultValue, MultiplePlayerSelector.class,
                 suggestionsProvider, defaultDescription
         );
     }
@@ -66,9 +63,25 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
-    public static <C> MultiplePlayerSelectorArgument.Builder<C> newBuilder(final @NonNull String name) {
-        return new MultiplePlayerSelectorArgument.Builder<>(name);
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new builder
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
@@ -78,8 +91,8 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> of(final @NonNull String name) {
-        return MultiplePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull MultiplePlayerSelectorArgument<C> of(final @NonNull String name) {
+        return MultiplePlayerSelectorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -89,8 +102,8 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> optional(final @NonNull String name) {
-        return MultiplePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(final @NonNull String name) {
+        return MultiplePlayerSelectorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -101,18 +114,33 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, MultiplePlayerSelector> optional(
+    public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(
             final @NonNull String name,
             final @NonNull String defaultEntitySelector
     ) {
-        return MultiplePlayerSelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
+        return MultiplePlayerSelectorArgument.<C>builder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, MultiplePlayerSelector> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, MultiplePlayerSelector, Builder<C>> {
+
+        private boolean allowEmpty = true;
 
         private Builder(final @NonNull String name) {
             super(MultiplePlayerSelector.class, name);
+        }
+
+        /**
+         * Set whether to allow empty results.
+         *
+         * @param allowEmpty whether to allow empty results
+         * @return builder instance
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        public @NonNull Builder<C> allowEmpty(final boolean allowEmpty) {
+            this.allowEmpty = allowEmpty;
+            return this;
         }
 
         /**
@@ -122,83 +150,66 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
          */
         @Override
         public @NonNull MultiplePlayerSelectorArgument<C> build() {
-            return new MultiplePlayerSelectorArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                    this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new MultiplePlayerSelectorArgument<>(
+                    this.allowEmpty,
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
     }
 
 
-    public static final class MultiplePlayerSelectorParser<C> implements ArgumentParser<C, MultiplePlayerSelector> {
+    public static final class MultiplePlayerSelectorParser<C> extends SelectorUtils.PlayerSelectorParser<C, MultiplePlayerSelector> {
+
+        private final boolean allowEmpty;
+
+        /**
+         * Creates a new {@link MultiplePlayerSelectorParser}.
+         *
+         * @param allowEmpty Whether to allow an empty result
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        public MultiplePlayerSelectorParser(final boolean allowEmpty) {
+            super(false);
+            this.allowEmpty = allowEmpty;
+        }
+
+        /**
+         * Creates a new {@link MultiplePlayerSelectorParser}.
+         */
+        public MultiplePlayerSelectorParser() {
+            this(true);
+        }
 
         @Override
-        public @NonNull ArgumentParseResult<MultiplePlayerSelector> parse(
+        public MultiplePlayerSelector mapResult(
+                final @NonNull String input,
+                final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
+        ) throws Exception {
+            final List<Player> players = wrapper.players();
+            if (players.isEmpty() && !this.allowEmpty) {
+                throw ((SimpleCommandExceptionType) NO_PLAYERS_EXCEPTION_TYPE.get()).create();
+            }
+            return new MultiplePlayerSelector(input, new ArrayList<>(players));
+        }
+
+        @Override
+        protected @NonNull ArgumentParseResult<MultiplePlayerSelector> legacyParse(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
-            if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        MultiplePlayerSelectorParser.class,
-                        commandContext
-                ));
+            @SuppressWarnings("deprecation") final @Nullable Player player = Bukkit.getPlayer(input);
+
+            if (player == null) {
+                return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
             }
-
-            if (!commandContext.get(BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES).contains(
-                    CloudBukkitCapabilities.BRIGADIER)) {
-                @SuppressWarnings("deprecation")
-                Player player = Bukkit.getPlayer(input);
-
-                if (player == null) {
-                    return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
-                }
-                inputQueue.remove();
-                return ArgumentParseResult.success(new MultiplePlayerSelector(input, ImmutableList.of(player)));
-            }
-
-            List<Entity> entities;
-            try {
-                entities = Bukkit.selectEntities(commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER), input);
-            } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new SelectorParseException(
-                        input,
-                        commandContext,
-                        SelectorParseException.FailureReason.MALFORMED_SELECTOR,
-                        MultiplePlayerSelectorParser.class
-                ));
-            }
-
-            for (Entity e : entities) {
-                if (!(e instanceof Player)) {
-                    return ArgumentParseResult.failure(new SelectorParseException(
-                            input,
-                            commandContext,
-                            SelectorParseException.FailureReason.NON_PLAYER_IN_PLAYER_SELECTOR,
-                            MultiplePlayerSelectorParser.class
-                    ));
-                }
-            }
-
             inputQueue.remove();
-            return ArgumentParseResult.success(new MultiplePlayerSelector(input, entities));
-        }
-
-        @Override
-        public @NonNull List<@NonNull String> suggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
-            List<String> output = new ArrayList<>();
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                final CommandSender bukkit = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);
-                if (bukkit instanceof Player && !((Player) bukkit).canSee(player)) {
-                    continue;
-                }
-                output.add(player.getName());
-            }
-
-            return output;
+            return ArgumentParseResult.success(new MultiplePlayerSelector(input, ImmutableList.of(player)));
         }
     }
 }

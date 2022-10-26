@@ -29,6 +29,7 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
+import cloud.commandframework.bukkit.annotation.specifier.AllowEmptySelection;
 import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
 import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
 import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
@@ -157,15 +158,28 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                 new Location2DArgument.Location2DParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(ProtoItemStack.class), parserParameters ->
                 new ItemStackArgument.Parser<>());
+
         /* Register Entity Selector Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(SingleEntitySelector.class), parserParameters ->
                 new SingleEntitySelectorArgument.SingleEntitySelectorParser<>());
         this.parserRegistry().registerParserSupplier(TypeToken.get(SinglePlayerSelector.class), parserParameters ->
                 new SinglePlayerSelectorArgument.SinglePlayerSelectorParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(MultipleEntitySelector.class), parserParameters ->
-                new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>());
-        this.parserRegistry().registerParserSupplier(TypeToken.get(MultiplePlayerSelector.class), parserParameters ->
-                new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>());
+        this.parserRegistry().registerAnnotationMapper(
+                AllowEmptySelection.class,
+                (annotation, type) -> ParserParameters.single(BukkitParserParameters.ALLOW_EMPTY_SELECTOR_RESULT, annotation.value())
+        );
+        this.parserRegistry().registerParserSupplier(
+                TypeToken.get(MultipleEntitySelector.class),
+                parserParameters -> new MultipleEntitySelectorArgument.MultipleEntitySelectorParser<>(
+                        parserParameters.get(BukkitParserParameters.ALLOW_EMPTY_SELECTOR_RESULT, true)
+                )
+        );
+        this.parserRegistry().registerParserSupplier(
+                TypeToken.get(MultiplePlayerSelector.class),
+                parserParameters -> new MultiplePlayerSelectorArgument.MultiplePlayerSelectorParser<>(
+                        parserParameters.get(BukkitParserParameters.ALLOW_EMPTY_SELECTOR_RESULT, true)
+                )
+        );
 
         if (CraftBukkitReflection.classExists("org.bukkit.NamespacedKey")) {
             this.registerParserSupplierFor(NamespacedKeyArgument.class);
