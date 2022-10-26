@@ -25,6 +25,7 @@ package cloud.commandframework.bukkit;
 
 import cloud.commandframework.arguments.parser.ParserParameter;
 import io.leangen.geantyref.TypeToken;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -32,10 +33,22 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @since 1.7.0
  */
+@API(status = API.Status.STABLE, since = "1.7.0")
 public final class BukkitParserParameters {
 
     private BukkitParserParameters() {
     }
+
+    /**
+     * Used to specify if an empty result is allowed for
+     * {@link cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgument} and
+     * {@link cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument}.
+     *
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static final ParserParameter<Boolean> ALLOW_EMPTY_SELECTOR_RESULT =
+            create("allow_empty_selector_result", TypeToken.get(Boolean.class));
 
     /**
      * Sets to require explicit namespaces for {@link cloud.commandframework.bukkit.argument.NamespacedKeyArgument}

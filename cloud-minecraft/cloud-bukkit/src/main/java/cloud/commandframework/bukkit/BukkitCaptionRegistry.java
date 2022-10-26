@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.captions.SimpleCaptionRegistry;
+import org.apiguardian.api.API;
 
 /**
  * Caption registry that uses bi-functions to produce messages
@@ -54,7 +55,11 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
     public static final String ARGUMENT_PARSE_FAILURE_WORLD = "'{input}' is not a valid Minecraft world";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED}
+     *
+     * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED = "Selector '{input}' is malformed.";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED}
@@ -63,15 +68,27 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
             "Entity selector argument type not supported below Minecraft 1.13.";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS}
+     *
+     * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS = "More than 1 player selected in single player selector";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES}
+     *
+     * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES = "More than 1 entity selected in single entity selector.";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER}
+     *
+     * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static final String ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER = "Non-player(s) selected in player selector.";
     /**
      * Default caption for {@link BukkitCaptionKeys#ARGUMENT_PARSE_FAILURE_LOCATION_INVALID_FORMAT}
@@ -106,6 +123,7 @@ public class BukkitCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
             "Invalid input '{input}', requires an explicit namespace.";
 
 
+    @SuppressWarnings("deprecation")
     protected BukkitCaptionRegistry() {
         super();
         this.registerMessageFactory(

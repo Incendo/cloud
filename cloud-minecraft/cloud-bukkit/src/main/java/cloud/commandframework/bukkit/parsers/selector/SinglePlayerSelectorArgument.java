@@ -26,21 +26,16 @@ package cloud.commandframework.bukkit.parsers.selector;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.bukkit.BukkitCommandContextKeys;
-import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -72,9 +67,25 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
-    public static <C> SinglePlayerSelectorArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new SinglePlayerSelectorArgument.Builder<>(name);
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
+    }
+
+    /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new builder
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
     }
 
     /**
@@ -84,8 +95,8 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> of(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>newBuilder(name).asRequired().build();
+    public static <C> @NonNull SinglePlayerSelectorArgument<C> of(final @NonNull String name) {
+        return SinglePlayerSelectorArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -95,8 +106,8 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>  Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> optional(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>newBuilder(name).asOptional().build();
+    public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(final @NonNull String name) {
+        return SinglePlayerSelectorArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -107,15 +118,15 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @param <C>                   Command sender type
      * @return Created argument
      */
-    public static <C> @NonNull CommandArgument<C, SinglePlayerSelector> optional(
+    public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(
             final @NonNull String name,
             final @NonNull String defaultEntitySelector
     ) {
-        return SinglePlayerSelectorArgument.<C>newBuilder(name).asOptionalWithDefault(defaultEntitySelector).build();
+        return SinglePlayerSelectorArgument.<C>builder(name).asOptionalWithDefault(defaultEntitySelector).build();
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, SinglePlayerSelector> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, SinglePlayerSelector, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(SinglePlayerSelector.class, name);
@@ -128,91 +139,48 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
          */
         @Override
         public @NonNull SinglePlayerSelectorArgument<C> build() {
-            return new SinglePlayerSelectorArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                    this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new SinglePlayerSelectorArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
     }
 
 
-    public static final class SinglePlayerSelectorParser<C> implements ArgumentParser<C, SinglePlayerSelector> {
+    public static final class SinglePlayerSelectorParser<C> extends SelectorUtils.PlayerSelectorParser<C, SinglePlayerSelector> {
+
+        /**
+         * Creates a new {@link SinglePlayerSelectorParser}.
+         */
+        public SinglePlayerSelectorParser() {
+            super(true);
+        }
 
         @Override
-        public @NonNull ArgumentParseResult<SinglePlayerSelector> parse(
+        public SinglePlayerSelector mapResult(
+                final @NonNull String input,
+                final SelectorUtils.@NonNull EntitySelectorWrapper wrapper
+        ) {
+            return new SinglePlayerSelector(input, Collections.singletonList(wrapper.singlePlayer()));
+        }
+
+        @Override
+        protected @NonNull ArgumentParseResult<SinglePlayerSelector> legacyParse(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull Queue<@NonNull String> inputQueue
         ) {
             final String input = inputQueue.peek();
-            if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        SinglePlayerSelectorParser.class,
-                        commandContext
-                ));
-            }
+            @SuppressWarnings("deprecation") final @Nullable Player player = Bukkit.getPlayer(input);
 
-            if (!commandContext.get(BukkitCommandContextKeys.CLOUD_BUKKIT_CAPABILITIES).contains(
-                    CloudBukkitCapabilities.BRIGADIER)) {
-                @SuppressWarnings("deprecation")
-                Player player = Bukkit.getPlayer(input);
-
-                if (player == null) {
-                    return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
-                }
-                inputQueue.remove();
-                return ArgumentParseResult.success(new SinglePlayerSelector(input, ImmutableList.of(player)));
+            if (player == null) {
+                return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
             }
-
-            List<Entity> entities;
-            try {
-                entities = Bukkit.selectEntities(commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER), input);
-            } catch (IllegalArgumentException e) {
-                return ArgumentParseResult.failure(new SelectorParseException(
-                        input,
-                        commandContext,
-                        SelectorParseException.FailureReason.MALFORMED_SELECTOR,
-                        SinglePlayerSelectorParser.class
-                ));
-            }
-
-            for (Entity e : entities) {
-                if (!(e instanceof Player)) {
-                    return ArgumentParseResult.failure(new SelectorParseException(
-                            input,
-                            commandContext,
-                            SelectorParseException.FailureReason.NON_PLAYER_IN_PLAYER_SELECTOR,
-                            SinglePlayerSelectorParser.class
-                    ));
-                }
-            }
-            if (entities.size() > 1) {
-                return ArgumentParseResult.failure(new SelectorParseException(
-                        input,
-                        commandContext,
-                        SelectorParseException.FailureReason.TOO_MANY_PLAYERS,
-                        SinglePlayerSelectorParser.class
-                ));
-            }
-
             inputQueue.remove();
-            return ArgumentParseResult.success(new SinglePlayerSelector(input, entities));
+            return ArgumentParseResult.success(new SinglePlayerSelector(input, ImmutableList.of(player)));
         }
 
-        @Override
-        public @NonNull List<@NonNull String> suggestions(
-                final @NonNull CommandContext<C> commandContext,
-                final @NonNull String input
-        ) {
-            List<String> output = new ArrayList<>();
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                final CommandSender bukkit = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);
-                if (bukkit instanceof Player && !((Player) bukkit).canSee(player)) {
-                    continue;
-                }
-                output.add(player.getName());
-            }
-
-            return output;
-        }
     }
 }
