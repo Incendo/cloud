@@ -703,7 +703,7 @@ public final class CloudBrigadierManager<C, S> {
         private ParsedCommandNodeHandler() {
         }
 
-        private static <S> List<Pair<CommandNode<S>, StringRange>> toPairList(List<?> nodes) {
+        private static <S> List<Pair<CommandNode<S>, StringRange>> toPairList(final List<?> nodes) {
             return ((List<ParsedCommandNode<S>>) nodes).stream()
                     .map(n -> Pair.of(n.getNode(), n.getRange()))
                     .collect(Collectors.toList());
