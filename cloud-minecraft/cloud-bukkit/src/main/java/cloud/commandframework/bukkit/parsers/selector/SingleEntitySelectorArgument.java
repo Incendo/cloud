@@ -34,6 +34,14 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Argument type for parsing {@link SingleEntitySelector}. On Minecraft 1.13+
+ * this argument uses Minecraft's built-in entity selector argument for parsing
+ * and suggestions. On prior versions, this argument will suggest nothing and
+ * always fail parsing with {@link SelectorParseException.FailureReason#UNSUPPORTED_VERSION}.
+ *
+ * @param <C> sender type
+ */
 public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, SingleEntitySelector> {
 
     private SingleEntitySelectorArgument(
