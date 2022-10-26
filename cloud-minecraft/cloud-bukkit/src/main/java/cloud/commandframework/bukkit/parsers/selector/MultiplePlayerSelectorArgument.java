@@ -41,6 +41,14 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Argument type for parsing {@link MultiplePlayerSelector}. On Minecraft 1.13+
+ * this argument uses Minecraft's built-in entity selector argument for parsing
+ * and suggestions. On prior versions, this argument behaves similarly to
+ * {@link PlayerArgument}.
+ *
+ * @param <C> sender type
+ */
 public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, MultiplePlayerSelector> {
 
     private MultiplePlayerSelectorArgument(
