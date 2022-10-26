@@ -214,6 +214,7 @@ public final class CloudBrigadierManager<C, S> {
                 case QUOTED:
                     return StringArgumentType.string();
                 case GREEDY:
+                case GREEDY_FLAG_YIELDING:
                     return StringArgumentType.greedyString();
                 default:
                     return StringArgumentType.word();
