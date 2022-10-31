@@ -81,7 +81,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
         if (!messageContent.startsWith(commandPrefix)) {
             return;
         }
-        messageContent = messageContent.replaceFirst(commandPrefix, "");
+        messageContent = messageContent.substring(commandPrefix.length());
 
         final String finalContent = messageContent;
         if (((StaticArgument<C>) this.command).getAliases()
