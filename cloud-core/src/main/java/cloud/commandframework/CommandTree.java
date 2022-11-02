@@ -659,28 +659,36 @@ public final class CommandTree<C> {
             commandContext.setCurrentArgument(child.getValue());
             final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
             final Optional<?> parsedValue = result.getParsedValue();
-            if ((parsedValue.isPresent() && !commandQueue.isEmpty()) || (!parsedValue.isPresent() && commandQueue.size() > 1)) {
-                if (parsedValue.isPresent()) {
+            final boolean parseSuccess = parsedValue.isPresent();
+
+            if ((parseSuccess && !commandQueue.isEmpty()) || (!parseSuccess && commandQueue.size() > 1)) {
+                if (parseSuccess) {
                     // the current argument at the position is parsable and there are more arguments following
                     commandContext.store(child.getValue().getName(), parsedValue.get());
                     return this.getSuggestions(commandContext, commandQueue, child);
                 } else {
+                    // at this point there should normally be no need to reset the command queue as we expect
+                    // users to only take out an argument if the parse succeeded. Just to be sure we do it anyway
+                    commandQueue.clear();
+                    commandQueue.addAll(commandQueueOriginal);
                     // there are more arguments following but the current argument isn't matching - there
                     // is no need to collect any further suggestions
                     return Collections.emptyList();
                 }
             }
             // END: Parsing
-        } else if (commandQueue.size() > 1) {
-            // The preprocessor denied the argument, and there are more arguments following the current one
-            // Therefore we shouldn't list the suggestions of the current argument, as clearly the suggestions of
-            // one of the following arguments is requested
-            return Collections.emptyList();
         }
 
         // Restore original command input queue
         commandQueue.clear();
         commandQueue.addAll(commandQueueOriginal);
+
+        if (!preParseSuccess && commandQueue.size() > 1) {
+            // The preprocessor denied the argument, and there are more arguments following the current one
+            // Therefore we shouldn't list the suggestions of the current argument, as clearly the suggestions of
+            // one of the following arguments is requested
+            return Collections.emptyList();
+        }
 
         // Fallback: use suggestion provider of argument
         commandContext.setCurrentArgument(child.getValue());
