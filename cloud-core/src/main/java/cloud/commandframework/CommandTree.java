@@ -661,20 +661,19 @@ public final class CommandTree<C> {
             final Optional<?> parsedValue = result.getParsedValue();
             final boolean parseSuccess = parsedValue.isPresent();
 
-            if ((parseSuccess && !commandQueue.isEmpty()) || (!parseSuccess && commandQueue.size() > 1)) {
-                if (parseSuccess) {
-                    // the current argument at the position is parsable and there are more arguments following
-                    commandContext.store(child.getValue().getName(), parsedValue.get());
-                    return this.getSuggestions(commandContext, commandQueue, child);
-                } else {
-                    // at this point there should normally be no need to reset the command queue as we expect
-                    // users to only take out an argument if the parse succeeded. Just to be sure we do it anyway
-                    commandQueue.clear();
-                    commandQueue.addAll(commandQueueOriginal);
-                    // there are more arguments following but the current argument isn't matching - there
-                    // is no need to collect any further suggestions
-                    return Collections.emptyList();
-                }
+            if (parseSuccess && !commandQueue.isEmpty()) {
+                // the current argument at the position is parsable and there are more arguments following
+                commandContext.store(child.getValue().getName(), parsedValue.get());
+                return this.getSuggestions(commandContext, commandQueue, child);
+            } else if (!parseSuccess && commandQueueOriginal.size() > 1) {
+                // at this point there should normally be no need to reset the command queue as we expect
+                // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway
+                commandQueue.clear();
+                commandQueue.addAll(commandQueueOriginal);
+
+                // there are more arguments following but the current argument isn't matching - there
+                // is no need to collect any further suggestions
+                return Collections.emptyList();
             }
             // END: Parsing
         }
