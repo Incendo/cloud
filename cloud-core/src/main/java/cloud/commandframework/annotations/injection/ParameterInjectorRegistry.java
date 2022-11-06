@@ -31,7 +31,7 @@ import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
 
     private volatile int injectorCount = 0;
-    private final Map<Class<?>, List<ParameterInjector<C, ?>>> injectors = new HashMap<>();
+    private final Map<Class<?>, List<ParameterInjector<C, ?>>> injectors = new LinkedHashMap<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
 
     /**
