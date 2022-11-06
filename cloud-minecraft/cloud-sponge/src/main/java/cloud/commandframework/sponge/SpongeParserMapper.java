@@ -114,7 +114,7 @@ public final class SpongeParserMapper<C> {
                 return CommandTreeNodeTypes.STRING.get().createNode().customCompletions().word();
             } else if (mode == StringArgument.StringMode.QUOTED) {
                 return CommandTreeNodeTypes.STRING.get().createNode().customCompletions();
-            } else if (mode == StringArgument.StringMode.GREEDY) {
+            } else if (mode == StringArgument.StringMode.GREEDY || mode == StringArgument.StringMode.GREEDY_FLAG_YIELDING) {
                 return CommandTreeNodeTypes.STRING.get().createNode().customCompletions().greedy();
             }
             throw new IllegalArgumentException("Unknown string mode '" + mode + "'!");
