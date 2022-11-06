@@ -64,7 +64,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
     }
 
     /**
-     * Register an injector for a particular type or any of it's assignable supertypes
+     * Register an injector for a particular type or any of it's assignable supertypes.
      *
      * @param clazz    Type that the injector should inject for. This type will matched using
      *                 {@link Class#isAssignableFrom(Class)}
@@ -79,12 +79,14 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
     }
 
     /**
-     * Register an injector for a particular type predicate
+     * Register an injector for a particular type predicate.
      *
-     * @param predicate A predicate that matches if the injector should be used for a type.
+     * @param predicate A predicate that matches if the injector should be used for a type
      * @param injector The injector that should inject the value into the command method
      * @param <T>      Injected type
+     * @since 1.8.0
      */
+    @API(status = API.Status.STABLE, since = "1.8.0")
     public synchronized <T> void registerInjector(
             final @NonNull Predicate<Class<?>> predicate,
             final @NonNull ParameterInjector<C, T> injector
@@ -108,7 +110,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
     ) {
         return Collections.unmodifiableCollection(this.injectors.stream()
                 .filter(pair -> pair.getFirst().test(clazz))
-                .map(pair -> pair.getSecond())
+                .map(Pair::getSecond)
                 .collect(Collectors.toList()));
     }
 
