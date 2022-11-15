@@ -1,6 +1,7 @@
 plugins {
     id("cloud.example-conventions")
-    id ("com.github.johnrengelman.shadow")
+    id("com.github.johnrengelman.shadow")
+    id("xyz.jpenilla.run-waterfall")
 }
 
 tasks {
@@ -9,8 +10,11 @@ tasks {
             exclude(dependency("net.md-5:bungeecord-api:1.8-SNAPSHOT"))
         }
     }
-    build {
+    assemble {
         dependsOn(shadowJar)
+    }
+    runWaterfall {
+        waterfallVersion("1.19")
     }
 }
 
