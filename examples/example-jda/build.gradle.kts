@@ -15,7 +15,7 @@ dependencies {
 }
 
 tasks {
-    build {
+    assemble {
         dependsOn(shadowJar)
     }
 }
