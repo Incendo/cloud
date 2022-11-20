@@ -403,7 +403,7 @@ public class CommandSuggestionsTest {
     void testFlagYieldingGreedyStringFollowedByFlagArgument() {
         // Arrange
         final CommandManager<TestCommandSender> manager = createManager();
-        manager.setSetting(CommandManager.ManagerSettings.ALLOW_FLAGS_EVERYWHERE, true);
+        manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
         manager.command(
                 manager.commandBuilder("command")
                         .argument(
@@ -454,7 +454,7 @@ public class CommandSuggestionsTest {
     void testFlagYieldingStringArrayFollowedByFlagArgument() {
         // Arrange
         final CommandManager<TestCommandSender> manager = createManager();
-        manager.setSetting(CommandManager.ManagerSettings.ALLOW_FLAGS_EVERYWHERE, true);
+        manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
         manager.command(
                 manager.commandBuilder("command")
                         .argument(

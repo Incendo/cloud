@@ -761,11 +761,11 @@ public final class CommandTree<C> {
             return Integer.MAX_VALUE;
         }
 
-        // Append flags before the first non-static argument
-        if (this.commandManager.getSetting(CommandManager.ManagerSettings.ALLOW_FLAGS_EVERYWHERE)) {
-            for (int i = 1; i < arguments.size(); i++) {
-                if (!(arguments.get(i) instanceof StaticArgument)) {
-                    return i - 1;
+        // Append flags after the last static argument
+        if (this.commandManager.getSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING)) {
+            for (int i = arguments.size() - 1; i >= 0; i--) {
+                if (arguments.get(i) instanceof StaticArgument) {
+                    return i;
                 }
             }
         }

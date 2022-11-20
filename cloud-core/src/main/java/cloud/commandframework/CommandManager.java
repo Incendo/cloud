@@ -1420,14 +1420,14 @@ public abstract class CommandManager<C> {
         OVERRIDE_EXISTING_COMMANDS,
 
         /**
-         * Allows parsing flags at any position by appending flag argument nodes between each command node.
+         * Allows parsing flags at any position after the last literal by appending flag argument nodes between each command node.
          * It can have some conflicts when integrating with other command systems like Brigadier,
          * and code inspecting the command tree may need to be adjusted.
          *
          * @since 1.8.0
          */
         @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
-        ALLOW_FLAGS_EVERYWHERE
+        LIBERAL_FLAG_PARSING
     }
 
 

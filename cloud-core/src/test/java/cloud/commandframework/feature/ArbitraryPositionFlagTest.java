@@ -48,7 +48,7 @@ class ArbitraryPositionFlagTest {
     @BeforeEach
     void setup() {
         this.commandManager = createManager();
-        this.commandManager.setSetting(CommandManager.ManagerSettings.ALLOW_FLAGS_EVERYWHERE, true);
+        this.commandManager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("test")
