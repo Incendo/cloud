@@ -75,7 +75,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
             final @NonNull Class<T> clazz,
             final @NonNull ParameterInjector<C, T> injector
     ) {
-        this.registerInjector(cl -> clazz.isAssignableFrom(cl), injector);
+        this.registerInjector(cl -> cl.isAssignableFrom(clazz), injector);
     }
 
     /**
