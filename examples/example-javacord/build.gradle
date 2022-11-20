@@ -9,7 +9,7 @@ application {
     mainClassName = "cloud.commandframework.examples.javacord.ExampleBot"
 }
 
-build.dependsOn(shadowJar)
+assemble.dependsOn(shadowJar)
 
 repositories {
     maven {

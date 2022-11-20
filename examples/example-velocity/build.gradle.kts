@@ -1,26 +1,11 @@
 plugins {
     id("com.github.johnrengelman.shadow")
     id("cloud.example-conventions")
+    id("xyz.jpenilla.run-velocity")
 }
 
 indra {
     javaVersions().target(11) // Velocity 3 requires Java 11
-}
-
-val velocityRunClasspath by configurations.creating {
-    attributes {
-        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class, Usage.JAVA_RUNTIME))
-        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class, Category.LIBRARY))
-        attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements::class, LibraryElements.JAR))
-    }
-}
-
-repositories {
-    ivy("https://versions.velocitypowered.com/download/") {
-        patternLayout { artifact("[revision].[ext]") }
-        metadataSources { artifact() }
-        content { includeModule("com.velocitypowered", "velocity-proxy") }
-    }
 }
 
 tasks {
@@ -29,39 +14,11 @@ tasks {
             exclude(dependency("com.velocitypowered:velocity-api"))
         }
     }
-    build {
+    assemble {
         dependsOn(shadowJar)
     }
-
-    val pluginJar = shadowJar.map { it.outputs }
-    val velocityRunFiles = velocityRunClasspath.asFileTree
-    register("runVelocity", JavaExec::class) {
-        group = "cloud"
-        description = "Spin up a Velocity server environment"
-        standardInput = System.`in`
-        if (JavaVersion.current() < JavaVersion.VERSION_11) {
-            javaLauncher.set(project.javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(11)) })
-        }
-
-        inputs.files(pluginJar)
-
-        classpath(velocityRunFiles)
-        workingDir = layout.projectDirectory.dir("run").asFile
-
-        doFirst {
-            // Prepare
-            val modsDir = workingDir.resolve("plugins")
-            if (!modsDir.isDirectory) {
-                modsDir.mkdirs()
-            }
-
-            project.copy {
-                into(modsDir.absolutePath)
-                from(pluginJar) {
-                    rename { "${rootProject.name}-${project.name}.jar" }
-                }
-            }
-        }
+    runVelocity {
+        velocityVersion(libs.versions.velocityApi.get())
     }
 }
 
@@ -71,5 +28,4 @@ dependencies {
     api(project(":cloud-annotations"))
     annotationProcessor(libs.velocityApi)
     compileOnly(libs.velocityApi)
-    velocityRunClasspath("com.velocitypowered", "velocity-proxy", libs.versions.velocityApi.get())
 }

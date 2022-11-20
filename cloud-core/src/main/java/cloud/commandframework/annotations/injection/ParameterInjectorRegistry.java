@@ -26,22 +26,24 @@ package cloud.commandframework.annotations.injection;
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.services.ServicePipeline;
+import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Registry containing mappings between {@link Class classes} and {@link ParameterInjector injectors}
+ *
+ * The order injectors are tested is the same order they were registered in.
  *
  * @param <C> Command sender type
  * @since 1.2.0
@@ -50,8 +52,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE, since = "1.2.0")
 public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
 
-    private volatile int injectorCount = 0;
-    private final Map<Class<?>, List<ParameterInjector<C, ?>>> injectors = new HashMap<>();
+    private final List<Pair<Predicate<Class<?>>, ParameterInjector<C, ?>>> injectors = new ArrayList<>();
     private final ServicePipeline servicePipeline = ServicePipeline.builder().build();
 
     /**
@@ -63,7 +64,7 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
     }
 
     /**
-     * Register an injector for a particular type
+     * Register an injector for a particular type or any of it's assignable supertypes.
      *
      * @param clazz    Type that the injector should inject for. This type will matched using
      *                 {@link Class#isAssignableFrom(Class)}
@@ -74,8 +75,23 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
             final @NonNull Class<T> clazz,
             final @NonNull ParameterInjector<C, T> injector
     ) {
-        this.injectors.computeIfAbsent(clazz, missingClass -> new LinkedList<>()).add(injector);
-        this.injectorCount++;
+        this.registerInjector(cl -> cl.isAssignableFrom(clazz), injector);
+    }
+
+    /**
+     * Register an injector for a particular type predicate.
+     *
+     * @param predicate A predicate that matches if the injector should be used for a type
+     * @param injector The injector that should inject the value into the command method
+     * @param <T>      Injected type
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public synchronized <T> void registerInjector(
+            final @NonNull Predicate<Class<?>> predicate,
+            final @NonNull ParameterInjector<C, T> injector
+    ) {
+        this.injectors.add(Pair.of(predicate, injector));
     }
 
     /**
@@ -92,13 +108,10 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
     public synchronized <T> @NonNull Collection<@NonNull ParameterInjector<C, ?>> injectors(
             final @NonNull Class<T> clazz
     ) {
-        final List<@NonNull ParameterInjector<C, ?>> injectors = new ArrayList<>(this.injectorCount);
-        for (final Map.Entry<Class<?>, List<ParameterInjector<C, ?>>> entry : this.injectors.entrySet()) {
-            if (clazz.isAssignableFrom(entry.getKey())) {
-                injectors.addAll(entry.getValue());
-            }
-        }
-        return Collections.unmodifiableCollection(injectors);
+        return Collections.unmodifiableCollection(this.injectors.stream()
+                .filter(pair -> pair.getFirst().test(clazz))
+                .map(Pair::getSecond)
+                .collect(Collectors.toList()));
     }
 
     @Override

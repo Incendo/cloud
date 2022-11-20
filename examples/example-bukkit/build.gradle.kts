@@ -1,9 +1,9 @@
-import xyz.jpenilla.runpaper.task.RunServerTask
+import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("cloud.example-conventions")
     id("com.github.johnrengelman.shadow")
-    id("xyz.jpenilla.run-paper") version "1.0.6"
+    id("xyz.jpenilla.run-paper")
 }
 
 dependencies {
@@ -28,7 +28,7 @@ tasks {
         relocate("me.lucko", "cloud.commandframework.example.lucko")
         relocate("io.leangen.geantyref", "cloud.commandframework.example.geantyref")
     }
-    build {
+    assemble {
         dependsOn(shadowJar)
     }
     runServer {
@@ -39,11 +39,12 @@ tasks {
         })
     }
 
-    // Setup a run task for each supported version
+    // Set up a run task for each supported version
     mapOf(
-            setOf("1.8.8", "1.9.4", "1.10.2", "1.11.2") to 11,
-            setOf("1.12.2", "1.13.2", "1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.2") to 17,
-    ).forEach { (minecraftVersions, javaVersion) ->
+            8 to setOf("1.8.8"),
+            11 to setOf("1.9.4", "1.10.2", "1.11.2"),
+            17 to setOf("1.12.2", "1.13.2", "1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.2"),
+    ).forEach { (javaVersion, minecraftVersions) ->
         for (version in minecraftVersions) {
             createVersionedRun(version, javaVersion)
         }
@@ -53,7 +54,7 @@ tasks {
 fun TaskContainerScope.createVersionedRun(
         version: String,
         javaVersion: Int
-) = register<RunServerTask>("runServer${version.replace(".", "_")}") {
+) = register<RunServer>("runServer${version.replace(".", "_")}") {
     group = "cloud"
     pluginJars.from(shadowJar.flatMap { it.archiveFile })
     minecraftVersion(version)

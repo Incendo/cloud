@@ -7,6 +7,9 @@ plugins:
   com.github.johnrengelman.shadow: 7.1.2
   com.github.ben-manes.versions: 0.42.0
   com.diffplug.spotless: &spotless 6.6.1
+  xyz.jpenilla.run-paper: &run-task 2.0.0
+  xyz.jpenilla.run-velocity: *run-task
+  xyz.jpenilla.run-waterfall: *run-task
 
 versions:
   checkstyle: 9.0

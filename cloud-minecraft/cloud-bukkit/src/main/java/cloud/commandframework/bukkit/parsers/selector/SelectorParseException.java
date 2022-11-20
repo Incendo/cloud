@@ -28,6 +28,7 @@ import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -73,7 +74,10 @@ public final class SelectorParseException extends ParserException {
     }
 
     /**
-     * Get the reason of failure for the selector parser
+     * Get the reason of failure for the selector parser.
+     *
+     * <p>Note: The only type currently used is {@link FailureReason#UNSUPPORTED_VERSION}, other exceptions
+     * are now handled by Brigadier in the form of {@link com.mojang.brigadier.exceptions.CommandSyntaxException}.</p>
      *
      * @return Failure reason
      * @since 1.2.0
@@ -90,9 +94,29 @@ public final class SelectorParseException extends ParserException {
     public enum FailureReason {
 
         UNSUPPORTED_VERSION(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_UNSUPPORTED),
+        /**
+         * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
+         */
+        @API(status = API.Status.DEPRECATED, since = "1.8.0")
+        @Deprecated
         MALFORMED_SELECTOR(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_MALFORMED),
+        /**
+         * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
+         */
+        @API(status = API.Status.DEPRECATED, since = "1.8.0")
+        @Deprecated
         TOO_MANY_PLAYERS(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_PLAYERS),
+        /**
+         * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
+         */
+        @API(status = API.Status.DEPRECATED, since = "1.8.0")
+        @Deprecated
         TOO_MANY_ENTITIES(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_TOO_MANY_ENTITIES),
+        /**
+         * @deprecated parsing is now handled by Brigadier and will throw {@link com.mojang.brigadier.exceptions.CommandSyntaxException} instead.
+         */
+        @API(status = API.Status.DEPRECATED, since = "1.8.0")
+        @Deprecated
         NON_PLAYER_IN_PLAYER_SELECTOR(BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_SELECTOR_NON_PLAYER);
 
 
