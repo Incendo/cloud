@@ -435,24 +435,24 @@ final class SelectorUtils {
 
         @SuppressWarnings("unchecked")
         List<Entity> entities() {
-            return reflectiveOperation(() -> ((List<Object>) this.methods().entities.invoke(
+            final List<Object> internalEntities = reflectiveOperation(() -> ((List<Object>) this.methods().entities.invoke(
                     this.selector,
                     this.commandContext.<Object>get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)
-            ))
-                    .stream()
+            )));
+            return internalEntities.stream()
                     .map(o -> reflectiveOperation(() -> (Entity) this.methods().getBukkitEntity.invoke(o)))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
         }
 
         @SuppressWarnings("unchecked")
         List<Player> players() {
-            return reflectiveOperation(() -> ((List<Object>) this.methods().players.invoke(
+            final List<Object> serverPlayers = reflectiveOperation(() -> ((List<Object>) this.methods().players.invoke(
                     this.selector,
                     this.commandContext.<Object>get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)
-            ))
-                    .stream()
+            )));
+            return serverPlayers.stream()
                     .map(o -> reflectiveOperation(() -> (Player) this.methods().getBukkitEntity.invoke(o)))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
         }
 
         @FunctionalInterface

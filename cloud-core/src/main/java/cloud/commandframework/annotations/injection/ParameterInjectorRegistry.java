@@ -41,7 +41,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Registry containing mappings between {@link Class classes} and {@link ParameterInjector injectors}
+ * Registry containing mappings between {@link Class} {@link Predicate Predicates}
+ * and {@link ParameterInjector injectors}.
  *
  * The order injectors are tested is the same order they were registered in.
  *
