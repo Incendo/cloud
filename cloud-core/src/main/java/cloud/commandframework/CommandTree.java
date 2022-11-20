@@ -755,7 +755,7 @@ public final class CommandTree<C> {
         }
     }
 
-    private int flagStartIndex(final List<CommandArgument<C, ?>> arguments, final FlagArgument<C> flags) {
+    private int flagStartIndex(final @NonNull List<CommandArgument<C, ?>> arguments, final @Nullable FlagArgument<C> flags) {
         // Do not append flags
         if (flags == null) {
             return Integer.MAX_VALUE;
