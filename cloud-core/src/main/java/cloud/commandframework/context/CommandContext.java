@@ -200,7 +200,7 @@ public class CommandContext<C> {
      * @param value Value
      * @param <T>   Value type
      */
-    public <T> void store(final @NonNull String key, final @NonNull T value) {
+    public <T extends @NonNull Object> void store(final @NonNull String key, final T value) {
         this.internalStorage.put(SimpleCloudKey.of(key), value);
     }
 
@@ -212,7 +212,7 @@ public class CommandContext<C> {
      * @param value Value
      * @param <T>   Value type
      */
-    public <T> void store(final @NonNull CloudKey<T> key, final @NonNull T value) {
+    public <T extends @NonNull Object> void store(final @NonNull CloudKey<T> key, final T value) {
         this.internalStorage.put(key, value);
     }
 
@@ -224,7 +224,7 @@ public class CommandContext<C> {
      * @param value     Value
      * @param <T>       Value type
      */
-    public <T> void store(final @NonNull CommandArgument<C, T> keyHolder, final @NonNull T value) {
+    public <T extends @NonNull Object> void store(final @NonNull CommandArgument<C, T> keyHolder, final T value) {
         this.store((CloudKeyHolder<T>) keyHolder, value);
     }
 
@@ -238,7 +238,7 @@ public class CommandContext<C> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> void store(final @NonNull CloudKeyHolder<T> keyHolder, final @NonNull T value) {
+    public <T extends @NonNull Object> void store(final @NonNull CloudKeyHolder<T> keyHolder, final T value) {
         this.internalStorage.put(keyHolder.getKey(), value);
     }
 
@@ -327,7 +327,7 @@ public class CommandContext<C> {
      * @param <T> Value type
      * @return Value
      */
-    public <T> @NonNull Optional<T> getOptional(final @NonNull String key) {
+    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull String key) {
         final Object value = this.internalStorage.get(SimpleCloudKey.of(key));
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
@@ -347,7 +347,7 @@ public class CommandContext<C> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> @NonNull Optional<T> getOptional(final @NonNull CloudKey<T> key) {
+    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull CloudKey<T> key) {
         final Object value = this.internalStorage.get(key);
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
@@ -366,7 +366,7 @@ public class CommandContext<C> {
      * @return Value
      */
     @SuppressWarnings("unused")
-    public <T> @NonNull Optional<T> getOptional(final @NonNull CommandArgument<C, T> keyHolder) {
+    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull CommandArgument<C, T> keyHolder) {
         return this.getOptional((CloudKeyHolder<T>) keyHolder);
     }
 
@@ -381,7 +381,7 @@ public class CommandContext<C> {
      */
     @SuppressWarnings("unused")
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> @NonNull Optional<T> getOptional(final @NonNull CloudKeyHolder<T> keyHolder) {
+    public <T extends @NonNull Object> @NonNull Optional<T> getOptional(final @NonNull CloudKeyHolder<T> keyHolder) {
         final Object value = this.internalStorage.get(keyHolder.getKey());
         if (value != null) {
             @SuppressWarnings("unchecked") final T castedValue = (T) value;
@@ -412,7 +412,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Get a required argument from the context. This will thrown an exception
+     * Get a required argument from the context. This will throw an exception
      * if there's no value associated with the given key
      *
      * @param key Argument key
@@ -421,7 +421,7 @@ public class CommandContext<C> {
      * @throws NullPointerException If no such argument is stored
      */
     @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
-    public <T> @NonNull T get(final @NonNull String key) {
+    public <T extends @NonNull Object> T get(final @NonNull String key) {
         final Object value = this.internalStorage.get(SimpleCloudKey.of(key));
         if (value == null) {
             throw new NullPointerException("No such object stored in the context: " + key);
@@ -430,7 +430,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Get a required argument from the context. This will thrown an exception
+     * Get a required argument from the context. This will throw an exception
      * if there's no value associated with the given key
      *
      * @param key Argument key
@@ -441,7 +441,7 @@ public class CommandContext<C> {
      */
     @SuppressWarnings({"unchecked", "TypeParameterUnusedInFormals"})
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> @NonNull T get(final @NonNull CloudKey<T> key) {
+    public <T extends @NonNull Object> T get(final @NonNull CloudKey<T> key) {
         final Object value = this.internalStorage.get(key);
         if (value == null) {
             throw new NullPointerException("No such object stored in the context: " + key);
@@ -450,7 +450,7 @@ public class CommandContext<C> {
     }
 
     /**
-     * Get a required argument from the context. This will thrown an exception
+     * Get a required argument from the context. This will throw an exception
      * if there's no value associated with the given argument
      *
      * @param keyHolder Holder of the identifying key
@@ -458,12 +458,12 @@ public class CommandContext<C> {
      * @return Stored value
      * @throws NullPointerException If no such value is stored
      */
-    public <T> @NonNull T get(final @NonNull CommandArgument<C, T> keyHolder) {
+    public <T extends @NonNull Object> T get(final @NonNull CommandArgument<C, T> keyHolder) {
         return this.get(keyHolder.getKey());
     }
 
     /**
-     * Get a required argument from the context. This will thrown an exception
+     * Get a required argument from the context. This will throw an exception
      * if there's no value associated with the given argument
      *
      * @param keyHolder Holder of the identifying key
@@ -473,7 +473,7 @@ public class CommandContext<C> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> @NonNull T get(final @NonNull CloudKeyHolder<T> keyHolder) {
+    public <T extends @NonNull Object> T get(final @NonNull CloudKeyHolder<T> keyHolder) {
         return this.get(keyHolder.getKey());
     }
 
@@ -485,9 +485,9 @@ public class CommandContext<C> {
      * @param <T>          Argument type
      * @return Stored value, or supplied default value
      */
-    public <T> @Nullable T getOrDefault(
-            final @NonNull CommandArgument<C, T> argument,
-            final @Nullable T defaultValue
+    public <T> T getOrDefault(
+            final @NonNull CommandArgument<C, @NonNull T> argument,
+            final T defaultValue
     ) {
         return this.<T>getOptional(argument.getName()).orElse(defaultValue);
     }
@@ -500,11 +500,11 @@ public class CommandContext<C> {
      * @param <T>          Argument type
      * @return Argument, or supplied default value
      */
-    public <T> @Nullable T getOrDefault(
+    public <T> T getOrDefault(
             final @NonNull String key,
-            final @Nullable T defaultValue
+            final T defaultValue
     ) {
-        return this.<T>getOptional(key).orElse(defaultValue);
+        return this.<@NonNull T>getOptional(key).orElse(defaultValue);
     }
 
     /**
@@ -517,9 +517,9 @@ public class CommandContext<C> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> @Nullable T getOrDefault(
-            final @NonNull CloudKey<T> key,
-            final @Nullable T defaultValue
+    public <T> T getOrDefault(
+            final @NonNull CloudKey<@NonNull T> key,
+            final T defaultValue
     ) {
         return this.getOptional(key).orElse(defaultValue);
     }
@@ -534,11 +534,11 @@ public class CommandContext<C> {
      * @since 1.2.0
      */
     @API(status = API.Status.STABLE, since = "1.2.0")
-    public <T> @Nullable T getOrSupplyDefault(
+    public <T> T getOrSupplyDefault(
             final @NonNull String key,
-            final @NonNull Supplier<@Nullable T> defaultSupplier
+            final @NonNull Supplier<T> defaultSupplier
     ) {
-        return this.<T>getOptional(key).orElseGet(defaultSupplier);
+        return this.<@NonNull T>getOptional(key).orElseGet(defaultSupplier);
     }
 
     /**
@@ -551,9 +551,9 @@ public class CommandContext<C> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public <T> @Nullable T getOrSupplyDefault(
-            final @NonNull CloudKey<T> key,
-            final @NonNull Supplier<@Nullable T> defaultSupplier
+    public <T> T getOrSupplyDefault(
+            final @NonNull CloudKey<@NonNull T> key,
+            final @NonNull Supplier<T> defaultSupplier
     ) {
         return this.getOptional(key).orElseGet(defaultSupplier);
     }
