@@ -22,7 +22,7 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           # allow master and *-dev branches to write caches (default is only master/main)
-          cache-read-only: ${{ github.ref != 'refs/heads/master' && !(github.ref.endsWith('-dev') && github.ref.startsWith('refs/heads/')) }}
+          cache-read-only: ${{ github.ref != 'refs/heads/master' && !(endsWith(github.ref, '-dev') && startsWith(github.ref, 'refs/heads/')) }}
         # gradle-build-action doesn't support caching files in the project dir
       - uses: actions/cache@v3
         with:
