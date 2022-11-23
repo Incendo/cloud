@@ -58,6 +58,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apiguardian.api.API;
@@ -952,15 +953,27 @@ public final class CommandTree<C> {
         return null;
     }
 
-    void deleteRecursively(final @NonNull Node<@Nullable CommandArgument<C, ?>> node, final boolean root) {
+    void deleteRecursively(
+        final @NonNull Node<@Nullable CommandArgument<C, ?>> node,
+        final boolean root,
+        final Consumer<Command<C>> op
+    ) {
         for (final Node<@Nullable CommandArgument<C, ?>> child : new ArrayList<>(node.children)) {
-            this.deleteRecursively(child, false);
+            this.deleteRecursively(child, false, op);
         }
 
+        final @Nullable CommandArgument<C, ?> value = node.getValue();
+        final @Nullable Command<C> owner = value == null ? null : value.getOwningCommand();
+        if (owner != null) {
+            op.accept(owner);
+        }
         this.removeNode(node, root);
     }
 
-    private boolean removeNode(final @NonNull Node<@Nullable CommandArgument<C, ?>> node, final boolean root) {
+    private boolean removeNode(
+        final @NonNull Node<@Nullable CommandArgument<C, ?>> node,
+        final boolean root
+    ) {
         if (root) {
             // root command node - remove it from the root tree
             return this.internalTree.removeChild(node);
