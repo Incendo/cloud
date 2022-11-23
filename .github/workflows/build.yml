@@ -36,7 +36,7 @@ jobs:
       - name : Test Summary
         uses : EnricoMi/publish-unit-test-result-action@v2.2.0
         with :
-          files : "**/build/test-results/test/TEST-*.xml"
+          junit_files : "**/build/test-results/test/TEST-*.xml"
         if : always()
       - name: Determine Status
         run: |
