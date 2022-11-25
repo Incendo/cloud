@@ -47,7 +47,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -468,17 +467,17 @@ public class Command<C> {
         }
 
         /**
-         * Applies the provided {@link Function} to this {@link Builder}, and returns the result.
+         * Applies the provided {@link Applicable} to this {@link Builder}, and returns the result.
          *
-         * @param op operation
+         * @param applicable operation
          * @return operation result
          * @since 1.8.0
          */
         @API(status = API.Status.STABLE, since = "1.8.0")
         public @NonNull Builder<@NonNull C> apply(
-                final @NonNull Function<@NonNull Builder<@NonNull C>, @NonNull Builder<@NonNull C>> op
+                final @NonNull Applicable<@NonNull C> applicable
         ) {
-            return op.apply(this);
+            return applicable.applyToCommandBuilder(this);
         }
 
         /**
@@ -1213,6 +1212,28 @@ public class Command<C> {
                     this.commandPermission,
                     this.commandMeta
             );
+        }
+
+        /**
+         * Essentially a {@link java.util.function.UnaryOperator} for {@link Builder},
+         * but as a separate interface to avoid conflicts.
+         *
+         * @param <C> sender type
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        @FunctionalInterface
+        public interface Applicable<C> {
+
+            /**
+             * Accepts a {@link Builder} and returns either the same or a modified {@link Builder} instance.
+             *
+             * @param builder builder
+             * @return possibly modified builder
+             * @since 1.8.0
+             */
+            @API(status = API.Status.STABLE, since = "1.8.0")
+            Builder<C> applyToCommandBuilder(Builder<C> builder);
         }
     }
 }
