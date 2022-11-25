@@ -1233,7 +1233,7 @@ public class Command<C> {
              * @since 1.8.0
              */
             @API(status = API.Status.STABLE, since = "1.8.0")
-            Builder<C> applyToCommandBuilder(Builder<C> builder);
+            @NonNull Builder<C> applyToCommandBuilder(@NonNull Builder<C> builder);
         }
     }
 }
