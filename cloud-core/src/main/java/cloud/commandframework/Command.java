@@ -47,6 +47,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -464,6 +465,20 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "1.3.0")
         public @NonNull CommandPermission commandPermission() {
             return this.commandPermission;
+        }
+
+        /**
+         * Applies the provided {@link Function} to this {@link Builder}, and returns the result.
+         *
+         * @param op operation
+         * @return operation result
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        public @NonNull Builder<@NonNull C> apply(
+                final @NonNull Function<@NonNull Builder<@NonNull C>, @NonNull Builder<@NonNull C>> op
+        ) {
+            return op.apply(this);
         }
 
         /**
