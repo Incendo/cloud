@@ -40,9 +40,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE)
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
 
-    private final @NonNull BiPredicate<@NonNull String, @NonNull String> filter;
-    private final boolean ignoreCase;
-
     /**
      * {@link BiPredicate} invoking {@link String#startsWith(String)}.
      *
@@ -58,6 +55,9 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
     public static final @NonNull BiPredicate<String, String> CONTAINS = String::contains;
+
+    private final @NonNull BiPredicate<@NonNull String, @NonNull String> filter;
+    private final boolean ignoreCase;
 
     /**
      * Create a new {@link FilteringCommandSuggestionProcessor} filtering with {@link String#startsWith(String)} that does
