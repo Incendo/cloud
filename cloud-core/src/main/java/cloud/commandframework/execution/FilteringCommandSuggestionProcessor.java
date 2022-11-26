@@ -40,7 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE)
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
 
-    private final BiPredicate<String, String> filter;
+    private final @NonNull BiPredicate<@NonNull String, @NonNull String> filter;
     private final boolean ignoreCase;
 
     /**
@@ -49,7 +49,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
-    public static final BiPredicate<String, String> STARTS_WITH = String::startsWith;
+    public static final @NonNull BiPredicate<String, String> STARTS_WITH = String::startsWith;
 
     /**
      * {@link BiPredicate} invoking {@link String#contains(CharSequence)}.
@@ -57,7 +57,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
-    public static final BiPredicate<String, String> CONTAINS = String::contains;
+    public static final @NonNull BiPredicate<String, String> CONTAINS = String::contains;
 
     /**
      * Create a new {@link FilteringCommandSuggestionProcessor} filtering with {@link String#startsWith(String)} that does
@@ -81,7 +81,10 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
-    public FilteringCommandSuggestionProcessor(final BiPredicate<String, String> filter, final boolean ignoreCase) {
+    public FilteringCommandSuggestionProcessor(
+            final @NonNull BiPredicate<@NonNull String, @NonNull String> filter,
+            final boolean ignoreCase
+    ) {
         this.filter = filter;
         this.ignoreCase = ignoreCase;
     }
