@@ -134,6 +134,6 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
          * @since 1.8.0
          */
         @API(status = API.Status.STABLE, since = "1.8.0")
-        boolean test(final CommandPreprocessingContext<C> context, final String suggestion, final String input);
+        boolean test(CommandPreprocessingContext<C> context, String suggestion, String input);
     }
 }
