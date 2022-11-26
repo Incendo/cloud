@@ -27,6 +27,7 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -204,6 +205,19 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
 
                 return null;
             };
+        }
+
+        /**
+         * Create a new context-free {@link Filter}.
+         *
+         * @param function function
+         * @param <C>      sender type
+         * @return filter
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        static <C> @NonNull Filter<C> contextFree(final @NonNull BiFunction<String, String, @Nullable String> function) {
+            return (ctx, suggestion, input) -> function.apply(suggestion, input);
         }
 
         /**
