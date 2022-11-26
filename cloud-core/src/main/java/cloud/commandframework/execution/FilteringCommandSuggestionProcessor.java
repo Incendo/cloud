@@ -31,7 +31,8 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Command suggestion processor that checks the input queue head and filters based on that
+ * Command suggestion processor filters suggestions based on the remaining unconsumed input in the
+ * queue.
  *
  * @param <C> Command sender type
  */
