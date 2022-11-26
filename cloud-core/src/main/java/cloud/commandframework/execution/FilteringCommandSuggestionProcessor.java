@@ -26,8 +26,11 @@ package cloud.commandframework.execution;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.function.BiPredicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Command suggestion processor that checks the input queue head and filters based on that
@@ -36,6 +39,52 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @API(status = API.Status.STABLE)
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
+
+    private final BiPredicate<String, String> filter;
+    private final boolean ignoreCase;
+
+    /**
+     * {@link BiPredicate} invoking {@link String#startsWith(String)}.
+     *
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static final BiPredicate<String, String> STARTS_WITH = String::startsWith;
+
+    /**
+     * {@link BiPredicate} invoking {@link String#contains(CharSequence)}.
+     *
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static final BiPredicate<String, String> CONTAINS = String::contains;
+
+    /**
+     * Create a new {@link FilteringCommandSuggestionProcessor} filtering with {@link String#startsWith(String)} that does
+     * not ignore case.
+     */
+    @API(status = API.Status.STABLE)
+    public FilteringCommandSuggestionProcessor() {
+        this(STARTS_WITH, false);
+    }
+
+    /**
+     * Create a new {@link FilteringCommandSuggestionProcessor}.
+     *
+     * <p>The first argument of the function is the potential suggestion, and the second is the
+     * remaining unconsumed input (or empty string).</p>
+     *
+     * <p>If {@code ignoreCase} is true, the filter function will be provided lower cased strings.</p>
+     *
+     * @param filter     mode
+     * @param ignoreCase whether to ignore case
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public FilteringCommandSuggestionProcessor(final BiPredicate<String, String> filter, final boolean ignoreCase) {
+        this.filter = filter;
+        this.ignoreCase = ignoreCase;
+    }
 
     @Override
     public @NonNull List<@NonNull String> apply(
@@ -46,12 +95,19 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         if (context.getInputQueue().isEmpty()) {
             input = "";
         } else {
-            input = context.getInputQueue().peek();
+            input = String.join(" ", context.getInputQueue());
         }
+        final @Nullable String inputLower = this.ignoreCase ? input.toLowerCase(Locale.ENGLISH) : null;
         final List<String> suggestions = new LinkedList<>();
         for (final String suggestion : strings) {
-            if (suggestion.startsWith(input)) {
-                suggestions.add(suggestion);
+            if (this.ignoreCase) {
+                if (this.filter.test(suggestion.toLowerCase(Locale.ENGLISH), inputLower)) {
+                    suggestions.add(suggestion);
+                }
+            } else {
+                if (this.filter.test(suggestion, input)) {
+                    suggestions.add(suggestion);
+                }
             }
         }
         return suggestions;
