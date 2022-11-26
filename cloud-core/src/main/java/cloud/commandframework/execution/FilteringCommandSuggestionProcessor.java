@@ -154,7 +154,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
          * @since 1.8.0
          */
         @API(status = API.Status.STABLE, since = "1.8.0")
-        static <C> @NonNull Filter<C> startsWith(final boolean ignoreCase) {
+        static <C> @NonNull Simple<C> startsWith(final boolean ignoreCase) {
             final BiPredicate<String, String> test = ignoreCase
                     ? (suggestion, input) -> suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT))
                     : String::startsWith;
@@ -170,7 +170,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
          * @since 1.8.0
          */
         @API(status = API.Status.STABLE, since = "1.8.0")
-        static <C> @NonNull Filter<C> contains(final boolean ignoreCase) {
+        static <C> @NonNull Simple<C> contains(final boolean ignoreCase) {
             final BiPredicate<String, String> test = ignoreCase
                     ? (suggestion, input) -> suggestion.toLowerCase(Locale.ROOT).contains(input.toLowerCase(Locale.ROOT))
                     : String::contains;
@@ -217,6 +217,21 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         @API(status = API.Status.STABLE, since = "1.8.0")
         static <C> @NonNull Filter<C> contextFree(final @NonNull BiFunction<String, String, @Nullable String> function) {
             return (ctx, suggestion, input) -> function.apply(suggestion, input);
+        }
+
+        /**
+         * Create a new {@link Simple}. This is a convenience method to allow
+         * for more easily implementing {@link Simple} using a lambda without
+         * casting, for methods which accept {@link Filter}.
+         *
+         * @param filter filter lambda
+         * @param <C>    sender type
+         * @return new simple filter
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        static <C> @NonNull Simple<C> simple(final Simple<C> filter) {
+            return filter;
         }
 
         /**
