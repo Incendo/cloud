@@ -24,7 +24,7 @@
 package cloud.commandframework.execution;
 
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.apiguardian.api.API;
@@ -71,7 +71,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         } else {
             input = String.join(" ", context.getInputQueue());
         }
-        final List<String> suggestions = new LinkedList<>();
+        final List<String> suggestions = new ArrayList<>(strings.size());
         for (final String suggestion : strings) {
             if (this.filter.test(context, suggestion, input)) {
                 suggestions.add(suggestion);
