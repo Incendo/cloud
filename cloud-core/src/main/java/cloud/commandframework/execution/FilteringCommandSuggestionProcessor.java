@@ -92,8 +92,8 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
     public static <C> Filter<C> startsWith(final boolean ignoreCase) {
         if (ignoreCase) {
             return (ctx, suggestion, input) -> suggestion
-                    .toLowerCase(Locale.ENGLISH)
-                    .startsWith(input.toLowerCase(Locale.ENGLISH));
+                    .toLowerCase(Locale.ROOT)
+                    .startsWith(input.toLowerCase(Locale.ROOT));
         }
         return (ctx, suggestion, input) -> suggestion.startsWith(input);
     }
@@ -109,7 +109,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
     @API(status = API.Status.STABLE, since = "1.8.0")
     public static <C> Filter<C> contains(final boolean ignoreCase) {
         if (ignoreCase) {
-            return (ctx, suggestion, input) -> suggestion.toLowerCase(Locale.ENGLISH).contains(input.toLowerCase(Locale.ENGLISH));
+            return (ctx, suggestion, input) -> suggestion.toLowerCase(Locale.ROOT).contains(input.toLowerCase(Locale.ROOT));
         }
         return (ctx, suggestion, input) -> suggestion.contains(input);
     }
