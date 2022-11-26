@@ -196,9 +196,8 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
                     return suggestion;
                 }
 
-                // Always use case-insensitive here. We can't modify input before spaces anyway in Minecraft,
-                // which is the main use case for this. Some people may want to deny the suggestion if it doesn't
-                // match case, but we can add that functionality later if someone requests it.
+                // Always use case-insensitive here. If case-sensitive filtering is desired it should
+                // be done in another filter which this is appended to using #and/#andTrimBeforeLastSpace.
                 if (suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT))) {
                     return suggestion.substring(lastSpace + 1);
                 }
