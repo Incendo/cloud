@@ -467,6 +467,20 @@ public class Command<C> {
         }
 
         /**
+         * Applies the provided {@link Applicable} to this {@link Builder}, and returns the result.
+         *
+         * @param applicable operation
+         * @return operation result
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        public @NonNull Builder<@NonNull C> apply(
+                final @NonNull Applicable<@NonNull C> applicable
+        ) {
+            return applicable.applyToCommandBuilder(this);
+        }
+
+        /**
          * Add command meta to the internal command meta map
          *
          * @param key   Meta key
@@ -1198,6 +1212,28 @@ public class Command<C> {
                     this.commandPermission,
                     this.commandMeta
             );
+        }
+
+        /**
+         * Essentially a {@link java.util.function.UnaryOperator} for {@link Builder},
+         * but as a separate interface to avoid conflicts.
+         *
+         * @param <C> sender type
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        @FunctionalInterface
+        public interface Applicable<C> {
+
+            /**
+             * Accepts a {@link Builder} and returns either the same or a modified {@link Builder} instance.
+             *
+             * @param builder builder
+             * @return possibly modified builder
+             * @since 1.8.0
+             */
+            @API(status = API.Status.STABLE, since = "1.8.0")
+            @NonNull Builder<C> applyToCommandBuilder(@NonNull Builder<C> builder);
         }
     }
 }
