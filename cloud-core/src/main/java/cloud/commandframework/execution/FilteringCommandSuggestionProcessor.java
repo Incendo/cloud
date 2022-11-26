@@ -72,6 +72,9 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         if (context.getInputQueue().isEmpty()) {
             input = "";
         } else {
+            // Note: Pre-1.8.0 we used the queue head rather than remaining unconsumed input,
+            // this is a behavioral change, but we've decided it's a fix. If you have a use case
+            // where the old behavior was desired, we are open to PRs adding an option.
             input = String.join(" ", context.getInputQueue());
         }
         final List<String> suggestions = new ArrayList<>(strings.size());
