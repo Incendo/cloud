@@ -195,7 +195,7 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
 
                 // Always use case-insensitive here. If case-sensitive filtering is desired it should
                 // be done in another filter which this is appended to using #and/#andTrimBeforeLastSpace.
-                if (suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT))) {
+                if (suggestion.toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
                     return suggestion.substring(lastSpace + 1);
                 }
 
