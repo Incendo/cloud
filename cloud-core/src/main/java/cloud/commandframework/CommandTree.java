@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +58,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apiguardian.api.API;
@@ -657,9 +658,22 @@ public final class CommandTree<C> {
             // START: Parsing
             commandContext.setCurrentArgument(child.getValue());
             final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
-            if (result.getParsedValue().isPresent() && !commandQueue.isEmpty()) {
-                commandContext.store(child.getValue().getName(), result.getParsedValue().get());
+            final Optional<?> parsedValue = result.getParsedValue();
+            final boolean parseSuccess = parsedValue.isPresent();
+
+            if (parseSuccess && !commandQueue.isEmpty()) {
+                // the current argument at the position is parsable and there are more arguments following
+                commandContext.store(child.getValue().getName(), parsedValue.get());
                 return this.getSuggestions(commandContext, commandQueue, child);
+            } else if (!parseSuccess && commandQueueOriginal.size() > 1) {
+                // at this point there should normally be no need to reset the command queue as we expect
+                // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway
+                commandQueue.clear();
+                commandQueue.addAll(commandQueueOriginal);
+
+                // there are more arguments following but the current argument isn't matching - there
+                // is no need to collect any further suggestions
+                return Collections.emptyList();
             }
             // END: Parsing
         }
@@ -667,6 +681,13 @@ public final class CommandTree<C> {
         // Restore original command input queue
         commandQueue.clear();
         commandQueue.addAll(commandQueueOriginal);
+
+        if (!preParseSuccess && commandQueue.size() > 1) {
+            // The preprocessor denied the argument, and there are more arguments following the current one
+            // Therefore we shouldn't list the suggestions of the current argument, as clearly the suggestions of
+            // one of the following arguments is requested
+            return Collections.emptyList();
+        }
 
         // Fallback: use suggestion provider of argument
         return this.directSuggestions(commandContext, child, commandQueue.peek());
@@ -1007,15 +1028,27 @@ public final class CommandTree<C> {
         return null;
     }
 
-    void deleteRecursively(final @NonNull Node<@Nullable CommandArgument<C, ?>> node, final boolean root) {
+    void deleteRecursively(
+        final @NonNull Node<@Nullable CommandArgument<C, ?>> node,
+        final boolean root,
+        final Consumer<Command<C>> op
+    ) {
         for (final Node<@Nullable CommandArgument<C, ?>> child : new ArrayList<>(node.children)) {
-            this.deleteRecursively(child, false);
+            this.deleteRecursively(child, false, op);
         }
 
+        final @Nullable CommandArgument<C, ?> value = node.getValue();
+        final @Nullable Command<C> owner = value == null ? null : value.getOwningCommand();
+        if (owner != null) {
+            op.accept(owner);
+        }
         this.removeNode(node, root);
     }
 
-    private boolean removeNode(final @NonNull Node<@Nullable CommandArgument<C, ?>> node, final boolean root) {
+    private boolean removeNode(
+        final @NonNull Node<@Nullable CommandArgument<C, ?>> node,
+        final boolean root
+    ) {
         if (root) {
             // root command node - remove it from the root tree
             return this.internalTree.removeChild(node);

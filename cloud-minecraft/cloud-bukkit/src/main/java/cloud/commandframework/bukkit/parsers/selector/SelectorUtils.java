@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -303,7 +303,25 @@ final class SelectorUtils {
                 final CommandContext<C> commandContext,
                 final String input
         ) {
-            return this.wrappedBrigadierParser.suggestions(commandContext, input);
+            final Object commandSourceStack = commandContext.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
+            final @Nullable Field bypassField =
+                    CraftBukkitReflection.findField(commandSourceStack.getClass(), "bypassSelectorPermissions");
+            try {
+                boolean prev = false;
+                try {
+                    if (bypassField != null) {
+                        prev = bypassField.getBoolean(commandSourceStack);
+                        bypassField.setBoolean(commandSourceStack, true);
+                    }
+                    return this.wrappedBrigadierParser.suggestions(commandContext, input);
+                } finally {
+                    if (bypassField != null) {
+                        bypassField.setBoolean(commandSourceStack, prev);
+                    }
+                }
+            } catch (final ReflectiveOperationException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -435,24 +453,24 @@ final class SelectorUtils {
 
         @SuppressWarnings("unchecked")
         List<Entity> entities() {
-            return reflectiveOperation(() -> ((List<Object>) this.methods().entities.invoke(
+            final List<Object> internalEntities = reflectiveOperation(() -> ((List<Object>) this.methods().entities.invoke(
                     this.selector,
                     this.commandContext.<Object>get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)
-            ))
-                    .stream()
+            )));
+            return internalEntities.stream()
                     .map(o -> reflectiveOperation(() -> (Entity) this.methods().getBukkitEntity.invoke(o)))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
         }
 
         @SuppressWarnings("unchecked")
         List<Player> players() {
-            return reflectiveOperation(() -> ((List<Object>) this.methods().players.invoke(
+            final List<Object> serverPlayers = reflectiveOperation(() -> ((List<Object>) this.methods().players.invoke(
                     this.selector,
                     this.commandContext.<Object>get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER)
-            ))
-                    .stream()
+            )));
+            return serverPlayers.stream()
                     .map(o -> reflectiveOperation(() -> (Player) this.methods().getBukkitEntity.invoke(o)))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
         }
 
         @FunctionalInterface

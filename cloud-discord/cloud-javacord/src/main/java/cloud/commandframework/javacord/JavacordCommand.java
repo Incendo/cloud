@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
         if (!messageContent.startsWith(commandPrefix)) {
             return;
         }
-        messageContent = messageContent.replaceFirst(commandPrefix, "");
+        messageContent = messageContent.substring(commandPrefix.length());
 
         final String finalContent = messageContent;
         if (((StaticArgument<C>) this.command).getAliases()

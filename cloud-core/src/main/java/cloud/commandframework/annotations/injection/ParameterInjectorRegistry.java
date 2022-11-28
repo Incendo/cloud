@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Registry containing mappings between {@link Class classes} and {@link ParameterInjector injectors}
+ * Registry containing mappings between {@link Class} {@link Predicate Predicates}
+ * and {@link ParameterInjector injectors}.
  *
  * The order injectors are tested is the same order they were registered in.
  *

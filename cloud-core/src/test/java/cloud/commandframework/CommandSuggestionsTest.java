@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
@@ -128,6 +129,18 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("literal_with_variable")
                 .literal("vici")
                 .literal("later"));
+
+        manager.command(manager.commandBuilder("cmd_with_multiple_args")
+                .argument(IntegerArgument.<TestCommandSender>of("number").addPreprocessor((ctx, input) -> {
+                    String argument = input.peek();
+                    if (argument == null || !argument.equals("1024")) {
+                        return ArgumentParseResult.success(true);
+                    } else {
+                        return ArgumentParseResult.failure(new NullPointerException());
+                    }
+                }))
+                .argument(EnumArgument.of(TestEnum.class, "enum"))
+                .literal("world"));
     }
 
     @Test
@@ -378,6 +391,7 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Collections.singletonList("literal"), suggestions9);
     }
 
+    @Test
     void testLiteralWithVariable() {
         final String input = "literal_with_variable ";
         final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
@@ -390,13 +404,46 @@ public class CommandSuggestionsTest {
         Assertions.assertEquals(Arrays.asList("vici", "vidi"), suggestions3);
         final String input4 = "literal_with_variable vidi";
         final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Collections.emptyList(), suggestions4);
+        Assertions.assertEquals(Collections.singletonList("vidi"), suggestions4);
         final String input5 = "literal_with_variable vidi ";
         final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
         Assertions.assertEquals(Collections.singletonList("now"), suggestions5);
         final String input6 = "literal_with_variable vici ";
         final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
         Assertions.assertEquals(Collections.singletonList("later"), suggestions6);
+    }
+
+    @Test
+    void testInvalidArgumentShouldNotCauseFurtherCompletion() {
+        // pass preprocess
+        final String input = "cmd_with_multiple_args 512 ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions);
+        final String input2 = "cmd_with_multiple_args 512 BAR ";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Collections.singletonList("world"), suggestions2);
+        final String input3 = "cmd_with_multiple_args test ";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Collections.emptyList(), suggestions3);
+        final String input4 = "cmd_with_multiple_args 512 f";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Collections.singletonList("foo"), suggestions4);
+        final String input5 = "cmd_with_multiple_args world f";
+        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(Collections.emptyList(), suggestions5);
+        // trigger preprocess fail
+        final String input6 = "cmd_with_multiple_args 1024";
+        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(11, suggestions6.size());
+        final String input7 = "cmd_with_multiple_args 1024 ";
+        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        Assertions.assertEquals(Collections.emptyList(), suggestions7);
+        final String input8 = "cmd_with_multiple_args 1024 f";
+        final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
+        Assertions.assertEquals(Collections.emptyList(), suggestions8);
+        final String input9 = "cmd_with_multiple_args 1024 foo w";
+        final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        Assertions.assertEquals(Collections.emptyList(), suggestions9);
     }
 
     @Test

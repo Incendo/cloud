@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,8 +65,8 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
             Pair.of('0', NamedTextColor.BLACK),
             Pair.of('1', NamedTextColor.DARK_BLUE),
             Pair.of('2', NamedTextColor.DARK_GREEN),
-            Pair.of('3', NamedTextColor.DARK_GREEN),
-            Pair.of('4', NamedTextColor.DARK_AQUA),
+            Pair.of('3', NamedTextColor.DARK_AQUA),
+            Pair.of('4', NamedTextColor.DARK_RED),
             Pair.of('5', NamedTextColor.DARK_PURPLE),
             Pair.of('6', NamedTextColor.GOLD),
             Pair.of('7', NamedTextColor.GRAY),

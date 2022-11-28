@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -500,6 +500,20 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "1.3.0")
         public @NonNull CommandPermission commandPermission() {
             return this.commandPermission;
+        }
+
+        /**
+         * Applies the provided {@link Applicable} to this {@link Builder}, and returns the result.
+         *
+         * @param applicable operation
+         * @return operation result
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        public @NonNull Builder<@NonNull C> apply(
+                final @NonNull Applicable<@NonNull C> applicable
+        ) {
+            return applicable.applyToCommandBuilder(this);
         }
 
         /**
@@ -1234,6 +1248,28 @@ public class Command<C> {
                     this.commandPermission,
                     this.commandMeta
             );
+        }
+
+        /**
+         * Essentially a {@link java.util.function.UnaryOperator} for {@link Builder},
+         * but as a separate interface to avoid conflicts.
+         *
+         * @param <C> sender type
+         * @since 1.8.0
+         */
+        @API(status = API.Status.STABLE, since = "1.8.0")
+        @FunctionalInterface
+        public interface Applicable<C> {
+
+            /**
+             * Accepts a {@link Builder} and returns either the same or a modified {@link Builder} instance.
+             *
+             * @param builder builder
+             * @return possibly modified builder
+             * @since 1.8.0
+             */
+            @API(status = API.Status.STABLE, since = "1.8.0")
+            @NonNull Builder<C> applyToCommandBuilder(@NonNull Builder<C> builder);
         }
     }
 }
