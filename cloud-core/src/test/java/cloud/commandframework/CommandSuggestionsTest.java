@@ -475,7 +475,7 @@ public class CommandSuggestionsTest {
         assertThat(suggestions3).containsExactly("--flag", "--flag2");
         assertThat(suggestions4).containsExactly("--flag", "--flag2");
         assertThat(suggestions5).containsExactly("-f");
-        assertThat(suggestions6).containsExactly("hello");
+        assertThat(suggestions6).isEmpty();
     }
 
     @Test

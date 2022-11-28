@@ -38,4 +38,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface CommandSuggestionProcessor<C> extends
         BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<String>, @NonNull List<String>> {
 
+    /**
+     * Create a pass through {@link CommandSuggestionProcessor} that simply returns
+     * the input.
+     *
+     * @param <C> sender type
+     * @return new processor
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
+        return (ctx, suggestions) -> suggestions;
+    }
 }
