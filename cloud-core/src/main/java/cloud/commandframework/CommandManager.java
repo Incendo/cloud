@@ -108,7 +108,8 @@ public abstract class CommandManager<C> {
 
     private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
-    private CommandSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandSuggestionProcessor<>();
+    private CommandSuggestionProcessor<C> commandSuggestionProcessor =
+            new FilteringCommandSuggestionProcessor<>(FilteringCommandSuggestionProcessor.Filter.startsWith(true));
     private CommandRegistrationHandler commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);

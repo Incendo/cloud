@@ -26,6 +26,7 @@ package cloud.commandframework.cloudburst;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.function.Function;
@@ -69,6 +70,9 @@ public class CloudburstCommandManager<C> extends CommandManager<C> {
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
         this.owningPlugin = owningPlugin;
+        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
+                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
+        ));
 
         // Prevent commands from being registered when the server would reject them anyways
         this.owningPlugin.getServer().getPluginManager().registerEvent(
