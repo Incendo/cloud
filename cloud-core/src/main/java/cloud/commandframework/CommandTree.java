@@ -659,9 +659,22 @@ public final class CommandTree<C> {
             // START: Parsing
             commandContext.setCurrentArgument(child.getValue());
             final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
-            if (result.getParsedValue().isPresent() && !commandQueue.isEmpty()) {
-                commandContext.store(child.getValue().getName(), result.getParsedValue().get());
+            final Optional<?> parsedValue = result.getParsedValue();
+            final boolean parseSuccess = parsedValue.isPresent();
+
+            if (parseSuccess && !commandQueue.isEmpty()) {
+                // the current argument at the position is parsable and there are more arguments following
+                commandContext.store(child.getValue().getName(), parsedValue.get());
                 return this.getSuggestions(commandContext, commandQueue, child);
+            } else if (!parseSuccess && commandQueueOriginal.size() > 1) {
+                // at this point there should normally be no need to reset the command queue as we expect
+                // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway
+                commandQueue.clear();
+                commandQueue.addAll(commandQueueOriginal);
+
+                // there are more arguments following but the current argument isn't matching - there
+                // is no need to collect any further suggestions
+                return Collections.emptyList();
             }
             // END: Parsing
         }
@@ -669,6 +682,13 @@ public final class CommandTree<C> {
         // Restore original command input queue
         commandQueue.clear();
         commandQueue.addAll(commandQueueOriginal);
+
+        if (!preParseSuccess && commandQueue.size() > 1) {
+            // The preprocessor denied the argument, and there are more arguments following the current one
+            // Therefore we shouldn't list the suggestions of the current argument, as clearly the suggestions of
+            // one of the following arguments is requested
+            return Collections.emptyList();
+        }
 
         // Fallback: use suggestion provider of argument
         commandContext.setCurrentArgument(child.getValue());
