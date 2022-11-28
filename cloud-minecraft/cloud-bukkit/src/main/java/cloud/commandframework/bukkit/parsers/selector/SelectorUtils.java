@@ -303,7 +303,25 @@ final class SelectorUtils {
                 final CommandContext<C> commandContext,
                 final String input
         ) {
-            return this.wrappedBrigadierParser.suggestions(commandContext, input);
+            final Object commandSourceStack = commandContext.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
+            final @Nullable Field bypassField =
+                    CraftBukkitReflection.findField(commandSourceStack.getClass(), "bypassSelectorPermissions");
+            try {
+                boolean prev = false;
+                try {
+                    if (bypassField != null) {
+                        prev = bypassField.getBoolean(commandSourceStack);
+                        bypassField.setBoolean(commandSourceStack, true);
+                    }
+                    return this.wrappedBrigadierParser.suggestions(commandContext, input);
+                } finally {
+                    if (bypassField != null) {
+                        bypassField.setBoolean(commandSourceStack, prev);
+                    }
+                }
+            } catch (final ReflectiveOperationException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
