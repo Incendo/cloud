@@ -27,6 +27,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import java.util.function.Function;
@@ -78,6 +79,9 @@ public class SpongeCommandManager<C> extends CommandManager<C> {
         this.owningPlugin = requireNonNull(container, "container");
         this.forwardMapper = requireNonNull(forwardMapper, "forwardMapper");
         this.reverseMapper = requireNonNull(reverseMapper, "reverseMapper");
+        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
+                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
+        ));
         ((SpongePluginRegistrationHandler<C>) this.commandRegistrationHandler()).initialize(this);
     }
 

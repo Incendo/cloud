@@ -29,6 +29,7 @@ import cloud.commandframework.bungee.arguments.PlayerArgument;
 import cloud.commandframework.bungee.arguments.ServerArgument;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
@@ -75,6 +76,10 @@ public class BungeeCommandManager<C> extends CommandManager<C> {
         this.owningPlugin = owningPlugin;
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
+
+        this.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
+                FilteringCommandSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
+        ));
 
         /* Register Bungee Preprocessor */
         this.registerCommandPreProcessor(new BungeeCommandPreprocessor<>(this));
