@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -495,9 +496,9 @@ public class CommandContext<C> {
     /**
      * Get a value if it exists, else return the provided default value
      *
-     * @param key          Argument key
+     * @param key          Cloud key
      * @param defaultValue Default value
-     * @param <T>          Argument type
+     * @param <T>          Value type
      * @return Argument, or supplied default value
      */
     public <T> T getOrDefault(
@@ -510,9 +511,9 @@ public class CommandContext<C> {
     /**
      * Get a value if it exists, else return the provided default value
      *
-     * @param key          Argument key
+     * @param key          Cloud key
      * @param defaultValue Default value
-     * @param <T>          Argument type
+     * @param <T>          Value type
      * @return Argument, or supplied default value
      * @since 1.4.0
      */
@@ -527,9 +528,9 @@ public class CommandContext<C> {
     /**
      * Get a value if it exists, else return the value supplied by the given supplier
      *
-     * @param key             Argument key
+     * @param key             Cloud key
      * @param defaultSupplier Supplier of default value
-     * @param <T>             Argument type
+     * @param <T>             Value type
      * @return Argument, or supplied default value
      * @since 1.2.0
      */
@@ -544,9 +545,9 @@ public class CommandContext<C> {
     /**
      * Get a value if it exists, else return the value supplied by the given supplier
      *
-     * @param key             Argument key
+     * @param key             Cloud key
      * @param defaultSupplier Supplier of default value
-     * @param <T>             Argument type
+     * @param <T>             Value type
      * @return Argument, or supplied default value
      * @since 1.4.0
      */
@@ -556,6 +557,25 @@ public class CommandContext<C> {
             final @NonNull Supplier<T> defaultSupplier
     ) {
         return this.getOptional(key).orElseGet(defaultSupplier);
+    }
+
+    /**
+     * Get a value if it exists, else compute and store the value returned by the function and return it.
+     *
+     * @param key             Cloud key
+     * @param defaultFunction Default value function
+     * @param <T>             Value type
+     * @return present or computed value
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public <T> T computeIfAbsent(
+            final @NonNull CloudKey<T> key,
+            final @NonNull Function<CloudKey<T>, T> defaultFunction
+    ) {
+        @SuppressWarnings("unchecked")
+        final T castedValue = (T) this.internalStorage.computeIfAbsent(key, k -> defaultFunction.apply((CloudKey<T>) k));
+        return castedValue;
     }
 
     /**

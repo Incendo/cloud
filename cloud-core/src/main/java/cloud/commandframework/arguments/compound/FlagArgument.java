@@ -79,6 +79,14 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
      */
     public static final CloudKey<String> FLAG_META_KEY = SimpleCloudKey.of("__last_flag__", TypeToken.get(String.class));
 
+    /**
+     * Meta data for the set of parsed flags, used to detect duplicates.
+     * @since 1.8.0
+     */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
+    public static final CloudKey<Set<CommandFlag<?>>> PARSED_FLAGS = SimpleCloudKey.of("__parsed_flags__",
+            new TypeToken<Set<CommandFlag<?>>>(){});
+
     private static final String FLAG_ARGUMENT_NAME = "flags";
 
     private final Collection<@NonNull CommandFlag<?>> flags;
@@ -157,16 +165,11 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
             parser.parse(commandContext, inputQueue);
 
             /*
-             * Remove all but the last element from the command input queue
              * If the parser parsed the entire queue, restore the last typed
              * input obtained earlier.
              */
             if (inputQueue.isEmpty()) {
                 inputQueue.add(lastInputValue);
-            } else {
-                while (inputQueue.size() > 1) {
-                    inputQueue.remove();
-                }
             }
 
             /*
@@ -309,11 +312,8 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     final @NonNull CommandContext<@NonNull C> commandContext,
                     final @NonNull Queue<@NonNull String> inputQueue
             ) {
-                /*
-                This argument must necessarily be the last so we can just consume all remaining input. This argument type
-                is similar to a greedy string in that sense. But, we need to keep all flag logic contained to the parser
-                 */
-                final Set<CommandFlag<?>> parsedFlags = new HashSet<>();
+                Set<CommandFlag<?>> parsedFlags = commandContext.computeIfAbsent(PARSED_FLAGS, k -> new HashSet());
+
                 CommandFlag<?> currentFlag = null;
                 String currentFlagName = null;
 
@@ -323,8 +323,12 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     this.currentFlagBeingParsed = Optional.empty();
                     this.currentFlagNameBeingParsed = Optional.empty();
 
-                    /* Parse next flag name to set */
-                    if (string.startsWith("-") && currentFlag == null) {
+                    if (!string.startsWith("-") && currentFlag == null) {
+                        /* Not flag waiting to be parsed */
+                        return ArgumentParseResult.success(FLAG_PARSE_RESULT_OBJECT);
+                    } else if (currentFlag == null) {
+                        /* Parse next flag name to set */
+
                         /* Remove flag argument from input queue */
                         inputQueue.poll();
 
@@ -418,43 +422,35 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                             currentFlag = null;
                         }
                     } else {
-                        if (currentFlag == null) {
+                        /* Mark this flag as the one currently being typed */
+                        this.currentFlagBeingParsed = Optional.of(currentFlag);
+                        this.currentFlagNameBeingParsed = Optional.of(currentFlagName);
+
+                        // Don't attempt to parse empty strings
+                        if (inputQueue.peek().isEmpty()) {
                             return ArgumentParseResult.failure(new FlagParseException(
-                                    string,
-                                    FailureReason.NO_FLAG_STARTED,
+                                    currentFlag.getName(),
+                                    FailureReason.MISSING_ARGUMENT,
                                     commandContext
                             ));
+                        }
+
+                        final ArgumentParseResult<?> result =
+                                ((CommandArgument) currentFlag.getCommandArgument())
+                                        .getParser()
+                                        .parse(
+                                                commandContext,
+                                                inputQueue
+                                        );
+                        if (result.getFailure().isPresent()) {
+                            return ArgumentParseResult.failure(result.getFailure().get());
+                        } else if (result.getParsedValue().isPresent()) {
+                            final CommandFlag erasedFlag = currentFlag;
+                            final Object value = result.getParsedValue().get();
+                            commandContext.flags().addValueFlag(erasedFlag, value);
+                            currentFlag = null;
                         } else {
-                            /* Mark this flag as the one currently being typed */
-                            this.currentFlagBeingParsed = Optional.of(currentFlag);
-                            this.currentFlagNameBeingParsed = Optional.of(currentFlagName);
-
-                            // Don't attempt to parse empty strings
-                            if (inputQueue.peek().isEmpty()) {
-                                return ArgumentParseResult.failure(new FlagParseException(
-                                        currentFlag.getName(),
-                                        FailureReason.MISSING_ARGUMENT,
-                                        commandContext
-                                ));
-                            }
-
-                            final ArgumentParseResult<?> result =
-                                    ((CommandArgument) currentFlag.getCommandArgument())
-                                            .getParser()
-                                            .parse(
-                                                    commandContext,
-                                                    inputQueue
-                                            );
-                            if (result.getFailure().isPresent()) {
-                                return ArgumentParseResult.failure(result.getFailure().get());
-                            } else if (result.getParsedValue().isPresent()) {
-                                final CommandFlag erasedFlag = currentFlag;
-                                final Object value = result.getParsedValue().get();
-                                commandContext.flags().addValueFlag(erasedFlag, value);
-                                currentFlag = null;
-                            } else {
-                                throw new IllegalStateException("Neither result or value were present. Panicking.");
-                            }
+                            throw new IllegalStateException("Neither result or value were present. Panicking.");
                         }
                     }
                 }
