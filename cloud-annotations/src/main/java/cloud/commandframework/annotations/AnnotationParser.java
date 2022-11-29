@@ -573,7 +573,7 @@ public final class AnnotationParser<C> {
                         argumentPair
                 );
                 commandArguments.put(argument.getName(), argument);
-                argumentDescriptions.put(argument, argumentPair.getArgument().description());
+                argumentDescriptions.put(argument, this.processString(argumentPair.getArgument().description()));
             }
             boolean commandNameFound = false;
             /* Build the command tree */
@@ -725,7 +725,7 @@ public final class AnnotationParser<C> {
                             )));
         } else {
             parser = this.manager.parserRegistry()
-                    .createParser(argumentPair.getArgument().parserName(), parameters)
+                    .createParser(this.processString(argumentPair.getArgument().parserName()), parameters)
                     .orElseThrow(() -> new IllegalArgumentException(
                             String.format("Parameter '%s' in method '%s' "
                                             + "has parser '%s' but no parser exists "
@@ -752,7 +752,7 @@ public final class AnnotationParser<C> {
             if (argument.defaultValue().isEmpty()) {
                 argumentBuilder.asOptional();
             } else {
-                argumentBuilder.asOptionalWithDefault(argument.defaultValue());
+                argumentBuilder.asOptionalWithDefault(this.processString(argument.defaultValue()));
             }
         } else {
             argumentBuilder.asRequired();
@@ -765,7 +765,7 @@ public final class AnnotationParser<C> {
             );
             argumentBuilder.withSuggestionsProvider((commandContext, input) -> suggestions);
         } else if (!argument.suggestions().isEmpty()) { /* Check whether or not a suggestion provider should be set */
-            final String suggestionProviderName = argument.suggestions();
+            final String suggestionProviderName = this.processString(argument.suggestions());
             final Optional<BiFunction<CommandContext<C>, String, List<String>>> suggestionsFunction =
                     this.manager.parserRegistry().getSuggestionProvider(suggestionProviderName);
             argumentBuilder.withSuggestionsProvider(
