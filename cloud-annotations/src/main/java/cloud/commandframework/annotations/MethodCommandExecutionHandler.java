@@ -113,7 +113,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                 if (argument.value().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
                     argumentName = parameter.getName();
                 } else {
-                    argumentName = argument.value();
+                    argumentName = this.annotationParser.processString(argument.value());
                 }
 
                 final CommandArgument<C, ?> commandArgument = this.context.commandArguments.get(argumentName);
