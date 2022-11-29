@@ -74,7 +74,10 @@ The code is based on a (W.I.P) paper that can be found [here](https://github.com
 - **cloud-core**: Core module containing most of the cloud API, and shared implementations
 - **cloud-annotations**: Annotation parsing code that allows you to use annotated methods rather than builders - Now also 
   includes several compile-time annotation processors
-- **cloud-services**: Services for Cloud
+- **cloud-services**: Services for cloud
+- **cloud-kotlin/cloud-kotlin-extensions**: Kotlin extensions for cloud
+- **cloud-kotlin/cloud-kotlin-coroutines**: Coroutine support for cloud
+- **cloud-kotlin/cloud-kotlin-coroutines-annotations**: Coroutine support for cloud-annotations
 - **cloud-minecraft/cloud-brigadier**: Brigadier mappings for cloud
 - **cloud-minecraft/cloud-bukkit**: Bukkit 1.8.8+ implementation of cloud
 - **cloud-minecraft/cloud-paper**: Module that extends cloud-bukkit to add special support for Paper 1.8.8+
