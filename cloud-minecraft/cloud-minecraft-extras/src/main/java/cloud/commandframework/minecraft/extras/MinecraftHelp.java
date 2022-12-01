@@ -600,16 +600,14 @@ public final class MinecraftHelp<C> {
             return this.line(this.headerFooterLength);
         }
 
-        final String nextPageCommand = String.format("%s %s %s", this.commandPrefix, query, currentPage + 1);
-        final Component nextPageButton = this.button('→', nextPageCommand,
+        final Component nextPageButton = this.button('→', this.pageCommand(query, currentPage + 1),
                 this.messageProvider.provide(sender, MESSAGE_CLICK_FOR_NEXT_PAGE).color(this.colors.text)
         );
         if (firstPage) {
             return this.header(sender, nextPageButton);
         }
 
-        final String previousPageCommand = String.format("%s %s %s", this.commandPrefix, query, currentPage - 1);
-        final Component previousPageButton = this.button('←', previousPageCommand,
+        final Component previousPageButton = this.button('←', this.pageCommand(query, currentPage - 1),
                 this.messageProvider.provide(sender, MESSAGE_CLICK_FOR_PREVIOUS_PAGE).color(this.colors.text)
         );
         if (lastPage) {
@@ -621,6 +619,13 @@ public final class MinecraftHelp<C> {
                 .append(this.line(3))
                 .append(nextPageButton).build();
         return this.header(sender, buttons);
+    }
+
+    private String pageCommand(final String query, final int page) {
+        if (query.isEmpty()) {
+            return String.format("%s %s", this.commandPrefix, page);
+        }
+        return String.format("%s %s %s", this.commandPrefix, query, page);
     }
 
     private @NonNull Component header(
