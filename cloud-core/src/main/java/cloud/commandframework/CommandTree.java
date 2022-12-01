@@ -758,7 +758,9 @@ public final class CommandTree<C> {
                 node = tempNode;
 
                 if (i >= flagStartIdx) {
-                    node = node.addChild(flags);
+                    tempNode = node.addChild(flags);
+                    tempNode.setParent(node);
+                    node = tempNode;
                 }
             }
 
