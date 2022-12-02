@@ -42,7 +42,7 @@ setupMinecraftModule("cloud-velocity")
 //setupMinecraftModule("cloud-sponge")
 setupMinecraftModule("cloud-sponge7")
 setupMinecraftModule("cloud-bungee")
-// setupMinecraftModule("cloud-cloudburst") // todo repo is down?
+setupMinecraftModule("cloud-cloudburst")
 setupMinecraftModule("cloud-minecraft-extras")
 
 // IRC Modules

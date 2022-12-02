@@ -88,9 +88,9 @@ repositories {
     }
     /* The paper repository, used for cloud-paper */
     maven("https://repo.papermc.io/repository/maven-public/")
-    /* The NukkitX repository, used for cloud-cloudburst */
-    maven("https://repo.nukkitx.com/maven-snapshots") {
-        mavenContent { snapshotsOnly() }
+    /* Used for cloud-cloudburst */
+    maven("https://repo.opencollab.dev/maven-snapshots/") {
+        mavenContent { includeGroup("org.cloudburstmc") }
     }
     /* The current Fabric repository */
     maven("https://maven.fabricmc.net/") {
