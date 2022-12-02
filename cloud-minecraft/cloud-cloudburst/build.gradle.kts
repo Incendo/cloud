@@ -4,5 +4,7 @@ plugins {
 
 dependencies {
     api(projects.cloudCore)
-    compileOnly(libs.cloudburst)
+    compileOnly(libs.cloudburst) {
+        isTransitive = false
+    }
 }
