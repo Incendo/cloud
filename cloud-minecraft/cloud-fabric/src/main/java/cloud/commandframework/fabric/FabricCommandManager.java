@@ -70,7 +70,6 @@ import net.minecraft.commands.arguments.OperationArgument;
 import net.minecraft.commands.arguments.ParticleArgument;
 import net.minecraft.commands.arguments.RangeArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.commands.arguments.ResourceOrTagLocationArgument;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument;
 import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
@@ -166,7 +165,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         /* Cloud-native argument types */
         brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {
         }, builder -> builder.toConstant(UuidArgument.uuid()));
-        this.registerRegistryEntryMappings();
+        // this.registerRegistryEntryMappings(); // todo - needs updating for 1.19.3
         brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {
         }, builder -> builder.toConstant(net.minecraft.commands.arguments.TeamArgument.team()));
         this.parserRegistry().registerParserSupplier(
@@ -181,7 +180,6 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerConstantNativeParserSupplier(NbtPathArgument.NbtPath.class, NbtPathArgument.nbtPath());
         this.registerConstantNativeParserSupplier(ObjectiveCriteria.class, ObjectiveCriteriaArgument.criteria());
         this.registerConstantNativeParserSupplier(OperationArgument.Operation.class, OperationArgument.operation());
-        this.registerConstantNativeParserSupplier(ParticleOptions.class, ParticleArgument.particle());
         this.registerConstantNativeParserSupplier(AngleArgument.SingleAngle.class, AngleArgument.angle());
         this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {
         }, SwizzleArgument.swizzle());
@@ -189,6 +187,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerConstantNativeParserSupplier(EntityAnchorArgument.Anchor.class, EntityAnchorArgument.anchor());
         this.registerConstantNativeParserSupplier(MinMaxBounds.Ints.class, RangeArgument.intRange());
         this.registerConstantNativeParserSupplier(MinMaxBounds.Doubles.class, RangeArgument.floatRange());
+        this.registerContextualNativeParserSupplier(ParticleOptions.class, ParticleArgument::particle);
         this.registerContextualNativeParserSupplier(ItemInput.class, ItemArgument::item);
         this.registerContextualNativeParserSupplier(BlockPredicateArgument.Result.class, BlockPredicateArgument::blockPredicate);
 
@@ -200,8 +199,9 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         );
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes", "unused" /* todo 1.19.3 */})
     private void registerRegistryEntryMappings() {
+        /* TODO 1.19.3
         this.brigadierManager.registerMapping(
                 new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {
                 },
@@ -209,6 +209,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                     builder.to(argument -> ResourceOrTagLocationArgument.<Object>resourceOrTag((ResourceKey) argument.registryKey()));
                 }
         );
+         */
 
         /* Find all fields of RegistryKey<? extends Registry<?>> and register those */
         /* This only works for vanilla registries really, we'll have to do other things for non-vanilla ones */

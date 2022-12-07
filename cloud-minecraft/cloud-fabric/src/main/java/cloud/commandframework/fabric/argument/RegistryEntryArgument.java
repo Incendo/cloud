@@ -239,10 +239,12 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final SharedSuggestionProvider reverseMapped = ctx.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
             // First try dynamic registries (for things loaded from data-packs)
             Registry<V> registry = reverseMapped.registryAccess().registry(this.registryIdent).orElse(null);
+            /* TODO - 1.19.3
             if (registry == null) {
                 // And then static registries
                 registry = (Registry<V>) Registry.REGISTRY.get(this.registryIdent.location());
             }
+             */
             return registry;
         }
 

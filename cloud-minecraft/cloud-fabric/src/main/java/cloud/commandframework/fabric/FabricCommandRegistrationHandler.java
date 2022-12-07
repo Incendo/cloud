@@ -130,7 +130,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 }
                 FabricArgumentParsers.ContextualArgumentTypeProvider.withBuildContext(
                         this.commandManager(),
-                        new CommandBuildContext(connection.registryAccess()),
+                        CommandBuildContext.simple(connection.registryAccess(), connection.enabledFeatures()),
                         false,
                         () -> this.registerClientCommand(dispatcher, (Command<C>) command)
                 );
