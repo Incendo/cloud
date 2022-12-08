@@ -29,6 +29,7 @@ import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.internal.CommandBuildContextSupplier;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
+import cloud.commandframework.bukkit.internal.RegistryReflection;
 import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
 import cloud.commandframework.bukkit.parsers.ItemStackArgument;
@@ -90,8 +91,17 @@ public final class BukkitBrigadierMapper<C> {
         this.mapSimpleNMS(new TypeToken<NamespacedKeyArgument.Parser<C>>() {
         }, "resource_location", true);
         /* Map Enchantment */
-        this.mapSimpleNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
-        }, "item_enchantment");
+        try {
+            // Pre-1.19.3
+            final Class<? extends ArgumentType<?>> ench = MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft(
+                    "item_enchantment"));
+            this.mapSimpleNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
+            }, "item_enchantment");
+        } catch (final IllegalArgumentException ignore) {
+            // 1.19.3+
+            this.mapNMS(new TypeToken<EnchantmentArgument.EnchantmentParser<C>>() {
+            }, this::modernEnchantment);
+        }
         /* Map Item arguments */
         this.mapSimpleContextNMS(new TypeToken<ItemStackArgument.Parser<C>>() {
         }, "item_stack");
@@ -115,6 +125,17 @@ public final class BukkitBrigadierMapper<C> {
         /* Map Vec2 */
         this.mapNMS(new TypeToken<Location2DArgument.Location2DParser<C>>() {
         }, this::argumentVec2);
+    }
+
+    private ArgumentType<?> modernEnchantment() {
+        try {
+            return (ArgumentType<?>) MinecraftArgumentTypes.getClassByKey(NamespacedKey.minecraft("resource_key"))
+                    .getDeclaredConstructors()[0]
+                    .newInstance(RegistryReflection.registryKey(RegistryReflection.registryByName("enchantment")));
+        } catch (final Exception e) {
+            this.commandManager.getOwningPlugin().getLogger().log(Level.INFO, "Failed to retrieve enchantment argument", e);
+            return fallbackType();
+        }
     }
 
     /**
