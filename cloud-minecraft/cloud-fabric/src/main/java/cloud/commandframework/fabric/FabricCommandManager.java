@@ -69,6 +69,7 @@ import net.minecraft.commands.arguments.ObjectiveCriteriaArgument;
 import net.minecraft.commands.arguments.OperationArgument;
 import net.minecraft.commands.arguments.ParticleArgument;
 import net.minecraft.commands.arguments.RangeArgument;
+import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument;
@@ -76,8 +77,8 @@ import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
@@ -165,7 +166,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         /* Cloud-native argument types */
         brigadier.registerMapping(new TypeToken<UUIDArgument.UUIDParser<C>>() {
         }, builder -> builder.toConstant(UuidArgument.uuid()));
-        // this.registerRegistryEntryMappings(); // todo - needs updating for 1.19.3
+        this.registerRegistryEntryMappings();
         brigadier.registerMapping(new TypeToken<TeamArgument.TeamParser<C>>() {
         }, builder -> builder.toConstant(net.minecraft.commands.arguments.TeamArgument.team()));
         this.parserRegistry().registerParserSupplier(
@@ -199,17 +200,15 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         );
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes", "unused" /* todo 1.19.3 */})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private void registerRegistryEntryMappings() {
-        /* TODO 1.19.3
         this.brigadierManager.registerMapping(
                 new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {
                 },
                 builder -> {
-                    builder.to(argument -> ResourceOrTagLocationArgument.<Object>resourceOrTag((ResourceKey) argument.registryKey()));
+                    builder.to(argument -> ResourceKeyArgument.key((ResourceKey) argument.registryKey()));
                 }
         );
-         */
 
         /* Find all fields of RegistryKey<? extends Registry<?>> and register those */
         /* This only works for vanilla registries really, we'll have to do other things for non-vanilla ones */
@@ -218,7 +217,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
          * Eventually, these could be resolved by using ParserParameters in some way? */
         seenClasses.add(ResourceLocation.class);
         seenClasses.add(Codec.class);
-        for (final Field field : Registry.class.getDeclaredFields()) {
+        for (final Field field : Registries.class.getDeclaredFields()) {
             if ((field.getModifiers() & MOD_PUBLIC_STATIC_FINAL) != MOD_PUBLIC_STATIC_FINAL) {
                 continue;
             }
