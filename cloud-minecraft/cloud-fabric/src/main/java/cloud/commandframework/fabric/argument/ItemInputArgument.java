@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -150,9 +150,9 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ItemStack defaultValue) {
             final String serializedDefault;
             if (defaultValue.hasTag()) {
-                serializedDefault = Registry.ITEM.getKey(defaultValue.getItem()) + defaultValue.getTag().toString();
+                serializedDefault = BuiltInRegistries.ITEM.getKey(defaultValue.getItem()) + defaultValue.getTag().toString();
             } else {
-                serializedDefault = Registry.ITEM.getKey(defaultValue.getItem()).toString();
+                serializedDefault = BuiltInRegistries.ITEM.getKey(defaultValue.getItem()).toString();
             }
             return this.asOptionalWithDefault(serializedDefault);
         }

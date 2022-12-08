@@ -25,21 +25,25 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import java.util.function.BiFunction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * An argument parsing a status effect from the {@link net.minecraft.core.Registry#MOB_EFFECT status effect registry}.
+ * An argument parsing a status effect from the {@link net.minecraft.core.registries.Registries#MOB_EFFECT status effect registry}.
  *
  * @param <C> the sender type
  * @since 1.5.0
+ * @deprecated backing vanilla type was removed in Minecraft 1.19.3. Uses {@link RegistryEntryArgument.Parser}.
  */
+@API(status = API.Status.DEPRECATED, since = "1.8.0")
+@Deprecated
 public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
 
     MobEffectArgument(
@@ -52,7 +56,7 @@ public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.MobEffectArgument.effect()),
+                new RegistryEntryArgument.Parser<>(Registries.MOB_EFFECT),
                 defaultValue,
                 MobEffect.class,
                 suggestionsProvider,
@@ -151,7 +155,7 @@ public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
          * @since 1.5.0
          */
         public @NonNull Builder<C> asOptionalWithDefault(final @NonNull MobEffect defaultValue) {
-            return this.asOptionalWithDefault(Registry.MOB_EFFECT.getKey(defaultValue).toString());
+            return this.asOptionalWithDefault(BuiltInRegistries.MOB_EFFECT.getKey(defaultValue).toString());
         }
     }
 }

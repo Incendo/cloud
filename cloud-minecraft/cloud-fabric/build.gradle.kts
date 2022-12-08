@@ -6,6 +6,10 @@ plugins {
     id("cloud.base-conventions")
 }
 
+indra {
+    javaVersions().target(17)
+}
+
 tasks {
     compileJava {
         options.errorprone {

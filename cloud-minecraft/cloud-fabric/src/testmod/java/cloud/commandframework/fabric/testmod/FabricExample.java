@@ -32,6 +32,7 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
 import cloud.commandframework.fabric.argument.ItemInputArgument;
 import cloud.commandframework.fabric.argument.NamedColorArgument;
+import cloud.commandframework.fabric.argument.RegistryEntryArgument;
 import cloud.commandframework.fabric.argument.server.ColumnPosArgument;
 import cloud.commandframework.fabric.argument.server.MultipleEntitySelectorArgument;
 import cloud.commandframework.fabric.argument.server.MultiplePlayerSelectorArgument;
@@ -54,6 +55,7 @@ import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.item.ItemInput;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
@@ -62,6 +64,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
 
 public final class FabricExample implements ModInitializer {
@@ -95,6 +98,27 @@ public final class FabricExample implements ModInitializer {
                             .append(" hug(s) <3")
                             .withStyle(style -> style.withBold(true)), false);
                 }));
+
+        final CommandArgument<CommandSourceStack, Biome> biomeArgument = RegistryEntryArgument.of(
+                "biome",
+                Biome.class,
+                Registries.BIOME
+        );
+
+        manager.command(base
+                .literal("land")
+                .argument(biomeArgument)
+                .handler(ctx -> {
+                    ctx.getSender().sendSuccess(Component.literal("Yes, the biome ")
+                            .append(Component.literal(
+                                            ctx.getSender().registryAccess()
+                                                    .registryOrThrow(Registries.BIOME)
+                                                    .getKey(ctx.get(biomeArgument)).toString())
+                                    .withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD))
+                            .append(Component.literal(" is pretty cool"))
+                            .withStyle(style -> style.withColor(0x884433)), false);
+                })
+        );
 
         final CommandArgument<CommandSourceStack, MultiplePlayerSelector> playerSelector =
                 MultiplePlayerSelectorArgument.of("players");

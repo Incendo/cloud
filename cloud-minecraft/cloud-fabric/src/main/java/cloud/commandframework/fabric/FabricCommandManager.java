@@ -69,16 +69,16 @@ import net.minecraft.commands.arguments.ObjectiveCriteriaArgument;
 import net.minecraft.commands.arguments.OperationArgument;
 import net.minecraft.commands.arguments.ParticleArgument;
 import net.minecraft.commands.arguments.RangeArgument;
+import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.commands.arguments.ResourceOrTagLocationArgument;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.commands.arguments.blocks.BlockPredicateArgument;
 import net.minecraft.commands.arguments.coordinates.SwizzleArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
@@ -181,7 +181,6 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerConstantNativeParserSupplier(NbtPathArgument.NbtPath.class, NbtPathArgument.nbtPath());
         this.registerConstantNativeParserSupplier(ObjectiveCriteria.class, ObjectiveCriteriaArgument.criteria());
         this.registerConstantNativeParserSupplier(OperationArgument.Operation.class, OperationArgument.operation());
-        this.registerConstantNativeParserSupplier(ParticleOptions.class, ParticleArgument.particle());
         this.registerConstantNativeParserSupplier(AngleArgument.SingleAngle.class, AngleArgument.angle());
         this.registerConstantNativeParserSupplier(new TypeToken<EnumSet<Direction.Axis>>() {
         }, SwizzleArgument.swizzle());
@@ -189,6 +188,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerConstantNativeParserSupplier(EntityAnchorArgument.Anchor.class, EntityAnchorArgument.anchor());
         this.registerConstantNativeParserSupplier(MinMaxBounds.Ints.class, RangeArgument.intRange());
         this.registerConstantNativeParserSupplier(MinMaxBounds.Doubles.class, RangeArgument.floatRange());
+        this.registerContextualNativeParserSupplier(ParticleOptions.class, ParticleArgument::particle);
         this.registerContextualNativeParserSupplier(ItemInput.class, ItemArgument::item);
         this.registerContextualNativeParserSupplier(BlockPredicateArgument.Result.class, BlockPredicateArgument::blockPredicate);
 
@@ -206,7 +206,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
                 new TypeToken<RegistryEntryArgument.Parser<C, ?>>() {
                 },
                 builder -> {
-                    builder.to(argument -> ResourceOrTagLocationArgument.<Object>resourceOrTag((ResourceKey) argument.registryKey()));
+                    builder.to(argument -> ResourceKeyArgument.key((ResourceKey) argument.registryKey()));
                 }
         );
 
@@ -217,7 +217,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
          * Eventually, these could be resolved by using ParserParameters in some way? */
         seenClasses.add(ResourceLocation.class);
         seenClasses.add(Codec.class);
-        for (final Field field : Registry.class.getDeclaredFields()) {
+        for (final Field field : Registries.class.getDeclaredFields()) {
             if ((field.getModifiers() & MOD_PUBLIC_STATIC_FINAL) != MOD_PUBLIC_STATIC_FINAL) {
                 continue;
             }
