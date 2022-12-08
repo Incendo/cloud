@@ -25,7 +25,6 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -51,7 +50,7 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
         super(
                 required,
                 name,
-                new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ParticleArgument.particle()),
+                FabricArgumentParsers.contextual(net.minecraft.commands.arguments.ParticleArgument::particle),
                 defaultValue,
                 ParticleOptions.class,
                 suggestionsProvider,
