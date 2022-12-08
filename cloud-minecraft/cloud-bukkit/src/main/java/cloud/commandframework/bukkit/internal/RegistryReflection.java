@@ -24,9 +24,14 @@
 package cloud.commandframework.bukkit.internal;
 
 import com.google.common.annotations.Beta;
+import io.leangen.geantyref.GenericTypeReflector;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -39,6 +44,7 @@ public final class RegistryReflection {
 
     public static final @Nullable Field REGISTRY_REGISTRY;
     public static final @Nullable Method REGISTRY_GET;
+    public static final @Nullable Method REGISTRY_KEY;
 
     private static final Class<?> RESOURCE_LOCATION_CLASS = CraftBukkitReflection.needNMSClassOrElse(
             "MinecraftKey",
@@ -58,17 +64,14 @@ public final class RegistryReflection {
         if (CraftBukkitReflection.MAJOR_REVISION < 17) {
             REGISTRY_REGISTRY = null;
             REGISTRY_GET = null;
+            REGISTRY_KEY = null;
         } else {
             registryClass = CraftBukkitReflection.firstNonNullOrThrow(
                     () -> "Registry",
                     CraftBukkitReflection.findMCClass("core.IRegistry"),
                     CraftBukkitReflection.findMCClass("core.Registry")
             );
-            final Class<?> registryClassFinal = registryClass;
-            REGISTRY_REGISTRY = Arrays.stream(registryClass.getDeclaredFields())
-                    .filter(it -> it.getType().equals(registryClassFinal))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Could not find Registry Registry field"));
+            REGISTRY_REGISTRY = registryRegistryField(registryClass);
             REGISTRY_REGISTRY.setAccessible(true);
             final Class<?> resourceLocationClass = CraftBukkitReflection.firstNonNullOrThrow(
                     () -> "ResourceLocation class",
@@ -81,6 +84,21 @@ public final class RegistryReflection {
                             && it.getReturnType().equals(Object.class))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Could not find Registry#get(ResourceLocation)"));
+
+            final Class<?> resourceKeyClass = CraftBukkitReflection.needMCClass("resources.ResourceKey");
+            REGISTRY_KEY = Arrays.stream(registryClass.getDeclaredMethods())
+                    .filter(m -> m.getParameterCount() == 0 && m.getReturnType().equals(resourceKeyClass))
+                    .findFirst()
+                    .orElse(null);
+        }
+    }
+
+    public static Object registryKey(final Object registry) {
+        Objects.requireNonNull(REGISTRY_KEY, "REGISTRY_KEY");
+        try {
+            return REGISTRY_KEY.invoke(registry);
+        } catch (final ReflectiveOperationException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -108,5 +126,37 @@ public final class RegistryReflection {
         } catch (final ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Field registryRegistryField(final Class<?> registryClass) {
+        // Pre-1.19.3 we want the first Registry type field in Registry
+        // 1.19.3+ we want the only static final Registry<? extends Registry<?>> from BuiltInRegistries
+        // In 1.19.3+ there are no Registry type fields in Registry
+        return Arrays.stream(registryClass.getDeclaredFields())
+                .filter(it -> it.getType().equals(registryClass))
+                .findFirst()
+                .orElseGet(() -> registryRegistryFieldFromBuiltInRegistries(registryClass));
+    }
+
+    private static Field registryRegistryFieldFromBuiltInRegistries(final Class<?> registryClass) {
+        final Class<?> builtInRegistriesClass =
+                CraftBukkitReflection.needMCClass("core.registries.BuiltInRegistries");
+        return Arrays.stream(builtInRegistriesClass.getDeclaredFields())
+                .filter(it -> {
+                    if (!it.getType().equals(registryClass) || !Modifier.isStatic(it.getModifiers())) {
+                        return false;
+                    }
+                    final Type genericType = it.getGenericType();
+                    if (!(genericType instanceof ParameterizedType)) {
+                        return false;
+                    }
+                    Type valueType = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+                    while (valueType instanceof WildcardType) {
+                        valueType = ((WildcardType) valueType).getUpperBounds()[0];
+                    }
+                    return GenericTypeReflector.erase(valueType).equals(registryClass);
+                })
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Could not find Registry Registry field"));
     }
 }
