@@ -57,9 +57,8 @@ public final class CommandBuildContextSupplier {
 
         if (COMMAND_BUILD_CONTEXT_CTR == null) {
             CREATE_CONTEXT_METHOD = Arrays.stream(COMMAND_BUILD_CONTEXT_CLASS.getDeclaredMethods())
-                    .filter(it -> it.getParameterCount() == 2 && it
-                            .getReturnType()
-                            .equals(COMMAND_BUILD_CONTEXT_CLASS) && Modifier.isStatic(it.getModifiers()))
+                    .filter(it -> it.getParameterCount() == 2 && COMMAND_BUILD_CONTEXT_CLASS.isAssignableFrom(it
+                            .getReturnType()) && Modifier.isStatic(it.getModifiers()))
                     .skip(1)
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Could not find CommandBuildContext.configurable"));
