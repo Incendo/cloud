@@ -97,6 +97,7 @@ final class SelectorUtils {
     }
 
     private static final class EntityArgumentParseFunction implements WrappedBrigadierParser.ParseFunction<Object> {
+
         static final EntityArgumentParseFunction INSTANCE = new EntityArgumentParseFunction();
 
         @Override
@@ -132,6 +133,7 @@ final class SelectorUtils {
     }
 
     private abstract static class SelectorParser<C, T> implements ArgumentParser<C, T>, SelectorMapper<T> {
+
         protected static final Supplier<Object> NO_PLAYERS_EXCEPTION_TYPE =
                 Suppliers.memoize(() -> findExceptionType("argument.entity.notfound.player"));
         protected static final Supplier<Object> NO_ENTITIES_EXCEPTION_TYPE =
@@ -141,6 +143,7 @@ final class SelectorUtils {
 
         // Hide brigadier references in inner class
         protected static final class Thrower {
+
             private final Object type;
 
             Thrower(final Object simpleCommandExceptionType) {
@@ -228,12 +231,14 @@ final class SelectorUtils {
     }
 
     abstract static class EntitySelectorParser<C, T> extends SelectorParser<C, T> {
+
         protected EntitySelectorParser(final boolean single) {
             super(single, false);
         }
     }
 
     abstract static class PlayerSelectorParser<C, T> extends SelectorParser<C, T> {
+
         protected PlayerSelectorParser(final boolean single) {
             super(single, true);
         }
@@ -258,6 +263,7 @@ final class SelectorUtils {
     }
 
     private static class ModernSelectorParser<C, T> implements ArgumentParser<C, T> {
+
         private final ArgumentParser<C, Object> wrappedBrigadierParser;
         private final SelectorMapper<T> mapper;
 
@@ -326,12 +332,14 @@ final class SelectorUtils {
     }
 
     static final class EntitySelectorWrapper {
+
         private static volatile @MonotonicNonNull Methods methods;
 
         private final CommandContext<?> commandContext;
         private final Object selector;
 
         private static final class Methods {
+
             private @MonotonicNonNull Method getBukkitEntity;
             private @MonotonicNonNull Method entity;
             private @MonotonicNonNull Method player;
@@ -342,7 +350,9 @@ final class SelectorUtils {
                 final Object nativeSender = commandContext.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
                 final Class<?> nativeSenderClass = nativeSender.getClass();
                 for (final Method method : selector.getClass().getDeclaredMethods()) {
-                    if (method.getParameterCount() != 1 || !method.getParameterTypes()[0].equals(nativeSenderClass)) {
+                    if (method.getParameterCount() != 1
+                            || !method.getParameterTypes()[0].equals(nativeSenderClass)
+                            || !Modifier.isPublic(method.getModifiers())) {
                         continue;
                     }
 
@@ -475,6 +485,7 @@ final class SelectorUtils {
 
         @FunctionalInterface
         interface ReflectiveOperation<T> {
+
             T run() throws ReflectiveOperationException;
         }
 
@@ -494,6 +505,7 @@ final class SelectorUtils {
 
     @FunctionalInterface
     interface SelectorMapper<T> {
+
         T mapResult(String input, EntitySelectorWrapper wrapper) throws Exception; // throws CommandSyntaxException
     }
 
