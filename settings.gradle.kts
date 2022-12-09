@@ -2,16 +2,72 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
+        mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.fabricmc.net/")
-        maven("https://maven.quiltmc.org/repository/release/")
-        maven("https://repo.jpenilla.xyz/snapshots/")
+        maven("https://maven.fabricmc.net/") {
+            name = "fabric"
+        }
+        maven("https://maven.quiltmc.org/repository/release/") {
+            name = "quiltReleases"
+            mavenContent { releasesOnly() }
+        }
+        maven("https://repo.jpenilla.xyz/snapshots/") {
+            name = "jmpSnapshots"
+            mavenContent { snapshotsOnly() }
+        }
     }
     includeBuild("build-logic")
 }
 
 plugins {
     id("ca.stellardrift.polyglot-version-catalogs") version "6.0.1"
+    id("quiet-fabric-loom") version "1.0-SNAPSHOT"
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        /* The Minecraft repository, used for cloud-brigadier */
+        maven("https://libraries.minecraft.net/") {
+            name = "minecraftLibraries"
+            mavenContent {
+                releasesOnly()
+                includeGroup("com.mojang")
+                includeGroup("net.minecraft")
+            }
+        }
+        /* The paper repository, used for cloud-paper */
+        maven("https://repo.papermc.io/repository/maven-public/")
+        /* Used for cloud-cloudburst */
+        maven("https://repo.opencollab.dev/maven-snapshots/") {
+            name = "cloudburst"
+            mavenContent {
+                snapshotsOnly()
+                includeGroup("org.cloudburstmc")
+            }
+        }
+        /* The current Fabric repository */
+        maven("https://maven.fabricmc.net/") {
+            name = "fabric"
+            mavenContent { includeGroup("net.fabricmc") }
+        }
+        /* The current Sponge repository */
+        maven("https://repo.spongepowered.org/repository/maven-public/") {
+            name = "sponge"
+            mavenContent { includeGroup("org.spongepowered") }
+        }
+        /* JitPack, used for random dependencies */
+        maven("https://jitpack.io") {
+            name = "jitpack"
+            content { includeGroupByRegex("com\\.github\\..*") }
+        }
+        /* JDA's maven repository for cloud-jda */
+        maven("https://m2.dv8tion.net/releases") {
+            name = "dv8tion"
+            mavenContent { releasesOnly() }
+        }
+    }
 }
 
 rootProject.name = "cloud"

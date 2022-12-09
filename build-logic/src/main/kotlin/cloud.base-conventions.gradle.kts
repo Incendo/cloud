@@ -64,51 +64,6 @@ spotless {
     }
 }
 
-repositories {
-    mavenCentral()
-    sonatype.ossSnapshots()
-    /* Velocity, used for cloud-velocity */
-    maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-release/") {
-        mavenContent {
-            releasesOnly()
-            includeGroup("com.velocitypowered")
-        }
-    }
-    maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-snapshots/") {
-        mavenContent {
-            snapshotsOnly()
-            includeGroup("com.velocitypowered")
-        }
-    }
-    /* The Minecraft repository, used for cloud-brigadier */
-    maven("https://libraries.minecraft.net/") {
-        mavenContent { releasesOnly() }
-    }
-    /* The Spigot repository, used for cloud-bukkit */
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") {
-        mavenContent { snapshotsOnly() }
-    }
-    /* The paper repository, used for cloud-paper */
-    maven("https://repo.papermc.io/repository/maven-public/")
-    /* Used for cloud-cloudburst */
-    maven("https://repo.opencollab.dev/maven-snapshots/") {
-        mavenContent { includeGroup("org.cloudburstmc") }
-    }
-    /* The current Fabric repository */
-    maven("https://maven.fabricmc.net/") {
-        mavenContent { includeGroup("net.fabricmc") }
-    }
-    /* The current Sponge repository */
-    maven("https://repo.spongepowered.org/repository/maven-public/") {
-        mavenContent { includeGroup("org.spongepowered") }
-    }
-    /* JitPack, used for random dependencies */
-    maven("https://jitpack.io") {
-        content { includeGroupByRegex("com\\.github\\..*") }
-    }
-    /* JDA's maven repository for cloud-jda */
-    maven("https://m2.dv8tion.net/releases")
-}
 
 dependencies {
     compileOnlyApi(libs.checkerQual)
