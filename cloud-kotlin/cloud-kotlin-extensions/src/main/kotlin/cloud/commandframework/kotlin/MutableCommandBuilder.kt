@@ -46,7 +46,7 @@ import kotlin.reflect.KClass
  */
 public class MutableCommandBuilder<C : Any>(
     commandBuilder: Command.Builder<C>,
-    private val commandManager: CommandManager<C>,
+    private val commandManager: CommandManager<C>
 ) {
     /**
      * The command builder that is being mutated by this [MutableCommandBuilder] instance.
@@ -703,7 +703,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription = ArgumentDescription.empty()
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
             this.commandManager

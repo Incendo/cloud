@@ -132,6 +132,7 @@ final class SelectorUtils {
         }
     }
 
+    @SuppressWarnings("unused") // errorprone false positive
     private abstract static class SelectorParser<C, T> implements ArgumentParser<C, T>, SelectorMapper<T> {
 
         protected static final Supplier<Object> NO_PLAYERS_EXCEPTION_TYPE =

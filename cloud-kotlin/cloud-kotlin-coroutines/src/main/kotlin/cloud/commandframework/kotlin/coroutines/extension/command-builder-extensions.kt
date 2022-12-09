@@ -43,5 +43,5 @@ import kotlin.coroutines.EmptyCoroutineContext
 public fun <C : Any> Command.Builder<C>.suspendingHandler(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext,
-    handler: SuspendingExecutionHandler<C>,
+    handler: SuspendingExecutionHandler<C>
 ): Command.Builder<C> = handler(SuspendingExecutionHandler.createCommandExecutionHandler(scope, context, handler))

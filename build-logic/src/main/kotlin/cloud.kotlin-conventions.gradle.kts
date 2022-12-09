@@ -8,9 +8,17 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
     jvmToolchain {
-        (this as JavaToolchainSpec).apply {
-            languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+    coreLibrariesVersion = "1.5.31"
+    target {
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "1.8"
+                languageVersion = "1.5"
+            }
         }
     }
 }
@@ -41,10 +49,7 @@ tasks {
 
 spotless {
     kotlin {
-        ktlint()
+        ktlint(libs.versions.ktlint.get())
+            .editorConfigOverride(mapOf("ktlint_disabled_rules" to "filename"))
     }
-}
-
-kotlin {
-    explicitApi()
 }

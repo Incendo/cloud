@@ -70,7 +70,7 @@ public interface ConsumerService<Context>
     void accept(@NonNull Context context);
 
 
-    class PipeBurst extends RuntimeException {
+    final class PipeBurst extends RuntimeException {
 
         private static final long serialVersionUID = -1143137258194595985L;
 

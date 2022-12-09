@@ -43,7 +43,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 public fun <C : Any> MutableCommandBuilder<C>.suspendingHandler(
     scope: CoroutineScope = GlobalScope,
     context: CoroutineContext = EmptyCoroutineContext,
-    handler: SuspendingExecutionHandler<C>,
+    handler: SuspendingExecutionHandler<C>
 ): MutableCommandBuilder<C> = mutate {
     it.suspendingHandler(scope, context, handler)
 }

@@ -60,7 +60,7 @@ public fun interface SuspendingExecutionHandler<C : Any> {
      */
     public fun asCommandExecutionHandler(
         scope: CoroutineScope = GlobalScope,
-        context: CoroutineContext = EmptyCoroutineContext,
+        context: CoroutineContext = EmptyCoroutineContext
     ): CommandExecutionHandler<C> = createCommandExecutionHandler(scope, context, this)
 
     public companion object {
@@ -76,7 +76,7 @@ public fun interface SuspendingExecutionHandler<C : Any> {
         public fun <C : Any> createCommandExecutionHandler(
             scope: CoroutineScope = GlobalScope,
             context: CoroutineContext = EmptyCoroutineContext,
-            handler: SuspendingExecutionHandler<C>,
+            handler: SuspendingExecutionHandler<C>
         ): CommandExecutionHandler<C> = CommandExecutionHandler.FutureCommandExecutionHandler { ctx ->
             scope.future(context) {
                 handler(ctx)

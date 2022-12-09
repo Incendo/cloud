@@ -378,7 +378,7 @@ public final class CloudBrigadierManager<C, S> {
     }
 
     @SuppressWarnings("all")
-    private <T, K extends ArgumentParser<C, ?>> @Nullable Pair<@NonNull ArgumentType<?>, @Nullable SuggestionProvider<S>> getArgument(
+    private <K extends ArgumentParser<C, ?>> @Nullable Pair<@NonNull ArgumentType<?>, @Nullable SuggestionProvider<S>> getArgument(
             final @NonNull TypeToken<?> valueType,
             final @NonNull K argumentParser
     ) {

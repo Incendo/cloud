@@ -1,4 +1,4 @@
-import net.kyori.indra.repository.sonatypeSnapshots
+import com.diffplug.gradle.spotless.FormatExtension
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
@@ -32,7 +32,7 @@ tasks {
                 "StringSplitter",
                 "EqualsGetClass",
                 "CatchAndPrintStackTrace",
-                "InlineMeSuggester",
+                "InlineMeSuggester"
             )
         }
         options.compilerArgs.addAll(listOf("-Xlint:-processing", "-Werror"))
@@ -40,31 +40,33 @@ tasks {
 }
 
 spotless {
-    java {
-        licenseHeaderFile(rootProject.file("HEADER"))
-        importOrderFile(rootProject.file(".spotless/cloud.importorder"))
-        indentWithSpaces(4)
+    fun FormatExtension.applyCommon(spaces: Int = 4) {
+        indentWithSpaces(spaces)
         trimTrailingWhitespace()
         endWithNewline()
     }
+    java {
+        licenseHeaderFile(rootProject.file("HEADER"))
+        importOrderFile(rootProject.file(".spotless/cloud.importorder"))
+        applyCommon()
+    }
     kotlin {
         licenseHeaderFile(rootProject.file("HEADER"))
-        indentWithSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
+        applyCommon()
+    }
+    kotlinGradle {
+        ktlint(libs.versions.ktlint.get())
     }
     format("configs") {
         target("**/*.yml", "**/*.yaml", "**/*.json")
         targetExclude("run/**")
-        indentWithSpaces(2)
-        trimTrailingWhitespace()
-        endWithNewline()
+        applyCommon(2)
     }
 }
 
 repositories {
     mavenCentral()
-    sonatypeSnapshots()
+    sonatype.ossSnapshots()
     /* Velocity, used for cloud-velocity */
     maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-release/") {
         mavenContent {

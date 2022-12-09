@@ -258,7 +258,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 return strings;
             } else {
                 CommandFlag<?> currentFlag = null;
-                if (lastArg.startsWith("--")) {
+                if (lastArg.startsWith("--")) { // --long
                     final String flagName = lastArg.substring(2);
                     for (final CommandFlag<?> flag : this.flags) {
                         if (flagName.equalsIgnoreCase(flag.getName())) {
@@ -266,7 +266,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                             break;
                         }
                     }
-                } else if (lastArg.startsWith("-")) {
+                } else { // -x
                     final String flagName = lastArg.substring(1);
                     for (final CommandFlag<?> flag : this.flags) {
                         for (final String alias : flag.getAliases()) {
