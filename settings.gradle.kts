@@ -28,6 +28,10 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         mavenCentral()
+        maven("https://oss.sonatype.org/content/repositories/snapshots/") {
+            name = "sonatypeOssSnapshots"
+            mavenContent { snapshotsOnly() }
+        }
         /* The Minecraft repository, used for cloud-brigadier */
         maven("https://libraries.minecraft.net/") {
             name = "minecraftLibraries"
