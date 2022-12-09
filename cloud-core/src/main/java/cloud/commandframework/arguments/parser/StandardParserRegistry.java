@@ -97,7 +97,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
      */
     public StandardParserRegistry() {
         /* Register standard mappers */
-        this.<Range, Number>registerAnnotationMapper(Range.class, new RangeMapper<>());
+        this.<Range, Number>registerAnnotationMapper(Range.class, new RangeMapper());
         this.<Greedy, String>registerAnnotationMapper(Greedy.class, new GreedyMapper());
         this.<Quoted, String>registerAnnotationMapper(
                 Quoted.class,
@@ -291,7 +291,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
 
-    private static final class RangeMapper<T> implements BiFunction<@NonNull Range, @NonNull TypeToken<?>,
+    private static final class RangeMapper implements BiFunction<@NonNull Range, @NonNull TypeToken<?>,
             @NonNull ParserParameters> {
 
         @Override

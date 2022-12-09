@@ -95,7 +95,7 @@ class CommandBuildingDSLTest {
                 "is",
                 "is this",
                 "is this going",
-                "is this going too_far",
+                "is this going too_far"
             )
                 .sorted()
         )

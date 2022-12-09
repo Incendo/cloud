@@ -1,0 +1,12 @@
+acceptedBreaks:
+  "1.7.1":
+    cloud.commandframework:cloud-core:
+    - code: "java.generics.formalTypeParameterRemoved"
+      old: "method <T> int cloud.commandframework.arguments.flags.FlagContext::count(java.lang.String)"
+      new: "method int cloud.commandframework.arguments.flags.FlagContext::count(java.lang.String)"
+      justification: "no binary break"
+    cloud.commandframework:cloud-services:
+    - code: "java.class.nowFinal"
+      old: "class cloud.commandframework.services.types.ConsumerService.PipeBurst"
+      new: "class cloud.commandframework.services.types.ConsumerService.PipeBurst"
+      justification: "no practical effect, the constructor was private already"

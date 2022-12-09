@@ -2,7 +2,7 @@ import net.fabricmc.loom.task.AbstractRunTask
 import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
-    id("quiet-fabric-loom") version "1.0-SNAPSHOT"
+    id("quiet-fabric-loom")
     id("cloud.base-conventions")
 }
 
@@ -26,7 +26,7 @@ tasks {
 
     withType<Javadoc> {
         (options as? StandardJavadocDocletOptions)?.apply {
-            //links("https://maven.fabricmc.net/docs/yarn-${Versions.fabricMc}+build.${Versions.fabricYarn}/") // todo
+            // links("https://maven.fabricmc.net/docs/yarn-${Versions.fabricMc}+build.${Versions.fabricYarn}/") // todo
         }
     }
 
@@ -34,8 +34,9 @@ tasks {
         standardInput = System.`in`
         jvmArgumentProviders += CommandLineArgumentProvider {
             if (System.getProperty("idea.active")?.toBoolean() == true || // IntelliJ
-                    System.getenv("TERM") != null || // linux terminals
-                    System.getenv("WT_SESSION") != null) { // Windows terminal
+                System.getenv("TERM") != null || // linux terminals
+                System.getenv("WT_SESSION") != null
+            ) { // Windows terminal
                 listOf("-Dfabric.log.disableAnsi=false")
             } else {
                 listOf()

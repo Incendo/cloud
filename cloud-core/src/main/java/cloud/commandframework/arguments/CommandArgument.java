@@ -478,7 +478,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     public final int compareTo(final @NonNull CommandArgument<?, ?> o) {
         if (this instanceof StaticArgument) {
             if (o instanceof StaticArgument) {
-                return (this.getName().compareTo(o.getName()));
+                return this.getName().compareTo(o.getName());
             } else {
                 return -1;
             }
