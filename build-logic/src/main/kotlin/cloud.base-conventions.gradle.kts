@@ -64,7 +64,6 @@ spotless {
     }
 }
 
-
 dependencies {
     compileOnlyApi(libs.checkerQual)
     compileOnlyApi(libs.apiguardian)

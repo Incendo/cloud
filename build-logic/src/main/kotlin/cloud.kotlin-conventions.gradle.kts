@@ -1,5 +1,4 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("cloud.base-conventions")
@@ -28,7 +27,7 @@ dependencies {
 }
 
 tasks {
-    withType<DokkaTask> {
+    withType(DokkaTask::class).configureEach {
         dokkaSourceSets.named("main") {
             includes.from(layout.projectDirectory.file("src/main/descriptions.md"))
             /*externalDocumentationLink { // todo: fix KDoc linking to JavaDoc
@@ -39,11 +38,6 @@ tasks {
     }
     javadocJar {
         from(dokkaHtml)
-    }
-    withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
     }
 }
 
