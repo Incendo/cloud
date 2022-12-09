@@ -24,7 +24,9 @@ dependencies {
 }
 
 spotless {
-    kotlin {
-        ktlint()
+    kotlinGradle {
+        target("*.gradle.kts", "src/*/kotlin/**.gradle.kts", "src/*/kotlin/**.kt")
+        ktlint(libs.versions.ktlint.get())
+            .editorConfigOverride(mapOf("ktlint_disabled_rules" to "filename"))
     }
 }

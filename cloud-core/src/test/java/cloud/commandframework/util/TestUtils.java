@@ -52,6 +52,7 @@ public final class TestUtils {
 
     private abstract static class TestCommandSenderCommandManager extends CommandManager<TestCommandSender> {
 
+        @SuppressWarnings("unused") // mocked via mockito
         protected TestCommandSenderCommandManager(
                 final @NonNull Function<@NonNull CommandTree<TestCommandSender>, @NonNull CommandExecutionCoordinator<TestCommandSender>> commandExecutionCoordinator,
                 final @NonNull CommandRegistrationHandler commandRegistrationHandler

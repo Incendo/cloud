@@ -1,5 +1,4 @@
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("cloud.base-conventions")
@@ -8,9 +7,17 @@ plugins {
 }
 
 kotlin {
+    explicitApi()
     jvmToolchain {
-        (this as JavaToolchainSpec).apply {
-            languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+    coreLibrariesVersion = "1.5.31"
+    target {
+        compilations.configureEach {
+            kotlinOptions {
+                jvmTarget = "1.8"
+                languageVersion = "1.5"
+            }
         }
     }
 }
@@ -20,7 +27,7 @@ dependencies {
 }
 
 tasks {
-    withType<DokkaTask> {
+    withType(DokkaTask::class).configureEach {
         dokkaSourceSets.named("main") {
             includes.from(layout.projectDirectory.file("src/main/descriptions.md"))
             /*externalDocumentationLink { // todo: fix KDoc linking to JavaDoc
@@ -32,19 +39,11 @@ tasks {
     javadocJar {
         from(dokkaHtml)
     }
-    withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
-    }
 }
 
 spotless {
     kotlin {
-        ktlint()
+        ktlint(libs.versions.ktlint.get())
+            .editorConfigOverride(mapOf("ktlint_disabled_rules" to "filename"))
     }
-}
-
-kotlin {
-    explicitApi()
 }

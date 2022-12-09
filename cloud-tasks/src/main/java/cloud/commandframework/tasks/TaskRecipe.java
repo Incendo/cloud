@@ -110,6 +110,7 @@ public final class TaskRecipe {
      * @param <I> Input type
      * @param <O> Output type
      */
+    @SuppressWarnings("UnusedTypeParameter") // already in public API
     public final class TaskRecipeComponentOutputting<I, O> {
 
         private final Object initialInput;

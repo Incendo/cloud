@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
     api(projects.cloudCore)
-    compileOnly (libs.jda)
+    compileOnly(libs.jda)
 }

@@ -107,12 +107,11 @@ public final class FlagContext {
      * Returns the number of values associated with the given {@code flag}.
      *
      * @param flag the flag
-     * @param <T>  the flag value type
      * @return the number of values associated with the flag
      * @since 1.7.0
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
-    public <T> int count(final @NonNull String flag) {
+    public int count(final @NonNull String flag) {
         return this.getAll(flag).size();
     }
 
