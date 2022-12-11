@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -151,4 +153,46 @@ public interface ParserRegistry<C> {
     @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
             @NonNull String name
     );
+
+    /**
+     * Register a new named suggestion provider
+     *
+     * @param name                Name of the suggestions provider. The name is case independent.
+     * @param provider The suggestions provider
+     * @see #getSuggestionProvider(String) Get a suggestion provider
+     * @since 1.1.0
+     */
+    @API(status = API.Status.STABLE, since = "1.1.0")
+    default void registerFullSuggestionProvider(
+            @NonNull String name,
+            @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> provider
+    ) {
+        this.registerSuggestionProvider(
+                name,
+                provider.andThen(l -> l.stream().map(Suggestion::suggestion).collect(Collectors.toList()))
+        );
+    }
+
+    /**
+     * Get a named suggestion provider, if a suggestion provider with the given name exists in the registry
+     *
+     * @param name Suggestion provider name. The name is case independent.
+     * @return Optional that either contains the suggestion provider, or is empty if no
+     *         suggestion provider is registered with the given name
+     * @see #registerSuggestionProvider(String, BiFunction) Register a suggestion provider
+     * @since 1.1.0
+     */
+    @API(status = API.Status.STABLE, since = "1.1.0")
+    @NonNull
+    default Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>>> getFullSuggestionProvider(
+            @NonNull String name
+    ) {
+        final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionProvider =
+                this.getSuggestionProvider(name).orElse(null);
+        if (suggestionProvider == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(suggestionProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList())));
+        }
+    }
 }

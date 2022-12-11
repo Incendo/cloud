@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations.parsers;
 
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
@@ -32,6 +33,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -43,7 +45,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
 
-    private final BiFunction<CommandContext<C>, String, List<String>> suggestionProvider;
+    private final BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionProvider;
     private final MethodHandle methodHandle;
 
     /**
@@ -54,10 +56,27 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
      * @param method             The annotated method
      * @throws Exception If the method lookup fails
      */
+    @Deprecated
     public MethodArgumentParser(
             final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionProvider,
             final @NonNull Object instance,
             final @NonNull Method method
+    ) throws Exception {
+        this.suggestionProvider = suggestionProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList()));
+        this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
+    }
+    /**
+     * Create a new parser
+     *
+     * @param suggestionProvider Suggestion provider
+     * @param instance           Instance that owns the method
+     * @param method             The annotated method
+     * @throws Exception If the method lookup fails
+     */
+    public MethodArgumentParser(
+            final @NonNull BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionProvider,
+            final @NonNull Method method,
+            final @NonNull Object instance
     ) throws Exception {
         this.suggestionProvider = suggestionProvider;
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
@@ -80,6 +99,14 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
 
     @Override
     public @NonNull List<@NonNull String> suggestions(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull String input
+    ) {
+        return this.suggestionProvider.apply(commandContext, input).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+    }
+
+    @Override
+    public @NonNull List<@NonNull Suggestion> fullSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

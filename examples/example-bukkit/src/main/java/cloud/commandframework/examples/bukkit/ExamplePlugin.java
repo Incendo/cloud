@@ -26,6 +26,7 @@ package cloud.commandframework.examples.bukkit;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandDescription;
@@ -35,6 +36,7 @@ import cloud.commandframework.annotations.Confirmation;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.annotations.specifier.Greedy;
+import cloud.commandframework.annotations.suggestions.FullSuggestions;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
@@ -75,8 +77,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import net.kyori.adventure.identity.Identity;
@@ -572,6 +576,41 @@ public final class ExamplePlugin extends JavaPlugin {
     ) {
         this.manager.deleteRootCommand(command);
         sender.sendMessage("Deleted the root command :)");
+    }
+    @CommandMethod(value = "example warp <location>", requiredSender = Player.class)
+    public void warp(
+            final @NonNull Player player,
+            final @NonNull @Argument(value = "location", suggestions = "warps") String warp
+    ) {
+        Bukkit.getScheduler().runTask(this, () -> {
+            switch (warp.toLowerCase(Locale.ROOT)) {
+                case "look":
+                    player.teleport(player.getEyeLocation());
+                    break;
+                case "respawn":
+                    Location location = player.getBedSpawnLocation();
+                    if (location != null) {
+                        player.teleport(location);
+                        break;
+                    }
+                    player.teleport(player.getWorld().getSpawnLocation());
+                    break;
+                case "spawn":
+                    player.teleport(player.getWorld().getSpawnLocation());
+            }
+        });
+    }
+
+    @FullSuggestions("warps")
+    public List<Suggestion> warps(
+            CommandContext<CommandSender> context,
+            String input
+    ) {
+        return Arrays.asList(
+                new Suggestion("spawn", "Teleports to the spawn of the world"),
+                new Suggestion("respawn", "Teleports to the place where you'll respawn"),
+                new Suggestion("look", "Teleports to the place where you look")
+        );
     }
 
     @Suggestions("commands")
