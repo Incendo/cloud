@@ -491,11 +491,27 @@ public final class CommandTree<C> {
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<@NonNull String> commandQueue
     ) {
-        return this.getSuggestions(context, commandQueue, this.internalTree);
+        return this.getSuggestions(context, commandQueue, this.internalTree)
+                .stream()
+                .map(Completion::completion)
+                .collect(Collectors.toList());
     }
 
+    /**
+     * Get suggestions from the input queue
+     *
+     * @param context      Context instance
+     * @param commandQueue Input queue
+     * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
+     */
+    public @NonNull List<@NonNull Completion> getFullSuggestions(
+            final @NonNull CommandContext<C> context,
+            final @NonNull Queue<@NonNull String> commandQueue
+    ) {
+        return this.getSuggestions(context, commandQueue, this.internalTree);
+    }
     @SuppressWarnings("MixedMutabilityReturnType")
-    private @NonNull List<@NonNull String> getSuggestions(
+    private @NonNull List<@NonNull Completion> getSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> root
@@ -546,7 +562,7 @@ public final class CommandTree<C> {
         }
 
         /* Calculate suggestions for the literal arguments */
-        final List<String> suggestions = new LinkedList<>();
+        final List<Completion> suggestions = new LinkedList<>();
         if (commandQueue.size() <= 1) {
             final String literalValue = this.stringOrEmpty(commandQueue.peek());
             for (final Node<CommandArgument<C, ?>> argument : staticArguments) {
@@ -554,10 +570,10 @@ public final class CommandTree<C> {
                     continue;
                 }
                 commandContext.setCurrentArgument(argument.getValue());
-                final List<String> suggestionsToAdd = argument.getValue().getSuggestionsProvider()
+                final List<Completion> suggestionsToAdd = argument.getValue().getCompletionsProvider()
                         .apply(commandContext, literalValue);
-                for (String suggestion : suggestionsToAdd) {
-                    if (suggestion.equals(literalValue) || !suggestion.startsWith(literalValue)) {
+                for (Completion suggestion : suggestionsToAdd) {
+                    if (suggestion.completion().equals(literalValue) || !suggestion.completion().startsWith(literalValue)) {
                         continue;
                     }
                     suggestions.add(suggestion);
@@ -575,7 +591,7 @@ public final class CommandTree<C> {
         return suggestions;
     }
 
-    private @NonNull List<@NonNull String> suggestionsForDynamicArgument(
+    private @NonNull List<@NonNull Completion> suggestionsForDynamicArgument(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> child
@@ -638,9 +654,9 @@ public final class CommandTree<C> {
                         ? ((LinkedList<String>) commandQueue).getLast()
                         : String.join(" ", commandQueue);
             }
-            return this.directSuggestions(commandContext, child, input);
+            return this.directCompletions(commandContext, child, input);
         } else if (commandQueue.peek().isEmpty()) {
-            return this.directSuggestions(commandContext, child, commandQueue.peek());
+            return this.directCompletions(commandContext, child, commandQueue.peek());
         }
 
         // Store original input command queue before the parsers below modify it
@@ -691,7 +707,7 @@ public final class CommandTree<C> {
         }
 
         // Fallback: use suggestion provider of argument
-        return this.directSuggestions(commandContext, child, commandQueue.peek());
+        return this.directCompletions(commandContext, child, commandQueue.peek());
     }
 
     private @NonNull String stringOrEmpty(final @Nullable String string) {
@@ -701,14 +717,14 @@ public final class CommandTree<C> {
         return string;
     }
 
-    private @NonNull List<@NonNull String> directSuggestions(
+    private @NonNull List<@NonNull Completion> directCompletions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Node<@NonNull CommandArgument<C, ?>> current,
             final @NonNull String text) {
         CommandArgument<C, ?> argument = Objects.requireNonNull(current.getValue());
 
         commandContext.setCurrentArgument(argument);
-        List<String> suggestions = argument.getSuggestionsProvider().apply(commandContext, text);
+        List<Completion> suggestions = argument.getCompletionsProvider().apply(commandContext, text);
 
         // When suggesting a flag, potentially suggest following nodes too
         if (argument instanceof FlagArgument
@@ -719,7 +735,7 @@ public final class CommandTree<C> {
             for (final Node<CommandArgument<C, ?>> child : current.getChildren()) {
                 argument = Objects.requireNonNull(child.getValue());
                 commandContext.setCurrentArgument(argument);
-                suggestions.addAll(argument.getSuggestionsProvider().apply(commandContext, text));
+                suggestions.addAll(argument.getCompletionsProvider().apply(commandContext, text));
             }
         }
 

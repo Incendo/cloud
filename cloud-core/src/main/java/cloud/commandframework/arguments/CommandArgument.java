@@ -26,6 +26,7 @@ package cloud.commandframework.arguments;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
@@ -42,6 +43,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -95,7 +97,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     /**
      * Suggestion provider
      */
-    private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
+    private final BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider;
     /**
      * Argument preprocessors that allows for extensions to existing argument types
      * without having to update all parsers
@@ -134,8 +136,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull String name,
             final @NonNull ArgumentParser<C, T> parser,
             final @NonNull String defaultValue,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull TypeToken<T> valueType,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
@@ -299,9 +301,172 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     ) {
         this(required, name, parser, "", valueType, null);
     }
+    /**
+     * Construct a new command argument
+     *
+     * @param required              Whether or not the argument is required
+     * @param name                  The argument name
+     * @param parser                The argument parser
+     * @param defaultValue          Default value used when no value is provided by the command sender
+     * @param valueType             Type produced by the parser
+     * @param suggestionsProvider   Suggestions provider
+     * @param defaultDescription    Default description to use when registering
+     * @param argumentPreprocessors Argument preprocessors
+     * @since 1.4.0
+     */
+    @API(status = API.Status.STABLE, since = "1.4.0")
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @NonNull TypeToken<T> valueType,
+            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+                    @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
+    ) {
+        this(
+                required,
+                name,
+                parser,
+                defaultValue,
+                suggestionsProvider == null ? null
+                        : suggestionsProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList())),
+                valueType,
+                defaultDescription,
+                argumentPreprocessors
+        );
+    }
+    /**
+     * Construct a new command argument
+     *
+     * @param required              Whether or not the argument is required
+     * @param name                  The argument name
+     * @param parser                The argument parser
+     * @param defaultValue          Default value used when no value is provided by the command sender
+     * @param valueType             Type produced by the parser
+     * @param suggestionsProvider   Suggestions provider
+     * @param argumentPreprocessors Argument preprocessors
+     */
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
+            final @NonNull TypeToken<T> valueType,
+            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+                    @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
+    ) {
+        this(
+                required,
+                name,
+                parser,
+                defaultValue,
+                suggestionsProvider,
+                valueType,
+                ArgumentDescription.empty(),
+                argumentPreprocessors
+        );
+    }
+
+    /**
+     * Construct a new command argument
+     *
+     * @param required            Whether or not the argument is required
+     * @param name                The argument name
+     * @param parser              The argument parser
+     * @param defaultValue        Default value used when no value is provided by the command sender
+     * @param valueType           Type produced by the parser
+     * @param suggestionsProvider Suggestions provider
+     */
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
+            final @NonNull TypeToken<T> valueType
+    ) {
+        this(required, name, parser, defaultValue, suggestionsProvider, valueType, Collections.emptyList());
+    }
+
+    /**
+     * Construct a new command argument
+     *
+     * @param required            Whether or not the argument is required
+     * @param name                The argument name
+     * @param parser              The argument parser
+     * @param defaultValue        Default value used when no value is provided by the command sender
+     * @param valueType           Type produced by the parser
+     * @param suggestionsProvider Suggestions provider
+     * @param defaultDescription  Default description to use when registering
+     * @since 1.4.0
+     */
+    @API(status = API.Status.STABLE, since = "1.4.0")
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
+            final @NonNull TypeToken<T> valueType,
+            final @NonNull ArgumentDescription defaultDescription
+    ) {
+        this(required, name, parser, defaultValue, suggestionsProvider, valueType, defaultDescription, Collections.emptyList());
+    }
+
+    /**
+     * Construct a new command argument
+     *
+     * @param required            Whether or not the argument is required
+     * @param name                The argument name
+     * @param parser              The argument parser
+     * @param defaultValue        Default value used when no value is provided by the command sender
+     * @param valueType           Type produced by the parser
+     * @param suggestionsProvider Suggestions provider
+     */
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull Suggestion>> suggestionsProvider,
+            final @NonNull Class<T> valueType
+    ) {
+        this(required, name, parser, defaultValue, suggestionsProvider, TypeToken.get(valueType));
+    }
+
+    /**
+     * Construct a new command argument
+     *
+     * @param required            Whether or not the argument is required
+     * @param name                The argument name
+     * @param parser              The argument parser
+     * @param defaultValue        Default value used when no value is provided by the command sender
+     * @param valueType           Type produced by the parser
+     * @param suggestionsProvider Suggestions provider
+     * @param defaultDescription  Default description to use when registering
+     * @since 1.4.0
+     */
+    @API(status = API.Status.STABLE, since = "1.4.0")
+    public CommandArgument(
+            final boolean required,
+            final @NonNull String name,
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull String defaultValue,
+            final @Nullable BiFunction<@NonNull CommandContext<C>,
+                    @NonNull String, @NonNull List<@NonNull Suggestion>> suggestionsProvider,
+            final @NonNull Class<T> valueType,
+            final @NonNull ArgumentDescription defaultDescription
+    ) {
+        this(required, name, parser, defaultValue, suggestionsProvider, TypeToken.get(valueType),  defaultDescription);
+    }
 
     private static <C> @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-            @NonNull List<String>> buildDefaultSuggestionsProvider(final @NonNull CommandArgument<C, ?> argument) {
+            @NonNull List<Suggestion>> buildDefaultSuggestionsProvider(final @NonNull CommandArgument<C, ?> argument) {
         return new DelegatingSuggestionsProvider<>(argument.getName(), argument.getParser());
     }
 
@@ -445,6 +610,15 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      */
     public final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
             @NonNull List<String>> getSuggestionsProvider() {
+        return this.suggestionsProvider.andThen(l -> l.stream().map(Suggestion::suggestion).collect(Collectors.toList()));
+    }
+    /**
+     * Get the argument suggestions provider
+     *
+     * @return Suggestions provider
+     */
+    public final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
+            @NonNull List<Suggestion>> getFullSuggestionsProvider() {
         return this.suggestionsProvider;
     }
 
@@ -526,7 +700,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      */
     public @NonNull CommandArgument<C, T> copy() {
         CommandArgument.Builder<C, T> builder = ofType(this.valueType, this.name);
-        builder = builder.withSuggestionsProvider(this.suggestionsProvider);
+        builder = builder.withFullSuggestionsProvider(this.suggestionsProvider);
         builder = builder.withParser(this.parser);
         if (this.isRequired()) {
             builder = builder.asRequired();
@@ -573,7 +747,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         private boolean required = true;
         private ArgumentParser<C, T> parser;
         private String defaultValue = "";
-        private BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider;
+        private @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> suggestionsProvider;
         private @NonNull ArgumentDescription defaultDescription = ArgumentDescription.empty();
 
         private final Collection<BiFunction<@NonNull CommandContext<C>,
@@ -671,6 +845,19 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
                         @NonNull String, @NonNull List<String>> suggestionsProvider
         ) {
+            this.suggestionsProvider = suggestionsProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList()));
+            return this;
+        }
+        /**
+         * Set the suggestions provider
+         *
+         * @param suggestionsProvider Suggestions provider
+         * @return Builder instance
+         */
+        public @NonNull @This Builder<@NonNull C, @NonNull T> withFullSuggestionsProvider(
+                final @NonNull BiFunction<@NonNull CommandContext<C>,
+                        @NonNull String, @NonNull List<Suggestion>> suggestionsProvider
+        ) {
             this.suggestionsProvider = suggestionsProvider;
             return this;
         }
@@ -714,8 +901,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                     this.name,
                     this.parser,
                     this.defaultValue,
-                    this.valueType,
                     this.suggestionsProvider,
+                    this.valueType,
                     this.defaultDescription
             );
         }
@@ -736,8 +923,15 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this.defaultValue;
         }
 
-        protected final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>
+        protected final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>
         getSuggestionsProvider() {
+            return this.suggestionsProvider == null ? null : this.suggestionsProvider.andThen(l -> l
+                    .stream()
+                    .map(Suggestion::suggestion)
+                    .collect(Collectors.toList()));
+        }
+        protected final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>>
+        getFullSuggestionsProvider() {
             return this.suggestionsProvider;
         }
 

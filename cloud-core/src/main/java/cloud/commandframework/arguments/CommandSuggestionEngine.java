@@ -23,8 +23,10 @@
 //
 package cloud.commandframework.arguments;
 
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -48,4 +50,20 @@ public interface CommandSuggestionEngine<C> {
             @NonNull CommandContext<C> context,
             @NonNull String input
     );
+    /**
+     * Get command suggestions for the "next" argument that would yield a correctly
+     * parsing command input
+     *
+     * @param context Request context
+     * @param input   Input provided by the sender
+     * @return List of suggestions
+     */
+    default @NonNull List<@NonNull Suggestion> getFullSuggestions(
+            @NonNull CommandContext<C> context,
+            @NonNull String input
+    ) {
+        return this.getSuggestions(context, input).stream()
+                .map(Suggestion::new)
+                .collect(Collectors.toList());
+    }
 }

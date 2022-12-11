@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,41 +25,36 @@ package cloud.commandframework.execution;
 
 import cloud.commandframework.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Processor that formats command suggestions
+ * Command suggestion processor that checks the input queue head and filters based on that
  *
  * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
-public interface CommandSuggestionProcessor<C> extends
-        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<String>, @NonNull List<String>> {
+public final class FilteringCommandFullSuggestionProcessor<C> implements CommandFullSuggestionProcessor<C> {
 
-    /**
-     * Create a pass through {@link CommandSuggestionProcessor} that simply returns
-     * the input.
-     *
-     * @param <C> sender type
-     * @return new processor
-     * @since 1.8.0
-     */
-    @API(status = API.Status.STABLE, since = "1.8.0")
-    static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
-        return (ctx, suggestions) -> suggestions;
-    }
-    /**
-     * Transforms to a full suggestion processor
-     * @return a {@link CommandFullSuggestionProcessor} analog
-     */
-    default CommandFullSuggestionProcessor<C> toFull() {
-        return(c, s) -> this.apply(c, s.stream().map(Suggestion::suggestion).collect(Collectors.toList()))
-                    .stream()
-                    .map(Suggestion::new)
-                    .collect(Collectors.toList());
+    @Override
+    public @NonNull List<@NonNull Suggestion> apply(
+            final @NonNull CommandPreprocessingContext<C> context,
+            final @NonNull List<@NonNull Suggestion> strings
+    ) {
+        final String input;
+        if (context.getInputQueue().isEmpty()) {
+            input = "";
+        } else {
+            input = context.getInputQueue().peek();
+        }
+        final List<Suggestion> suggestions = new LinkedList<>();
+        for (final Suggestion suggestion : strings) {
+            if (suggestion.suggestion().startsWith(input)) {
+                suggestions.add(suggestion);
+            }
+        }
+        return suggestions;
     }
 }

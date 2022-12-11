@@ -25,6 +25,7 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.internal.CommandInputTokenizer;
@@ -32,6 +33,7 @@ import cloud.commandframework.services.State;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -43,7 +45,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class DelegatingCommandSuggestionEngine<C> implements CommandSuggestionEngine<C> {
 
-    private static final List<String> SINGLE_EMPTY_SUGGESTION = Collections.unmodifiableList(Collections.singletonList(""));
+    private static final List<Suggestion> SINGLE_EMPTY_SUGGESTION = Collections.singletonList(new Suggestion(""));
 
     private final CommandManager<C> commandManager;
     private final CommandTree<C> commandTree;
@@ -63,18 +65,23 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
     }
 
     @Override
-    public @NonNull List<@NonNull String> getSuggestions(
+    public @NonNull List<@NonNull String> getSuggestions(@NonNull final CommandContext<C> context, @NonNull final String input) {
+        return this.getFullSuggestions(context, input).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+    }
+
+    @Override
+    public @NonNull List<@NonNull Suggestion> getFullSuggestions(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
         final @NonNull LinkedList<@NonNull String> inputQueue = new CommandInputTokenizer(input).tokenize();
         /* Store a copy of the input queue in the context */
         context.store("__raw_input__", new LinkedList<>(inputQueue));
-        final List<String> suggestions;
+        final List<Suggestion> suggestions;
         if (this.commandManager.preprocessContext(context, inputQueue) == State.ACCEPTED) {
-            suggestions = this.commandManager.commandSuggestionProcessor().apply(
+            suggestions = this.commandManager.commandFullSuggestionProcessor().apply(
                     new CommandPreprocessingContext<>(context, inputQueue),
-                    this.commandTree.getSuggestions(
+                    this.commandTree.getFullSuggestions(
                             context,
                             inputQueue
                     )
