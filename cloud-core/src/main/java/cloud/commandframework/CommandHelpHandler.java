@@ -113,6 +113,19 @@ public final class CommandHelpHandler<C> {
     }
 
     /**
+     * Query a root index help topic. This is the topic returned when querying {@link #queryHelp(Object, String)} with
+     * an empty string, or when there are no results.
+     *
+     * @param recipient The recipient of this help query to check permissions against (if Non-Null)
+     * @return index help topic
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public @NonNull IndexHelpTopic<C> queryRootIndex(final @Nullable C recipient) {
+        return (IndexHelpTopic<C>) this.queryHelp(recipient, "");
+    }
+
+    /**
      * Query for help
      *
      * @param recipient The recipient of this help query to check permissions against (if Non-Null)
