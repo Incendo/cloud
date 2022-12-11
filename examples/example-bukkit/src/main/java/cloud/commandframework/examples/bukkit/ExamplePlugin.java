@@ -493,12 +493,13 @@ public final class ExamplePlugin extends JavaPlugin {
     }
 
     @Suggestions("help_queries")
-    public @NonNull List<String> suggestHelpQueries(final @NonNull CommandContext<CommandSender> ctx, final @NonNull String input) {
-        // We can cast to index topic since we always use empty string query
-        final CommandHelpHandler.IndexHelpTopic<CommandSender> topic = (CommandHelpHandler.IndexHelpTopic<CommandSender>) this.manager
-                .createCommandHelpHandler()
-                .queryHelp(ctx.getSender(), "");
-        return topic.getEntries().stream().map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString).collect(Collectors.toList());
+    public @NonNull List<String> suggestHelpQueries(
+            final @NonNull CommandContext<CommandSender> ctx,
+            final @NonNull String input
+    ) {
+        return this.manager.createCommandHelpHandler().queryRootIndex(ctx.getSender()).getEntries().stream()
+                .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
+                .collect(Collectors.toList());
     }
 
     @CommandMethod("example|e|ex help [query]")
