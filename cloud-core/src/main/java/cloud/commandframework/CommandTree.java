@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
@@ -59,6 +60,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apiguardian.api.API;
@@ -208,8 +210,7 @@ public final class CommandTree<C> {
                 } else {
                     /* Too many arguments. We have a unique path, so we can send the entire context */
                     return Pair.of(null, new InvalidSyntaxException(
-                            this.commandManager.commandSyntaxFormatter()
-                                    .apply(parsedArguments, root),
+                            this.formatSyntax(commandContext.getSender(), parsedArguments, root),
                             commandContext.getSender(), this.getChain(root)
                             .stream()
                             .filter(node -> node.getValue() != null)
@@ -220,8 +221,7 @@ public final class CommandTree<C> {
             } else {
                 /* Too many arguments. We have a unique path, so we can send the entire context */
                 return Pair.of(null, new InvalidSyntaxException(
-                        this.commandManager.commandSyntaxFormatter()
-                                .apply(parsedArguments, root),
+                        this.formatSyntax(commandContext.getSender(), parsedArguments, root),
                         commandContext.getSender(), this.getChain(root)
                         .stream()
                         .filter(node -> node.getValue() != null)
@@ -279,8 +279,7 @@ public final class CommandTree<C> {
             }
             /* We know that there's no command and we also cannot match any of the children */
             return Pair.of(null, new InvalidSyntaxException(
-                    this.commandManager.commandSyntaxFormatter()
-                            .apply(parsedArguments, root),
+                    this.formatSyntax(commandContext.getSender(), parsedArguments, root),
                     commandContext.getSender(), this.getChain(root)
                     .stream()
                     .filter(node -> node.getValue() != null)
@@ -288,6 +287,18 @@ public final class CommandTree<C> {
                     .collect(Collectors.toList())
             ));
         }
+    }
+
+    private String formatSyntax(
+            final @NonNull C sender,
+            final List<@NonNull CommandArgument<C, ?>> parsedArguments,
+            final Node<@Nullable CommandArgument<C, ?>> root) {
+        final CommandSyntaxFormatter<C> csf = this.commandManager.commandSyntaxFormatter();
+        if (csf instanceof CommandSyntaxFormatter.Filtering) {
+            return ((CommandSyntaxFormatter.Filtering<C>) this.commandManager.commandSyntaxFormatter())
+                    .apply(parsedArguments, root, this.formatterFilter(sender));
+        }
+        return this.commandManager.commandSyntaxFormatter().apply(parsedArguments, root);
     }
 
     private @NonNull Pair<@Nullable Command<C>, @Nullable Exception> attemptParseUnambiguousChild(
@@ -380,11 +391,8 @@ public final class CommandTree<C> {
                         }
                         /* Not enough arguments */
                         return Pair.of(null, new InvalidSyntaxException(
-                                this.commandManager.commandSyntaxFormatter()
-                                        .apply(Objects.requireNonNull(
-                                                        child.getValue()
-                                                                .getOwningCommand())
-                                                .getArguments(), child),
+                                this.formatSyntax(commandContext.getSender(),
+                                        Objects.requireNonNull(child.getValue().getOwningCommand()).getArguments(), child),
                                 commandContext.getSender(), this.getChain(root)
                                 .stream()
                                 .filter(node -> node.getValue() != null)
@@ -413,8 +421,7 @@ public final class CommandTree<C> {
                         }
                         /* Child does not have a command and so we cannot proceed */
                         return Pair.of(null, new InvalidSyntaxException(
-                                this.commandManager.commandSyntaxFormatter()
-                                        .apply(parsedArguments, root),
+                                this.formatSyntax(commandContext.getSender(), parsedArguments, root),
                                 commandContext.getSender(), this.getChain(root)
                                 .stream()
                                 .filter(node -> node.getValue() != null)
@@ -451,8 +458,7 @@ public final class CommandTree<C> {
                         } else {
                             /* Too many arguments. We have a unique path, so we can send the entire context */
                             return Pair.of(null, new InvalidSyntaxException(
-                                    this.commandManager.commandSyntaxFormatter()
-                                            .apply(parsedArguments, child),
+                                    this.formatSyntax(commandContext.getSender(), parsedArguments, child),
                                     commandContext.getSender(), this.getChain(root)
                                     .stream()
                                     .filter(node -> node.getValue() != null)
@@ -796,6 +802,12 @@ public final class CommandTree<C> {
 
         // Append flags after the last argument
         return arguments.size() - 1;
+    }
+
+    private @NonNull Predicate<CommandTree.@NonNull Node<@Nullable CommandArgument<C, ?>>> formatterFilter(
+            final @NonNull C sender
+    ) {
+        return node -> this.isPermitted(sender, node) == null;
     }
 
     private @Nullable CommandPermission isPermitted(

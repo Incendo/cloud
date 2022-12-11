@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -44,16 +45,22 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter<C> {
+public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter.Filtering<C> {
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public final @NonNull String apply(
+            final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
+            final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
+    ) {
+        return Filtering.super.apply(commandArguments, node);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public final @NonNull String apply(
             final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
-            final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
+            final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node,
+            final @NonNull Predicate<CommandTree.@NonNull Node<@Nullable CommandArgument<C, ?>>> filter
     ) {
         final FormattingInstance formattingInstance = this.createInstance();
         final Iterator<CommandArgument<C, ?>> iterator = commandArguments.iterator();
@@ -77,10 +84,11 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             }
         }
         CommandTree.Node<CommandArgument<C, ?>> tail = node;
-        while (tail != null && !tail.isLeaf()) {
+        while (tail != null && !tail.isLeaf() && filter.test(tail)) {
             if (tail.getChildren().size() > 1) {
                 formattingInstance.appendBlankSpace();
-                final Iterator<CommandTree.Node<CommandArgument<C, ?>>> childIterator = tail.getChildren().iterator();
+                final Iterator<CommandTree.Node<CommandArgument<C, ?>>> childIterator = tail.getChildren()
+                        .stream().filter(filter).iterator();
                 while (childIterator.hasNext()) {
                     final CommandTree.Node<CommandArgument<C, ?>> child = childIterator.next();
 
@@ -96,6 +104,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                         formattingInstance.appendPipe();
                     }
                 }
+                break;
+            }
+            if (!filter.test(tail.getChildren().get(0))) {
                 break;
             }
             final CommandArgument<C, ?> argument = tail.getChildren().get(0).getValue();

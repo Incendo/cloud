@@ -25,6 +25,7 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandTree;
 import java.util.List;
+import java.util.function.Predicate;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -53,4 +54,21 @@ public interface CommandSyntaxFormatter<C> {
             @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
             CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
     );
+
+    interface Filtering<C> extends CommandSyntaxFormatter<C> {
+
+        @Override
+        default @NonNull String apply(
+                @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
+                CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
+        ) {
+            return this.apply(commandArguments, node, $ -> true);
+        }
+
+        @NonNull String apply(
+                @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
+                CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node,
+                @NonNull Predicate<CommandTree.@NonNull Node<@Nullable CommandArgument<C, ?>>> filter
+        );
+    }
 }
