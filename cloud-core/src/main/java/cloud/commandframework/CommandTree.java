@@ -491,11 +491,27 @@ public final class CommandTree<C> {
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<@NonNull String> commandQueue
     ) {
-        return this.getSuggestions(context, commandQueue, this.internalTree);
+        return this.getSuggestions(context, commandQueue, this.internalTree)
+                .stream()
+                .map(Suggestion::suggestion)
+                .collect(Collectors.toList());
     }
 
+    /**
+     * Get suggestions from the input queue
+     *
+     * @param context      Context instance
+     * @param commandQueue Input queue
+     * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
+     */
+    public @NonNull List<@NonNull Suggestion> getFullSuggestions(
+            final @NonNull CommandContext<C> context,
+            final @NonNull Queue<@NonNull String> commandQueue
+    ) {
+        return this.getSuggestions(context, commandQueue, this.internalTree);
+    }
     @SuppressWarnings("MixedMutabilityReturnType")
-    private @NonNull List<@NonNull String> getSuggestions(
+    private @NonNull List<@NonNull Suggestion> getSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> root
@@ -546,7 +562,7 @@ public final class CommandTree<C> {
         }
 
         /* Calculate suggestions for the literal arguments */
-        final List<String> suggestions = new LinkedList<>();
+        final List<Suggestion> suggestions = new LinkedList<>();
         if (commandQueue.size() <= 1) {
             final String literalValue = this.stringOrEmpty(commandQueue.peek());
             for (final Node<CommandArgument<C, ?>> argument : staticArguments) {
@@ -554,10 +570,10 @@ public final class CommandTree<C> {
                     continue;
                 }
                 commandContext.setCurrentArgument(argument.getValue());
-                final List<String> suggestionsToAdd = argument.getValue().getSuggestionsProvider()
+                final List<Suggestion> suggestionsToAdd = argument.getValue().getFullSuggestionsProvider()
                         .apply(commandContext, literalValue);
-                for (String suggestion : suggestionsToAdd) {
-                    if (suggestion.equals(literalValue) || !suggestion.startsWith(literalValue)) {
+                for (Suggestion suggestion : suggestionsToAdd) {
+                    if (suggestion.suggestion().equals(literalValue) || !suggestion.suggestion().startsWith(literalValue)) {
                         continue;
                     }
                     suggestions.add(suggestion);
@@ -575,7 +591,7 @@ public final class CommandTree<C> {
         return suggestions;
     }
 
-    private @NonNull List<@NonNull String> suggestionsForDynamicArgument(
+    private @NonNull List<@NonNull Suggestion> suggestionsForDynamicArgument(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> child
@@ -635,7 +651,7 @@ public final class CommandTree<C> {
             if (child.getValue() instanceof CompoundArgument) {
                 final String last = ((LinkedList<String>) commandQueue).getLast();
                 commandContext.setCurrentArgument(child.getValue());
-                return child.getValue().getSuggestionsProvider().apply(commandContext, last);
+                return child.getValue().getFullSuggestionsProvider().apply(commandContext, last);
             }
             return Collections.emptyList();
         } else if (commandQueue.peek().isEmpty()) {

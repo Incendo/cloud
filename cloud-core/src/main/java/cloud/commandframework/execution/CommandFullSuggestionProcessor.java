@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2021 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -36,30 +35,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
-@API(status = API.Status.STABLE)
-public interface CommandSuggestionProcessor<C> extends
-        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<String>, @NonNull List<String>> {
+public interface CommandFullSuggestionProcessor<C> extends
+        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Suggestion>, @NonNull List<Suggestion>> {
 
     /**
-     * Create a pass through {@link CommandSuggestionProcessor} that simply returns
-     * the input.
-     *
-     * @param <C> sender type
-     * @return new processor
-     * @since 1.8.0
+     * Transforms to a simple suggestion processor
+     * @return a {@link CommandSuggestionProcessor} analog
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
-    static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
-        return (ctx, suggestions) -> suggestions;
-    }
-    /**
-     * Transforms to a full suggestion processor
-     * @return a {@link CommandFullSuggestionProcessor} analog
-     */
-    default CommandFullSuggestionProcessor<C> toFull() {
-        return(c, s) -> this.apply(c, s.stream().map(Suggestion::suggestion).collect(Collectors.toList()))
-                    .stream()
-                    .map(Suggestion::new)
-                    .collect(Collectors.toList());
+    default CommandSuggestionProcessor<C> toSimple() {
+        return (c, s) -> this.apply(c, s.stream().map(Suggestion::new).collect(Collectors.toList()))
+                .stream()
+                .map(Suggestion::suggestion)
+                .collect(Collectors.toList());
     }
 }

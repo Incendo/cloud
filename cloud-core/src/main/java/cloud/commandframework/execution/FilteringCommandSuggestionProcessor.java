@@ -40,6 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
+@Deprecated
 public final class FilteringCommandSuggestionProcessor<C> implements CommandSuggestionProcessor<C> {
 
     private final @NonNull Filter<C> filter;

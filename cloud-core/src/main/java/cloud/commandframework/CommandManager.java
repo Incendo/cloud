@@ -43,9 +43,10 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.CommandFullSuggestionProcessor;
 import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.execution.CommandSuggestionProcessor;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.execution.FilteringCommandFullSuggestionProcessor;
 import cloud.commandframework.execution.postprocessor.AcceptingCommandPostprocessor;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessingContext;
 import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
@@ -108,8 +109,7 @@ public abstract class CommandManager<C> {
 
     private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
-    private CommandSuggestionProcessor<C> commandSuggestionProcessor =
-            new FilteringCommandSuggestionProcessor<>(FilteringCommandSuggestionProcessor.Filter.startsWith(true));
+    private CommandFullSuggestionProcessor<C> commandSuggestionProcessor = new FilteringCommandFullSuggestionProcessor<>();
     private CommandRegistrationHandler commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
@@ -217,6 +217,27 @@ public abstract class CommandManager<C> {
                 this
         );
         return this.commandSuggestionEngine.getSuggestions(context, input);
+    }
+    /**
+     * Get command suggestions for the "next" argument that would yield a correctly parsing command input. The command
+     * suggestions provided by the command argument parsers will be filtered using the {@link CommandSuggestionProcessor}
+     * before being returned.
+     *
+     * @param commandSender Sender of the command
+     * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
+     *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
+     * @return List of suggestions
+     */
+    public @NonNull List<@NonNull Suggestion> fullSuggest(
+            final @NonNull C commandSender,
+            final @NonNull String input
+    ) {
+        final CommandContext<C> context = this.commandContextFactory.create(
+                true,
+                commandSender,
+                this
+        );
+        return this.commandSuggestionEngine.getFullSuggestions(context, input);
     }
 
     /**
@@ -1005,6 +1026,17 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor() {
+        return this.commandSuggestionProcessor.toSimple();
+    }
+    /**
+     * Returns the command suggestion processor used in this command manager.
+     *
+     * @return the command suggestion processor
+     * @since 1.7.0
+     * @see #commandSuggestionProcessor(CommandSuggestionProcessor)
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public @NonNull CommandFullSuggestionProcessor<C> commandFullSuggestionProcessor() {
         return this.commandSuggestionProcessor;
     }
 
@@ -1035,6 +1067,20 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public void commandSuggestionProcessor(final @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor) {
+        this.commandSuggestionProcessor = commandSuggestionProcessor.toFull();
+    }
+    /**
+     * Sets the command suggestion processor.
+     * <p>
+     * This will be called ever time {@link #suggest(Object, String)} is called, in order to process the list
+     * of suggestions before it's returned to the caller.
+     *
+     * @param commandSuggestionProcessor the new command sugesstion processor
+     * @since 1.7.0
+     * @see #commandSuggestionProcessor()
+     */
+    @API(status = API.Status.STABLE, since = "1.7.0")
+    public void commandFullSuggestionProcessor(final @NonNull CommandFullSuggestionProcessor<C> commandSuggestionProcessor) {
         this.commandSuggestionProcessor = commandSuggestionProcessor;
     }
 
