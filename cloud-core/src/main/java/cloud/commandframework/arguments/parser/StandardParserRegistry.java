@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.annotations.specifier.FlagYielding;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.specifier.Liberal;
@@ -56,6 +57,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -88,7 +90,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     private final Map<TypeToken<?>, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new HashMap<>();
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
             annotationMappers = new HashMap<>();
-    private final Map<String, BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>>
+    private final Map<String, BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>>>
             namedSuggestionProviders = new HashMap<>();
 
     /**
@@ -278,16 +280,35 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final @NonNull String name,
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
     ) {
-        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider);
+        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH),
+                suggestionsProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList())));
     }
 
     @Override
     public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
             final @NonNull String name
     ) {
-        final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionProvider =
+        final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> suggestionProvider =
                 this.namedSuggestionProviders.get(name.toLowerCase(Locale.ENGLISH));
-        return Optional.ofNullable(suggestionProvider);
+        if (suggestionProvider == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(suggestionProvider.andThen(l -> l.stream().map(Suggestion::suggestion).collect(Collectors.toList())));
+        }
+    }
+    @Override
+    public void registerFullSuggestionProvider(
+            final @NonNull String name,
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> suggestionsProvider
+    ) {
+        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider);
+    }
+
+    @Override
+    public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>>> getFullSuggestionProvider(
+            final @NonNull String name
+    ) {
+        return Optional.ofNullable(this.namedSuggestionProviders.get(name));
     }
 
 
