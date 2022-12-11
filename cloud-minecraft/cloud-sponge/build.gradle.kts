@@ -2,7 +2,7 @@ import org.spongepowered.gradle.vanilla.repository.MinecraftPlatform
 
 plugins {
     id("cloud.base-conventions")
-    id("org.spongepowered.gradle.vanilla") version "0.2.1-SNAPSHOT"
+    id("org.spongepowered.gradle.vanilla")
 }
 
 dependencies {

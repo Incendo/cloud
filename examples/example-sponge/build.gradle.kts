@@ -2,7 +2,7 @@ import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
 
 plugins {
-    id("org.spongepowered.gradle.plugin") version "2.0.1"
+    id("org.spongepowered.gradle.plugin") version "2.1.1"
     id("com.github.johnrengelman.shadow")
 }
 
@@ -12,6 +12,7 @@ dependencies {
 }
 
 sponge {
+    injectRepositories(false)
     apiVersion("8.0.0")
     plugin("cloud-example-sponge") {
         loader {
@@ -30,7 +31,7 @@ sponge {
 }
 
 tasks {
-    build {
+    assemble {
         dependsOn(shadowJar)
     }
 }
