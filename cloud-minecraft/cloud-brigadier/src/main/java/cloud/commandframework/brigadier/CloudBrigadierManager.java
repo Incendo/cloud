@@ -26,6 +26,7 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
@@ -631,13 +632,13 @@ public final class CloudBrigadierManager<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        final List<String> suggestionsUnfiltered = this.commandManager.suggest(
+        final List<Suggestion> suggestionsUnfiltered = this.commandManager.fullSuggest(
                 commandContext.getSender(),
                 command
         );
 
         /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-        final List<String> suggestions = new ArrayList<>(suggestionsUnfiltered);
+        final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
         if (parentNode != null) {
             final Set<String> siblingLiterals = parentNode.getChildren().stream()
                     .map(CommandTree.Node::getValue)
@@ -645,7 +646,7 @@ public final class CloudBrigadierManager<C, S> {
                             ? ((StaticArgument<C>) arg).getAliases().stream() : Stream.empty())
                     .collect(Collectors.toSet());
 
-            suggestions.removeIf(siblingLiterals::contains);
+            suggestions.removeIf(s -> siblingLiterals.contains(s.suggestion()));
         }
 
         SuggestionsBuilder suggestionsBuilder = builder;
@@ -655,16 +656,21 @@ public final class CloudBrigadierManager<C, S> {
             suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
         }
 
-        for (final String suggestion : suggestions) {
-            String tooltip = argument.getName();
-            if (!(argument instanceof StaticArgument)) {
-                if (argument.isRequired()) {
-                    tooltip = '<' + tooltip + '>';
-                } else {
-                    tooltip = '[' + tooltip + ']';
+        for (final Suggestion suggestion : suggestions) {
+            if (suggestion instanceof NativeSuggestion) {
+                NativeSuggestion s = (NativeSuggestion) suggestion;
+                suggestionsBuilder = suggestionsBuilder.suggest(s.suggestion(), s.richDescription());
+            } else {
+                String tooltip = argument.getName();
+                if (!(argument instanceof StaticArgument)) {
+                    if (argument.isRequired()) {
+                        tooltip = '<' + tooltip + '>';
+                    } else {
+                        tooltip = '[' + tooltip + ']';
+                    }
                 }
+                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
             }
-            suggestionsBuilder = suggestionsBuilder.suggest(suggestion, new LiteralMessage(tooltip));
         }
 
         return suggestionsBuilder.buildFuture();

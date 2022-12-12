@@ -45,6 +45,7 @@ import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.brigadier.NativeSuggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
@@ -84,10 +85,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.platform.bukkit.MinecraftComponentSerializer;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -123,6 +127,7 @@ public final class ExamplePlugin extends JavaPlugin {
     private MinecraftHelp<CommandSender> minecraftHelp;
     private CommandConfirmationManager<CommandSender> confirmationManager;
     private AnnotationParser<CommandSender> annotationParser;
+    private BiFunction<String, Component, Suggestion> suggestionProvider;
 
     @Override
     public void onEnable() {
@@ -234,9 +239,25 @@ public final class ExamplePlugin extends JavaPlugin {
                                 .append(component).build()
                 ).apply(this.manager, this.bukkitAudiences::sender);
         //
+        // Make a suggestion provider that will work with internals
+        // If you only use paper 1.16.5+ you may prefer PaperBrigadier from paper mojangapi
+        //
+        this.suggestionProvider = getSuggestionProvider(manager.hasCapability(CloudBukkitCapabilities.BRIGADIER));
+        //
         // Create the commands
         //
         this.constructCommands();
+    }
+
+    @SuppressWarnings("UnstableApiUsage") // We should be careful as we will work with minecraft internals
+    private BiFunction<String, Component, Suggestion> getSuggestionProvider(boolean support) {
+        if (support && MinecraftComponentSerializer.isSupported()) {
+            return (suggstion, description) -> {
+                Object component = MinecraftComponentSerializer.get().serialize(description);
+                return NativeSuggestion.ofUnknown(suggstion, component);
+            };
+        }
+        return (suggestion, ignored) -> Suggestion.of(suggestion);
     }
 
     private void constructCommands() {
@@ -626,10 +647,11 @@ public final class ExamplePlugin extends JavaPlugin {
             String input
     ) {
         return Arrays.asList(
-                //TODO use paper suggestions
-//                new Suggestion("spawn", "Teleports to the spawn of the world"),
-//                new Suggestion("respawn", "Teleports to the place where you'll respawn"),
-//                new Suggestion("look", "Teleports to the place where you look")
+                this.suggestionProvider.apply("spawn", Component.text("Teleports to the spawn of the world",
+                        NamedTextColor.GOLD)),
+                this.suggestionProvider.apply("respawn", Component.text("Teleports to the place where you'll respawn",
+                        NamedTextColor.YELLOW)),
+                this.suggestionProvider.apply("look", Component.text("Teleports to the place where you look", NamedTextColor.RED))
         );
     }
 

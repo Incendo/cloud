@@ -26,8 +26,10 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -45,7 +47,11 @@ public enum CloudBukkitCapabilities implements CloudCapability {
             && !CraftBukkitReflection.classExists("org.bukkit.entity.Warden")),
 
     ASYNCHRONOUS_COMPLETION(CraftBukkitReflection.classExists(
-            "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent"));
+            "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent")),
+    PAPER_TOOLTIPS(Optional.ofNullable(CraftBukkitReflection.findClass(
+            "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent"))
+            .flatMap(c -> Stream.of(c.getClasses()).map(Class::getSimpleName).filter("Completion"::equals).findAny())
+            .isPresent());
 
     static final Set<CloudBukkitCapabilities> CAPABLE = Arrays.stream(values())
             .filter(CloudBukkitCapabilities::capable)

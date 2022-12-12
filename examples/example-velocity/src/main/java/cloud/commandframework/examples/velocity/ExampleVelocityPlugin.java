@@ -23,6 +23,9 @@
 //
 package cloud.commandframework.examples.velocity;
 
+import cloud.commandframework.Suggestion;
+import cloud.commandframework.brigadier.NativeSuggestion;
+import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.AudienceProvider;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
@@ -35,11 +38,16 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.command.VelocityBrigadierMessage;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -57,6 +65,28 @@ public final class ExampleVelocityPlugin {
 
     @Inject
     private Injector injector;
+
+    private static List<Suggestion> playerSuggestions(@NonNull CommandContext<CommandSource> ctx, @NonNull String input) {
+        final Collection<Player> players = ctx.<ProxyServer>get("ProxyServer").getAllPlayers();
+        final List<Suggestion> suggestions = new LinkedList<>();
+        for (Player player : players) {
+            Component tooltip = Component.text()
+                    .append(Component.text("Ping: "))
+                    .append(Component.text(player.getPing(), NamedTextColor.GREEN))
+                    .append(Component.newline())
+                    .append(Component.text("UUID: "))
+                    .append(Component.text(player.getUniqueId().toString(), NamedTextColor.GOLD))
+                    .append(Component.newline())
+                            .append(Component.text("Brand: "))
+                                    .append(Component.text(player.getClientBrand(), NamedTextColor.BLUE))
+                                            .build();
+            suggestions.add(NativeSuggestion.of(
+                    player.getUsername(),
+                    VelocityBrigadierMessage.tooltip(tooltip)
+            ));
+        }
+        return suggestions;
+    }
 
     /**
      * Listener that listeners for the initialization event
@@ -88,7 +118,8 @@ public final class ExampleVelocityPlugin {
                 .apply(commandManager, AudienceProvider.nativeAudience());
         commandManager.command(
                 commandManager.commandBuilder("example")
-                        .argument(PlayerArgument.of("player"))
+                        .argument(PlayerArgument.<CommandSource>newBuilder("player")
+                                .withFullSuggestionsProvider(ExampleVelocityPlugin::playerSuggestions))
                         .handler(context -> {
                                     final Player player = context.get("player");
                                     context.getSender().sendMessage(

@@ -23,11 +23,26 @@
 //
 package cloud.commandframework.paper;
 
+import cloud.commandframework.Suggestion;
+import cloud.commandframework.brigadier.NativeSuggestion;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
+import cloud.commandframework.bukkit.CloudBukkitCapabilities;
+import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
+import com.mojang.brigadier.Message;
+import io.papermc.paper.brigadier.PaperBrigadier;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -36,8 +51,68 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
 
     private final PaperCommandManager<C> paperCommandManager;
 
+    private final BiConsumer<AsyncTabCompleteEvent, List<Suggestion>> suggestionApplier;
+
+    @SuppressWarnings("ConstantConditions")
     AsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
+        if (paperCommandManager.hasCapability(CloudBukkitCapabilities.PAPER_TOOLTIPS)) {
+            BiFunction<String, Message, AsyncTabCompleteEvent.Completion> completionWithDescription;
+            if (Audience.class.isAssignableFrom(Player.class)) { //If we use native adventure
+                completionWithDescription = (s, desc) -> {
+                    Component component = PaperBrigadier.componentFromMessage(desc);
+                    return AsyncTabCompleteEvent.Completion.completion(s, component);
+                };
+            } else { //We have a shaded adventure, using method handles to get needed methods without shading
+                final Method componentFromMessageMethod = CraftBukkitReflection.needMethod(
+                        PaperBrigadier.class,
+                        "componentFromMessage",
+                        Message.class
+                );
+                final Method completionWithTooltipMethod = CraftBukkitReflection.needMethod(
+                                AsyncTabCompleteEvent.Completion.class,
+                                "completion",
+                                String.class,
+                                componentFromMessageMethod.getReturnType()
+                        );
+
+                final MethodHandle completionWithTooltip;
+                final MethodHandle componentFromMessage;
+                try {
+                    componentFromMessage = MethodHandles.publicLookup().unreflect(componentFromMessageMethod);
+                    completionWithTooltip = MethodHandles.publicLookup().unreflect(completionWithTooltipMethod);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                completionWithDescription = (suggestion, description) -> {
+                    try {
+                        final Object component = componentFromMessage.invoke(description);
+                        return (AsyncTabCompleteEvent.Completion) completionWithTooltip.invoke(suggestion, component);
+                    } catch (Throwable t) {
+                        throw new RuntimeException(t);
+                    }
+                };
+            }
+            suggestionApplier = (event, list) -> {
+                List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
+                for (Suggestion suggestion : list) {
+                    if (suggestion instanceof NativeSuggestion) {
+                        String suggest = suggestion.suggestion();
+                        Message desc = ((NativeSuggestion) suggestion).richDescription();
+                        completions.add(completionWithDescription.apply(suggest, desc));
+                    } else {
+                        completions.add(AsyncTabCompleteEvent.Completion.completion(suggestion.suggestion()));
+                    }
+                }
+                event.completions(completions);
+                event.setHandled(true);
+            };
+        } else {
+            suggestionApplier = (event, list) -> {
+                event.setCompletions(Suggestion.raw(list));
+                event.setHandled(true);
+            };
+        }
     }
 
     @EventHandler
@@ -64,12 +139,11 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
         final String inputBuffer = this.paperCommandManager.stripNamespace(event.getBuffer());
 
-        final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggest(
+        final List<Suggestion> suggestions = new ArrayList<>(this.paperCommandManager.fullSuggest(
                 cloudSender,
                 inputBuffer
         ));
 
-        event.setCompletions(suggestions);
-        event.setHandled(true);
+        suggestionApplier.accept(event, suggestions);
     }
 }
