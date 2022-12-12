@@ -64,12 +64,28 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     /**
      * Create a new {@link Builder}.
      *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
+     * Create a new builder
+     *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new Builder<>(name);
+        return builder(name);
     }
 
     /**
@@ -80,7 +96,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Double> of(final @NonNull String name) {
-        return DoubleArgument.<C>newBuilder(name).asRequired().build();
+        return DoubleArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -91,7 +107,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Double> optional(final @NonNull String name) {
-        return DoubleArgument.<C>newBuilder(name).asOptional().build();
+        return DoubleArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -106,7 +122,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             final @NonNull String name,
             final double defaultNum
     ) {
-        return DoubleArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+        return DoubleArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**

@@ -47,7 +47,7 @@ class Issue281 {
     void commandExceptionShouldNotBeSwallowed() {
         // Arrange
         final CommandManager<TestCommandSender> commandManager = new CommandManager<TestCommandSender>(
-                AsynchronousCommandExecutionCoordinator.<TestCommandSender>newBuilder().withSynchronousParsing().build(),
+                AsynchronousCommandExecutionCoordinator.<TestCommandSender>builder().withSynchronousParsing().build(),
                 CommandRegistrationHandler.nullCommandRegistrationHandler()
         ) {
             @Override

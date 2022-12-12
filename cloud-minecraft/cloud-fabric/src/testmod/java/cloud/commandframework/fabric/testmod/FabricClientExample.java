@@ -129,7 +129,7 @@ public final class FabricClientExample implements ClientModInitializer {
 
         commandManager.command(base.literal("flag_test")
                 .argument(StringArgument.optional("parameter"))
-                .flag(CommandFlag.newBuilder("flag").withAliases("f"))
+                .flag(CommandFlag.builder("flag").withAliases("f"))
                 .handler(ctx -> ctx.getSender().sendFeedback(Component.literal("Had flag: " + ctx.flags().isPresent("flag")))));
     }
 

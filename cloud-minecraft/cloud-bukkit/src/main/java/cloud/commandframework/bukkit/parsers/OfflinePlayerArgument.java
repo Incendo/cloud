@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -75,14 +76,30 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new Builder<>(name);
+        return builder(name);
     }
 
     /**
@@ -93,7 +110,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, OfflinePlayer> of(final @NonNull String name) {
-        return OfflinePlayerArgument.<C>newBuilder(name).asRequired().build();
+        return OfflinePlayerArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -104,7 +121,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, OfflinePlayer> optional(final @NonNull String name) {
-        return OfflinePlayerArgument.<C>newBuilder(name).asOptional().build();
+        return OfflinePlayerArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -119,7 +136,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
             final @NonNull String name,
             final @NonNull String defaultPlayer
     ) {
-        return OfflinePlayerArgument.<C>newBuilder(name).asOptionalWithDefault(defaultPlayer).build();
+        return OfflinePlayerArgument.<C>builder(name).asOptionalWithDefault(defaultPlayer).build();
     }
 
 

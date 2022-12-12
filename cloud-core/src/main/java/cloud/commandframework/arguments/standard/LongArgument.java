@@ -64,12 +64,28 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     /**
      * Create a new {@link Builder}.
      *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
+     * Create a new builder
+     *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
-    public static <C> LongArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new Builder<>(name);
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
     }
 
     /**
@@ -80,7 +96,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Long> of(final @NonNull String name) {
-        return LongArgument.<C>newBuilder(name).asRequired().build();
+        return LongArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -91,7 +107,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Long> optional(final @NonNull String name) {
-        return LongArgument.<C>newBuilder(name).asOptional().build();
+        return LongArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -106,7 +122,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
             final @NonNull String name,
             final long defaultNum
     ) {
-        return LongArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+        return LongArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
     }
 
     /**

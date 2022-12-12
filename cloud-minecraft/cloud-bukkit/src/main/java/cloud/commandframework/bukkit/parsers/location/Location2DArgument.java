@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -76,16 +77,30 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
     }
 
     /**
-     * Create a new argument builder
+     * Create a new {@link Builder}.
      *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Builder instance
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
      */
-    public static <C> @NonNull Builder<C> newBuilder(
-            final @NonNull String name
-    ) {
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
+    }
+
+    /**
+     * Create a new builder
+     *
+     * @param name Name of the argument
+     * @param <C>  Command sender type
+     * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
+     */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
     }
 
     /**
@@ -98,9 +113,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
     public static <C> @NonNull CommandArgument<C, Location2D> of(
             final @NonNull String name
     ) {
-        return Location2DArgument.<C>newBuilder(
-                name
-        ).asRequired().build();
+        return Location2DArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -113,9 +126,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
     public static <C> @NonNull CommandArgument<C, Location2D> optional(
             final @NonNull String name
     ) {
-        return Location2DArgument.<C>newBuilder(
-                name
-        ).asOptional().build();
+        return Location2DArgument.<C>builder(name).asOptional().build();
     }
 
 

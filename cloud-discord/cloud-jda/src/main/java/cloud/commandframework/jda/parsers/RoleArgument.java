@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -64,14 +65,30 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new Builder<>(name);
+        return builder(name);
     }
 
     /**
@@ -82,7 +99,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, Role> of(final @NonNull String name) {
-        return RoleArgument.<C>newBuilder(name).asRequired().build();
+        return RoleArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -93,7 +110,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, Role> optional(final @NonNull String name) {
-        return RoleArgument.<C>newBuilder(name).asOptional().build();
+        return RoleArgument.<C>builder(name).asOptional().build();
     }
 
     /**

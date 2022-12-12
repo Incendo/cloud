@@ -36,6 +36,7 @@ import io.leangen.geantyref.TypeToken;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.pircbotx.PircBotX;
@@ -70,14 +71,30 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     }
 
     /**
-     * Create a new user argument builder
+     * Create a new {@link Builder}.
      *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Builder instance
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
      */
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
         return new Builder<>(name);
+    }
+
+    /**
+     * Create a new builder
+     *
+     * @param name Name of the argument
+     * @param <C>  Command sender type
+     * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
+     */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
     }
 
     /**
@@ -88,7 +105,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @return Argument instance
      */
     public static <C> @NonNull CommandArgument<C, User> of(final @NonNull String name) {
-        return UserArgument.<C>newBuilder(name).asRequired().build();
+        return UserArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -99,7 +116,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @return Argument instance
      */
     public static <C> @NonNull CommandArgument<C, User> optional(final @NonNull String name) {
-        return UserArgument.<C>newBuilder(name).asOptional().build();
+        return UserArgument.<C>builder(name).asOptional().build();
     }
 
 

@@ -57,7 +57,7 @@ public final class ExamplePlugin extends Plugin {
     @Override
     public void onEnable() {
         final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-                AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
+                AsynchronousCommandExecutionCoordinator.<CommandSender>builder().build();
 
         final Function<CommandSender, CommandSender> mapperFunction = Function.identity();
 

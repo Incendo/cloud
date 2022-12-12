@@ -124,7 +124,7 @@ public final class ExamplePlugin extends JavaPlugin {
         // asynchronously
         //
         final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
-                AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
+                AsynchronousCommandExecutionCoordinator.<CommandSender>builder().build();
         //
         // However, in many cases it is fine for to run everything synchronously:
         //
