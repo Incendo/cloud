@@ -777,7 +777,7 @@ public final class AnnotationParser<C> {
             argumentBuilder.withSuggestionsProvider((commandContext, input) -> suggestions);
         } else if (!argument.suggestions().isEmpty()) { /* Check whether or not a suggestion provider should be set */
             final String suggestionProviderName = this.processString(argument.suggestions());
-            final Optional<BiFunction<CommandContext<C>, String, List<String>>> suggestionsFunction =
+            final Optional<BiFunction<CommandContext<C>, String, List<Suggestion>>> suggestionsFunction =
                     this.manager.parserRegistry().getFullSuggestionProvider(suggestionProviderName);
             argumentBuilder.withFullSuggestionsProvider(
                     suggestionsFunction.orElseThrow(() ->

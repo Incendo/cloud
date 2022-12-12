@@ -716,14 +716,14 @@ public final class CommandTree<C> {
         return string;
     }
 
-    private @NonNull List<@NonNull String> directSuggestions(
+    private @NonNull List<@NonNull Suggestion> directSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Node<@NonNull CommandArgument<C, ?>> current,
             final @NonNull String text) {
         CommandArgument<C, ?> argument = Objects.requireNonNull(current.getValue());
 
         commandContext.setCurrentArgument(argument);
-        List<String> suggestions = argument.getSuggestionsProvider().apply(commandContext, text);
+        List<Suggestion> suggestions = argument.getFullSuggestionsProvider().apply(commandContext, text);
 
         // When suggesting a flag, potentially suggest following nodes too
         if (argument instanceof FlagArgument
@@ -734,7 +734,7 @@ public final class CommandTree<C> {
             for (final Node<CommandArgument<C, ?>> child : current.getChildren()) {
                 argument = Objects.requireNonNull(child.getValue());
                 commandContext.setCurrentArgument(argument);
-                suggestions.addAll(argument.getSuggestionsProvider().apply(commandContext, text));
+                suggestions.addAll(argument.getFullSuggestionsProvider().apply(commandContext, text));
             }
         }
 
