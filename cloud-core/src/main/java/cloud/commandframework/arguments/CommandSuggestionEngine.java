@@ -26,7 +26,6 @@ package cloud.commandframework.arguments;
 import cloud.commandframework.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -62,8 +61,6 @@ public interface CommandSuggestionEngine<C> {
             @NonNull CommandContext<C> context,
             @NonNull String input
     ) {
-        return this.getSuggestions(context, input).stream()
-                .map(Suggestion::new)
-                .collect(Collectors.toList());
+        return Suggestion.of(this.getSuggestions(context, input));
     }
 }

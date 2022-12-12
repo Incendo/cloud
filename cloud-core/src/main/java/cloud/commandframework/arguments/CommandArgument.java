@@ -331,8 +331,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                 name,
                 parser,
                 defaultValue,
-                suggestionsProvider == null ? null
-                        : suggestionsProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList())),
+                suggestionsProvider == null ? null : suggestionsProvider.andThen(Suggestion::of),
                 valueType,
                 defaultDescription,
                 argumentPreprocessors
@@ -845,7 +844,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
                         @NonNull String, @NonNull List<String>> suggestionsProvider
         ) {
-            this.suggestionsProvider = suggestionsProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList()));
+            this.suggestionsProvider = suggestionsProvider.andThen(Suggestion::of);
             return this;
         }
         /**

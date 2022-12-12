@@ -280,8 +280,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final @NonNull String name,
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
     ) {
-        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH),
-                suggestionsProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList())));
+        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider.andThen(Suggestion::of));
     }
 
     @Override
@@ -290,11 +289,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     ) {
         final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> suggestionProvider =
                 this.namedSuggestionProviders.get(name.toLowerCase(Locale.ENGLISH));
-        if (suggestionProvider == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(suggestionProvider.andThen(l -> l.stream().map(Suggestion::suggestion).collect(Collectors.toList())));
-        }
+        return suggestionProvider == null ? Optional.empty() : Optional.of(suggestionProvider.andThen(Suggestion::raw));
     }
     @Override
     public void registerFullSuggestionProvider(

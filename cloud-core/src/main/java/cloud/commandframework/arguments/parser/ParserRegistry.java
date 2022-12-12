@@ -167,10 +167,7 @@ public interface ParserRegistry<C> {
             @NonNull String name,
             @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> provider
     ) {
-        this.registerSuggestionProvider(
-                name,
-                provider.andThen(l -> l.stream().map(Suggestion::suggestion).collect(Collectors.toList()))
-        );
+        this.registerSuggestionProvider(name, provider.andThen(Suggestion::raw));
     }
 
     /**
@@ -189,10 +186,6 @@ public interface ParserRegistry<C> {
     ) {
         final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionProvider =
                 this.getSuggestionProvider(name).orElse(null);
-        if (suggestionProvider == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(suggestionProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList())));
-        }
+        return suggestionProvider == null ? Optional.empty() : Optional.of(suggestionProvider.andThen(Suggestion::of));
     }
 }

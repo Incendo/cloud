@@ -626,9 +626,10 @@ public final class ExamplePlugin extends JavaPlugin {
             String input
     ) {
         return Arrays.asList(
-                new Suggestion("spawn", "Teleports to the spawn of the world"),
-                new Suggestion("respawn", "Teleports to the place where you'll respawn"),
-                new Suggestion("look", "Teleports to the place where you look")
+                //TODO use paper suggestions
+//                new Suggestion("spawn", "Teleports to the spawn of the world"),
+//                new Suggestion("respawn", "Teleports to the place where you'll respawn"),
+//                new Suggestion("look", "Teleports to the place where you look")
         );
     }
 

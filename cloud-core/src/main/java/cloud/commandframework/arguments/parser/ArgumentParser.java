@@ -108,7 +108,7 @@ public interface ArgumentParser<C, T> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return this.suggestions(commandContext, input).stream().map(Suggestion::new).collect(Collectors.toList());
+        return Suggestion.of(this.suggestions(commandContext, input));
     }
 
     /**

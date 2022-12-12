@@ -45,7 +45,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class DelegatingCommandSuggestionEngine<C> implements CommandSuggestionEngine<C> {
 
-    private static final List<Suggestion> SINGLE_EMPTY_SUGGESTION = Collections.singletonList(new Suggestion(""));
+    private static final List<Suggestion> SINGLE_EMPTY_SUGGESTION = Collections.singletonList(Suggestion.of(""));
 
     private final CommandManager<C> commandManager;
     private final CommandTree<C> commandTree;

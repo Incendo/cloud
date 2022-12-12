@@ -57,9 +57,6 @@ public interface CommandSuggestionProcessor<C> extends
      * @return a {@link CommandFullSuggestionProcessor} analog
      */
     default CommandFullSuggestionProcessor<C> toFull() {
-        return(c, s) -> this.apply(c, s.stream().map(Suggestion::suggestion).collect(Collectors.toList()))
-                    .stream()
-                    .map(Suggestion::new)
-                    .collect(Collectors.toList());
+        return(c, s) -> Suggestion.of(this.apply(c, Suggestion.raw(s)));
     }
 }

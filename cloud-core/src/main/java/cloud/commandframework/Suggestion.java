@@ -23,50 +23,98 @@
 //
 package cloud.commandframework;
 
-import java.util.Objects;
+import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.reflection.qual.NewInstance;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
  * A class containing information about suggestions
  */
-public final class Suggestion {
-    private final @NonNull String suggestion;
-    private final @Nullable String description;
-
+public interface Suggestion {
 
     /**
-     * A simple constructor providing only basic information
-     * @param suggestion the suggestion itself
+     * Creates a simple representation of the suggestion
+     * @param suggestion The suggestion itself.
+     * @return An instance of suggestion representing this string.
      */
-    public Suggestion(@NonNull final String suggestion) {
-        this(suggestion, null);
+    static Suggestion of(String suggestion) {
+        return new SimpleSuggestion(suggestion);
     }
-
     /**
-     * A constructor providing additional description to the suggestion
-     * @param suggestion the suggestion itself
-     * @param description the description of the suggestion
+     * Wraps multiple raw suggestions into a simple representation of the suggestion
+     * @param suggestions The suggestions
+     * @return A list with the instances of suggestions representing those raw suggestions.
      */
-    public Suggestion(@NonNull final String suggestion, @Nullable final String description) {
-        this.suggestion = Objects.requireNonNull(suggestion, "The suggestion shouldn't be null");
-        this.description = description;
+    static List<Suggestion> of(Iterable<String> suggestions) {
+        List<Suggestion> suggestion = new LinkedList<>();
+        for (String raw: suggestions){
+            suggestion.add(new SimpleSuggestion(raw));
+        }
+        return suggestion;
+    }
+    /**
+     * Wraps multiple raw suggestions into a simple representation of the suggestion
+     * @param suggestions The suggestions
+     * @return A list with the instances of suggestions representing those raw suggestions.
+     */
+    static List<String> raw(Iterable<Suggestion> suggestions) {
+        List<String> raw = new LinkedList<>();
+        for (Suggestion suggestion: suggestions){
+            raw.add(suggestion.suggestion());
+        }
+        return raw;
     }
 
     /**
      * Returns the description of the suggestion.
+     * <p>
+     * Check platform specific implementation which support this
      * @return the description of the suggestion.
      */
-    public @Nullable String description() {
-        return this.description;
-    }
+    @Nullable String description();
 
     /**
      * Returns the suggestion itself.
      * @return the suggestion itself.
      */
-    public @NonNull String suggestion() {
-        return this.suggestion;
+    @NonNull String suggestion();
+
+    /**
+     * Creates a new suggestion with given raw suggestion
+     * @param suggestion new suggestion
+     * @return a new instance with this suggestion
+     */
+    @NonNull Suggestion withSuggestion(@NonNull String suggestion);
+
+    /**
+     * SimpleSuggestion is a suggestion that wraps around a string suggestion and has no description
+     */
+    final class SimpleSuggestion implements Suggestion {
+
+        private final String suggestion;
+
+        private SimpleSuggestion(final String suggestion) {
+            this.suggestion = suggestion;
+        }
+
+        @Override
+        public @Nullable String description() {
+            return null;
+        }
+
+        @Override
+        public @NonNull String suggestion() {
+            return this.suggestion;
+        }
+
+        @Override
+        public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
+            return new SimpleSuggestion(suggestion);
+        }
     }
 }

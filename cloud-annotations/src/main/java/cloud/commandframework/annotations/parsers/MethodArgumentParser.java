@@ -62,7 +62,7 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
             final @NonNull Object instance,
             final @NonNull Method method
     ) throws Exception {
-        this.suggestionProvider = suggestionProvider.andThen(l -> l.stream().map(Suggestion::new).collect(Collectors.toList()));
+        this.suggestionProvider = suggestionProvider.andThen(Suggestion::of);
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
     }
     /**
@@ -102,7 +102,7 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return this.suggestionProvider.apply(commandContext, input).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        return Suggestion.raw(this.suggestionProvider.apply(commandContext, input));
     }
 
     @Override
