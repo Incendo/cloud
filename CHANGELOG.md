@@ -7,7 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Core: Added `CommandBuilderApplicable` and `Command.Builder#apply(CommandBuilderApplicable)` ([#409](https://github.com/Incendo/cloud/pull/409))
 - Core: Expose failure reason when flag parsing fails ([#380](https://github.com/Incendo/cloud/pull/380))
+- Core: Allow registering injectors to `ParameterInjectorRegistry` using a class predicate instead of just a class ([#402](https://github.com/Incendo/cloud/pull/402))
+- Core: Experimental option to allow flags to be parsed and suggested anywhere after the last literal in a command chain ([#395](https://github.com/Incendo/cloud/pull/395))
+- Core: New `Filter` interface used by `FilteringCommandSuggestionProcessor`, allowing custom filter behavior ([#410](https://github.com/Incendo/cloud/pull/410))
+- Core: Helper to get the root index help topic ([#415](https://github.com/Incendo/cloud/pull/415))
+- Bukkit/Paper: Full support for Minecraft 1.19.3 ([#412](https://github.com/Incendo/cloud/pull/412))
+
+### Fixed
+- Core: Greedy arguments are now able to suggest after a space in the input, and will receive the full concatenated input 
+  instead of just the queue head ([#414](https://github.com/Incendo/cloud/pull/414))
+- Core: Fixed invalid suggestions when parsing of argument fails ([#401](https://github.com/Incendo/cloud/pull/401))
+- Core: Fixed commands not being removed from command collection on unregister ([#408](https://github.com/Incendo/cloud/pull/408))
+- Annotations: Fix argument annotation name not being processed ([#397](https://github.com/Incendo/cloud/pull/397))
+- Brigadier: Further fixes for suggestions on old versions of Minecraft
+- Brigadier: Fixed handling of `GREEDY_FLAG_YIELDING` string arguments
+- Minecraft-Extras: Fixed wrong color codes in TextColorArgument ([#407](https://github.com/Incendo/cloud/pull/407))
+- Minecraft-Extras: Removed double space when paginating with a blank help query
+- Javacord: Fixed regex issue with certain prefixes ([#400](https://github.com/Incendo/cloud/pull/400))
+
+### Changed
+- Deprecated `newBuilder` argument builder static factories, added `builder` factories to align with conventions for new 
+  arguments ([#419](https://github.com/Incendo/cloud/pull/419))
+- Core: Improve nullability annotations on generics in `CommandContext` ([#405](https://github.com/Incendo/cloud/pull/405))
+- Core: Made injection order of `ParameterInjectorRegistry` consistent ([#402](https://github.com/Incendo/cloud/pull/402))
+- Bukkit/Paper: Rewrite Bukkit entity selector arguments using `WrappedBrigadierParser` instead of Bukkit API
+- Fabric: Updated for Minecraft 1.19.3, dropping support for previous versions ([#411](https://github.com/Incendo/cloud/pull/411))
+- Core: Default suggestion processor ignores case when checking starts with ([#410](https://github.com/Incendo/cloud/pull/410))
+- Minecraft: Default suggestion processor now removes the part of a suggestion which is before the last user typed space in 
+  the input, allowing for full sentence suggestions more easily, especially combined with other fixes in this update ([#410](https://github.com/Incendo/cloud/pull/410))
 
 ## [1.7.1]
 
