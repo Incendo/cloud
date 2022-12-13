@@ -28,13 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Javacord: Fixed regex issue with certain prefixes ([#400](https://github.com/Incendo/cloud/pull/400))
 
 ### Changed
+- Default suggestion processor ignores case when checking starts with ([#410](https://github.com/Incendo/cloud/pull/410))
 - Deprecated `newBuilder` argument builder static factories, added `builder` factories to align with conventions for new 
   arguments ([#419](https://github.com/Incendo/cloud/pull/419))
 - Core: Improve nullability annotations on generics in `CommandContext` ([#405](https://github.com/Incendo/cloud/pull/405))
 - Core: Made injection order of `ParameterInjectorRegistry` consistent ([#402](https://github.com/Incendo/cloud/pull/402))
 - Bukkit/Paper: Rewrite Bukkit entity selector arguments using `WrappedBrigadierParser` instead of Bukkit API
 - Fabric: Updated for Minecraft 1.19.3, dropping support for previous versions ([#411](https://github.com/Incendo/cloud/pull/411))
-- Core: Default suggestion processor ignores case when checking starts with ([#410](https://github.com/Incendo/cloud/pull/410))
 - Minecraft: Default suggestion processor now removes the part of a suggestion which is before the last user typed space in 
   the input, allowing for full sentence suggestions more easily, especially combined with other fixes in this update ([#410](https://github.com/Incendo/cloud/pull/410))
 
