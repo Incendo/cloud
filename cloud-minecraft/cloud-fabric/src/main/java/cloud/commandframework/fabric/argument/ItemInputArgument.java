@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
@@ -47,7 +48,7 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -55,8 +56,8 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
                 name,
                 FabricArgumentParsers.contextual(ItemArgument::item),
                 defaultValue,
-                ItemInput.class,
                 suggestionsProvider,
+                ItemInput.class,
                 defaultDescription
         );
     }
@@ -134,7 +135,7 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

@@ -169,8 +169,8 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 stringMode = StringArgument.StringMode.SINGLE;
             }
             return new StringArgument.StringParser<>(
-                    stringMode,
-                    (context, s) -> Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))
+                    (context, s) -> Suggestion.of(Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))),
+                    stringMode
             );
         });
         this.registerParserSupplier(TypeToken.get(Boolean.class), options -> {

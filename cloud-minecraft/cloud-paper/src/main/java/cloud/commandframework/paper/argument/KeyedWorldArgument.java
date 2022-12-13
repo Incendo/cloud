@@ -24,6 +24,7 @@
 package cloud.commandframework.paper.argument;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -56,10 +57,10 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new Parser<>(), defaultValue, World.class, suggestionsProvider, defaultDescription);
+        super(required, name, new Parser<>(), defaultValue, suggestionsProvider, World.class, defaultDescription);
     }
 
     /**
@@ -150,7 +151,7 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

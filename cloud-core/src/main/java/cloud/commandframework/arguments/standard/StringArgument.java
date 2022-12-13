@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -35,6 +36,7 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
@@ -59,11 +61,11 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             final @NonNull StringMode stringMode,
             final @NonNull String defaultValue,
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new StringParser<>(stringMode, suggestionsProvider),
-                defaultValue, String.class, suggestionsProvider, defaultDescription
+        super(required, name, new StringParser<>(suggestionsProvider, stringMode),
+                defaultValue, suggestionsProvider, String.class, defaultDescription
         );
         this.stringMode = stringMode;
     }
@@ -237,10 +239,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     public static final class Builder<C> extends CommandArgument.Builder<C, String> {
 
         private StringMode stringMode = StringMode.SINGLE;
-        private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
 
         private Builder(final @NonNull String name) {
             super(String.class, name);
+            withFullSuggestionsProvider((v1, v2) -> Collections.emptyList());
         }
 
         /**
@@ -296,20 +298,13 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             return this;
         }
 
-//        /**
-//         * Set the suggestions provider
-//         *
-//         * @param suggestionsProvider Suggestions provider
-//         * @return Builder instance
-//         */
-//        @Override
-//        public @NonNull @This Builder<C> withSuggestionsProvider(
-//                final @NonNull BiFunction<@NonNull CommandContext<C>,
-//                        @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
-//        ) {
-//            this.suggestionsProvider = suggestionsProvider;
-//            return this;
-//        }
+        @Override
+        public @This Builder<@NonNull C> withSuggestionsProvider(
+                final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
+        ) {
+            super.withSuggestionsProvider(suggestionsProvider);
+            return this;
+        }
 
         /**
          * Builder a new string argument
@@ -318,8 +313,13 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          */
         @Override
         public @NonNull StringArgument<C> build() {
-            return new StringArgument<>(this.isRequired(), this.getName(), this.stringMode,
-                    this.getDefaultValue(), this.suggestionsProvider, this.getDefaultDescription()
+            return new StringArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.stringMode,
+                    this.getDefaultValue(),
+                    Objects.requireNonNull(this.getFullSuggestionsProvider(), "Suggestion provider was replaced by null"),
+                    this.getDefaultDescription()
             );
         }
     }
@@ -332,8 +332,24 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
 
         private final StringMode stringMode;
-        private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
+        private final BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider;
 
+        /**
+         * Construct a new string parser
+         *
+         * @param stringMode          String parsing mode
+         * @param suggestionsProvider Suggestions provider
+         * @deprecated Possible losing the suggestion additional data
+         */
+        @Deprecated
+        public StringParser(
+                final @NonNull StringMode stringMode,
+                final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                        @NonNull List<@NonNull String>> suggestionsProvider
+        ) {
+            this.stringMode = stringMode;
+            this.suggestionsProvider = suggestionsProvider.andThen(Suggestion::of);
+        }
         /**
          * Construct a new string parser
          *
@@ -341,9 +357,9 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @param suggestionsProvider Suggestions provider
          */
         public StringParser(
-                final @NonNull StringMode stringMode,
                 final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                        @NonNull List<@NonNull String>> suggestionsProvider
+                        @NonNull List<@NonNull Suggestion>> suggestionsProvider,
+                final @NonNull StringMode stringMode
         ) {
             this.stringMode = stringMode;
             this.suggestionsProvider = suggestionsProvider;
@@ -461,6 +477,14 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
         @Override
         public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return Suggestion.raw(this.suggestionsProvider.apply(commandContext, input));
+        }
+
+        @Override
+        public @NonNull List<@NonNull Suggestion> fullSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

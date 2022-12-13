@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -53,10 +54,10 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
             final short max,
             final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<String>> suggestionsProvider,
+                    @NonNull List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new ShortParser<>(min, max), defaultValue, Short.class, suggestionsProvider, defaultDescription);
+        super(required, name, new ShortParser<>(min, max), defaultValue, suggestionsProvider, Short.class, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -189,7 +190,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         @Override
         public @NonNull ShortArgument<C> build() {
             return new ShortArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+                    this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
             );
         }
     }

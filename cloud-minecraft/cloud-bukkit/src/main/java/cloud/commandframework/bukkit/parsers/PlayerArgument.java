@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -57,10 +58,10 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new PlayerParser<>(), defaultValue, Player.class, suggestionsProvider, defaultDescription);
+        super(required, name, new PlayerParser<>(), defaultValue, suggestionsProvider, Player.class, defaultDescription);
     }
 
     /**
@@ -145,7 +146,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

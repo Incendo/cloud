@@ -24,6 +24,7 @@
 package cloud.commandframework.jda.parsers;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -61,7 +62,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull String, @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes,
             final @NonNull Isolation isolationLevel
@@ -71,8 +72,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 name,
                 new UserParser<>(modes, isolationLevel),
                 defaultValue,
-                User.class,
                 suggestionsProvider,
+                User.class,
                 defaultDescription
         );
         this.modes = modes;
@@ -203,7 +204,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription(),
                     this.modes,
                     this.isolationLevel

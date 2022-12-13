@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
@@ -56,11 +57,11 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new MultiplePlayerSelectorParser<>(allowEmpty), defaultValue, MultiplePlayerSelector.class,
-                suggestionsProvider, defaultDescription
+        super(required, name, new MultiplePlayerSelectorParser<>(allowEmpty), defaultValue,
+                suggestionsProvider, MultiplePlayerSelector.class, defaultDescription
         );
     }
 
@@ -162,7 +163,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

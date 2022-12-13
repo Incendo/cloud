@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.argument.server;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
@@ -48,7 +49,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final boolean centerIntegers
     ) {
@@ -57,8 +58,8 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
                 name,
                 FabricArgumentParsers.vec3(centerIntegers),
                 defaultValue,
-                Coordinates.class,
                 suggestionsProvider,
+                Coordinates.class,
                 defaultDescription
         );
         this.centerIntegers = centerIntegers;
@@ -232,7 +233,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription(),
                     this.centerIntegers()
             );

@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
@@ -47,7 +48,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -55,8 +56,8 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
                 name,
                 new WrappedBrigadierParser<>(RangeArgument.intRange()),
                 defaultValue,
-                MinMaxBounds.Ints.class,
                 suggestionsProvider,
+                MinMaxBounds.Ints.class,
                 defaultDescription
         );
     }
@@ -138,7 +139,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

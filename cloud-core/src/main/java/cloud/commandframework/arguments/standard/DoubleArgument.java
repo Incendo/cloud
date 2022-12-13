@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -53,10 +54,10 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             final double max,
             final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class, suggestionsProvider, defaultDescription);
+        super(required, name, new DoubleParser<>(min, max), defaultValue, suggestionsProvider, Double.class, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -197,7 +198,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         @Override
         public @NonNull DoubleArgument<C> build() {
             return new DoubleArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+                    this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
             );
         }
     }

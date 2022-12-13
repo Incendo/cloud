@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.context.CommandContext;
@@ -50,11 +51,11 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(required, name, new MultipleEntitySelectorParser<>(allowEmpty), defaultValue,
-                MultipleEntitySelector.class, suggestionsProvider, defaultDescription
+                suggestionsProvider, MultipleEntitySelector.class, defaultDescription
         );
     }
 
@@ -156,7 +157,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers.location;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -60,7 +61,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @NonNull ArgumentDescription defaultDescription,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>,
                     @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
@@ -69,8 +70,8 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
                 name,
                 new Location2DParser<>(),
                 defaultValue,
-                TypeToken.get(Location2D.class),
                 suggestionsProvider,
+                TypeToken.get(Location2D.class),
                 defaultDescription,
                 argumentPreprocessors
         );
@@ -148,7 +149,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
                     this.getName(),
                     this.getDefaultValue(),
                     this.getDefaultDescription(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     new LinkedList<>()
             );
         }

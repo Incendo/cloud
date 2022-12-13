@@ -24,6 +24,7 @@
 package cloud.commandframework.pircbotx.arguments;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -56,7 +57,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull String, @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -64,8 +65,8 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 name,
                 new UserArgumentParser<>(),
                 defaultValue,
-                TypeToken.get(User.class),
                 suggestionsProvider,
+                TypeToken.get(User.class),
                 defaultDescription
         );
     }
@@ -137,7 +138,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

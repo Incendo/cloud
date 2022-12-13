@@ -24,6 +24,7 @@
 package cloud.commandframework.jda.parsers;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -57,7 +58,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull String, @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
@@ -66,8 +67,8 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 name,
                 new MessageParser<>(modes),
                 defaultValue,
-                MessageChannel.class,
                 suggestionsProvider,
+                MessageChannel.class,
                 defaultDescription
         );
         this.modes = modes;
@@ -169,7 +170,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription(),
                     this.modes
             );

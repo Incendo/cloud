@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -61,7 +62,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -69,8 +70,8 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
                 name,
                 new OfflinePlayerParser<>(),
                 defaultValue,
-                OfflinePlayer.class,
                 suggestionsProvider,
+                OfflinePlayer.class,
                 defaultDescription
         );
     }
@@ -154,7 +155,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
         @Override
         public @NonNull OfflinePlayerArgument<C> build() {
             return new OfflinePlayerArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                    this.getSuggestionsProvider(), this.getDefaultDescription()
+                    this.getFullSuggestionsProvider(), this.getDefaultDescription()
             );
         }
     }

@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
@@ -44,7 +45,7 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -52,8 +53,8 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
                 name,
                 new WrappedBrigadierParser<>(net.minecraft.commands.arguments.AngleArgument.angle()),
                 defaultValue,
-                net.minecraft.commands.arguments.AngleArgument.SingleAngle.class,
                 suggestionsProvider,
+                net.minecraft.commands.arguments.AngleArgument.SingleAngle.class,
                 defaultDescription
         );
     }
@@ -136,7 +137,7 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

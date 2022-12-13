@@ -46,8 +46,8 @@ class StringParserTest {
     void Parse_GreedyFlagAwareLongFormFlag_EndsAfterFlag() {
         // Arrange
         final StringArgument.StringParser<TestCommandSender> parser = new StringArgument.StringParser<>(
-                StringArgument.StringMode.GREEDY_FLAG_YIELDING,
-                (context, input) -> Collections.emptyList()
+                (context, input) -> Collections.emptyList(),
+                StringArgument.StringMode.GREEDY_FLAG_YIELDING
         );
         final LinkedList<String> input = ArgumentTestHelper.linkedListOf(
                 "this",
@@ -77,8 +77,8 @@ class StringParserTest {
     void Parse_GreedyFlagAwareShortFormFlag_EndsAfterFlag() {
         // Arrange
         final StringArgument.StringParser<TestCommandSender> parser = new StringArgument.StringParser<>(
-                StringArgument.StringMode.GREEDY_FLAG_YIELDING,
-                (context, input) -> Collections.emptyList()
+                (context, input) -> Collections.emptyList(),
+                StringArgument.StringMode.GREEDY_FLAG_YIELDING
         );
         final LinkedList<String> input = ArgumentTestHelper.linkedListOf(
                 "this",

@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -66,7 +67,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -74,8 +75,8 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                 name,
                 new Parser<>(),
                 defaultValue,
-                Duration.class,
                 suggestionsProvider,
+                Duration.class,
                 defaultDescription
         );
     }
@@ -186,7 +187,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

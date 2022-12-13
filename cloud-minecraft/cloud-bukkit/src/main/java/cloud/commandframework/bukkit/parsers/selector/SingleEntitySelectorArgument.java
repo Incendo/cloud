@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.context.CommandContext;
@@ -49,7 +50,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -57,8 +58,8 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
                 name,
                 new SingleEntitySelectorParser<>(),
                 defaultValue,
-                SingleEntitySelector.class,
                 suggestionsProvider,
+                SingleEntitySelector.class,
                 defaultDescription
         );
     }
@@ -145,7 +146,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

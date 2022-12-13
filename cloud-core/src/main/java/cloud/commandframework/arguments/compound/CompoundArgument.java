@@ -77,8 +77,8 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
                 name,
                 new CompoundParser<>(parserTuple, mapper, tupleFactory),
                 "",
-                valueType,
-                null
+                null,
+                valueType
         );
         this.parserTuple = parserTuple;
         this.names = names;

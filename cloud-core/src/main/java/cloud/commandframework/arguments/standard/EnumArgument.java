@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -52,6 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE)
 public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
+    @Deprecated
     protected EnumArgument(
             final @NonNull Class<E> enumClass,
             final boolean required,
@@ -62,6 +64,17 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass, suggestionsProvider, defaultDescription);
+    }
+    protected EnumArgument(
+            final @NonNull Class<E> enumClass,
+            final boolean required,
+            final @NonNull String name,
+            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
+            final @NonNull String defaultValue,
+            final @NonNull ArgumentDescription defaultDescription
+    ) {
+        super(required, name, new EnumParser<>(enumClass), defaultValue, suggestionsProvider, enumClass, defaultDescription);
     }
 
     /**
@@ -165,7 +178,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         @Override
         public @NonNull CommandArgument<C, E> build() {
             return new EnumArgument<>(this.enumClass, this.isRequired(), this.getName(),
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+                    this.getFullSuggestionsProvider(), this.getDefaultValue(), this.getDefaultDescription()
             );
         }
     }

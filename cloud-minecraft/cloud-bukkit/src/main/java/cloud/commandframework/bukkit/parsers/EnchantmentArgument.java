@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -54,7 +55,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -62,8 +63,8 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
                 name,
                 new EnchantmentParser<>(),
                 defaultValue,
-                Enchantment.class,
                 suggestionsProvider,
+                Enchantment.class,
                 defaultDescription
         );
     }
@@ -144,7 +145,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

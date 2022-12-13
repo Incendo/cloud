@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.parsers;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -71,10 +72,10 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new Parser<>(), defaultValue, ProtoItemStack.class, suggestionsProvider, defaultDescription);
+        super(required, name, new Parser<>(), defaultValue, suggestionsProvider, ProtoItemStack.class, defaultDescription);
     }
 
     /**
@@ -132,7 +133,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

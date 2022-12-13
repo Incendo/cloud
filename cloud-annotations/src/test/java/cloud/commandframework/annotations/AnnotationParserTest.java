@@ -25,6 +25,7 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.specifier.Quoted;
@@ -73,7 +74,7 @@ class AnnotationParserTest {
         manager = new TestCommandManager();
         annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
         manager.parserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
-                StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList("potato")));
+                (c, s) -> Collections.singletonList(Suggestion.of("potato")), StringArgument.StringMode.SINGLE));
         /* Register a suggestion provider */
         manager.parserRegistry().registerSuggestionProvider(
                 "some-name",

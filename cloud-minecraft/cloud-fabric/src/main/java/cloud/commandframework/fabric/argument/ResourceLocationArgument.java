@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
@@ -45,7 +46,7 @@ public final class ResourceLocationArgument<C> extends CommandArgument<C, Resour
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -53,8 +54,8 @@ public final class ResourceLocationArgument<C> extends CommandArgument<C, Resour
                 name,
                 new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ResourceLocationArgument.id()),
                 defaultValue,
-                ResourceLocation.class,
                 suggestionsProvider,
+                ResourceLocation.class,
                 defaultDescription
         );
     }
@@ -136,7 +137,7 @@ public final class ResourceLocationArgument<C> extends CommandArgument<C, Resour
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

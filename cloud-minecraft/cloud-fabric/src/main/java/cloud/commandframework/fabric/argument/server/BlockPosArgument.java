@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.argument.server;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
@@ -46,7 +47,7 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -54,8 +55,8 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
                 name,
                 FabricArgumentParsers.blockPos(),
                 defaultValue,
-                BlockCoordinates.class,
                 suggestionsProvider,
+                BlockCoordinates.class,
                 defaultDescription
         );
     }
@@ -135,7 +136,7 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

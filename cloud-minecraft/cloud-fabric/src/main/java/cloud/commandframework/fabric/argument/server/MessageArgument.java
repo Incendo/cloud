@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.argument.server;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
@@ -45,7 +46,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -53,8 +54,8 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
                 name,
                 FabricArgumentParsers.message(),
                 defaultValue,
-                Message.class,
                 suggestionsProvider,
+                Message.class,
                 defaultDescription
         );
     }
@@ -136,7 +137,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

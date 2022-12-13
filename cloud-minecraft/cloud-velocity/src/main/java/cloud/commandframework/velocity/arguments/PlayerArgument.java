@@ -24,6 +24,7 @@
 package cloud.commandframework.velocity.arguments;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -57,7 +58,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
@@ -67,8 +68,8 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
                 name,
                 new PlayerParser<>(),
                 defaultValue,
-                TypeToken.get(Player.class),
                 suggestionsProvider,
+                TypeToken.get(Player.class),
                 defaultDescription,
                 argumentPreprocessors
         );
@@ -140,7 +141,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()
             );

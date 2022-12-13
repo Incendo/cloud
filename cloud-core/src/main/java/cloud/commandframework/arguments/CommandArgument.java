@@ -858,19 +858,19 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this;
         }
 
-//        /**
-//         * Set the suggestions provider
-//         *
-//         * @param suggestionsProvider Suggestions provider
-//         * @return Builder instance
-//         */
-//        public @NonNull @This Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
-//                final @NonNull BiFunction<@NonNull CommandContext<C>,
-//                        @NonNull String, @NonNull List<String>> suggestionsProvider
-//        ) {
-//            this.suggestionsProvider = suggestionsProvider.andThen(Suggestion::of);
-//            return this;
-//        }
+        /**
+         * Set the suggestions provider
+         *
+         * @param suggestionsProvider Suggestions provider
+         * @return Builder instance
+         */
+        public @NonNull @This Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
+                final @NonNull BiFunction<@NonNull CommandContext<C>,
+                        @NonNull String, @NonNull List<String>> suggestionsProvider
+        ) {
+            this.suggestionsProvider = suggestionsProvider.andThen(Suggestion::of);
+            return this;
+        }
         /**
          * Set the suggestions provider
          *
@@ -946,12 +946,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this.defaultValue;
         }
 
+        @Deprecated
         protected final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>
         getSuggestionsProvider() {
-            return this.suggestionsProvider == null ? null : this.suggestionsProvider.andThen(l -> l
-                    .stream()
-                    .map(Suggestion::suggestion)
-                    .collect(Collectors.toList()));
+            return this.suggestionsProvider == null ? null : this.suggestionsProvider.andThen(Suggestion::raw);
         }
         protected final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>>
         getFullSuggestionsProvider() {

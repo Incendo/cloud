@@ -24,6 +24,7 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -57,7 +58,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final boolean requireExplicitNamespace,
             final String defaultNamespace
@@ -67,8 +68,8 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                 name,
                 new Parser<>(requireExplicitNamespace, defaultNamespace),
                 defaultValue,
-                NamespacedKey.class,
                 suggestionsProvider,
+                NamespacedKey.class,
                 defaultDescription
         );
     }
@@ -193,7 +194,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription(),
                     this.requireExplicitNamespace,
                     this.defaultNamespace

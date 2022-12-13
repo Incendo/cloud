@@ -24,6 +24,7 @@
 package cloud.commandframework.jda.parsers;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -56,11 +57,11 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull String, @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
-        super(required, name, new RoleParser<>(modes), defaultValue, Role.class, suggestionsProvider, defaultDescription);
+        super(required, name, new RoleParser<>(modes), defaultValue, suggestionsProvider, Role.class, defaultDescription);
         this.modes = modes;
     }
 
@@ -160,7 +161,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription(),
                     this.modes
             );

@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
@@ -44,7 +45,7 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
             final boolean required,
             final @NonNull String name,
             final @NonNull String defaultValue,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -52,8 +53,8 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
                 name,
                 FabricArgumentParsers.contextual(net.minecraft.commands.arguments.ParticleArgument::particle),
                 defaultValue,
-                ParticleOptions.class,
                 suggestionsProvider,
+                ParticleOptions.class,
                 defaultDescription
         );
     }
@@ -135,7 +136,7 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getSuggestionsProvider(),
+                    this.getFullSuggestionsProvider(),
                     this.getDefaultDescription()
             );
         }

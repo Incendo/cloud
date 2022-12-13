@@ -90,8 +90,8 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
                 name,
                 new TextColorParser<>(),
                 defaultValue,
-                TypeToken.get(TextColor.class),
                 null,
+                TypeToken.get(TextColor.class),
                 new LinkedList<>()
         );
     }

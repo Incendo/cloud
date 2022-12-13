@@ -24,6 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.Suggestion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -60,7 +61,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
             final int max,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
@@ -68,8 +69,8 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
                 name,
                 new IntegerParser<>(min, max),
                 defaultValue,
-                Integer.class,
                 suggestionsProvider,
+                Integer.class,
                 defaultDescription
         );
         this.min = min;
@@ -204,7 +205,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         @Override
         public @NonNull IntegerArgument<C> build() {
             return new IntegerArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+                    this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
             );
         }
     }
