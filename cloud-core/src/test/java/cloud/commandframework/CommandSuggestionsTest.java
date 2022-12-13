@@ -519,7 +519,7 @@ public class CommandSuggestionsTest {
         manager.command(
                 manager.commandBuilder("command")
                         .argument(
-                                StringArgument.<TestCommandSender>newBuilder("string")
+                                StringArgument.<TestCommandSender>builder("string")
                                         .greedy()
                                         .withSuggestionsProvider((context, input) -> Collections.singletonList("hello world"))
                                         .build())
