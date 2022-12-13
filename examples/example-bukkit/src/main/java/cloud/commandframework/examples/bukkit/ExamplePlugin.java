@@ -25,6 +25,7 @@ package cloud.commandframework.examples.bukkit;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
@@ -56,6 +57,7 @@ import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
+import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
@@ -79,6 +81,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -149,6 +152,12 @@ public final class ExamplePlugin extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        // Use contains to filter suggestions instead of default startsWith
+        this.manager.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
+                FilteringCommandSuggestionProcessor.Filter.<CommandSender>contains(true).andTrimBeforeLastSpace()
+        ));
+
         //
         // Create a BukkitAudiences instance (adventure) in order to use the minecraft-extras
         // help system
@@ -483,11 +492,21 @@ public final class ExamplePlugin extends JavaPlugin {
                 }));
     }
 
+    @Suggestions("help_queries")
+    public @NonNull List<String> suggestHelpQueries(
+            final @NonNull CommandContext<CommandSender> ctx,
+            final @NonNull String input
+    ) {
+        return this.manager.createCommandHelpHandler().queryRootIndex(ctx.getSender()).getEntries().stream()
+                .map(CommandHelpHandler.VerboseHelpEntry::getSyntaxString)
+                .collect(Collectors.toList());
+    }
+
     @CommandMethod("example|e|ex help [query]")
     @CommandDescription("Help menu")
     public void commandHelp(
             final @NonNull CommandSender sender,
-            final @Argument("query") @Greedy String query
+            final @Argument(value = "query", suggestions = "help_queries") @Greedy String query
     ) {
         this.minecraftHelp.queryCommands(query == null ? "" : query, sender);
     }

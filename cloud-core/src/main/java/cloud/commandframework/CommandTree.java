@@ -629,15 +629,16 @@ public final class CommandTree<C> {
 
         if (commandQueue.isEmpty()) {
             return Collections.emptyList();
-        } else if (child.isLeaf() && commandQueue.size() < 2) {
-            return this.directSuggestions(commandContext, child, commandQueue.peek());
         } else if (child.isLeaf()) {
-            if (child.getValue() instanceof CompoundArgument) {
-                final String last = ((LinkedList<String>) commandQueue).getLast();
-                commandContext.setCurrentArgument(child.getValue());
-                return child.getValue().getSuggestionsProvider().apply(commandContext, last);
+            final String input;
+            if (commandQueue.size() == 1) {
+                input = commandQueue.peek();
+            } else {
+                input = child.getValue() instanceof CompoundArgument
+                        ? ((LinkedList<String>) commandQueue).getLast()
+                        : String.join(" ", commandQueue);
             }
-            return Collections.emptyList();
+            return this.directSuggestions(commandContext, child, input);
         } else if (commandQueue.peek().isEmpty()) {
             return this.directSuggestions(commandContext, child, commandQueue.peek());
         }
