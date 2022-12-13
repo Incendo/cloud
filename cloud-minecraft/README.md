@@ -24,14 +24,14 @@ mappings will be available.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-bukkit</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-bukkit:1.8.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-bukkit:1.8.0'
 }
 ```
 
@@ -93,14 +93,14 @@ mappings are available even without commodore present.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-paper</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-paper:1.8.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-paper:1.8.0'
 }
 ```
 
@@ -118,14 +118,14 @@ BungeeCord mappings for cloud.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-bungee</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-bungee:1.8.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-bungee:1.8.0'
 }
 ```
 
@@ -150,14 +150,14 @@ cloud mappings for Velocity 1.1.0.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-velocity</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-velocity:1.8.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-velocity:1.8.0'
 }
 ```
 
@@ -181,14 +181,14 @@ cloud mappings for CloudBurst 1.0.0-SNAPSHOT.
 <dependency>
     <groupId>cloud.commandframework</groupId>
     <artifactId>cloud-cloudburst</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
 **gradle**:
 ```groovy
 dependencies {
-    implementation 'cloud.commandframework:cloud-velocity:1.8.0-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-velocity:1.8.0'
 }
 ```
 
@@ -205,14 +205,19 @@ the generic type and pass `Function.identity()` as the forward and backward mapp
 
 ## cloud-fabric
 
-cloud mappings for the Fabric mod loader for Minecraft 1.16+
+cloud mappings for the Fabric mod loader for Minecraft 1.19.3+
+
+### old versions of Minecraft
+
+For Minecraft 1.16-1.18.2, use Cloud 1.6.2, for 1.19-1.19.2, use Cloud 1.7.1. Keep in mind we only support
+the latest release of cloud.
 
 ### dependency
 
 **gradle**:
 ```groovy
 dependencies {
-    modImplementation 'cloud.commandframework:cloud-fabric:1.8.0-SNAPSHOT'
+    modImplementation 'cloud.commandframework:cloud-fabric:1.8.0'
 }
 ```
 
