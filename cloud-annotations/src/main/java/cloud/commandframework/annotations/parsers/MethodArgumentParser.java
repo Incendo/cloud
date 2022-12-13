@@ -33,7 +33,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

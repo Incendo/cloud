@@ -27,7 +27,6 @@ import cloud.commandframework.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -57,6 +56,6 @@ public interface CommandSuggestionProcessor<C> extends
      * @return a {@link CommandFullSuggestionProcessor} analog
      */
     default CommandFullSuggestionProcessor<C> toFull() {
-        return(c, s) -> Suggestion.of(this.apply(c, Suggestion.raw(s)));
+        return (c, s) -> Suggestion.of(this.apply(c, Suggestion.raw(s)));
     }
 }

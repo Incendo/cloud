@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ import cloud.commandframework.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**

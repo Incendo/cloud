@@ -168,7 +168,11 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param valueType             Type produced by the parser
      * @param suggestionsProvider   Suggestions provider
      * @param argumentPreprocessors Argument preprocessors
+     * @deprecated Possible lose of suggestion additional data, use see
+     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken, Collection)}
+     * for an alternative
      */
+    @Deprecated
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -200,7 +204,11 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultValue        Default value used when no value is provided by the command sender
      * @param valueType           Type produced by the parser
      * @param suggestionsProvider Suggestions provider
+     * @deprecated Possible lose of suggestion additional data, use see
+     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken)}
+     * for an alternative
      */
+    @Deprecated
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -223,7 +231,11 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param suggestionsProvider Suggestions provider
      * @param defaultDescription  Default description to use when registering
      * @since 1.4.0
+     * @deprecated Possible lose of suggestion additional data, use see
+     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken,  ArgumentDescription)}
+     * for an alternative
      */
+    @Deprecated
     @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
             final boolean required,
@@ -246,7 +258,11 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultValue        Default value used when no value is provided by the command sender
      * @param valueType           Type produced by the parser
      * @param suggestionsProvider Suggestions provider
+     * @deprecated Possible lose of suggestion additional data, use see
+     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, Class)}
+     * for an alternative
      */
+    @Deprecated
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -270,7 +286,11 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param suggestionsProvider Suggestions provider
      * @param defaultDescription  Default description to use when registering
      * @since 1.4.0
+     * @deprecated Possible lose of suggestion additional data, use see
+     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, Class,  ArgumentDescription)}
+     * for an alternative
      */
+    @Deprecated
     @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
             final boolean required,
@@ -313,7 +333,11 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultDescription    Default description to use when registering
      * @param argumentPreprocessors Argument preprocessors
      * @since 1.4.0
+     * @deprecated Possible lose of suggestion additional data, use see
+     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken,  ArgumentDescription, Collection)}
+     * for an alternative
      */
+    @Deprecated
     @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
             final boolean required,
@@ -834,19 +858,19 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this;
         }
 
-        /**
-         * Set the suggestions provider
-         *
-         * @param suggestionsProvider Suggestions provider
-         * @return Builder instance
-         */
-        public @NonNull @This Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
-                final @NonNull BiFunction<@NonNull CommandContext<C>,
-                        @NonNull String, @NonNull List<String>> suggestionsProvider
-        ) {
-            this.suggestionsProvider = suggestionsProvider.andThen(Suggestion::of);
-            return this;
-        }
+//        /**
+//         * Set the suggestions provider
+//         *
+//         * @param suggestionsProvider Suggestions provider
+//         * @return Builder instance
+//         */
+//        public @NonNull @This Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
+//                final @NonNull BiFunction<@NonNull CommandContext<C>,
+//                        @NonNull String, @NonNull List<String>> suggestionsProvider
+//        ) {
+//            this.suggestionsProvider = suggestionsProvider.andThen(Suggestion::of);
+//            return this;
+//        }
         /**
          * Set the suggestions provider
          *
@@ -1018,16 +1042,16 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this.self();
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public @NonNull Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
-                final @NonNull BiFunction<@NonNull CommandContext<C>,
-                        @NonNull String, @NonNull List<String>> suggestionsProvider
-        ) {
-            super.withSuggestionsProvider(suggestionsProvider);
-            return this.self();
-        }
+//        /**
+//         * {@inheritDoc}
+//         */
+//        @Override
+//        public @NonNull Builder<@NonNull C, @NonNull T> withSuggestionsProvider(
+//                final @NonNull BiFunction<@NonNull CommandContext<C>,
+//                        @NonNull String, @NonNull List<String>> suggestionsProvider
+//        ) {
+//            super.withSuggestionsProvider(suggestionsProvider);
+//            return this.self();
+//        }
     }
 }

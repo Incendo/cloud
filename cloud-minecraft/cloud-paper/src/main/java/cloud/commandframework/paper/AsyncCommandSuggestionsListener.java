@@ -93,7 +93,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
                     }
                 };
             }
-            suggestionApplier = (event, list) -> {
+            this.suggestionApplier = (event, list) -> {
                 List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
                 for (Suggestion suggestion : list) {
                     if (suggestion instanceof NativeSuggestion) {
@@ -108,7 +108,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
                 event.setHandled(true);
             };
         } else {
-            suggestionApplier = (event, list) -> {
+            this.suggestionApplier = (event, list) -> {
                 event.setCompletions(Suggestion.raw(list));
                 event.setHandled(true);
             };
@@ -144,6 +144,6 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
                 inputBuffer
         ));
 
-        suggestionApplier.accept(event, suggestions);
+        this.suggestionApplier.accept(event, suggestions);
     }
 }

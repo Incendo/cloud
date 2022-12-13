@@ -127,7 +127,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         this.checkBrigadierCompatibility();
         if (!this.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             super.registerBrigadier();
-            registeredCommodore = true;
+            this.registeredCommodore = true;
         } else {
             try {
                 this.paperBrigadierListener = new PaperBrigadierListener<>(this);
@@ -181,7 +181,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      * @param description the description of the suggestion
      * @return the suggestion instance that is best supported
      */
-    public Suggestion createSuggestion(@NonNull String suggestion, @NonNull String description) {
+    public Suggestion createSuggestion(@NonNull final String suggestion, @NonNull final String description) {
         if (this.registeredAsyncTooltipCompletions || this.registeredCommodore) {
             return NativeSuggestion.of(suggestion, description);
         }

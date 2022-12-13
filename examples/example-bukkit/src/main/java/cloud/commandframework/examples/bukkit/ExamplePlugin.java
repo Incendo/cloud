@@ -242,7 +242,7 @@ public final class ExamplePlugin extends JavaPlugin {
         // Make a suggestion provider that will work with internals
         // If you only use paper 1.16.5+ you may prefer PaperBrigadier from paper mojangapi
         //
-        this.suggestionProvider = getSuggestionProvider(manager.hasCapability(CloudBukkitCapabilities.BRIGADIER));
+        this.suggestionProvider = this.getSuggestionProvider(this.manager.hasCapability(CloudBukkitCapabilities.BRIGADIER));
         //
         // Create the commands
         //
@@ -250,7 +250,7 @@ public final class ExamplePlugin extends JavaPlugin {
     }
 
     @SuppressWarnings("UnstableApiUsage") // We should be careful as we will work with minecraft internals
-    private BiFunction<String, Component, Suggestion> getSuggestionProvider(boolean support) {
+    private BiFunction<String, Component, Suggestion> getSuggestionProvider(final boolean support) {
         if (support && MinecraftComponentSerializer.isSupported()) {
             return (suggstion, description) -> {
                 Object component = MinecraftComponentSerializer.get().serialize(description);
@@ -637,14 +637,17 @@ public final class ExamplePlugin extends JavaPlugin {
                     break;
                 case "spawn":
                     player.teleport(player.getWorld().getSpawnLocation());
+                    break;
+                default:
+                    player.sendMessage("Invalid warp" + warp);
             }
         });
     }
 
     @FullSuggestions("warps")
     public List<Suggestion> warps(
-            CommandContext<CommandSender> context,
-            String input
+            final CommandContext<CommandSender> context,
+            final String input
     ) {
         return Arrays.asList(
                 this.suggestionProvider.apply("spawn", Component.text("Teleports to the spawn of the world",

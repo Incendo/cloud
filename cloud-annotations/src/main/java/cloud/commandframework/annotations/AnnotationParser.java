@@ -771,10 +771,10 @@ public final class AnnotationParser<C> {
         /* Check for Completions annotation */
         final Completions completions = parameter.getDeclaredAnnotation(Completions.class);
         if (completions != null) {
-            final List<String> suggestions = Arrays.asList(
+            final List<Suggestion> suggestions = Suggestion.of(Arrays.asList(
                     completions.value().replace(" ", "").split(",")
-            );
-            argumentBuilder.withSuggestionsProvider((commandContext, input) -> suggestions);
+            ));
+            argumentBuilder.withFullSuggestionsProvider((commandContext, input) -> suggestions);
         } else if (!argument.suggestions().isEmpty()) { /* Check whether or not a suggestion provider should be set */
             final String suggestionProviderName = this.processString(argument.suggestions());
             final Optional<BiFunction<CommandContext<C>, String, List<Suggestion>>> suggestionsFunction =

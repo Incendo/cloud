@@ -296,20 +296,20 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             return this;
         }
 
-        /**
-         * Set the suggestions provider
-         *
-         * @param suggestionsProvider Suggestions provider
-         * @return Builder instance
-         */
-        @Override
-        public @NonNull @This Builder<C> withSuggestionsProvider(
-                final @NonNull BiFunction<@NonNull CommandContext<C>,
-                        @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
-        ) {
-            this.suggestionsProvider = suggestionsProvider;
-            return this;
-        }
+//        /**
+//         * Set the suggestions provider
+//         *
+//         * @param suggestionsProvider Suggestions provider
+//         * @return Builder instance
+//         */
+//        @Override
+//        public @NonNull @This Builder<C> withSuggestionsProvider(
+//                final @NonNull BiFunction<@NonNull CommandContext<C>,
+//                        @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
+//        ) {
+//            this.suggestionsProvider = suggestionsProvider;
+//            return this;
+//        }
 
         /**
          * Builder a new string argument

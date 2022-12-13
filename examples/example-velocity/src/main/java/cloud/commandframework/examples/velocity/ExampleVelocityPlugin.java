@@ -66,7 +66,8 @@ public final class ExampleVelocityPlugin {
     @Inject
     private Injector injector;
 
-    private static List<Suggestion> playerSuggestions(@NonNull CommandContext<CommandSource> ctx, @NonNull String input) {
+    private static List<Suggestion> playerSuggestions(@NonNull final CommandContext<CommandSource> ctx,
+                                                      @NonNull final String input) {
         final Collection<Player> players = ctx.<ProxyServer>get("ProxyServer").getAllPlayers();
         final List<Suggestion> suggestions = new LinkedList<>();
         for (Player player : players) {
@@ -77,9 +78,12 @@ public final class ExampleVelocityPlugin {
                     .append(Component.text("UUID: "))
                     .append(Component.text(player.getUniqueId().toString(), NamedTextColor.GOLD))
                     .append(Component.newline())
-                            .append(Component.text("Brand: "))
-                                    .append(Component.text(player.getClientBrand(), NamedTextColor.BLUE))
-                                            .build();
+                    .append(Component.text("Brand: "))
+                    .append(Component.text(
+                            player.getClientBrand() == null ? "Unknown" : player.getClientBrand(),
+                            NamedTextColor.BLUE
+                    ))
+                    .build();
             suggestions.add(NativeSuggestion.of(
                     player.getUsername(),
                     VelocityBrigadierMessage.tooltip(tooltip)

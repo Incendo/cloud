@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2021 Alexander Söderberg & Contributors
+// Copyright (c) 2022 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,10 @@
 //
 package cloud.commandframework;
 
-import org.checkerframework.checker.lock.qual.NewObject;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.common.reflection.qual.NewInstance;
-import org.checkerframework.common.returnsreceiver.qual.This;
 import java.util.LinkedList;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 /**
