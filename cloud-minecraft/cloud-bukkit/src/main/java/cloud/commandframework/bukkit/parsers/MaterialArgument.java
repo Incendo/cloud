@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -59,14 +60,30 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new builder
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
-    public static <C> MaterialArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new MaterialArgument.Builder<>(name);
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
     }
 
     /**
@@ -77,7 +94,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Material> of(final @NonNull String name) {
-        return MaterialArgument.<C>newBuilder(name).asRequired().build();
+        return MaterialArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -88,7 +105,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Material> optional(final @NonNull String name) {
-        return MaterialArgument.<C>newBuilder(name).asOptional().build();
+        return MaterialArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -103,7 +120,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
             final @NonNull String name,
             final @NonNull Material material
     ) {
-        return MaterialArgument.<C>newBuilder(name).asOptionalWithDefault(material.name().toLowerCase()).build();
+        return MaterialArgument.<C>builder(name).asOptionalWithDefault(material.name().toLowerCase()).build();
     }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Material> {

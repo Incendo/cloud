@@ -56,14 +56,30 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new builder
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
-    public static <C> CharArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new CharArgument.Builder<>(name);
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
     }
 
     /**
@@ -74,7 +90,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Character> of(final @NonNull String name) {
-        return CharArgument.<C>newBuilder(name).asRequired().build();
+        return CharArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -85,7 +101,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Character> optional(final @NonNull String name) {
-        return CharArgument.<C>newBuilder(name).asOptional().build();
+        return CharArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -100,7 +116,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
             final @NonNull String name,
             final @NonNull String defaultNum
     ) {
-        return CharArgument.<C>newBuilder(name).asOptionalWithDefault(defaultNum).build();
+        return CharArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
     }
 
 

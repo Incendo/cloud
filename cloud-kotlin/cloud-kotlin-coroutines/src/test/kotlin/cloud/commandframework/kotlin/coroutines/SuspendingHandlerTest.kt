@@ -62,7 +62,7 @@ class SuspendingHandlerTest {
     private class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
-        AsynchronousCommandExecutionCoordinator.newBuilder<TestCommandSender>()
+        AsynchronousCommandExecutionCoordinator.builder<TestCommandSender>()
             .withExecutor(executorService)
             .build(),
         CommandRegistrationHandler.nullCommandRegistrationHandler()

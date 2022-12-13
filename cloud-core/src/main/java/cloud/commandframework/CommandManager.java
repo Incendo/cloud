@@ -873,7 +873,7 @@ public abstract class CommandManager<C> {
      * @return Flag builder
      */
     public CommandFlag.@NonNull Builder<Void> flagBuilder(final @NonNull String name) {
-        return CommandFlag.newBuilder(name);
+        return CommandFlag.builder(name);
     }
 
     /**

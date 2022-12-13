@@ -61,7 +61,7 @@ final class Mc113 {
                 .argument(BlockPredicateArgument.of("predicate"))
                 .literal("with")
                 .argument(MaterialArgument.of("block")) // todo: use BlockDataArgument
-                .argument(IntegerArgument.<CommandSender>newBuilder("radius").withMin(1))
+                .argument(IntegerArgument.<CommandSender>builder("radius").withMin(1))
                 .handler(this::executeReplace));
 
         this.manager.command(builder.literal("test_item")

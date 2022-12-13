@@ -69,14 +69,30 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new builder
      *
      * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
-    public static <C> StringArgument.@NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new StringArgument.Builder<>(name);
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
     }
 
     /**
@@ -87,7 +103,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, String> of(final @NonNull String name) {
-        return StringArgument.<C>newBuilder(name).single().asRequired().build();
+        return StringArgument.<C>builder(name).single().asRequired().build();
     }
 
     /**
@@ -102,7 +118,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             final @NonNull String name,
             final @NonNull StringMode stringMode
     ) {
-        return StringArgument.<C>newBuilder(name).withMode(stringMode).asRequired().build();
+        return StringArgument.<C>builder(name).withMode(stringMode).asRequired().build();
     }
 
     /**
@@ -113,7 +129,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, String> optional(final @NonNull String name) {
-        return StringArgument.<C>newBuilder(name).single().asOptional().build();
+        return StringArgument.<C>builder(name).single().asOptional().build();
     }
 
     /**
@@ -128,7 +144,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             final @NonNull String name,
             final @NonNull StringMode stringMode
     ) {
-        return StringArgument.<C>newBuilder(name).withMode(stringMode).asOptional().build();
+        return StringArgument.<C>builder(name).withMode(stringMode).asOptional().build();
     }
 
     /**
@@ -143,7 +159,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             final @NonNull String name,
             final @NonNull String defaultString
     ) {
-        return StringArgument.<C>newBuilder(name).asOptionalWithDefault(defaultString).build();
+        return StringArgument.<C>builder(name).asOptionalWithDefault(defaultString).build();
     }
 
     /**

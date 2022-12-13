@@ -37,6 +37,7 @@ import java.util.function.BiFunction;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -73,14 +74,30 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new Builder<>(name);
+        return builder(name);
     }
 
     /**
@@ -91,7 +108,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, MessageChannel> of(final @NonNull String name) {
-        return ChannelArgument.<C>newBuilder(name).asRequired().build();
+        return ChannelArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -102,7 +119,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, MessageChannel> optional(final @NonNull String name) {
-        return ChannelArgument.<C>newBuilder(name).asOptional().build();
+        return ChannelArgument.<C>builder(name).asOptional().build();
     }
 
     /**

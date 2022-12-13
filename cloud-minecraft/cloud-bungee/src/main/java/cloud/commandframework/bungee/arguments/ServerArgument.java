@@ -41,6 +41,7 @@ import java.util.Queue;
 import java.util.function.BiFunction;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -74,20 +75,30 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
     }
 
     /**
-     * Create a new argument builder
+     * Create a new {@link Builder}.
      *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Constructed builder
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
      */
-    public static <C> CommandArgument.@NonNull Builder<C, ServerInfo> newBuilder(
-            final @NonNull String name
-    ) {
-        return new Builder<C>(
-                name
-        ).withParser(
-                new ServerParser<>()
-        );
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
+     * Create a new builder
+     *
+     * @param name Name of the argument
+     * @param <C>  Command sender type
+     * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
+     */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
+        return builder(name);
     }
 
     /**
@@ -100,7 +111,7 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
     public static <C> @NonNull CommandArgument<C, ServerInfo> of(
             final @NonNull String name
     ) {
-        return ServerArgument.<C>newBuilder(name).asRequired().build();
+        return ServerArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -113,7 +124,7 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
     public static <C> @NonNull CommandArgument<C, ServerInfo> optional(
             final @NonNull String name
     ) {
-        return ServerArgument.<C>newBuilder(name).asOptional().build();
+        return ServerArgument.<C>builder(name).asOptional().build();
     }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, ServerInfo> {

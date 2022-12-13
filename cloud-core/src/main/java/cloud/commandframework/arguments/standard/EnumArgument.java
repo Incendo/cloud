@@ -65,19 +65,40 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     }
 
     /**
-     * Create a new builder
+     * Create a new {@link Builder}.
      *
-     * @param name      Name of the argument
-     * @param enumClass Enum class
-     * @param <C>       Command sender type
-     * @param <E>       Enum type
-     * @return Created builder
+     * @param enumClass enum class
+     * @param name      argument name
+     * @param <C>       sender type
+     * @param <E>       enum type
+     * @return new {@link Builder}
+     * @since 1.8.0
      */
-    public static <C, E extends Enum<E>> EnumArgument.@NonNull Builder<C, E> newBuilder(
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C, E extends Enum<E>> @NonNull Builder<C, E> builder(
             final @NonNull Class<E> enumClass,
             final @NonNull String name
     ) {
-        return new EnumArgument.Builder<>(name, enumClass);
+        return new Builder<>(name, enumClass);
+    }
+
+    /**
+     * Create a new builder
+     *
+     * @param enumClass enum class
+     * @param name      Name of the argument
+     * @param <C>       Command sender type
+     * @param <E>       enum type
+     * @return Created builder
+     * @deprecated prefer {@link #builder(Class, String)}
+     */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
+    public static <C, E extends Enum<E>> @NonNull Builder<C, E> newBuilder(
+            final @NonNull Class<E> enumClass,
+            final @NonNull String name
+    ) {
+        return builder(enumClass, name);
     }
 
     /**
@@ -93,7 +114,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             final @NonNull Class<E> enumClass,
             final @NonNull String name
     ) {
-        return EnumArgument.<C, E>newBuilder(enumClass, name).asRequired().build();
+        return EnumArgument.<C, E>builder(enumClass, name).asRequired().build();
     }
 
     /**
@@ -109,7 +130,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             final @NonNull Class<E> enumClass,
             final @NonNull String name
     ) {
-        return EnumArgument.<C, E>newBuilder(enumClass, name).asOptional().build();
+        return EnumArgument.<C, E>builder(enumClass, name).asOptional().build();
     }
 
     /**
@@ -127,7 +148,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             final @NonNull String name,
             final @NonNull E defaultValue
     ) {
-        return EnumArgument.<C, E>newBuilder(enumClass, name).asOptionalWithDefault(defaultValue.name().toLowerCase()).build();
+        return EnumArgument.<C, E>builder(enumClass, name).asOptionalWithDefault(defaultValue.name().toLowerCase()).build();
     }
 
 
