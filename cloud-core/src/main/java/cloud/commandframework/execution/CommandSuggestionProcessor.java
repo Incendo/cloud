@@ -34,7 +34,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Processor that formats command suggestions
  *
  * @param <C> Command sender type
+ * @deprecated Can result in lose of suggestion's additional data
  */
+@Deprecated
 @API(status = API.Status.STABLE)
 public interface CommandSuggestionProcessor<C> extends
         BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<String>, @NonNull List<String>> {

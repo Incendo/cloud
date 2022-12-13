@@ -659,7 +659,7 @@ public final class CloudBrigadierManager<C, S> {
         for (final Suggestion suggestion : suggestions) {
             if (suggestion instanceof NativeSuggestion) {
                 NativeSuggestion s = (NativeSuggestion) suggestion;
-                suggestionsBuilder = suggestionsBuilder.suggest(s.suggestion(), s.richDescription());
+                suggestionsBuilder = suggestionsBuilder.suggest(s.suggestion(), s.tooltip());
             } else {
                 String tooltip = argument.getName();
                 if (!(argument instanceof StaticArgument)) {

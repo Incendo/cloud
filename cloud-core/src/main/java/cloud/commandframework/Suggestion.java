@@ -26,7 +26,6 @@ package cloud.commandframework;
 import java.util.LinkedList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 /**
@@ -68,14 +67,6 @@ public interface Suggestion {
     }
 
     /**
-     * Returns the description of the suggestion.
-     * <p>
-     * Check platform specific implementation which support this
-     * @return the description of the suggestion.
-     */
-    @Nullable String description();
-
-    /**
      * Returns the suggestion itself.
      * @return the suggestion itself.
      */
@@ -97,11 +88,6 @@ public interface Suggestion {
 
         private SimpleSuggestion(final String suggestion) {
             this.suggestion = suggestion;
-        }
-
-        @Override
-        public @Nullable String description() {
-            return null;
         }
 
         @Override

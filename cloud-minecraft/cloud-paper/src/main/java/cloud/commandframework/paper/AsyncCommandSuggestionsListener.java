@@ -98,7 +98,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
                 for (Suggestion suggestion : list) {
                     if (suggestion instanceof NativeSuggestion) {
                         String suggest = suggestion.suggestion();
-                        Message desc = ((NativeSuggestion) suggestion).richDescription();
+                        Message desc = ((NativeSuggestion) suggestion).tooltip();
                         completions.add(completionWithDescription.apply(suggest, desc));
                     } else {
                         completions.add(AsyncTabCompleteEvent.Completion.completion(suggestion.suggestion()));

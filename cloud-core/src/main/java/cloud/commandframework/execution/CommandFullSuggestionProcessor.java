@@ -40,7 +40,9 @@ public interface CommandFullSuggestionProcessor<C> extends
     /**
      * Transforms to a simple suggestion processor
      * @return a {@link CommandSuggestionProcessor} analog
+     * @deprecated Avoid using {@link CommandSuggestionProcessor}
      */
+    @Deprecated
     default CommandSuggestionProcessor<C> toSimple() {
         return (c, s) -> Suggestion.raw(this.apply(c, Suggestion.of(s)));
     }

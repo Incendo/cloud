@@ -1023,8 +1023,10 @@ public abstract class CommandManager<C> {
      * @return the command suggestion processor
      * @since 1.7.0
      * @see #commandSuggestionProcessor(CommandSuggestionProcessor)
+     * @deprecated Can result in lose of suggestion's additional data
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
+    @Deprecated
     public @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor() {
         return this.commandSuggestionProcessor.toSimple();
     }
@@ -1064,8 +1066,10 @@ public abstract class CommandManager<C> {
      * @param commandSuggestionProcessor the new command sugesstion processor
      * @since 1.7.0
      * @see #commandSuggestionProcessor()
+     * @deprecated Can result in loose of suggestion's additional data
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
+    @Deprecated
     public void commandSuggestionProcessor(final @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor) {
         this.commandSuggestionProcessor = commandSuggestionProcessor.toFull();
     }

@@ -36,11 +36,17 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface NativeSuggestion extends Suggestion {
 
     /**
-     * Gives a native chat component
+     * Gives a native chat component tooltip for suggestion
      * @return chat component
      */
-    @API(status = API.Status.INTERNAL)
-    @NonNull Message richDescription();
+    @NonNull Message tooltip();
+
+    /**
+     * Returns a new native suggestion with a new tooltip
+     * @param tooltip the new tooltip message
+     * @return a new suggestion instance with this tooltip
+     */
+    @NonNull NativeSuggestion withTooltip(@NonNull Message tooltip);
 
     /**
      * Gives a suggestion instance with native brigadier message as description
@@ -79,16 +85,11 @@ public interface NativeSuggestion extends Suggestion {
     final class SimpleSuggestion implements NativeSuggestion {
 
         private final @NonNull String suggestion;
-        private final @NonNull Message richDescription;
+        private final @NonNull Message tooltip;
 
-        private SimpleSuggestion(final @NonNull String suggestion, final @NonNull Message description) {
+        private SimpleSuggestion(final @NonNull String suggestion, final @NonNull Message tooltip) {
             this.suggestion = suggestion;
-            this.richDescription = description;
-        }
-
-        @Override
-        public @Nullable String description() {
-            return this.richDescription().getString();
+            this.tooltip = tooltip;
         }
 
         @Override
@@ -98,12 +99,17 @@ public interface NativeSuggestion extends Suggestion {
 
         @Override
         public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
-            return new NativeSuggestion.SimpleSuggestion(suggestion, this.richDescription);
+            return new NativeSuggestion.SimpleSuggestion(suggestion, this.tooltip);
         }
 
         @Override
-        public @NonNull Message richDescription() {
-            return this.richDescription;
+        public @NonNull Message tooltip() {
+            return this.tooltip;
+        }
+
+        @Override
+        public @NonNull NativeSuggestion withTooltip(@NonNull final Message tooltip) {
+            return new NativeSuggestion.SimpleSuggestion(suggestion, tooltip);
         }
     }
 }
