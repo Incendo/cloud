@@ -36,10 +36,15 @@ import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.types.tuples.Pair;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -576,6 +581,99 @@ public class CommandContext<C> {
         @SuppressWarnings("unchecked")
         final T castedValue = (T) this.internalStorage.computeIfAbsent(key, k -> defaultFunction.apply((CloudKey<T>) k));
         return castedValue;
+    }
+
+    /**
+     * Locates elements in the command context by type.
+     *
+     * <p>When {@code exactType} is {@code flase}, a value may be returned
+     * if it's type is assignable to {@code type}. Otherwise the type must pass
+     * an equals comparison.</p>
+     *
+     * @param type       type to find
+     * @param exactType  whether exact type is required
+     * @param allowEmpty whether to allow empty result
+     * @param <T>        type to find
+     * @return found elements, may be empty when {@code allowEmpty} is {@code true}
+     * @throws IllegalStateException when {@code allowEmpty} is {@code false} and no elements are found
+     * @since 1.9.0
+     */
+    @API(status = API.Status.STABLE, since = "1.9.0")
+    @SuppressWarnings("unchecked")
+    public <@NonNull T> @NonNull Collection<Pair<CloudKey<? extends T>, T>> find(
+            final @NonNull Class<T> type,
+            final boolean exactType,
+            final boolean allowEmpty
+    ) {
+        final List<Pair<CloudKey<? extends T>, T>> found = new ArrayList<>();
+        for (final Map.Entry<CloudKey<?>, Object> entry : this.internalStorage.entrySet()) {
+            final boolean test = exactType
+                    ? type.equals(entry.getValue().getClass())
+                    : type.isAssignableFrom(entry.getClass());
+            if (test) {
+                found.add(Pair.of((CloudKey<? extends T>) entry.getKey(), (T) entry.getValue()));
+            }
+        }
+        if (found.isEmpty() && !allowEmpty) {
+            throw new IllegalStateException("allowEmpty was false, but no elements were found matching '" + type.getName() + "'");
+        }
+        return found;
+    }
+
+    /**
+     * Locates an element in the command context by type. If no matching elements
+     * are found, returns {@code null}.
+     *
+     * <p>When {@code exactType} is {@code flase}, a value may be returned
+     * if it's type is assignable to {@code type}. Otherwise the type must pass
+     * an equals comparison.</p>
+     *
+     * @param type      type to find
+     * @param exactType whether exact type is required
+     * @param <T>       type to find
+     * @return found element or null
+     * @throws IllegalStateException when more than one matching element is found
+     * @since 1.9.0
+     */
+    @API(status = API.Status.STABLE, since = "1.9.0")
+    public <@NonNull T> @Nullable Pair<CloudKey<? extends T>, T> findSingle(
+            final @NonNull Class<T> type,
+            final boolean exactType
+    ) {
+        final Collection<Pair<CloudKey<? extends T>, T>> found = this.find(type, exactType, true);
+        if (found.size() > 1) {
+            throw new IllegalStateException("More than one element (" + found.size() + ") located with type '" + type.getName() + "'.");
+        } else if (found.isEmpty()) {
+            return null;
+        }
+        return found.iterator().next();
+    }
+
+    /**
+     * Locates an element in the command context by type.
+     *
+     * <p>When {@code exactType} is {@code flase}, a value may be returned
+     * if it's type is assignable to {@code type}. Otherwise the type must pass
+     * an equals comparison.</p>
+     *
+     * @param type      type to find
+     * @param exactType whether exact type is required
+     * @param <T>       type to find
+     * @return found element
+     * @throws IllegalStateException  when more than one element of the type is found
+     * @throws NoSuchElementException when no element of the type is found
+     * @since 1.9.0
+     */
+    @API(status = API.Status.STABLE, since = "1.9.0")
+    public <@NonNull T> @NonNull Pair<CloudKey<? extends T>, T> requireSingle(
+            final @NonNull Class<T> type,
+            final boolean exactType
+    ) {
+        final @Nullable Pair<CloudKey<? extends T>, T> found = this.findSingle(type, exactType);
+        if (found == null) {
+            throw new NoSuchElementException("No element found in command context matching '" + type.getName() + "'.");
+        }
+        return found;
     }
 
     /**
