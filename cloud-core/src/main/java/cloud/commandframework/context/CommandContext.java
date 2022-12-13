@@ -590,11 +590,13 @@ public class CommandContext<C> {
      * if it's type is assignable to {@code type}. Otherwise the type must pass
      * an equals comparison.</p>
      *
-     * @param type       type to find
-     * @param exactType  whether exact type is required
-     * @param allowEmpty whether to allow empty result
-     * @param <T>        type to find
-     * @return found elements, may be empty when {@code allowEmpty} is {@code true}
+     * <p>Note that any undocumented/internal values returned by this method
+     * are not to be relied upon as API.</p>
+     *
+     * @param type      type to find
+     * @param exactType whether exact type is required
+     * @param <T>       type to find
+     * @return found elements, may be empty if there are no matching elements
      * @throws IllegalStateException when {@code allowEmpty} is {@code false} and no elements are found
      * @since 1.9.0
      */
@@ -602,8 +604,7 @@ public class CommandContext<C> {
     @SuppressWarnings("unchecked")
     public <@NonNull T> @NonNull Collection<Pair<CloudKey<? extends T>, T>> find(
             final @NonNull Class<T> type,
-            final boolean exactType,
-            final boolean allowEmpty
+            final boolean exactType
     ) {
         final List<Pair<CloudKey<? extends T>, T>> found = new ArrayList<>();
         for (final Map.Entry<CloudKey<?>, Object> entry : this.internalStorage.entrySet()) {
@@ -613,9 +614,6 @@ public class CommandContext<C> {
             if (test) {
                 found.add(Pair.of((CloudKey<? extends T>) entry.getKey(), (T) entry.getValue()));
             }
-        }
-        if (found.isEmpty() && !allowEmpty) {
-            throw new IllegalStateException("allowEmpty was false, but no elements were found matching '" + type.getName() + "'");
         }
         return found;
     }
@@ -627,6 +625,9 @@ public class CommandContext<C> {
      * <p>When {@code exactType} is {@code flase}, a value may be returned
      * if it's type is assignable to {@code type}. Otherwise the type must pass
      * an equals comparison.</p>
+     *
+     * <p>Note that any undocumented/internal values returned by this method
+     * are not to be relied upon as API.</p>
      *
      * @param type      type to find
      * @param exactType whether exact type is required
@@ -640,7 +641,7 @@ public class CommandContext<C> {
             final @NonNull Class<T> type,
             final boolean exactType
     ) {
-        final Collection<Pair<CloudKey<? extends T>, T>> found = this.find(type, exactType, true);
+        final Collection<Pair<CloudKey<? extends T>, T>> found = this.find(type, exactType);
         if (found.size() > 1) {
             throw new IllegalStateException("More than one element (" + found.size() + ") located with type '" + type.getName() + "'.");
         } else if (found.isEmpty()) {
@@ -655,6 +656,9 @@ public class CommandContext<C> {
      * <p>When {@code exactType} is {@code flase}, a value may be returned
      * if it's type is assignable to {@code type}. Otherwise the type must pass
      * an equals comparison.</p>
+     *
+     * <p>Note that any undocumented/internal values returned by this method
+     * are not to be relied upon as API.</p>
      *
      * @param type      type to find
      * @param exactType whether exact type is required
