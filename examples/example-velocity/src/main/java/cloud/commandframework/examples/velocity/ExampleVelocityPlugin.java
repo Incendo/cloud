@@ -74,11 +74,9 @@ public final class ExampleVelocityPlugin {
             Component tooltip = Component.text()
                     .append(Component.text("Ping: "))
                     .append(Component.text(player.getPing(), NamedTextColor.GREEN))
-                    .append(Component.newline())
-                    .append(Component.text("UUID: "))
+                    .append(Component.text(", UUID: "))
                     .append(Component.text(player.getUniqueId().toString(), NamedTextColor.GOLD))
-                    .append(Component.newline())
-                    .append(Component.text("Brand: "))
+                    .append(Component.text(", Brand: "))
                     .append(Component.text(
                             player.getClientBrand() == null ? "Unknown" : player.getClientBrand(),
                             NamedTextColor.BLUE
