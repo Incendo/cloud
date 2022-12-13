@@ -140,7 +140,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

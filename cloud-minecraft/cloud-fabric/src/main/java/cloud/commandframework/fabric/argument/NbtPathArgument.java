@@ -138,7 +138,7 @@ public final class NbtPathArgument<C> extends CommandArgument<C, net.minecraft.c
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

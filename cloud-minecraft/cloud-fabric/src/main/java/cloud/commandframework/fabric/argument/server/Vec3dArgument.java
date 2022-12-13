@@ -233,7 +233,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription(),
                     this.centerIntegers()
             );

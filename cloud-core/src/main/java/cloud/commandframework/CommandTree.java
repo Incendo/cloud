@@ -491,7 +491,7 @@ public final class CommandTree<C> {
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<@NonNull String> commandQueue
     ) {
-        return this.getSuggestions(context, commandQueue, this.internalTree)
+        return this.getCompletions(context, commandQueue, this.internalTree)
                 .stream()
                 .map(Completion::completion)
                 .collect(Collectors.toList());
@@ -504,14 +504,14 @@ public final class CommandTree<C> {
      * @param commandQueue Input queue
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
      */
-    public @NonNull List<@NonNull Completion> getFullSuggestions(
+    public @NonNull List<@NonNull Completion> getCompletions(
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<@NonNull String> commandQueue
     ) {
-        return this.getSuggestions(context, commandQueue, this.internalTree);
+        return this.getCompletions(context, commandQueue, this.internalTree);
     }
     @SuppressWarnings("MixedMutabilityReturnType")
-    private @NonNull List<@NonNull Completion> getSuggestions(
+    private @NonNull List<@NonNull Completion> getCompletions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull Node<@Nullable CommandArgument<C, ?>> root
@@ -546,7 +546,7 @@ public final class CommandTree<C> {
                         if (result.getParsedValue().isPresent()) {
                             // If further arguments are specified, dive into this literal
                             if (!commandQueue.isEmpty()) {
-                                return this.getSuggestions(commandContext, commandQueue, child);
+                                return this.getCompletions(commandContext, commandQueue, child);
                             }
 
                             // We've already matched one exactly, no use looking further
@@ -681,7 +681,7 @@ public final class CommandTree<C> {
             if (parseSuccess && !commandQueue.isEmpty()) {
                 // the current argument at the position is parsable and there are more arguments following
                 commandContext.store(child.getValue().getName(), parsedValue.get());
-                return this.getSuggestions(commandContext, commandQueue, child);
+                return this.getCompletions(commandContext, commandQueue, child);
             } else if (!parseSuccess && commandQueueOriginal.size() > 1) {
                 // at this point there should normally be no need to reset the command queue as we expect
                 // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway

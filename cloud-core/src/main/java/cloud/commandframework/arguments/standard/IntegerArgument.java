@@ -205,7 +205,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         @Override
         public @NonNull IntegerArgument<C> build() {
             return new IntegerArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
+                    this.getDefaultValue(), this.getCompletionsProvider(), this.getDefaultDescription()
             );
         }
     }

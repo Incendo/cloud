@@ -155,7 +155,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
         @Override
         public @NonNull OfflinePlayerArgument<C> build() {
             return new OfflinePlayerArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(), this.getDefaultDescription()
+                    this.getCompletionsProvider(), this.getDefaultDescription()
             );
         }
     }

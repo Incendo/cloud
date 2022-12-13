@@ -105,7 +105,7 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
     }
 
     @Override
-    public @NonNull List<@NonNull Completion> fullSuggestions(
+    public @NonNull List<@NonNull Completion> completions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

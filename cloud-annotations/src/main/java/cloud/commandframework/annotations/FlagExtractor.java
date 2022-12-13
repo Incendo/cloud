@@ -128,7 +128,7 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                         .withParser(parser);
                 final CommandArgument argument;
                 if (suggestionProvider != null) {
-                    argument = argumentBuilder.withFullSuggestionsProvider(suggestionProvider).build();
+                    argument = argumentBuilder.withCompletionsProvider(suggestionProvider).build();
                 } else {
                     argument = argumentBuilder.build();
                 }

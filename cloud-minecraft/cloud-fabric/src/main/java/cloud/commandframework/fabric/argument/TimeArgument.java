@@ -136,7 +136,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

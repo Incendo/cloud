@@ -310,7 +310,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                     this.registryIdent,
                     this.getDefaultValue(),
                     this.getValueType(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

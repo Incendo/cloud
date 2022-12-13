@@ -137,7 +137,7 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

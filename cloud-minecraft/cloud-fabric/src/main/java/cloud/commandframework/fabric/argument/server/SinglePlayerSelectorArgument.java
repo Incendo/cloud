@@ -121,7 +121,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

@@ -45,7 +45,7 @@ final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull Comm
 
     @Override
     public @NonNull List<@NonNull Completion> apply(final @NonNull CommandContext<C> context, final @NonNull String s) {
-        return this.parser.fullSuggestions(context, s);
+        return this.parser.completions(context, s);
     }
 
     @Override

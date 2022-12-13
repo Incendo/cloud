@@ -137,7 +137,7 @@ public final class ResourceLocationArgument<C> extends CommandArgument<C, Resour
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

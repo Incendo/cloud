@@ -187,7 +187,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

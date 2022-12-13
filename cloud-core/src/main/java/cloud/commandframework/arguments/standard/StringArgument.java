@@ -242,7 +242,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
         private Builder(final @NonNull String name) {
             super(String.class, name);
-            withFullSuggestionsProvider((v1, v2) -> Collections.emptyList());
+            withCompletionsProvider((v1, v2) -> Collections.emptyList());
         }
 
         /**
@@ -318,7 +318,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     this.getName(),
                     this.stringMode,
                     this.getDefaultValue(),
-                    Objects.requireNonNull(this.getFullSuggestionsProvider(), "Suggestion provider was replaced by null"),
+                    Objects.requireNonNull(this.getCompletionsProvider(), "Suggestion provider was replaced by null"),
                     this.getDefaultDescription()
             );
         }
@@ -332,37 +332,37 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
 
         private final StringMode stringMode;
-        private final BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider;
+        private final BiFunction<CommandContext<C>, String, List<Completion>> completionsProvider;
 
         /**
          * Construct a new string parser
          *
          * @param stringMode          String parsing mode
-         * @param suggestionsProvider Suggestions provider
+         * @param completionsProvider Suggestions provider
          * @deprecated Possible losing the suggestion additional data
          */
         @Deprecated
         public StringParser(
                 final @NonNull StringMode stringMode,
                 final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                        @NonNull List<@NonNull String>> suggestionsProvider
+                        @NonNull List<@NonNull String>> completionsProvider
         ) {
             this.stringMode = stringMode;
-            this.suggestionsProvider = suggestionsProvider.andThen(Completion::of);
+            this.completionsProvider = completionsProvider.andThen(Completion::of);
         }
         /**
          * Construct a new string parser
          *
          * @param stringMode          String parsing mode
-         * @param suggestionsProvider Suggestions provider
+         * @param completionsProvider Suggestions provider
          */
         public StringParser(
                 final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                        @NonNull List<@NonNull Completion>> suggestionsProvider,
+                        @NonNull List<@NonNull Completion>> completionsProvider,
                 final @NonNull StringMode stringMode
         ) {
             this.stringMode = stringMode;
-            this.suggestionsProvider = suggestionsProvider;
+            this.completionsProvider = completionsProvider;
         }
 
         @Override
@@ -480,15 +480,15 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return Completion.raw(this.suggestionsProvider.apply(commandContext, input));
+            return Completion.raw(this.completionsProvider.apply(commandContext, input));
         }
 
         @Override
-        public @NonNull List<@NonNull Completion> fullSuggestions(
+        public @NonNull List<@NonNull Completion> completions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return this.suggestionsProvider.apply(commandContext, input);
+            return this.completionsProvider.apply(commandContext, input);
         }
 
         @Override

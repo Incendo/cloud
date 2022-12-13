@@ -123,7 +123,7 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

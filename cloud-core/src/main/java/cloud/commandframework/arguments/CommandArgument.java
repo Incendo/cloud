@@ -640,7 +640,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @return completions provider
      */
     public final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-            @NonNull List<Completion>> getFullSuggestionsProvider() {
+            @NonNull List<Completion>> getCompletionsProvider() {
         return this.suggestionsProvider;
     }
 
@@ -722,7 +722,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      */
     public @NonNull CommandArgument<C, T> copy() {
         CommandArgument.Builder<C, T> builder = ofType(this.valueType, this.name);
-        builder = builder.withFullSuggestionsProvider(this.suggestionsProvider);
+        builder = builder.withCompletionsProvider(this.suggestionsProvider);
         builder = builder.withParser(this.parser);
         if (this.isRequired()) {
             builder = builder.asRequired();
@@ -876,7 +876,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @param suggestionsProvider Suggestions provider
          * @return Builder instance
          */
-        public @NonNull @This Builder<@NonNull C, @NonNull T> withFullSuggestionsProvider(
+        public @NonNull @This Builder<@NonNull C, @NonNull T> withCompletionsProvider(
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
                         @NonNull String, @NonNull List<Completion>> suggestionsProvider
         ) {
@@ -951,7 +951,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this.completionsProvider == null ? null : this.completionsProvider.andThen(Completion::raw);
         }
         protected final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>>
-        getFullSuggestionsProvider() {
+        getCompletionsProvider() {
             return this.completionsProvider;
         }
 

@@ -157,7 +157,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

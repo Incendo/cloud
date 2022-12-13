@@ -137,7 +137,7 @@ public final class NamedColorArgument<C> extends CommandArgument<C, ChatFormatti
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

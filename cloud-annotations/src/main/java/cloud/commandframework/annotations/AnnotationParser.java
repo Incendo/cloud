@@ -33,7 +33,7 @@ import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.specifier.Completions;
-import cloud.commandframework.annotations.suggestions.FullSuggestions;
+import cloud.commandframework.annotations.suggestions.CompletionProvider;
 import cloud.commandframework.annotations.suggestions.MethodCompletionsProvider;
 import cloud.commandframework.annotations.suggestions.MethodSuggestionsProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
@@ -446,8 +446,8 @@ public final class AnnotationParser<C> {
     private <T> void parseSuggestions(final @NonNull T instance) {
         for (final Method method : instance.getClass().getMethods()) {
             final Suggestions suggestions = method.getAnnotation(Suggestions.class);
-            final FullSuggestions fullSuggestions = method.getAnnotation(FullSuggestions.class);
-            if (suggestions == null && fullSuggestions == null) {
+            final CompletionProvider completionProvider = method.getAnnotation(CompletionProvider.class);
+            if (suggestions == null && completionProvider == null) {
                 continue;
             }
             if (!method.isAccessible()) {
@@ -467,7 +467,7 @@ public final class AnnotationParser<C> {
             try {
                 if (suggestions == null) {
                     this.manager.parserRegistry().registerCompletionProvider(
-                            this.processString(fullSuggestions.value()),
+                            this.processString(completionProvider.value()),
                             new MethodCompletionsProvider<>(instance, method)
                     );
                 } else {
@@ -774,12 +774,12 @@ public final class AnnotationParser<C> {
             final List<Completion> suggestions = Completion.of(Arrays.asList(
                     completions.value().replace(" ", "").split(",")
             ));
-            argumentBuilder.withFullSuggestionsProvider((commandContext, input) -> suggestions);
+            argumentBuilder.withCompletionsProvider((commandContext, input) -> suggestions);
         } else if (!argument.suggestions().isEmpty()) { /* Check whether or not a suggestion provider should be set */
             final String suggestionProviderName = this.processString(argument.suggestions());
             final Optional<BiFunction<CommandContext<C>, String, List<Completion>>> suggestionsFunction =
                     this.manager.parserRegistry().getCompletionProvider(suggestionProviderName);
-            argumentBuilder.withFullSuggestionsProvider(
+            argumentBuilder.withCompletionsProvider(
                     suggestionsFunction.orElseThrow(() ->
                             new IllegalArgumentException(String.format(
                                     "There is no suggestion provider with name '%s'. Did you forget to register it?",

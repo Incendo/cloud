@@ -137,7 +137,7 @@ public final class ObjectiveCriteriaArgument<C> extends CommandArgument<C, Objec
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

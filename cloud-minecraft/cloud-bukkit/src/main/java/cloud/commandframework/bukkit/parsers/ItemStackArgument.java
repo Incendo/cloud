@@ -133,7 +133,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

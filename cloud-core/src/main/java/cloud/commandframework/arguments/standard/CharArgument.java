@@ -136,7 +136,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         @Override
         public @NonNull CharArgument<C> build() {
             return new CharArgument<>(this.isRequired(), this.getName(),
-                    this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
+                    this.getDefaultValue(), this.getCompletionsProvider(), this.getDefaultDescription()
             );
         }
     }

@@ -121,7 +121,7 @@ public final class ExampleVelocityPlugin {
         commandManager.command(
                 commandManager.commandBuilder("example")
                         .argument(PlayerArgument.<CommandSource>newBuilder("player")
-                                .withFullSuggestionsProvider(ExampleVelocityPlugin::playerSuggestions))
+                                .withCompletionsProvider(ExampleVelocityPlugin::playerSuggestions))
                         .handler(context -> {
                                     final Player player = context.get("player");
                                     context.getSender().sendMessage(

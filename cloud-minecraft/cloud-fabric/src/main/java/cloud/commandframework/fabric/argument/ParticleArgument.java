@@ -136,7 +136,7 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

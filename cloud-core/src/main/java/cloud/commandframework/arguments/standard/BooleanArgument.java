@@ -170,7 +170,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
                     this.getName(),
                     this.liberal,
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

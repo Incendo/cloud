@@ -151,7 +151,7 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

@@ -139,7 +139,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

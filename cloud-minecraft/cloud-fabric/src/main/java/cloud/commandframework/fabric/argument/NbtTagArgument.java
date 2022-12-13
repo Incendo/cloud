@@ -134,7 +134,7 @@ public final class NbtTagArgument<C> extends CommandArgument<C, Tag> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

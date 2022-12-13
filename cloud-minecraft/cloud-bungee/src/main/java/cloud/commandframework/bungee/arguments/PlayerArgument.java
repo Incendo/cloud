@@ -143,7 +143,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()
             );

@@ -194,7 +194,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription(),
                     this.requireExplicitNamespace,
                     this.defaultNamespace

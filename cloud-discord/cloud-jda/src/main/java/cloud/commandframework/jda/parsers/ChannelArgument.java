@@ -170,7 +170,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription(),
                     this.modes
             );

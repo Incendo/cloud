@@ -144,7 +144,7 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

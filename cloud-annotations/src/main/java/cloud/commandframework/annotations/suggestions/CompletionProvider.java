@@ -30,17 +30,17 @@ import java.lang.annotation.Target;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * This annotation allows you to create annotated methods that behave like suggestions providers.
+ * This annotation allows you to create annotated methods that behave like completions providers.
  * The method must have this exact signature: <pre>{@code
- * ﹫Suggestions("name")
- * public List<Suggestion> methodName(CommandContext<YourSender> sender, String input) {
+ * ﹫CompletionProvider("name")
+ * public List<Completion> methodName(CommandContext<YourSender> sender, String input) {
  * }}</pre>
  *
- * @since 1.3.0
+ * @since 1.9.0
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FullSuggestions {
+public @interface CompletionProvider {
 
     /**
      * Name of the suggestions provider. This should be the same as the name specified in your command arguments

@@ -200,7 +200,7 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

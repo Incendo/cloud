@@ -190,7 +190,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         @Override
         public @NonNull ShortArgument<C> build() {
             return new ShortArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
+                    this.getDefaultValue(), this.getCompletionsProvider(), this.getDefaultDescription()
             );
         }
     }

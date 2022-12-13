@@ -138,7 +138,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()
             );

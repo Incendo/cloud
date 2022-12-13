@@ -135,7 +135,7 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

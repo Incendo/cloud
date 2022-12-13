@@ -198,7 +198,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         @Override
         public @NonNull DoubleArgument<C> build() {
             return new DoubleArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
+                    this.getDefaultValue(), this.getCompletionsProvider(), this.getDefaultDescription()
             );
         }
     }

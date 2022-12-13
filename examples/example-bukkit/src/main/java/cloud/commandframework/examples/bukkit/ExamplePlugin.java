@@ -37,7 +37,7 @@ import cloud.commandframework.annotations.Confirmation;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.annotations.specifier.Greedy;
-import cloud.commandframework.annotations.suggestions.FullSuggestions;
+import cloud.commandframework.annotations.suggestions.CompletionProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
@@ -644,7 +644,7 @@ public final class ExamplePlugin extends JavaPlugin {
         });
     }
 
-    @FullSuggestions("warps")
+    @CompletionProvider("warps")
     public List<Completion> warps(
             final CommandContext<CommandSender> context,
             final String input

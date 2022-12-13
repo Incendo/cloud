@@ -178,7 +178,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         @Override
         public @NonNull CommandArgument<C, E> build() {
             return new EnumArgument<>(this.enumClass, this.isRequired(), this.getName(),
-                    this.getFullSuggestionsProvider(), this.getDefaultValue(), this.getDefaultDescription()
+                    this.getCompletionsProvider(), this.getDefaultValue(), this.getDefaultDescription()
             );
         }
     }

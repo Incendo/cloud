@@ -136,7 +136,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

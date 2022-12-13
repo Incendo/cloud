@@ -136,7 +136,7 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

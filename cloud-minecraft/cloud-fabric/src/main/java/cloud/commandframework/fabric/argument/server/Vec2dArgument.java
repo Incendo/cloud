@@ -232,7 +232,7 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription(),
                     this.centerIntegers()
             );

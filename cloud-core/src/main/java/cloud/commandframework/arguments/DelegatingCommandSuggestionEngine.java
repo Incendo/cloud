@@ -81,7 +81,7 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
         if (this.commandManager.preprocessContext(context, inputQueue) == State.ACCEPTED) {
             completions = this.commandManager.commandCompletionProcessor().apply(
                     new CommandPreprocessingContext<>(context, inputQueue),
-                    this.commandTree.getFullSuggestions(
+                    this.commandTree.getCompletions(
                             context,
                             inputQueue
                     )

@@ -193,7 +193,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         @Override
         public @NonNull LongArgument<C> build() {
             return new LongArgument<>(this.isRequired(), this.getName(), this.min,
-                    this.max, this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
+                    this.max, this.getDefaultValue(), this.getCompletionsProvider(), this.getDefaultDescription()
             );
         }
     }

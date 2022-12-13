@@ -103,7 +103,7 @@ public interface ArgumentParser<C, T> {
      * @param input          Input string
      * @return List of suggestions
      */
-    default @NonNull List<@NonNull Completion> fullSuggestions(
+    default @NonNull List<@NonNull Completion> completions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

@@ -161,7 +161,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription(),
                     this.modes
             );

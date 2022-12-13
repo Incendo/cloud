@@ -153,7 +153,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()
             );

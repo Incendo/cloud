@@ -149,7 +149,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
                     this.getName(),
                     this.getDefaultValue(),
                     this.getDefaultDescription(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     new LinkedList<>()
             );
         }

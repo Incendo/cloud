@@ -198,7 +198,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         @Override
         public @NonNull ByteArgument<C> build() {
             return new ByteArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getFullSuggestionsProvider(), this.getDefaultDescription()
+                    this.getDefaultValue(), this.getCompletionsProvider(), this.getDefaultDescription()
             );
         }
     }

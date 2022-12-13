@@ -129,7 +129,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

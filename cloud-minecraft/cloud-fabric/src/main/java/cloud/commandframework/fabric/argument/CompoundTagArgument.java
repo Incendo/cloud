@@ -137,7 +137,7 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }

@@ -139,7 +139,7 @@ public final class FloatRangeArgument<C> extends CommandArgument<C, MinMaxBounds
                     this.isRequired(),
                     this.getName(),
                     this.getDefaultValue(),
-                    this.getFullSuggestionsProvider(),
+                    this.getCompletionsProvider(),
                     this.getDefaultDescription()
             );
         }
