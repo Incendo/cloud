@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import java.util.Arrays;
@@ -511,6 +512,38 @@ public class CommandSuggestionsTest {
         assertThat(suggestions6).isEmpty();
     }
 
+    @Test
+    void testGreedyArgumentSuggestsAfterSpace() {
+        // Arrange
+        final CommandManager<TestCommandSender> manager = createManager();
+        manager.command(
+                manager.commandBuilder("command")
+                        .argument(
+                                StringArgument.<TestCommandSender>newBuilder("string")
+                                        .greedy()
+                                        .withSuggestionsProvider((context, input) -> Collections.singletonList("hello world"))
+                                        .build())
+        );
+        manager.commandSuggestionProcessor(
+                new FilteringCommandSuggestionProcessor<>(
+                        FilteringCommandSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).andTrimBeforeLastSpace()));
+
+        // Act
+        final List<String> suggestions1 = suggest(manager, "command ");
+        final List<String> suggestions2 = suggest(manager, "command hello");
+        final List<String> suggestions3 = suggest(manager, "command hello ");
+        final List<String> suggestions4 = suggest(manager, "command hello wo");
+        final List<String> suggestions5 = suggest(manager, "command hello world");
+        final List<String> suggestions6 = suggest(manager, "command hello world ");
+
+        // Assert
+        assertThat(suggestions1).containsExactly("hello world");
+        assertThat(suggestions2).containsExactly("hello world");
+        assertThat(suggestions3).containsExactly("world");
+        assertThat(suggestions4).containsExactly("world");
+        assertThat(suggestions5).containsExactly("world");
+        assertThat(suggestions6).isEmpty();
+    }
 
     @Test
     void testFlagYieldingGreedyStringWithLiberalFlagArgument() {
