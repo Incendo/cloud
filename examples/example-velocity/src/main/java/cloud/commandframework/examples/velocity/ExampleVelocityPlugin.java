@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.examples.velocity;
 
-import cloud.commandframework.Suggestion;
-import cloud.commandframework.brigadier.NativeSuggestion;
+import cloud.commandframework.Completion;
+import cloud.commandframework.brigadier.NativeCompletion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.AudienceProvider;
@@ -66,10 +66,10 @@ public final class ExampleVelocityPlugin {
     @Inject
     private Injector injector;
 
-    private static List<Suggestion> playerSuggestions(@NonNull final CommandContext<CommandSource> ctx,
+    private static List<Completion> playerSuggestions(@NonNull final CommandContext<CommandSource> ctx,
                                                       @NonNull final String input) {
         final Collection<Player> players = ctx.<ProxyServer>get("ProxyServer").getAllPlayers();
-        final List<Suggestion> suggestions = new LinkedList<>();
+        final List<Completion> completions = new LinkedList<>();
         for (Player player : players) {
             Component tooltip = Component.text()
                     .append(Component.text("Ping: "))
@@ -82,12 +82,12 @@ public final class ExampleVelocityPlugin {
                             NamedTextColor.BLUE
                     ))
                     .build();
-            suggestions.add(NativeSuggestion.of(
+            completions.add(NativeCompletion.of(
                     player.getUsername(),
                     VelocityBrigadierMessage.tooltip(tooltip)
             ));
         }
-        return suggestions;
+        return completions;
     }
 
     /**

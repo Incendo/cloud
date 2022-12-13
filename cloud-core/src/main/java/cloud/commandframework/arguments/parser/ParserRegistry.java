@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
@@ -162,11 +162,11 @@ public interface ParserRegistry<C> {
      * @since 1.1.0
      */
     @API(status = API.Status.STABLE, since = "1.1.0")
-    default void registerFullSuggestionProvider(
+    default void registerCompletionProvider(
             @NonNull String name,
-            @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> provider
+            @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>> provider
     ) {
-        this.registerSuggestionProvider(name, provider.andThen(Suggestion::raw));
+        this.registerSuggestionProvider(name, provider.andThen(Completion::raw));
     }
 
     /**
@@ -180,11 +180,11 @@ public interface ParserRegistry<C> {
      */
     @API(status = API.Status.STABLE, since = "1.1.0")
     @NonNull
-    default Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>>> getFullSuggestionProvider(
+    default Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>>> getCompletionProvider(
             @NonNull String name
     ) {
         final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionProvider =
                 this.getSuggestionProvider(name).orElse(null);
-        return suggestionProvider == null ? Optional.empty() : Optional.of(suggestionProvider.andThen(Suggestion::of));
+        return suggestionProvider == null ? Optional.empty() : Optional.of(suggestionProvider.andThen(Completion::of));
     }
 }

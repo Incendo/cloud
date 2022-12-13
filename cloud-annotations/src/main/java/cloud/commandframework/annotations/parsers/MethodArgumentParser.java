@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations.parsers;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
@@ -44,7 +44,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
 
-    private final BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionProvider;
+    private final BiFunction<CommandContext<C>, String, List<Completion>> suggestionProvider;
     private final MethodHandle methodHandle;
 
     /**
@@ -61,7 +61,7 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
             final @NonNull Object instance,
             final @NonNull Method method
     ) throws Exception {
-        this.suggestionProvider = suggestionProvider.andThen(Suggestion::of);
+        this.suggestionProvider = suggestionProvider.andThen(Completion::of);
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
     }
     /**
@@ -73,7 +73,7 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
      * @throws Exception If the method lookup fails
      */
     public MethodArgumentParser(
-            final @NonNull BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionProvider,
+            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> suggestionProvider,
             final @NonNull Method method,
             final @NonNull Object instance
     ) throws Exception {
@@ -101,11 +101,11 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return Suggestion.raw(this.suggestionProvider.apply(commandContext, input));
+        return Completion.raw(this.suggestionProvider.apply(commandContext, input));
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> fullSuggestions(
+    public @NonNull List<@NonNull Completion> fullSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

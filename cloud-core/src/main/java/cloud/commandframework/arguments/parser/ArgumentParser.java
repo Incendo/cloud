@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.context.CommandContext;
 import java.util.Collections;
 import java.util.List;
@@ -103,11 +103,11 @@ public interface ArgumentParser<C, T> {
      * @param input          Input string
      * @return List of suggestions
      */
-    default @NonNull List<@NonNull Suggestion> fullSuggestions(
+    default @NonNull List<@NonNull Completion> fullSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return Suggestion.of(this.suggestions(commandContext, input));
+        return Completion.of(this.suggestions(commandContext, input));
     }
 
     /**

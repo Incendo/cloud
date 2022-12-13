@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.context.CommandContext;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -38,7 +38,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.3.0
  */
-public final class MethodFullSuggestionsProvider<C> implements BiFunction<CommandContext<C>, String, List<Suggestion>> {
+public final class MethodCompletionsProvider<C> implements BiFunction<CommandContext<C>, String, List<Completion>> {
 
     private final MethodHandle methodHandle;
 
@@ -49,7 +49,7 @@ public final class MethodFullSuggestionsProvider<C> implements BiFunction<Comman
      * @param method   The annotated method
      * @throws Exception If the method lookup fails
      */
-    public MethodFullSuggestionsProvider(
+    public MethodCompletionsProvider(
             final @NonNull Object instance,
             final @NonNull Method method
     ) throws Exception {
@@ -58,9 +58,9 @@ public final class MethodFullSuggestionsProvider<C> implements BiFunction<Comman
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Suggestion> apply(final CommandContext<C> context, final String s) {
+    public List<Completion> apply(final CommandContext<C> context, final String s) {
         try {
-            return (List<Suggestion>) this.methodHandle.invokeWithArguments(context, s);
+            return (List<Completion>) this.methodHandle.invokeWithArguments(context, s);
         } catch (final Throwable t) {
             throw new RuntimeException(t);
         }

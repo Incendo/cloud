@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -57,10 +57,10 @@ public interface CommandSuggestionEngine<C> {
      * @param input   Input provided by the sender
      * @return List of suggestions
      */
-    default @NonNull List<@NonNull Suggestion> getFullSuggestions(
+    default @NonNull List<@NonNull Completion> getCompletions(
             @NonNull CommandContext<C> context,
             @NonNull String input
     ) {
-        return Suggestion.of(this.getSuggestions(context, input));
+        return Completion.of(this.getSuggestions(context, input));
     }
 }

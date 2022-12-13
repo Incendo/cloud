@@ -24,7 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -54,7 +54,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             final double max,
             final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
+                    @NonNull List<@NonNull Completion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(required, name, new DoubleParser<>(min, max), defaultValue, suggestionsProvider, Double.class, defaultDescription);

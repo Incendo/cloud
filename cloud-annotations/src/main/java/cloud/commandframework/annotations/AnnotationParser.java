@@ -26,7 +26,7 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
@@ -34,7 +34,7 @@ import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.suggestions.FullSuggestions;
-import cloud.commandframework.annotations.suggestions.MethodFullSuggestionsProvider;
+import cloud.commandframework.annotations.suggestions.MethodCompletionsProvider;
 import cloud.commandframework.annotations.suggestions.MethodSuggestionsProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
@@ -466,9 +466,9 @@ public final class AnnotationParser<C> {
             }
             try {
                 if (suggestions == null) {
-                    this.manager.parserRegistry().registerFullSuggestionProvider(
+                    this.manager.parserRegistry().registerCompletionProvider(
                             this.processString(fullSuggestions.value()),
-                            new MethodFullSuggestionsProvider<>(instance, method)
+                            new MethodCompletionsProvider<>(instance, method)
                     );
                 } else {
                     this.manager.parserRegistry().registerSuggestionProvider(
@@ -505,11 +505,11 @@ public final class AnnotationParser<C> {
             }
             try {
                 final String suggestions = this.processString(parser.suggestions());
-                final BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider;
+                final BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider;
                 if (suggestions.isEmpty()) {
                     suggestionsProvider = (context, input) -> Collections.emptyList();
                 } else {
-                    suggestionsProvider = this.manager.parserRegistry().getFullSuggestionProvider(suggestions)
+                    suggestionsProvider = this.manager.parserRegistry().getCompletionProvider(suggestions)
                             .orElseThrow(() -> new NullPointerException(
                                     String.format(
                                             "Cannot find the suggestions provider with name '%s'",
@@ -771,14 +771,14 @@ public final class AnnotationParser<C> {
         /* Check for Completions annotation */
         final Completions completions = parameter.getDeclaredAnnotation(Completions.class);
         if (completions != null) {
-            final List<Suggestion> suggestions = Suggestion.of(Arrays.asList(
+            final List<Completion> suggestions = Completion.of(Arrays.asList(
                     completions.value().replace(" ", "").split(",")
             ));
             argumentBuilder.withFullSuggestionsProvider((commandContext, input) -> suggestions);
         } else if (!argument.suggestions().isEmpty()) { /* Check whether or not a suggestion provider should be set */
             final String suggestionProviderName = this.processString(argument.suggestions());
-            final Optional<BiFunction<CommandContext<C>, String, List<Suggestion>>> suggestionsFunction =
-                    this.manager.parserRegistry().getFullSuggestionProvider(suggestionProviderName);
+            final Optional<BiFunction<CommandContext<C>, String, List<Completion>>> suggestionsFunction =
+                    this.manager.parserRegistry().getCompletionProvider(suggestionProviderName);
             argumentBuilder.withFullSuggestionsProvider(
                     suggestionsFunction.orElseThrow(() ->
                             new IllegalArgumentException(String.format(

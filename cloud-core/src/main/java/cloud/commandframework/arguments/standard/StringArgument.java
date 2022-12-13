@@ -24,7 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -61,7 +61,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             final @NonNull StringMode stringMode,
             final @NonNull String defaultValue,
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
+                    @NonNull List<@NonNull Completion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(required, name, new StringParser<>(suggestionsProvider, stringMode),
@@ -332,7 +332,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
 
         private final StringMode stringMode;
-        private final BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider;
+        private final BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider;
 
         /**
          * Construct a new string parser
@@ -348,7 +348,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                         @NonNull List<@NonNull String>> suggestionsProvider
         ) {
             this.stringMode = stringMode;
-            this.suggestionsProvider = suggestionsProvider.andThen(Suggestion::of);
+            this.suggestionsProvider = suggestionsProvider.andThen(Completion::of);
         }
         /**
          * Construct a new string parser
@@ -358,7 +358,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          */
         public StringParser(
                 final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                        @NonNull List<@NonNull Suggestion>> suggestionsProvider,
+                        @NonNull List<@NonNull Completion>> suggestionsProvider,
                 final @NonNull StringMode stringMode
         ) {
             this.stringMode = stringMode;
@@ -480,11 +480,11 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return Suggestion.raw(this.suggestionsProvider.apply(commandContext, input));
+            return Completion.raw(this.suggestionsProvider.apply(commandContext, input));
         }
 
         @Override
-        public @NonNull List<@NonNull Suggestion> fullSuggestions(
+        public @NonNull List<@NonNull Completion> fullSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

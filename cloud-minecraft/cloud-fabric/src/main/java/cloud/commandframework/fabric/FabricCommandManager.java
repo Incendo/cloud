@@ -32,7 +32,7 @@ import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandFullSuggestionProcessor;
+import cloud.commandframework.execution.FilteringCommandCompletionProcessor;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.argument.RegistryEntryArgument;
 import cloud.commandframework.fabric.argument.TeamArgument;
@@ -155,8 +155,8 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
         this.registerNativeBrigadierMappings(this.brigadierManager);
         this.captionRegistry(new FabricCaptionRegistry<>());
         this.registerCommandPreProcessor(new FabricCommandPreprocessor<>(this));
-        this.commandFullSuggestionProcessor(new FilteringCommandFullSuggestionProcessor<>(
-                FilteringCommandFullSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
+        this.commandCompletionProcessor(new FilteringCommandCompletionProcessor<>(
+                FilteringCommandCompletionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
         ));
 
         ((FabricCommandRegistrationHandler<C, S>) this.commandRegistrationHandler()).initialize(this);

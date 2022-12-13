@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull CommandContext<C>,
-        @NonNull String, @NonNull List<Suggestion>> {
+        @NonNull String, @NonNull List<Completion>> {
 
     private final String argumentName;
     private final ArgumentParser<C, ?> parser;
@@ -44,7 +44,7 @@ final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull Comm
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> apply(final @NonNull CommandContext<C> context, final @NonNull String s) {
+    public @NonNull List<@NonNull Completion> apply(final @NonNull CommandContext<C> context, final @NonNull String s) {
         return this.parser.fullSuggestions(context, s);
     }
 

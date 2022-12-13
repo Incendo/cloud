@@ -55,7 +55,7 @@ import cloud.commandframework.bukkit.parsers.selector.MultiplePlayerSelectorArgu
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
 import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandFullSuggestionProcessor;
+import cloud.commandframework.execution.FilteringCommandCompletionProcessor;
 import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
@@ -135,8 +135,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         final BukkitSynchronizer bukkitSynchronizer = new BukkitSynchronizer(owningPlugin);
         this.taskFactory = new TaskFactory(bukkitSynchronizer);
 
-        this.commandFullSuggestionProcessor(new FilteringCommandFullSuggestionProcessor<>(
-                FilteringCommandFullSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
+        this.commandCompletionProcessor(new FilteringCommandCompletionProcessor<>(
+                FilteringCommandCompletionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
         ));
 
         /* Register capabilities */

@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.annotations.specifier.FlagYielding;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.specifier.Liberal;
@@ -89,8 +89,8 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     private final Map<TypeToken<?>, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new HashMap<>();
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
             annotationMappers = new HashMap<>();
-    private final Map<String, BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>>>
-            namedSuggestionProviders = new HashMap<>();
+    private final Map<String, BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>>>
+            namedCompletionProviders = new HashMap<>();
 
     /**
      * Construct a new {@link StandardParserRegistry} instance. This will also
@@ -169,7 +169,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                 stringMode = StringArgument.StringMode.SINGLE;
             }
             return new StringArgument.StringParser<>(
-                    (context, s) -> Suggestion.of(Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))),
+                    (context, s) -> Completion.of(Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))),
                     stringMode
             );
         });
@@ -279,30 +279,30 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final @NonNull String name,
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
     ) {
-        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider.andThen(Suggestion::of));
+        this.namedCompletionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider.andThen(Completion::of));
     }
 
     @Override
     public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
             final @NonNull String name
     ) {
-        final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> suggestionProvider =
-                this.namedSuggestionProviders.get(name.toLowerCase(Locale.ENGLISH));
-        return suggestionProvider == null ? Optional.empty() : Optional.of(suggestionProvider.andThen(Suggestion::raw));
+        final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>> suggestionProvider =
+                this.namedCompletionProviders.get(name.toLowerCase(Locale.ENGLISH));
+        return suggestionProvider == null ? Optional.empty() : Optional.of(suggestionProvider.andThen(Completion::raw));
     }
     @Override
-    public void registerFullSuggestionProvider(
+    public void registerCompletionProvider(
             final @NonNull String name,
-            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>> suggestionsProvider
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>> suggestionsProvider
     ) {
-        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider);
+        this.namedCompletionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider);
     }
 
     @Override
-    public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Suggestion>>> getFullSuggestionProvider(
+    public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>>> getCompletionProvider(
             final @NonNull String name
     ) {
-        return Optional.ofNullable(this.namedSuggestionProviders.get(name));
+        return Optional.ofNullable(this.namedCompletionProviders.get(name));
     }
 
 

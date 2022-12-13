@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.execution;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,34 +41,34 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <C> Command sender type
  */
 @API(status = API.Status.STABLE)
-public final class FilteringCommandFullSuggestionProcessor<C> implements CommandFullSuggestionProcessor<C> {
+public final class FilteringCommandCompletionProcessor<C> implements CommandCompletionProcessor<C> {
 
     private final @NonNull Filter<C> filter;
 
     /**
-     * Create a new {@link FilteringCommandFullSuggestionProcessor} filtering with {@link String#startsWith(String)} that does
+     * Create a new {@link FilteringCommandCompletionProcessor} filtering with {@link String#startsWith(String)} that does
      * not ignore case.
      */
     @API(status = API.Status.STABLE)
-    public FilteringCommandFullSuggestionProcessor() {
+    public FilteringCommandCompletionProcessor() {
         this(Filter.startsWith(false));
     }
 
     /**
-     * Create a new {@link FilteringCommandFullSuggestionProcessor}.
+     * Create a new {@link FilteringCommandCompletionProcessor}.
      *
      * @param filter mode
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
-    public FilteringCommandFullSuggestionProcessor(final @NonNull Filter<C> filter) {
+    public FilteringCommandCompletionProcessor(final @NonNull Filter<C> filter) {
         this.filter = filter;
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> apply(
+    public @NonNull List<@NonNull Completion> apply(
             final @NonNull CommandPreprocessingContext<C> context,
-            final @NonNull List<@NonNull Suggestion> suggestions
+            final @NonNull List<@NonNull Completion> completions
     ) {
         final String input;
         if (context.getInputQueue().isEmpty()) {
@@ -76,14 +76,14 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
         } else {
             input = String.join(" ", context.getInputQueue());
         }
-        final List<Suggestion> filteredSuggestions = new ArrayList<>(suggestions.size());
-        for (final Suggestion suggestion : suggestions) {
-            final @Nullable Suggestion filtered = this.filter.filter(context, suggestion, input);
+        final List<Completion> filteredCompletions = new ArrayList<>(completions.size());
+        for (final Completion completion : completions) {
+            final @Nullable Completion filtered = this.filter.filter(context, completion, input);
             if (filtered != null) {
-                filteredSuggestions.add(filtered);
+                filteredCompletions.add(filtered);
             }
         }
-        return filteredSuggestions;
+        return filteredCompletions;
     }
 
     /**
@@ -100,15 +100,15 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
          * Filters a potential suggestion against the input and context.
          *
          * @param context    context
-         * @param suggestion potential suggestion
+         * @param completion potential suggestion
          * @param input      remaining unconsumed input
          * @return possibly modified suggestion or null to deny
          * @since 1.8.0
          */
         @API(status = API.Status.STABLE, since = "1.8.0")
-        @Nullable Suggestion filter(
+        @Nullable Completion filter(
                 @NonNull CommandPreprocessingContext<C> context,
-                @NonNull Suggestion suggestion,
+                @NonNull Completion completion,
                 @NonNull String input
         );
 
@@ -123,7 +123,7 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
         @API(status = API.Status.STABLE, since = "1.8.0")
         default @NonNull Filter<C> and(final @NonNull Filter<C> and) {
             return (ctx, suggestion, input) -> {
-                final @Nullable Suggestion filtered = this.filter(ctx, suggestion, input);
+                final @Nullable Completion filtered = this.filter(ctx, suggestion, input);
                 if (filtered == null) {
                     return null;
                 }
@@ -153,9 +153,9 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
          */
         @API(status = API.Status.STABLE, since = "1.8.0")
         static <C> @NonNull Simple<C> startsWith(final boolean ignoreCase) {
-            final BiPredicate<Suggestion, String> test = ignoreCase
-                    ? (suggestion, input) -> suggestion.suggestion().toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT))
-                    : (suggestion, input) -> suggestion.suggestion().startsWith(input);
+            final BiPredicate<Completion, String> test = ignoreCase
+                    ? (suggestion, input) -> suggestion.completion().toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT))
+                    : (suggestion, input) -> suggestion.completion().startsWith(input);
             return Simple.contextFree(test);
         }
 
@@ -169,9 +169,9 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
          */
         @API(status = API.Status.STABLE, since = "1.8.0")
         static <C> @NonNull Simple<C> contains(final boolean ignoreCase) {
-            final BiPredicate<Suggestion, String> test = ignoreCase
-                    ? (suggestion, input) -> suggestion.suggestion().toLowerCase(Locale.ROOT).contains(input.toLowerCase(Locale.ROOT))
-                    : (suggestion, input) -> suggestion.suggestion().contains(input);
+            final BiPredicate<Completion, String> test = ignoreCase
+                    ? (suggestion, input) -> suggestion.completion().toLowerCase(Locale.ROOT).contains(input.toLowerCase(Locale.ROOT))
+                    : (suggestion, input) -> suggestion.completion().contains(input);
             return Simple.contextFree(test);
         }
 
@@ -196,8 +196,8 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
 
                 // Always use case-insensitive here. If case-sensitive filtering is desired it should
                 // be done in another filter which this is appended to using #and/#andTrimBeforeLastSpace.
-                if (suggestion.suggestion().toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
-                    return suggestion.withSuggestion(suggestion.suggestion().substring(lastSpace + 1));
+                if (suggestion.completion().toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
+                    return suggestion.withSuggestion(suggestion.completion().substring(lastSpace + 1));
                 }
 
                 return null;
@@ -213,7 +213,7 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
          * @since 1.8.0
          */
         @API(status = API.Status.STABLE, since = "1.8.0")
-        static <C> @NonNull Filter<C> contextFree(final @NonNull BiFunction<Suggestion, String, @Nullable Suggestion> function) {
+        static <C> @NonNull Filter<C> contextFree(final @NonNull BiFunction<Completion, String, @Nullable Completion> function) {
             return (ctx, suggestion, input) -> function.apply(suggestion, input);
         }
 
@@ -248,7 +248,7 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
              * Tests a suggestion against the context and input.
              *
              * @param context    context
-             * @param suggestion potential suggestion
+             * @param completion potential suggestion
              * @param input      remaining unconsumed input
              * @return whether to accept the suggestion
              * @since 1.8.0
@@ -256,19 +256,19 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
             @API(status = API.Status.STABLE, since = "1.8.0")
             boolean test(
                     @NonNull CommandPreprocessingContext<C> context,
-                    @NonNull Suggestion suggestion,
+                    @NonNull Completion completion,
                     @NonNull String input
             );
 
             @Override
             @SuppressWarnings("FunctionalInterfaceMethodChanged")
-            default @Nullable Suggestion filter(
+            default @Nullable Completion filter(
                     @NonNull CommandPreprocessingContext<C> context,
-                    @NonNull Suggestion suggestion,
+                    @NonNull Completion completion,
                     @NonNull String input
             ) {
-                if (this.test(context, suggestion, input)) {
-                    return suggestion;
+                if (this.test(context, completion, input)) {
+                    return completion;
                 }
                 return null;
             }
@@ -282,7 +282,7 @@ public final class FilteringCommandFullSuggestionProcessor<C> implements Command
              * @since 1.8.0
              */
             @API(status = API.Status.STABLE, since = "1.8.0")
-            static <C> @NonNull Simple<C> contextFree(final @NonNull BiPredicate<Suggestion, String> test) {
+            static <C> @NonNull Simple<C> contextFree(final @NonNull BiPredicate<Completion, String> test) {
                 return (ctx, suggestion, input) -> test.test(suggestion, input);
             }
         }

@@ -27,7 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandDescription;
@@ -45,7 +45,7 @@ import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
-import cloud.commandframework.brigadier.NativeSuggestion;
+import cloud.commandframework.brigadier.NativeCompletion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
@@ -127,7 +127,7 @@ public final class ExamplePlugin extends JavaPlugin {
     private MinecraftHelp<CommandSender> minecraftHelp;
     private CommandConfirmationManager<CommandSender> confirmationManager;
     private AnnotationParser<CommandSender> annotationParser;
-    private BiFunction<String, Component, Suggestion> suggestionProvider;
+    private BiFunction<String, Component, Completion> suggestionProvider;
 
     @Override
     public void onEnable() {
@@ -250,14 +250,14 @@ public final class ExamplePlugin extends JavaPlugin {
     }
 
     @SuppressWarnings("UnstableApiUsage") // We should be careful as we will work with minecraft internals
-    private BiFunction<String, Component, Suggestion> getSuggestionProvider(final boolean support) {
+    private BiFunction<String, Component, Completion> getSuggestionProvider(final boolean support) {
         if (support && MinecraftComponentSerializer.isSupported()) {
             return (suggstion, description) -> {
                 Object component = MinecraftComponentSerializer.get().serialize(description);
-                return NativeSuggestion.ofUnknown(suggstion, component);
+                return NativeCompletion.ofUnknown(suggstion, component);
             };
         }
-        return (suggestion, ignored) -> Suggestion.of(suggestion);
+        return (suggestion, ignored) -> Completion.of(suggestion);
     }
 
     private void constructCommands() {
@@ -645,7 +645,7 @@ public final class ExamplePlugin extends JavaPlugin {
     }
 
     @FullSuggestions("warps")
-    public List<Suggestion> warps(
+    public List<Completion> warps(
             final CommandContext<CommandSender> context,
             final String input
     ) {

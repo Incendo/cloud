@@ -31,37 +31,37 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * A class containing information about suggestions
  */
-public interface Suggestion {
+public interface Completion {
 
     /**
-     * Creates a simple representation of the suggestion
-     * @param suggestion The suggestion itself.
-     * @return An instance of suggestion representing this string.
+     * Creates a simple representation of the completion
+     * @param completion The completion itself.
+     * @return An instance of completion representing this string.
      */
-    static Suggestion of(String suggestion) {
-        return new SimpleSuggestion(suggestion);
+    static Completion of(String completion) {
+        return new SimpleCompletion(completion);
     }
     /**
      * Wraps multiple raw suggestions into a simple representation of the suggestion
      * @param suggestions The suggestions
      * @return A list with the instances of suggestions representing those raw suggestions.
      */
-    static List<Suggestion> of(Iterable<String> suggestions) {
-        List<Suggestion> suggestion = new LinkedList<>();
+    static List<Completion> of(Iterable<String> suggestions) {
+        List<Completion> completion = new LinkedList<>();
         for (String raw: suggestions){
-            suggestion.add(new SimpleSuggestion(raw));
+            completion.add(new SimpleCompletion(raw));
         }
-        return suggestion;
+        return completion;
     }
     /**
      * Wraps multiple raw suggestions into a simple representation of the suggestion
      * @param suggestions The suggestions
      * @return A list with the instances of suggestions representing those raw suggestions.
      */
-    static List<String> raw(Iterable<Suggestion> suggestions) {
+    static List<String> raw(Iterable<Completion> suggestions) {
         List<String> raw = new LinkedList<>();
-        for (Suggestion suggestion: suggestions){
-            raw.add(suggestion.suggestion());
+        for (Completion completion : suggestions){
+            raw.add(completion.completion());
         }
         return raw;
     }
@@ -70,34 +70,34 @@ public interface Suggestion {
      * Returns the suggestion itself.
      * @return the suggestion itself.
      */
-    @NonNull String suggestion();
+    @NonNull String completion();
 
     /**
      * Creates a new suggestion with given raw suggestion
      * @param suggestion new suggestion
      * @return a new instance with this suggestion
      */
-    @NonNull Suggestion withSuggestion(@NonNull String suggestion);
+    @NonNull Completion withSuggestion(@NonNull String suggestion);
 
     /**
      * SimpleSuggestion is a suggestion that wraps around a string suggestion and has no description
      */
-    final class SimpleSuggestion implements Suggestion {
+    final class SimpleCompletion implements Completion {
 
-        private final String suggestion;
+        private final String completion;
 
-        private SimpleSuggestion(final String suggestion) {
-            this.suggestion = suggestion;
+        private SimpleCompletion(final String completion) {
+            this.completion = completion;
         }
 
         @Override
-        public @NonNull String suggestion() {
-            return this.suggestion;
+        public @NonNull String completion() {
+            return this.completion;
         }
 
         @Override
-        public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
-            return new SimpleSuggestion(suggestion);
+        public @NonNull Completion withSuggestion(@NonNull final String suggestion) {
+            return new SimpleCompletion(suggestion);
         }
     }
 }

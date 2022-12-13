@@ -24,7 +24,7 @@
 package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -54,7 +54,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
             final short max,
             final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<Suggestion>> suggestionsProvider,
+                    @NonNull List<Completion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(required, name, new ShortParser<>(min, max), defaultValue, suggestionsProvider, Short.class, defaultDescription);

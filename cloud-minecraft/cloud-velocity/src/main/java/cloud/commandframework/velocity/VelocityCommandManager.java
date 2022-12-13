@@ -29,7 +29,7 @@ import cloud.commandframework.brigadier.BrigadierManagerHolder;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.captions.FactoryDelegatingCaptionRegistry;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandFullSuggestionProcessor;
+import cloud.commandframework.execution.FilteringCommandCompletionProcessor;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.velocity.arguments.PlayerArgument;
@@ -115,8 +115,8 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
         this.commandSenderMapper = commandSenderMapper;
         this.backwardsCommandSenderMapper = backwardsCommandSenderMapper;
 
-        this.commandFullSuggestionProcessor(new FilteringCommandFullSuggestionProcessor<>(
-                FilteringCommandFullSuggestionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
+        this.commandCompletionProcessor(new FilteringCommandCompletionProcessor<>(
+                FilteringCommandCompletionProcessor.Filter.<C>startsWith(true).andTrimBeforeLastSpace()
         ));
 
         /* Register Velocity Preprocessor */

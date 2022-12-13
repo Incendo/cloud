@@ -24,7 +24,7 @@
 package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -70,7 +70,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final @NonNull ResourceKey<? extends Registry<V>> registry,
             final @NonNull String defaultValue,
             final @NonNull TypeToken<V> valueType,
-            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(

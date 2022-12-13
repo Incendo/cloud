@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit.parsers.location;
 
 import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -61,7 +61,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @NonNull ArgumentDescription defaultDescription,
-            final @Nullable BiFunction<CommandContext<C>, String, List<Suggestion>> suggestionsProvider,
+            final @Nullable BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>,
                     @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {

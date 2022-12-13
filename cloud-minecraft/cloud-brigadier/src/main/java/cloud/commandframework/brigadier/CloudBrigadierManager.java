@@ -26,7 +26,7 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
@@ -632,13 +632,13 @@ public final class CloudBrigadierManager<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        final List<Suggestion> suggestionsUnfiltered = this.commandManager.fullSuggest(
+        final List<Completion> suggestionsUnfiltered = this.commandManager.giveCompletions(
                 commandContext.getSender(),
                 command
         );
 
         /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-        final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
+        final List<Completion> completions = new ArrayList<>(suggestionsUnfiltered);
         if (parentNode != null) {
             final Set<String> siblingLiterals = parentNode.getChildren().stream()
                     .map(CommandTree.Node::getValue)
@@ -646,7 +646,7 @@ public final class CloudBrigadierManager<C, S> {
                             ? ((StaticArgument<C>) arg).getAliases().stream() : Stream.empty())
                     .collect(Collectors.toSet());
 
-            suggestions.removeIf(s -> siblingLiterals.contains(s.suggestion()));
+            completions.removeIf(s -> siblingLiterals.contains(s.completion()));
         }
 
         SuggestionsBuilder suggestionsBuilder = builder;
@@ -656,10 +656,10 @@ public final class CloudBrigadierManager<C, S> {
             suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
         }
 
-        for (final Suggestion suggestion : suggestions) {
-            if (suggestion instanceof NativeSuggestion) {
-                NativeSuggestion s = (NativeSuggestion) suggestion;
-                suggestionsBuilder = suggestionsBuilder.suggest(s.suggestion(), s.tooltip());
+        for (final Completion completion : completions) {
+            if (completion instanceof NativeCompletion) {
+                NativeCompletion s = (NativeCompletion) completion;
+                suggestionsBuilder = suggestionsBuilder.suggest(s.completion(), s.tooltip());
             } else {
                 String tooltip = argument.getName();
                 if (!(argument instanceof StaticArgument)) {
@@ -669,7 +669,7 @@ public final class CloudBrigadierManager<C, S> {
                         tooltip = '[' + tooltip + ']';
                     }
                 }
-                suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
+                suggestionsBuilder = suggestionsBuilder.suggest(completion.completion(), new LiteralMessage(tooltip));
             }
         }
 

@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.brigadier;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
 import org.apiguardian.api.API;
@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A suggestion which gives native minecraft chat component as description, used for brigadier support
  */
-public interface NativeSuggestion extends Suggestion {
+public interface NativeCompletion extends Completion {
 
     /**
      * Gives a native chat component tooltip for suggestion
@@ -46,7 +46,7 @@ public interface NativeSuggestion extends Suggestion {
      * @param tooltip the new tooltip message
      * @return a new suggestion instance with this tooltip
      */
-    @NonNull NativeSuggestion withTooltip(@NonNull Message tooltip);
+    @NonNull NativeCompletion withTooltip(@NonNull Message tooltip);
 
     /**
      * Gives a suggestion instance with native brigadier message as description
@@ -54,8 +54,8 @@ public interface NativeSuggestion extends Suggestion {
      * @param description the plain text as description
      * @return a new suggestion instance
      */
-    static @NonNull NativeSuggestion of(@NonNull final String suggestion, @NonNull final String description) {
-        return new SimpleSuggestion(suggestion, new LiteralMessage(description));
+    static @NonNull NativeCompletion of(@NonNull final String suggestion, @NonNull final String description) {
+        return new SimpleCompletion(suggestion, new LiteralMessage(description));
     }
     /**
      * Gives a suggestion instance with native brigadier message as description
@@ -63,8 +63,8 @@ public interface NativeSuggestion extends Suggestion {
      * @param description the rich text as description
      * @return a new suggestion instance
      */
-    static @NonNull NativeSuggestion of(@NonNull final String suggestion, @NonNull final Message description) {
-        return new SimpleSuggestion(suggestion, description);
+    static @NonNull NativeCompletion of(@NonNull final String suggestion, @NonNull final Message description) {
+        return new SimpleCompletion(suggestion, description);
     }
     /**
      * Gives a suggestion instance with native brigadier message as description
@@ -73,33 +73,33 @@ public interface NativeSuggestion extends Suggestion {
      * @param description the rich text as description
      * @return a new suggestion instance
      */
-    static @NonNull Suggestion ofUnknown(@NonNull final String suggestion, @Nullable final Object description) {
+    static @NonNull Completion ofUnknown(@NonNull final String suggestion, @Nullable final Object description) {
         Message message = null;
         if (description instanceof Message) {
             message = (Message) description;
         }
-        return message == null ? Suggestion.of(suggestion) : new SimpleSuggestion(suggestion, message);
+        return message == null ? Completion.of(suggestion) : new SimpleCompletion(suggestion, message);
     }
 
     @API(status = API.Status.INTERNAL)
-    final class SimpleSuggestion implements NativeSuggestion {
+    final class SimpleCompletion implements NativeCompletion {
 
         private final @NonNull String suggestion;
         private final @NonNull Message tooltip;
 
-        private SimpleSuggestion(final @NonNull String suggestion, final @NonNull Message tooltip) {
+        private SimpleCompletion(final @NonNull String suggestion, final @NonNull Message tooltip) {
             this.suggestion = suggestion;
             this.tooltip = tooltip;
         }
 
         @Override
-        public @NonNull String suggestion() {
+        public @NonNull String completion() {
             return this.suggestion;
         }
 
         @Override
-        public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
-            return new NativeSuggestion.SimpleSuggestion(suggestion, this.tooltip);
+        public @NonNull Completion withSuggestion(@NonNull final String suggestion) {
+            return new NativeCompletion.SimpleCompletion(suggestion, this.tooltip);
         }
 
         @Override
@@ -108,8 +108,8 @@ public interface NativeSuggestion extends Suggestion {
         }
 
         @Override
-        public @NonNull NativeSuggestion withTooltip(@NonNull final Message tooltip) {
-            return new NativeSuggestion.SimpleSuggestion(suggestion, tooltip);
+        public @NonNull NativeCompletion withTooltip(@NonNull final Message tooltip) {
+            return new NativeCompletion.SimpleCompletion(this.suggestion, tooltip);
         }
     }
 }

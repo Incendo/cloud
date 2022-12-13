@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit.parsers;
 
 import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -68,7 +68,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
             final @NonNull String name,
             final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull Suggestion>> suggestionsProvider,
+                    @NonNull List<@NonNull Completion>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(required, name, new Parser<>(), defaultValue, suggestionsProvider, BlockPredicate.class, defaultDescription);

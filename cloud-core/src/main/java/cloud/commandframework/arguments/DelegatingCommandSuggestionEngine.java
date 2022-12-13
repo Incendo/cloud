@@ -25,7 +25,7 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.internal.CommandInputTokenizer;
@@ -45,7 +45,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
 public final class DelegatingCommandSuggestionEngine<C> implements CommandSuggestionEngine<C> {
 
-    private static final List<Suggestion> SINGLE_EMPTY_SUGGESTION = Collections.singletonList(Suggestion.of(""));
+    private static final List<Completion> SINGLE_EMPTY_COMPLETION = Collections.singletonList(Completion.of(""));
 
     private final CommandManager<C> commandManager;
     private final CommandTree<C> commandTree;
@@ -66,20 +66,20 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
 
     @Override
     public @NonNull List<@NonNull String> getSuggestions(@NonNull final CommandContext<C> context, @NonNull final String input) {
-        return this.getFullSuggestions(context, input).stream().map(Suggestion::suggestion).collect(Collectors.toList());
+        return this.getCompletions(context, input).stream().map(Completion::completion).collect(Collectors.toList());
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> getFullSuggestions(
+    public @NonNull List<@NonNull Completion> getCompletions(
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
         final @NonNull LinkedList<@NonNull String> inputQueue = new CommandInputTokenizer(input).tokenize();
         /* Store a copy of the input queue in the context */
         context.store("__raw_input__", new LinkedList<>(inputQueue));
-        final List<Suggestion> suggestions;
+        final List<Completion> completions;
         if (this.commandManager.preprocessContext(context, inputQueue) == State.ACCEPTED) {
-            suggestions = this.commandManager.commandFullSuggestionProcessor().apply(
+            completions = this.commandManager.commandCompletionProcessor().apply(
                     new CommandPreprocessingContext<>(context, inputQueue),
                     this.commandTree.getFullSuggestions(
                             context,
@@ -87,11 +87,11 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
                     )
             );
         } else {
-            suggestions = Collections.emptyList();
+            completions = Collections.emptyList();
         }
-        if (this.commandManager.getSetting(CommandManager.ManagerSettings.FORCE_SUGGESTION) && suggestions.isEmpty()) {
-            return SINGLE_EMPTY_SUGGESTION;
+        if (this.commandManager.getSetting(CommandManager.ManagerSettings.FORCE_SUGGESTION) && completions.isEmpty()) {
+            return SINGLE_EMPTY_COMPLETION;
         }
-        return suggestions;
+        return completions;
     }
 }

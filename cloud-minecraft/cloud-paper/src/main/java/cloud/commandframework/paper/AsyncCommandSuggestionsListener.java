@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.paper;
 
-import cloud.commandframework.Suggestion;
-import cloud.commandframework.brigadier.NativeSuggestion;
+import cloud.commandframework.Completion;
+import cloud.commandframework.brigadier.NativeCompletion;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
@@ -51,7 +51,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
 
     private final PaperCommandManager<C> paperCommandManager;
 
-    private final BiConsumer<AsyncTabCompleteEvent, List<Suggestion>> suggestionApplier;
+    private final BiConsumer<AsyncTabCompleteEvent, List<Completion>> completionsApplier;
 
     @SuppressWarnings("ConstantConditions")
     AsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
@@ -93,23 +93,23 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
                     }
                 };
             }
-            this.suggestionApplier = (event, list) -> {
+            this.completionsApplier = (event, list) -> {
                 List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
-                for (Suggestion suggestion : list) {
-                    if (suggestion instanceof NativeSuggestion) {
-                        String suggest = suggestion.suggestion();
-                        Message desc = ((NativeSuggestion) suggestion).tooltip();
+                for (Completion completion : list) {
+                    if (completion instanceof NativeCompletion) {
+                        String suggest = completion.completion();
+                        Message desc = ((NativeCompletion) completion).tooltip();
                         completions.add(completionWithDescription.apply(suggest, desc));
                     } else {
-                        completions.add(AsyncTabCompleteEvent.Completion.completion(suggestion.suggestion()));
+                        completions.add(AsyncTabCompleteEvent.Completion.completion(completion.completion()));
                     }
                 }
                 event.completions(completions);
                 event.setHandled(true);
             };
         } else {
-            this.suggestionApplier = (event, list) -> {
-                event.setCompletions(Suggestion.raw(list));
+            this.completionsApplier = (event, list) -> {
+                event.setCompletions(Completion.raw(list));
                 event.setHandled(true);
             };
         }
@@ -139,11 +139,11 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
         final String inputBuffer = this.paperCommandManager.stripNamespace(event.getBuffer());
 
-        final List<Suggestion> suggestions = new ArrayList<>(this.paperCommandManager.fullSuggest(
+        final List<Completion> completions = new ArrayList<>(this.paperCommandManager.giveCompletions(
                 cloudSender,
                 inputBuffer
         ));
 
-        this.suggestionApplier.accept(event, suggestions);
+        this.completionsApplier.accept(event, completions);
     }
 }

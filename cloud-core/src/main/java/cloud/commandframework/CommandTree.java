@@ -562,7 +562,7 @@ public final class CommandTree<C> {
         }
 
         /* Calculate suggestions for the literal arguments */
-        final List<Completion> suggestions = new LinkedList<>();
+        final List<Completion> completions = new LinkedList<>();
         if (commandQueue.size() <= 1) {
             final String literalValue = this.stringOrEmpty(commandQueue.peek());
             for (final Node<CommandArgument<C, ?>> argument : staticArguments) {
@@ -572,11 +572,11 @@ public final class CommandTree<C> {
                 commandContext.setCurrentArgument(argument.getValue());
                 final List<Completion> suggestionsToAdd = argument.getValue().getCompletionsProvider()
                         .apply(commandContext, literalValue);
-                for (Completion suggestion : suggestionsToAdd) {
-                    if (suggestion.completion().equals(literalValue) || !suggestion.completion().startsWith(literalValue)) {
+                for (Completion completion : suggestionsToAdd) {
+                    if (completion.completion().equals(literalValue) || !suggestion.completion().startsWith(literalValue)) {
                         continue;
                     }
-                    suggestions.add(suggestion);
+                    completions.add(completion);
                 }
             }
         }
@@ -584,11 +584,11 @@ public final class CommandTree<C> {
         /* Calculate suggestions for the variable argument, if one exists */
         for (final Node<CommandArgument<C, ?>> child : root.getChildren()) {
             if (child.getValue() != null && !(child.getValue() instanceof StaticArgument)) {
-                suggestions.addAll(this.suggestionsForDynamicArgument(commandContext, commandQueue, child));
+                completions.addAll(this.suggestionsForDynamicArgument(commandContext, commandQueue, child));
             }
         }
 
-        return suggestions;
+        return completions;
     }
 
     private @NonNull List<@NonNull Completion> suggestionsForDynamicArgument(
@@ -724,22 +724,22 @@ public final class CommandTree<C> {
         CommandArgument<C, ?> argument = Objects.requireNonNull(current.getValue());
 
         commandContext.setCurrentArgument(argument);
-        List<Completion> suggestions = argument.getCompletionsProvider().apply(commandContext, text);
+        List<Completion> completions = argument.getCompletionsProvider().apply(commandContext, text);
 
         // When suggesting a flag, potentially suggest following nodes too
         if (argument instanceof FlagArgument
                 && !current.getChildren().isEmpty() // Has children
                 && !text.startsWith("-") // Not a flag
                 && !commandContext.getOptional(FlagArgument.FLAG_META_KEY).isPresent()) {
-            suggestions = new ArrayList<>(suggestions);
+            completions = new ArrayList<>(completions);
             for (final Node<CommandArgument<C, ?>> child : current.getChildren()) {
                 argument = Objects.requireNonNull(child.getValue());
                 commandContext.setCurrentArgument(argument);
-                suggestions.addAll(argument.getCompletionsProvider().apply(commandContext, text));
+                completions.addAll(argument.getCompletionsProvider().apply(commandContext, text));
             }
         }
 
-        return suggestions;
+        return completions;
     }
 
     /**

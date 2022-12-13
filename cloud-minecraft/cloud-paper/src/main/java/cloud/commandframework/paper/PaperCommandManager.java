@@ -25,9 +25,9 @@ package cloud.commandframework.paper;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.NativeSuggestion;
+import cloud.commandframework.brigadier.NativeCompletion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
@@ -176,15 +176,15 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
     }
 
     /**
-     * Creates the best supported suggestion with description
-     * @param suggestion the suggestion itself
-     * @param description the description of the suggestion
-     * @return the suggestion instance that is best supported
+     * Creates the best supported completion with description
+     * @param completion the completion itself
+     * @param description the description of the completion
+     * @return the completion instance that is best supported
      */
-    public Suggestion createSuggestion(@NonNull final String suggestion, @NonNull final String description) {
+    public Completion createCompletion(@NonNull final String completion, @NonNull final String description) {
         if (this.registeredAsyncTooltipCompletions || this.registeredCommodore) {
-            return NativeSuggestion.of(suggestion, description);
+            return NativeCompletion.of(completion, description);
         }
-        return Suggestion.of(suggestion);
+        return Completion.of(completion);
     }
 }

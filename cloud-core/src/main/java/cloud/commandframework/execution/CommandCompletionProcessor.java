@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.execution;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -34,8 +34,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <C> Command sender type
  */
-public interface CommandFullSuggestionProcessor<C> extends
-        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Suggestion>, @NonNull List<Suggestion>> {
+public interface CommandCompletionProcessor<C> extends
+        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Completion>, @NonNull List<Completion>> {
 
     /**
      * Transforms to a simple suggestion processor
@@ -44,6 +44,6 @@ public interface CommandFullSuggestionProcessor<C> extends
      */
     @Deprecated
     default CommandSuggestionProcessor<C> toSimple() {
-        return (c, s) -> Suggestion.raw(this.apply(c, Suggestion.of(s)));
+        return (c, s) -> Completion.raw(this.apply(c, Completion.of(s)));
     }
 }

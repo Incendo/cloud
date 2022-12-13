@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.execution;
 
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -55,9 +55,9 @@ public interface CommandSuggestionProcessor<C> extends
     }
     /**
      * Transforms to a full suggestion processor
-     * @return a {@link CommandFullSuggestionProcessor} analog
+     * @return a {@link CommandCompletionProcessor} analog
      */
-    default CommandFullSuggestionProcessor<C> toFull() {
-        return (c, s) -> Suggestion.of(this.apply(c, Suggestion.raw(s)));
+    default CommandCompletionProcessor<C> toFull() {
+        return (c, s) -> Completion.of(this.apply(c, Completion.raw(s)));
     }
 }

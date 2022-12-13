@@ -25,7 +25,7 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.Suggestion;
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -112,10 +112,10 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                                     parameter.getType().getCanonicalName(), flagName, method.getName()
                             ));
                 }
-                final BiFunction<?, @NonNull String, @NonNull List<Suggestion>> suggestionProvider;
+                final BiFunction<?, @NonNull String, @NonNull List<Completion>> suggestionProvider;
                 final String suggestions = this.annotationParser.processString(flag.suggestions());
                 if (!suggestions.isEmpty()) {
-                    suggestionProvider = registry.getFullSuggestionProvider(suggestions).orElse(null);
+                    suggestionProvider = registry.getCompletionProvider(suggestions).orElse(null);
                 } else {
                     suggestionProvider = null;
                 }
