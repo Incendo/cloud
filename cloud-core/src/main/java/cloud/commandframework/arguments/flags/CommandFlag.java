@@ -72,11 +72,26 @@ public final class CommandFlag<T> {
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name flag name
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static @NonNull Builder<Void> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new flag builder
      *
      * @param name Flag name
      * @return Flag builder
+     * @deprecated prefer {@link #builder(String)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static @NonNull Builder<Void> newBuilder(final @NonNull String name) {
         return new Builder<>(name);
     }

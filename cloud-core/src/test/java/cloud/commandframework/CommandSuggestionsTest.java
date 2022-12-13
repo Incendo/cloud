@@ -53,18 +53,18 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("test").literal("two").build());
         manager.command(manager.commandBuilder("test")
                 .literal("var")
-                .argument(StringArgument.<TestCommandSender>newBuilder("str")
+                .argument(StringArgument.<TestCommandSender>builder("str")
                         .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two")))
                 .argument(EnumArgument.of(TestEnum.class, "enum")));
         manager.command(manager.commandBuilder("test")
                 .literal("comb")
-                .argument(StringArgument.<TestCommandSender>newBuilder("str")
+                .argument(StringArgument.<TestCommandSender>builder("str")
                         .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two")))
-                .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
+                .argument(IntegerArgument.<TestCommandSender>builder("num")
                         .withMin(1).withMax(95).asOptional()));
         manager.command(manager.commandBuilder("test")
                 .literal("alt")
-                .argument(IntegerArgument.<TestCommandSender>newBuilder("num")
+                .argument(IntegerArgument.<TestCommandSender>builder("num")
                         .withSuggestionsProvider((c, s) -> Arrays.asList("3", "33", "333"))));
 
         manager.command(manager.commandBuilder("com")
@@ -110,11 +110,11 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("numberswithfollowingargument").argument(IntegerArgument.of("num"))
                 .argument(BooleanArgument.of("another_argument")));
         manager.command(manager.commandBuilder("numberswithmin")
-                .argument(IntegerArgument.<TestCommandSender>newBuilder("num").withMin(5).withMax(100)));
+                .argument(IntegerArgument.<TestCommandSender>builder("num").withMin(5).withMax(100)));
 
         manager.command(manager.commandBuilder("partial")
                 .argument(
-                        StringArgument.<TestCommandSender>newBuilder("arg")
+                        StringArgument.<TestCommandSender>builder("arg")
                                 .withSuggestionsProvider((contect, input) -> Arrays.asList("hi", "hey", "heya", "hai", "hello"))
                 )
                 .literal("literal")
@@ -122,7 +122,7 @@ public class CommandSuggestionsTest {
 
         manager.command(manager.commandBuilder("literal_with_variable")
                 .argument(
-                        StringArgument.<TestCommandSender>newBuilder("arg")
+                        StringArgument.<TestCommandSender>builder("arg")
                                 .withSuggestionsProvider((context, input) -> Arrays.asList("veni", "vidi")).build()
                 )
                 .literal("now"));
@@ -453,7 +453,7 @@ public class CommandSuggestionsTest {
         manager.command(
                 manager.commandBuilder("command")
                         .argument(
-                                StringArgument.<TestCommandSender>newBuilder("string")
+                                StringArgument.<TestCommandSender>builder("string")
                                         .greedyFlagYielding()
                                         .withSuggestionsProvider((context, input) -> Collections.singletonList("hello"))
                                         .build()
@@ -520,7 +520,7 @@ public class CommandSuggestionsTest {
         manager.command(
                 manager.commandBuilder("command")
                         .argument(
-                                StringArgument.<TestCommandSender>newBuilder("string")
+                                StringArgument.<TestCommandSender>builder("string")
                                         .greedyFlagYielding()
                                         .withSuggestionsProvider((context, input) -> Collections.singletonList("hello"))
                                         .build()

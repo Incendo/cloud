@@ -65,11 +65,26 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     }
 
     /**
+     * Create a new {@link Builder} instance.
+     *
+     * @param <C> sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder() {
+        return new Builder<>();
+    }
+
+    /**
      * Create a new {@link Builder} instance
      *
      * @param <C> Command sender type
      * @return Builder
+     * @deprecated prefer {@link #builder()}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static <C> @NonNull Builder<C> newBuilder() {
         return new Builder<>();
     }

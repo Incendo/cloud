@@ -20,7 +20,7 @@ Cloud allows for commands to be defined using builder patterns, like this:
 manager.command(
         manager.commandBuilder("command", Description.of("Test cloud command using a builder"), "alias")
                 .argument(StringArgument.of("input"))
-                .argument(IntegerArgument.<CommandSender>newBuilder("number").withMin(1).withMax(100).build())
+                .argument(IntegerArgument.<CommandSender>builder("number").withMin(1).withMax(100).build())
                 .handler(context -> {
                     String input = context.get("input");
                     int number = context.get("number");

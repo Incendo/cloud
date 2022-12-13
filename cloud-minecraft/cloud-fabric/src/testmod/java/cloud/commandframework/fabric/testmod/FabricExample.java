@@ -78,7 +78,7 @@ public final class FabricExample implements ModInitializer {
         final Command.Builder<CommandSourceStack> base = manager.commandBuilder("cloudtest");
 
         final CommandArgument<CommandSourceStack, String> name = StringArgument.of("name");
-        final CommandArgument<CommandSourceStack, Integer> hugs = IntegerArgument.<CommandSourceStack>newBuilder("hugs")
+        final CommandArgument<CommandSourceStack, Integer> hugs = IntegerArgument.<CommandSourceStack>builder("hugs")
                 .asOptionalWithDefault("1")
                 .build();
 
@@ -148,7 +148,7 @@ public final class FabricExample implements ModInitializer {
                 .permission("cloud.give")
                 .argument(MultiplePlayerSelectorArgument.of("targets"))
                 .argument(ItemInputArgument.of("item"))
-                .argument(IntegerArgument.<CommandSourceStack>newBuilder("amount")
+                .argument(IntegerArgument.<CommandSourceStack>builder("amount")
                         .withMin(1)
                         .asOptionalWithDefault("1"))
                 .handler(ctx -> {

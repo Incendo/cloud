@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -79,14 +80,30 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new Builder<>(name);
+        return builder(name);
     }
 
     /**
@@ -97,7 +114,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, User> of(final @NonNull String name) {
-        return UserArgument.<C>newBuilder(name).withParserMode(ParserMode.MENTION).asRequired().build();
+        return UserArgument.<C>builder(name).withParserMode(ParserMode.MENTION).asRequired().build();
     }
 
     /**
@@ -108,7 +125,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, User> optional(final @NonNull String name) {
-        return UserArgument.<C>newBuilder(name).withParserMode(ParserMode.MENTION).asOptional().build();
+        return UserArgument.<C>builder(name).withParserMode(ParserMode.MENTION).asOptional().build();
     }
 
     /**

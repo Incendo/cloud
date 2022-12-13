@@ -57,14 +57,30 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     }
 
     /**
+     * Create a new {@link Builder}.
+     *
+     * @param name argument name
+     * @param <C>  sender type
+     * @return new {@link Builder}
+     * @since 1.8.0
+     */
+    @API(status = API.Status.STABLE, since = "1.8.0")
+    public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
+        return new Builder<>(name);
+    }
+
+    /**
      * Create a new builder
      *
-     * @param name Name of the component
+     * @param name Name of the argument
      * @param <C>  Command sender type
      * @return Created builder
+     * @deprecated prefer {@link #builder(String)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.8.0")
+    @Deprecated
     public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return new Builder<>(name);
+        return builder(name);
     }
 
     /**
@@ -75,7 +91,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, UUID> of(final @NonNull String name) {
-        return UUIDArgument.<C>newBuilder(name).asRequired().build();
+        return UUIDArgument.<C>builder(name).asRequired().build();
     }
 
     /**
@@ -86,7 +102,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, UUID> optional(final @NonNull String name) {
-        return UUIDArgument.<C>newBuilder(name).asOptional().build();
+        return UUIDArgument.<C>builder(name).asOptional().build();
     }
 
     /**
@@ -101,7 +117,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
             final @NonNull String name,
             final @NonNull UUID defaultUUID
     ) {
-        return UUIDArgument.<C>newBuilder(name).asOptionalWithDefault(defaultUUID.toString()).build();
+        return UUIDArgument.<C>builder(name).asOptionalWithDefault(defaultUUID.toString()).build();
     }
 
 
