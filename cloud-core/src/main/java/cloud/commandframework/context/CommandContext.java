@@ -586,6 +586,9 @@ public class CommandContext<C> {
     /**
      * Locates elements in the command context by type.
      *
+     * <p>If you have or are able to get the key for a value, it should be preferred
+     * to retrieve values by their key.</p>
+     *
      * <p>When {@code exactType} is {@code flase}, a value may be returned
      * if it's type is assignable to {@code type}. Otherwise the type must pass
      * an equals comparison.</p>
@@ -622,6 +625,9 @@ public class CommandContext<C> {
      * Locates an element in the command context by type. If no matching elements
      * are found, returns {@code null}.
      *
+     * <p>If you have or are able to get the key for a value, it should be preferred
+     * to retrieve values by their key.</p>
+     *
      * <p>When {@code exactType} is {@code flase}, a value may be returned
      * if it's type is assignable to {@code type}. Otherwise the type must pass
      * an equals comparison.</p>
@@ -652,6 +658,9 @@ public class CommandContext<C> {
 
     /**
      * Locates an element in the command context by type.
+     *
+     * <p>If you have or are able to get the key for a value, it should be preferred
+     * to retrieve values by their key.</p>
      *
      * <p>When {@code exactType} is {@code flase}, a value may be returned
      * if it's type is assignable to {@code type}. Otherwise the type must pass
