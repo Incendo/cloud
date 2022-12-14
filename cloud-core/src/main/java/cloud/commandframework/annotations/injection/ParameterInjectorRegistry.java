@@ -80,7 +80,11 @@ public final class ParameterInjectorRegistry<C> implements InjectionService<C> {
     }
 
     /**
-     * Register an injector for a particular type predicate.
+     * Register an injector for a particular type predicate. The predicate should only
+     * return true if the injected type is assignable to the tested type. This predicate overload
+     * is provided in addition to {@link #registerInjector(Class, ParameterInjector)} to allow
+     * for exact, non-exact, or custom predicates, however is still bound by the aforementioned constraint.
+     * Failure to adhere to this will result in runtime exceptions.
      *
      * @param predicate A predicate that matches if the injector should be used for a type
      * @param injector The injector that should inject the value into the command method
