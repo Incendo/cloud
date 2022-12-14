@@ -120,7 +120,7 @@ public final class ExampleVelocityPlugin {
                 .apply(commandManager, AudienceProvider.nativeAudience());
         commandManager.command(
                 commandManager.commandBuilder("example")
-                        .argument(PlayerArgument.<CommandSource>newBuilder("player")
+                        .argument(PlayerArgument.<CommandSource>builder("player")
                                 .withCompletionsProvider(ExampleVelocityPlugin::playerSuggestions))
                         .handler(context -> {
                                     final Player player = context.get("player");

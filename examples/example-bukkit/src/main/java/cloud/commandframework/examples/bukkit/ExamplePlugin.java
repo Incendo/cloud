@@ -60,7 +60,7 @@ import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.execution.FilteringCommandCompletionProcessor;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
@@ -163,8 +163,8 @@ public final class ExamplePlugin extends JavaPlugin {
         }
 
         // Use contains to filter suggestions instead of default startsWith
-        this.manager.commandSuggestionProcessor(new FilteringCommandSuggestionProcessor<>(
-                FilteringCommandSuggestionProcessor.Filter.<CommandSender>contains(true).andTrimBeforeLastSpace()
+        this.manager.commandCompletionProcessor(new FilteringCommandCompletionProcessor<>(
+                FilteringCommandCompletionProcessor.Filter.<CommandSender>contains(true).andTrimBeforeLastSpace()
         ));
 
         //
@@ -188,6 +188,7 @@ public final class ExamplePlugin extends JavaPlugin {
         }
         //
         // Register asynchronous completions
+        // Check for PAPER_TOOLTIPS if you don't want to lose completions in favour of async completions
         //
         if (this.manager.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             ((PaperCommandManager<CommandSender>) this.manager).registerAsynchronousCompletions();

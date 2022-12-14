@@ -33,7 +33,6 @@ import cloud.commandframework.services.State;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -66,7 +65,7 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
 
     @Override
     public @NonNull List<@NonNull String> getSuggestions(@NonNull final CommandContext<C> context, @NonNull final String input) {
-        return this.getCompletions(context, input).stream().map(Completion::suggestion).collect(Collectors.toList());
+        return Completion.raw(this.getCompletions(context, input));
     }
 
     @Override
