@@ -573,7 +573,7 @@ public final class CommandTree<C> {
                 final List<Completion> suggestionsToAdd = argument.getValue().getCompletionsProvider()
                         .apply(commandContext, literalValue);
                 for (Completion completion : suggestionsToAdd) {
-                    if (completion.completion().equals(literalValue) || !suggestion.completion().startsWith(literalValue)) {
+                    if (completion.completion().equals(literalValue) || !completion.completion().startsWith(literalValue)) {
                         continue;
                     }
                     completions.add(completion);
