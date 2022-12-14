@@ -30,7 +30,7 @@ import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
-import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.execution.FilteringCommandCompletionProcessor;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
 import java.util.Arrays;
@@ -524,9 +524,9 @@ public class CommandSuggestionsTest {
                                         .withSuggestionsProvider((context, input) -> Collections.singletonList("hello world"))
                                         .build())
         );
-        manager.commandSuggestionProcessor(
-                new FilteringCommandSuggestionProcessor<>(
-                        FilteringCommandSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).andTrimBeforeLastSpace()));
+        manager.commandCompletionProcessor(
+                new FilteringCommandCompletionProcessor<>(
+                        FilteringCommandCompletionProcessor.Filter.<TestCommandSender>startsWith(true).andTrimBeforeLastSpace()));
 
         // Act
         final List<String> suggestions1 = suggest(manager, "command ");

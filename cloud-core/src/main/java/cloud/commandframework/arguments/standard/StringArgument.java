@@ -355,6 +355,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          *
          * @param stringMode          String parsing mode
          * @param completionsProvider Suggestions provider
+         * @since 1.9.0
          */
         public StringParser(
                 final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,

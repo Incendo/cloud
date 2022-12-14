@@ -108,7 +108,7 @@ public abstract class CommandManager<C> {
 
     private CaptionVariableReplacementHandler captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
-    private CommandCompletionProcessor<C> commandCompletitionProcessor = new FilteringCommandCompletionProcessor<>();
+    private CommandCompletionProcessor<C> commandCompletionProcessor = new FilteringCommandCompletionProcessor<>();
     private CommandRegistrationHandler commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
@@ -197,9 +197,10 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get command suggestions for the "next" argument that would yield a correctly parsing command input. The command
-     * suggestions provided by the command argument parsers will be filtered using the {@link CommandCompletionProcessor}
-     * before being returned.
+     * Get command suggestions for the "next" argument that would yield a correctly parsing command input.
+     *
+     * <p>The command completions provided by the command argument parsers will be filtered using
+     * the {@link CommandCompletionProcessor} before being returned.</p>
      *
      * @param commandSender Sender of the command
      * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
@@ -218,16 +219,18 @@ public abstract class CommandManager<C> {
         return this.commandSuggestionEngine.getSuggestions(context, input);
     }
     /**
-     * Get command suggestions for the "next" argument that would yield a correctly parsing command input. The command
-     * completions provided by the command argument parsers will be filtered using the {@link CommandCompletionProcessor}
-     * before being returned.
+     * Get command completions for the "next" argument that would yield a correctly parsing command input.
+     *
+     * <p>The command completions provided by the command argument parsers will be filtered using
+     * the {@link CommandCompletionProcessor} before being returned.</p>
      *
      * @param commandSender Sender of the command
      * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
      *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
      * @return List of completions
+     * @since 1.9.0
      */
-    public @NonNull List<@NonNull Completion> giveCompletions(
+    public @NonNull List<@NonNull Completion> completions(
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
@@ -1007,7 +1010,8 @@ public abstract class CommandManager<C> {
      * Get the command suggestions processor instance currently used in this command manager
      *
      * @return Command suggestions processor
-     * @see #commandCompletionProcessor(CommandCompletionProcessor) Setting the suggestion processor
+     * @see #commandCompletionProcessor() Getter that won't lose anything
+     * @see #commandCompletionProcessor(CommandCompletionProcessor) Setting a completion processor
      * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #commandSuggestionProcessor()} instead.
      */
     @Deprecated
@@ -1021,24 +1025,25 @@ public abstract class CommandManager<C> {
      *
      * @return the command suggestion processor
      * @since 1.7.0
-     * @see #commandCompletionProcessor(CommandCompletionProcessor)
+     * @see #commandCompletionProcessor() Getter that won't lose anything
+     * @see #commandCompletionProcessor(CommandCompletionProcessor) Setting a completion processor
      * @deprecated Can result in lose of suggestion's additional data
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     @Deprecated
     public cloud.commandframework.execution.CommandSuggestionProcessor<C> commandSuggestionProcessor() {
-        return this.commandCompletitionProcessor.toSimple();
+        return this.commandCompletionProcessor.toSimple();
     }
     /**
-     * Returns the command suggestion processor used in this command manager.
+     * Returns the command completion processor used in this command manager.
      *
-     * @return the command suggestion processor
-     * @since 1.7.0
-     * @see #commandCompletionProcessor(CommandCompletionProcessor)
+     * @return the command completion processor
+     * @since 1.9.0
+     * @see #commandCompletionProcessor(CommandCompletionProcessor) Setter
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull CommandCompletionProcessor<C> commandCompletionProcessor() {
-        return this.commandCompletitionProcessor;
+        return this.commandCompletionProcessor;
     }
 
     /**
@@ -1047,6 +1052,8 @@ public abstract class CommandManager<C> {
      * before it's returned to the caller
      *
      * @param commandSuggestionProcessor New command suggestions processor
+     * @see #commandCompletionProcessor() Getting a completion processor
+     * @see #commandCompletionProcessor(CommandCompletionProcessor) Setting a completion processor that won't lose anything
      * @deprecated for removal since 1.7.0. Use the non-prefixed setter
      * {@link #commandCompletionProcessor(CommandCompletionProcessor)} instead.
      */
@@ -1066,7 +1073,8 @@ public abstract class CommandManager<C> {
      *
      * @param commandSuggestionProcessor the new command sugesstion processor
      * @since 1.7.0
-     * @see #commandSuggestionProcessor()
+     * @see #commandCompletionProcessor() Getting a completion processor
+     * @see #commandCompletionProcessor(CommandCompletionProcessor) Setting a completion processor that won't lose anything
      * @deprecated Can result in loose of suggestion's additional data
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
@@ -1074,21 +1082,21 @@ public abstract class CommandManager<C> {
     public void commandSuggestionProcessor(
             final cloud.commandframework.execution.CommandSuggestionProcessor<C> commandSuggestionProcessor
     ) {
-        this.commandCompletitionProcessor = commandSuggestionProcessor.toFull();
+        this.commandCompletionProcessor = commandSuggestionProcessor.toFull();
     }
     /**
      * Sets the command completion processor.
      * <p>
-     * This will be called ever time {@link #giveCompletions(Object, String)} is called, in order to process the list
-     * of suggestions before it's returned to the caller.
+     * This will be called ever time {@link #completions(Object, String)} is called, in order to process the list
+     * of completions before it's returned to the caller.
      *
-     * @param commandSuggestionProcessor the new command sugesstion processor
+     * @param commandCompletionProcessor the new command completion processor
      * @since 1.7.0
-     * @see #commandSuggestionProcessor()
+     * @see #commandCompletionProcessor() Getter
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
-    public void commandCompletionProcessor(final @NonNull CommandCompletionProcessor<C> commandSuggestionProcessor) {
-        this.commandCompletitionProcessor = commandSuggestionProcessor;
+    public void commandCompletionProcessor(final @NonNull CommandCompletionProcessor<C> commandCompletionProcessor) {
+        this.commandCompletionProcessor = commandCompletionProcessor;
     }
 
     /**

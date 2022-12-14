@@ -36,7 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Represents a method annotated with {@link Suggestions}
  *
  * @param <C> Command sender type
- * @since 1.3.0
+ * @since 1.9.0
  */
 public final class MethodCompletionsProvider<C> implements BiFunction<CommandContext<C>, String, List<Completion>> {
 

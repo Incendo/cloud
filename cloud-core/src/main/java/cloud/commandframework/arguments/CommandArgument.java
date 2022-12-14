@@ -127,7 +127,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param completionsProvider   Completions provider
      * @param defaultDescription    Default description to use when registering
      * @param argumentPreprocessors Argument preprocessors
-     * @since 1.4.0
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
@@ -167,9 +167,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param valueType             Type produced by the parser
      * @param suggestionsProvider   Suggestions provider
      * @param argumentPreprocessors Argument preprocessors
-     * @deprecated Possible lose of suggestion additional data, use see
-     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken, Collection)}
-     * for an alternative
+     * @deprecated Possible lose of suggestion additional data
+     * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken, Collection) New alternative
      */
     @Deprecated
     public CommandArgument(
@@ -203,9 +202,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultValue        Default value used when no value is provided by the command sender
      * @param valueType           Type produced by the parser
      * @param suggestionsProvider Suggestions provider
-     * @deprecated Possible lose of suggestion additional data, use see
-     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken)}
-     * for an alternative
+     * @deprecated Possible lose of suggestion additional data
+     * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken) New alternative
      */
     @Deprecated
     public CommandArgument(
@@ -230,9 +228,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param suggestionsProvider Suggestions provider
      * @param defaultDescription  Default description to use when registering
      * @since 1.4.0
-     * @deprecated Possible lose of suggestion additional data, use see
-     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken,  ArgumentDescription)}
-     * for an alternative
+     * @deprecated Possible lose of suggestion additional data
+     * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken,  ArgumentDescription) New alternative
      */
     @Deprecated
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -257,9 +254,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultValue        Default value used when no value is provided by the command sender
      * @param valueType           Type produced by the parser
      * @param suggestionsProvider Suggestions provider
-     * @deprecated Possible lose of suggestion additional data, use see
-     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, Class)}
-     * for an alternative
+     * @deprecated Possible lose of suggestion additional data
+     * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, Class) New alternative
      */
     @Deprecated
     public CommandArgument(
@@ -285,9 +281,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param suggestionsProvider Suggestions provider
      * @param defaultDescription  Default description to use when registering
      * @since 1.4.0
-     * @deprecated Possible lose of suggestion additional data, use see
-     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, Class,  ArgumentDescription)}
-     * for an alternative
+     * @deprecated Possible lose of suggestion additional data
+     * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, Class,  ArgumentDescription) New alternative
      */
     @Deprecated
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -332,9 +327,9 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultDescription    Default description to use when registering
      * @param argumentPreprocessors Argument preprocessors
      * @since 1.4.0
-     * @deprecated Possible lose of suggestion additional data, use see
-     * {@link #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken,  ArgumentDescription, Collection)}
-     * for an alternative
+     * @deprecated Possible lose of suggestion additional data
+     * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken,  ArgumentDescription, Collection)
+     * New alternative
      */
     @Deprecated
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -370,6 +365,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param valueType             Type produced by the parser
      * @param completionsProvider   Completions provider
      * @param argumentPreprocessors Argument preprocessors
+     * @since 1.9.0
      */
     public CommandArgument(
             final boolean required,
@@ -402,6 +398,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultValue        Default value used when no value is provided by the command sender
      * @param valueType           Type produced by the parser
      * @param completionsProvider Completions provider
+     * @since 1.9.0
      */
     public CommandArgument(
             final boolean required,
@@ -424,7 +421,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param valueType           Type produced by the parser
      * @param completionsProvider Completions provider
      * @param defaultDescription  Default description to use when registering
-     * @since 1.4.0
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
@@ -448,6 +445,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultValue        Default value used when no value is provided by the command sender
      * @param valueType           Type produced by the parser
      * @param completionsProvider Completions provider
+     * @since 1.9.0
      */
     public CommandArgument(
             final boolean required,
@@ -471,7 +469,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param valueType           Type produced by the parser
      * @param completionsProvider Completions provider
      * @param defaultDescription  Default description to use when registering
-     * @since 1.4.0
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public CommandArgument(
@@ -629,7 +627,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * Get the argument suggestions provider
      *
      * @return Suggestions provider
+     * @deprecated May result in suggestion's data loss
+     * @see #getCompletionsProvider() New alternative
      */
+    @Deprecated
     public final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
             @NonNull List<String>> getSuggestionsProvider() {
         return this.suggestionsProvider.andThen(Completion::raw);
@@ -638,6 +639,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * Get the argument completions provider
      *
      * @return completions provider
+     * @since 1.9.0
      */
     public final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
             @NonNull List<Completion>> getCompletionsProvider() {
@@ -871,16 +873,17 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             return this;
         }
         /**
-         * Set the suggestions provider
+         * Set the completions provider
          *
-         * @param suggestionsProvider Suggestions provider
+         * @param completionsProvider Completions provider
          * @return Builder instance
+         * @since 1.9.0
          */
         public @NonNull @This Builder<@NonNull C, @NonNull T> withCompletionsProvider(
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
-                        @NonNull String, @NonNull List<Completion>> suggestionsProvider
+                        @NonNull String, @NonNull List<Completion>> completionsProvider
         ) {
-            this.completionsProvider = suggestionsProvider;
+            this.completionsProvider = completionsProvider;
             return this;
         }
 

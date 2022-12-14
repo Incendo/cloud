@@ -50,12 +50,13 @@ public interface CommandSuggestionEngine<C> {
             @NonNull String input
     );
     /**
-     * Get command suggestions for the "next" argument that would yield a correctly
+     * Get command completions for the "next" argument that would yield a correctly
      * parsing command input
      *
      * @param context Request context
      * @param input   Input provided by the sender
-     * @return List of suggestions
+     * @return List of completions
+     * @since 1.9.0
      */
     default @NonNull List<@NonNull Completion> getCompletions(
             @NonNull CommandContext<C> context,

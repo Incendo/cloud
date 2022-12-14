@@ -39,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * queue.
  *
  * @param <C> Command sender type
+ * @since 1.9.0
  */
 @API(status = API.Status.STABLE)
 public final class FilteringCommandCompletionProcessor<C> implements CommandCompletionProcessor<C> {
@@ -48,6 +49,7 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
     /**
      * Create a new {@link FilteringCommandCompletionProcessor} filtering with {@link String#startsWith(String)} that does
      * not ignore case.
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE)
     public FilteringCommandCompletionProcessor() {
@@ -58,9 +60,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
      * Create a new {@link FilteringCommandCompletionProcessor}.
      *
      * @param filter mode
-     * @since 1.8.0
+     * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
+    @API(status = API.Status.STABLE, since = "1.9.0")
     public FilteringCommandCompletionProcessor(final @NonNull Filter<C> filter) {
         this.filter = filter;
     }
@@ -90,9 +92,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
      * Filter function that tests (and potentially changes) each suggestion against the input and context.
      *
      * @param <C> sender type
-     * @since 1.8.0
+     * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
+    @API(status = API.Status.STABLE, since = "1.9.0")
     @FunctionalInterface
     public interface Filter<C> {
 
@@ -103,9 +105,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          * @param completion potential suggestion
          * @param input      remaining unconsumed input
          * @return possibly modified suggestion or null to deny
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         @Nullable Completion filter(
                 @NonNull CommandPreprocessingContext<C> context,
                 @NonNull Completion completion,
@@ -118,9 +120,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          *
          * @param and next filter
          * @return combined filter
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         default @NonNull Filter<C> and(final @NonNull Filter<C> and) {
             return (ctx, suggestion, input) -> {
                 final @Nullable Completion filtered = this.filter(ctx, suggestion, input);
@@ -136,9 +138,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          * uses {@link #trimBeforeLastSpace()} if the result is non-null.
          *
          * @return combined filter
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         default Filter<C> andTrimBeforeLastSpace() {
             return this.and(trimBeforeLastSpace());
         }
@@ -149,13 +151,13 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          * @param ignoreCase whether to ignore case
          * @param <C>        sender type
          * @return new filter
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         static <C> @NonNull Simple<C> startsWith(final boolean ignoreCase) {
             final BiPredicate<Completion, String> test = ignoreCase
-                    ? (suggestion, input) -> suggestion.completion().toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT))
-                    : (suggestion, input) -> suggestion.completion().startsWith(input);
+                    ? (suggestion, input) -> suggestion.suggestion().toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT))
+                    : (suggestion, input) -> suggestion.suggestion().startsWith(input);
             return Simple.contextFree(test);
         }
 
@@ -165,13 +167,13 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          * @param ignoreCase whether to ignore case
          * @param <C>        sender type
          * @return new filter
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         static <C> @NonNull Simple<C> contains(final boolean ignoreCase) {
             final BiPredicate<Completion, String> test = ignoreCase
-                    ? (suggestion, input) -> suggestion.completion().toLowerCase(Locale.ROOT).contains(input.toLowerCase(Locale.ROOT))
-                    : (suggestion, input) -> suggestion.completion().contains(input);
+                    ? (suggestion, input) -> suggestion.suggestion().toLowerCase(Locale.ROOT).contains(input.toLowerCase(Locale.ROOT))
+                    : (suggestion, input) -> suggestion.suggestion().contains(input);
             return Simple.contextFree(test);
         }
 
@@ -183,9 +185,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          *
          * @param <C> sender type
          * @return new filter
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         static <C> @NonNull Filter<C> trimBeforeLastSpace() {
             return (context, suggestion, input) -> {
                 final int lastSpace = input.lastIndexOf(' ');
@@ -196,8 +198,8 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
 
                 // Always use case-insensitive here. If case-sensitive filtering is desired it should
                 // be done in another filter which this is appended to using #and/#andTrimBeforeLastSpace.
-                if (suggestion.completion().toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
-                    return suggestion.withSuggestion(suggestion.completion().substring(lastSpace + 1));
+                if (suggestion.suggestion().toLowerCase(Locale.ROOT).startsWith(input.toLowerCase(Locale.ROOT).substring(0, lastSpace))) {
+                    return suggestion.withSuggestion(suggestion.suggestion().substring(lastSpace + 1));
                 }
 
                 return null;
@@ -210,9 +212,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          * @param function function
          * @param <C>      sender type
          * @return filter
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         static <C> @NonNull Filter<C> contextFree(final @NonNull BiFunction<Completion, String, @Nullable Completion> function) {
             return (ctx, suggestion, input) -> function.apply(suggestion, input);
         }
@@ -225,9 +227,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          * @param filter filter lambda
          * @param <C>    sender type
          * @return new simple filter
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         static <C> @NonNull Simple<C> simple(final Simple<C> filter) {
             return filter;
         }
@@ -238,9 +240,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
          * <p>Returns boolean instead of nullable String.</p>
          *
          * @param <C> sender type
-         * @since 1.8.0
+         * @since 1.9.0
          */
-        @API(status = API.Status.STABLE, since = "1.8.0")
+        @API(status = API.Status.STABLE, since = "1.9.0")
         @FunctionalInterface
         interface Simple<C> extends Filter<C> {
 
@@ -251,9 +253,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
              * @param completion potential suggestion
              * @param input      remaining unconsumed input
              * @return whether to accept the suggestion
-             * @since 1.8.0
+             * @since 1.9.0
              */
-            @API(status = API.Status.STABLE, since = "1.8.0")
+            @API(status = API.Status.STABLE, since = "1.9.0")
             boolean test(
                     @NonNull CommandPreprocessingContext<C> context,
                     @NonNull Completion completion,
@@ -279,9 +281,9 @@ public final class FilteringCommandCompletionProcessor<C> implements CommandComp
              * @param test predicate
              * @param <C>  sender type
              * @return simple filter
-             * @since 1.8.0
+             * @since 1.9.0
              */
-            @API(status = API.Status.STABLE, since = "1.8.0")
+            @API(status = API.Status.STABLE, since = "1.9.0")
             static <C> @NonNull Simple<C> contextFree(final @NonNull BiPredicate<Completion, String> test) {
                 return (ctx, suggestion, input) -> test.test(suggestion, input);
             }

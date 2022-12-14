@@ -56,6 +56,7 @@ public interface CommandSuggestionProcessor<C> extends
     /**
      * Transforms to a full suggestion processor
      * @return a {@link CommandCompletionProcessor} analog
+     * @since 1.9.0
      */
     default CommandCompletionProcessor<C> toFull() {
         return (c, s) -> Completion.of(this.apply(c, Completion.raw(s)));

@@ -23,13 +23,15 @@
 //
 package cloud.commandframework;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 
 /**
- * A class containing information about suggestions
+ * A class containing information about completions
+ * @since 1.9.0
  */
 public interface Completion {
 
@@ -38,15 +40,15 @@ public interface Completion {
      * @param completion The completion itself.
      * @return An instance of completion representing this string.
      */
-    static Completion of(String completion) {
+    static @NonNull Completion of(@NonNull final String completion) {
         return new SimpleCompletion(completion);
     }
     /**
-     * Wraps multiple raw suggestions into a simple representation of the suggestion
+     * Wraps multiple raw suggestions into a simple representation of the completion
      * @param suggestions The suggestions
-     * @return A list with the instances of suggestions representing those raw suggestions.
+     * @return A list with the instances of completions representing those raw suggestions.
      */
-    static List<Completion> of(Iterable<String> suggestions) {
+    static @NonNull List<@NonNull Completion> of(final @NonNull Iterable<@NonNull String> suggestions) {
         List<Completion> completion = new LinkedList<>();
         for (String raw: suggestions){
             completion.add(new SimpleCompletion(raw));
@@ -54,44 +56,56 @@ public interface Completion {
         return completion;
     }
     /**
-     * Wraps multiple raw suggestions into a simple representation of the suggestion
+     * Wraps multiple raw suggestions into a simple representation of the completion
      * @param suggestions The suggestions
-     * @return A list with the instances of suggestions representing those raw suggestions.
+     * @return A list with the instances of completions representing those raw suggestions.
      */
-    static List<String> raw(Iterable<Completion> suggestions) {
+    static @NonNull List<@NonNull Completion> of(@NonNull final String @NonNull... suggestions) {
+        ArrayList<Completion> completion = new ArrayList<>(suggestions.length);
+        for (String raw: suggestions){
+            completion.add(new SimpleCompletion(raw));
+        }
+        return completion;
+    }
+    /**
+     * Transforms multiple completions into raw suggestion
+     * @param completions The completions
+     * @return A list with suggestions
+     */
+    static @NonNull List<@NonNull String> raw(@NonNull final Iterable<@NonNull Completion> completions) {
         List<String> raw = new LinkedList<>();
-        for (Completion completion : suggestions){
-            raw.add(completion.completion());
+        for (Completion completion : completions){
+            raw.add(completion.suggestion());
         }
         return raw;
     }
 
     /**
-     * Returns the suggestion itself.
-     * @return the suggestion itself.
+     * Returns the raw suggestion which this completion contains.
+     * @return a suggestion
      */
-    @NonNull String completion();
+    @NonNull String suggestion();
 
     /**
-     * Creates a new suggestion with given raw suggestion
+     * Creates a new completion with given raw suggestion
      * @param suggestion new suggestion
      * @return a new instance with this suggestion
      */
     @NonNull Completion withSuggestion(@NonNull String suggestion);
 
     /**
-     * SimpleSuggestion is a suggestion that wraps around a string suggestion and has no description
+     * SimpleSuggestion is a suggestion that wraps around a string completion
      */
     final class SimpleCompletion implements Completion {
 
-        private final String completion;
+        private final @NonNull String completion;
 
-        private SimpleCompletion(final String completion) {
+        private SimpleCompletion(final @NonNull String completion) {
             this.completion = completion;
         }
 
         @Override
-        public @NonNull String completion() {
+        public @NonNull String suggestion() {
             return this.completion;
         }
 

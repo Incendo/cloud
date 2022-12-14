@@ -32,6 +32,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A suggestion which gives native minecraft chat component as description, used for brigadier support
+ * @since 1.9.0
  */
 public interface NativeCompletion extends Completion {
 
@@ -93,7 +94,7 @@ public interface NativeCompletion extends Completion {
         }
 
         @Override
-        public @NonNull String completion() {
+        public @NonNull String suggestion() {
             return this.suggestion;
         }
 

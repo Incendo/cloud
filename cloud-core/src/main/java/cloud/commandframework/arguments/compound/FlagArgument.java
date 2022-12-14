@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.compound;
 
+import cloud.commandframework.Completion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -184,8 +185,16 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         }
 
         @Override
-        @SuppressWarnings({"unchecked", "rawtypes"})
         public @NonNull List<@NonNull String> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
+            return Completion.raw(this.completions(commandContext, input));
+        }
+
+        @Override
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        public @NonNull List<@NonNull Completion> completions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -255,7 +264,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 if (suggestCombined) {
                     strings.add(input);
                 }
-                return strings;
+                return Completion.of(strings);
             } else {
                 CommandFlag<?> currentFlag = null;
                 if (lastArg.startsWith("--")) { // --long
@@ -280,12 +289,12 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 if (currentFlag != null
                         && commandContext.hasPermission(currentFlag.permission())
                         && currentFlag.getCommandArgument() != null) {
-                    return (List<String>) ((BiFunction) currentFlag.getCommandArgument().getSuggestionsProvider())
+                    return (List<Completion>) ((BiFunction) currentFlag.getCommandArgument().getCompletionsProvider())
                             .apply(commandContext, input);
                 }
             }
             commandContext.store(FLAG_META_KEY, "");
-            return this.suggestions(commandContext, input);
+            return this.completions(commandContext, input);
         }
 
 

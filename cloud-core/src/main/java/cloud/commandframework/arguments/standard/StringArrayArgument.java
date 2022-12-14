@@ -91,18 +91,19 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      * Create a new required string array argument
      *
      * @param name                Argument name
-     * @param suggestionsProvider Suggestions provider
+     * @param completionsProvider Completions provider
      * @param <C>                 Command sender type
      * @return Created argument
+     * @since 1.9.0
      */
     public static <C> @NonNull StringArrayArgument<C> ofRich(
             final @NonNull String name,
-            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider
+            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> completionsProvider
     ) {
         return new StringArrayArgument<>(
                 true /* required */,
                 name,
-                suggestionsProvider,
+                completionsProvider,
                 ArgumentDescription.empty(),
                 false /* flagYielding */
         );
@@ -137,21 +138,21 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      *
      * @param name                Argument name
      * @param flagYielding        Whether the parser should stop parsing when encountering a potential flag
-     * @param suggestionsProvider Suggestions provider
+     * @param completionsProvider Completions provider
      * @param <C>                 Command sender type
      * @return Created argument
-     * @since 1.7.0
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public static <C> @NonNull StringArrayArgument<C> ofRich(
             final @NonNull String name,
             final boolean flagYielding,
-            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider
+            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> completionsProvider
     ) {
         return new StringArrayArgument<>(
                 true /* required */,
                 name,
-                suggestionsProvider,
+                completionsProvider,
                 ArgumentDescription.empty(),
                 flagYielding
         );
@@ -181,18 +182,19 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      * Create a new optional string array argument
      *
      * @param name                Argument name
-     * @param suggestionsProvider Suggestions provider
+     * @param completionsProvider Completions provider
      * @param <C>                 Command sender type
      * @return Created argument
+     * @since 1.9.0
      */
     public static <C> @NonNull StringArrayArgument<C> optionalRich(
             final @NonNull String name,
-            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider
+            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> completionsProvider
     ) {
         return new StringArrayArgument<>(
                 false /* required */,
                 name,
-                suggestionsProvider,
+                completionsProvider,
                 ArgumentDescription.empty(),
                 false /* flagYielding */
         );
@@ -227,20 +229,20 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      *
      * @param name                Argument name
      * @param flagYielding        Whether the parser should stop parsing when encountering a potential flag
-     * @param suggestionsProvider Suggestions provider
+     * @param completionsProvider Completions provider
      * @param <C>                 Command sender type
      * @return Created argument
-     * @since 1.7.0
+     * @since 1.9.0
      */
     public static <C> @NonNull StringArrayArgument<C> optional(
             final @NonNull String name,
-            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> suggestionsProvider,
+            final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> completionsProvider,
             final boolean flagYielding
     ) {
         return new StringArrayArgument<>(
                 false /* required */,
                 name,
-                suggestionsProvider,
+                completionsProvider,
                 ArgumentDescription.empty(),
                 flagYielding
         );

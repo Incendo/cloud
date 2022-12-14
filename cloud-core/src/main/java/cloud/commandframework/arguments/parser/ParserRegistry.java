@@ -130,7 +130,7 @@ public interface ParserRegistry<C> {
      *
      * @param name                Name of the suggestions provider. The name is case independent.
      * @param suggestionsProvider The suggestions provider
-     * @see #getSuggestionProvider(String) Get a suggestion provider
+     * @see #getCompletionProvider(String) Get a completion provider
      * @since 1.1.0
      */
     @API(status = API.Status.STABLE, since = "1.1.0")
@@ -146,20 +146,23 @@ public interface ParserRegistry<C> {
      * @return Optional that either contains the suggestion provider, or is empty if no
      *         suggestion provider is registered with the given name
      * @see #registerSuggestionProvider(String, BiFunction) Register a suggestion provider
+     * @see #getCompletionProvider(String) New alternative
+     * @deprecated can result in completion data loss
      * @since 1.1.0
      */
     @API(status = API.Status.STABLE, since = "1.1.0")
+    @Deprecated
     @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
             @NonNull String name
     );
 
     /**
-     * Register a new named suggestion provider
+     * Register a new named completion provider
      *
-     * @param name                Name of the suggestions provider. The name is case independent.
-     * @param provider The suggestions provider
-     * @see #getSuggestionProvider(String) Get a suggestion provider
-     * @since 1.1.0
+     * @param name     Name of the completions provider. The name is case independent.
+     * @param provider The completions provider
+     * @see #getCompletionProvider(String) Get a suggestion provider
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.1.0")
     default void registerCompletionProvider(
@@ -176,7 +179,7 @@ public interface ParserRegistry<C> {
      * @return Optional that either contains the suggestion provider, or is empty if no
      *         suggestion provider is registered with the given name
      * @see #registerSuggestionProvider(String, BiFunction) Register a suggestion provider
-     * @since 1.1.0
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.1.0")
     @NonNull

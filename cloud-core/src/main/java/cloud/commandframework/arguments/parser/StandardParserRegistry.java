@@ -283,6 +283,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     }
 
     @Override
+    @Deprecated
     public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
             final @NonNull String name
     ) {
@@ -293,9 +294,9 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     @Override
     public void registerCompletionProvider(
             final @NonNull String name,
-            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>> suggestionsProvider
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>> completionsProvider
     ) {
-        this.namedCompletionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider);
+        this.namedCompletionProviders.put(name.toLowerCase(Locale.ENGLISH), completionsProvider);
     }
 
     @Override

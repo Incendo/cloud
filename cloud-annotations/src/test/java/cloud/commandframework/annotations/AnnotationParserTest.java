@@ -156,11 +156,11 @@ class AnnotationParserTest {
 
     @Test
     void testAnnotatedSuggestionsProviders() {
-        final BiFunction<CommandContext<TestCommandSender>, String, List<String>> suggestionsProvider =
-                this.manager.parserRegistry().getSuggestionProvider("cows").orElse(null);
+        final BiFunction<CommandContext<TestCommandSender>, String, List<Completion>> suggestionsProvider =
+                this.manager.parserRegistry().getCompletionProvider("cows").orElse(null);
         Assertions.assertNotNull(suggestionsProvider);
-        Assertions.assertTrue(suggestionsProvider.apply(new CommandContext<>(new TestCommandSender(), manager), "")
-                .contains("Stella"));
+        Assertions.assertTrue(Completion.raw(suggestionsProvider.apply(new CommandContext<>(new TestCommandSender(), manager),
+                        "")).contains("Stella"));
     }
 
     @Test

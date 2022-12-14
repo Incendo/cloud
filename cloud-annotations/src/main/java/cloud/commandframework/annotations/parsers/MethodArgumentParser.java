@@ -54,6 +54,7 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
      * @param instance           Instance that owns the method
      * @param method             The annotated method
      * @throws Exception If the method lookup fails
+     * @deprecated May result in lose of completion's additional data
      */
     @Deprecated
     public MethodArgumentParser(
@@ -71,6 +72,7 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
      * @param instance           Instance that owns the method
      * @param method             The annotated method
      * @throws Exception If the method lookup fails
+     * @since 1.9.0
      */
     public MethodArgumentParser(
             final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> suggestionProvider,

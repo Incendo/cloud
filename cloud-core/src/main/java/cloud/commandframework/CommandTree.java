@@ -491,10 +491,7 @@ public final class CommandTree<C> {
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<@NonNull String> commandQueue
     ) {
-        return this.getCompletions(context, commandQueue, this.internalTree)
-                .stream()
-                .map(Completion::completion)
-                .collect(Collectors.toList());
+        return Completion.raw(this.getCompletions(context, commandQueue, this.internalTree));
     }
 
     /**
@@ -573,7 +570,7 @@ public final class CommandTree<C> {
                 final List<Completion> suggestionsToAdd = argument.getValue().getCompletionsProvider()
                         .apply(commandContext, literalValue);
                 for (Completion completion : suggestionsToAdd) {
-                    if (completion.completion().equals(literalValue) || !completion.completion().startsWith(literalValue)) {
+                    if (completion.suggestion().equals(literalValue) || !completion.suggestion().startsWith(literalValue)) {
                         continue;
                     }
                     completions.add(completion);

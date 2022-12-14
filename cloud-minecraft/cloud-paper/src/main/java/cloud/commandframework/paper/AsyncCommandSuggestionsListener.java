@@ -58,12 +58,12 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         this.paperCommandManager = paperCommandManager;
         if (paperCommandManager.hasCapability(CloudBukkitCapabilities.PAPER_TOOLTIPS)) {
             BiFunction<String, Message, AsyncTabCompleteEvent.Completion> completionWithDescription;
-            if (Audience.class.isAssignableFrom(Player.class)) { //If we use native adventure
+            if (Audience.class.isAssignableFrom(Player.class)) { // If we use native adventure
                 completionWithDescription = (s, desc) -> {
                     Component component = PaperBrigadier.componentFromMessage(desc);
                     return AsyncTabCompleteEvent.Completion.completion(s, component);
                 };
-            } else { //We have a shaded adventure, using method handles to get needed methods without shading
+            } else { // We have a shaded adventure, using method handles to get needed methods without shading
                 final Method componentFromMessageMethod = CraftBukkitReflection.needMethod(
                         PaperBrigadier.class,
                         "componentFromMessage",
@@ -97,11 +97,11 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
                 List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
                 for (Completion completion : list) {
                     if (completion instanceof NativeCompletion) {
-                        String suggest = completion.completion();
+                        String suggest = completion.suggestion();
                         Message desc = ((NativeCompletion) completion).tooltip();
                         completions.add(completionWithDescription.apply(suggest, desc));
                     } else {
-                        completions.add(AsyncTabCompleteEvent.Completion.completion(completion.completion()));
+                        completions.add(AsyncTabCompleteEvent.Completion.completion(completion.suggestion()));
                     }
                 }
                 event.completions(completions);
@@ -139,7 +139,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         final C cloudSender = this.paperCommandManager.getCommandSenderMapper().apply(sender);
         final String inputBuffer = this.paperCommandManager.stripNamespace(event.getBuffer());
 
-        final List<Completion> completions = new ArrayList<>(this.paperCommandManager.giveCompletions(
+        final List<Completion> completions = new ArrayList<>(this.paperCommandManager.completions(
                 cloudSender,
                 inputBuffer
         ));

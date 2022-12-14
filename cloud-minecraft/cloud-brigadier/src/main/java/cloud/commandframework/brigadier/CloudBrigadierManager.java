@@ -632,7 +632,7 @@ public final class CloudBrigadierManager<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        final List<Completion> suggestionsUnfiltered = this.commandManager.giveCompletions(
+        final List<Completion> suggestionsUnfiltered = this.commandManager.completions(
                 commandContext.getSender(),
                 command
         );
@@ -646,7 +646,7 @@ public final class CloudBrigadierManager<C, S> {
                             ? ((StaticArgument<C>) arg).getAliases().stream() : Stream.empty())
                     .collect(Collectors.toSet());
 
-            completions.removeIf(s -> siblingLiterals.contains(s.completion()));
+            completions.removeIf(s -> siblingLiterals.contains(s.suggestion()));
         }
 
         SuggestionsBuilder suggestionsBuilder = builder;
@@ -659,7 +659,7 @@ public final class CloudBrigadierManager<C, S> {
         for (final Completion completion : completions) {
             if (completion instanceof NativeCompletion) {
                 NativeCompletion s = (NativeCompletion) completion;
-                suggestionsBuilder = suggestionsBuilder.suggest(s.completion(), s.tooltip());
+                suggestionsBuilder = suggestionsBuilder.suggest(s.suggestion(), s.tooltip());
             } else {
                 String tooltip = argument.getName();
                 if (!(argument instanceof StaticArgument)) {
@@ -669,7 +669,7 @@ public final class CloudBrigadierManager<C, S> {
                         tooltip = '[' + tooltip + ']';
                     }
                 }
-                suggestionsBuilder = suggestionsBuilder.suggest(completion.completion(), new LiteralMessage(tooltip));
+                suggestionsBuilder = suggestionsBuilder.suggest(completion.suggestion(), new LiteralMessage(tooltip));
             }
         }
 

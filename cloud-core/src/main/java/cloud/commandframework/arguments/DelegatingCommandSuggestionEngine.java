@@ -66,7 +66,7 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
 
     @Override
     public @NonNull List<@NonNull String> getSuggestions(@NonNull final CommandContext<C> context, @NonNull final String input) {
-        return this.getCompletions(context, input).stream().map(Completion::completion).collect(Collectors.toList());
+        return this.getCompletions(context, input).stream().map(Completion::suggestion).collect(Collectors.toList());
     }
 
     @Override

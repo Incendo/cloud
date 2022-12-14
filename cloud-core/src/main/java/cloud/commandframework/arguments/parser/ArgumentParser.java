@@ -101,7 +101,8 @@ public interface ArgumentParser<C, T> {
      *
      * @param commandContext Command context
      * @param input          Input string
-     * @return List of suggestions
+     * @return List of completions
+     * @since 1.9.0
      */
     default @NonNull List<@NonNull Completion> completions(
             final @NonNull CommandContext<C> commandContext,

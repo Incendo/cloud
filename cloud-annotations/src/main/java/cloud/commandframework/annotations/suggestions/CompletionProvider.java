@@ -43,9 +43,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public @interface CompletionProvider {
 
     /**
-     * Name of the suggestions provider. This should be the same as the name specified in your command arguments
+     * Name of the completion provider. This should be the same as the name specified in your command arguments
      *
-     * @return Suggestions provider name
+     * @return Completion provider name
+     * @since 1.9.0
      */
     @NonNull String value();
 }

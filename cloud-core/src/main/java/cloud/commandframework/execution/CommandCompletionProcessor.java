@@ -33,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Processor that formats command suggestions
  *
  * @param <C> Command sender type
+ * @since 1.9.0
  */
 public interface CommandCompletionProcessor<C> extends
         BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Completion>, @NonNull List<Completion>> {
