@@ -28,11 +28,13 @@ import cloud.commandframework.brigadier.BrigadierCompletion;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
+import cloud.commandframework.minecraft.extras.RichCompletion;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import com.mojang.brigadier.Message;
 import io.papermc.paper.brigadier.PaperBrigadier;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -41,6 +43,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -58,12 +61,16 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         this.paperCommandManager = paperCommandManager;
         if (paperCommandManager.hasCapability(CloudBukkitCapabilities.PAPER_TOOLTIPS)) {
             BiFunction<String, Message, AsyncTabCompleteEvent.Completion> completionWithDescription;
+            BiFunction<String, Component, AsyncTabCompleteEvent.Completion> completionWithAdventureTooltip;
             if (Audience.class.isAssignableFrom(Player.class)) { // If we use native adventure
                 completionWithDescription = (s, desc) -> {
                     Component component = PaperBrigadier.componentFromMessage(desc);
                     return AsyncTabCompleteEvent.Completion.completion(s, component);
                 };
+                completionWithAdventureTooltip = AsyncTabCompleteEvent.Completion::completion;
             } else { // We have a shaded adventure, using method handles to get needed methods without shading
+                final Class<?> gsonSerializer = CraftBukkitReflection.needClass("net.kyo".concat("ri.adventure.text"
+                        + ".serializer.gson.GsonComponentSerializer"));
                 final Method componentFromMessageMethod = CraftBukkitReflection.needMethod(
                         PaperBrigadier.class,
                         "componentFromMessage",
@@ -76,12 +83,24 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
                                 componentFromMessageMethod.getReturnType()
                         );
 
+                final Method deserializeMethod = CraftBukkitReflection.needMethod(
+                        gsonSerializer,
+                        "deserialize",
+                        Object.class
+                );
+                final Method gsonInstance = CraftBukkitReflection.needMethod(
+                        gsonSerializer,
+                        "gson"
+                );
+
                 final MethodHandle completionWithTooltip;
                 final MethodHandle componentFromMessage;
+                final MethodHandle deserialize;
                 try {
                     componentFromMessage = MethodHandles.publicLookup().unreflect(componentFromMessageMethod);
                     completionWithTooltip = MethodHandles.publicLookup().unreflect(completionWithTooltipMethod);
-                } catch (IllegalAccessException e) {
+                    deserialize = MethodHandles.lookup().unreflect(deserializeMethod).bindTo(gsonInstance.invoke(null));
+                } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new RuntimeException(e);
                 }
                 completionWithDescription = (suggestion, description) -> {
@@ -92,21 +111,51 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
                         throw new RuntimeException(t);
                     }
                 };
-            }
-            this.completionsApplier = (event, list) -> {
-                List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
-                for (Completion completion : list) {
-                    if (completion instanceof BrigadierCompletion) {
-                        String suggest = completion.suggestion();
-                        Message desc = ((BrigadierCompletion) completion).tooltip();
-                        completions.add(completionWithDescription.apply(suggest, desc));
-                    } else {
-                        completions.add(AsyncTabCompleteEvent.Completion.completion(completion.suggestion()));
+                completionWithAdventureTooltip =  (suggestion, tooltip) -> {
+                    try {
+                        String serialized = GsonComponentSerializer.gson().serialize(tooltip);
+                        Object deserialized = deserialize.invoke(serialized);
+                        return (AsyncTabCompleteEvent.Completion) completionWithTooltip.invoke(suggestion, deserialized);
+                    } catch (Throwable e) {
+                        throw new RuntimeException(e);
                     }
-                }
-                event.completions(completions);
-                event.setHandled(true);
-            };
+                };
+            }
+            if (paperCommandManager.hasCapability(CloudBukkitCapabilities.EXTRAS_PRESENT)) {
+                this.completionsApplier = (event, list) -> {
+                    List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
+                    for (Completion completion : list) {
+                        if (completion instanceof BrigadierCompletion) {
+                            String suggest = completion.suggestion();
+                            Message desc = ((BrigadierCompletion) completion).tooltip();
+                            completions.add(completionWithDescription.apply(suggest, desc));
+                        } else if (completion instanceof RichCompletion) {
+                            String suggest = completion.suggestion();
+                            Component tooltip = ((RichCompletion) completion).tooltip();
+                            completions.add(completionWithAdventureTooltip.apply(suggest, tooltip));
+                        } else {
+                            completions.add(AsyncTabCompleteEvent.Completion.completion(completion.suggestion()));
+                        }
+                    }
+                    event.completions(completions);
+                    event.setHandled(true);
+                };
+            } else {
+                this.completionsApplier = (event, list) -> {
+                    List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
+                    for (Completion completion : list) {
+                        if (completion instanceof BrigadierCompletion) {
+                            String suggest = completion.suggestion();
+                            Message desc = ((BrigadierCompletion) completion).tooltip();
+                            completions.add(completionWithDescription.apply(suggest, desc));
+                        } else {
+                            completions.add(AsyncTabCompleteEvent.Completion.completion(completion.suggestion()));
+                        }
+                    }
+                    event.completions(completions);
+                    event.setHandled(true);
+                };
+            }
         } else {
             this.completionsApplier = (event, list) -> {
                 event.setCompletions(Completion.raw(list));
