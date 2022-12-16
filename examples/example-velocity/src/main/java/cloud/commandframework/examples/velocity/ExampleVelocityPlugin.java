@@ -24,7 +24,7 @@
 package cloud.commandframework.examples.velocity;
 
 import cloud.commandframework.Completion;
-import cloud.commandframework.brigadier.NativeCompletion;
+import cloud.commandframework.brigadier.BrigadierCompletion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.AudienceProvider;
@@ -82,7 +82,7 @@ public final class ExampleVelocityPlugin {
                             NamedTextColor.BLUE
                     ))
                     .build();
-            completions.add(NativeCompletion.of(
+            completions.add(BrigadierCompletion.of(
                     player.getUsername(),
                     VelocityBrigadierMessage.tooltip(tooltip)
             ));

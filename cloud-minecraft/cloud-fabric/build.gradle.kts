@@ -60,6 +60,10 @@ dependencies {
     api(include(projects.cloudBrigadier)!!)
     api(include(projects.cloudServices)!!)
 
+    compileOnly(projects.cloudMinecraftExtras)
+    compileOnly(libs.adventureApi)
+    compileOnly(libs.adventureTextSerializerGson)
+
     api(libs.geantyref)
     include(libs.geantyref)
 }

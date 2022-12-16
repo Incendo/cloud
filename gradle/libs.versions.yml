@@ -175,6 +175,10 @@ dependencies:
     group: net.kyori
     name: adventure-text-serializer-plain
     version: { ref: adventureApi }
+  adventureTextSerializerGson:
+    group: net.kyori
+    name: adventure-text-serializer-gson
+    version: { ref: adventureApi }
   paperApi:
     group: com.destroystokyo.paper
     name: paper-api

@@ -45,7 +45,6 @@ import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
-import cloud.commandframework.brigadier.NativeCompletion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
@@ -66,6 +65,7 @@ import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
+import cloud.commandframework.minecraft.extras.RichCompletion;
 import cloud.commandframework.minecraft.extras.RichDescription;
 import cloud.commandframework.minecraft.extras.TextColorArgument;
 import cloud.commandframework.paper.PaperCommandManager;
@@ -85,12 +85,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.platform.bukkit.MinecraftComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -127,7 +125,6 @@ public final class ExamplePlugin extends JavaPlugin {
     private MinecraftHelp<CommandSender> minecraftHelp;
     private CommandConfirmationManager<CommandSender> confirmationManager;
     private AnnotationParser<CommandSender> annotationParser;
-    private BiFunction<String, Component, Completion> suggestionProvider;
 
     @Override
     public void onEnable() {
@@ -240,25 +237,9 @@ public final class ExamplePlugin extends JavaPlugin {
                                 .append(component).build()
                 ).apply(this.manager, this.bukkitAudiences::sender);
         //
-        // Make a suggestion provider that will work with internals
-        // If you only use paper 1.16.5+ you may prefer PaperBrigadier from paper mojangapi
-        //
-        this.suggestionProvider = this.getSuggestionProvider(this.manager.hasCapability(CloudBukkitCapabilities.BRIGADIER));
-        //
         // Create the commands
         //
         this.constructCommands();
-    }
-
-    @SuppressWarnings("UnstableApiUsage") // We should be careful as we will work with minecraft internals
-    private BiFunction<String, Component, Completion> getSuggestionProvider(final boolean support) {
-        if (support && MinecraftComponentSerializer.isSupported()) {
-            return (suggstion, description) -> {
-                Object component = MinecraftComponentSerializer.get().serialize(description);
-                return NativeCompletion.ofUnknown(suggstion, component);
-            };
-        }
-        return (suggestion, ignored) -> Completion.of(suggestion);
     }
 
     private void constructCommands() {
@@ -651,11 +632,11 @@ public final class ExamplePlugin extends JavaPlugin {
             final String input
     ) {
         return Arrays.asList(
-                this.suggestionProvider.apply("spawn", Component.text("Teleports to the spawn of the world",
+                RichCompletion.of("spawn", Component.text("Teleports to the spawn of the world",
                         NamedTextColor.GOLD)),
-                this.suggestionProvider.apply("respawn", Component.text("Teleports to the place where you'll respawn",
+                RichCompletion.of("respawn", Component.text("Teleports to the place where you'll respawn",
                         NamedTextColor.YELLOW)),
-                this.suggestionProvider.apply("look", Component.text("Teleports to the place where you look", NamedTextColor.RED))
+                RichCompletion.of("look", Component.text("Teleports to the place where you look", NamedTextColor.RED))
         );
     }
 

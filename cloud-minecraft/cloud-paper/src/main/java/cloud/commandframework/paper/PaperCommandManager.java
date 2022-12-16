@@ -26,8 +26,8 @@ package cloud.commandframework.paper;
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.Completion;
+import cloud.commandframework.brigadier.BrigadierCompletion;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.NativeCompletion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
@@ -183,7 +183,7 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
      */
     public Completion createCompletion(@NonNull final String completion, @NonNull final String description) {
         if (this.registeredAsyncTooltipCompletions || this.registeredCommodore) {
-            return NativeCompletion.of(completion, description);
+            return BrigadierCompletion.of(completion, description);
         }
         return Completion.of(completion);
     }

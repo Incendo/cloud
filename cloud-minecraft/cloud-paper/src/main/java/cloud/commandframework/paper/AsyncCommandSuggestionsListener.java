@@ -24,7 +24,7 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.Completion;
-import cloud.commandframework.brigadier.NativeCompletion;
+import cloud.commandframework.brigadier.BrigadierCompletion;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
@@ -96,9 +96,9 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
             this.completionsApplier = (event, list) -> {
                 List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
                 for (Completion completion : list) {
-                    if (completion instanceof NativeCompletion) {
+                    if (completion instanceof BrigadierCompletion) {
                         String suggest = completion.suggestion();
-                        Message desc = ((NativeCompletion) completion).tooltip();
+                        Message desc = ((BrigadierCompletion) completion).tooltip();
                         completions.add(completionWithDescription.apply(suggest, desc));
                     } else {
                         completions.add(AsyncTabCompleteEvent.Completion.completion(completion.suggestion()));

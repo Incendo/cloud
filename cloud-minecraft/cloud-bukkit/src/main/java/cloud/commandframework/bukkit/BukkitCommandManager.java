@@ -347,9 +347,18 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
             cloudCommodoreManager.initialize(this);
             this.commandRegistrationHandler(cloudCommodoreManager);
             this.setSplitAliases(true);
+            this.registerMessageExtractor(cloudCommodoreManager.brigadierManager());
         } catch (final Throwable e) {
             throw new BrigadierFailureException(BrigadierFailureReason.COMMODORE_NOT_PRESENT, e);
         }
+    }
+
+    /**
+     * Registers RichCompletion support
+     * @param manager Brigadier manager
+     */
+    protected void registerMessageExtractor(final @NonNull CloudBrigadierManager<C, ?> manager) {
+        //TODO
     }
 
     /**
