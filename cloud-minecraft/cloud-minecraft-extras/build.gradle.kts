@@ -6,5 +6,4 @@ dependencies {
     api(projects.cloudCore)
     api(libs.adventureApi)
     api(libs.adventureTextSerializerPlain)
-    api(libs.adventureTextSerializerGson)
 }

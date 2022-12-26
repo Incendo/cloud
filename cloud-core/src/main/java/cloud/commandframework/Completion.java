@@ -41,7 +41,7 @@ public interface Completion {
      * @return An instance of completion representing this string.
      */
     static @NonNull Completion of(@NonNull final String completion) {
-        return new CompletionImpl(completion);
+        return new SimpleCompletion(completion);
     }
     /**
      * Wraps multiple raw suggestions into a simple representation of the completion
@@ -51,7 +51,7 @@ public interface Completion {
     static @NonNull List<@NonNull Completion> of(final @NonNull Iterable<@NonNull String> suggestions) {
         List<Completion> completion = new LinkedList<>();
         for (String raw: suggestions){
-            completion.add(new CompletionImpl(raw));
+            completion.add(new SimpleCompletion(raw));
         }
         return completion;
     }
@@ -63,7 +63,7 @@ public interface Completion {
     static @NonNull List<@NonNull Completion> of(@NonNull final String @NonNull... suggestions) {
         ArrayList<Completion> completion = new ArrayList<>(suggestions.length);
         for (String raw: suggestions){
-            completion.add(new CompletionImpl(raw));
+            completion.add(new SimpleCompletion(raw));
         }
         return completion;
     }
@@ -92,4 +92,26 @@ public interface Completion {
      * @return a new instance with this suggestion
      */
     @NonNull Completion withSuggestion(@NonNull String suggestion);
+
+    /**
+     * SimpleSuggestion is a suggestion that wraps around a string completion
+     */
+    final class SimpleCompletion implements Completion {
+
+        private final @NonNull String completion;
+
+        private SimpleCompletion(final @NonNull String completion) {
+            this.completion = completion;
+        }
+
+        @Override
+        public @NonNull String suggestion() {
+            return this.completion;
+        }
+
+        @Override
+        public @NonNull Completion withSuggestion(@NonNull final String suggestion) {
+            return new SimpleCompletion(suggestion);
+        }
+    }
 }

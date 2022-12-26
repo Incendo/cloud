@@ -26,13 +26,15 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Completion;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A suggestion which gives native minecraft chat component as description, used for brigadier support
  * @since 1.9.0
  */
-public interface BrigadierCompletion extends Completion {
+public interface NativeCompletion extends Completion {
 
     /**
      * Gives a native chat component tooltip for suggestion
@@ -45,7 +47,7 @@ public interface BrigadierCompletion extends Completion {
      * @param tooltip the new tooltip message
      * @return a new suggestion instance with this tooltip
      */
-    @NonNull BrigadierCompletion withTooltip(@NonNull Message tooltip);
+    @NonNull NativeCompletion withTooltip(@NonNull Message tooltip);
 
     /**
      * Gives a suggestion instance with native brigadier message as description
@@ -53,8 +55,8 @@ public interface BrigadierCompletion extends Completion {
      * @param description the plain text as description
      * @return a new suggestion instance
      */
-    static @NonNull BrigadierCompletion of(@NonNull final String suggestion, @NonNull final String description) {
-        return new BrigadierCompletionImpl(suggestion, new LiteralMessage(description));
+    static @NonNull NativeCompletion of(@NonNull final String suggestion, @NonNull final String description) {
+        return new SimpleCompletion(suggestion, new LiteralMessage(description));
     }
     /**
      * Gives a suggestion instance with native brigadier message as description
@@ -62,7 +64,53 @@ public interface BrigadierCompletion extends Completion {
      * @param description the rich text as description
      * @return a new suggestion instance
      */
-    static @NonNull BrigadierCompletion of(@NonNull final String suggestion, @NonNull final Message description) {
-        return new BrigadierCompletionImpl(suggestion, description);
+    static @NonNull NativeCompletion of(@NonNull final String suggestion, @NonNull final Message description) {
+        return new SimpleCompletion(suggestion, description);
+    }
+    /**
+     * Gives a suggestion instance with native brigadier message as description
+     * if the description object is a brigadier message
+     * @param suggestion the suggestion
+     * @param description the rich text as description
+     * @return a new suggestion instance
+     */
+    static @NonNull Completion ofUnknown(@NonNull final String suggestion, @Nullable final Object description) {
+        Message message = null;
+        if (description instanceof Message) {
+            message = (Message) description;
+        }
+        return message == null ? Completion.of(suggestion) : new SimpleCompletion(suggestion, message);
+    }
+
+    @API(status = API.Status.INTERNAL)
+    final class SimpleCompletion implements NativeCompletion {
+
+        private final @NonNull String suggestion;
+        private final @NonNull Message tooltip;
+
+        private SimpleCompletion(final @NonNull String suggestion, final @NonNull Message tooltip) {
+            this.suggestion = suggestion;
+            this.tooltip = tooltip;
+        }
+
+        @Override
+        public @NonNull String suggestion() {
+            return this.suggestion;
+        }
+
+        @Override
+        public @NonNull Completion withSuggestion(@NonNull final String suggestion) {
+            return new NativeCompletion.SimpleCompletion(suggestion, this.tooltip);
+        }
+
+        @Override
+        public @NonNull Message tooltip() {
+            return this.tooltip;
+        }
+
+        @Override
+        public @NonNull NativeCompletion withTooltip(@NonNull final Message tooltip) {
+            return new NativeCompletion.SimpleCompletion(this.suggestion, tooltip);
+        }
     }
 }

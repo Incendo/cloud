@@ -51,8 +51,7 @@ public enum CloudBukkitCapabilities implements CloudCapability {
     PAPER_TOOLTIPS(Optional.ofNullable(CraftBukkitReflection.findClass(
             "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent"))
             .flatMap(c -> Stream.of(c.getClasses()).map(Class::getSimpleName).filter("Completion"::equals).findAny())
-            .isPresent()),
-    EXTRAS_PRESENT(CraftBukkitReflection.classExists("cloud.commandframework.minecraft.extras.RichCompletion"));
+            .isPresent());
 
     static final Set<CloudBukkitCapabilities> CAPABLE = Arrays.stream(values())
             .filter(CloudBukkitCapabilities::capable)

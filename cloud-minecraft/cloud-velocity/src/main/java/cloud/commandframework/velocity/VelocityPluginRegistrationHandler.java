@@ -29,11 +29,9 @@ import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandRegistrationHandler;
-import cloud.commandframework.minecraft.extras.RichCompletion;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.command.VelocityBrigadierMessage;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -57,12 +55,6 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
                 sender -> this.manager.commandSenderMapper().apply(sender)
         );
         this.brigadierManager.backwardsBrigadierSenderMapper(this.manager.backwardsCommandSenderMapper());
-        try {
-            Class.forName("cloud.commandframework.minecraft.extras.RichCompletion");
-            this.brigadierManager.registerMessageExtractor(RichCompletion.class, c -> VelocityBrigadierMessage.tooltip(c.tooltip()));
-        } catch (ClassNotFoundException ignored) {
-            // We don't have extras present, no need for support
-        }
     }
 
     @Override
