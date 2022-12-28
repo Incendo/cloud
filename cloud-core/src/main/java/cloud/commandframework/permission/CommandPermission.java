@@ -63,10 +63,13 @@ public interface CommandPermission {
     @API(status = API.Status.STABLE, since = "1.4.0")
     default @NonNull CommandPermission or(final @NonNull CommandPermission other) {
         requireNonNull(other, "other");
-        final Set<CommandPermission> permission = new HashSet<>(2);
-        permission.add(this);
-        permission.add(other);
-        return OrPermission.of(permission);
+
+        // Performance optimization
+        if (other instanceof OrPermission) {
+            return other.or(this);
+        }
+
+        return OrPermission.of(Arrays.asList(this, other));
     }
 
     /**
@@ -95,10 +98,13 @@ public interface CommandPermission {
     @API(status = API.Status.STABLE, since = "1.4.0")
     default @NonNull CommandPermission and(final @NonNull CommandPermission other) {
         requireNonNull(other, "other");
-        final Set<CommandPermission> permission = new HashSet<>(2);
-        permission.add(this);
-        permission.add(other);
-        return AndPermission.of(permission);
+
+        // Performance optimization
+        if (other instanceof AndPermission) {
+            return other.and(this);
+        }
+
+        return AndPermission.of(Arrays.asList(this, other));
     }
 
     /**
