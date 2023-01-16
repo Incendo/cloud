@@ -24,11 +24,14 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.Completion;
-import cloud.commandframework.brigadier.NativeCompletion;
+import cloud.commandframework.DescriptiveCompletion;
+import cloud.commandframework.brigadier.BrigadierCompletion;
+import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
 import io.papermc.paper.brigadier.PaperBrigadier;
 import java.lang.invoke.MethodHandle;
@@ -95,13 +98,27 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
             }
             this.completionsApplier = (event, list) -> {
                 List<AsyncTabCompleteEvent.Completion> completions = new LinkedList<>();
+                CloudBrigadierManager<C, ?> brigadier = paperCommandManager.brigadierManager();
                 for (Completion completion : list) {
-                    if (completion instanceof NativeCompletion) {
-                        String suggest = completion.suggestion();
-                        Message desc = ((NativeCompletion) completion).tooltip();
-                        completions.add(completionWithDescription.apply(suggest, desc));
+                    if (brigadier == null) {
+                        if (completion instanceof BrigadierCompletion) {
+                            String suggest = completion.suggestion();
+                            Message desc = ((BrigadierCompletion) completion).tooltip();
+                            completions.add(completionWithDescription.apply(suggest, desc));
+                        } else if (completion instanceof DescriptiveCompletion) {
+                            String suggest = completion.suggestion();
+                            String desc = ((DescriptiveCompletion) completion).description();
+                            completions.add(completionWithDescription.apply(suggest, new LiteralMessage(desc)));
+                        } else {
+                            completions.add(AsyncTabCompleteEvent.Completion.completion(completion.suggestion()));
+                        }
                     } else {
-                        completions.add(AsyncTabCompleteEvent.Completion.completion(completion.suggestion()));
+                        Message message = brigadier.extractMessage(null, completion);
+                        if (message == null) {
+                            completions.add(AsyncTabCompleteEvent.Completion.completion(completion.suggestion()));
+                        } else {
+                            completions.add(completionWithDescription.apply(completion.suggestion(), message));
+                        }
                     }
                 }
                 event.completions(completions);

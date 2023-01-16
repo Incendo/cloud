@@ -27,6 +27,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.Completion;
+import cloud.commandframework.DescriptiveCompletion;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
@@ -48,6 +49,7 @@ import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.LiteralMessage;
+import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -70,10 +72,13 @@ import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -102,6 +107,7 @@ public final class CloudBrigadierManager<C, S> {
     private final Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers;
     private final Supplier<CommandContext<C>> dummyContextProvider;
     private final CommandManager<C> commandManager;
+    private final LinkedList<BrigadierMessageExtractor<C, ?>> extractors = new LinkedList<>();
     private Function<S, C> brigadierCommandSenderMapper;
     private Function<C, S> backwardsBrigadierCommandSenderMapper;
 
@@ -138,6 +144,70 @@ public final class CloudBrigadierManager<C, S> {
                 );
             }
         });
+        this.registerMessageExtractor(Completion.class, (argument, c) -> {
+            if (argument == null) {
+                return null;
+            } else if (argument instanceof StaticArgument) {
+                return new LiteralMessage(argument.getName());
+            } else if (argument.isRequired()) {
+                return new LiteralMessage('<' + argument.getName() + '>');
+            } else {
+                return new LiteralMessage('[' + argument.getName() + ']');
+            }
+        });
+        this.registerMessageExtractor(DescriptiveCompletion.class, c -> new LiteralMessage(c.description()));
+        this.registerMessageExtractor(BrigadierCompletion.class, BrigadierCompletion::tooltip);
+    }
+
+    /**
+     * Registers a compatibility with a completion type for tooltip support, the last registered
+     * extractor will be the first used
+     * <p>
+     * If it returns null it will search for another extractor
+     * </p>
+     * @param completionClass The class instance
+     * @param extractor The extractor from a completion and argument instance
+     * @param <T> The completion type whose support you register
+     * @since 1.9.0
+     */
+    public <T extends Completion> void registerMessageExtractor(
+            final @NonNull Class<T> completionClass,
+            final @NonNull BiFunction<@Nullable CommandArgument<C, ?>, @NonNull T, @Nullable Message> extractor
+    ) {
+        this.extractors.addFirst(new BrigadierMessageExtractor<>(completionClass, extractor));
+    }
+    /**
+     * Registers a compatibility with a completion type for tooltip support, the last registered
+     * extractor will be the first used
+     * <p>
+     * If it returns null it will search for another extractor
+     * </p>
+     * @param completionClass the class instance
+     * @param extractor the extractor from a completion instance
+     * @param <T> The completion type whose support you register
+     * @since 1.9.0
+     */
+    public <T extends Completion> void registerMessageExtractor(
+            final @NonNull Class<T> completionClass,
+            final @NonNull Function<@NonNull T, @Nullable Message> extractor
+    ) {
+        this.extractors.addFirst(new BrigadierMessageExtractor<>(completionClass, (ignored, c) -> extractor.apply(c)));
+    }
+
+    /**
+     * Extracts the message using registered message extractors
+     * @param argument the argument which is providing the completion
+     * @param completion the completion itself
+     * @return a message tooltip
+     * @since 1.8.1
+     */
+    public @Nullable Message extractMessage(@Nullable final CommandArgument<C, ?> argument, @NonNull final Completion completion) {
+        Message tooltip = null;
+        Iterator<BrigadierMessageExtractor<C, ?>> iterator = this.extractors.iterator();
+        while (tooltip == null && iterator.hasNext()) {
+            tooltip = iterator.next().tryExtract(argument, completion);
+        }
+        return tooltip;
     }
 
     private void registerInternalMappings() {
@@ -657,20 +727,7 @@ public final class CloudBrigadierManager<C, S> {
         }
 
         for (final Completion completion : completions) {
-            if (completion instanceof NativeCompletion) {
-                NativeCompletion s = (NativeCompletion) completion;
-                suggestionsBuilder = suggestionsBuilder.suggest(s.suggestion(), s.tooltip());
-            } else {
-                String tooltip = argument.getName();
-                if (!(argument instanceof StaticArgument)) {
-                    if (argument.isRequired()) {
-                        tooltip = '<' + tooltip + '>';
-                    } else {
-                        tooltip = '[' + tooltip + ']';
-                    }
-                }
-                suggestionsBuilder = suggestionsBuilder.suggest(completion.suggestion(), new LiteralMessage(tooltip));
-            }
+            suggestionsBuilder = suggestionsBuilder.suggest(completion.suggestion(), this.extractMessage(argument, completion));
         }
 
         return suggestionsBuilder.buildFuture();

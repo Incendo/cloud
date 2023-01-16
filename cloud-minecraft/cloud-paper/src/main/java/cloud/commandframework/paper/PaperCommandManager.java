@@ -25,9 +25,7 @@ package cloud.commandframework.paper;
 
 import cloud.commandframework.CloudCapability;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.Completion;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.brigadier.NativeCompletion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
@@ -47,8 +45,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class PaperCommandManager<C> extends BukkitCommandManager<C> {
 
     private PaperBrigadierListener<C> paperBrigadierListener = null;
-    private boolean registeredCommodore = false;
-    private boolean registeredAsyncTooltipCompletions = false;
 
     /**
      * Construct a new Paper command manager
@@ -127,7 +123,6 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         this.checkBrigadierCompatibility();
         if (!this.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             super.registerBrigadier();
-            this.registeredCommodore = true;
         } else {
             try {
                 this.paperBrigadierListener = new PaperBrigadierListener<>(this);
@@ -170,21 +165,5 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
                 new AsyncCommandSuggestionsListener<>(this),
                 this.getOwningPlugin()
         );
-        if (this.hasCapability(CloudBukkitCapabilities.PAPER_TOOLTIPS)) {
-            this.registeredAsyncTooltipCompletions = true;
-        }
-    }
-
-    /**
-     * Creates the best supported completion with description
-     * @param completion the completion itself
-     * @param description the description of the completion
-     * @return the completion instance that is best supported
-     */
-    public Completion createCompletion(@NonNull final String completion, @NonNull final String description) {
-        if (this.registeredAsyncTooltipCompletions || this.registeredCommodore) {
-            return NativeCompletion.of(completion, description);
-        }
-        return Completion.of(completion);
     }
 }
