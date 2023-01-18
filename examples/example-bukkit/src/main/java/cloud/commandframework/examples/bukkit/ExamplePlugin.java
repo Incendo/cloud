@@ -39,6 +39,8 @@ import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.suggestions.CompletionProvider;
+import cloud.commandframework.annotations.suggestions.ConstantCompletions;
+import cloud.commandframework.annotations.suggestions.SingleCompletion;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
@@ -80,7 +82,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -601,7 +602,11 @@ public final class ExamplePlugin extends JavaPlugin {
     @CommandMethod(value = "example warp <location>", requiredSender = Player.class)
     public void warp(
             final @NonNull Player player,
-            final @NonNull @Argument(value = "location", suggestions = "warps") String warp
+            final @NonNull @Argument(value = "location") @ConstantCompletions({
+                    @SingleCompletion(value = "spawn", description = "Teleports to the spawn of the world"),
+                    @SingleCompletion(value = "respawn", description = "Teleports to the place where you'll respawn"),
+                    @SingleCompletion(value = "look", description = "Teleports to the place where you look")
+            }) String warp
     ) {
         Bukkit.getScheduler().runTask(this, () -> {
             switch (warp.toLowerCase(Locale.ROOT)) {
@@ -624,17 +629,20 @@ public final class ExamplePlugin extends JavaPlugin {
             }
         });
     }
+    @CommandMethod(value = "example tphere <player>", requiredSender = Player.class)
+    public void tp(final @NonNull Player sender,
+                   final @NonNull @Argument(value = "player", suggestions = "rich_players") Player player) {
+        player.teleport(sender);
+    }
 
-    @CompletionProvider("warps")
-    public List<Completion> warps(
-            final CommandContext<CommandSender> context,
-            final String input
+    @CompletionProvider("rich_players")
+    public List<Completion> players(
+            final @NonNull CommandContext<CommandSender> context,
+            final @NonNull String input
     ) {
-        return Arrays.asList(
-                DescriptiveCompletion.of("spawn", "Teleports to the spawn of the world"),
-                DescriptiveCompletion.of("respawn", "Teleports to the place where you'll respawn"),
-                DescriptiveCompletion.of("look", "Teleports to the place where you look")
-        );
+        return Bukkit.getOnlinePlayers().stream()
+                .map(player -> DescriptiveCompletion.optional(player.getName(), ChatColor.stripColor(player.getDisplayName())))
+                .collect(Collectors.toList());
     }
 
     @Suggestions("commands")
