@@ -53,7 +53,7 @@ dependencies {
     modImplementation(fabricApi.module("fabric-networking-api-v1", libs.versions.fabricApi.get()))
     modImplementation(fabricApi.module("fabric-lifecycle-events-v1", libs.versions.fabricApi.get()))
 
-    modImplementation(libs.fabricPermissionsApi)
+    modApi(libs.fabricPermissionsApi)
     include(libs.fabricPermissionsApi)
 
     api(include(projects.cloudCore)!!)
