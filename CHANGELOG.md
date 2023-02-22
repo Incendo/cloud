@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1]
+
+### Fixed
+- Core: Fixed last argument always being treated as greedy in suggestions ([#428](https://github.com/Incendo/cloud/pull/428))
+- Core: Remove redundant at literal in docs (formatting fix) ([#427](https://github.com/Incendo/cloud/pull/427))
+
+### Changed
+- Core: Improve ParameterInjectorRegistry#registerInjector JavaDoc ([#423](https://github.com/Incendo/cloud/pull/423))
+- Fabric: Exposed permissions API in apiElements to match old behavior when consumers update to loom 1.1 (which also fixes api 
+  guardian being missing from the classpath)
+
 ## [1.8.0]
 
 ### Added
