@@ -115,7 +115,7 @@ Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot reposi
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-PLATFORM</artifactId>
- <version>1.8.1</version>
+ <version>1.8.2</version>
 </dependency>
 <!-- 
 ~    Optional: Allows you to use annotated methods
@@ -124,7 +124,7 @@ Snapshot builds of Cloud are available through the [Sonatype OSS Snapshot reposi
 <dependency>  
  <groupId>cloud.commandframework</groupId>
  <artifactId>cloud-annotations</artifactId>
- <version>1.8.1</version>
+ <version>1.8.2</version>
 </dependency>
 ``` 
 
@@ -185,7 +185,7 @@ repositories {
 
 ```kotlin
 dependencies {
-    implementation("cloud.commandframework", "cloud-PLATFORM", "1.8.1")
+    implementation("cloud.commandframework", "cloud-PLATFORM", "1.8.2")
 }
 ```
 
