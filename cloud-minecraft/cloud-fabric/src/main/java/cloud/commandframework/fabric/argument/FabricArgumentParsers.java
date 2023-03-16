@@ -368,7 +368,7 @@ public final class FabricArgumentParsers {
 
         @Override
         public @NonNull BlockPos blockPos() {
-            return new BlockPos(this.position());
+            return BlockPos.containing(this.position());
         }
 
         @Override
