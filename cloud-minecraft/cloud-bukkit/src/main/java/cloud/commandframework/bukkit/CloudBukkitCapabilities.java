@@ -34,16 +34,36 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Capabilities for the Bukkit module
  */
 public enum CloudBukkitCapabilities implements CloudCapability {
+    /**
+     * Whether Brigadier is present in the current environment. Certain parser types require this, and are able to work
+     * even if a capability for Brigadier command registration is not present (as long as this capability is present).
+     */
     BRIGADIER(CraftBukkitReflection.classExists("com.mojang.brigadier.tree.CommandNode")
             && CraftBukkitReflection.findOBCClass("command.BukkitCommandWrapper") != null),
 
+    /**
+     * Whether support for native Brigadier command registration is available
+     * through the Paper API ({@code PaperCommandManager#registerBrigadier} from {@code cloud-paper}).
+     */
     NATIVE_BRIGADIER(CraftBukkitReflection.classExists(
             "com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent")),
 
+    /**
+     * Whether support for Brigadier command registration is available through Commodore
+     * ({@link BukkitCommandManager#registerBrigadier}).
+     *
+     * <p><b>Note:</b> As of 1.19.2, Commodore simply delegates to the same Paper API as cloud is capable of using directly,
+     * doing nothing on non-Paper Bukkit implementations. As such, this capability will not be present in 1.19.2+ environments.
+     * Users should prefer using {@code PaperCommandManager} from {@code cloud-paper} and checking for
+     * {@link #NATIVE_BRIGADIER}.</p>
+     */
     COMMODORE_BRIGADIER(BRIGADIER.capable()
             && !NATIVE_BRIGADIER.capable()
             && !CraftBukkitReflection.classExists("org.bukkit.entity.Warden")),
 
+    /**
+     * Whether asynchronous command completions are supported through the Paper API.
+     */
     ASYNCHRONOUS_COMPLETION(CraftBukkitReflection.classExists(
             "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent"));
 
