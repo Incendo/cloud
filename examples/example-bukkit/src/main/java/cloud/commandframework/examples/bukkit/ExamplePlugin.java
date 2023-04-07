@@ -180,7 +180,7 @@ public final class ExamplePlugin extends JavaPlugin {
         //
         // Register Brigadier mappings
         //
-        if (this.manager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
+        if (this.manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
             this.manager.registerBrigadier();
         }
         //

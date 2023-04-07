@@ -643,16 +643,13 @@ public final class CommandTree<C> {
         if (commandQueue.isEmpty()) {
             return Collections.emptyList();
         } else if (child.isLeaf()) {
-            final String input;
+            // Handles only simple cases, others will attempt to parse and then decide based on what gets consumed.
             if (commandQueue.size() == 1) {
-                input = commandQueue.peek();
-            } else {
-                input = child.getValue() instanceof CompoundArgument
-                        ? ((LinkedList<String>) commandQueue).getLast()
-                        : String.join(" ", commandQueue);
+                return this.directCompletions(commandContext, child, commandQueue.peek());
+            } else if (child.getValue() instanceof CompoundArgument) {
+                return this.directCompletions(commandContext, child, ((LinkedList<String>) commandQueue).getLast());
             }
-            return this.directCompletions(commandContext, child, input);
-        } else if (commandQueue.peek().isEmpty()) {
+        } else if (commandQueue.size() == 1 && commandQueue.peek().isEmpty()) {
             return this.directCompletions(commandContext, child, commandQueue.peek());
         }
 
@@ -674,6 +671,18 @@ public final class CommandTree<C> {
             final ArgumentParseResult<?> result = child.getValue().getParser().parse(commandContext, commandQueue);
             final Optional<?> parsedValue = result.getParsedValue();
             final boolean parseSuccess = parsedValue.isPresent();
+
+            // It's the last node, we don't care for success or not as we don't need to delegate to a child
+            if (child.isLeaf()) {
+                if (commandQueue.isEmpty()) {
+                    // Greedy parser took all the input, we can restore and just ask for suggestions
+                    commandQueue.addAll(commandQueueOriginal);
+                    return this.directSuggestions(commandContext, child, String.join(" ", commandQueue));
+                } else {
+                    // It's a leaf and there's leftover stuff, no possible suggestions!
+                    return Collections.emptyList();
+                }
+            }
 
             if (parseSuccess && !commandQueue.isEmpty()) {
                 // the current argument at the position is parsable and there are more arguments following
@@ -701,10 +710,10 @@ public final class CommandTree<C> {
             // Therefore we shouldn't list the suggestions of the current argument, as clearly the suggestions of
             // one of the following arguments is requested
             return Collections.emptyList();
+        } else {
+            // Fallback: use suggestion provider of argument
+            return this.directCompletions(commandContext, child, commandQueue.peek());
         }
-
-        // Fallback: use suggestion provider of argument
-        return this.directCompletions(commandContext, child, commandQueue.peek());
     }
 
     private @NonNull String stringOrEmpty(final @Nullable String string) {

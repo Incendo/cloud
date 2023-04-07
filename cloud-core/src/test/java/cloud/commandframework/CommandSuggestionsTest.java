@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.BooleanArgument;
+import cloud.commandframework.arguments.standard.DurationArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
@@ -112,6 +113,8 @@ public class CommandSuggestionsTest {
                 .argument(BooleanArgument.of("another_argument")));
         manager.command(manager.commandBuilder("numberswithmin")
                 .argument(IntegerArgument.<TestCommandSender>builder("num").withMin(5).withMax(100)));
+
+        manager.command(manager.commandBuilder("duration").argument(DurationArgument.of("duration")));
 
         manager.command(manager.commandBuilder("partial")
                 .argument(
@@ -316,6 +319,10 @@ public class CommandSuggestionsTest {
         final String input5 = "numberswithmin ";
         final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
         Assertions.assertEquals(Arrays.asList("5", "6", "7", "8", "9"), suggestions5);
+
+        final String input6 = "numbers 1 ";
+        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(Collections.emptyList(), suggestions6);
     }
 
     @Test
@@ -335,6 +342,22 @@ public class CommandSuggestionsTest {
                 Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
                 suggestions4
         );
+    }
+
+    @Test
+    void testDurations() {
+        final String input = "duration ";
+        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final String input2 = "duration 5";
+        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(Arrays.asList("5d", "5h", "5m", "5s"), suggestions2);
+        final String input3 = "duration 5s";
+        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(Collections.emptyList(), suggestions3);
+        final String input4 = "duration 5s ";
+        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(Collections.emptyList(), suggestions4);
     }
 
     @Test

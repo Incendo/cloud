@@ -331,7 +331,10 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
     }
 
     /**
-     * Attempt to register the Brigadier mapper, and return it.
+     * Attempts to enable Brigadier command registration through Commodore.
+     *
+     * <p>Callers should check for {@link CloudBukkitCapabilities#COMMODORE_BRIGADIER} first
+     * to avoid exceptions.</p>
      *
      * @throws BrigadierFailureException If Brigadier isn't
      *                                   supported by the platform
