@@ -677,7 +677,7 @@ public final class CommandTree<C> {
                 if (commandQueue.isEmpty()) {
                     // Greedy parser took all the input, we can restore and just ask for suggestions
                     commandQueue.addAll(commandQueueOriginal);
-                    return this.directSuggestions(commandContext, child, String.join(" ", commandQueue));
+                    return this.directCompletions(commandContext, child, String.join(" ", commandQueue));
                 } else {
                     // It's a leaf and there's leftover stuff, no possible suggestions!
                     return Collections.emptyList();
