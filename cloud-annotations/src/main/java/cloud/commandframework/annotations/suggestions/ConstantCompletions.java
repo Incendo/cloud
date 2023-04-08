@@ -42,5 +42,5 @@ public @interface ConstantCompletions {
      * @return the completions
      * @since 1.9.0
      */
-    @NonNull SingleCompletion[] value() default {};
+    @NonNull ConstantCompletion[] value() default {};
 }

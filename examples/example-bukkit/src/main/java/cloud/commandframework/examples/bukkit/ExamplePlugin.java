@@ -38,9 +38,8 @@ import cloud.commandframework.annotations.Confirmation;
 import cloud.commandframework.annotations.Flag;
 import cloud.commandframework.annotations.Regex;
 import cloud.commandframework.annotations.specifier.Greedy;
-import cloud.commandframework.annotations.suggestions.CompletionProvider;
-import cloud.commandframework.annotations.suggestions.ConstantCompletions;
-import cloud.commandframework.annotations.suggestions.SingleCompletion;
+import cloud.commandframework.annotations.suggestions.Completions;
+import cloud.commandframework.annotations.suggestions.ConstantCompletion;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
@@ -108,6 +107,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -599,19 +599,30 @@ public final class ExamplePlugin extends JavaPlugin {
         this.manager.deleteRootCommand(command);
         sender.sendMessage("Deleted the root command :)");
     }
+
     @CommandMethod(value = "example warp <location>", requiredSender = Player.class)
     public void warp(
             final @NonNull Player player,
-            final @NonNull @Argument(value = "location") @ConstantCompletions({
-                    @SingleCompletion(value = "spawn", description = "Teleports to the spawn of the world"),
-                    @SingleCompletion(value = "respawn", description = "Teleports to the place where you'll respawn"),
-                    @SingleCompletion(value = "look", description = "Teleports to the place where you look")
-            }) String warp
+            final @NonNull
+            @Argument(value = "location")
+            @Regex("(?i)(spawn|respawn|look)")
+            @ConstantCompletion(value = "spawn", description = "Teleports to the spawn of the world")
+            @ConstantCompletion(value = "respawn", description = "Teleports to the place where you'll respawn")
+            @ConstantCompletion(value = "look", description = "Teleports to the place where you look")
+            String warp
     ) {
         Bukkit.getScheduler().runTask(this, () -> {
             switch (warp.toLowerCase(Locale.ROOT)) {
                 case "look":
-                    player.teleport(player.getEyeLocation());
+                    Location loc;
+                    RayTraceResult result = player.rayTraceBlocks(10);
+                    if (result != null) {
+                        Location ploc = player.getLocation();
+                        loc = result.getHitPosition().toLocation(player.getWorld(), ploc.getYaw(), ploc.getPitch());
+                    } else {
+                        loc = player.getEyeLocation();
+                    }
+                    player.teleport(loc);
                     break;
                 case "respawn":
                     Location location = player.getBedSpawnLocation();
@@ -629,13 +640,16 @@ public final class ExamplePlugin extends JavaPlugin {
             }
         });
     }
+
     @CommandMethod(value = "example tphere <player>", requiredSender = Player.class)
-    public void tp(final @NonNull Player sender,
-                   final @NonNull @Argument(value = "player", suggestions = "rich_players") Player player) {
+    public void tp(
+            final @NonNull Player sender,
+            final @NonNull @Argument(value = "player", suggestions = "rich_players") Player player
+    ) {
         player.teleport(sender);
     }
 
-    @CompletionProvider("rich_players")
+    @Completions("rich_players")
     public List<Completion> players(
             final @NonNull CommandContext<CommandSender> context,
             final @NonNull String input

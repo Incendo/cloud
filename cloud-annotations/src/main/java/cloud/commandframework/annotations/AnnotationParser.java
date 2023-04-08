@@ -33,12 +33,11 @@ import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
-import cloud.commandframework.annotations.specifier.Completions;
-import cloud.commandframework.annotations.suggestions.CompletionProvider;
+import cloud.commandframework.annotations.suggestions.Completions;
 import cloud.commandframework.annotations.suggestions.ConstantCompletions;
 import cloud.commandframework.annotations.suggestions.MethodCompletionsProvider;
 import cloud.commandframework.annotations.suggestions.MethodSuggestionsProvider;
-import cloud.commandframework.annotations.suggestions.SingleCompletion;
+import cloud.commandframework.annotations.suggestions.ConstantCompletion;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -111,7 +110,7 @@ public final class AnnotationParser<C> {
     private final TypeToken<C> commandSenderType;
     private final MetaFactory metaFactory;
     private final FlagExtractor flagExtractor;
-    private Function<@NonNull SingleCompletion, Completion> completionConverter = c -> "".equals(c.description())
+    private Function<@NonNull ConstantCompletion, Completion> completionConverter = c -> "".equals(c.description())
             ? Completion.of(this.processString(c.value()))
             : DescriptiveCompletion.of(this.processString(c.value()), this.processString(c.description()));
 
@@ -336,11 +335,11 @@ public final class AnnotationParser<C> {
     }
 
     /**
-     * Sets a completion converter which transforms {@link SingleCompletion} to {@link Completion}.
+     * Sets a completion converter which transforms {@link ConstantCompletion} to {@link Completion}.
      * May be useful to transform to custom completion implementation, or parse custom string format
      * @param completionConverter the new converter
      */
-    public void completionConverter(final @NonNull Function<@NonNull SingleCompletion, @NonNull Completion> completionConverter) {
+    public void completionConverter(final @NonNull Function<@NonNull ConstantCompletion, @NonNull Completion> completionConverter) {
         this.completionConverter = completionConverter;
     }
 
@@ -461,8 +460,8 @@ public final class AnnotationParser<C> {
     private <T> void parseSuggestions(final @NonNull T instance) {
         for (final Method method : instance.getClass().getMethods()) {
             final Suggestions suggestions = method.getAnnotation(Suggestions.class);
-            final CompletionProvider completionProvider = method.getAnnotation(CompletionProvider.class);
-            if (suggestions == null && completionProvider == null) {
+            final Completions completions = method.getAnnotation(Completions.class);
+            if (suggestions == null && completions == null) {
                 continue;
             }
             if (!method.isAccessible()) {
@@ -482,7 +481,7 @@ public final class AnnotationParser<C> {
             try {
                 if (suggestions == null) {
                     this.manager.parserRegistry().registerCompletionProvider(
-                            this.processString(completionProvider.value()),
+                            this.processString(completions.value()),
                             new MethodCompletionsProvider<>(instance, method)
                     );
                 } else {
@@ -784,7 +783,7 @@ public final class AnnotationParser<C> {
             argumentBuilder.asRequired();
         }
         /* Check for Completions annotation */
-        final Completions suggestions = parameter.getDeclaredAnnotation(Completions.class);
+        final cloud.commandframework.annotations.specifier.Completions suggestions = parameter.getDeclaredAnnotation(cloud.commandframework.annotations.specifier.Completions.class);
         final ConstantCompletions completions = parameter.getDeclaredAnnotation(ConstantCompletions.class);
         if (suggestions != null) {
             final List<Completion> suggests = Completion.of(Arrays.asList(
@@ -804,7 +803,7 @@ public final class AnnotationParser<C> {
             );
         } else if (completions != null) {
             final List<Completion> completionList = new ArrayList<>(completions.value().length);
-            for (SingleCompletion completion : completions.value()) {
+            for (ConstantCompletion completion : completions.value()) {
                 completionList.add(this.completionConverter.apply(completion));
             }
             final List<Completion> finalList = Collections.unmodifiableList(completionList);

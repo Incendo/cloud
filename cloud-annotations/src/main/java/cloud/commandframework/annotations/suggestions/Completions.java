@@ -23,23 +23,30 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * A single completion
+ * This annotation allows you to create annotated methods that behave like completions providers.
+ * The method must have this exact signature: <pre>{@code
+ * ﹫Completions("name")
+ * public List<Completion> methodName(CommandContext<YourSender> sender, String input) {
+ * }}</pre>
+ *
  * @since 1.9.0
  */
-public @interface SingleCompletion {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Completions {
 
     /**
-     * The suggestion that this completion represent
-     * @return the suggestion
+     * Name of the completion provider. This should be the same as the name specified in your command arguments
+     *
+     * @return Completion provider name
+     * @since 1.9.0
      */
     @NonNull String value();
-
-    /**
-     * The description, if it's an empty string, the completion won't have description
-     * @return the description
-     */
-    @NonNull String description() default "";
 }
