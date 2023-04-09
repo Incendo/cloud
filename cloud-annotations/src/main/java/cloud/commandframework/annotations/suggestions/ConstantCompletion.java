@@ -23,13 +23,13 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
-import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represent a constant completion
