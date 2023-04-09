@@ -96,6 +96,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      * @return Created argument
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public static <C> @NonNull StringArrayArgument<C> ofRich(
             final @NonNull String name,
             final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> completionsProvider
@@ -143,7 +144,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      * @return Created argument
      * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public static <C> @NonNull StringArrayArgument<C> ofRich(
             final @NonNull String name,
             final boolean flagYielding,
@@ -187,6 +188,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      * @return Created argument
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public static <C> @NonNull StringArrayArgument<C> optionalRich(
             final @NonNull String name,
             final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> completionsProvider
@@ -234,6 +236,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
      * @return Created argument
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public static <C> @NonNull StringArrayArgument<C> optional(
             final @NonNull String name,
             final @NonNull BiFunction<CommandContext<C>, String, List<Completion>> completionsProvider,

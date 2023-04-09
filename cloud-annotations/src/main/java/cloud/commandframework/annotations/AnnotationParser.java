@@ -339,6 +339,7 @@ public final class AnnotationParser<C> {
      * May be useful to transform to custom completion implementation, or parse custom string format
      * @param completionConverter the new converter
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public void completionConverter(final @NonNull Function<@NonNull ConstantCompletion, @NonNull Completion> completionConverter) {
         this.completionConverter = completionConverter;
     }

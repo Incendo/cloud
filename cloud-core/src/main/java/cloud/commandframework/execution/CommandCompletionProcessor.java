@@ -27,6 +27,7 @@ import cloud.commandframework.Completion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.List;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -35,6 +36,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.9.0
  */
+@API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
 public interface CommandCompletionProcessor<C> extends
         BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Completion>, @NonNull List<Completion>> {
 
@@ -44,6 +46,7 @@ public interface CommandCompletionProcessor<C> extends
      * @deprecated Avoid using {@link CommandSuggestionProcessor}
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     default CommandSuggestionProcessor<C> toSimple() {
         return (c, s) -> Completion.raw(this.apply(c, Completion.of(s)));
     }

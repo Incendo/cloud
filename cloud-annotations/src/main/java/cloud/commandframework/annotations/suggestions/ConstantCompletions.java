@@ -32,10 +32,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * List of command completions
+ * @since 1.9.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-@API(status = API.Status.STABLE)
+@API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
 public @interface ConstantCompletions {
     /**
      * The completions which will be returned as suggestions, useful when the suggestions don't change

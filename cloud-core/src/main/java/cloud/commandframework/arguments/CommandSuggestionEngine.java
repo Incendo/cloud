@@ -58,6 +58,7 @@ public interface CommandSuggestionEngine<C> {
      * @return List of completions
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     default @NonNull List<@NonNull Completion> getCompletions(
             @NonNull CommandContext<C> context,
             @NonNull String input

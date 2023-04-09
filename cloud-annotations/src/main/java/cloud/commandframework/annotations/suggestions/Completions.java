@@ -27,6 +27,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -40,6 +41,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
 public @interface Completions {
 
     /**

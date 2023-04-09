@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -37,6 +38,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(ConstantCompletions.class)
+@API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
 public @interface ConstantCompletion {
 
     /**

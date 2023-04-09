@@ -68,6 +68,9 @@ public enum CloudBukkitCapabilities implements CloudCapability {
      */
     ASYNCHRONOUS_COMPLETION(CraftBukkitReflection.classExists(
             "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent")),
+    /**
+     * Whether paper asynchronous completions support components
+     */
     PAPER_TOOLTIPS(Optional.ofNullable(CraftBukkitReflection.findClass(
             "com.destroystokyo.paper.event.server.AsyncTabCompleteEvent"))
             .flatMap(c -> Stream.of(c.getClasses()).map(Class::getSimpleName).filter("Completion"::equals).findAny())

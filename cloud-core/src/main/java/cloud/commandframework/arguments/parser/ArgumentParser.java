@@ -104,6 +104,7 @@ public interface ArgumentParser<C, T> {
      * @return List of completions
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     default @NonNull List<@NonNull Completion> completions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input

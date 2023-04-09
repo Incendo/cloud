@@ -129,7 +129,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param argumentPreprocessors Argument preprocessors
      * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -171,6 +171,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken, Collection) New alternative
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -206,6 +207,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken) New alternative
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -232,7 +234,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, TypeToken,  ArgumentDescription) New alternative
      */
     @Deprecated
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -258,6 +260,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, Class) New alternative
      */
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -285,7 +288,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @see #CommandArgument(boolean, String, ArgumentParser, String, BiFunction, Class,  ArgumentDescription) New alternative
      */
     @Deprecated
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -332,7 +335,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * New alternative
      */
     @Deprecated
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -367,6 +370,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param argumentPreprocessors Argument preprocessors
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -400,6 +404,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param completionsProvider Completions provider
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -423,7 +428,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultDescription  Default description to use when registering
      * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -447,6 +452,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param completionsProvider Completions provider
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -471,7 +477,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @param defaultDescription  Default description to use when registering
      * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.4.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public CommandArgument(
             final boolean required,
             final @NonNull String name,
@@ -641,6 +647,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @return completions provider
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
             @NonNull List<Completion>> getCompletionsProvider() {
         return this.suggestionsProvider;
@@ -879,6 +886,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
          * @return Builder instance
          * @since 1.9.0
          */
+        @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
         public @NonNull @This Builder<@NonNull C, @NonNull T> withCompletionsProvider(
                 final @NonNull BiFunction<@NonNull CommandContext<C>,
                         @NonNull String, @NonNull List<Completion>> completionsProvider

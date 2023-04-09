@@ -342,6 +342,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @deprecated Possible losing the suggestion additional data
          */
         @Deprecated
+        @API(status = API.Status.DEPRECATED, since = "1.9.0")
         public StringParser(
                 final @NonNull StringMode stringMode,
                 final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
@@ -357,6 +358,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @param completionsProvider Suggestions provider
          * @since 1.9.0
          */
+        @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
         public StringParser(
                 final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
                         @NonNull List<@NonNull Completion>> completionsProvider,

@@ -150,7 +150,7 @@ public interface ParserRegistry<C> {
      * @deprecated can result in completion data loss
      * @since 1.1.0
      */
-    @API(status = API.Status.STABLE, since = "1.1.0")
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     @Deprecated
     @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
             @NonNull String name
@@ -164,7 +164,7 @@ public interface ParserRegistry<C> {
      * @see #getCompletionProvider(String) Get a suggestion provider
      * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.1.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     default void registerCompletionProvider(
             @NonNull String name,
             @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>> provider
@@ -181,7 +181,7 @@ public interface ParserRegistry<C> {
      * @see #registerSuggestionProvider(String, BiFunction) Register a suggestion provider
      * @since 1.9.0
      */
-    @API(status = API.Status.STABLE, since = "1.1.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     @NonNull
     default Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<Completion>>> getCompletionProvider(
             @NonNull String name

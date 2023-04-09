@@ -230,6 +230,7 @@ public abstract class CommandManager<C> {
      * @return List of completions
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public @NonNull List<@NonNull Completion> completions(
             final @NonNull C commandSender,
             final @NonNull String input
@@ -1041,7 +1042,7 @@ public abstract class CommandManager<C> {
      * @since 1.9.0
      * @see #commandCompletionProcessor(CommandCompletionProcessor) Setter
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public @NonNull CommandCompletionProcessor<C> commandCompletionProcessor() {
         return this.commandCompletionProcessor;
     }
@@ -1094,7 +1095,7 @@ public abstract class CommandManager<C> {
      * @since 1.7.0
      * @see #commandCompletionProcessor() Getter
      */
-    @API(status = API.Status.STABLE, since = "1.7.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public void commandCompletionProcessor(final @NonNull CommandCompletionProcessor<C> commandCompletionProcessor) {
         this.commandCompletionProcessor = commandCompletionProcessor;
     }

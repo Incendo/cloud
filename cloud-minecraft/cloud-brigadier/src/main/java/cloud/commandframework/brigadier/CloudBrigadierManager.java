@@ -85,6 +85,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -170,6 +171,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param <T> The completion type whose support you register
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public <T extends Completion> void registerMessageExtractor(
             final @NonNull Class<T> completionClass,
             final @NonNull BiFunction<@Nullable CommandArgument<C, ?>, @NonNull T, @Nullable Message> extractor
@@ -187,6 +189,7 @@ public final class CloudBrigadierManager<C, S> {
      * @param <T> The completion type whose support you register
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public <T extends Completion> void registerMessageExtractor(
             final @NonNull Class<T> completionClass,
             final @NonNull Function<@NonNull T, @Nullable Message> extractor
@@ -199,8 +202,9 @@ public final class CloudBrigadierManager<C, S> {
      * @param argument the argument which is providing the completion
      * @param completion the completion itself
      * @return a message tooltip
-     * @since 1.8.1
+     * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public @Nullable Message extractMessage(@Nullable final CommandArgument<C, ?> argument, @NonNull final Completion completion) {
         Message tooltip = null;
         Iterator<BrigadierMessageExtractor<C, ?>> iterator = this.extractors.iterator();

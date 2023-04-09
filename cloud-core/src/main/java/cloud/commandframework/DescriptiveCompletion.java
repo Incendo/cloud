@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -30,6 +31,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * A completion with description
  * @since 1.9.0
  */
+@API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
 public interface DescriptiveCompletion extends Completion {
 
     /**

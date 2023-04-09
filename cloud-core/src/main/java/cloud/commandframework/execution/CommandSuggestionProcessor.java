@@ -37,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @deprecated Can result in lose of suggestion's additional data
  */
 @Deprecated
-@API(status = API.Status.STABLE)
+@API(status = API.Status.DEPRECATED, since = "1.9.0")
 public interface CommandSuggestionProcessor<C> extends
         BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<String>, @NonNull List<String>> {
 
@@ -58,6 +58,7 @@ public interface CommandSuggestionProcessor<C> extends
      * @return a {@link CommandCompletionProcessor} analog
      * @since 1.9.0
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     default CommandCompletionProcessor<C> toFull() {
         return (c, s) -> Completion.of(this.apply(c, Completion.raw(s)));
     }

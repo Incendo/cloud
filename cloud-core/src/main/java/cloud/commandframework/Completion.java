@@ -26,6 +26,7 @@ package cloud.commandframework;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 
@@ -33,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * A class containing information about completions
  * @since 1.9.0
  */
+@API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
 public interface Completion {
 
     /**

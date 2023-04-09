@@ -26,12 +26,14 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Completion;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.Message;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A suggestion which gives native minecraft chat component as description, used for brigadier support
  * @since 1.9.0
  */
+@API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
 public interface BrigadierCompletion extends Completion {
 
     /**

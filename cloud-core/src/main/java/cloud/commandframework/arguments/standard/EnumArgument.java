@@ -54,6 +54,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
     @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     protected EnumArgument(
             final @NonNull Class<E> enumClass,
             final boolean required,
@@ -65,6 +66,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     ) {
         super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass, suggestionsProvider, defaultDescription);
     }
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     protected EnumArgument(
             final @NonNull Class<E> enumClass,
             final boolean required,

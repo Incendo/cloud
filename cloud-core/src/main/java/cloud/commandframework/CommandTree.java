@@ -499,15 +499,16 @@ public final class CommandTree<C> {
      *
      * @param context      Context instance
      * @param commandQueue Input queue
-     * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
+     * @return Completions. These completions should be filtered based on {@link String#startsWith(String)} from
+     * {@link Completion#suggestion()}
      */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public @NonNull List<@NonNull Completion> getCompletions(
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<@NonNull String> commandQueue
     ) {
         return this.getCompletions(context, commandQueue, this.internalTree);
     }
-    @SuppressWarnings("MixedMutabilityReturnType")
     private @NonNull List<@NonNull Completion> getCompletions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,

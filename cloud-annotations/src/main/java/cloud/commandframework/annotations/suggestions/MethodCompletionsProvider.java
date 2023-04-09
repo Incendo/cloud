@@ -30,6 +30,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -38,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> Command sender type
  * @since 1.9.0
  */
+@API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
 public final class MethodCompletionsProvider<C> implements BiFunction<CommandContext<C>, String, List<Completion>> {
 
     private final MethodHandle methodHandle;
