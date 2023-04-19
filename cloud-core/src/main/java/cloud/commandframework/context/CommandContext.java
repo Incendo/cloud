@@ -678,7 +678,7 @@ public class CommandContext<C> {
      * @param <T>                Type to inject
      * @return Optional that may contain the created value
      */
-    @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
+    @API(status = API.Status.EXPERIMENTAL, since = "1.9.0")
     public <@NonNull T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz, final @NonNull AnnotationAccessor annotationAccessor) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(
