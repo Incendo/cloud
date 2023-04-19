@@ -163,6 +163,15 @@ class AnnotationParserTest {
     }
 
     @Test
+    void testAnnotatedInjectionSuggestionsProviders() {
+        final BiFunction<CommandContext<TestCommandSender>, String, List<String>> suggestionsProvider =
+                this.manager.parserRegistry().getSuggestionProvider("injection").orElse(null);
+        Assertions.assertNotNull(suggestionsProvider);
+        Assertions.assertTrue(suggestionsProvider.apply(new CommandContext<>(new TestCommandSender(), manager), "")
+                .contains("InjectionStella"));
+    }
+
+    @Test
     void testAnnotatedArgumentParser() {
         final ArgumentParser<TestCommandSender, CustomType> parser = this.manager.parserRegistry().createParser(
                 TypeToken.get(CustomType.class),
@@ -180,6 +189,26 @@ class AnnotationParserTest {
                 context,
                 ""
         ).contains("Stella"));
+    }
+
+    @Test
+    void testAnnotatedInjectionArgumentParser() {
+        final ArgumentParser<TestCommandSender, CustomInjectionType> parser = this.manager.parserRegistry().createParser(
+                TypeToken.get(CustomInjectionType.class),
+                ParserParameters.empty()
+        ).orElseThrow(() -> new NullPointerException("Could not find CustomInjectionType parser"));
+        final CommandContext<TestCommandSender> context = new CommandContext<>(
+                new TestCommandSender(),
+                this.manager
+        );
+        Assertions.assertEquals("injection", parser.parse(
+                context,
+                new LinkedList<>()
+        ).getParsedValue().orElse(new CustomInjectionType("")).toString());
+        Assertions.assertTrue(parser.suggestions(
+                context,
+                ""
+        ).contains("InjectionStella"));
     }
 
     @Test
@@ -212,9 +241,20 @@ class AnnotationParserTest {
         return Arrays.asList("Stella", "Bella", "Agda");
     }
 
+    @Suggestions("injection")
+    public List<String> injectionSuggestions(final TestCommandSender sender, final String input,
+                                             final CommandContext<TestCommandSender> context) {
+        return Arrays.asList("InjectionStella", "InjectionBella", "InjectionAgda");
+    }
+
     @Parser(suggestions = "cows")
     public CustomType customTypeParser(final CommandContext<TestCommandSender> context, final Queue<String> input) {
         return new CustomType("yay");
+    }
+
+    @Parser(suggestions = "injection")
+    public CustomInjectionType customInjectionTypeParser(final CommandContext<TestCommandSender> context, final Queue<String> input) {
+        return new CustomInjectionType("injection");
     }
 
     @IntegerArgumentInjector
@@ -330,6 +370,20 @@ class AnnotationParserTest {
         private final String value;
 
         private CustomType(final String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+    }
+
+    private static final class CustomInjectionType {
+
+        private final String value;
+
+        private CustomInjectionType(final String value) {
             this.value = value;
         }
 
