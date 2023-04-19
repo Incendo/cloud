@@ -32,6 +32,7 @@ import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.specifier.Completions;
+import cloud.commandframework.annotations.suggestions.InjectionMethodSuggestionsProvider;
 import cloud.commandframework.annotations.suggestions.MethodSuggestionsProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
@@ -449,14 +450,24 @@ public final class AnnotationParser<C> {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
+            final BiFunction<CommandContext<C>, String, List<String>> suggestionProvider;
             try {
-                this.manager.parserRegistry().registerSuggestionProvider(
-                        this.processString(suggestions.value()),
-                        new MethodSuggestionsProvider<>(instance, method)
-                );
+                if (method.getParameterCount() == 2
+                        && method.getReturnType().equals(List.class)
+                        && method.getParameters()[0].getType().equals(CommandContext.class)
+                        && method.getParameters()[1].getType().equals(String.class)
+                ) {
+                    suggestionProvider = new MethodSuggestionsProvider<>(instance, method);
+                } else {
+                    suggestionProvider = new InjectionMethodSuggestionsProvider<>(instance, method);
+                }
             } catch (final Exception e) {
                 throw new RuntimeException(e);
             }
+            this.manager.parserRegistry().registerSuggestionProvider(
+                    this.processString(suggestions.value()),
+                    suggestionProvider
+            );
         }
     }
 

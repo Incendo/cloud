@@ -23,15 +23,11 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.context.CommandContext;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -44,8 +40,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class MethodSuggestionsProvider<C> implements BiFunction<CommandContext<C>, String, List<String>> {
 
     private final MethodHandle methodHandle;
-    private final Parameter[] parameters;
-    private final AnnotationAccessor annotationAccessor;
 
     /**
      * Create a new provider
@@ -59,52 +53,15 @@ public final class MethodSuggestionsProvider<C> implements BiFunction<CommandCon
             final @NonNull Method method
     ) throws Exception {
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
-        this.parameters = method.getParameters();
-        this.annotationAccessor = AnnotationAccessor.of(method);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<String> apply(final CommandContext<C> context, final String s) {
         try {
-            return (List<String>) this.methodHandle.invokeWithArguments(this.createParameterValues(context, s));
+            return (List<String>) this.methodHandle.invokeWithArguments(context, s);
         } catch (final Throwable t) {
             throw new RuntimeException(t);
         }
-    }
-
-    /**
-     * Creates a list containing the values for the given method parameters.
-     *
-     * @param context The context
-     * @param input The suggestion input comes from the user
-     * @return A list containing all parameters, in order
-     */
-    @NonNull
-    private List<@NonNull Object> createParameterValues(final CommandContext<C> context, final String input) {
-        final List<@NonNull Object> parameters = new ArrayList<>(this.parameters.length);
-        for (final Parameter parameter : this.parameters) {
-            if (parameter.getType().isAssignableFrom(context.getSender().getClass())) {
-                parameters.add(context.getSender());
-            } else if (parameter.getType() == String.class && parameter.getAnnotations().length == 0) {
-                parameters.add(input);
-            } else {
-                final Optional<?> value = context.inject(
-                        parameter.getType(),
-                        AnnotationAccessor.of(AnnotationAccessor.of(parameter), this.annotationAccessor)
-                );
-                if (value.isPresent()) {
-                    parameters.add(value.get());
-                } else {
-                    throw new IllegalArgumentException(String.format(
-                            "Could not create value for parameter '%s' of type '%s' in method '%s'",
-                            parameter.getName(),
-                            parameter.getType().getTypeName(),
-                            this.methodHandle.toString()
-                    ));
-                }
-            }
-        }
-        return parameters;
     }
 }
