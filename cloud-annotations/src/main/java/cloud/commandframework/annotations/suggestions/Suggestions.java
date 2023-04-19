@@ -23,6 +23,8 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
+import cloud.commandframework.annotations.CommandMethod;
+import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,11 +33,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This annotation allows you to create annotated methods that behave like suggestions providers.
- * The method must have this exact signature: <pre>{@code
- * ﹫Suggestions("name")
- * public List<String> methodName(CommandContext<YourSender> sender, String input) {
- * }}</pre>
- *
+ * <p>
+ * Methods are supported by {@link ParameterInjectorRegistry} that allows you to register your own parameter values like how
+ * {@link CommandMethod} works.
  * @since 1.3.0
  */
 @Target(ElementType.METHOD)
