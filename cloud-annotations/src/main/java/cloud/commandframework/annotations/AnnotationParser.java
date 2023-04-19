@@ -449,17 +449,6 @@ public final class AnnotationParser<C> {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
-            if (method.getParameterCount() != 2
-                    || !method.getReturnType().equals(List.class)
-                    || !method.getParameters()[0].getType().equals(CommandContext.class)
-                    || !method.getParameters()[1].getType().equals(String.class)
-            ) {
-                throw new IllegalArgumentException(String.format(
-                        "@Suggestions annotated method '%s' in class '%s' does not have the correct signature",
-                        method.getName(),
-                        instance.getClass().getCanonicalName()
-                ));
-            }
             try {
                 this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
