@@ -24,7 +24,6 @@
 package cloud.commandframework.annotations.suggestions;
 
 import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.context.CommandContext;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -46,7 +45,6 @@ public final class MethodSuggestionsProvider<C> implements BiFunction<CommandCon
 
     private final MethodHandle methodHandle;
     private final Parameter[] parameters;
-    private final ParameterInjectorRegistry<C> injectorRegistry;
     private final AnnotationAccessor annotationAccessor;
 
     /**
@@ -54,17 +52,14 @@ public final class MethodSuggestionsProvider<C> implements BiFunction<CommandCon
      *
      * @param instance Instance that owns the method
      * @param method   The annotated method
-     * @param injectorRegistry The injector registry that will be used for providing parameter values
      * @throws Exception If the method lookup fails
      */
     public MethodSuggestionsProvider(
             final @NonNull Object instance,
-            final @NonNull Method method,
-            final @NonNull ParameterInjectorRegistry<C> injectorRegistry
+            final @NonNull Method method
     ) throws Exception {
         this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
         this.parameters = method.getParameters();
-        this.injectorRegistry = injectorRegistry;
         this.annotationAccessor = AnnotationAccessor.of(method);
     }
 
@@ -94,9 +89,8 @@ public final class MethodSuggestionsProvider<C> implements BiFunction<CommandCon
             } else if (parameter.getType().isAssignableFrom(String.class) && parameter.getAnnotations().length == 0) {
                 parameters.add(input);
             } else {
-                final Optional<?> value = this.injectorRegistry.getInjectable(
+                final Optional<?> value = context.inject(
                         parameter.getType(),
-                        context,
                         AnnotationAccessor.of(AnnotationAccessor.of(parameter), this.annotationAccessor)
                 );
                 if (value.isPresent()) {

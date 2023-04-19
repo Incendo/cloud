@@ -665,12 +665,27 @@ public class CommandContext<C> {
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
     public <@NonNull T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz) {
+        return this.inject(clazz, AnnotationAccessor.empty());
+    }
+
+    /**
+     * Attempt to retrieve a value that has been registered to the associated command manager's
+     * {@link cloud.commandframework.annotations.injection.ParameterInjectorRegistry}
+     *
+     * @param clazz              Class of type to inject
+     * @param annotationAccessor Annotation accessor for the injection. If the object is requested without access to
+     *                           annotations, use {@link AnnotationAccessor#empty()}
+     * @param <T>   Type to inject
+     * @return Optional that may contain the created value
+     */
+    @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
+    public <@NonNull T> @NonNull Optional<T> inject(final @NonNull Class<T> clazz, final @NonNull AnnotationAccessor annotationAccessor) {
         if (this.commandManager == null) {
             throw new UnsupportedOperationException(
                     "Cannot retrieve injectable values from a command context that is not associated with a command manager"
             );
         }
-        return this.commandManager.parameterInjectorRegistry().getInjectable(clazz, this, AnnotationAccessor.empty());
+        return this.commandManager.parameterInjectorRegistry().getInjectable(clazz, this, annotationAccessor);
     }
 
 

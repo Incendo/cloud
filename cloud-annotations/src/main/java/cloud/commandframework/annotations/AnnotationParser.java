@@ -463,7 +463,7 @@ public final class AnnotationParser<C> {
             try {
                 this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
-                        new MethodSuggestionsProvider<>(instance, method, this.getParameterInjectorRegistry())
+                        new MethodSuggestionsProvider<>(instance, method)
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
