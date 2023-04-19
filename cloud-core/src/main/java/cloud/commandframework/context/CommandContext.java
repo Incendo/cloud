@@ -675,7 +675,7 @@ public class CommandContext<C> {
      * @param clazz              Class of type to inject
      * @param annotationAccessor Annotation accessor for the injection. If the object is requested without access to
      *                           annotations, use {@link AnnotationAccessor#empty()}
-     * @param <T>   Type to inject
+     * @param <T>                Type to inject
      * @return Optional that may contain the created value
      */
     @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
