@@ -86,7 +86,7 @@ public final class MethodSuggestionsProvider<C> implements BiFunction<CommandCon
         for (final Parameter parameter : this.parameters) {
             if (parameter.getType().isAssignableFrom(context.getSender().getClass())) {
                 parameters.add(context.getSender());
-            } else if (parameter.getType().isAssignableFrom(String.class) && parameter.getAnnotations().length == 0) {
+            } else if (parameter.getType() == String.class && parameter.getAnnotations().length == 0) {
                 parameters.add(input);
             } else {
                 final Optional<?> value = context.inject(
