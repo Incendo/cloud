@@ -81,6 +81,9 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         this.cloudCommand = cloudCommand;
         if (this.command.getOwningCommand() != null) {
             this.setPermission(this.command.getOwningCommand().getCommandPermission().toString());
+        } else {
+            final String string = this.cloudCommand.getCommandPermission().toString();
+            if (!string.isEmpty()) this.setPermission(string);
         }
         this.disabled = false;
     }
