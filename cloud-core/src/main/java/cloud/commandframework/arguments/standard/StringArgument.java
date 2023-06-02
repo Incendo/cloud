@@ -249,7 +249,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          * @param stringMode String mode to parse with
          * @return Builder instance
          */
-        private @NonNull @This Builder<C> withMode(final @NonNull StringMode stringMode) {
+        public @NonNull @This Builder<C> withMode(final @NonNull StringMode stringMode) {
             this.stringMode = stringMode;
             return this;
         }
