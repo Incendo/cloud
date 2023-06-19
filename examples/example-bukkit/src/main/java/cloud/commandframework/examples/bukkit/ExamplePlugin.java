@@ -412,7 +412,7 @@ public final class ExamplePlugin extends JavaPlugin {
         this.manager.command(
                 this.manager.commandBuilder(
                         "arraycommand",
-                        ArgumentDescription.of("Bukkit-esque cmmand")
+                        ArgumentDescription.of("Bukkit-esque command")
                 ).argument(
                         StringArrayArgument.optional(
                                 "args",
