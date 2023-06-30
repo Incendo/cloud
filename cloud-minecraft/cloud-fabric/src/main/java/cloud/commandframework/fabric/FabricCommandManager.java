@@ -217,6 +217,7 @@ public abstract class FabricCommandManager<C, S extends SharedSuggestionProvider
          * Eventually, these could be resolved by using ParserParameters in some way? */
         seenClasses.add(ResourceLocation.class);
         seenClasses.add(Codec.class);
+        seenClasses.add(String.class); // avoid pottery pattern registry overriding default string parser
         for (final Field field : Registries.class.getDeclaredFields()) {
             if ((field.getModifiers() & MOD_PUBLIC_STATIC_FINAL) != MOD_PUBLIC_STATIC_FINAL) {
                 continue;
