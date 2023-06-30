@@ -152,16 +152,21 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final boolean greedy = options.get(StandardParameters.GREEDY, false);
             final boolean greedyFlagAware = options.get(StandardParameters.FLAG_YIELDING, false);
             final boolean quoted = options.get(StandardParameters.QUOTED, false);
-            if (greedy && quoted) {
+            if (greedyFlagAware && quoted) {
+                throw new IllegalArgumentException(
+                        "Don't know whether to create GREEDY_FLAG_YIELDING or QUOTED StringArgument.StringParser, both specified."
+                );
+            } else if (greedy && quoted) {
                 throw new IllegalArgumentException(
                         "Don't know whether to create GREEDY or QUOTED StringArgument.StringParser, both specified."
                 );
             }
             final StringArgument.StringMode stringMode;
-            if (greedy) {
-                stringMode = StringArgument.StringMode.GREEDY;
-            } else if (greedyFlagAware) {
+            // allow @Greedy and @FlagYielding to both be true, give flag yielding priority
+            if (greedyFlagAware) {
                 stringMode = StringArgument.StringMode.GREEDY_FLAG_YIELDING;
+            } else if (greedy) {
+                stringMode = StringArgument.StringMode.GREEDY;
             } else if (quoted) {
                 stringMode = StringArgument.StringMode.QUOTED;
             } else {
