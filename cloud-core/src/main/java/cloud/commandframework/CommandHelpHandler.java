@@ -41,9 +41,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @API(status = API.Status.STABLE)
-public final class CommandHelpHandler<C> {
+public class CommandHelpHandler<C> {
 
-    private final CommandManager<C> commandManager;
+    protected final CommandManager<C> commandManager;
     private final Predicate<Command<C>> commandPredicate;
 
     CommandHelpHandler(
@@ -52,44 +52,6 @@ public final class CommandHelpHandler<C> {
     ) {
         this.commandManager = commandManager;
         this.commandPredicate = commandPredicate;
-    }
-
-    /**
-     * Get exact syntax hints for all commands
-     *
-     * @return Syntax hints for all registered commands, order in lexicographical order
-     */
-    public @NonNull List<@NonNull VerboseHelpEntry<C>> getAllCommands() {
-        return this.commandManager.commands().stream()
-                .filter(this.commandPredicate)
-                .map((command) -> {
-                    final List<CommandArgument<C, ?>> arguments = command.getArguments();
-                    final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
-                    return new VerboseHelpEntry<>(
-                            command,
-                            this.commandManager.commandSyntaxFormatter()
-                                    .apply(arguments, null),
-                            description
-                    );
-                }).sorted(Comparator.comparing(VerboseHelpEntry::getSyntaxString))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Get a list of the longest shared command chains of all commands.
-     * If there are two commands "foo bar 1" and "foo bar 2", this would
-     * then return "foo bar 1|2"
-     *
-     * @return Longest shared command chains
-     */
-    public @NonNull List<@NonNull String> getLongestSharedChains() {
-        return this.commandManager.commandTree().getRootNodes().stream()
-                .filter((node) -> node.getValue() != null)
-                .map(node -> node.getValue().getName() + this.commandManager
-                        .commandSyntaxFormatter()
-                        .apply(Collections.emptyList(), node))
-                .sorted(String::compareTo)
-                .collect(Collectors.toList());
     }
 
     /**
@@ -135,10 +97,18 @@ public final class CommandHelpHandler<C> {
                     }
                 }).collect(Collectors.toList());
 
-        if (query.trim().isEmpty()) {
+        if (query.trim().isEmpty()) { // query is empty, return all commands
             return new IndexHelpTopic<>(commands);
+        } else {
+            return queryHelpForCommands(recipient, query, commands);
         }
+    }
 
+    protected HelpTopic<C> queryHelpForCommands(
+            final @Nullable C recipient,
+            final @NonNull String query,
+            final @NonNull List<VerboseHelpEntry<C>> commands
+    ) {
         final String[] queryFragments = query.split(" ");
         final String rootFragment = queryFragments[0];
 
@@ -156,16 +126,15 @@ public final class CommandHelpHandler<C> {
                     .get(0);
 
             for (final String alias : staticArgument.getAliases()) {
-                if (alias.toLowerCase(Locale.ENGLISH).startsWith(rootFragment.toLowerCase(Locale.ENGLISH))) {
+                final String aliasLower = alias.toLowerCase(Locale.ENGLISH);
+                final String rootLower = rootFragment.toLowerCase(Locale.ENGLISH);
+
+                if (aliasLower.equalsIgnoreCase(rootLower)) {
+                    inexactMatch = false;
+                    break;
+                } else if (aliasLower.startsWith(rootLower)) {
                     availableCommands.add(entry);
                     availableCommandLabels.add(staticArgument.getName());
-                    break;
-                }
-            }
-
-            for (final String alias : staticArgument.getAliases()) {
-                if (alias.equalsIgnoreCase(rootFragment)) {
-                    inexactMatch = false;
                     break;
                 }
             }
@@ -179,17 +148,24 @@ public final class CommandHelpHandler<C> {
             }
         }
 
-        /* No command found, return all possible commands */
-        if (availableCommands.isEmpty()) {
+        if (availableCommands.isEmpty()) { // No command found, return all possible commands
             return new IndexHelpTopic<>(Collections.emptyList());
-        } else if (inexactMatch || availableCommandLabels.size() > 1) {
+        } else if (inexactMatch || availableCommandLabels.size() > 1) { // Found >1 command, return info for them
             final List<VerboseHelpEntry<C>> syntaxHints = availableCommands.stream()
                     .sorted(Comparator.comparing(VerboseHelpEntry::getSyntaxString))
                     .collect(Collectors.toList());
             return new IndexHelpTopic<>(syntaxHints);
+        } else { // Traverse command to find the most specific help topic
+            return querySpecificHelp(recipient, queryFragments, availableCommandLabels);
         }
+    }
 
-        /* Traverse command to find the most specific help topic */
+    protected HelpTopic<C> querySpecificHelp(
+            final @Nullable C recipient,
+            final @NonNull String[] queryFragments,
+            final Set<String> availableCommandLabels
+    ) {
+        // TODO: 2023-07-15 The complexity of this code is way too high. What can we do to make it easier to understand?
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.commandTree()
                 .getNamedNode(availableCommandLabels.iterator().next());
 
@@ -263,6 +239,44 @@ public final class CommandHelpHandler<C> {
         return new IndexHelpTopic<>(Collections.emptyList());
     }
 
+    /**
+     * Get exact syntax hints for all commands
+     *
+     * @return Syntax hints for all registered commands, order in lexicographical order
+     */
+    public @NonNull List<@NonNull VerboseHelpEntry<C>> getAllCommands() {
+        return this.commandManager.commands().stream()
+                .filter(this.commandPredicate)
+                .map((command) -> {
+                    final List<CommandArgument<C, ?>> arguments = command.getArguments();
+                    final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
+                    return new VerboseHelpEntry<>(
+                            command,
+                            this.commandManager.commandSyntaxFormatter()
+                                    .apply(arguments, null),
+                            description
+                    );
+                }).sorted(Comparator.comparing(VerboseHelpEntry::getSyntaxString))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get a list of the longest shared command chains of all commands.
+     * If there are two commands "foo bar 1" and "foo bar 2", this would
+     * then return "foo bar 1|2"
+     *
+     * @return Longest shared command chains
+     */
+    public @NonNull List<@NonNull String> getLongestSharedChains() {
+        return this.commandManager.commandTree().getRootNodes().stream()
+                .filter((node) -> node.getValue() != null)
+                .map(node -> node.getValue().getName() + this.commandManager
+                        .commandSyntaxFormatter()
+                        .apply(Collections.emptyList(), node))
+                .sorted(String::compareTo)
+                .collect(Collectors.toList());
+    }
+
     /* Checks using the predicate whether a command node or one of its children is visible */
     private boolean isNodeVisible(final CommandTree.@NonNull Node<CommandArgument<C, ?>> node) {
         /* Check node is itself a command that is visible */
@@ -320,6 +334,34 @@ public final class CommandHelpHandler<C> {
             this.description = description;
         }
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.command, this.syntaxString, this.description);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final VerboseHelpEntry<?> that = (VerboseHelpEntry<?>) o;
+            return this.command.equals(that.command)
+                    && this.syntaxString.equals(that.syntaxString)
+                    && this.description.equals(that.description);
+        }
+
+        @Override
+        public String toString() {
+            return "VerboseHelpEntry{"
+                    + "command=" + this.command
+                    + ", syntaxString='" + this.syntaxString + '\''
+                    + ", description='" + this.description + '\''
+                    + '}';
+        }
+
         /**
          * Get the command
          *
@@ -346,34 +388,6 @@ public final class CommandHelpHandler<C> {
         public @NonNull String getDescription() {
             return this.description;
         }
-
-        @Override
-        public String toString() {
-            return "VerboseHelpEntry{"
-                    + "command=" + this.command
-                    + ", syntaxString='" + this.syntaxString + '\''
-                    + ", description='" + this.description + '\''
-                    + '}';
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass() != o.getClass()) {
-                return false;
-            }
-            final VerboseHelpEntry<?> that = (VerboseHelpEntry<?>) o;
-            return this.command.equals(that.command)
-                    && this.syntaxString.equals(that.syntaxString)
-                    && this.description.equals(that.description);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.command, this.syntaxString, this.description);
-        }
     }
 
 
@@ -391,29 +405,9 @@ public final class CommandHelpHandler<C> {
             this.entries = entries;
         }
 
-        /**
-         * Get help entries
-         *
-         * @return Entries
-         */
-        public @NonNull List<@NonNull VerboseHelpEntry<C>> getEntries() {
-            return this.entries;
-        }
-
-        /**
-         * Check if the help topic is entry
-         *
-         * @return {@code true} if the topic is entry, else {@code false}
-         */
-        public boolean isEmpty() {
-            return this.getEntries().isEmpty();
-        }
-
         @Override
-        public String toString() {
-            return "IndexHelpTopic{"
-                    + "entries=" + this.entries
-                    + '}';
+        public int hashCode() {
+            return Objects.hash(this.entries);
         }
 
         @Override
@@ -429,8 +423,28 @@ public final class CommandHelpHandler<C> {
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(this.entries);
+        public String toString() {
+            return "IndexHelpTopic{"
+                    + "entries=" + this.entries
+                    + '}';
+        }
+
+        /**
+         * Get help entries
+         *
+         * @return Entries
+         */
+        public @NonNull List<@NonNull VerboseHelpEntry<C>> getEntries() {
+            return this.entries;
+        }
+
+        /**
+         * Check if the help topic is entry
+         *
+         * @return {@code true} if the topic is entry, else {@code false}
+         */
+        public boolean isEmpty() {
+            return this.entries.isEmpty();
         }
     }
 
@@ -452,6 +466,31 @@ public final class CommandHelpHandler<C> {
             this.description = command.getCommandMeta().getOrDefault(CommandMeta.LONG_DESCRIPTION, shortDescription);
         }
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.command, this.description);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final VerboseHelpTopic<?> that = (VerboseHelpTopic<?>) o;
+            return this.command.equals(that.command) && this.description.equals(that.description);
+        }
+
+        @Override
+        public String toString() {
+            return "VerboseHelpTopic{"
+                    + "command=" + this.command
+                    + ", description='" + this.description + '\''
+                    + '}';
+        }
+
         /**
          * Get the command
          *
@@ -468,31 +507,6 @@ public final class CommandHelpHandler<C> {
          */
         public @NonNull String getDescription() {
             return this.description;
-        }
-
-        @Override
-        public String toString() {
-            return "VerboseHelpTopic{"
-                    + "command=" + this.command
-                    + ", description='" + this.description + '\''
-                    + '}';
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass() != o.getClass()) {
-                return false;
-            }
-            final VerboseHelpTopic<?> that = (VerboseHelpTopic<?>) o;
-            return this.command.equals(that.command) && this.description.equals(that.description);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.command, this.description);
         }
     }
 
@@ -516,6 +530,31 @@ public final class CommandHelpHandler<C> {
             this.childSuggestions = childSuggestions;
         }
 
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.longestPath, this.childSuggestions);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || this.getClass() != o.getClass()) {
+                return false;
+            }
+            final MultiHelpTopic<?> that = (MultiHelpTopic<?>) o;
+            return this.longestPath.equals(that.longestPath) && this.childSuggestions.equals(that.childSuggestions);
+        }
+
+        @Override
+        public String toString() {
+            return "MultiHelpTopic{"
+                    + "longestPath='" + this.longestPath + '\''
+                    + ", childSuggestions=" + this.childSuggestions
+                    + '}';
+        }
+
         /**
          * Get the longest shared path
          *
@@ -532,31 +571,6 @@ public final class CommandHelpHandler<C> {
          */
         public @NonNull List<@NonNull String> getChildSuggestions() {
             return this.childSuggestions;
-        }
-
-        @Override
-        public String toString() {
-            return "MultiHelpTopic{"
-                    + "longestPath='" + this.longestPath + '\''
-                    + ", childSuggestions=" + this.childSuggestions
-                    + '}';
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || this.getClass() != o.getClass()) {
-                return false;
-            }
-            final MultiHelpTopic<?> that = (MultiHelpTopic<?>) o;
-            return this.longestPath.equals(that.longestPath) && this.childSuggestions.equals(that.childSuggestions);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.longestPath, this.childSuggestions);
         }
     }
 }
