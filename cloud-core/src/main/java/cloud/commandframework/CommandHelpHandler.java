@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2023 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -129,8 +129,10 @@ public class CommandHelpHandler<C> {
                 final String aliasLower = alias.toLowerCase(Locale.ENGLISH);
                 final String rootLower = rootFragment.toLowerCase(Locale.ENGLISH);
 
-                if (aliasLower.equalsIgnoreCase(rootLower)) {
+                if (alias.equalsIgnoreCase(rootFragment)) {
                     inexactMatch = false;
+                    availableCommands.add(entry);
+                    availableCommandLabels.add(staticArgument.getName());
                     break;
                 } else if (aliasLower.startsWith(rootLower)) {
                     availableCommands.add(entry);
@@ -220,14 +222,17 @@ public class CommandHelpHandler<C> {
                 /* Attempt to parse the longest possible description for the children */
                 final List<String> childSuggestions = head.getChildren().stream()
                         .filter(this::isNodeVisible)
-                        .filter(child -> !(recipient == null ||
-                                child.getValue() == null ||
-                                child.getValue().getOwningCommand() == null ||
-                                this.commandManager.hasPermission(
-                                        recipient,
-                                        child.getValue().getOwningCommand().getCommandPermission()
-                                )
-                        )).map((child) -> {
+                        .filter(child -> {
+                                    if (recipient == null || child.getValue() == null || child.getValue().getOwningCommand() == null) {
+                                        return true;
+                                    } else {
+                                        return this.commandManager.hasPermission(
+                                                recipient,
+                                                child.getValue().getOwningCommand().getCommandPermission()
+                                        );
+                                    }
+                                }
+                        ).map((child) -> {
                             final List<CommandArgument<C, ?>> traversedNodesSub = new LinkedList<>(traversedNodes);
                             traversedNodesSub.add(child.getValue());
                             return this.commandManager.commandSyntaxFormatter().apply(traversedNodesSub, child);
