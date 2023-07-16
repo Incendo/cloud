@@ -1,7 +1,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2022 Alexander Söderberg & Contributors
+// Copyright (c) 2023 Alexander Söderberg & Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,6 +52,7 @@ import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.execution.preprocessor.AcceptingCommandPreprocessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
+import cloud.commandframework.help.CommandHelpHandlerCreator;
 import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
@@ -113,6 +114,8 @@ public abstract class CommandManager<C> {
     private CommandRegistrationHandler commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
+
+    private CommandHelpHandlerCreator<C> commandHelpHandlerCreator = CommandHelpHandler::new;
 
     /**
      * Create a new command manager instance
@@ -1047,7 +1050,7 @@ public abstract class CommandManager<C> {
      * <p>
      * When creating a new parser type, it is recommended to register it in the parser
      * registry. In particular, default parser types (shipped with cloud implementations)
-     * should be registered in the constructor of the platform {@link CommandManager}
+     * should be registered in the constructor of the platform
      *
      * @return Parser registry instance
      * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #parserRegistry()} instead.
@@ -1068,7 +1071,7 @@ public abstract class CommandManager<C> {
      * <p>
      * When creating a new parser type, it is highly recommended to register it in the parser registry.
      * In particular, default parser types (shipped with cloud implementations) should be registered in the
-     * constructor of the platform {@link CommandManager}.
+     * constructor of the platform .
      *
      * @return the parser registry instance
      * @since 1.7.0
@@ -1192,7 +1195,7 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public final @NonNull CommandHelpHandler<C> createCommandHelpHandler() {
-        return new CommandHelpHandler<>(this, cmd -> true);
+        return createCommandHelpHandler(cmd -> true);
     }
 
     /**
@@ -1231,7 +1234,30 @@ public abstract class CommandManager<C> {
     public final @NonNull CommandHelpHandler<C> createCommandHelpHandler(
             final @NonNull Predicate<Command<C>> commandPredicate
     ) {
-        return new CommandHelpHandler<>(this, commandPredicate);
+        return commandHelpHandlerCreator.createHelpHandler(this, commandPredicate);
+    }
+
+    /**
+     * Gets the command help handler creator.
+     *
+     * @see #commandHelpHandlerCreator(CommandHelpHandlerCreator)
+     * @since 1.9.0
+     */
+    @API(status = API.Status.STABLE, since = "1.9.0")
+    public CommandHelpHandlerCreator<C> commandHelpHandlerCreator() {
+        return commandHelpHandlerCreator;
+    }
+
+    /**
+     * Sets the command help handler creator.
+     *
+     * @param commandHelpHandlerCreator new replacement creator.
+     * @see #commandHelpHandlerCreator()
+     * @since 1.9.0
+     */
+    @API(status = API.Status.STABLE, since = "1.9.0")
+    public void commandHelpHandlerCreator(final CommandHelpHandlerCreator<C> commandHelpHandlerCreator) {
+        this.commandHelpHandlerCreator = commandHelpHandlerCreator;
     }
 
     /**
