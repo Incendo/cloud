@@ -45,7 +45,7 @@ public interface CommandHelpHandlerCreator<C> {
      * @return a new command help handler
      */
     @NonNull CommandHelpHandler<C> createHelpHandler(
-            CommandManager<C> commandManager,
+            @NonNull CommandManager<C> commandManager,
             @NonNull Predicate<Command<C>> commandPredicate
     );
 }
