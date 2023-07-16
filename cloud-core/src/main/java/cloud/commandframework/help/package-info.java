@@ -1,3 +1,4 @@
+
 //
 // MIT License
 //
@@ -21,31 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.help;
-
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandHelpHandler;
-import cloud.commandframework.CommandManager;
-import java.util.function.Predicate;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Creates new instances of {@link CommandHelpHandler}.
- *
- * @param <C> Command sender type
+ * Command help handler allows string help queries to search for matching commands
  */
-@FunctionalInterface
-public interface CommandHelpHandlerCreator<C> {
-
-    /**
-     * Creates a new {@link CommandHelpHandler}.
-     *
-     * @param commandManager   The command manager
-     * @param commandPredicate The predicate to filter commands
-     * @return a new command help handler
-     */
-    CommandHelpHandler<C> createHelpHandler(
-            CommandManager<C> commandManager,
-            @NonNull Predicate<Command<C>> commandPredicate
-    );
-}
+package cloud.commandframework.help;

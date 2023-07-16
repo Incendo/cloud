@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE)
 public class CommandHelpHandler<C> {
 
-    protected final CommandManager<C> commandManager;
+    private final CommandManager<C> commandManager;
     private final Predicate<Command<C>> commandPredicate;
 
     CommandHelpHandler(
@@ -100,10 +100,21 @@ public class CommandHelpHandler<C> {
         if (query.trim().isEmpty()) { // query is empty, return all commands
             return new IndexHelpTopic<>(commands);
         } else {
-            return queryHelpForCommands(recipient, query, commands);
+            return this.queryHelpForCommands(recipient, query, commands);
         }
     }
 
+    /**
+     * Query for help against a list of commands.
+     * Note: does not check for empty query.
+     * <p>
+     * Invoked as part of {@link #queryHelp(Object, String)}
+     *
+     * @param recipient The recipient of this help query to check permissions against (if Non-Null)
+     * @param query     Query string
+     * @param commands  List of commands to query against
+     * @return The help topic, only including help info for commands in the list provided.
+     */
     protected HelpTopic<C> queryHelpForCommands(
             final @Nullable C recipient,
             final @NonNull String query,
@@ -158,16 +169,28 @@ public class CommandHelpHandler<C> {
                     .collect(Collectors.toList());
             return new IndexHelpTopic<>(syntaxHints);
         } else { // Traverse command to find the most specific help topic
-            return querySpecificHelp(recipient, queryFragments, availableCommandLabels);
+            return this.querySpecificHelp(recipient, queryFragments, availableCommandLabels);
         }
     }
 
+    /**
+     * Query for help against a list of commands.
+     * Note: does not check for empty query.
+     * <p>
+     * Invoked as part of {@link #queryHelp(Object, String)}
+     *
+     * @param recipient              The recipient of this help query to check permissions against (if Non-Null)
+     * @param queryFragments         Query fragments string array
+     * @param availableCommandLabels List of command labels to query against
+     * @return The help topic, only including help info for commands in the list provided.
+     */
     protected HelpTopic<C> querySpecificHelp(
             final @Nullable C recipient,
             final @NonNull String[] queryFragments,
             final Set<String> availableCommandLabels
     ) {
-        // TODO: 2023-07-15 The complexity of this code is way too high. What can we do to make it easier to understand?
+        // The complexity of this code is way too high. What can we do to make it easier to understand?
+
         final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.commandTree()
                 .getNamedNode(availableCommandLabels.iterator().next());
 
@@ -242,6 +265,15 @@ public class CommandHelpHandler<C> {
         }
 
         return new IndexHelpTopic<>(Collections.emptyList());
+    }
+
+    /**
+     * Get the command manager
+     *
+     * @return The command manager
+     */
+    public CommandManager<C> getCommandManager() {
+        return this.commandManager;
     }
 
     /**

@@ -1195,7 +1195,7 @@ public abstract class CommandManager<C> {
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public final @NonNull CommandHelpHandler<C> createCommandHelpHandler() {
-        return createCommandHelpHandler(cmd -> true);
+        return this.createCommandHelpHandler(cmd -> true);
     }
 
     /**
@@ -1234,7 +1234,7 @@ public abstract class CommandManager<C> {
     public final @NonNull CommandHelpHandler<C> createCommandHelpHandler(
             final @NonNull Predicate<Command<C>> commandPredicate
     ) {
-        return commandHelpHandlerCreator.createHelpHandler(this, commandPredicate);
+        return this.commandHelpHandlerCreator.createHelpHandler(this, commandPredicate);
     }
 
     /**
@@ -1242,10 +1242,11 @@ public abstract class CommandManager<C> {
      *
      * @see #commandHelpHandlerCreator(CommandHelpHandlerCreator)
      * @since 1.9.0
+     * @return The command help handler creator.
      */
     @API(status = API.Status.STABLE, since = "1.9.0")
     public CommandHelpHandlerCreator<C> commandHelpHandlerCreator() {
-        return commandHelpHandlerCreator;
+        return this.commandHelpHandlerCreator;
     }
 
     /**
