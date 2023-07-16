@@ -44,7 +44,7 @@ public interface CommandHelpHandlerCreator<C> {
      * @param commandPredicate The predicate to filter commands
      * @return a new command help handler
      */
-    CommandHelpHandler<C> createHelpHandler(
+    @NonNull CommandHelpHandler<C> createHelpHandler(
             CommandManager<C> commandManager,
             @NonNull Predicate<Command<C>> commandPredicate
     );
