@@ -41,7 +41,6 @@ import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.OrPermission;
 import cloud.commandframework.types.tuples.Pair;
-import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -613,10 +612,6 @@ public final class CommandTree<C> {
             if (!lastFlag.isPresent()) {
                 commandContext.remove(FlagArgument.FLAG_META_KEY);
             }
-        } else if (GenericTypeReflector.erase(child.getValue().getValueType().getType()).isArray()) {
-            while (commandQueue.size() > 1) {
-                commandQueue.remove();
-            }
         } else if (commandQueue.size() <= child.getValue().getParser().getRequestedArgumentCount()) {
             for (int i = 0; i < child.getValue().getParser().getRequestedArgumentCount() - 1
                     && commandQueue.size() > 1; i++) {
@@ -636,7 +631,7 @@ public final class CommandTree<C> {
             } else if (child.getValue() instanceof CompoundArgument) {
                 return this.directSuggestions(commandContext, child, ((LinkedList<String>) commandQueue).getLast());
             }
-        } else if (commandQueue.size() == 1 && commandQueue.peek().isEmpty()) {
+        } else if (commandQueue.size() == 1) {
             return this.directSuggestions(commandContext, child, commandQueue.peek());
         }
 
