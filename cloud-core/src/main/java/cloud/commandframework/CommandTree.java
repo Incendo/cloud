@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.context.ArgumentContext;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.ArgumentParseException;
@@ -236,12 +237,20 @@ public final class CommandTree<C> {
                     final Node<CommandArgument<C, ?>> child = childIterator.next();
                     if (child.getValue() != null) {
                         final CommandArgument<C, ?> argument = child.getValue();
-                        final CommandContext.ArgumentTiming argumentTiming = commandContext.createTiming(argument);
+                        final ArgumentContext<C, ?> argumentContext = commandContext.createArgumentContext(argument);
 
-                        argumentTiming.setStart(System.nanoTime());
+                        // Copy the current queue so that we can deduce the captured input.
+                        final List<String> currentQueue = new LinkedList<>(commandQueue);
+
+                        argumentContext.markStart();
                         commandContext.setCurrentArgument(argument);
+
                         final ArgumentParseResult<?> result = argument.getParser().parse(commandContext, commandQueue);
-                        argumentTiming.setEnd(System.nanoTime(), result.getFailure().isPresent());
+                        argumentContext.markEnd();
+                        argumentContext.success(!result.getFailure().isPresent());
+
+                        currentQueue.removeAll(commandQueue);
+                        argumentContext.consumedInput(currentQueue);
 
                         if (result.getParsedValue().isPresent()) {
                             parsedArguments.add(child.getValue());
@@ -425,10 +434,10 @@ public final class CommandTree<C> {
                 }
 
                 final CommandArgument<C, ?> argument = child.getValue();
-                final CommandContext.ArgumentTiming argumentTiming = commandContext.createTiming(argument);
+                final ArgumentContext<C, ?> argumentContext = commandContext.createArgumentContext(argument);
 
                 // START: Parsing
-                argumentTiming.setStart(System.nanoTime());
+                argumentContext.markStart();
                 final ArgumentParseResult<?> result;
                 final ArgumentParseResult<Boolean> preParseResult = child.getValue().preprocess(
                         commandContext,
@@ -436,11 +445,20 @@ public final class CommandTree<C> {
                 );
                 if (!preParseResult.getFailure().isPresent() && preParseResult.getParsedValue().orElse(false)) {
                     commandContext.setCurrentArgument(argument);
+
+                    // Copy the current queue so that we can deduce the captured input.
+                    final List<String> currentQueue = new LinkedList<>(commandQueue);
+
                     result = argument.getParser().parse(commandContext, commandQueue);
+
+                    // We remove all remaining queue, and then we'll have a list of the captured input.
+                    currentQueue.removeAll(commandQueue);
+                    argumentContext.consumedInput(currentQueue);
                 } else {
                     result = preParseResult;
                 }
-                argumentTiming.setEnd(System.nanoTime(), result.getFailure().isPresent());
+                argumentContext.markEnd();
+                argumentContext.success(!result.getFailure().isPresent());
                 // END: Parsing
 
                 if (result.getParsedValue().isPresent()) {
