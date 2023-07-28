@@ -26,6 +26,7 @@ package cloud.commandframework.context;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -125,7 +126,16 @@ public final class ArgumentContext<C, T> {
     }
 
     /**
-     * Returns the exact alias used, if the argument was static. If no alias was consumed
+     * Return the list of consumed input.
+     *
+     * @return the list of consumed input
+     */
+    public @NonNull List<@NonNull String> consumedInput() {
+        return Collections.unmodifiableList(this.consumedInput);
+    }
+
+    /**
+     * Return the exact alias used, if the argument was static. If no alias was consumed
      * then {@code null} is returned.
      *
      * @return the exact alias, or {@code null}
