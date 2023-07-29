@@ -79,7 +79,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
      * @param name argument name
      * @param <C>  sender type
      * @return new {@link Builder}
-     * @since 1.8.0
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.9.0")
     public static <C> @NonNull Builder<C> builder(final @NonNull String name) {
@@ -124,7 +124,6 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
         NAME
     }
 
-
     public static final class Builder<C> extends CommandArgument.Builder<C, MessageChannel> {
 
         private Set<ParserMode> modes = new HashSet<>();
@@ -161,7 +160,6 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
             );
         }
     }
-
 
     public static final class MessageParser<C> implements ArgumentParser<C, MessageChannel> {
 
