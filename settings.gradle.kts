@@ -99,6 +99,7 @@ setupMinecraftModule("cloud-sponge7")
 setupMinecraftModule("cloud-bungee")
 setupMinecraftModule("cloud-cloudburst")
 setupMinecraftModule("cloud-minecraft-extras")
+setupMinecraftModule("cloud-minestom")
 
 // IRC Modules
 setupIrcModule("cloud-pircbotx")
