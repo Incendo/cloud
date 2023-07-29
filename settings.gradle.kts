@@ -92,6 +92,7 @@ setupKotlinModule("cloud-kotlin-coroutines-annotations")
 // Discord Modules
 setupDiscordModule("cloud-javacord")
 setupDiscordModule("cloud-jda")
+setupDiscordModule("cloud-jda5")
 
 // Minecraft Modules
 setupMinecraftModule("cloud-brigadier")
