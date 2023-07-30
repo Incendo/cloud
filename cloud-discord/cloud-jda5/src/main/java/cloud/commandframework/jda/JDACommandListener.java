@@ -29,6 +29,8 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.jda.permission.BotJDAPermissionException;
+import cloud.commandframework.jda.permission.UserJDAPermissionException;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -128,6 +130,22 @@ public class JDACommandListener<C> extends ListenerAdapter {
                                     throwable.getCause().printStackTrace();
                                 }
                         );
+                    } else if (throwable instanceof BotJDAPermissionException) {
+                        this.commandManager.handleException(sender, BotJDAPermissionException.class,
+                                (BotJDAPermissionException) throwable, (c, e) -> {
+                                    this.sendMessage(
+                                        event,
+                                        e.getMessage()
+                                    );
+                                });
+                    } else if (throwable instanceof UserJDAPermissionException) {
+                        this.commandManager.handleException(sender, UserJDAPermissionException.class,
+                                (UserJDAPermissionException) throwable, (c, e) -> {
+                                    this.sendMessage(
+                                            event,
+                                            e.getMessage()
+                                    );
+                                });
                     } else {
                         this.sendMessage(event, throwable.getMessage());
                     }

@@ -29,17 +29,20 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.jda.parsers.ChannelArgument;
+import cloud.commandframework.jda.parsers.MemberArgument;
 import cloud.commandframework.jda.parsers.RoleArgument;
 import cloud.commandframework.jda.parsers.UserArgument;
+import cloud.commandframework.jda.permission.BotPermissionPostProcessor;
+import cloud.commandframework.jda.permission.UserPermissionPostProcessor;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -104,19 +107,27 @@ public class JDA5CommandManager<C> extends CommandManager<C> {
         /* Register JDA Preprocessor */
         this.registerCommandPreProcessor(new JDACommandPreprocessor<>(this));
 
+        /* Register JDA Command Postprocessors */
+        this.registerCommandPostProcessor(new BotPermissionPostProcessor<>());
+        this.registerCommandPostProcessor(new UserPermissionPostProcessor<>());
+
         /* Register JDA Parsers */
         this.parserRegistry().registerParserSupplier(TypeToken.get(User.class), parserParameters ->
                 new UserArgument.UserParser<>(
-                        new HashSet<>(Arrays.asList(UserArgument.ParserMode.values())),
+                        EnumSet.allOf(UserArgument.ParserMode.class),
                         UserArgument.Isolation.GLOBAL
                 ));
         this.parserRegistry().registerParserSupplier(TypeToken.get(MessageChannel.class), parserParameters ->
                 new ChannelArgument.MessageParser<>(
-                        new HashSet<>(Arrays.asList(ChannelArgument.ParserMode.values()))
+                        EnumSet.allOf(ChannelArgument.ParserMode.class)
                 ));
         this.parserRegistry().registerParserSupplier(TypeToken.get(Role.class), parserParameters ->
                 new RoleArgument.RoleParser<>(
-                        new HashSet<>(Arrays.asList(RoleArgument.ParserMode.values()))
+                        EnumSet.allOf(RoleArgument.ParserMode.class)
+                ));
+        this.parserRegistry().registerParserSupplier(TypeToken.get(Member.class), parserParameters ->
+                new MemberArgument.MemberParser<>(
+                        EnumSet.allOf(MemberArgument.ParserMode.class)
                 ));
 
         // No "native" command system means that we can delete commands just fine.
