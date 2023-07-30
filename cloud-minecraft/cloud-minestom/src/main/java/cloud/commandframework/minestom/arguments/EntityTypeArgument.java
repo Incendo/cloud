@@ -48,7 +48,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <C> Command sender type
  * @since 1.9.0
  */
-public class EntityTypeArgument<C> extends CommandArgument<C, EntityType> {
+public final class EntityTypeArgument<C> extends CommandArgument<C, EntityType> {
 
     private EntityTypeArgument(
             final boolean required,
@@ -202,7 +202,7 @@ public class EntityTypeArgument<C> extends CommandArgument<C, EntityType> {
          * @return String value
          */
         public @NotNull String getInput() {
-            return input;
+            return this.input;
         }
     }
 }

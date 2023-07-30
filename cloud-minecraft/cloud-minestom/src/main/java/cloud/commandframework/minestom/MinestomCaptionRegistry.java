@@ -43,7 +43,7 @@ public class MinestomCaptionRegistry<C> extends SimpleCaptionRegistry<C> {
      */
     public static final String ARGUMENT_PARSE_FAILURE_ENTITY_TYPE = "'{input}' is not a valid entity type";
 
-    public MinestomCaptionRegistry() {
+    protected MinestomCaptionRegistry() {
         super();
 
         this.registerMessageFactory(

@@ -44,7 +44,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <C> Command sender type
  */
-public class MinestomCommandManager<C> extends CommandManager<C> {
+public final class MinestomCommandManager<C> extends CommandManager<C> {
 
     @NotNull
     private final Function<CommandSender, C> commandSenderMapper;
@@ -63,13 +63,16 @@ public class MinestomCommandManager<C> extends CommandManager<C> {
      * {@link AsynchronousCommandExecutionCoordinator}
      *
      * @param commandExecutionCoordinator Execution coordinator instance.
+     * @param commandSenderMapper          Function that maps {@link CommandSender} to the command sender type
+     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSender}
      */
+    @SuppressWarnings("unchecked")
     public MinestomCommandManager(
-            Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
+            final Function<CommandTree<C>, CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NotNull Function<CommandSender, C> commandSenderMapper,
             final @NotNull Function<C, CommandSender> backwardsCommandSenderMapper
     ) {
-        super(commandExecutionCoordinator, new MinestomCommandRegistrationHandler<>());
+        super(commandExecutionCoordinator, new MinestomCommandRegistrationHandler<C>());
 
         MinestomCommandRegistrationHandler<C> registrationHandler = (MinestomCommandRegistrationHandler<C>) commandRegistrationHandler();
         registrationHandler.initialize(this);
@@ -79,22 +82,22 @@ public class MinestomCommandManager<C> extends CommandManager<C> {
 
         captionRegistry(new MinestomCaptionRegistry<>());
 
-        setupParsers();
+        this.setupParsers();
     }
 
     @NotNull
-    public C mapCommandSender(CommandSender sender) {
-        return commandSenderMapper.apply(sender);
+    C mapCommandSender(final @NotNull CommandSender sender) {
+        return this.commandSenderMapper.apply(sender);
     }
 
     @NotNull
-    public CommandSender backwardsMapCommandSender(C sender) {
-        return backwardsCommandSenderMapper.apply(sender);
+    CommandSender backwardsMapCommandSender(final @NotNull C sender) {
+        return this.backwardsCommandSenderMapper.apply(sender);
     }
 
     @Override
-    public boolean hasPermission(@NotNull C sender, @NotNull String permission) {
-        CommandSender minestomSender = backwardsMapCommandSender(sender);
+    public boolean hasPermission(final @NotNull C sender, final @NotNull String permission) {
+        CommandSender minestomSender = this.backwardsMapCommandSender(sender);
         return minestomSender instanceof ConsoleSender
                 || minestomSender.hasPermission(permission)
                 || (minestomSender instanceof Player && ((Player) minestomSender).getPermissionLevel() >= 4);

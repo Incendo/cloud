@@ -34,7 +34,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @since 1.9.0
  */
-public class MinestomCaptionKeys {
+public final class MinestomCaptionKeys {
 
     private static final Collection<Caption> RECOGNIZED_CAPTIONS = new LinkedList<>();
 

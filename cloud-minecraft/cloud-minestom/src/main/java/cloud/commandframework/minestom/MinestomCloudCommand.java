@@ -23,8 +23,15 @@
 //
 package cloud.commandframework.minestom;
 
-import cloud.commandframework.exceptions.*;
+import cloud.commandframework.exceptions.ArgumentParseException;
+import cloud.commandframework.exceptions.CommandExecutionException;
+import cloud.commandframework.exceptions.InvalidCommandSenderException;
+import cloud.commandframework.exceptions.InvalidSyntaxException;
+import cloud.commandframework.exceptions.NoPermissionException;
+import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandResult;
+import java.util.concurrent.CompletionException;
+import java.util.function.BiConsumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.command.CommandSender;
@@ -33,10 +40,8 @@ import net.minestom.server.command.builder.CommandContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.concurrent.CompletionException;
-import java.util.function.BiConsumer;
 
-public class MinestomCloudCommand<C> extends Command {
+public final class MinestomCloudCommand<C> extends Command {
 
     private static final String MESSAGE_INTERNAL_ERROR = "An internal error occurred while attempting to perform this command.";
     private static final String MESSAGE_NO_PERMS =
@@ -46,15 +51,19 @@ public class MinestomCloudCommand<C> extends Command {
 
     private final MinestomCommandManager<C> manager;
 
-    public MinestomCloudCommand(MinestomCommandManager<C> manager, @NotNull String name, @Nullable String... aliases) {
+    MinestomCloudCommand(final MinestomCommandManager<C> manager, final @NotNull String name, final @Nullable String... aliases) {
         super(name, aliases);
         this.manager = manager;
     }
 
     @Override
-    public void globalListener(@NotNull CommandSender commandSender, @NotNull CommandContext context, @NotNull String command) {
-        C sender = manager.mapCommandSender(commandSender);
-        manager.executeCommand(sender, command).whenComplete(getResultConsumer(commandSender, sender));
+    public void globalListener(
+            final @NotNull CommandSender commandSender,
+            final @NotNull CommandContext context,
+            final @NotNull String command
+    ) {
+        C sender = this.manager.mapCommandSender(commandSender);
+        this.manager.executeCommand(sender, command).whenComplete(this.getResultConsumer(commandSender, sender));
     }
 
     private @NonNull BiConsumer<@NonNull CommandResult<C>, ? super Throwable> getResultConsumer(

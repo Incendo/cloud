@@ -54,9 +54,9 @@ import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
-public class MinestomCommandRegistrationHandler<C> implements CommandRegistrationHandler {
+public final class MinestomCommandRegistrationHandler<C> implements CommandRegistrationHandler {
 
-    private static final CommandExecutor emptyExecutor = (sender, context) -> {
+    private static final CommandExecutor EMPTY_EXECUTOR = (sender, context) -> {
     };
 
     private MinestomCommandManager<C> commandManager;
@@ -67,11 +67,11 @@ public class MinestomCommandRegistrationHandler<C> implements CommandRegistratio
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean registerCommand(@NotNull cloud.commandframework.Command<?> cloudCommand) {
+    public boolean registerCommand(final @NotNull cloud.commandframework.Command<?> cloudCommand) {
         cloud.commandframework.Command<C> command = (cloud.commandframework.Command<C>) cloudCommand;
         List<CommandArgument<@NonNull C, ?>> arguments = command.getArguments();
         StaticArgument<C> cmdArg = (StaticArgument<C>) arguments.get(0);
-        MinestomCloudCommand<C> root = getRootCommand(cmdArg);
+        MinestomCloudCommand<C> root = this.getRootCommand(cmdArg);
 
         if (command.isHidden()) {
             root.setCondition((sender, commandString) -> commandString != null);
@@ -88,18 +88,18 @@ public class MinestomCommandRegistrationHandler<C> implements CommandRegistratio
             }
 
             if (subcommand) {
-                parent = getSubcommand(parent, (StaticArgument<C>) argument);
+                parent = this.getSubcommand(parent, (StaticArgument<C>) argument);
             } else {
-                minestomArguments.add(createMinestomArgument(argument));
+                minestomArguments.add(this.createMinestomArgument(argument));
             }
         }
 
-        parent.addSyntax(emptyExecutor, minestomArguments.toArray(new Argument[0]));
+        parent.addSyntax(EMPTY_EXECUTOR, minestomArguments.toArray(new Argument<?>[0]));
         return true;
     }
 
     @SuppressWarnings("unchecked")
-    private MinestomCloudCommand<C> getRootCommand(StaticArgument<C> argument) {
+    private MinestomCloudCommand<C> getRootCommand(final StaticArgument<C> argument) {
         String name = argument.getName();
         String[] aliases = argument.getAlternativeAliases().toArray(new String[0]);
 
@@ -108,17 +108,17 @@ public class MinestomCommandRegistrationHandler<C> implements CommandRegistratio
             return (MinestomCloudCommand<C>) command;
         }
 
-        command = new MinestomCloudCommand<>(commandManager, name, aliases);
+        command = new MinestomCloudCommand<>(this.commandManager, name, aliases);
         MinecraftServer.getCommandManager().register(command);
         return (MinestomCloudCommand<C>) command;
     }
 
-    private Command getSubcommand(Command parent, StaticArgument<C> argument) {
+    private Command getSubcommand(final Command parent, final StaticArgument<C> argument) {
         String name = argument.getName();
         String[] aliases = argument.getAlternativeAliases().toArray(new String[0]);
 
         Command command = parent.getSubcommands().stream()
-                .filter((it -> it.getName().equals(name)))
+                .filter(it -> it.getName().equals(name))
                 .findFirst().orElse(null);
         if (command != null) {
             return command;
@@ -129,32 +129,34 @@ public class MinestomCommandRegistrationHandler<C> implements CommandRegistratio
         return command;
     }
 
-    private Argument<?> createMinestomArgument(CommandArgument<C, ?> arg) {
+    private Argument<?> createMinestomArgument(final CommandArgument<C, ?> arg) {
         Argument<?> minestomArgument = convertArgument(arg);
-        addSuggestions(minestomArgument);
+        this.addSuggestions(minestomArgument);
         return minestomArgument;
     }
 
-    private void addSuggestions(Argument<?> argument) {
-        argument.setSuggestionCallback(((sender, context, suggestion) -> {
-            List<@NonNull String> suggestionList = commandManager.suggest(
-                    commandManager.mapCommandSender(sender),
+    private void addSuggestions(final Argument<?> argument) {
+        argument.setSuggestionCallback((sender, context, suggestion) -> {
+            List<@NonNull String> suggestionList = this.commandManager.suggest(
+                    this.commandManager.mapCommandSender(sender),
                     fixInput(context.getInput())
             );
             for (String sug : suggestionList) {
                 suggestion.addEntry(new SuggestionEntry(sug));
             }
-        }));
+        });
     }
 
-    private static String fixInput(String input) {
+    @NotNull
+    private static String fixInput(final @NotNull String input) {
         if (input.endsWith("\u0000")) {
             return input.substring(0, input.length() - 1);
         }
         return input;
     }
 
-    private static <C> Argument<?> convertArgument(CommandArgument<C, ?> arg) {
+    @NotNull
+    private static <C> Argument<?> convertArgument(final @NotNull CommandArgument<C, ?> arg) {
         ArgumentParser<C, ?> parser = arg.getParser();
 
         String defaultValue = arg.getDefaultValue();
@@ -164,26 +166,27 @@ public class MinestomCommandRegistrationHandler<C> implements CommandRegistratio
         if (parser instanceof final StringArgument.StringParser<?> sp) {
             switch (sp.getStringMode()) {
                 case SINGLE -> {
-                    ArgumentWord result = new ArgumentWord((arg.getName()));
+                    ArgumentWord result = new ArgumentWord(arg.getName());
                     if (hasDefaultValue) {
                         result.setDefaultValue(defaultValue);
                     }
                     return result;
                 }
                 case GREEDY -> {
-                    ArgumentStringArray result = new ArgumentStringArray((arg.getName()));
+                    ArgumentStringArray result = new ArgumentStringArray(arg.getName());
                     if (hasDefaultValue) {
                         result.setDefaultValue(defaultValue.split(Pattern.quote(" ")));
                     }
                     return result;
                 }
                 case QUOTED -> {
-                    ArgumentString result = new ArgumentString((arg.getName()));
+                    ArgumentString result = new ArgumentString(arg.getName());
                     if (hasDefaultValue) {
                         result.setDefaultValue(defaultValue);
                     }
                     return result;
                 }
+                default -> {}
             }
         }
 
