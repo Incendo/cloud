@@ -4,18 +4,18 @@ metadata:
     - plugins
 
 plugins:
-  com.github.johnrengelman.shadow: 7.1.2
-  com.github.ben-manes.versions: 0.44.0
-  com.diffplug.spotless: &spotless 6.12.0
-  xyz.jpenilla.run-paper: &run-task 2.0.0
+  com.github.johnrengelman.shadow: 8.1.1
+  com.github.ben-manes.versions: 0.48.0
+  com.diffplug.spotless: &spotless 6.21.0
+  xyz.jpenilla.run-paper: &run-task 2.1.0
   xyz.jpenilla.run-velocity: *run-task
   xyz.jpenilla.run-waterfall: *run-task
 
 versions:
   checkstyle: 10.5.0
-  checkerQual: 3.28.0
+  checkerQual: 3.38.0
   errorprone: 2.16
-  geantyref: 1.3.13
+  geantyref: 1.3.14
   jmh: 1.36
   apiguardian: 1.1.2
 
@@ -26,7 +26,7 @@ versions:
   kotlin: 1.7.22
   dokka: 1.7.20
   coroutines: 1.5.2
-  ktlint: 0.47.1
+  ktlint: 0.50.0
 
   # discord
   javacord: 3.1.1
@@ -48,13 +48,13 @@ versions:
   velocityApi: 3.1.0
   spongeApi7: 7.3.0
   jetbrainsAnnotations: 23.0.0
-  fabricMinecraft: 1.19.4-pre1
-  fabricLoader: 0.14.14
-  fabricApi: 0.75.0+1.19.4
+  fabricMinecraft: 1.19.4
+  fabricLoader: 0.14.22
+  fabricApi: 0.87.0+1.19.4
   fabricPermissionsApi: 0.2-SNAPSHOT
 
   # testing
-  jupiterEngine : 5.9.1
+  jupiterEngine : 5.10.0
   mockitoCore : 4.9.0
   mockitoKotlin : 4.1.0
   mockitoJupiter: 4.9.0
@@ -62,7 +62,7 @@ versions:
   compileTesting: "0.20"
 
   # build-logic
-  indra: 3.0.1
+  indra: 3.1.3
   gradleTestLogger: 3.2.0
   gradleErrorprone: 3.0.1
   spotless: *spotless
