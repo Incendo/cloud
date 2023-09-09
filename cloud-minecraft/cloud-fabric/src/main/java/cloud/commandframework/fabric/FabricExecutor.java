@@ -158,7 +158,7 @@ final class FabricExecutor<C, S extends SharedSuggestionProvider> implements Com
                         LOGGER.warn(
                                 "Error occurred while executing command for user {}:",
                                 this.getName.apply(source),
-                                throwable
+                                throwable.getCause()
                         );
                     }
             );

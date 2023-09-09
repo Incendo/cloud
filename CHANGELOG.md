@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.4]
+
+### Fixed
+- Core: Flags not tab-completing unless string is empty ([#460](https://github.com/Incendo/cloud/pull/460))
+- Core: Parser registry not properly resolving `TypeToken`s ([#454](https://github.com/Incendo/cloud/pull/454))
+- Fabric: Pottery pattern registry overriding default string parser for annotations
+- Fabric: Log cause of CommandExecutionException in fabric's default exception handler ([#466](https://github.com/Incendo/cloud/pull/466))
+
+### Changed
+- Core: Improved string parser supplier argument checking
+- Bukkit/Paper: Improve docs around Brigadier support
+
 ## [1.8.3]
 
 ### Changed

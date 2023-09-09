@@ -36,13 +36,17 @@ import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.permission.CommandPermission;
+import cloud.commandframework.types.tuples.Pair;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -56,7 +60,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class CommandContext<C> {
 
     private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
-    private final Map<CommandArgument<C, ?>, ArgumentTiming> argumentTimings = new HashMap<>();
+    private final List<ArgumentContext<C, ?>> argumentContexts = new LinkedList<>();
     private final FlagContext flagContext = FlagContext.create();
     private final Map<CloudKey<?>, Object> internalStorage = new HashMap<>();
     private final C commandSender;
@@ -603,20 +607,103 @@ public class CommandContext<C> {
      *
      * @param argument Argument
      * @return Created timing instance
+     *
+     * @deprecated This has been replaced by {@link #createArgumentContext(CommandArgument)}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
+    @Deprecated
     public @NonNull ArgumentTiming createTiming(final @NonNull CommandArgument<C, ?> argument) {
-        final ArgumentTiming argumentTiming = new ArgumentTiming();
-        this.argumentTimings.put(argument, argumentTiming);
-        return argumentTiming;
+        return new ArgumentTiming();
     }
 
     /**
      * Get an immutable view of the argument timings map
      *
      * @return Argument timings
+     * @deprecated Replaced with {@link #argumentContexts()}
      */
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
+    @Deprecated
     public @NonNull Map<CommandArgument<@NonNull C, @NonNull ?>, ArgumentTiming> getArgumentTimings() {
-        return Collections.unmodifiableMap(this.argumentTimings);
+        return this.argumentContexts.stream()
+                .map(context -> Pair.of(
+                                context.argument(),
+                                new ArgumentTiming(
+                                        context.startTime(),
+                                        context.endTime(),
+                                        context.success()
+                                )
+                        )
+                ).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+    }
+
+    /**
+     * Create an argument context instance for the given argument
+     *
+     * @param argument the argument
+     * @return the created context
+     * @param <T> the type of the argument
+     * @since 1.9.0
+     */
+    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    public <T> @NonNull ArgumentContext<C, T> createArgumentContext(final @NonNull CommandArgument<C, T> argument) {
+        final ArgumentContext<C, T> argumentContext = new ArgumentContext<>(argument);
+        this.argumentContexts.add(argumentContext);
+        return argumentContext;
+    }
+
+    /**
+     * Returns the context for the given argument
+     *
+     * @param argument the argument
+     * @return the context
+     * @param <T> the type of the argument
+     * @since 1.9.0
+     */
+    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    @SuppressWarnings("unchecked")
+    public <T> @NonNull ArgumentContext<C, T> argumentContext(final @NonNull CommandArgument<C, T> argument) {
+        return this.argumentContexts.stream().filter(context -> context.argument().equals(argument))
+                .findFirst()
+                .map(context -> (ArgumentContext<C, T>) context)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    /**
+     * Returns the context for the argument at the given position
+     *
+     * @param position the position
+     * @return the context
+     * @since 1.9.0
+     */
+    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    public @NonNull ArgumentContext<C, ?> argumentContext(final int position) {
+        return this.argumentContexts.get(position);
+    }
+
+    /**
+     * Return the context for the argument with the given name.
+     *
+     * @param name the name
+     * @return the context
+     * @since 1.9.0
+     */
+    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    public @NonNull ArgumentContext<C, ?> argumentContext(final String name) {
+        return this.argumentContexts.stream().filter(context -> context.argument().getName().equals(name))
+                .findFirst()
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    /**
+     * Return an unmodifiable view of the stored argument contexts
+     *
+     * @return the contexts
+     * @since 1.9.0
+     */
+    @API(status = API.Status.MAINTAINED, since = "1.9.0")
+    public @NonNull List<@NonNull ArgumentContext<@NonNull C, @NonNull ?>> argumentContexts() {
+        return Collections.unmodifiableList(this.argumentContexts);
     }
 
     /**
@@ -695,8 +782,11 @@ public class CommandContext<C> {
      * parsed.
      * <p>
      * The times are measured in nanoseconds.
+     *
+     * @deprecated Superseded by {@link ArgumentContext}
      */
-    @API(status = API.Status.STABLE)
+    @Deprecated
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     public static final class ArgumentTiming {
 
         private long start;
@@ -704,7 +794,7 @@ public class CommandContext<C> {
         private boolean success;
 
         /**
-         * Created a new argument timing instance
+         * Creates a new argument timing instance
          *
          * @param start   Start time (in nanoseconds)
          * @param end     End time (in nanoseconds)
@@ -717,7 +807,7 @@ public class CommandContext<C> {
         }
 
         /**
-         * Created a new argument timing instance without an end time
+         * Creates a new argument timing instance without an end time
          *
          * @param start Start time (in nanoseconds)
          */
@@ -727,7 +817,7 @@ public class CommandContext<C> {
         }
 
         /**
-         * Created a new argument timing instance
+         * Creates a new argument timing instance
          */
         public ArgumentTiming() {
             this(-1, -1, false);
