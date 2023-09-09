@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.BooleanArgument;
@@ -37,8 +38,10 @@ import cloud.commandframework.types.tuples.Triplet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.util.TestUtils.createManager;
@@ -634,6 +637,41 @@ public class CommandSuggestionsTest {
         assertThat(suggestions5).containsExactly("-f");
         assertThat(suggestions6).isEmpty();
     }
+
+    @Test
+    void testTextFlagCompletion() {
+        // Arrange
+        final CommandManager<TestCommandSender> manager = createManager();
+        manager.setSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING, true);
+        manager.command(
+                manager.commandBuilder("command")
+                        .flag(manager.flagBuilder("flag").withAliases("f")
+                                .withArgument(EnumArgument.of(TestEnum.class, "test")).build())
+                        .flag(manager.flagBuilder("flog").build())
+        );
+
+        // Act
+        final List<String> suggestions1 = suggest(manager, "command ");
+        final List<String> suggestions2 = suggest(manager, "command --");
+        final List<String> suggestions3 = suggest(manager, "command --f");
+        final List<String> suggestions4 = suggest(manager, "command --fla");
+        final List<String> suggestions5 = suggest(manager, "command -f");
+        final List<String> suggestions6 = suggest(manager, "command -");
+
+        final List<String> suggestions7 = suggest(manager, "command -f ");
+        final List<String> suggestions8 = suggest(manager, "command -f b");
+
+        // Assert
+        assertThat(suggestions1).containsExactly("--flag", "--flog", "-f");
+        assertThat(suggestions2).containsExactly("--flag", "--flog");
+        assertThat(suggestions3).containsExactly("--flag", "--flog");
+        assertThat(suggestions4).containsExactly("--flag");
+        assertThat(suggestions5).containsExactly("-f");
+        assertThat(suggestions6).containsExactly("--flag", "--flog", "-f");
+        assertThat(suggestions7).containsExactly("foo", "bar");
+        assertThat(suggestions8).containsExactly("bar");
+    }
+
 
     private List<String> suggest(CommandManager<TestCommandSender> manager, String command) {
         return manager.suggest(new TestCommandSender(), command);
