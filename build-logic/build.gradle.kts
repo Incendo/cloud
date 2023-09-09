@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     // loom needs this version of asm, for some reason we have an older one on the classpath without this
-    implementation("org.ow2.asm:asm:9.4")
+    implementation("org.ow2.asm:asm:9.5")
     implementation(libs.indraCommon)
     implementation(libs.indraPublishingSonatype)
     implementation(libs.gradleTestLogger)
@@ -27,6 +27,12 @@ spotless {
     kotlinGradle {
         target("*.gradle.kts", "src/*/kotlin/**.gradle.kts", "src/*/kotlin/**.kt")
         ktlint(libs.versions.ktlint.get())
-            .editorConfigOverride(mapOf("ktlint_disabled_rules" to "filename"))
+            .editorConfigOverride(
+                mapOf(
+                    "ktlint_standard_filename" to "disabled",
+                    "ktlint_standard_trailing-comma-on-call-site" to "disabled",
+                    "ktlint_standard_trailing-comma-on-declaration-site" to "disabled",
+                )
+            )
     }
 }
