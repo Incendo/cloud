@@ -113,7 +113,16 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
     }
 
     /**
-     * Register Brigadier mappings using the native paper events
+     * Attempts to enable Brigadier command registration through the Paper API, falling
+     * back to {@link BukkitCommandManager#registerBrigadier()} if that fails.
+     *
+     * <p>Callers should check for {@link CloudBukkitCapabilities#NATIVE_BRIGADIER} first
+     * to avoid exceptions.</p>
+     *
+     * <p>A check for {@link CloudBukkitCapabilities#NATIVE_BRIGADIER} {@code ||} {@link CloudBukkitCapabilities#COMMODORE_BRIGADIER}
+     * may also be appropriate for some use cases (because of the fallback behavior), but not most, as Commodore does not offer
+     * any functionality on modern
+     * versions (see the documentation for {@link CloudBukkitCapabilities#COMMODORE_BRIGADIER}).</p>
      *
      * @throws BrigadierFailureException Exception thrown if the mappings cannot be registered
      */

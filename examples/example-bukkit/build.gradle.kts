@@ -12,9 +12,6 @@ dependencies {
     implementation(project(":cloud-annotations"))
     implementation(project(":cloud-minecraft-extras"))
     /* Extras */
-    implementation(libs.commodore) {
-        isTransitive = false
-    }
     implementation(libs.adventurePlatformBukkit)
     /* Bukkit */
     compileOnly(libs.bukkit)
@@ -25,7 +22,6 @@ dependencies {
 tasks {
     shadowJar {
         relocate("net.kyori", "cloud.commandframework.example.kyori")
-        relocate("me.lucko", "cloud.commandframework.example.lucko")
         relocate("io.leangen.geantyref", "cloud.commandframework.example.geantyref")
     }
     assemble {

@@ -42,9 +42,11 @@ import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.standard.UUIDArgument;
 import cloud.commandframework.context.CommandContext;
+import io.leangen.geantyref.AnnotatedTypeMap;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
@@ -85,7 +87,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     };
 
     private final Map<String, Function<ParserParameters, ArgumentParser<C, ?>>> namedParsers = new HashMap<>();
-    private final Map<TypeToken<?>, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new HashMap<>();
+    private final Map<AnnotatedType, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new AnnotatedTypeMap<>();
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
             annotationMappers = new HashMap<>();
     private final Map<String, BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>>
@@ -152,16 +154,21 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final boolean greedy = options.get(StandardParameters.GREEDY, false);
             final boolean greedyFlagAware = options.get(StandardParameters.FLAG_YIELDING, false);
             final boolean quoted = options.get(StandardParameters.QUOTED, false);
-            if (greedy && quoted) {
+            if (greedyFlagAware && quoted) {
+                throw new IllegalArgumentException(
+                        "Don't know whether to create GREEDY_FLAG_YIELDING or QUOTED StringArgument.StringParser, both specified."
+                );
+            } else if (greedy && quoted) {
                 throw new IllegalArgumentException(
                         "Don't know whether to create GREEDY or QUOTED StringArgument.StringParser, both specified."
                 );
             }
             final StringArgument.StringMode stringMode;
-            if (greedy) {
-                stringMode = StringArgument.StringMode.GREEDY;
-            } else if (greedyFlagAware) {
+            // allow @Greedy and @FlagYielding to both be true, give flag yielding priority
+            if (greedyFlagAware) {
                 stringMode = StringArgument.StringMode.GREEDY_FLAG_YIELDING;
+            } else if (greedy) {
+                stringMode = StringArgument.StringMode.GREEDY;
             } else if (quoted) {
                 stringMode = StringArgument.StringMode.QUOTED;
             } else {
@@ -190,7 +197,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             final @NonNull Function<@NonNull ParserParameters,
                     @NonNull ArgumentParser<C, ?>> supplier
     ) {
-        this.parserSuppliers.put(type, supplier);
+        this.parserSuppliers.put(type.getAnnotatedType(), supplier);
     }
 
     @Override
@@ -243,7 +250,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         } else {
             actualType = type;
         }
-        final Function<ParserParameters, ArgumentParser<C, ?>> producer = this.parserSuppliers.get(actualType);
+        final Function<ParserParameters, ArgumentParser<C, ?>> producer = this.parserSuppliers.get(actualType.getAnnotatedType());
         if (producer == null) {
             /* Give enums special treatment */
             if (GenericTypeReflector.isSuperType(Enum.class, actualType.getType())) {
