@@ -64,6 +64,9 @@ public class NoPermissionException extends CommandParseException {
     }
 
     /**
+     * Get the missing permission node
+     *
+     * @return Get the missing permission node
      * @deprecated use {@link #missingPermission()) instead
      */
     @API(status = API.Status.DEPRECATED, since = "1.8.5")
