@@ -69,7 +69,7 @@ public class NoPermissionException extends CommandParseException {
      * @return Get the missing permission node
      * @deprecated use {@link #missingPermission()} instead
      */
-    @API(status = API.Status.DEPRECATED, since = "1.8.5")
+    @API(status = API.Status.DEPRECATED, since = "1.9.0")
     @Deprecated
     public @NonNull String getMissingPermission() {
         return this.missingPermission.toString();
@@ -81,7 +81,7 @@ public class NoPermissionException extends CommandParseException {
      * @return the missing permission
      * @since 1.8.5
      */
-    @API(status = API.Status.STABLE, since = "1.8.5")
+    @API(status = API.Status.STABLE, since = "1.9.0")
     public @NonNull CommandPermission missingPermission() {
         return this.missingPermission;
     }
