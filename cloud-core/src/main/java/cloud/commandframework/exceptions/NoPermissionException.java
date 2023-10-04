@@ -79,7 +79,7 @@ public class NoPermissionException extends CommandParseException {
      * Returns the missing {@link CommandPermission}
      *
      * @return the missing permission
-     * @since 1.8.5
+     * @since 1.9.0
      */
     @API(status = API.Status.STABLE, since = "1.9.0")
     public @NonNull CommandPermission missingPermission() {
