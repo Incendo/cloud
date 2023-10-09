@@ -104,11 +104,11 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     @Override
     public boolean execute(
             final @NonNull CommandSender commandSender,
-            final @NonNull String s,
+            final @NonNull String commandLabel,
             final @NonNull String @NonNull [] strings
     ) {
         /* Join input */
-        final StringBuilder builder = new StringBuilder(this.command.getName());
+        final StringBuilder builder = new StringBuilder(commandLabel);
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
