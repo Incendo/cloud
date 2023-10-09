@@ -545,8 +545,6 @@ public final class AnnotationParser<C> {
             final Method method = commandMethodPair.getMethod();
             final String syntax = syntaxPrefix + this.processString(commandMethod.value());
             final List<SyntaxFragment> tokens = this.syntaxParser.apply(syntax);
-            /* Determine command name */
-            final String commandToken = syntax.split(" ")[0].split("\\|")[0];
             @SuppressWarnings("rawtypes") final CommandManager manager = this.manager;
             final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
                     .with(this.metaFactory.apply(method));
@@ -554,10 +552,11 @@ public final class AnnotationParser<C> {
                 metaBuilder.with(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true);
             }
 
+            final SyntaxFragment commandToken = tokens.get(0);
             @SuppressWarnings("rawtypes")
             Command.Builder builder = manager.commandBuilder(
-                    commandToken,
-                    tokens.get(0).getMinor(),
+                    commandToken.getMajor(),
+                    commandToken.getMinor(),
                     metaBuilder.build()
             );
             final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
