@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.context.ArgumentContext;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandResult;
 import java.util.Collection;
@@ -65,8 +66,8 @@ final class CommandPerformanceTest {
         long elapsedTime = 0L;
         int amount = 0;
         for (int i = 0; i < 100000; i++) {
-            for (final CommandContext.ArgumentTiming argumentTiming : result.getCommandContext().getArgumentTimings().values()) {
-                elapsedTime += argumentTiming.getElapsedTime();
+            for (final ArgumentContext<?, ?> argumentContext : result.getCommandContext().argumentContexts()) {
+                elapsedTime += argumentContext.parseDuration().toNanos();
                 amount += 1;
             }
         }
