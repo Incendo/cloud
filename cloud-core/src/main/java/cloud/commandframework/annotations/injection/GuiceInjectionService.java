@@ -26,8 +26,11 @@ package cloud.commandframework.annotations.injection;
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.types.tuples.Triplet;
+import com.google.inject.BindingAnnotation;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import java.lang.annotation.Annotation;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -61,8 +64,20 @@ public final class GuiceInjectionService<C> implements InjectionService<C> {
     @Override
     @SuppressWarnings("EmptyCatch")
     public @Nullable Object handle(final @NonNull Triplet<CommandContext<C>, Class<?>, AnnotationAccessor> triplet) {
+        final Annotation bindingAnnotation = triplet
+                .getThird()
+                .annotations()
+                .stream()
+                .filter(annotation -> annotation.annotationType().isAnnotationPresent(BindingAnnotation.class))
+                .findFirst()
+                .orElse(null);
+
         try {
-            return this.injector.getInstance(triplet.getSecond());
+            if (bindingAnnotation == null) {
+                return this.injector.getInstance(triplet.getSecond());
+            } else {
+                return this.injector.getInstance(Key.get(triplet.getSecond(), bindingAnnotation));
+            }
         } catch (final ConfigurationException ignored) {
         }
         return null;

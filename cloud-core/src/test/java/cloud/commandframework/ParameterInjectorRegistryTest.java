@@ -30,8 +30,14 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import com.google.inject.AbstractModule;
+import com.google.inject.BindingAnnotation;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,7 +82,7 @@ public class ParameterInjectorRegistryTest {
     }
 
     @Test
-    void testGuiceInjection() {
+    void testGuiceInjection() throws NoSuchMethodException {
         this.parameterInjectorRegistry.registerInjectionService(GuiceInjectionService.create(this.injector));
 
         assertThat(
@@ -86,7 +92,19 @@ public class ParameterInjectorRegistryTest {
                         AnnotationAccessor.empty()
                 )
         ).hasValue(TestModule.INJECTED_INTEGER);
+
+        final Method testAnnotatedMethod = this.getClass().getDeclaredMethod("testAnnotatedMethod", Integer.class);
+        assertThat(
+                parameterInjectorRegistry.getInjectable(
+                        Integer.class,
+                        this.createContext(),
+                        AnnotationAccessor.of(testAnnotatedMethod.getParameters()[0])
+                )
+        ).hasValue(TestModule.ANNOTATED_INTEGER);
     }
+
+    @SuppressWarnings("unused")
+    private static void testAnnotatedMethod(@TestAnnotation final Integer ignored) {}
 
     @Test
     void testNonExistentInjection() {
@@ -103,9 +121,17 @@ public class ParameterInjectorRegistryTest {
 
         private static final int INJECTED_INTEGER = 10;
 
+        private static final int ANNOTATED_INTEGER = 17;
+
         @Override
         protected void configure() {
             bind(Integer.class).toInstance(INJECTED_INTEGER);
+            bind(Integer.class).annotatedWith(TestAnnotation.class).toInstance(ANNOTATED_INTEGER);
         }
     }
+
+    @BindingAnnotation
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD })
+    public @interface TestAnnotation {}
 }
