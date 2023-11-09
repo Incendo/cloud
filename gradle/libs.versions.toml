@@ -32,7 +32,7 @@ jda = "4.2.1_257"
 pircbotx = "12f5639c5d"
 
 # minecraft
-guava = "21.0-jre"
+guava = "21.0"
 brigadier = "1.0.17"
 bukkit = "1.13.2-R0.1-SNAPSHOT"
 commodore = "2.2"
