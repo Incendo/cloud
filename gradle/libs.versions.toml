@@ -33,7 +33,7 @@ pircbotx = "12f5639c5d"
 
 # minecraft
 guava = "21.0-jre"
-brigadier = "1.0.17"
+brigadier = "1.0.500"
 bukkit = "1.13.2-R0.1-SNAPSHOT"
 commodore = "2.2"
 bungeecord = "1.8-SNAPSHOT"
