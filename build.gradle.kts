@@ -1,6 +1,6 @@
 plugins {
     id("cloud.parent-build-logic")
-    id("com.github.ben-manes.versions")
+    alias(libs.plugins.versions)
 }
 
 subprojects {
