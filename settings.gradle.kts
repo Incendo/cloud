@@ -7,10 +7,6 @@ pluginManagement {
         maven("https://maven.fabricmc.net/") {
             name = "fabric"
         }
-        maven("https://maven.quiltmc.org/repository/release/") {
-            name = "quiltReleases"
-            mavenContent { releasesOnly() }
-        }
         maven("https://repo.jpenilla.xyz/snapshots/") {
             name = "jmpSnapshots"
             mavenContent { snapshotsOnly() }
@@ -20,7 +16,7 @@ pluginManagement {
 }
 
 plugins {
-    id("quiet-fabric-loom") version "1.3-SNAPSHOT"
+    id("quiet-fabric-loom") version "1.4-SNAPSHOT"
 }
 
 dependencyResolutionManagement {
