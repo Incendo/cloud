@@ -8,7 +8,9 @@
   ],
   "ignoreDeps": [
     "com.mojang:minecraft",
-    "quiet-fabric-loom"
+    "quiet-fabric-loom",
+    "com.google.guava:guava",
+    "com.mojang:brigadier"
   ],
   "labels": [
     "dependencies"
