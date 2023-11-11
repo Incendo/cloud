@@ -54,20 +54,16 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
     private final int max;
 
     private IntegerArgument(
-            final boolean required,
             final @NonNull String name,
             final int min,
             final int max,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new IntegerParser<>(min, max),
-                defaultValue,
                 Integer.class,
                 suggestionsProvider,
                 defaultDescription
@@ -111,30 +107,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Integer> of(final @NonNull String name) {
-        return IntegerArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link IntegerArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Integer> optional(final @NonNull String name) {
-        return IntegerArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required {@link IntegerArgument} with the specified default value.
-     *
-     * @param name       Argument name
-     * @param defaultNum Default value
-     * @param <C>        Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Integer> optional(final @NonNull String name, final int defaultNum) {
-        return IntegerArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
+        return IntegerArgument.<C>builder(name).build();
     }
 
     /**
@@ -188,23 +161,10 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
             return this;
         }
 
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        @API(status = API.Status.STABLE, since = "1.5.0")
-        public @NonNull Builder<C> asOptionalWithDefault(final int defaultValue) {
-            return (Builder<C>) this.asOptionalWithDefault(Integer.toString(defaultValue));
-        }
-
         @Override
         public @NonNull IntegerArgument<C> build() {
-            return new IntegerArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new IntegerArgument<>(this.getName(), this.min, this.max,
+                    this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
     }

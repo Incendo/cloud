@@ -43,17 +43,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, SingleEntitySelector> {
 
     SingleEntitySelectorArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.singleEntitySelector(),
-                defaultValue,
                 SingleEntitySelector.class,
                 suggestionsProvider,
                 defaultDescription
@@ -81,20 +77,9 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
      * @since 1.5.0
      */
     public static <C> @NonNull SingleEntitySelectorArgument<C> of(final @NonNull String name) {
-        return SingleEntitySelectorArgument.<C>builder(name).asRequired().build();
+        return SingleEntitySelectorArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link SingleEntitySelectorArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull SingleEntitySelectorArgument<C> optional(final @NonNull String name) {
-        return SingleEntitySelectorArgument.<C>builder(name).asOptional().build();
-    }
 
     /**
      * Builder for {@link SingleEntitySelectorArgument}.
@@ -117,9 +102,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
         @Override
         public @NonNull SingleEntitySelectorArgument<C> build() {
             return new SingleEntitySelectorArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

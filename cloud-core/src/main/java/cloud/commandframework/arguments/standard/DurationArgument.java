@@ -62,18 +62,14 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
     private static final Pattern DURATION_PATTERN = Pattern.compile("(([1-9][0-9]+|[1-9])[dhms])");
 
     private DurationArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new Parser<>(),
-                defaultValue,
                 Duration.class,
                 suggestionsProvider,
                 defaultDescription
@@ -101,51 +97,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
      * @since 1.7.0
      */
     public static <C> @NonNull DurationArgument<C> of(final @NonNull String name) {
-        return DurationArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link DurationArgument}.
-     *
-     * @param name argument name
-     * @param <C>  sender type
-     * @return built argument
-     * @since 1.7.0
-     */
-    public static <C> @NonNull DurationArgument<C> optional(final @NonNull String name) {
-        return DurationArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link DurationArgument} with the specified default value.
-     *
-     * @param name            argument name
-     * @param defaultDuration default duration
-     * @param <C>             sender type
-     * @return built argument
-     * @since 1.7.0
-     */
-    public static <C> @NonNull DurationArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull String defaultDuration
-    ) {
-        return DurationArgument.<C>builder(name).asOptionalWithDefault(defaultDuration).build();
-    }
-
-    /**
-     * Create a new optional {@link DurationArgument} with the specified default value.
-     *
-     * @param name            argument name
-     * @param defaultDuration default duration
-     * @param <C>             sender type
-     * @return built argument
-     * @since 1.7.0
-     */
-    public static <C> @NonNull DurationArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull Duration defaultDuration
-    ) {
-        return DurationArgument.<C>builder(name).asOptionalWithDefault(defaultDuration).build();
+        return DurationArgument.<C>builder(name).build();
     }
 
 
@@ -163,18 +115,6 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         }
 
         /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.7.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Duration defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.getSeconds() + "s");
-        }
-
-        /**
          * Create a new {@link DurationArgument} from this builder.
          *
          * @return built argument
@@ -183,9 +123,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         @Override
         public @NonNull DurationArgument<C> build() {
             return new DurationArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

@@ -47,16 +47,14 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     private final float max;
 
     private FloatArgument(
-            final boolean required,
             final @NonNull String name,
             final float min,
             final float max,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new FloatParser<>(min, max), defaultValue, Float.class, suggestionsProvider, defaultDescription);
+        super(name, new FloatParser<>(min, max), Float.class, suggestionsProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -96,33 +94,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Float> of(final @NonNull String name) {
-        return FloatArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link FloatArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Float> optional(final @NonNull String name) {
-        return FloatArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link FloatArgument} with the specified default value.
-     *
-     * @param name       Argument name
-     * @param defaultNum Default num
-     * @param <C>        Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Float> optional(
-            final @NonNull String name,
-            final float defaultNum
-    ) {
-        return FloatArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
+        return FloatArgument.<C>builder(name).build();
     }
 
     /**
@@ -176,23 +148,14 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
             return this;
         }
 
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        @API(status = API.Status.STABLE, since = "1.5.0")
-        public @NonNull Builder<C> asOptionalWithDefault(final float defaultValue) {
-            return (Builder<C>) this.asOptionalWithDefault(Float.toString(defaultValue));
-        }
-
         @Override
         public @NonNull FloatArgument<C> build() {
-            return new FloatArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new FloatArgument<>(
+                    this.getName(),
+                    this.min,
+                    this.max,
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
     }

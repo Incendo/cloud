@@ -25,6 +25,7 @@ package cloud.commandframework.annotations;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
 import cloud.commandframework.annotations.injection.RawArgs;
@@ -562,18 +563,16 @@ public final class AnnotationParser<C> {
             );
             final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
             final Collection<CommandFlag<?>> flags = this.flagExtractor.apply(method);
-            final Map<String, CommandArgument<C, ?>> commandArguments = new HashMap<>();
-            final Map<CommandArgument<C, ?>, String> argumentDescriptions = new HashMap<>();
+            final Map<String, CommandComponent<C>> commandComponents = new HashMap<>();
             /* Go through all annotated parameters and build up the argument tree */
             for (final ArgumentParameterPair argumentPair : arguments) {
                 final String argumentName = this.processString(argumentPair.argumentName());
-                final CommandArgument<C, ?> argument = this.buildArgument(
+                final CommandComponent<C> component = this.buildComponent(
                         method,
                         this.findSyntaxFragment(tokens, argumentName),
                         argumentPair
                 );
-                commandArguments.put(argument.getName(), argument);
-                argumentDescriptions.put(argument, this.processString(argumentPair.getArgument().description()));
+                commandComponents.put(component.argument().getName(), component);
             }
             boolean commandNameFound = false;
             /* Build the command tree */
@@ -585,16 +584,15 @@ public final class AnnotationParser<C> {
                 if (token.getArgumentMode() == ArgumentMode.LITERAL) {
                     builder = builder.literal(token.getMajor(), token.getMinor().toArray(new String[0]));
                 } else {
-                    final CommandArgument<C, ?> argument = commandArguments.get(token.getMajor());
-                    if (argument == null) {
+                    final CommandComponent<C> component = commandComponents.get(token.getMajor());
+                    if (component == null) {
                         throw new IllegalArgumentException(String.format(
                                 "Found no mapping for argument '%s' in method '%s'",
                                 token.getMajor(), method.getName()
                         ));
                     }
 
-                    final String description = argumentDescriptions.getOrDefault(argument, "");
-                    builder = builder.argument(argument, ArgumentDescription.of(description));
+                    builder = builder.argument(component);
                 }
             }
             /* Try to find the command sender type */
@@ -623,7 +621,7 @@ public final class AnnotationParser<C> {
                 final MethodCommandExecutionHandler.CommandMethodContext<C> context =
                         new MethodCommandExecutionHandler.CommandMethodContext<>(
                                 instance,
-                                commandArguments,
+                                commandComponents,
                                 method,
                                 this /* annotationParser */
                         );
@@ -701,7 +699,7 @@ public final class AnnotationParser<C> {
     }
 
     @SuppressWarnings("unchecked")
-    private @NonNull CommandArgument<C, ?> buildArgument(
+    private @NonNull CommandComponent<C> buildComponent(
             final @NonNull Method method,
             final @Nullable SyntaxFragment syntaxFragment,
             final @NonNull ArgumentParameterPair argumentPair
@@ -747,16 +745,6 @@ public final class AnnotationParser<C> {
                 parameter.getType(),
                 argumentName
         );
-        /* Set the argument requirement status */
-        if (syntaxFragment.getArgumentMode() == ArgumentMode.OPTIONAL) {
-            if (argument.defaultValue().isEmpty()) {
-                argumentBuilder.asOptional();
-            } else {
-                argumentBuilder.asOptionalWithDefault(this.processString(argument.defaultValue()));
-            }
-        } else {
-            argumentBuilder.asRequired();
-        }
         /* Check for Completions annotation */
         final Completions completions = parameter.getDeclaredAnnotation(Completions.class);
         if (completions != null) {
@@ -789,8 +777,15 @@ public final class AnnotationParser<C> {
                 builtArgument.addPreprocessor(preprocessor);
             }
         }
-        /* Yay, we're done */
-        return builtArgument;
+
+        final ArgumentDescription description = ArgumentDescription.of(this.processString(argumentPair.getArgument().description()));
+        if (syntaxFragment.getArgumentMode() == ArgumentMode.REQUIRED) {
+            return CommandComponent.required(builtArgument, description);
+        } else if (argument.defaultValue().isEmpty()) {
+            return CommandComponent.optional(builtArgument, description);
+        } else {
+            return CommandComponent.optional(builtArgument, description, this.processString(argument.defaultValue()));
+        }
     }
 
     @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>,

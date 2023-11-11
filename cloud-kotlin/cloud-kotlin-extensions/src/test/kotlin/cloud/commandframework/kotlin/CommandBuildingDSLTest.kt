@@ -48,7 +48,7 @@ class CommandBuildingDSLTest {
                 senderType<SpecificCommandSender>()
 
                 literal("dsl")
-                argument(argumentDescription("An amazing command argument")) {
+                required(argumentDescription("An amazing command argument")) {
                     StringArgument.of("moment")
                 }
                 handler {

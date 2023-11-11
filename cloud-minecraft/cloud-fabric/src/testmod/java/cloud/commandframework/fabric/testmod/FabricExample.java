@@ -78,14 +78,12 @@ public final class FabricExample implements ModInitializer {
         final Command.Builder<CommandSourceStack> base = manager.commandBuilder("cloudtest");
 
         final CommandArgument<CommandSourceStack, String> name = StringArgument.of("name");
-        final CommandArgument<CommandSourceStack, Integer> hugs = IntegerArgument.<CommandSourceStack>builder("hugs")
-                .asOptionalWithDefault("1")
-                .build();
+        final CommandArgument<CommandSourceStack, Integer> hugs = IntegerArgument.of("hugs");
 
         manager.command(base
                 .literal("hugs")
-                .argument(name)
-                .argument(hugs)
+                .required(name)
+                .optional(hugs, "1")
                 .handler(ctx -> {
                     ctx.getSender().sendSuccess(Component.literal("Hello, ")
                             .append(ctx.get(name))
@@ -107,7 +105,7 @@ public final class FabricExample implements ModInitializer {
 
         manager.command(base
                 .literal("land")
-                .argument(biomeArgument)
+                .required(biomeArgument)
                 .handler(ctx -> {
                     ctx.getSender().sendSuccess(Component.literal("Yes, the biome ")
                             .append(Component.literal(
@@ -125,8 +123,8 @@ public final class FabricExample implements ModInitializer {
         final CommandArgument<CommandSourceStack, ChatFormatting> textColor = NamedColorArgument.of("color");
 
         manager.command(base.literal("wave")
-                .argument(playerSelector)
-                .argument(textColor)
+                .required(playerSelector)
+                .required(textColor)
                 .handler(ctx -> {
                     final MultiplePlayerSelector selector = ctx.get(playerSelector);
                     final Collection<ServerPlayer> selected = selector.get();
@@ -146,11 +144,10 @@ public final class FabricExample implements ModInitializer {
 
         manager.command(base.literal("give")
                 .permission("cloud.give")
-                .argument(MultiplePlayerSelectorArgument.of("targets"))
-                .argument(ItemInputArgument.of("item"))
-                .argument(IntegerArgument.<CommandSourceStack>builder("amount")
-                        .withMin(1)
-                        .asOptionalWithDefault("1"))
+                .required(MultiplePlayerSelectorArgument.of("targets"))
+                .required(ItemInputArgument.of("item"))
+                .optional(IntegerArgument.<CommandSourceStack>builder("amount")
+                        .withMin(1), "1")
                 .handler(ctx -> {
                     final ItemInput item = ctx.get("item");
                     final MultiplePlayerSelector targets = ctx.get("targets");
@@ -223,7 +220,7 @@ public final class FabricExample implements ModInitializer {
                 })
                 .build();
 
-        manager.command(mods.argument(modMetadata)
+        manager.command(mods.required(modMetadata)
                 .handler(ctx -> {
                     final ModMetadata meta = ctx.get(modMetadata);
                     final MutableComponent text = Component.literal("")
@@ -252,8 +249,8 @@ public final class FabricExample implements ModInitializer {
 
         manager.command(base.literal("teleport")
                 .permission("cloud.teleport")
-                .argument(MultipleEntitySelectorArgument.of("targets"))
-                .argument(Vec3dArgument.of("location"))
+                .required(MultipleEntitySelectorArgument.of("targets"))
+                .required(Vec3dArgument.of("location"))
                 .handler(ctx -> {
                     final MultipleEntitySelector selector = ctx.get("targets");
                     final Vec3 location = ctx.<Coordinates>get("location").position();
@@ -263,7 +260,7 @@ public final class FabricExample implements ModInitializer {
 
         manager.command(base.literal("gotochunk")
                 .permission("cloud.gotochunk")
-                .argument(ColumnPosArgument.of("chunk_position"))
+                .required(ColumnPosArgument.of("chunk_position"))
                 .handler(ctx -> {
                     final ServerPlayer player;
                     try {

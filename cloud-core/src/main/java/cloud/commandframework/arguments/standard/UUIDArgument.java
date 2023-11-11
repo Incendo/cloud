@@ -46,14 +46,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     private UUIDArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new UUIDParser<>(), defaultValue, UUID.class, suggestionsProvider, defaultDescription);
+        super(name, new UUIDParser<>(), UUID.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -91,33 +89,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, UUID> of(final @NonNull String name) {
-        return UUIDArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command component
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created component
-     */
-    public static <C> @NonNull CommandArgument<C, UUID> optional(final @NonNull String name) {
-        return UUIDArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required command component with a default value
-     *
-     * @param name        Component name
-     * @param defaultUUID Default uuid
-     * @param <C>         Command sender type
-     * @return Created component
-     */
-    public static <C> @NonNull CommandArgument<C, UUID> optional(
-            final @NonNull String name,
-            final @NonNull UUID defaultUUID
-    ) {
-        return UUIDArgument.<C>builder(name).asOptionalWithDefault(defaultUUID.toString()).build();
+        return UUIDArgument.<C>builder(name).build();
     }
 
 
@@ -136,9 +108,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
         @Override
         public @NonNull UUIDArgument<C> build() {
             return new UUIDArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

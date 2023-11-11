@@ -57,18 +57,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePlayer> {
 
     private OfflinePlayerArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new OfflinePlayerParser<>(),
-                defaultValue,
                 OfflinePlayer.class,
                 suggestionsProvider,
                 defaultDescription
@@ -110,33 +106,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, OfflinePlayer> of(final @NonNull String name) {
-        return OfflinePlayerArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command component
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created component
-     */
-    public static <C> @NonNull CommandArgument<C, OfflinePlayer> optional(final @NonNull String name) {
-        return OfflinePlayerArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required command component with a default value
-     *
-     * @param name          Component name
-     * @param defaultPlayer Default player
-     * @param <C>           Command sender type
-     * @return Created component
-     */
-    public static <C> @NonNull CommandArgument<C, OfflinePlayer> optional(
-            final @NonNull String name,
-            final @NonNull String defaultPlayer
-    ) {
-        return OfflinePlayerArgument.<C>builder(name).asOptionalWithDefault(defaultPlayer).build();
+        return OfflinePlayerArgument.<C>builder(name).build();
     }
 
 
@@ -153,9 +123,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
          */
         @Override
         public @NonNull OfflinePlayerArgument<C> build() {
-            return new OfflinePlayerArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(),
-                    this.getSuggestionsProvider(), this.getDefaultDescription()
-            );
+            return new OfflinePlayerArgument<>(this.getName(), this.getSuggestionsProvider(), this.getDefaultDescription());
         }
     }
 

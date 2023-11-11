@@ -42,12 +42,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -61,8 +59,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class Command<C> {
 
     private final List<@NonNull CommandComponent<C>> components;
-    private final List<@NonNull CommandArgument<C, ?>> arguments;
-    private final @Nullable FlagArgument<C> flagArgument;
+    private final @Nullable CommandComponent<C> flagComponent;
     private final CommandExecutionHandler<C> commandExecutionHandler;
     private final Class<? extends C> senderType;
     private final CommandPermission commandPermission;
@@ -88,31 +85,30 @@ public class Command<C> {
             final @NonNull CommandMeta commandMeta
     ) {
         this.components = Objects.requireNonNull(commandComponents, "Command components may not be null");
-        this.arguments = this.components.stream().map(CommandComponent::getArgument).collect(Collectors.toList());
         if (this.components.isEmpty()) {
             throw new IllegalArgumentException("At least one command component is required");
         }
 
-        this.flagArgument =
-                this.arguments.stream()
-                        .filter(ca -> ca instanceof FlagArgument)
-                        .map(ca -> (FlagArgument<C>) ca)
+        this.flagComponent =
+                this.components.stream()
+                        .filter(ca -> ca.argument() instanceof FlagArgument)
                         .findFirst()
                         .orElse(null);
 
         // Enforce ordering of command arguments
         boolean foundOptional = false;
-        for (final CommandArgument<C, ?> argument : this.arguments) {
+        for (final CommandComponent<C> component : this.components) {
+            final CommandArgument<C, ?> argument = component.argument();
             if (argument.getName().isEmpty()) {
                 throw new IllegalArgumentException("Argument names may not be empty");
             }
-            if (foundOptional && argument.isRequired()) {
+            if (foundOptional && component.required()) {
                 throw new IllegalArgumentException(
                         String.format(
                                 "Command argument '%s' cannot be placed after an optional argument",
                                 argument.getName()
                         ));
-            } else if (!argument.isRequired()) {
+            } else if (!component.required()) {
                 foundOptional = true;
             }
         }
@@ -161,82 +157,6 @@ public class Command<C> {
     }
 
     /**
-     * Construct a new command
-     *
-     * @param commandArguments        Command argument and description pairs
-     * @param commandExecutionHandler Execution handler
-     * @param senderType              Required sender type. May be {@code null}
-     * @param commandPermission       Command permission
-     * @param commandMeta             Command meta instance
-     * @see #Command(List, CommandExecutionHandler, Class, CommandPermission, CommandMeta)
-     * @deprecated Map does not allow for the same literal or variable argument name to repeat
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED)
-    public Command(
-            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
-            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-            final @Nullable Class<? extends C> senderType,
-            final @NonNull CommandPermission commandPermission,
-            final @NonNull CommandMeta commandMeta
-    ) {
-        this(mapToComponents(commandArguments), commandExecutionHandler, senderType, commandPermission, commandMeta);
-    }
-
-    /**
-     * Construct a new command
-     *
-     * @param commandArguments        Command arguments
-     * @param commandExecutionHandler Execution handler
-     * @param senderType              Required sender type. May be {@code null}
-     * @param commandMeta             Command meta instance
-     * @see #Command(List, CommandExecutionHandler, Class, CommandMeta)
-     * @deprecated Map does not allow for the same literal or variable argument name to repeat
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED)
-    public Command(
-            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
-            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-            final @Nullable Class<? extends C> senderType,
-            final @NonNull CommandMeta commandMeta
-    ) {
-        this(mapToComponents(commandArguments), commandExecutionHandler, senderType, commandMeta);
-    }
-
-    /**
-     * Construct a new command
-     *
-     * @param commandArguments        Command arguments
-     * @param commandExecutionHandler Execution handler
-     * @param commandPermission       Command permission
-     * @param commandMeta             Command meta instance
-     * @see #Command(List, CommandExecutionHandler, CommandPermission, CommandMeta)
-     * @deprecated Map does not allow for the same literal or variable argument name to repeat
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED)
-    public Command(
-            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments,
-            final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
-            final @NonNull CommandPermission commandPermission,
-            final @NonNull CommandMeta commandMeta
-    ) {
-        this(mapToComponents(commandArguments), commandExecutionHandler, commandPermission, commandMeta);
-    }
-
-    // Converts a map of CommandArgument and Description pairs to a List of CommandComponent
-    // Used for backwards-compatibility
-    @SuppressWarnings("deprecation")
-    private static <C> @NonNull List<@NonNull CommandComponent<C>> mapToComponents(
-            final @NonNull Map<@NonNull CommandArgument<C, ?>, @NonNull Description> commandArguments
-    ) {
-        return commandArguments.entrySet().stream()
-                .map(e -> CommandComponent.of(e.getKey(), e.getValue()))
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Create a new command builder. Is recommended to use the builder methods
      * in {@link CommandManager} rather than invoking this method directly.
      *
@@ -279,7 +199,7 @@ public class Command<C> {
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
-        commands.add(CommandComponent.of(StaticArgument.of(commandName, aliases), description));
+        commands.add(CommandComponent.required(StaticArgument.of(commandName, aliases), description));
         return new Builder<>(
                 null,
                 commandMeta,
@@ -307,7 +227,7 @@ public class Command<C> {
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
-        commands.add(CommandComponent.of(StaticArgument.of(commandName, aliases), ArgumentDescription.empty()));
+        commands.add(CommandComponent.required(StaticArgument.of(commandName, aliases), ArgumentDescription.empty()));
         return new Builder<>(
                 null,
                 commandMeta,
@@ -320,27 +240,40 @@ public class Command<C> {
     }
 
     /**
-     * Return a copy of the command argument array
+     * Returns a copy of the list of the components that make up this command.
      *
-     * @return Copy of the command argument array.  This List is mutable.
+     * @return modifiable copy of the component list
+     * @since 2.0.0
      */
-    public @NonNull List<CommandArgument<@NonNull C, @NonNull ?>> getArguments() {
-        return new ArrayList<>(this.arguments);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull List<CommandComponent<C>> components() {
+        return new ArrayList<>(this.components);
     }
 
     /**
-     * Return a mutable copy of the command arguments, ignoring flag arguments.
+     * Return a mutable copy of the command components, ignoring flag arguments.
      *
      * @return argument list
      * @since 1.8.0
      */
     @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
-    public @NonNull List<CommandArgument<@NonNull C, @NonNull ?>> nonFlagArguments() {
-        List<CommandArgument<C, ?>> arguments = new ArrayList<>(this.arguments);
-        if (this.flagArgument != null) {
-            arguments.remove(this.flagArgument);
+    public @NonNull List<CommandComponent<C>> nonFlagArguments() {
+        final List<CommandComponent<C>> components = new ArrayList<>(this.components);
+        if (this.flagComponent() != null) {
+            components.remove(this.flagComponent());
         }
-        return arguments;
+        return components;
+    }
+
+    /**
+     * Returns the component that contains the flags belonging to the command.
+     *
+     * @return the flag component, or {@code null} if no flags have been registered
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @Nullable CommandComponent<C> flagComponent() {
+        return this.flagComponent;
     }
 
     /**
@@ -349,20 +282,13 @@ public class Command<C> {
      * @return flag argument or null
      * @since 1.8.0
      */
-    @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
+    @SuppressWarnings("unchecked")
+    @API(status = API.Status.STABLE, since = "1.8.0")
     public @Nullable FlagArgument<@NonNull C> flagArgument() {
-        return this.flagArgument;
-    }
-
-    /**
-     * Returns a copy of the command component array
-     *
-     * @return Copy of the command component array. This List is mutable
-     * @since 1.3.0
-     */
-    @API(status = API.Status.STABLE, since = "1.3.0")
-    public @NonNull List<CommandComponent<@NonNull C>> getComponents() {
-        return new ArrayList<>(this.components);
+        if (this.flagComponent() == null) {
+            return null;
+        }
+        return (FlagArgument<C>) this.flagComponent().argument();
     }
 
     /**
@@ -408,14 +334,14 @@ public class Command<C> {
      * @return Argument description
      * @throws IllegalArgumentException If the command argument does not exist
      * @deprecated More than one matching command argument may exist per command.
-     *         Use {@link #getArguments()} and search in that, instead.
+     *         Use {@link #components()} and search in that, instead.
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED)
     public @NonNull String getArgumentDescription(final @NonNull CommandArgument<C, ?> argument) {
         for (final CommandComponent<C> component : this.components) {
-            if (component.getArgument().equals(argument)) {
-                return component.getArgumentDescription().getDescription();
+            if (component.argument().equals(argument)) {
+                return component.argumentDescription().getDescription();
             }
         }
         throw new IllegalArgumentException("Command argument not found: " + argument);
@@ -424,8 +350,8 @@ public class Command<C> {
     @Override
     public final String toString() {
         final StringBuilder stringBuilder = new StringBuilder();
-        for (final CommandArgument<C, ?> argument : this.getArguments()) {
-            stringBuilder.append(argument.getName()).append(' ');
+        for (final CommandComponent<C> component : this.components()) {
+            stringBuilder.append(component.argument().getName()).append(' ');
         }
         final String build = stringBuilder.toString();
         return build.substring(0, build.length() - 1);
@@ -593,7 +519,7 @@ public class Command<C> {
                 final @NonNull String main,
                 final @NonNull String... aliases
         ) {
-            return this.argument(StaticArgument.of(main, aliases));
+            return this.required(StaticArgument.of(main, aliases));
         }
 
         /**
@@ -612,7 +538,7 @@ public class Command<C> {
                 final @NonNull Description description,
                 final @NonNull String... aliases
         ) {
-            return this.argument(StaticArgument.of(main, aliases), description);
+            return this.required(StaticArgument.of(main, aliases), description);
         }
 
         /**
@@ -630,139 +556,257 @@ public class Command<C> {
                 final @NonNull ArgumentDescription description,
                 final @NonNull String... aliases
         ) {
-            return this.argument(StaticArgument.of(main, aliases), description);
+            return this.required(StaticArgument.of(main, aliases), description);
         }
 
         /**
-         * Add a new command argument with an empty description to the command
+         * Adds the given required {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
-         * @param builder Argument to add. {@link CommandArgument.Builder#build()} will be invoked
-         *                and the result will be registered in the command.
-         * @param <T>     Argument type
+         * @param argument    Argument to add
+         * @param description Description of the argument
+         * @param <T>         Argument type
          * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
          */
-        public <T> @NonNull Builder<C> argument(final CommandArgument.@NonNull Builder<C, T> builder) {
-            return this.argument(builder.build());
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull CommandArgument<C, T> argument,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(CommandComponent.required(argument, description));
         }
 
         /**
-         * Add a new command argument with an empty description to the command
+         * Adds the given required {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument    Argument to add
+         * @param description Description of the argument
+         * @param <T>         Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final CommandArgument.@NonNull Builder<C, T> argument,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(CommandComponent.required(argument.build(), description));
+        }
+
+        /**
+         * Adds the given optional {@code argument} to the command with no default value
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument    Argument to add
+         * @param description Description of the argument
+         * @param <T>         Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CommandArgument<C, T> argument,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(CommandComponent.optional(argument, description));
+        }
+
+        /**
+         * Adds the given optional {@code argument} to the command with no default value
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument    Argument to add
+         * @param description Description of the argument
+         * @param <T>         Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final CommandArgument.@NonNull Builder<C, T> argument,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(CommandComponent.optional(argument.build(), description));
+        }
+
+        /**
+         * Adds the given optional {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument     Argument to add
+         * @param description  Description of the argument
+         * @param defaultValue The default value that gets used when the argument is omitted
+         * @param <T>          Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CommandArgument<C, T> argument,
+                final @NonNull ArgumentDescription description,
+                final @NonNull String defaultValue
+        ) {
+            return this.argument(CommandComponent.optional(argument, description, defaultValue));
+        }
+
+        /**
+         * Adds the given optional {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument     Argument to add
+         * @param description  Description of the argument
+         * @param defaultValue The default value that gets used when the argument is omitted
+         * @param <T>          Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final CommandArgument.@NonNull Builder<C, T> argument,
+                final @NonNull ArgumentDescription description,
+                final @NonNull String defaultValue
+        ) {
+            return this.argument(CommandComponent.optional(argument.build(), description, defaultValue));
+        }
+
+        /**
+         * Adds the given required {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument Argument to add
          * @param <T>      Argument type
          * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
          */
-        public <T> @NonNull Builder<C> argument(final @NonNull CommandArgument<C, T> argument) {
-            return this.argument(argument, argument.getDefaultDescription());
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull CommandArgument<C, T> argument
+        ) {
+            return this.argument(CommandComponent.required(argument, argument.getDefaultDescription()));
         }
 
         /**
-         * Add a new command argument to the command
+         * Adds the given required {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
-         * @param argument    Argument to add
-         * @param description Argument description
-         * @param <T>         Argument type
+         * @param argument Argument to add
+         * @param <T>      Argument type
          * @return New builder instance with the command argument inserted into the argument list
-         * @deprecated for removal since 1.4.0. Use {@link #argument(CommandArgument, ArgumentDescription)} instead.
+         * @since 2.0.0
          */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public <T> @NonNull Builder<C> argument(
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final CommandArgument.@NonNull Builder<C, T> argument
+        ) {
+            return this.required(argument.build());
+        }
+
+        /**
+         * Adds the given optional {@code argument} to the command with no default value
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument Argument to add
+         * @param <T>      Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CommandArgument<C, T> argument
+        ) {
+            return this.argument(CommandComponent.optional(argument, argument.getDefaultDescription()));
+        }
+
+        /**
+         * Adds the given optional {@code argument} to the command with no default value
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument Argument to add
+         * @param <T>      Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final CommandArgument.@NonNull Builder<C, T> argument
+        ) {
+            return this.optional(argument.build());
+        }
+
+        /**
+         * Adds the given optional {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument     Argument to add
+         * @param defaultValue The default value that gets used when the argument is omitted
+         * @param <T>          Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
                 final @NonNull CommandArgument<C, T> argument,
-                final @NonNull Description description
+                final @NonNull String defaultValue
         ) {
-            return this.argument(argument, (ArgumentDescription) description);
+            return this.argument(CommandComponent.optional(argument, argument.getDefaultDescription(), defaultValue));
         }
 
         /**
-         * Add a new command argument to the command
+         * Adds the given optional {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
-         * @param argument    Argument to add
-         * @param description Argument description
-         * @param <T>         Argument type
+         * @param argument     Argument to add
+         * @param defaultValue The default value that gets used when the argument is omitted
+         * @param <T>          Argument type
          * @return New builder instance with the command argument inserted into the argument list
-         * @since 1.4.0
+         * @since 2.0.0
          */
-        @API(status = API.Status.STABLE, since = "1.4.0")
-        public <T> @NonNull Builder<C> argument(
-                final @NonNull CommandArgument<C, T> argument,
-                final @NonNull ArgumentDescription description
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final CommandArgument.@NonNull Builder<C, T> argument,
+                final @NonNull String defaultValue
         ) {
-            if (argument.isArgumentRegistered()) {
-                throw new IllegalArgumentException("The provided argument has already been associated with a command."
-                        + " Use CommandArgument#copy to create a copy of the argument.");
-            }
-            argument.setArgumentRegistered();
-            final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
-            commandComponents.add(CommandComponent.of(argument, description));
-            return new Builder<>(
-                    this.commandManager,
-                    this.commandMeta,
-                    this.senderType,
-                    commandComponents,
-                    this.commandExecutionHandler,
-                    this.commandPermission,
-                    this.flags
-            );
+            return this.optional(argument.build(), defaultValue);
         }
 
         /**
-         * Add a new command argument to the command
-         *
-         * @param builder     Argument to add. {@link CommandArgument.Builder#build()} will be invoked
-         *                    and the result will be registered in the command.
-         * @param description Argument description
-         * @param <T>         Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @deprecated for removal since 1.4.0. Use {@link #argument(CommandArgument.Builder, ArgumentDescription)} instead.
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public <T> @NonNull Builder<C> argument(
-                final CommandArgument.@NonNull Builder<C, T> builder,
-                final @NonNull Description description
-        ) {
-            return this.argument(builder, (ArgumentDescription) description);
-        }
-
-        /**
-         * Add a new command argument to the command
-         *
-         * @param builder     Argument to add. {@link CommandArgument.Builder#build()} will be invoked
-         *                    and the result will be registered in the command.
-         * @param description Argument description
-         * @param <T>         Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 1.4.0
-         */
-        @API(status = API.Status.STABLE, since = "1.4.0")
-        public <T> @NonNull Builder<C> argument(
-                final CommandArgument.@NonNull Builder<C, T> builder,
-                final @NonNull ArgumentDescription description
-        ) {
-            final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
-            commandComponents.add(CommandComponent.of(builder.build(), description));
-            return new Builder<>(
-                    this.commandManager,
-                    this.commandMeta,
-                    this.senderType,
-                    commandComponents,
-                    this.commandExecutionHandler,
-                    this.commandPermission,
-                    this.flags
-            );
-        }
-
-        /**
-         * Add a new command argument by interacting with a constructed command argument builder
+         * Adds a new required command argument by interacting with a constructed command argument builder
          *
          * @param clazz           Argument class
          * @param name            Argument name
          * @param builderConsumer Builder consumer
          * @param <T>             Argument type
          * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
          */
-        public <T> @NonNull Builder<C> argument(
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
                 final @NonNull Class<T> clazz,
                 final @NonNull String name,
                 final @NonNull Consumer<CommandArgument.Builder<C, T>> builderConsumer
@@ -772,7 +816,63 @@ public class Command<C> {
                 builder.manager(this.commandManager);
             }
             builderConsumer.accept(builder);
-            return this.argument(builder.build());
+            return this.required(builder.build());
+        }
+
+        /**
+         * Adds a new optional command argument by interacting with a constructed command argument builder
+         *
+         * @param clazz           Argument class
+         * @param name            Argument name
+         * @param builderConsumer Builder consumer
+         * @param <T>             Argument type
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull Class<T> clazz,
+                final @NonNull String name,
+                final @NonNull Consumer<CommandArgument.Builder<C, T>> builderConsumer
+        ) {
+            final CommandArgument.Builder<C, T> builder = CommandArgument.ofType(clazz, name);
+            if (this.commandManager != null) {
+                builder.manager(this.commandManager);
+            }
+            builderConsumer.accept(builder);
+            return this.optional(builder.build());
+        }
+
+        /**
+         * Adds the given {@code argument} to the command
+         * <p>
+         * After this method has been invoked, the component may not be inserted into another command builder. If you want
+         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         *
+         * @param argument Argument to add
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> argument(
+                final @NonNull CommandComponent<C> argument
+        ) {
+            if (argument.argument().isArgumentRegistered()) {
+                throw new IllegalArgumentException("The provided argument has already been associated with a command."
+                        + " Use CommandComponent#copy to create a copy of the argument.");
+            }
+            argument.argument().setArgumentRegistered();
+            final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
+            commandComponents.add(argument);
+            return new Builder<>(
+                    this.commandManager,
+                    this.commandMeta,
+                    this.senderType,
+                    commandComponents,
+                    this.commandExecutionHandler,
+                    this.commandPermission,
+                    this.flags
+            );
         }
 
         // Compound helper methods
@@ -793,17 +893,19 @@ public class Command<C> {
          * @param <U>         First type
          * @param <V>         Second type
          * @return Builder instance with the argument inserted
-         * @deprecated for removal since 1.4.0. Use {@link #argumentPair(String, Pair, Pair, ArgumentDescription)} instead.
+         * @since 1.4.0
          */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public <U, V> @NonNull Builder<C> argumentPair(
+        @API(status = API.Status.STABLE, since = "1.4.0")
+        public <U, V> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                final @NonNull Description description
+                final @NonNull ArgumentDescription description
         ) {
-            return this.argumentPair(name, names, parserPair, (ArgumentDescription) description);
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.required(ArgumentPair.of(this.commandManager, name, names, parserPair).simple(), description);
         }
 
         /**
@@ -825,7 +927,7 @@ public class Command<C> {
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
-        public <U, V> @NonNull Builder<C> argumentPair(
+        public <U, V> @NonNull Builder<C> optionalArgumentPair(
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
@@ -834,42 +936,7 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.argument(ArgumentPair.of(this.commandManager, name, names, parserPair).simple(), description);
-        }
-
-        /**
-         * Create a new argument pair that maps to a custom type.
-         * <p>
-         * For this to work, there must be a {@link CommandManager}
-         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
-         * using {@link CommandManager#commandBuilder(String, String...)}
-         *
-         * @param name        Name of the argument
-         * @param outputType  The output type
-         * @param names       Pair containing the names of the sub-arguments
-         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
-         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
-         *                    {@link CommandManager} attached to this command
-         * @param mapper      Mapper that maps from {@link Pair} to the custom type
-         * @param description Description of the argument
-         * @param <U>         First type
-         * @param <V>         Second type
-         * @param <O>         Output type
-         * @return Builder instance with the argument inserted
-         * @deprecated for removal since 1.4.0. Use
-         *         {@link #argumentPair(String, TypeToken, Pair, Pair, BiFunction, ArgumentDescription)} instead.
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public <U, V, O> @NonNull Builder<C> argumentPair(
-                final @NonNull String name,
-                final @NonNull TypeToken<O> outputType,
-                final @NonNull Pair<String, String> names,
-                final @NonNull Pair<Class<U>, Class<V>> parserPair,
-                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
-                final @NonNull Description description
-        ) {
-            return this.argumentPair(name, outputType, names, parserPair, mapper, (ArgumentDescription) description);
+            return this.optional(ArgumentPair.of(this.commandManager, name, names, parserPair).simple(), description);
         }
 
         /**
@@ -894,7 +961,7 @@ public class Command<C> {
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
-        public <U, V, O> @NonNull Builder<C> argumentPair(
+        public <U, V, O> @NonNull Builder<C> requiredArgumentPair(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
                 final @NonNull Pair<String, String> names,
@@ -905,7 +972,46 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.argument(
+            return this.required(
+                    ArgumentPair.of(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
+                    description
+            );
+        }
+
+        /**
+         * Create a new argument pair that maps to a custom type.
+         * <p>
+         * For this to work, there must be a {@link CommandManager}
+         * attached to the command builder. To guarantee this, it is recommended to get the command builder instance
+         * using {@link CommandManager#commandBuilder(String, String...)}
+         *
+         * @param name        Name of the argument
+         * @param outputType  The output type
+         * @param names       Pair containing the names of the sub-arguments
+         * @param parserPair  Pair containing the types of the sub-arguments. There must be parsers for these types registered
+         *                    in the {@link cloud.commandframework.arguments.parser.ParserRegistry} used by the
+         *                    {@link CommandManager} attached to this command
+         * @param mapper      Mapper that maps from {@link Pair} to the custom type
+         * @param description Description of the argument
+         * @param <U>         First type
+         * @param <V>         Second type
+         * @param <O>         Output type
+         * @return Builder instance with the argument inserted
+         * @since 1.4.0
+         */
+        @API(status = API.Status.STABLE, since = "1.4.0")
+        public <U, V, O> @NonNull Builder<C> optionalArgumentPair(
+                final @NonNull String name,
+                final @NonNull TypeToken<O> outputType,
+                final @NonNull Pair<String, String> names,
+                final @NonNull Pair<Class<U>, Class<V>> parserPair,
+                final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
+                final @NonNull ArgumentDescription description
+        ) {
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.optional(
                     ArgumentPair.of(this.commandManager, name, names, parserPair).withMapper(outputType, mapper),
                     description
             );
@@ -928,18 +1034,19 @@ public class Command<C> {
          * @param <V>           Second type
          * @param <W>           Third type
          * @return Builder instance with the argument inserted
-         * @deprecated for removal since 1.4.0. Use {@link #argumentTriplet(String, Triplet, Triplet, ArgumentDescription)}
-         *         instead.
+         * @since 1.4.0
          */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public <U, V, W> @NonNull Builder<C> argumentTriplet(
+        @API(status = API.Status.STABLE, since = "1.4.0")
+        public <U, V, W> @NonNull Builder<C> requiredArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                final @NonNull Description description
+                final @NonNull ArgumentDescription description
         ) {
-            return this.argumentTriplet(name, names, parserTriplet, (ArgumentDescription) description);
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.required(ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(), description);
         }
 
         /**
@@ -962,7 +1069,7 @@ public class Command<C> {
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
-        public <U, V, W> @NonNull Builder<C> argumentTriplet(
+        public <U, V, W> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
@@ -971,7 +1078,7 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.argument(ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(), description);
+            return this.optional(ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).simple(), description);
         }
 
         /**
@@ -994,26 +1101,23 @@ public class Command<C> {
          * @param <W>           Third type
          * @param <O>           Output type
          * @return Builder instance with the argument inserted
-         * @deprecated for removal since 1.4.0, use
-         *         {@link #argumentTriplet(String, TypeToken, Triplet, Triplet, BiFunction, ArgumentDescription)} instead.
+         * @since 1.4.0
          */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public <U, V, W, O> @NonNull Builder<C> argumentTriplet(
+        @API(status = API.Status.STABLE, since = "1.4.0")
+        public <U, V, W, O> @NonNull Builder<C> requiredArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                final @NonNull Description description
+                final @NonNull ArgumentDescription description
         ) {
-            return this.argumentTriplet(
-                    name,
-                    outputType,
-                    names,
-                    parserTriplet,
-                    mapper,
-                    (ArgumentDescription) description
+            if (this.commandManager == null) {
+                throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
+            }
+            return this.required(
+                    ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
+                    description
             );
         }
 
@@ -1040,7 +1144,7 @@ public class Command<C> {
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
-        public <U, V, W, O> @NonNull Builder<C> argumentTriplet(
+        public <U, V, W, O> @NonNull Builder<C> optionalArgumentTriplet(
                 final @NonNull String name,
                 final @NonNull TypeToken<O> outputType,
                 final @NonNull Triplet<String, String, String> names,
@@ -1051,7 +1155,7 @@ public class Command<C> {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
             }
-            return this.argument(
+            return this.optional(
                     ArgumentTriplet.of(this.commandManager, name, names, parserTriplet).withMapper(outputType, mapper),
                     description
             );
@@ -1173,13 +1277,12 @@ public class Command<C> {
          */
         public @NonNull Builder<C> proxies(final @NonNull Command<C> command) {
             Builder<C> builder = this;
-            for (final CommandComponent<C> component : command.getComponents()) {
-                final CommandArgument<C, ?> argument = component.getArgument();
-                if (argument instanceof StaticArgument) {
+            for (final CommandComponent<C> component : command.components()) {
+                if (component.argument() instanceof StaticArgument) {
                     continue;
                 }
-                final CommandArgument<C, ?> builtArgument = argument.copy();
-                builder = builder.argument(builtArgument, component.getArgumentDescription());
+                final CommandComponent<C> componentCopy = component.copy();
+                builder = builder.argument(componentCopy);
             }
             if (this.commandPermission.toString().isEmpty()) {
                 builder = builder.permission(command.getCommandPermission());
@@ -1239,7 +1342,7 @@ public class Command<C> {
             /* Construct flag node */
             if (!this.flags.isEmpty()) {
                 final FlagArgument<C> flagArgument = new FlagArgument<>(this.flags);
-                commandComponents.add(CommandComponent.of(flagArgument, ArgumentDescription.of("Command flags")));
+                commandComponents.add(CommandComponent.optional(flagArgument, ArgumentDescription.of("Command flags")));
             }
             return new Command<>(
                     Collections.unmodifiableList(commandComponents),

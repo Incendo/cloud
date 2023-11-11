@@ -54,19 +54,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer> {
 
     private ServerArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         super(
-                required,
                 name,
                 new ServerParser<>(),
-                defaultValue,
                 TypeToken.get(RegisteredServer.class),
                 suggestionsProvider,
                 defaultDescription,
@@ -111,19 +107,9 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
     public static <C> @NonNull CommandArgument<C, RegisteredServer> of(
             final @NonNull String name
     ) {
-        return ServerArgument.<C>builder(name).asRequired().build();
+        return ServerArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional server argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, RegisteredServer> optional(final @NonNull String name) {
-        return ServerArgument.<C>builder(name).asOptional().build();
-    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, RegisteredServer> {
 
@@ -134,9 +120,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
         @Override
         public @NonNull CommandArgument<@NonNull C, @NonNull RegisteredServer> build() {
             return new ServerArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()

@@ -41,17 +41,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ParticleArgument<C> extends CommandArgument<C, ParticleOptions> {
 
     ParticleArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.contextual(net.minecraft.commands.arguments.ParticleArgument::particle),
-                defaultValue,
                 ParticleOptions.class,
                 suggestionsProvider,
                 defaultDescription
@@ -79,35 +75,7 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
      * @since 1.5.0
      */
     public static <C> @NonNull ParticleArgument<C> of(final @NonNull String name) {
-        return ParticleArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link ParticleArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ParticleArgument<C> optional(final @NonNull String name) {
-        return ParticleArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link ParticleArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default particle effect value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ParticleArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull ParticleOptions defaultValue
-    ) {
-        return ParticleArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return ParticleArgument.<C>builder(name).build();
     }
 
 
@@ -132,24 +100,10 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
         @Override
         public @NonNull ParticleArgument<C> build() {
             return new ParticleArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ParticleOptions defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.writeToString());
         }
     }
 }

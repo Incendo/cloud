@@ -53,13 +53,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
 
     KeyedWorldArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new Parser<>(), defaultValue, World.class, suggestionsProvider, defaultDescription);
+        super(name, new Parser<>(), World.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -83,36 +81,9 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
      * @since 1.6.0
      */
     public static <C> @NonNull KeyedWorldArgument<C> of(final @NonNull String name) {
-        return KeyedWorldArgument.<C>builder(name).asRequired().build();
+        return KeyedWorldArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link KeyedWorldArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.6.0
-     */
-    public static <C> @NonNull KeyedWorldArgument<C> optional(final @NonNull String name) {
-        return KeyedWorldArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new {@link KeyedWorldArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.6.0
-     */
-    public static <C> @NonNull KeyedWorldArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull NamespacedKey defaultValue
-    ) {
-        return KeyedWorldArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
-    }
 
     /**
      * Builder for {@link KeyedWorldArgument}.
@@ -127,18 +98,6 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
         }
 
         /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.6.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull NamespacedKey defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.toString());
-        }
-
-        /**
          * Build a new {@link KeyedWorldArgument}.
          *
          * @return constructed argument
@@ -147,9 +106,7 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
         @Override
         public @NonNull KeyedWorldArgument<C> build() {
             return new KeyedWorldArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

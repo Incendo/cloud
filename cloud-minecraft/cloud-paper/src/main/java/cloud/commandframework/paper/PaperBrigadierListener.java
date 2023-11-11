@@ -24,7 +24,6 @@
 package cloud.commandframework.paper;
 
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitBrigadierMapper;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
@@ -100,7 +99,7 @@ class PaperBrigadierListener<C> implements Listener {
             label = event.getCommandLabel();
         }
 
-        final CommandTree.Node<CommandArgument<C, ?>> node = commandTree.getNamedNode(label);
+        final CommandTree.CommandNode<C> node = commandTree.getNamedNode(label);
         if (node == null) {
             return;
         }

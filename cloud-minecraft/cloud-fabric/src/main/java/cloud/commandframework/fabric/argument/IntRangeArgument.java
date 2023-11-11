@@ -44,17 +44,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.Ints> {
 
     IntRangeArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new WrappedBrigadierParser<>(RangeArgument.intRange()),
-                defaultValue,
                 MinMaxBounds.Ints.class,
                 suggestionsProvider,
                 defaultDescription
@@ -82,35 +78,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
      * @since 1.5.0
      */
     public static <C> @NonNull IntRangeArgument<C> of(final @NonNull String name) {
-        return IntRangeArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link IntRangeArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull IntRangeArgument<C> optional(final @NonNull String name) {
-        return IntRangeArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link IntRangeArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull IntRangeArgument<C> optional(
-            final @NonNull String name,
-            final MinMaxBounds.@NonNull Ints defaultValue
-    ) {
-        return IntRangeArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return IntRangeArgument.<C>builder(name).build();
     }
 
 
@@ -135,32 +103,10 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
         @Override
         public @NonNull IntRangeArgument<C> build() {
             return new IntRangeArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final MinMaxBounds.@NonNull Ints defaultValue) {
-            final StringBuilder value = new StringBuilder(6);
-            if (defaultValue.getMin() != null) {
-                value.append(defaultValue.getMin());
-            }
-            value.append("..");
-            if (defaultValue.getMax() != null) {
-                value.append(defaultValue.getMax());
-            }
-            return this.asOptionalWithDefault(value.toString());
         }
     }
 }

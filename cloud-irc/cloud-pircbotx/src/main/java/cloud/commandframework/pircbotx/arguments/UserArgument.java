@@ -52,18 +52,14 @@ import org.pircbotx.exception.DaoException;
 public final class UserArgument<C> extends CommandArgument<C, User> {
 
     private UserArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new UserArgumentParser<>(),
-                defaultValue,
                 TypeToken.get(User.class),
                 suggestionsProvider,
                 defaultDescription
@@ -105,18 +101,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
      * @return Argument instance
      */
     public static <C> @NonNull CommandArgument<C, User> of(final @NonNull String name) {
-        return UserArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a optional user argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Argument instance
-     */
-    public static <C> @NonNull CommandArgument<C, User> optional(final @NonNull String name) {
-        return UserArgument.<C>builder(name).asOptional().build();
+        return UserArgument.<C>builder(name).build();
     }
 
 
@@ -134,9 +119,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         @Override
         public @NonNull CommandArgument<@NonNull C, @NonNull User> build() {
             return new UserArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

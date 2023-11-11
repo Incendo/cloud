@@ -87,7 +87,7 @@ class AnnotationParserTest {
         /* Register a builder modifier */
         annotationParser.registerBuilderModifier(
                 IntegerArgumentInjector.class,
-                (injector, builder) -> builder.argument(IntegerArgument.of(injector.value()))
+                (injector, builder) -> builder.required(IntegerArgument.of(injector.value()))
         );
         /* Parse the class. Required for both testMethodConstruction() and testNamedSuggestionProvider() */
         commands = new ArrayList<>();
@@ -189,7 +189,7 @@ class AnnotationParserTest {
 
         // Find the root command that we are looking for.
         for (final Command<TestCommandSender> command : commands) {
-            final StaticArgument<?> argument = (StaticArgument<?>) command.getArguments().get(0);
+            final StaticArgument<?> argument = (StaticArgument<?>) command.components().get(0).argument();
 
             if (argument.getAliases().contains("acommand")) {
                 final Set<String> requiredAliases = new HashSet<>(Arrays.asList("acommand", "analias", "anotheralias"));

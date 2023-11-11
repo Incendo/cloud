@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.exceptions;
 
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -49,7 +49,7 @@ public final class NoSuchCommandException extends CommandParseException {
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public NoSuchCommandException(
             final @NonNull Object commandSender,
-            final @NonNull List<CommandArgument<?, ?>> currentChain,
+            final @NonNull List<CommandComponent<?>> currentChain,
             final @NonNull String command
     ) {
         super(commandSender, currentChain);
@@ -60,11 +60,11 @@ public final class NoSuchCommandException extends CommandParseException {
     @Override
     public String getMessage() {
         final StringBuilder builder = new StringBuilder();
-        for (final CommandArgument<?, ?> commandArgument : this.getCurrentChain()) {
-            if (commandArgument == null) {
+        for (final CommandComponent<?> commandComponent : this.getCurrentChain()) {
+            if (commandComponent == null) {
                 continue;
             }
-            builder.append(" ").append(commandArgument.getName());
+            builder.append(" ").append(commandComponent.argument().getName());
         }
         return String.format("Unrecognized command input '%s' following chain%s", this.suppliedCommand, builder.toString());
     }

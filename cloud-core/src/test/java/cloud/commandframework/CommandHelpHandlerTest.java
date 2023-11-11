@@ -59,12 +59,12 @@ class CommandHelpHandlerTest {
                 .with(CommandMeta.DESCRIPTION, "Command with variables")
                 .build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
-                argument(IntegerArgument.of("int"), ArgumentDescription.of("A number")).build());
-        manager.command(manager.commandBuilder("test").argument(StringArgument.of("potato")));
+                required(IntegerArgument.of("int"), ArgumentDescription.of("A number")).build());
+        manager.command(manager.commandBuilder("test").required(StringArgument.of("potato")));
 
         manager.command(manager.commandBuilder("vec")
                 .meta(CommandMeta.DESCRIPTION, "Takes in a vector")
-                .argumentPair("vec", Pair.of("x", "y"),
+                .requiredArgumentPair("vec", Pair.of("x", "y"),
                         Pair.of(Double.class, Double.class), ArgumentDescription.of("Vector")
                 )
                 .build());
@@ -173,13 +173,13 @@ class CommandHelpHandlerTest {
 
             //TODO: Use CommandManager syntax for this
             StringBuilder syntax = new StringBuilder();
-            for (CommandArgument<TestCommandSender, ?> argument : verbose.getCommand().getArguments()) {
-                if (argument instanceof StaticArgument) {
-                    syntax.append(argument.getName());
-                } else if (argument.isRequired()) {
-                    syntax.append('<').append(argument.getName()).append('>');
+            for (CommandComponent<TestCommandSender> component : verbose.getCommand().components()) {
+                if (component.argument() instanceof StaticArgument) {
+                    syntax.append(component.argument().getName());
+                } else if (component.required()) {
+                    syntax.append('<').append(component.argument().getName()).append('>');
                 } else {
-                    syntax.append('[').append(argument.getName()).append(']');
+                    syntax.append('[').append(component.argument().getName()).append(']');
                 }
                 syntax.append(' ');
             }
@@ -240,20 +240,20 @@ class CommandHelpHandlerTest {
 
     private void printVerboseHelpTopic(final CommandHelpHandler.VerboseHelpTopic<TestCommandSender> helpTopic) {
         System.out.printf("└── Command: /%s\n", manager.commandSyntaxFormatter()
-                .apply(helpTopic.getCommand().getArguments(), null));
+                .apply(helpTopic.getCommand().components(), null));
         System.out.printf("    ├── Description: %s\n", helpTopic.getDescription());
         System.out.println("    └── Args: ");
-        final Iterator<CommandComponent<TestCommandSender>> iterator = helpTopic.getCommand().getComponents().iterator();
+        final Iterator<CommandComponent<TestCommandSender>> iterator = helpTopic.getCommand().components().iterator();
         while (iterator.hasNext()) {
             final CommandComponent<TestCommandSender> component = iterator.next();
 
-            String description = component.getArgumentDescription().getDescription();
+            String description = component.argumentDescription().getDescription();
             if (!description.isEmpty()) {
                 description = ": " + description;
             }
 
             System.out.printf("        %s %s%s\n", iterator.hasNext() ? "├──" : "└──", manager.commandSyntaxFormatter().apply(
-                    Collections.singletonList(component.getArgument()), null), description);
+                    Collections.singletonList(component), null), description);
         }
     }
 }

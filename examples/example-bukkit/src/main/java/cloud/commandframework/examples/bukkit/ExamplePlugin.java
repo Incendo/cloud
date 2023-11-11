@@ -275,8 +275,8 @@ public final class ExamplePlugin extends JavaPlugin {
                         .literal("me")
                         // Require a player sender
                         .senderType(Player.class)
-                        .argument(worldArgument, ArgumentDescription.of("World name"))
-                        .argumentTriplet(
+                        .required(worldArgument, ArgumentDescription.of("World name"))
+                        .requiredArgumentTriplet(
                                 "coords",
                                 TypeToken.get(Vector.class),
                                 Triplet.of("x", "y", "z"),
@@ -297,7 +297,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 .command(builder.literal("teleport")
                         .literal("entity")
                         .senderType(Player.class)
-                        .argument(
+                        .required(
                                 SingleEntitySelectorArgument.of("entity"),
                                 ArgumentDescription.of("Entity to teleport")
                         )
@@ -318,7 +318,7 @@ public final class ExamplePlugin extends JavaPlugin {
                         ))
                 .command(builder.literal("teleport")
                         .meta(CommandMeta.DESCRIPTION, "Teleport to a world")
-                        .argument(WorldArgument.of("world"), ArgumentDescription.of("World to teleport to"))
+                        .required(WorldArgument.of("world"), ArgumentDescription.of("World to teleport to"))
                         .handler(context -> this.manager.taskRecipe().begin(context).synchronous(ctx -> {
                             final Player player = (Player) ctx.getSender();
                             player.teleport(ctx.<World>get("world").getSpawnLocation());
@@ -338,8 +338,8 @@ public final class ExamplePlugin extends JavaPlugin {
                 ));
         this.manager.command(this.manager.commandBuilder("give")
                 .senderType(Player.class)
-                .argument(MaterialArgument.of("material"))
-                .argument(IntegerArgument.of("amount"))
+                .required(MaterialArgument.of("material"))
+                .required(IntegerArgument.of("amount"))
                 .handler(c -> {
                     final Material material = c.get("material");
                     final int amount = c.get("amount");
@@ -349,15 +349,15 @@ public final class ExamplePlugin extends JavaPlugin {
                 }));
         this.manager.command(builder.literal("summon")
                 .senderType(Player.class)
-                .argument(EnumArgument.of(EntityType.class, "type"))
+                .required(EnumArgument.of(EntityType.class, "type"))
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Location loc = ((Player) ctx.getSender()).getLocation();
                     loc.getWorld().spawnEntity(loc, ctx.get("type"));
                 }).execute()));
         this.manager.command(builder.literal("enchant")
                 .senderType(Player.class)
-                .argument(EnchantmentArgument.of("enchant"))
-                .argument(IntegerArgument.of("level"))
+                .required(EnchantmentArgument.of("enchant"))
+                .required(IntegerArgument.of("level"))
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Player player = ((Player) ctx.getSender());
                     player.getInventory().getItemInMainHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));
@@ -369,23 +369,23 @@ public final class ExamplePlugin extends JavaPlugin {
         this.manager.command(builder
                 .meta(CommandMeta.DESCRIPTION, "Sets the color scheme for '/example help'")
                 .literal("helpcolors")
-                .argument(
+                .required(
                         TextColorArgument.of("primary"),
                         RichDescription.of(text("The primary color for the color scheme", Style.style(TextDecoration.ITALIC)))
                 )
-                .argument(
+                .required(
                         TextColorArgument.of("highlight"),
                         RichDescription.of(text("The primary color used to highlight commands and queries"))
                 )
-                .argument(
+                .required(
                         TextColorArgument.of("alternate_highlight"),
                         RichDescription.of(text("The secondary color used to highlight commands and queries"))
                 )
-                .argument(
+                .required(
                         TextColorArgument.of("text"),
                         RichDescription.of(text("The color used for description text"))
                 )
-                .argument(
+                .required(
                         TextColorArgument.of("accent"),
                         RichDescription.of(text("The color used for accents and symbols"))
                 )
@@ -412,8 +412,8 @@ public final class ExamplePlugin extends JavaPlugin {
                 this.manager.commandBuilder(
                         "arraycommand",
                         ArgumentDescription.of("Bukkit-esque cmmand")
-                ).argument(
-                        StringArrayArgument.optional(
+                ).optional(
+                        StringArrayArgument.of(
                                 "args",
                                 (context, lastString) -> {
                                     final List<String> allArgs = context.getRawInput();
@@ -442,7 +442,7 @@ public final class ExamplePlugin extends JavaPlugin {
         // compound itemstack arg
         this.manager.command(this.manager.commandBuilder("gib")
                 .senderType(Player.class)
-                .argumentPair(
+                .requiredArgumentPair(
                         "itemstack",
                         TypeToken.get(ItemStack.class),
                         Pair.of("item", "amount"),
@@ -460,7 +460,7 @@ public final class ExamplePlugin extends JavaPlugin {
                 }));
 
         this.manager.command(builder.literal("keyed_world")
-                .argument(KeyedWorldArgument.of("world"))
+                .required(KeyedWorldArgument.of("world"))
                 .senderType(Player.class)
                 .handler(ctx -> {
                     final World world = ctx.get("world");
@@ -483,7 +483,7 @@ public final class ExamplePlugin extends JavaPlugin {
 
         this.manager.command(this.manager.commandBuilder("example")
                 .literal("namespacedkey")
-                .argument(NamespacedKeyArgument.of("key"))
+                .required(NamespacedKeyArgument.of("key"))
                 .handler(ctx -> {
                     final NamespacedKey namespacedKey = ctx.get("key");
                     final String key = namespacedKey.getNamespace() + ":" + namespacedKey.getKey();

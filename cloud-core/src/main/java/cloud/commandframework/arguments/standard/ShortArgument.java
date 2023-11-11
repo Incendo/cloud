@@ -47,16 +47,14 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     private final short max;
 
     private ShortArgument(
-            final boolean required,
             final @NonNull String name,
             final short min,
             final short max,
-            final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new ShortParser<>(min, max), defaultValue, Short.class, suggestionsProvider, defaultDescription);
+        super(name, new ShortParser<>(min, max), Short.class, suggestionsProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -96,30 +94,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Short> of(final @NonNull String name) {
-        return ShortArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link ShortArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Short> optional(final @NonNull String name) {
-        return ShortArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required {@link ShortArgument} with the specified default value.
-     *
-     * @param name       Argument name
-     * @param defaultNum Default value
-     * @param <C>        Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Short> optional(final @NonNull String name, final short defaultNum) {
-        return ShortArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
+        return ShortArgument.<C>builder(name).build();
     }
 
     /**
@@ -173,23 +148,10 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
             return this;
         }
 
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        @API(status = API.Status.STABLE, since = "1.5.0")
-        public @NonNull Builder<C> asOptionalWithDefault(final short defaultValue) {
-            return (Builder<C>) this.asOptionalWithDefault(Short.toString(defaultValue));
-        }
-
         @Override
         public @NonNull ShortArgument<C> build() {
-            return new ShortArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new ShortArgument<>(this.getName(), this.min, this.max,
+                    this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
     }

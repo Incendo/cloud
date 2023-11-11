@@ -24,6 +24,7 @@
 package cloud.commandframework.annotations.feature;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.AnnotationParser;
 import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.CommandDescription;
@@ -105,10 +106,10 @@ class StringProcessingTest {
         assertThat(command.getCommandPermission().toString()).isEqualTo(testProperty);
         assertThat(command.getCommandMeta().get(CommandMeta.DESCRIPTION)).hasValue(testProperty);
 
-        final List<CommandArgument<TestCommandSender, ?>> arguments = command.getArguments();
-        assertThat(arguments).hasSize(3);
+        final List<CommandComponent<TestCommandSender>> components = command.components();
+        assertThat(components).hasSize(3);
 
-        final FlagArgument<TestCommandSender> flagArgument = (FlagArgument<TestCommandSender>) arguments.get(2);
+        final FlagArgument<TestCommandSender> flagArgument = (FlagArgument<TestCommandSender>) components.get(2).argument();
         assertThat(flagArgument).isNotNull();
 
         final List<CommandFlag<?>> flags = new ArrayList<>(flagArgument.getFlags());

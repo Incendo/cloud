@@ -472,7 +472,7 @@ public final class MinecraftHelp<C> {
         audience.sendMessage(this.basicHeader(sender));
         audience.sendMessage(this.showingResults(sender, query));
         final String command = this.commandManager.commandSyntaxFormatter()
-                .apply(helpTopic.getCommand().getArguments(), null);
+                .apply(helpTopic.getCommand().components(), null);
         audience.sendMessage(text()
                 .append(this.lastBranch())
                 .append(space())
@@ -495,7 +495,7 @@ public final class MinecraftHelp<C> {
             topicDescription = this.descriptionDecorator.apply(sender, helpTopic.getDescription());
         }
 
-        final boolean hasArguments = helpTopic.getCommand().getArguments().size() > 1;
+        final boolean hasArguments = helpTopic.getCommand().components().size() > 1;
         audience.sendMessage(text()
                 .append(text("   "))
                 .append(hasArguments ? this.branch() : this.lastBranch())
@@ -513,29 +513,29 @@ public final class MinecraftHelp<C> {
                     .append(text(":", this.colors.primary))
             );
 
-            final Iterator<CommandComponent<C>> iterator = helpTopic.getCommand().getComponents().iterator();
+            final Iterator<CommandComponent<C>> iterator = helpTopic.getCommand().components().iterator();
             /* Skip the first one because it's the command literal */
             iterator.next();
 
             while (iterator.hasNext()) {
                 final CommandComponent<C> component = iterator.next();
-                final CommandArgument<C, ?> argument = component.getArgument();
+                final CommandArgument<C, ?> argument = component.argument();
 
                 final String syntax = this.commandManager.commandSyntaxFormatter()
-                        .apply(Collections.singletonList(argument), null);
+                        .apply(Collections.singletonList(component), null);
 
                 final TextComponent.Builder textComponent = text()
                         .append(text("       "))
                         .append(iterator.hasNext() ? this.branch() : this.lastBranch())
                         .append(this.highlight(text(" " + syntax, this.colors.highlight)));
-                if (!argument.isRequired()) {
+                if (component.optional()) {
                     textComponent.append(text(" (", this.colors.alternateHighlight));
                     textComponent.append(
                             this.messageProvider.provide(sender, MESSAGE_OPTIONAL).color(this.colors.alternateHighlight)
                     );
                     textComponent.append(text(")", this.colors.alternateHighlight));
                 }
-                final ArgumentDescription description = component.getArgumentDescription();
+                final ArgumentDescription description = component.argumentDescription();
                 if (!description.isEmpty()) {
                     textComponent.append(text(" - ", this.colors.accent));
                     textComponent.append(this.formatDescription(sender, description).colorIfAbsent(this.colors.text));

@@ -97,7 +97,7 @@ class CommandManagerTest {
                 .build();
         final Command<TestCommandSender> commandC = this.commandManager.commandBuilder("test")
                 .literal("c")
-                .argument(IntegerArgument.optional("opt"))
+                .optional(IntegerArgument.of("opt"))
                 .handler(handlerC)
                 .build();
 
@@ -141,7 +141,7 @@ class CommandManagerTest {
         Command<TestCommandSender> command = this.commandManager.commandBuilder("component")
                 .literal("literal", "literalalias")
                 .literal("detail", ArgumentDescription.of("detaildescription"))
-                .argument(
+                .required(
                         CommandArgument.ofType(int.class, "argument"),
                         ArgumentDescription.of("argumentdescription")
                 )
@@ -149,30 +149,23 @@ class CommandManagerTest {
         this.commandManager.command(command);
 
         // Verify all the details we have configured are present
-        List<CommandArgument<TestCommandSender, ?>> arguments = command.getArguments();
-        List<CommandComponent<TestCommandSender>> components = command.getComponents();
-        assertThat(arguments.size()).isEqualTo(components.size());
+        List<CommandComponent<TestCommandSender>> components = command.components();
         assertThat(components.size()).isEqualTo(4);
-
-        // Arguments should exactly match the component getArgument() result, in same order
-        for (int i = 0; i < components.size(); i++) {
-            assertThat(components.get(i).getArgument()).isEqualTo(arguments.get(i));
-        }
 
         // Argument configuration, we know component has the same argument so no need to test those
         // TODO: Aliases
-        assertThat(arguments.get(0).getName()).isEqualTo("component");
-        assertThat(arguments.get(1).getName()).isEqualTo("literal");
-        assertThat(arguments.get(2).getName()).isEqualTo("detail");
-        assertThat(arguments.get(3).getName()).isEqualTo("argument");
+        assertThat(components.get(0).argument().getName()).isEqualTo("component");
+        assertThat(components.get(1).argument().getName()).isEqualTo("literal");
+        assertThat(components.get(2).argument().getName()).isEqualTo("detail");
+        assertThat(components.get(3).argument().getName()).isEqualTo("argument");
 
         // Check argument is indeed a command argument
-        assertThat(TypeToken.get(int.class)).isEqualTo(arguments.get(3).getValueType());
+        assertThat(TypeToken.get(int.class)).isEqualTo(components.get(3).argument().getValueType());
 
         // Check description is set for all components, is empty when not specified
-        assertThat(components.get(0).getArgumentDescription().getDescription()).isEmpty();
-        assertThat(components.get(1).getArgumentDescription().getDescription()).isEmpty();
-        assertThat(components.get(2).getArgumentDescription().getDescription()).isEqualTo("detaildescription");
-        assertThat(components.get(3).getArgumentDescription().getDescription()).isEqualTo("argumentdescription");
+        assertThat(components.get(0).argumentDescription().getDescription()).isEmpty();
+        assertThat(components.get(1).argumentDescription().getDescription()).isEmpty();
+        assertThat(components.get(2).argumentDescription().getDescription()).isEqualTo("detaildescription");
+        assertThat(components.get(3).argumentDescription().getDescription()).isEqualTo("argumentdescription");
     }
 }

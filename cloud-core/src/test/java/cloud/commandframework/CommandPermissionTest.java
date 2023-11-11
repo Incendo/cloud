@@ -66,7 +66,7 @@ class CommandPermissionTest {
     @Test
     void testComplexPermissions() {
         manager.command(manager.commandBuilder("first").permission("first"));
-        manager.command(manager.commandBuilder("first").argument(IntegerArgument.of("second")).permission("second"));
+        manager.command(manager.commandBuilder("first").required(IntegerArgument.of("second")).permission("second"));
 
         manager.executeCommand(new TestCommandSender(), "first").join();
 

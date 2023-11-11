@@ -47,9 +47,9 @@ class ArgumentContextTest {
     void testConsumedInput() throws Exception {
         // Arrange
         this.commandManager.command(
-                this.commandManager.commandBuilder("test", "t").argument(
+                this.commandManager.commandBuilder("test", "t").required(
                         IntegerArgument.builder("int")
-                ).argument(
+                ).required(
                         StringArgument.greedy("string")
                 )
         );

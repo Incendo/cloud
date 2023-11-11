@@ -58,16 +58,16 @@ final class Mc113 {
 
         this.manager.command(builder.literal("replace")
                 .senderType(Player.class)
-                .argument(BlockPredicateArgument.of("predicate"))
+                .required(BlockPredicateArgument.of("predicate"))
                 .literal("with")
-                .argument(MaterialArgument.of("block")) // todo: use BlockDataArgument
-                .argument(IntegerArgument.<CommandSender>builder("radius").withMin(1))
+                .required(MaterialArgument.of("block")) // todo: use BlockDataArgument
+                .required(IntegerArgument.<CommandSender>builder("radius").withMin(1))
                 .handler(this::executeReplace));
 
         this.manager.command(builder.literal("test_item")
-                .argument(ItemStackArgument.of("item"))
+                .required(ItemStackArgument.of("item"))
                 .literal("is")
-                .argument(ItemStackPredicateArgument.of("predicate"))
+                .required(ItemStackPredicateArgument.of("predicate"))
                 .handler(Mc113::executeTestItem));
     }
 

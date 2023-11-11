@@ -64,14 +64,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ItemStackPredicateArgument<C> extends CommandArgument<C, ItemStackPredicate> {
 
     private ItemStackPredicateArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new Parser<>(), defaultValue, ItemStackPredicate.class, suggestionsProvider, defaultDescription);
+        super(name, new Parser<>(), ItemStackPredicate.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -98,18 +96,6 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
         return ItemStackPredicateArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link ItemStackPredicateArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ItemStackPredicateArgument<C> optional(final @NonNull String name) {
-        return ItemStackPredicateArgument.<C>builder(name).asOptional().build();
-    }
-
 
     /**
      * Builder for {@link ItemStackPredicateArgument}.
@@ -126,9 +112,7 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
         @Override
         public @NonNull ItemStackPredicateArgument<C> build() {
             return new ItemStackPredicateArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

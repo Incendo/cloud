@@ -49,14 +49,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class MaterialArgument<C> extends CommandArgument<C, Material> {
 
     protected MaterialArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new MaterialParser<>(), defaultValue, Material.class, suggestionsProvider, defaultDescription);
+        super(name, new MaterialParser<>(), Material.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -94,34 +92,9 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Material> of(final @NonNull String name) {
-        return MaterialArgument.<C>builder(name).asRequired().build();
+        return MaterialArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Material> optional(final @NonNull String name) {
-        return MaterialArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional argument with a default value
-     *
-     * @param name     Argument name
-     * @param material Default value
-     * @param <C>      Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Material> optional(
-            final @NonNull String name,
-            final @NonNull Material material
-    ) {
-        return MaterialArgument.<C>builder(name).asOptionalWithDefault(material.name().toLowerCase()).build();
-    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Material> {
 
@@ -132,9 +105,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
         @Override
         public @NonNull CommandArgument<C, Material> build() {
             return new MaterialArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

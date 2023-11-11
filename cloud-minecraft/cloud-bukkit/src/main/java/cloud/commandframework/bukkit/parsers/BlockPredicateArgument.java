@@ -63,14 +63,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPredicate> {
 
     private BlockPredicateArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new Parser<>(), defaultValue, BlockPredicate.class, suggestionsProvider, defaultDescription);
+        super(name, new Parser<>(), BlockPredicate.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -97,18 +95,6 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
         return BlockPredicateArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link BlockPredicateArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull BlockPredicateArgument<C> optional(final @NonNull String name) {
-        return BlockPredicateArgument.<C>builder(name).asOptional().build();
-    }
-
 
     /**
      * Builder for {@link BlockPredicateArgument}.
@@ -125,9 +111,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
         @Override
         public @NonNull BlockPredicateArgument<C> build() {
             return new BlockPredicateArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

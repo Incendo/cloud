@@ -44,7 +44,7 @@ public class DurationArgumentTest {
     static void setup() {
         manager = createManager();
         manager.command(manager.commandBuilder("duration")
-                .argument(DurationArgument.of("duration"))
+                .required(DurationArgument.of("duration"))
                 .handler(c -> {
                     final Duration duration = c.get("duration");
                     storage[0] = duration;

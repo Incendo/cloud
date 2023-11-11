@@ -98,7 +98,6 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
      */
     public FlagArgument(final Collection<CommandFlag<?>> flags) {
         super(
-                false,
                 FLAG_ARGUMENT_NAME,
                 new FlagArgumentParser<>(flags.toArray(new CommandFlag<?>[0])),
                 Object.class

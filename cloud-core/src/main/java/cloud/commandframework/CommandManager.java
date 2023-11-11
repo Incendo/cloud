@@ -536,14 +536,14 @@ public abstract class CommandManager<C> {
         }
 
         // Mark the command for deletion.
-        final CommandTree.Node<@Nullable CommandArgument<C, ?>> node = this.commandTree.getNamedNode(rootCommand);
+        final CommandTree.CommandNode<C> node = this.commandTree.getNamedNode(rootCommand);
         if (node == null) {
             // If the node doesn't exist, we don't really need to delete it...
             return;
         }
 
         // The registration handler gets to act before we destruct the command.
-        this.commandRegistrationHandler.unregisterRootCommand((StaticArgument<?>) node.getValue());
+        this.commandRegistrationHandler.unregisterRootCommand((StaticArgument<?>) node.argument());
 
         // We then delete it from the tree.
         this.commandTree.deleteRecursively(node, true, this.commands::remove);
@@ -563,7 +563,7 @@ public abstract class CommandManager<C> {
     public @NonNull Collection<@NonNull String> rootCommands() {
         return this.commandTree.getRootNodes()
                 .stream()
-                .map(CommandTree.Node::getValue)
+                .map(CommandTree.CommandNode::argument)
                 .filter(arg -> arg instanceof StaticArgument)
                 .map(arg -> (StaticArgument<C>) arg)
                 .map(StaticArgument::getName)

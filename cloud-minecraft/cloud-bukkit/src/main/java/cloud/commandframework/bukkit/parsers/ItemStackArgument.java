@@ -67,14 +67,12 @@ import static java.util.Objects.requireNonNull;
 public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStack> {
 
     private ItemStackArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new Parser<>(), defaultValue, ProtoItemStack.class, suggestionsProvider, defaultDescription);
+        super(name, new Parser<>(), ProtoItemStack.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -101,18 +99,6 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         return ItemStackArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link ItemStackArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ItemStackArgument<C> optional(final @NonNull String name) {
-        return ItemStackArgument.<C>builder(name).asOptional().build();
-    }
-
 
     /**
      * Builder for {@link ItemStackArgument}.
@@ -129,9 +115,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         @Override
         public @NonNull ItemStackArgument<C> build() {
             return new ItemStackArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

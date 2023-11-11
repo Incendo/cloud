@@ -30,7 +30,6 @@ import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates.ColumnCoordinates;
 import java.util.List;
 import java.util.function.BiFunction;
-import net.minecraft.core.BlockPos;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -43,17 +42,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordinates> {
 
     ColumnPosArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.columnPos(),
-                defaultValue,
                 ColumnCoordinates.class,
                 suggestionsProvider,
                 defaultDescription
@@ -81,35 +76,9 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
      * @since 1.5.0
      */
     public static <C> @NonNull ColumnPosArgument<C> of(final @NonNull String name) {
-        return ColumnPosArgument.<C>builder(name).asRequired().build();
+        return ColumnPosArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link ColumnPosArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ColumnPosArgument<C> optional(final @NonNull String name) {
-        return ColumnPosArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link ColumnPosArgument} with the specified default value.
-     *
-     * @param name         Component name
-     * @param defaultValue default value, y coordinate will be ignored as it is always 0
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ColumnPosArgument<C> optional(final @NonNull String name, final @NonNull BlockPos defaultValue) {
-        return ColumnPosArgument.<C>builder(name)
-                .asOptionalWithDefault(defaultValue)
-                .build();
-    }
 
     /**
      * Builder for {@link ColumnPosArgument}.
@@ -132,28 +101,10 @@ public final class ColumnPosArgument<C> extends CommandArgument<C, ColumnCoordin
         @Override
         public @NonNull ColumnPosArgument<C> build() {
             return new ColumnPosArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull BlockPos defaultValue) {
-            return this.asOptionalWithDefault(String.format(
-                    "%s %s",
-                    defaultValue.getX(),
-                    defaultValue.getZ()
-            ));
         }
     }
 }

@@ -54,14 +54,12 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
     protected EnumArgument(
             final @NonNull Class<E> enumClass,
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new EnumParser<>(enumClass), defaultValue, enumClass, suggestionsProvider, defaultDescription);
+        super(name, new EnumParser<>(enumClass), enumClass, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -114,41 +112,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             final @NonNull Class<E> enumClass,
             final @NonNull String name
     ) {
-        return EnumArgument.<C, E>builder(enumClass, name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command argument
-     *
-     * @param enumClass Enum class
-     * @param name      Name of the argument
-     * @param <C>       Command sender type
-     * @param <E>       Enum type
-     * @return Created argument
-     */
-    public static <C, E extends Enum<E>> @NonNull CommandArgument<C, E> optional(
-            final @NonNull Class<E> enumClass,
-            final @NonNull String name
-    ) {
-        return EnumArgument.<C, E>builder(enumClass, name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional command argument with a default value
-     *
-     * @param enumClass    Enum class
-     * @param name         Name of the argument
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @param <E>          Enum type
-     * @return Created argument
-     */
-    public static <C, E extends Enum<E>> @NonNull CommandArgument<C, E> optional(
-            final @NonNull Class<E> enumClass,
-            final @NonNull String name,
-            final @NonNull E defaultValue
-    ) {
-        return EnumArgument.<C, E>builder(enumClass, name).asOptionalWithDefault(defaultValue.name().toLowerCase()).build();
+        return EnumArgument.<C, E>builder(enumClass, name).build();
     }
 
 
@@ -164,9 +128,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
         @Override
         public @NonNull CommandArgument<C, E> build() {
-            return new EnumArgument<>(this.enumClass, this.isRequired(), this.getName(),
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
-            );
+            return new EnumArgument<>(this.enumClass, this.getName(), this.getSuggestionsProvider(), this.getDefaultDescription());
         }
     }
 

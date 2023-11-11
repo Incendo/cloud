@@ -54,16 +54,14 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     private final StringMode stringMode;
 
     private StringArgument(
-            final boolean required,
             final @NonNull String name,
             final @NonNull StringMode stringMode,
-            final @NonNull String defaultValue,
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new StringParser<>(stringMode, suggestionsProvider),
-                defaultValue, String.class, suggestionsProvider, defaultDescription
+        super(name, new StringParser<>(stringMode, suggestionsProvider),
+                String.class, suggestionsProvider, defaultDescription
         );
         this.stringMode = stringMode;
     }
@@ -103,7 +101,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, String> of(final @NonNull String name) {
-        return StringArgument.<C>builder(name).single().asRequired().build();
+        return StringArgument.<C>builder(name).single().build();
     }
 
     /**
@@ -118,48 +116,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             final @NonNull String name,
             final @NonNull StringMode stringMode
     ) {
-        return StringArgument.<C>builder(name).withMode(stringMode).asRequired().build();
-    }
-
-    /**
-     * Create a new optional single string command argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, String> optional(final @NonNull String name) {
-        return StringArgument.<C>builder(name).single().asOptional().build();
-    }
-
-    /**
-     * Create a new optional command argument
-     *
-     * @param name       Argument name
-     * @param stringMode String mode
-     * @param <C>        Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, String> optional(
-            final @NonNull String name,
-            final @NonNull StringMode stringMode
-    ) {
-        return StringArgument.<C>builder(name).withMode(stringMode).asOptional().build();
-    }
-
-    /**
-     * Create a new required command argument with a default value
-     *
-     * @param name          Argument name
-     * @param defaultString Default string
-     * @param <C>           Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, String> optional(
-            final @NonNull String name,
-            final @NonNull String defaultString
-    ) {
-        return StringArgument.<C>builder(name).asOptionalWithDefault(defaultString).build();
+        return StringArgument.<C>builder(name).withMode(stringMode).build();
     }
 
     /**
@@ -318,8 +275,8 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
          */
         @Override
         public @NonNull StringArgument<C> build() {
-            return new StringArgument<>(this.isRequired(), this.getName(), this.stringMode,
-                    this.getDefaultValue(), this.suggestionsProvider, this.getDefaultDescription()
+            return new StringArgument<>(this.getName(), this.stringMode,
+                    this.suggestionsProvider, this.getDefaultDescription()
             );
         }
     }

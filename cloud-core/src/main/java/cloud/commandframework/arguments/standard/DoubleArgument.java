@@ -47,16 +47,14 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     private final double max;
 
     private DoubleArgument(
-            final boolean required,
             final @NonNull String name,
             final double min,
             final double max,
-            final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new DoubleParser<>(min, max), defaultValue, Double.class, suggestionsProvider, defaultDescription);
+        super(name, new DoubleParser<>(min, max), Double.class, suggestionsProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -96,33 +94,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Double> of(final @NonNull String name) {
-        return DoubleArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link DoubleArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Double> optional(final @NonNull String name) {
-        return DoubleArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link DoubleArgument} with the specified default value.
-     *
-     * @param name       Argument name
-     * @param defaultNum Default num
-     * @param <C>        Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Double> optional(
-            final @NonNull String name,
-            final double defaultNum
-    ) {
-        return DoubleArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
+        return DoubleArgument.<C>builder(name).build();
     }
 
     /**
@@ -177,27 +149,18 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         }
 
         /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        @API(status = API.Status.STABLE, since = "1.5.0")
-        public @NonNull Builder<C> asOptionalWithDefault(final double defaultValue) {
-            return (Builder<C>) this.asOptionalWithDefault(Double.toString(defaultValue));
-        }
-
-        /**
          * Builder a new double argument
          *
          * @return Constructed argument
          */
         @Override
         public @NonNull DoubleArgument<C> build() {
-            return new DoubleArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new DoubleArgument<>(
+                    this.getName(),
+                    this.min,
+                    this.max,
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
             );
         }
     }

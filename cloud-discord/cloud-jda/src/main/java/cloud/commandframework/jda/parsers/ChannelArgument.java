@@ -53,19 +53,15 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
     private final Set<ParserMode> modes;
 
     private ChannelArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
         super(
-                required,
                 name,
                 new MessageParser<>(modes),
-                defaultValue,
                 MessageChannel.class,
                 suggestionsProvider,
                 defaultDescription
@@ -108,18 +104,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, MessageChannel> of(final @NonNull String name) {
-        return ChannelArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command component
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created component
-     */
-    public static <C> @NonNull CommandArgument<C, MessageChannel> optional(final @NonNull String name) {
-        return ChannelArgument.<C>builder(name).asOptional().build();
+        return ChannelArgument.<C>builder(name).build();
     }
 
     /**
@@ -166,9 +151,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
         @Override
         public @NonNull ChannelArgument<C> build() {
             return new ChannelArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription(),
                     this.modes

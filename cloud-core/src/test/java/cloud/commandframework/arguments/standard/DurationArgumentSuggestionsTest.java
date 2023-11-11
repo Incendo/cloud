@@ -42,7 +42,7 @@ public class DurationArgumentSuggestionsTest {
     static void setupManager() {
         manager = createManager();
         manager.command(manager.commandBuilder("duration")
-                .argument(DurationArgument.of("duration")));
+                .required(DurationArgument.of("duration")));
     }
 
 

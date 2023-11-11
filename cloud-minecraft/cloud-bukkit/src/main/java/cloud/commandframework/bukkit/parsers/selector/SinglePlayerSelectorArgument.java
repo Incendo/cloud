@@ -51,18 +51,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, SinglePlayerSelector> {
 
     private SinglePlayerSelectorArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new SinglePlayerSelectorParser<>(),
-                defaultValue,
                 SinglePlayerSelector.class,
                 suggestionsProvider,
                 defaultDescription
@@ -104,33 +100,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @return Created argument
      */
     public static <C> @NonNull SinglePlayerSelectorArgument<C> of(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required command argument with a default value
-     *
-     * @param name                  Argument name
-     * @param defaultEntitySelector Default player
-     * @param <C>                   Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull String defaultEntitySelector
-    ) {
-        return SinglePlayerSelectorArgument.<C>builder(name).asOptionalWithDefault(defaultEntitySelector).build();
+        return SinglePlayerSelectorArgument.<C>builder(name).build();
     }
 
 
@@ -148,9 +118,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         @Override
         public @NonNull SinglePlayerSelectorArgument<C> build() {
             return new SinglePlayerSelectorArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

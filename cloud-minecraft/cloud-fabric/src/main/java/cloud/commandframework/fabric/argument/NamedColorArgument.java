@@ -42,17 +42,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class NamedColorArgument<C> extends CommandArgument<C, ChatFormatting> {
 
     NamedColorArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ColorArgument.color()),
-                defaultValue,
                 ChatFormatting.class,
                 suggestionsProvider,
                 defaultDescription
@@ -80,35 +76,7 @@ public final class NamedColorArgument<C> extends CommandArgument<C, ChatFormatti
      * @since 1.5.0
      */
     public static <C> @NonNull NamedColorArgument<C> of(final @NonNull String name) {
-        return NamedColorArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link NamedColorArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created component
-     * @since 1.5.0
-     */
-    public static <C> @NonNull NamedColorArgument<C> optional(final @NonNull String name) {
-        return NamedColorArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link NamedColorArgument} with the specified default value.
-     *
-     * @param name         Component name
-     * @param defaultColor Default colour, must be {@link ChatFormatting#isColor() a color}
-     * @param <C>          Command sender type
-     * @return Created component
-     * @since 1.5.0
-     */
-    public static <C> @NonNull NamedColorArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull ChatFormatting defaultColor
-    ) {
-        return NamedColorArgument.<C>builder(name).asOptionalWithDefault(defaultColor).build();
+        return NamedColorArgument.<C>builder(name).build();
     }
 
 
@@ -133,27 +101,10 @@ public final class NamedColorArgument<C> extends CommandArgument<C, ChatFormatti
         @Override
         public @NonNull NamedColorArgument<C> build() {
             return new NamedColorArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultColor default value, must be {@link ChatFormatting#isColor() a color}
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ChatFormatting defaultColor) {
-            if (!defaultColor.isColor()) {
-                throw new IllegalArgumentException("Only color types are allowed but " + defaultColor + " was provided");
-            }
-            return this.asOptionalWithDefault(defaultColor.toString());
         }
     }
 }

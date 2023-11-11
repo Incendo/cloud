@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.meta.CommandMeta;
 import java.util.ArrayList;
@@ -67,12 +66,12 @@ public final class CommandHelpHandler<C> {
                 continue;
             }
 
-            final List<CommandArgument<C, ?>> arguments = command.getArguments();
+            final List<CommandComponent<C>> components = command.components();
             final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
             syntaxHints.add(new VerboseHelpEntry<>(
                     command,
                     this.commandManager.commandSyntaxFormatter()
-                            .apply(arguments, null),
+                            .apply(components, null),
                     description
             ));
         }
@@ -90,7 +89,7 @@ public final class CommandHelpHandler<C> {
     public @NonNull List<@NonNull String> getLongestSharedChains() {
         final List<String> chains = new ArrayList<>();
         this.commandManager.commandTree().getRootNodes().forEach(node ->
-                chains.add(Objects.requireNonNull(node.getValue())
+                chains.add(Objects.requireNonNull(node.argument())
                         .getName() + this.commandManager
                         .commandSyntaxFormatter()
                         .apply(
@@ -156,8 +155,8 @@ public final class CommandHelpHandler<C> {
 
         for (final VerboseHelpEntry<C> entry : commands) {
             final Command<C> command = entry.getCommand();
-            @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) command.getArguments()
-                    .get(0);
+            @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) command.components()
+                    .get(0).argument();
             for (final String alias : staticArgument.getAliases()) {
                 if (alias.toLowerCase(Locale.ENGLISH).startsWith(rootFragment.toLowerCase(Locale.ENGLISH))) {
                     availableCommands.add(command);
@@ -188,12 +187,12 @@ public final class CommandHelpHandler<C> {
         } else if (!exactMatch || availableCommandLabels.size() > 1) {
             final List<VerboseHelpEntry<C>> syntaxHints = new ArrayList<>();
             for (final Command<C> command : availableCommands) {
-                final List<CommandArgument<C, ?>> arguments = command.getArguments();
+                final List<CommandComponent<C>> components = command.components();
                 final String description = command.getCommandMeta().getOrDefault(CommandMeta.DESCRIPTION, "");
                 syntaxHints.add(new VerboseHelpEntry<>(
                         command,
                         this.commandManager.commandSyntaxFormatter()
-                                .apply(arguments, null),
+                                .apply(components, null),
                         description
                 ));
             }
@@ -204,43 +203,43 @@ public final class CommandHelpHandler<C> {
         }
 
         /* Traverse command to find the most specific help topic */
-        final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager.commandTree()
+        final CommandTree.CommandNode<C> node = this.commandManager.commandTree()
                 .getNamedNode(availableCommandLabels.iterator().next());
 
-        final List<CommandArgument<C, ?>> traversedNodes = new LinkedList<>();
-        CommandTree.Node<CommandArgument<C, ?>> head = node;
+        final List<CommandComponent<C>> traversedNodes = new LinkedList<>();
+        CommandTree.CommandNode<C> head = node;
         int index = 0;
 
         outer:
         while (head != null && this.isNodeVisible(head)) {
             ++index;
-            traversedNodes.add(head.getValue());
+            traversedNodes.add(head.component());
 
-            if (head.getValue() != null && head.getValue().getOwningCommand() != null) {
+            if (head.component() != null && head.argument().getOwningCommand() != null) {
                 if (head.isLeaf() || index == queryFragments.length) {
-                    if (recipient == null || this.commandManager.hasPermission(recipient, head.getValue()
+                    if (recipient == null || this.commandManager.hasPermission(recipient, head.argument()
                             .getOwningCommand()
                             .getCommandPermission())) {
-                        return new VerboseHelpTopic<>(head.getValue().getOwningCommand());
+                        return new VerboseHelpTopic<>(head.argument().getOwningCommand());
                     }
                 }
             }
 
-            if (head.getChildren().size() == 1) {
-                head = head.getChildren().get(0);
+            if (head.children().size() == 1) {
+                head = head.children().get(0);
             } else {
                 if (index < queryFragments.length) {
                     /* We might still be able to match an argument */
-                    CommandTree.Node<CommandArgument<C, ?>> potentialVariable = null;
-                    for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
-                        if (!(child.getValue() instanceof StaticArgument)) {
-                            if (child.getValue() != null) {
+                    CommandTree.CommandNode<C> potentialVariable = null;
+                    for (final CommandTree.CommandNode<C> child : head.children()) {
+                        if (!(child.argument() instanceof StaticArgument)) {
+                            if (child.argument() != null) {
                                 potentialVariable = child;
                             }
                             continue;
                         }
                         @SuppressWarnings("unchecked") final StaticArgument<C> childArgument = (StaticArgument<C>) child
-                                .getValue();
+                                .argument();
                         for (final String childAlias : childArgument.getAliases()) {
                             if (childAlias.equalsIgnoreCase(queryFragments[index])) {
                                 head = child;
@@ -256,21 +255,21 @@ public final class CommandHelpHandler<C> {
                 final String currentDescription = this.commandManager.commandSyntaxFormatter().apply(traversedNodes, null);
                 /* Attempt to parse the longest possible description for the children */
                 final List<String> childSuggestions = new LinkedList<>();
-                for (final CommandTree.Node<CommandArgument<C, ?>> child : head.getChildren()) {
+                for (final CommandTree.CommandNode<C> child : head.children()) {
                     /* Check filtered by predicate */
                     if (!this.isNodeVisible(child)) {
                         continue;
                     }
 
-                    final List<CommandArgument<C, ?>> traversedNodesSub = new LinkedList<>(traversedNodes);
+                    final List<CommandComponent<C>> traversedNodesSub = new LinkedList<>(traversedNodes);
                     if (recipient == null
-                            || child.getValue() == null
-                            || child.getValue().getOwningCommand() == null
+                            || child.argument() == null
+                            || child.argument().getOwningCommand() == null
                             || this.commandManager.hasPermission(
                             recipient,
-                            child.getValue().getOwningCommand().getCommandPermission()
+                            child.argument().getOwningCommand().getCommandPermission()
                     )) {
-                        traversedNodesSub.add(child.getValue());
+                        traversedNodesSub.add(child.component());
                         childSuggestions.add(this.commandManager.commandSyntaxFormatter().apply(traversedNodesSub, child));
                     }
                 }
@@ -283,19 +282,19 @@ public final class CommandHelpHandler<C> {
 
     /* Checks using the predicate whether a command node or one of its children is visible */
     private boolean isNodeVisible(
-            final CommandTree.@NonNull Node<CommandArgument<C, ?>> node
+            final CommandTree.@NonNull CommandNode<C> node
     ) {
         /* Check node is itself a command that is visible */
-        final CommandArgument<C, ?> argument = node.getValue();
-        if (argument != null) {
-            final Command<C> owningCommand = argument.getOwningCommand();
+        final CommandComponent<C> component = node.component();
+        if (component != null) {
+            final Command<C> owningCommand = component.argument().getOwningCommand();
             if (owningCommand != null && this.commandPredicate.test(owningCommand)) {
                 return true;
             }
         }
 
         /* Query the children recursively */
-        for (CommandTree.Node<CommandArgument<C, ?>> childNode : node.getChildren()) {
+        for (CommandTree.CommandNode<C> childNode : node.children()) {
             if (this.isNodeVisible(childNode)) {
                 return true;
             }

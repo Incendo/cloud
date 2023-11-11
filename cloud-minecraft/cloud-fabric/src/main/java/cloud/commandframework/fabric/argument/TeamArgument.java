@@ -51,17 +51,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
 
     TeamArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new TeamParser<>(),
-                defaultValue,
                 PlayerTeam.class,
                 suggestionsProvider,
                 defaultDescription
@@ -89,36 +85,9 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
      * @since 1.5.0
      */
     public static <C> @NonNull TeamArgument<C> of(final @NonNull String name) {
-        return TeamArgument.<C>builder(name).asRequired().build();
+        return TeamArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link TeamArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull TeamArgument<C> optional(final @NonNull String name) {
-        return TeamArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link TeamArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull TeamArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull PlayerTeam defaultValue
-    ) {
-        return TeamArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
-    }
 
     /**
      * Argument parser for {@link PlayerTeam Teams}.
@@ -175,6 +144,7 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
         }
     }
 
+
     /**
      * Builder for {@link TeamArgument}.
      *
@@ -196,24 +166,10 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
         @Override
         public @NonNull TeamArgument<C> build() {
             return new TeamArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull PlayerTeam defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.getName());
         }
     }
 

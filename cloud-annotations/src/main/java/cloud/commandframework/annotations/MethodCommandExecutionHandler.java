@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.injection.ParameterInjectorRegistry;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.FlagContext;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.CommandExecutionException;
@@ -116,8 +116,8 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                     argumentName = this.annotationParser.processString(argument.value());
                 }
 
-                final CommandArgument<C, ?> commandArgument = this.context.commandArguments.get(argumentName);
-                if (commandArgument.isRequired()) {
+                final CommandComponent<C> commandComponent = this.context.commandComponents.get(argumentName);
+                if (commandComponent.required()) {
                     arguments.add(commandContext.get(argumentName));
                 } else {
                     final Object optional = commandContext.getOptional(argumentName).orElse(null);
@@ -207,19 +207,19 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
     public static class CommandMethodContext<C> {
 
         private final Object instance;
-        private final Map<String, CommandArgument<C, ?>> commandArguments;
+        private final Map<String, CommandComponent<C>> commandComponents;
         private final Method method;
         private final ParameterInjectorRegistry<C> injectorRegistry;
         private final AnnotationParser<C> annotationParser;
 
         CommandMethodContext(
                 final @NonNull Object instance,
-                final @NonNull Map<@NonNull String, @NonNull CommandArgument<@NonNull C, @NonNull ?>> commandArguments,
+                final @NonNull Map<@NonNull String, @NonNull CommandComponent<C>> commandComponents,
                 final @NonNull Method method,
                 final @NonNull AnnotationParser<C> annotationParser
         ) {
             this.instance = instance;
-            this.commandArguments = commandArguments;
+            this.commandComponents = commandComponents;
             this.method = method;
             this.method.setAccessible(true);
             this.injectorRegistry = annotationParser.getParameterInjectorRegistry();
@@ -250,10 +250,10 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
          * The compiled command arguments
          *
          * @return Compiled command arguments
-         * @since 1.6.0
+         * @since 2.0.0
          */
-        public final @NonNull Map<@NonNull String, @NonNull CommandArgument<C, ?>> commandArguments() {
-            return this.commandArguments;
+        public final @NonNull Map<@NonNull String, @NonNull CommandComponent<C>> commandComponents() {
+            return this.commandComponents;
         }
 
         /**

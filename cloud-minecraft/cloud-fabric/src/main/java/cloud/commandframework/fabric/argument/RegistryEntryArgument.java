@@ -64,19 +64,15 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
     private static final String NAMESPACE_MINECRAFT = "minecraft";
 
     RegistryEntryArgument(
-            final boolean required,
             final @NonNull String name,
             final @NonNull ResourceKey<? extends Registry<V>> registry,
-            final @NonNull String defaultValue,
             final @NonNull TypeToken<V> valueType,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new Parser<>(registry),
-                defaultValue,
                 valueType,
                 suggestionsProvider,
                 defaultDescription
@@ -137,50 +133,9 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final @NonNull Class<V> type,
             final @NonNull ResourceKey<? extends Registry<V>> registry
     ) {
-        return RegistryEntryArgument.<C, V>newBuilder(name, type, registry).asRequired().build();
+        return RegistryEntryArgument.<C, V>newBuilder(name, type, registry).build();
     }
 
-    /**
-     * Create a new optional {@link RegistryEntryArgument}.
-     *
-     * @param name     Argument name
-     * @param type     The type of registry entry
-     * @param registry A key for the registry to get values from
-     * @param <C>      Command sender type
-     * @param <V>      Registry entry type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
-            final @NonNull String name,
-            final @NonNull Class<V> type,
-            final @NonNull ResourceKey<? extends Registry<V>> registry
-    ) {
-        return RegistryEntryArgument.<C, V>newBuilder(name, type, registry).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link RegistryEntryArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param type         The type of registry entry
-     * @param registry     A key for the registry to get values from
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @param <V>          Registry entry type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C, V> @NonNull RegistryEntryArgument<C, V> optional(
-            final @NonNull String name,
-            final @NonNull Class<V> type,
-            final @NonNull ResourceKey<? extends Registry<V>> registry,
-            final @NonNull ResourceKey<V> defaultValue
-    ) {
-        return RegistryEntryArgument.<C, V>newBuilder(name, type, registry)
-                .asOptionalWithDefault(defaultValue)
-                .build();
-    }
 
     /**
      * A parser for values stored in a {@link Registry}.
@@ -304,26 +259,12 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         @Override
         public @NonNull RegistryEntryArgument<@NonNull C, @NonNull V> build() {
             return new RegistryEntryArgument<>(
-                    this.isRequired(),
                     this.getName(),
                     this.registryIdent,
-                    this.getDefaultValue(),
                     this.getValueType(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C, V> asOptionalWithDefault(final @NonNull ResourceKey<V> defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.location().toString());
         }
     }
 

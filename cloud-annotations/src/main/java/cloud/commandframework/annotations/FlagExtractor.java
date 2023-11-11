@@ -122,7 +122,7 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                         parameter.getType(),
                         flagName
                 );
-                final CommandArgument.Builder argumentBuilder = argumentBuilder0.asRequired()
+                final CommandArgument.Builder argumentBuilder = argumentBuilder0
                         .manager(this.commandManager)
                         .withParser(parser);
                 final CommandArgument argument;

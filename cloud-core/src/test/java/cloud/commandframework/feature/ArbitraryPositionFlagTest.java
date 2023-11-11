@@ -53,7 +53,7 @@ class ArbitraryPositionFlagTest {
         this.commandManager.command(
                 this.commandManager.commandBuilder("test")
                         .literal("literal")
-                        .argument(StringArgument.greedyFlagYielding("text"))
+                        .required(StringArgument.greedyFlagYielding("text"))
                         .flag(this.commandManager.flagBuilder("flag").withAliases("f")));
     }
 

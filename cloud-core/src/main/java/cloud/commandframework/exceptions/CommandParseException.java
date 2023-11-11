@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.exceptions;
 
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import java.util.Collections;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -38,7 +38,7 @@ public class CommandParseException extends IllegalArgumentException {
 
     private static final long serialVersionUID = -2415981126382517435L;
     private final Object commandSender;
-    private final List<CommandArgument<?, ?>> currentChain;
+    private final List<CommandComponent<?>> currentChain;
 
     /**
      * Construct a new command parse exception
@@ -49,7 +49,7 @@ public class CommandParseException extends IllegalArgumentException {
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     protected CommandParseException(
             final @NonNull Object commandSender,
-            final @NonNull List<CommandArgument<?, ?>> currentChain
+            final @NonNull List<CommandComponent<?>> currentChain
     ) {
         this.commandSender = commandSender;
         this.currentChain = currentChain;
@@ -69,7 +69,7 @@ public class CommandParseException extends IllegalArgumentException {
      *
      * @return Unmodifiable list of command arguments
      */
-    public @NonNull List<@NonNull CommandArgument<?, ?>> getCurrentChain() {
+    public @NonNull List<@NonNull CommandComponent<?>> getCurrentChain() {
         return Collections.unmodifiableList(this.currentChain);
     }
 }
