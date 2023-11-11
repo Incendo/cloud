@@ -27,12 +27,12 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import io.leangen.geantyref.TypeToken;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -50,7 +50,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
 
     private StringArrayArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final boolean flagYielding
     ) {
@@ -58,7 +58,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
                 name,
                 new StringArrayParser<>(flagYielding),
                 TypeToken.get(String[].class),
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -66,18 +66,18 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
     /**
      * Create a new required string array argument
      *
-     * @param name                Argument name
-     * @param suggestionsProvider Suggestions provider
-     * @param <C>                 Command sender type
+     * @param name               Argument name
+     * @param suggestionProvider Suggestion provider
+     * @param <C>                Command sender type
      * @return Created argument
      */
     public static <C> @NonNull StringArrayArgument<C> of(
             final @NonNull String name,
-            final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+            final @NonNull SuggestionProvider<C> suggestionProvider
     ) {
         return new StringArrayArgument<>(
                 name,
-                suggestionsProvider,
+                suggestionProvider,
                 ArgumentDescription.empty(),
                 false /* flagYielding */
         );
@@ -86,10 +86,10 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
     /**
      * Create a new required string array argument
      *
-     * @param name                Argument name
-     * @param flagYielding        Whether the parser should stop parsing when encountering a potential flag
-     * @param suggestionsProvider Suggestions provider
-     * @param <C>                 Command sender type
+     * @param name               Argument name
+     * @param flagYielding       Whether the parser should stop parsing when encountering a potential flag
+     * @param suggestionProvider Suggestion provider
+     * @param <C>                Command sender type
      * @return Created argument
      * @since 1.7.0
      */
@@ -97,11 +97,11 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
     public static <C> @NonNull StringArrayArgument<C> of(
             final @NonNull String name,
             final boolean flagYielding,
-            final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
+            final @NonNull SuggestionProvider<C> suggestionProvider
     ) {
         return new StringArrayArgument<>(
                 name,
-                suggestionsProvider,
+                suggestionProvider,
                 ArgumentDescription.empty(),
                 flagYielding
         );

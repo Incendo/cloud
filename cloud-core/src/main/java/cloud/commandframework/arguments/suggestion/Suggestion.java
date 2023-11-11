@@ -21,36 +21,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-final class DelegatingSuggestionsProvider<C> implements BiFunction<@NonNull CommandContext<C>,
-        @NonNull String, @NonNull List<String>> {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface Suggestion {
 
-    private final String argumentName;
-    private final ArgumentParser<C, ?> parser;
-
-    DelegatingSuggestionsProvider(final @NonNull String argumentName, final @NonNull ArgumentParser<C, ?> parser) {
-        this.argumentName = argumentName;
-        this.parser = parser;
+    /**
+     * Returns a simple suggestion that returns the given {@code suggestion}
+     *
+     * @param suggestion the suggestion string
+     * @return the created suggestion
+     */
+    static @NonNull Suggestion simple(final @NonNull String suggestion) {
+        return new SimpleSuggestion(suggestion);
     }
 
-    @Override
-    public @NonNull List<@NonNull String> apply(final @NonNull CommandContext<C> context, final @NonNull String s) {
-        return this.parser.suggestions(context, s);
-    }
+    /**
+     * Returns a string representation of this suggestion, which can be parsed by the parser that suggested it
+     *
+     * @return the suggestions
+     */
+    @NonNull String suggestion();
 
-    @Override
-    public String toString() {
-        return String.format("DelegatingSuggestionsProvider{name='%s',parser='%s'}", this.argumentName,
-                this.parser.getClass().getCanonicalName()
-        );
-    }
+    /**
+     * Returns a copy of this suggestion instance using the given {@code suggestion}
+     *
+     * @param suggestion the suggestion string
+     * @return the new suggestion
+     */
+    @NonNull Suggestion withSuggestion(@NonNull String suggestion);
 }

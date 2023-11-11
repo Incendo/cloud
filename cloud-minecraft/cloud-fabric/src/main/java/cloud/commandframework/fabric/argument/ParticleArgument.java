@@ -25,9 +25,7 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.function.BiFunction;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import net.minecraft.core.particles.ParticleOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -42,14 +40,14 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
 
     ParticleArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 FabricArgumentParsers.contextual(net.minecraft.commands.arguments.ParticleArgument::particle),
                 ParticleOptions.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -101,7 +99,7 @@ public final class ParticleArgument<C> extends CommandArgument<C, ParticleOption
         public @NonNull ParticleArgument<C> build() {
             return new ParticleArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

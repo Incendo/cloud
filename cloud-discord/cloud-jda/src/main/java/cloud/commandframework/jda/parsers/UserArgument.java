@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.Collections;
@@ -34,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -58,8 +58,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     private UserArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes,
             final @NonNull Isolation isolationLevel
@@ -68,7 +67,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                 name,
                 new UserParser<>(modes, isolationLevel),
                 User.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
         this.modes = modes;
@@ -186,7 +185,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         public @NonNull UserArgument<C> build() {
             return new UserArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription(),
                     this.modes,
                     this.isolationLevel

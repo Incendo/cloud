@@ -27,15 +27,14 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.pircbotx.PircBotXCommandManager;
 import io.leangen.geantyref.TypeToken;
-import java.util.List;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -53,15 +52,14 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
     private UserArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new UserArgumentParser<>(),
                 TypeToken.get(User.class),
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -120,7 +118,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         public @NonNull CommandArgument<@NonNull C, @NonNull User> build() {
             return new UserArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

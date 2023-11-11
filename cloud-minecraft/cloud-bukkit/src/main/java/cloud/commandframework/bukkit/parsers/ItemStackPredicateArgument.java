@@ -27,6 +27,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.ItemStackPredicate;
@@ -43,7 +45,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -65,11 +66,10 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
 
     private ItemStackPredicateArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new Parser<>(), ItemStackPredicate.class, suggestionsProvider, defaultDescription);
+        super(name, new Parser<>(), ItemStackPredicate.class, suggestionProvider, defaultDescription);
     }
 
     /**
@@ -113,7 +113,7 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
         public @NonNull ItemStackPredicateArgument<C> build() {
             return new ItemStackPredicateArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }
@@ -222,7 +222,7 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

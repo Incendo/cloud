@@ -33,7 +33,7 @@ import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
 import cloud.commandframework.annotations.specifier.Completions;
-import cloud.commandframework.annotations.suggestions.MethodSuggestionsProvider;
+import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
@@ -43,6 +43,8 @@ import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionHandler;
@@ -464,7 +466,7 @@ public final class AnnotationParser<C> {
             try {
                 this.manager.parserRegistry().registerSuggestionProvider(
                         this.processString(suggestions.value()),
-                        new MethodSuggestionsProvider<>(instance, method)
+                        new MethodSuggestionProvider<>(instance, method)
                 );
             } catch (final Exception e) {
                 throw new RuntimeException(e);
@@ -495,20 +497,20 @@ public final class AnnotationParser<C> {
             }
             try {
                 final String suggestions = this.processString(parser.suggestions());
-                final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
+                final SuggestionProvider<C> suggestionProvider;
                 if (suggestions.isEmpty()) {
-                    suggestionsProvider = (context, input) -> Collections.emptyList();
+                    suggestionProvider = (context, input) -> Collections.emptyList();
                 } else {
-                    suggestionsProvider = this.manager.parserRegistry().getSuggestionProvider(suggestions)
+                    suggestionProvider = this.manager.parserRegistry().getSuggestionProvider(suggestions)
                             .orElseThrow(() -> new NullPointerException(
                                     String.format(
-                                            "Cannot find the suggestions provider with name '%s'",
+                                            "Cannot find the suggestion provider with name '%s'",
                                             suggestions
                                     )
                             ));
                 }
                 final MethodArgumentParser<C, ?> methodArgumentParser = new MethodArgumentParser<>(
-                        suggestionsProvider,
+                        suggestionProvider,
                         instance,
                         method
                 );
@@ -748,15 +750,15 @@ public final class AnnotationParser<C> {
         /* Check for Completions annotation */
         final Completions completions = parameter.getDeclaredAnnotation(Completions.class);
         if (completions != null) {
-            final List<String> suggestions = Arrays.asList(
+            final List<Suggestion> suggestions = Arrays.stream(
                     completions.value().replace(" ", "").split(",")
-            );
-            argumentBuilder.withSuggestionsProvider((commandContext, input) -> suggestions);
-        } else if (!argument.suggestions().isEmpty()) { /* Check whether or not a suggestion provider should be set */
+            ).map(Suggestion::simple).collect(Collectors.toList());
+            argumentBuilder.withSuggestionProvider((commandContext, input) -> suggestions);
+        } else if (!argument.suggestions().isEmpty()) { /* Check whether a suggestion provider should be set */
             final String suggestionProviderName = this.processString(argument.suggestions());
-            final Optional<BiFunction<CommandContext<C>, String, List<String>>> suggestionsFunction =
+            final Optional<SuggestionProvider<C>> suggestionsFunction =
                     this.manager.parserRegistry().getSuggestionProvider(suggestionProviderName);
-            argumentBuilder.withSuggestionsProvider(
+            argumentBuilder.withSuggestionProvider(
                     suggestionsFunction.orElseThrow(() ->
                             new IllegalArgumentException(String.format(
                                     "There is no suggestion provider with name '%s'. Did you forget to register it?",

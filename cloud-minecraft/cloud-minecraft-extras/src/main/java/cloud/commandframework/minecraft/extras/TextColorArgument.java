@@ -150,7 +150,7 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext, final @NonNull String input
         ) {
             final List<String> suggestions = new LinkedList<>();

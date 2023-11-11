@@ -25,9 +25,7 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.function.BiFunction;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -43,14 +41,14 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
 
     ItemInputArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 FabricArgumentParsers.contextual(ItemArgument::item),
                 ItemInput.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -102,7 +100,7 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
         public @NonNull ItemInputArgument<C> build() {
             return new ItemInputArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

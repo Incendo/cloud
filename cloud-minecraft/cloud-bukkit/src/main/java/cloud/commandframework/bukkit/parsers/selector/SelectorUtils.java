@@ -25,6 +25,7 @@ package cloud.commandframework.bukkit.parsers.selector;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
@@ -175,7 +176,7 @@ final class SelectorUtils {
             ));
         }
 
-        protected List<String> legacySuggestions(
+        protected @NonNull List<@NonNull Suggestion> legacySuggestions(
                 final CommandContext<C> commandContext,
                 final String input
         ) {
@@ -194,9 +195,9 @@ final class SelectorUtils {
         }
 
         @Override
-        public List<String> suggestions(
-                final CommandContext<C> commandContext,
-                final String input
+        public List<@NonNull Suggestion> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
         ) {
             if (this.modernParser != null) {
                 return this.modernParser.suggestions(commandContext, input);
@@ -245,18 +246,18 @@ final class SelectorUtils {
         }
 
         @Override
-        protected List<String> legacySuggestions(
+        protected @NonNull List<@NonNull Suggestion> legacySuggestions(
                 final CommandContext<C> commandContext,
                 final String input
         ) {
-            final List<String> suggestions = new ArrayList<>();
+            final List<Suggestion> suggestions = new ArrayList<>();
 
             for (final Player player : Bukkit.getOnlinePlayers()) {
                 final CommandSender bukkit = commandContext.get(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER);
                 if (bukkit instanceof Player && !((Player) bukkit).canSee(player)) {
                     continue;
                 }
-                suggestions.add(player.getName());
+                suggestions.add(Suggestion.simple(player.getName()));
             }
 
             return suggestions;
@@ -306,9 +307,9 @@ final class SelectorUtils {
         }
 
         @Override
-        public List<String> suggestions(
-                final CommandContext<C> commandContext,
-                final String input
+        public List<@NonNull Suggestion> suggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
         ) {
             final Object commandSourceStack = commandContext.get(WrappedBrigadierParser.COMMAND_CONTEXT_BRIGADIER_NATIVE_SENDER);
             final @Nullable Field bypassField =

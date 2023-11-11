@@ -26,14 +26,13 @@ package cloud.commandframework.bukkit.parsers.selector;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.arguments.selector.SinglePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
 import com.google.common.collect.ImmutableList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -52,15 +51,14 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
 
     private SinglePlayerSelectorArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new SinglePlayerSelectorParser<>(),
                 SinglePlayerSelector.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -119,7 +117,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         public @NonNull SinglePlayerSelectorArgument<C> build() {
             return new SinglePlayerSelectorArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

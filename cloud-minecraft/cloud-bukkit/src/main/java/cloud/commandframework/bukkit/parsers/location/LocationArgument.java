@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.Caption;
@@ -62,7 +63,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
 
     private LocationArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>,
                     @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
@@ -71,7 +72,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                 name,
                 new LocationParser<>(),
                 TypeToken.get(Location.class),
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription,
                 argumentPreprocessors
         );
@@ -133,7 +134,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
         public @NonNull CommandArgument<@NonNull C, @NonNull Location> build() {
             return new LocationArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()
             );
@@ -263,7 +264,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

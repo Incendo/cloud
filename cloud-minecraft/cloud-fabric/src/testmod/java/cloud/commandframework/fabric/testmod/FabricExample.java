@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricServerCommandManager;
 import cloud.commandframework.fabric.argument.ItemInputArgument;
@@ -201,9 +202,10 @@ public final class FabricExample implements ModInitializer {
         }));
 
         final CommandArgument<CommandSourceStack, ModMetadata> modMetadata = manager.argumentBuilder(ModMetadata.class, "mod")
-                .withSuggestionsProvider((ctx, input) -> FabricLoader.getInstance().getAllMods().stream()
+                .withSuggestionProvider((ctx, input) -> FabricLoader.getInstance().getAllMods().stream()
                         .map(ModContainer::getMetadata)
                         .map(ModMetadata::getId)
+                        .map(Suggestion::simple)
                         .collect(Collectors.toList()))
                 .withParser((ctx, inputQueue) -> {
                     final ModMetadata meta = FabricLoader.getInstance().getModContainer(inputQueue.peek())

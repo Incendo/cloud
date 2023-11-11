@@ -25,11 +25,9 @@ package cloud.commandframework.fabric.argument.server;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.SingleEntitySelector;
-import java.util.List;
-import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,14 +42,14 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
 
     SingleEntitySelectorArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 FabricArgumentParsers.singleEntitySelector(),
                 SingleEntitySelector.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -103,7 +101,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
         public @NonNull SingleEntitySelectorArgument<C> build() {
             return new SingleEntitySelectorArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

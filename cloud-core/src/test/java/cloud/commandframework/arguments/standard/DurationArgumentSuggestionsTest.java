@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.ArgumentTestHelper.suggestionList;
 import static cloud.commandframework.util.TestUtils.createManager;
 
 public class DurationArgumentSuggestionsTest {
@@ -49,41 +51,41 @@ public class DurationArgumentSuggestionsTest {
     @Test
     void testDurationSuggestions() {
         final String input = "duration ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
 
         final String input2 = "duration 1";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("1d", "1h", "1m", "1s"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("1d", "1h", "1m", "1s"), suggestions2);
 
         final String input3 = "duration 1d";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.emptyList(), suggestions3);
 
         final String input4 = "duration 1d2";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertTrue(suggestions4.containsAll(Arrays.asList("1d2h", "1d2m", "1d2s")));
-        Assertions.assertFalse(suggestions4.contains("1d2d"));
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertTrue(suggestions4.containsAll(suggestionList("1d2h", "1d2m", "1d2s")));
+        Assertions.assertFalse(suggestions4.contains(Suggestion.simple("1d2d")));
 
         final String input9 = "duration 1d22";
-        final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
-        Assertions.assertTrue(suggestions9.containsAll(Arrays.asList("1d22h", "1d22m", "1d22s")));
-        Assertions.assertFalse(suggestions9.contains("1d22d"));
+        final List<Suggestion> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        Assertions.assertTrue(suggestions9.containsAll(suggestionList("1d22h", "1d22m", "1d22s")));
+        Assertions.assertFalse(suggestions9.contains(Suggestion.simple("1d22d")));
 
         final String input5 = "duration d";
-        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);
         Assertions.assertEquals(Collections.emptyList(), suggestions5);
 
         final String input6 = "duration 1d2d";
-        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        final List<Suggestion> suggestions6 = manager.suggest(new TestCommandSender(), input6);
         Assertions.assertEquals(Collections.emptyList(), suggestions6);
 
         final String input7 = "duration 1d2h3m4s";
-        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        final List<Suggestion> suggestions7 = manager.suggest(new TestCommandSender(), input7);
         Assertions.assertEquals(Collections.emptyList(), suggestions7);
 
         final String input8 = "duration dd";
-        final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
+        final List<Suggestion> suggestions8 = manager.suggest(new TestCommandSender(), input8);
         Assertions.assertEquals(Collections.emptyList(), suggestions8);
     }
 }

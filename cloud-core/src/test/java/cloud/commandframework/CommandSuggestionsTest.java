@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.BooleanArgument;
@@ -32,22 +31,21 @@ import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.ArgumentTestHelper.suggestionList;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 
-public class CommandSuggestionsTest {
+class CommandSuggestionsTest {
 
     private static CommandManager<TestCommandSender> manager;
 
@@ -59,18 +57,18 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("test")
                 .literal("var")
                 .required(StringArgument.<TestCommandSender>builder("str")
-                        .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two")))
+                        .withSuggestionProvider((c, s) -> suggestionList("one", "two")))
                 .required(EnumArgument.of(TestEnum.class, "enum")));
         manager.command(manager.commandBuilder("test")
                 .literal("comb")
                 .required(StringArgument.<TestCommandSender>builder("str")
-                        .withSuggestionsProvider((c, s) -> Arrays.asList("one", "two")))
+                        .withSuggestionProvider((c, s) -> suggestionList("one", "two")))
                 .optional(IntegerArgument.<TestCommandSender>builder("num")
                         .withMin(1).withMax(95)));
         manager.command(manager.commandBuilder("test")
                 .literal("alt")
                 .required(IntegerArgument.<TestCommandSender>builder("num")
-                        .withSuggestionsProvider((c, s) -> Arrays.asList("3", "33", "333"))));
+                        .withSuggestionProvider((c, s) -> suggestionList("3", "33", "333"))));
 
         manager.command(manager.commandBuilder("com")
                 .requiredArgumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
@@ -122,7 +120,7 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("partial")
                 .required(
                         StringArgument.<TestCommandSender>builder("arg")
-                                .withSuggestionsProvider((contect, input) -> Arrays.asList("hi", "hey", "heya", "hai", "hello"))
+                                .withSuggestionProvider((contect, input) -> suggestionList("hi", "hey", "heya", "hai", "hello"))
                 )
                 .literal("literal")
                 .build());
@@ -130,7 +128,7 @@ public class CommandSuggestionsTest {
         manager.command(manager.commandBuilder("literal_with_variable")
                 .required(
                         StringArgument.<TestCommandSender>builder("arg")
-                                .withSuggestionsProvider((context, input) -> Arrays.asList("veni", "vidi")).build()
+                                .withSuggestionProvider((context, input) -> suggestionList("veni", "vidi")).build()
                 )
                 .literal("now"));
         manager.command(manager.commandBuilder("literal_with_variable")
@@ -153,196 +151,196 @@ public class CommandSuggestionsTest {
     @Test
     void testRootAliases() {
         final String input = "test ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
         final String input2 = "testalias ";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
         Assertions.assertEquals(suggestions, suggestions2);
     }
 
     @Test
     void testSimple() {
         final String input = "test";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
         Assertions.assertTrue(suggestions.isEmpty());
         final String input2 = "test ";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("alt", "comb", "one", "two", "var"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("alt", "comb", "one", "two", "var"), suggestions2);
         final String input3 = "test a";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Collections.singletonList("alt"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("alt"), suggestions3);
     }
 
     @Test
     void testVar() {
         final String input = "test var";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
         Assertions.assertTrue(suggestions.isEmpty());
         final String input2 = "test var one";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Collections.singletonList("one"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("one"), suggestions2);
         final String input3 = "test var one f";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Collections.singletonList("foo"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("foo"), suggestions3);
         final String input4 = "test var one ";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(suggestionList("foo", "bar"), suggestions4);
     }
 
     @Test
     void testEmpty() {
         final String input = "kenny";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
         Assertions.assertTrue(suggestions.isEmpty());
     }
 
     @Test
     void testComb() {
         final String input = "test comb ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("one", "two"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("one", "two"), suggestions);
         final String input2 = "test comb one ";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions2);
         final String input3 = "test comb one 9";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Arrays.asList("9", "90", "91", "92", "93", "94", "95"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("9", "90", "91", "92", "93", "94", "95"), suggestions3);
     }
 
     @Test
     void testAltered() {
         final String input = "test alt ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("3", "33", "333"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("3", "33", "333"), suggestions);
     }
 
     @Test
     void testCompound() {
         final String input = "com ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
         final String input2 = "com 1 ";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("foo", "bar"), suggestions2);
         final String input3 = "com 1 foo ";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions3);
         final String input4 = "com2 1 ";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(suggestionList("foo", "bar"), suggestions4);
     }
 
     @Test
     void testFlags() {
         final String input = "flags 10 ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("--enum", "--static"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("--enum", "--static"), suggestions);
         final String input2 = "flags 10 --enum ";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("foo", "bar"), suggestions2);
         final String input3 = "flags 10 --enum foo ";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Collections.singletonList("--static"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("--static"), suggestions3);
         final String input4 = "flags2 ";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Arrays.asList("--first", "--second", "--third", "-f", "-s", "-t"), suggestions4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(suggestionList("--first", "--second", "--third", "-f", "-s", "-t"), suggestions4);
         final String input5 = "flags2 -f";
-        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
-        Assertions.assertEquals(Arrays.asList("-fs", "-ft", "-f"), suggestions5);
+        final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(suggestionList("-fs", "-ft", "-f"), suggestions5);
         final String input6 = "flags2 -f -s";
-        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
-        Assertions.assertEquals(Arrays.asList("-st", "-s"), suggestions6);
+        final List<Suggestion> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(suggestionList("-st", "-s"), suggestions6);
 
         /* When an incorrect flag is specified, should resolve to listing flags */
         final String input7 = "flags2 --invalid ";
-        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
-        Assertions.assertEquals(Arrays.asList("--first", "--second", "--third", "-f", "-s", "-t"), suggestions7);
+        final List<Suggestion> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        Assertions.assertEquals(suggestionList("--first", "--second", "--third", "-f", "-s", "-t"), suggestions7);
     }
 
     @Test
     void testCompoundFlags() {
         final String input = "flags3 ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("--compound", "--presence", "--single", "-p"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("--compound", "--presence", "--single", "-p"), suggestions);
 
         final String input2 = "flags3 --c";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Collections.singletonList("--compound"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("--compound"), suggestions2);
 
         final String input3 = "flags3 --compound ";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions3);
 
         final String input4 = "flags3 --compound 1";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Arrays.asList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(suggestionList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions4);
 
         final String input5 = "flags3 --compound 22 ";
-        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
-        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions5);
+        final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(suggestionList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions5);
 
         final String input6 = "flags3 --compound 22 1";
-        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
-        Assertions.assertEquals(Arrays.asList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions6);
+        final List<Suggestion> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(suggestionList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions6);
 
         /* We've typed compound already, so that flag should be omitted from the suggestions */
         final String input7 = "flags3 --compound 22 33 44 ";
-        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
-        Assertions.assertEquals(Arrays.asList("--presence", "--single", "-p"), suggestions7);
+        final List<Suggestion> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        Assertions.assertEquals(suggestionList("--presence", "--single", "-p"), suggestions7);
 
         final String input8 = "flags3 --compound 22 33 44 --pres";
-        final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
-        Assertions.assertEquals(Collections.singletonList("--presence"), suggestions8);
+        final List<Suggestion> suggestions8 = manager.suggest(new TestCommandSender(), input8);
+        Assertions.assertEquals(suggestionList("--presence"), suggestions8);
 
         final String input9 = "flags3 --compound 22 33 44 --presence ";
-        final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
-        Assertions.assertEquals(Collections.singletonList("--single"), suggestions9);
+        final List<Suggestion> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        Assertions.assertEquals(suggestionList("--single"), suggestions9);
 
         final String input10 = "flags3 --compound 22 33 44 --single ";
-        final List<String> suggestions10 = manager.suggest(new TestCommandSender(), input10);
-        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions10);
+        final List<Suggestion> suggestions10 = manager.suggest(new TestCommandSender(), input10);
+        Assertions.assertEquals(suggestionList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions10);
     }
 
     @Test
     void testNumbers() {
         final String input = "numbers ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
         final String input2 = "numbers 1";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions2);
         final String input3 = "numbers -";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Arrays.asList("-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"), suggestions3);
         final String input4 = "numbers -1";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
         Assertions.assertEquals(
-                Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
+                suggestionList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
                 suggestions4
         );
         final String input5 = "numberswithmin ";
-        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
-        Assertions.assertEquals(Arrays.asList("5", "6", "7", "8", "9"), suggestions5);
+        final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(suggestionList("5", "6", "7", "8", "9"), suggestions5);
 
         final String input6 = "numbers 1 ";
-        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        final List<Suggestion> suggestions6 = manager.suggest(new TestCommandSender(), input6);
         Assertions.assertEquals(Collections.emptyList(), suggestions6);
     }
 
     @Test
     void testNumbersWithFollowingArguments() {
         final String input = "numberswithfollowingargument ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
         final String input2 = "numberswithfollowingargument 1";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("1", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"), suggestions2);
         final String input3 = "numberswithfollowingargument -";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Arrays.asList("-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"), suggestions3);
         final String input4 = "numberswithfollowingargument -1";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
         Assertions.assertEquals(
-                Arrays.asList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
+                suggestionList("-1", "-10", "-11", "-12", "-13", "-14", "-15", "-16", "-17", "-18", "-19"),
                 suggestions4
         );
     }
@@ -350,29 +348,29 @@ public class CommandSuggestionsTest {
     @Test
     void testDurations() {
         final String input = "duration ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("1", "2", "3", "4", "5", "6", "7", "8", "9"), suggestions);
         final String input2 = "duration 5";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("5d", "5h", "5m", "5s"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("5d", "5h", "5m", "5s"), suggestions2);
         final String input3 = "duration 5s";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.emptyList(), suggestions3);
         final String input4 = "duration 5s ";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
         Assertions.assertEquals(Collections.emptyList(), suggestions4);
     }
 
     @Test
     void testInvalidLiteralThenSpace() {
         final String input = "test o";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Collections.singletonList("one"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("one"), suggestions);
         final String input2 = "test o ";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
         Assertions.assertEquals(Collections.emptyList(), suggestions2);
         final String input3 = "test o abc123xyz";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.emptyList(), suggestions3);
     }
 
@@ -390,86 +388,86 @@ public class CommandSuggestionsTest {
          * [/partial bonjour ] - should show the literal following the argument (not suggested)
          */
         final String input = "partial";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
         Assertions.assertEquals(Collections.emptyList(), suggestions);
         final String input2 = "partial ";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("hi", "hey", "heya", "hai", "hello"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("hi", "hey", "heya", "hai", "hello"), suggestions2);
         final String input3 = "partial h";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Arrays.asList("hi", "hey", "heya", "hai", "hello"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("hi", "hey", "heya", "hai", "hello"), suggestions3);
         final String input4 = "partial he";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Arrays.asList("hey", "heya", "hello"), suggestions4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(suggestionList("hey", "heya", "hello"), suggestions4);
         final String input5 = "partial hey";
-        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
-        Assertions.assertEquals(Arrays.asList("hey", "heya"), suggestions5);
+        final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(suggestionList("hey", "heya"), suggestions5);
         final String input6 = "partial hi";
-        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
-        Assertions.assertEquals(Collections.singletonList("hi"), suggestions6);
+        final List<Suggestion> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(suggestionList("hi"), suggestions6);
         final String input7 = "partial b";
-        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        final List<Suggestion> suggestions7 = manager.suggest(new TestCommandSender(), input7);
         Assertions.assertEquals(Collections.emptyList(), suggestions7);
         final String input8 = "partial hello ";
-        final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
-        Assertions.assertEquals(Collections.singletonList("literal"), suggestions8);
+        final List<Suggestion> suggestions8 = manager.suggest(new TestCommandSender(), input8);
+        Assertions.assertEquals(suggestionList("literal"), suggestions8);
         final String input9 = "partial bonjour ";
-        final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
-        Assertions.assertEquals(Collections.singletonList("literal"), suggestions9);
+        final List<Suggestion> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        Assertions.assertEquals(suggestionList("literal"), suggestions9);
     }
 
     @Test
     void testLiteralWithVariable() {
         final String input = "literal_with_variable ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("vici", "veni", "vidi"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("vici", "veni", "vidi"), suggestions);
         final String input2 = "literal_with_variable v";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Arrays.asList("vici", "veni", "vidi"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("vici", "veni", "vidi"), suggestions2);
         final String input3 = "literal_with_variable vi";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(Arrays.asList("vici", "vidi"), suggestions3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        Assertions.assertEquals(suggestionList("vici", "vidi"), suggestions3);
         final String input4 = "literal_with_variable vidi";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Collections.singletonList("vidi"), suggestions4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(suggestionList("vidi"), suggestions4);
         final String input5 = "literal_with_variable vidi ";
-        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
-        Assertions.assertEquals(Collections.singletonList("now"), suggestions5);
+        final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        Assertions.assertEquals(suggestionList("now"), suggestions5);
         final String input6 = "literal_with_variable vici ";
-        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
-        Assertions.assertEquals(Collections.singletonList("later"), suggestions6);
+        final List<Suggestion> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        Assertions.assertEquals(suggestionList("later"), suggestions6);
     }
 
     @Test
     void testInvalidArgumentShouldNotCauseFurtherCompletion() {
         // pass preprocess
         final String input = "cmd_with_multiple_args 512 ";
-        final List<String> suggestions = manager.suggest(new TestCommandSender(), input);
-        Assertions.assertEquals(Arrays.asList("foo", "bar"), suggestions);
+        final List<Suggestion> suggestions = manager.suggest(new TestCommandSender(), input);
+        Assertions.assertEquals(suggestionList("foo", "bar"), suggestions);
         final String input2 = "cmd_with_multiple_args 512 BAR ";
-        final List<String> suggestions2 = manager.suggest(new TestCommandSender(), input2);
-        Assertions.assertEquals(Collections.singletonList("world"), suggestions2);
+        final List<Suggestion> suggestions2 = manager.suggest(new TestCommandSender(), input2);
+        Assertions.assertEquals(suggestionList("world"), suggestions2);
         final String input3 = "cmd_with_multiple_args test ";
-        final List<String> suggestions3 = manager.suggest(new TestCommandSender(), input3);
+        final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
         Assertions.assertEquals(Collections.emptyList(), suggestions3);
         final String input4 = "cmd_with_multiple_args 512 f";
-        final List<String> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(Collections.singletonList("foo"), suggestions4);
+        final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
+        Assertions.assertEquals(suggestionList("foo"), suggestions4);
         final String input5 = "cmd_with_multiple_args world f";
-        final List<String> suggestions5 = manager.suggest(new TestCommandSender(), input5);
+        final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);
         Assertions.assertEquals(Collections.emptyList(), suggestions5);
         // trigger preprocess fail
         final String input6 = "cmd_with_multiple_args 1024";
-        final List<String> suggestions6 = manager.suggest(new TestCommandSender(), input6);
+        final List<Suggestion> suggestions6 = manager.suggest(new TestCommandSender(), input6);
         Assertions.assertEquals(11, suggestions6.size());
         final String input7 = "cmd_with_multiple_args 1024 ";
-        final List<String> suggestions7 = manager.suggest(new TestCommandSender(), input7);
+        final List<Suggestion> suggestions7 = manager.suggest(new TestCommandSender(), input7);
         Assertions.assertEquals(Collections.emptyList(), suggestions7);
         final String input8 = "cmd_with_multiple_args 1024 f";
-        final List<String> suggestions8 = manager.suggest(new TestCommandSender(), input8);
+        final List<Suggestion> suggestions8 = manager.suggest(new TestCommandSender(), input8);
         Assertions.assertEquals(Collections.emptyList(), suggestions8);
         final String input9 = "cmd_with_multiple_args 1024 foo w";
-        final List<String> suggestions9 = manager.suggest(new TestCommandSender(), input9);
+        final List<Suggestion> suggestions9 = manager.suggest(new TestCommandSender(), input9);
         Assertions.assertEquals(Collections.emptyList(), suggestions9);
     }
 
@@ -482,26 +480,26 @@ public class CommandSuggestionsTest {
                         .required(
                                 StringArgument.<TestCommandSender>builder("string")
                                         .greedyFlagYielding()
-                                        .withSuggestionsProvider((context, input) -> Collections.singletonList("hello"))
+                                        .withSuggestionProvider((context, input) -> suggestionList("hello"))
                                         .build()
                         ).flag(manager.flagBuilder("flag").withAliases("f").build())
                         .flag(manager.flagBuilder("flag2").build())
         );
 
         // Act
-        final List<String> suggestions1 = suggest(manager, "command ");
-        final List<String> suggestions2 = suggest(manager, "command hel");
-        final List<String> suggestions3 = suggest(manager, "command hello --");
-        final List<String> suggestions4 = suggest(manager, "command hello --f");
-        final List<String> suggestions5 = suggest(manager, "command hello -f");
-        final List<String> suggestions6 = suggest(manager, "command hello -");
+        final List<Suggestion> suggestions1 = suggest(manager, "command ");
+        final List<Suggestion> suggestions2 = suggest(manager, "command hel");
+        final List<Suggestion> suggestions3 = suggest(manager, "command hello --");
+        final List<Suggestion> suggestions4 = suggest(manager, "command hello --f");
+        final List<Suggestion> suggestions5 = suggest(manager, "command hello -f");
+        final List<Suggestion> suggestions6 = suggest(manager, "command hello -");
 
         // Assert
-        assertThat(suggestions1).containsExactly("hello");
-        assertThat(suggestions2).containsExactly("hello");
-        assertThat(suggestions3).containsExactly("--flag", "--flag2");
-        assertThat(suggestions4).containsExactly("--flag", "--flag2");
-        assertThat(suggestions5).containsExactly("-f");
+        assertThat(suggestions1).containsExactlyElementsIn(suggestionList("hello"));
+        assertThat(suggestions2).containsExactlyElementsIn(suggestionList("hello"));
+        assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
+        assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -522,19 +520,19 @@ public class CommandSuggestionsTest {
         );
 
         // Act
-        final List<String> suggestions1 = suggest(manager, "command ");
-        final List<String> suggestions2 = suggest(manager, "command hello");
-        final List<String> suggestions3 = suggest(manager, "command hello --");
-        final List<String> suggestions4 = suggest(manager, "command hello --f");
-        final List<String> suggestions5 = suggest(manager, "command hello -f");
-        final List<String> suggestions6 = suggest(manager, "command hello -");
+        final List<Suggestion> suggestions1 = suggest(manager, "command ");
+        final List<Suggestion> suggestions2 = suggest(manager, "command hello");
+        final List<Suggestion> suggestions3 = suggest(manager, "command hello --");
+        final List<Suggestion> suggestions4 = suggest(manager, "command hello --f");
+        final List<Suggestion> suggestions5 = suggest(manager, "command hello -f");
+        final List<Suggestion> suggestions6 = suggest(manager, "command hello -");
 
         // Assert
         assertThat(suggestions1).isEmpty();
         assertThat(suggestions2).isEmpty();
-        assertThat(suggestions3).containsExactly("--flag", "--flag2");
-        assertThat(suggestions4).containsExactly("--flag", "--flag2");
-        assertThat(suggestions5).containsExactly("-f");
+        assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
+        assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -547,7 +545,7 @@ public class CommandSuggestionsTest {
                         .required(
                                 StringArgument.<TestCommandSender>builder("string")
                                         .greedy()
-                                        .withSuggestionsProvider((context, input) -> Collections.singletonList("hello world"))
+                                        .withSuggestionProvider((context, input) -> suggestionList("hello world"))
                                         .build())
         );
         manager.commandSuggestionProcessor(
@@ -555,19 +553,19 @@ public class CommandSuggestionsTest {
                         FilteringCommandSuggestionProcessor.Filter.<TestCommandSender>startsWith(true).andTrimBeforeLastSpace()));
 
         // Act
-        final List<String> suggestions1 = suggest(manager, "command ");
-        final List<String> suggestions2 = suggest(manager, "command hello");
-        final List<String> suggestions3 = suggest(manager, "command hello ");
-        final List<String> suggestions4 = suggest(manager, "command hello wo");
-        final List<String> suggestions5 = suggest(manager, "command hello world");
-        final List<String> suggestions6 = suggest(manager, "command hello world ");
+        final List<Suggestion> suggestions1 = suggest(manager, "command ");
+        final List<Suggestion> suggestions2 = suggest(manager, "command hello");
+        final List<Suggestion> suggestions3 = suggest(manager, "command hello ");
+        final List<Suggestion> suggestions4 = suggest(manager, "command hello wo");
+        final List<Suggestion> suggestions5 = suggest(manager, "command hello world");
+        final List<Suggestion> suggestions6 = suggest(manager, "command hello world ");
 
         // Assert
-        assertThat(suggestions1).containsExactly("hello world");
-        assertThat(suggestions2).containsExactly("hello world");
-        assertThat(suggestions3).containsExactly("world");
-        assertThat(suggestions4).containsExactly("world");
-        assertThat(suggestions5).containsExactly("world");
+        assertThat(suggestions1).containsExactlyElementsIn(suggestionList("hello world"));
+        assertThat(suggestions2).containsExactlyElementsIn(suggestionList("hello world"));
+        assertThat(suggestions3).containsExactlyElementsIn(suggestionList("world"));
+        assertThat(suggestions4).containsExactlyElementsIn(suggestionList("world"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("world"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -581,26 +579,26 @@ public class CommandSuggestionsTest {
                         .required(
                                 StringArgument.<TestCommandSender>builder("string")
                                         .greedyFlagYielding()
-                                        .withSuggestionsProvider((context, input) -> Collections.singletonList("hello"))
+                                        .withSuggestionProvider((context, input) -> suggestionList("hello"))
                                         .build()
                         ).flag(manager.flagBuilder("flag").withAliases("f").build())
                         .flag(manager.flagBuilder("flag2").build())
         );
 
         // Act
-        final List<String> suggestions1 = suggest(manager, "command ");
-        final List<String> suggestions2 = suggest(manager, "command hel");
-        final List<String> suggestions3 = suggest(manager, "command hello --");
-        final List<String> suggestions4 = suggest(manager, "command hello --f");
-        final List<String> suggestions5 = suggest(manager, "command hello -f");
-        final List<String> suggestions6 = suggest(manager, "command hello -");
+        final List<Suggestion> suggestions1 = suggest(manager, "command ");
+        final List<Suggestion> suggestions2 = suggest(manager, "command hel");
+        final List<Suggestion> suggestions3 = suggest(manager, "command hello --");
+        final List<Suggestion> suggestions4 = suggest(manager, "command hello --f");
+        final List<Suggestion> suggestions5 = suggest(manager, "command hello -f");
+        final List<Suggestion> suggestions6 = suggest(manager, "command hello -");
 
         // Assert
-        assertThat(suggestions1).containsExactly("hello", "--flag", "--flag2", "-f");
-        assertThat(suggestions2).containsExactly("hello");
-        assertThat(suggestions3).containsExactly("--flag", "--flag2");
-        assertThat(suggestions4).containsExactly("--flag", "--flag2");
-        assertThat(suggestions5).containsExactly("-f");
+        assertThat(suggestions1).containsExactlyElementsIn(suggestionList("hello", "--flag", "--flag2", "-f"));
+        assertThat(suggestions2).containsExactlyElementsIn(suggestionList("hello"));
+        assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
+        assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -622,19 +620,19 @@ public class CommandSuggestionsTest {
         );
 
         // Act
-        final List<String> suggestions1 = suggest(manager, "command ");
-        final List<String> suggestions2 = suggest(manager, "command hello");
-        final List<String> suggestions3 = suggest(manager, "command hello --");
-        final List<String> suggestions4 = suggest(manager, "command hello --f");
-        final List<String> suggestions5 = suggest(manager, "command hello -f");
-        final List<String> suggestions6 = suggest(manager, "command hello -");
+        final List<Suggestion> suggestions1 = suggest(manager, "command ");
+        final List<Suggestion> suggestions2 = suggest(manager, "command hello");
+        final List<Suggestion> suggestions3 = suggest(manager, "command hello --");
+        final List<Suggestion> suggestions4 = suggest(manager, "command hello --f");
+        final List<Suggestion> suggestions5 = suggest(manager, "command hello -f");
+        final List<Suggestion> suggestions6 = suggest(manager, "command hello -");
 
         // Assert
-        assertThat(suggestions1).containsExactly("--flag", "--flag2", "-f");
+        assertThat(suggestions1).containsExactlyElementsIn(suggestionList("--flag", "--flag2", "-f"));
         assertThat(suggestions2).isEmpty();
-        assertThat(suggestions3).containsExactly("--flag", "--flag2");
-        assertThat(suggestions4).containsExactly("--flag", "--flag2");
-        assertThat(suggestions5).containsExactly("-f");
+        assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
+        assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag", "--flag2"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
         assertThat(suggestions6).isEmpty();
     }
 
@@ -651,29 +649,29 @@ public class CommandSuggestionsTest {
         );
 
         // Act
-        final List<String> suggestions1 = suggest(manager, "command ");
-        final List<String> suggestions2 = suggest(manager, "command --");
-        final List<String> suggestions3 = suggest(manager, "command --f");
-        final List<String> suggestions4 = suggest(manager, "command --fla");
-        final List<String> suggestions5 = suggest(manager, "command -f");
-        final List<String> suggestions6 = suggest(manager, "command -");
+        final List<Suggestion> suggestions1 = suggest(manager, "command ");
+        final List<Suggestion> suggestions2 = suggest(manager, "command --");
+        final List<Suggestion> suggestions3 = suggest(manager, "command --f");
+        final List<Suggestion> suggestions4 = suggest(manager, "command --fla");
+        final List<Suggestion> suggestions5 = suggest(manager, "command -f");
+        final List<Suggestion> suggestions6 = suggest(manager, "command -");
 
-        final List<String> suggestions7 = suggest(manager, "command -f ");
-        final List<String> suggestions8 = suggest(manager, "command -f b");
+        final List<Suggestion> suggestions7 = suggest(manager, "command -f ");
+        final List<Suggestion> suggestions8 = suggest(manager, "command -f b");
 
         // Assert
-        assertThat(suggestions1).containsExactly("--flag", "--flog", "-f");
-        assertThat(suggestions2).containsExactly("--flag", "--flog");
-        assertThat(suggestions3).containsExactly("--flag", "--flog");
-        assertThat(suggestions4).containsExactly("--flag");
-        assertThat(suggestions5).containsExactly("-f");
-        assertThat(suggestions6).containsExactly("--flag", "--flog", "-f");
-        assertThat(suggestions7).containsExactly("foo", "bar");
-        assertThat(suggestions8).containsExactly("bar");
+        assertThat(suggestions1).containsExactlyElementsIn(suggestionList("--flag", "--flog", "-f"));
+        assertThat(suggestions2).containsExactlyElementsIn(suggestionList("--flag", "--flog"));
+        assertThat(suggestions3).containsExactlyElementsIn(suggestionList("--flag", "--flog"));
+        assertThat(suggestions4).containsExactlyElementsIn(suggestionList("--flag"));
+        assertThat(suggestions5).containsExactlyElementsIn(suggestionList("-f"));
+        assertThat(suggestions6).containsExactlyElementsIn(suggestionList("--flag", "--flog", "-f"));
+        assertThat(suggestions7).containsExactlyElementsIn(suggestionList("foo", "bar"));
+        assertThat(suggestions8).containsExactlyElementsIn(suggestionList("bar"));
     }
 
 
-    private List<String> suggest(CommandManager<TestCommandSender> manager, String command) {
+    private List<Suggestion> suggest(CommandManager<TestCommandSender> manager, String command) {
         return manager.suggest(new TestCommandSender(), command);
     }
 

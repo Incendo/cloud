@@ -23,11 +23,14 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -41,7 +44,7 @@ import static java.util.Objects.requireNonNull;
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE)
-public interface ArgumentParser<C, T> {
+public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
 
     /**
      * Default amount of arguments that the parser expects to consume
@@ -77,7 +80,7 @@ public interface ArgumentParser<C, T> {
     );
 
     /**
-     * Get a list of suggested arguments that would be correctly parsed by this parser
+     * Returns a list of suggested arguments that would be correctly parsed by this parser
      * <p>
      * This method is likely to be called for every character provided by the sender and
      * so it may be necessary to cache results locally to prevent unnecessary computations
@@ -85,12 +88,35 @@ public interface ArgumentParser<C, T> {
      * @param commandContext Command context
      * @param input          Input string
      * @return List of suggestions
+     * @since 2.0.0
      */
-    default @NonNull List<@NonNull String> suggestions(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default @NonNull List<@NonNull String> stringSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
         return Collections.emptyList();
+    }
+
+    /**
+     * Returns a list of suggested arguments that would be correctly parsed by this parser
+     * <p>
+     * This method is likely to be called for every character provided by the sender and
+     * so it may be necessary to cache results locally to prevent unnecessary computations
+     *
+     * @param commandContext Command context
+     * @param input          Input string
+     * @return List of suggestions
+     * @since 2.0.0
+     */
+    @Override
+    @SuppressWarnings("FunctionalInterfaceMethodChanged")
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default @NonNull List<@NonNull Suggestion> suggestions(
+            final @NonNull CommandContext<C> commandContext,
+            final @NonNull String input
+    ) {
+        return this.stringSuggestions(commandContext, input).stream().map(Suggestion::simple).collect(Collectors.toList());
     }
 
     /**

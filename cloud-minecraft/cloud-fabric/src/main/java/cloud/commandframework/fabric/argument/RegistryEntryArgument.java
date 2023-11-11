@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -40,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.BiFunction;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -67,14 +67,14 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final @NonNull String name,
             final @NonNull ResourceKey<? extends Registry<V>> registry,
             final @NonNull TypeToken<V> valueType,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new Parser<>(registry),
                 valueType,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -195,7 +195,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -262,7 +262,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                     this.getName(),
                     this.registryIdent,
                     this.getValueType(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

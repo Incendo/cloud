@@ -26,6 +26,7 @@ package cloud.commandframework.feature;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.CommandResult;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,12 +101,12 @@ class RepeatableFlagTest {
         );
 
         // Act
-        final List<String> suggestions = this.commandManager.suggest(
+        final List<Suggestion> suggestions = this.commandManager.suggest(
                 new TestCommandSender(),
                 "test --flag --"
         );
 
         // Assert
-        assertThat(suggestions).containsExactly("--flag");
+        assertThat(suggestions).containsExactly(Suggestion.simple("--flag"));
     }
 }

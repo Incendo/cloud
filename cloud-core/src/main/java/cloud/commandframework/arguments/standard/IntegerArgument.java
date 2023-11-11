@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
@@ -37,7 +38,6 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -57,15 +57,14 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
             final @NonNull String name,
             final int min,
             final int max,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new IntegerParser<>(min, max),
                 Integer.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
         this.min = min;
@@ -164,7 +163,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         @Override
         public @NonNull IntegerArgument<C> build() {
             return new IntegerArgument<>(this.getName(), this.min, this.max,
-                    this.getSuggestionsProvider(), this.getDefaultDescription()
+                    this.suggestionProvider(), this.getDefaultDescription()
             );
         }
     }
@@ -313,7 +312,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

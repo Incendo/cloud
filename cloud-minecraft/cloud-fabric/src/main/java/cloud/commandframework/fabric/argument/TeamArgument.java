@@ -26,6 +26,7 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -35,7 +36,6 @@ import cloud.commandframework.fabric.FabricCommandContextKeys;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.scores.PlayerTeam;
@@ -52,14 +52,14 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
 
     TeamArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new TeamParser<>(),
                 PlayerTeam.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -98,7 +98,7 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
     public static final class TeamParser<C> extends SidedArgumentParser<C, String, PlayerTeam> {
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -167,7 +167,7 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
         public @NonNull TeamArgument<C> build() {
             return new TeamArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

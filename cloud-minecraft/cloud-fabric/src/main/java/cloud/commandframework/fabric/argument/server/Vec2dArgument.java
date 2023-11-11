@@ -25,11 +25,9 @@ package cloud.commandframework.fabric.argument.server;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates;
-import java.util.List;
-import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -45,7 +43,7 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
 
     Vec2dArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final boolean centerIntegers
     ) {
@@ -53,7 +51,7 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
                 name,
                 FabricArgumentParsers.vec2(centerIntegers),
                 Coordinates.CoordinatesXZ.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
         this.centerIntegers = centerIntegers;
@@ -153,7 +151,7 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
         public @NonNull Vec2dArgument<C> build() {
             return new Vec2dArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription(),
                     this.centerIntegers()
             );

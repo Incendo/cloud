@@ -25,10 +25,8 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.function.BiFunction;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -43,14 +41,14 @@ public final class ObjectiveCriteriaArgument<C> extends CommandArgument<C, Objec
 
     ObjectiveCriteriaArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ObjectiveCriteriaArgument.criteria()),
                 ObjectiveCriteria.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -102,7 +100,7 @@ public final class ObjectiveCriteriaArgument<C> extends CommandArgument<C, Objec
         public @NonNull ObjectiveCriteriaArgument<C> build() {
             return new ObjectiveCriteriaArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

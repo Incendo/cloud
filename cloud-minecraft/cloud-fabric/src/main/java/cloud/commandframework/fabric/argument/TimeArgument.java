@@ -25,10 +25,8 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.fabric.data.MinecraftTime;
-import java.util.List;
-import java.util.function.BiFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -42,14 +40,14 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
 
     TimeArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 FabricArgumentParsers.time(),
                 MinecraftTime.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -101,7 +99,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
         public @NonNull TimeArgument<C> build() {
             return new TimeArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

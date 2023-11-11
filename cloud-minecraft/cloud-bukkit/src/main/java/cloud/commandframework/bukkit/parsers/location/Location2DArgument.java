@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument.LocationParseException;
 import cloud.commandframework.context.CommandContext;
@@ -58,7 +59,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
     private Location2DArgument(
             final @NonNull String name,
             final @NonNull ArgumentDescription defaultDescription,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>,
                     @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
@@ -66,7 +67,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
                 name,
                 new Location2DParser<>(),
                 TypeToken.get(Location2D.class),
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription,
                 argumentPreprocessors
         );
@@ -129,7 +130,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
             return new Location2DArgument<>(
                     this.getName(),
                     this.getDefaultDescription(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     new LinkedList<>()
             );
         }
@@ -226,7 +227,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

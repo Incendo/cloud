@@ -27,6 +27,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -37,7 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.StringJoiner;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
@@ -56,12 +57,11 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     private StringArgument(
             final @NonNull String name,
             final @NonNull StringMode stringMode,
-            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @NonNull SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new StringParser<>(stringMode, suggestionsProvider),
-                String.class, suggestionsProvider, defaultDescription
+        super(name, new StringParser<>(stringMode, suggestionProvider),
+                String.class, suggestionProvider, defaultDescription
         );
         this.stringMode = stringMode;
     }
@@ -194,7 +194,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
     public static final class Builder<C> extends CommandArgument.Builder<C, String> {
 
         private StringMode stringMode = StringMode.SINGLE;
-        private BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider = (v1, v2) -> Collections.emptyList();
+        private SuggestionProvider<C> suggestionProvider = (v1, v2) -> Collections.emptyList();
 
         private Builder(final @NonNull String name) {
             super(String.class, name);
@@ -254,17 +254,16 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         }
 
         /**
-         * Set the suggestions provider
+         * Set the suggestion provider
          *
-         * @param suggestionsProvider Suggestions provider
+         * @param suggestionProvider Suggestion provider
          * @return Builder instance
          */
         @Override
-        public @NonNull @This Builder<C> withSuggestionsProvider(
-                final @NonNull BiFunction<@NonNull CommandContext<C>,
-                        @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider
+        public @NonNull @This Builder<C> withSuggestionProvider(
+                final @NonNull SuggestionProvider<C> suggestionProvider
         ) {
-            this.suggestionsProvider = suggestionsProvider;
+            this.suggestionProvider = suggestionProvider;
             return this;
         }
 
@@ -276,7 +275,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         @Override
         public @NonNull StringArgument<C> build() {
             return new StringArgument<>(this.getName(), this.stringMode,
-                    this.suggestionsProvider, this.getDefaultDescription()
+                    this.suggestionProvider, this.getDefaultDescription()
             );
         }
     }
@@ -289,21 +288,20 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         private static final Pattern FLAG_PATTERN = Pattern.compile("(-[A-Za-z_\\-0-9])|(--[A-Za-z_\\-0-9]*)");
 
         private final StringMode stringMode;
-        private final BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider;
+        private final SuggestionProvider<C> suggestionProvider;
 
         /**
          * Construct a new string parser
          *
-         * @param stringMode          String parsing mode
-         * @param suggestionsProvider Suggestions provider
+         * @param stringMode         String parsing mode
+         * @param suggestionProvider Suggestion provider
          */
         public StringParser(
                 final @NonNull StringMode stringMode,
-                final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                        @NonNull List<@NonNull String>> suggestionsProvider
+                final @NonNull SuggestionProvider<C> suggestionProvider
         ) {
             this.stringMode = stringMode;
-            this.suggestionsProvider = suggestionsProvider;
+            this.suggestionProvider = suggestionProvider;
         }
 
         @Override
@@ -417,11 +415,11 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return this.suggestionsProvider.apply(commandContext, input);
+            return this.suggestionProvider.suggestions(commandContext, input);
         }
 
         @Override

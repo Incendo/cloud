@@ -25,6 +25,7 @@ package cloud.commandframework.sponge7;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -36,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.CommandCallable;
@@ -164,12 +166,14 @@ final class CloudCommandCallable<C> implements CommandCallable {
     }
 
     @Override
-    public List<String> getSuggestions(
+    public @NonNull List<@NonNull String> getSuggestions(
             final @NonNull CommandSource source,
             final @NonNull String arguments,
             final @Nullable Location<World> targetPosition
     ) {
-        return this.manager.suggest(this.manager.getCommandSourceMapper().apply(source), this.formatCommand(arguments));
+        return this.manager.suggest(this.manager.getCommandSourceMapper().apply(source), this.formatCommand(arguments))
+                .stream().map(Suggestion::suggestion)
+                .collect(Collectors.toList());
     }
 
     private String formatCommand(final String arguments) {

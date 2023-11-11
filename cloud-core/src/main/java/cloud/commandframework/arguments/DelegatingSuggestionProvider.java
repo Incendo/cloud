@@ -21,47 +21,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations.suggestions;
+package cloud.commandframework.arguments;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Represents a method annotated with {@link Suggestions}
- *
- * @param <C> Command sender type
- * @since 1.3.0
- */
-public final class MethodSuggestionsProvider<C> implements BiFunction<CommandContext<C>, String, List<String>> {
+@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
+final class DelegatingSuggestionProvider<C> implements SuggestionProvider<C> {
 
-    private final MethodHandle methodHandle;
+    private final String argumentName;
+    private final SuggestionProvider<C> suggestionProvider;
 
-    /**
-     * Create a new provider
-     *
-     * @param instance Instance that owns the method
-     * @param method   The annotated method
-     * @throws Exception If the method lookup fails
-     */
-    public MethodSuggestionsProvider(
-            final @NonNull Object instance,
-            final @NonNull Method method
-    ) throws Exception {
-        this.methodHandle = MethodHandles.lookup().unreflect(method).bindTo(instance);
+    DelegatingSuggestionProvider(final @NonNull String argumentName, final @NonNull SuggestionProvider<C> suggestionProvider) {
+        this.argumentName = argumentName;
+        this.suggestionProvider = suggestionProvider;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<String> apply(final CommandContext<C> context, final String s) {
-        try {
-            return (List<String>) this.methodHandle.invokeWithArguments(context, s);
-        } catch (final Throwable t) {
-            throw new RuntimeException(t);
-        }
+    public @NonNull List<@NonNull Suggestion> suggestions(final @NonNull CommandContext<C> context, final @NonNull String s) {
+        return this.suggestionProvider.suggestions(context, s);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DelegatingSuggestionProvider{name='%s',parser='%s'}", this.argumentName,
+                this.suggestionProvider.getClass().getCanonicalName()
+        );
     }
 }

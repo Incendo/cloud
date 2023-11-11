@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -145,13 +146,13 @@ class LongParserTest {
                 LongArgument.LongParser.DEFAULT_MAXIMUM
         );
 
-        final List<String> expectedSuggestions = new ArrayList<>();
+        final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Long.toString((long) i));
+            expectedSuggestions.add(Suggestion.simple(Long.toString((long) i)));
         }
 
         // Act
-        final List<String> suggestions = parser.suggestions(
+        final List<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 ""
         );
@@ -168,13 +169,13 @@ class LongParserTest {
                 LongArgument.LongParser.DEFAULT_MAXIMUM
         );
 
-        final List<String> expectedSuggestions = new ArrayList<>();
+        final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Long.toString((long) -i));
+            expectedSuggestions.add(Suggestion.simple(Long.toString((long) -i)));
         }
 
         // Act
-        final List<String> suggestions = parser.suggestions(
+        final List<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 "-"
         );

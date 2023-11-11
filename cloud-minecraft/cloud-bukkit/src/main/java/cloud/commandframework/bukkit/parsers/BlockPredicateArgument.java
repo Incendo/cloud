@@ -27,6 +27,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.data.BlockPredicate;
@@ -42,7 +44,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -64,11 +65,10 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
 
     private BlockPredicateArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new Parser<>(), BlockPredicate.class, suggestionsProvider, defaultDescription);
+        super(name, new Parser<>(), BlockPredicate.class, suggestionProvider, defaultDescription);
     }
 
     /**
@@ -112,7 +112,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
         public @NonNull BlockPredicateArgument<C> build() {
             return new BlockPredicateArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }
@@ -261,7 +261,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.parser;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import java.util.Queue;
@@ -72,7 +73,7 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O>
     }
 
     @Override
-    public @NonNull List<@NonNull String> suggestions(
+    public @NonNull List<@NonNull Suggestion> suggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {

@@ -27,13 +27,13 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -50,11 +50,10 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
             final @NonNull String name,
             final long min,
             final long max,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new LongParser<>(min, max), Long.class, suggestionsProvider, defaultDescription);
+        super(name, new LongParser<>(min, max), Long.class, suggestionProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -151,7 +150,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         @Override
         public @NonNull LongArgument<C> build() {
             return new LongArgument<>(this.getName(), this.min,
-                    this.max, this.getSuggestionsProvider(), this.getDefaultDescription()
+                    this.max, this.suggestionProvider(), this.getDefaultDescription()
             );
         }
     }
@@ -259,7 +258,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

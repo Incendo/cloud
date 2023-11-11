@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -37,14 +38,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface CommandSuggestionEngine<C> {
 
     /**
-     * Get command suggestions for the "next" argument that would yield a correctly
+     * Returns command suggestions for the "next" argument that would yield a correctly
      * parsing command input
      *
      * @param context Request context
      * @param input   Input provided by the sender
      * @return List of suggestions
+     * @since 2.0.0
      */
-    @NonNull List<@NonNull String> getSuggestions(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @NonNull List<@NonNull Suggestion> getSuggestions(
             @NonNull CommandContext<C> context,
             @NonNull String input
     );

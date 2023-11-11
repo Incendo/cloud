@@ -41,6 +41,7 @@ import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.permission.CommandPermission;
@@ -468,7 +469,7 @@ public final class CloudBrigadierManager<C, S> {
      *
      * @param cloudCommand       Cloud root command
      * @param root               Brigadier root command
-     * @param suggestionProvider Brigadier suggestions provider
+     * @param suggestionProvider Brigadier suggestion provider
      * @param executor           Brigadier command executor
      * @param permissionChecker  Permission checker
      * @return Constructed literal command node
@@ -632,13 +633,13 @@ public final class CloudBrigadierManager<C, S> {
             command = command.substring(leading.split(":")[0].length() + 1);
         }
 
-        final List<String> suggestionsUnfiltered = this.commandManager.suggest(
+        final List<Suggestion> suggestionsUnfiltered = this.commandManager.suggest(
                 commandContext.getSender(),
                 command
         );
 
         /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
-        final List<String> suggestions = new ArrayList<>(suggestionsUnfiltered);
+        final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
         if (parentNode != null) {
             final Set<String> siblingLiterals = parentNode.children().stream()
                     .map(CommandTree.CommandNode::argument)
@@ -646,7 +647,7 @@ public final class CloudBrigadierManager<C, S> {
                             ? ((StaticArgument<C>) arg).getAliases().stream() : Stream.empty())
                     .collect(Collectors.toSet());
 
-            suggestions.removeIf(siblingLiterals::contains);
+            suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));
         }
 
         SuggestionsBuilder suggestionsBuilder = builder;
@@ -656,7 +657,7 @@ public final class CloudBrigadierManager<C, S> {
             suggestionsBuilder = builder.createOffset(builder.getStart() + lastIndexOfSpaceInRemainingString + 1);
         }
 
-        for (final String suggestion : suggestions) {
+        for (final Suggestion suggestion : suggestions) {
             String tooltip = component.argument().getName();
             if (!(component.argument() instanceof StaticArgument)) {
                 if (component.required()) {
@@ -665,7 +666,7 @@ public final class CloudBrigadierManager<C, S> {
                     tooltip = '[' + tooltip + ']';
                 }
             }
-            suggestionsBuilder = suggestionsBuilder.suggest(suggestion, new LiteralMessage(tooltip));
+            suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
         }
 
         return suggestionsBuilder.buildFuture();

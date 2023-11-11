@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
@@ -168,7 +169,7 @@ class CommandDeletionTest {
         );
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
-        assertThat(this.commandManager.suggest(new TestCommandSender(), "")).contains("test");
+        assertThat(this.commandManager.suggest(new TestCommandSender(), "")).contains(Suggestion.simple("test"));
         assertThat(this.commandManager.commandTree().getRootNodes()).hasSize(1);
     }
 }

@@ -25,10 +25,8 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.function.BiFunction;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.commands.arguments.RangeArgument;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -45,14 +43,14 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
 
     IntRangeArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new WrappedBrigadierParser<>(RangeArgument.intRange()),
                 MinMaxBounds.Ints.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -104,7 +102,7 @@ public final class IntRangeArgument<C> extends CommandArgument<C, MinMaxBounds.I
         public @NonNull IntRangeArgument<C> build() {
             return new IntRangeArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

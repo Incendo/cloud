@@ -25,6 +25,7 @@ package cloud.commandframework.bungee;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -33,6 +34,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -178,6 +180,6 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         return this.manager.suggest(
                 this.manager.getCommandSenderMapper().apply(sender),
                 builder.toString()
-        );
+        ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
     }
 }

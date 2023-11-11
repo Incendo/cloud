@@ -23,11 +23,10 @@
 //
 package cloud.commandframework.arguments.parser;
 
-import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -127,15 +126,15 @@ public interface ParserRegistry<C> {
     /**
      * Register a new named suggestion provider
      *
-     * @param name                Name of the suggestions provider. The name is case independent.
-     * @param suggestionsProvider The suggestions provider
+     * @param name               Name of the suggestion provider. The name is case independent.
+     * @param suggestionProvider The suggestion provider
      * @see #getSuggestionProvider(String) Get a suggestion provider
      * @since 1.1.0
      */
-    @API(status = API.Status.STABLE, since = "1.1.0")
+    @API(status = API.Status.STABLE, since = "2.0.0")
     void registerSuggestionProvider(
             @NonNull String name,
-            @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
+            @NonNull SuggestionProvider<C> suggestionProvider
     );
 
     /**
@@ -144,11 +143,11 @@ public interface ParserRegistry<C> {
      * @param name Suggestion provider name. The name is case independent.
      * @return Optional that either contains the suggestion provider, or is empty if no
      *         suggestion provider is registered with the given name
-     * @see #registerSuggestionProvider(String, BiFunction) Register a suggestion provider
-     * @since 1.1.0
+     * @see #registerSuggestionProvider(String, SuggestionProvider) Register a suggestion provider
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.1.0")
-    @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    @NonNull Optional<SuggestionProvider<C>> getSuggestionProvider(
             @NonNull String name
     );
 }

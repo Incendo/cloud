@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -36,7 +37,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -55,11 +55,10 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     protected EnumArgument(
             final @NonNull Class<E> enumClass,
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new EnumParser<>(enumClass), enumClass, suggestionsProvider, defaultDescription);
+        super(name, new EnumParser<>(enumClass), enumClass, suggestionProvider, defaultDescription);
     }
 
     /**
@@ -128,7 +127,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
         @Override
         public @NonNull CommandArgument<C, E> build() {
-            return new EnumArgument<>(this.enumClass, this.getName(), this.getSuggestionsProvider(), this.getDefaultDescription());
+            return new EnumArgument<>(this.enumClass, this.getName(), this.suggestionProvider(), this.getDefaultDescription());
         }
     }
 
@@ -173,7 +172,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
