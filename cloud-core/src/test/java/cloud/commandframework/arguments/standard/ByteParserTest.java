@@ -148,7 +148,7 @@ class ByteParserTest {
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Suggestion.simple(Byte.toString((byte) i)));
+            expectedSuggestions.add(Suggestion.of(Byte.toString((byte) i)));
         }
 
         // Act
@@ -171,7 +171,7 @@ class ByteParserTest {
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Suggestion.simple(Byte.toString((byte) -i)));
+            expectedSuggestions.add(Suggestion.of(Byte.toString((byte) -i)));
         }
 
         // Act

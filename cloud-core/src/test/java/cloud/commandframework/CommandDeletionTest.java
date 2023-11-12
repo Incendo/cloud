@@ -169,7 +169,7 @@ class CommandDeletionTest {
         );
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
-        assertThat(this.commandManager.suggest(new TestCommandSender(), "")).contains(Suggestion.simple("test"));
+        assertThat(this.commandManager.suggest(new TestCommandSender(), "")).contains(Suggestion.of("test"));
         assertThat(this.commandManager.commandTree().getRootNodes()).hasSize(1);
     }
 }

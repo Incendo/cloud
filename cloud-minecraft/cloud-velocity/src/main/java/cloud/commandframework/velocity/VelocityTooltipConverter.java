@@ -21,48 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments.suggestion;
+package cloud.commandframework.velocity;
 
-import java.util.Objects;
+import cloud.commandframework.arguments.suggestion.TooltipConverter;
+import com.mojang.brigadier.Message;
+import com.velocitypowered.api.command.VelocityBrigadierMessage;
+import net.kyori.adventure.text.Component;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-class SimpleSuggestion implements Suggestion {
+/**
+ * Converts between Adventure {@link Component} and Brigadier {@link Message}.
+ *
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+class VelocityTooltipConverter extends TooltipConverter<Component, Message> {
 
-    private final String suggestion;
-
-    SimpleSuggestion(final @NonNull String suggestion) {
-        this.suggestion = suggestion;
+    VelocityTooltipConverter() {
+        super(Component.class);
     }
 
     @Override
-    public @NonNull String suggestion() {
-        return this.suggestion;
-    }
-
-    @Override
-    public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
-        return new SimpleSuggestion(suggestion);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final SimpleSuggestion that = (SimpleSuggestion) o;
-        return Objects.equals(this.suggestion, that.suggestion);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.suggestion);
-    }
-
-    @Override
-    public @NonNull String toString() {
-        return this.suggestion;
+    public @NonNull Message convert(final @NonNull Component tooltip) {
+        return VelocityBrigadierMessage.tooltip(tooltip);
     }
 }

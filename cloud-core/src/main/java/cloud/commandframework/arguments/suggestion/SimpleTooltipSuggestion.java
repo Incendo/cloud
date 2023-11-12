@@ -26,22 +26,28 @@ package cloud.commandframework.arguments.suggestion;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-class SimpleSuggestion implements Suggestion {
+class SimpleTooltipSuggestion<T> extends SimpleSuggestion implements TooltipSuggestion<T> {
 
-    private final String suggestion;
+    private final T tooltip;
 
-    SimpleSuggestion(final @NonNull String suggestion) {
-        this.suggestion = suggestion;
+    SimpleTooltipSuggestion(final @NonNull String suggestion, final @NonNull T tooltip) {
+        super(suggestion);
+        this.tooltip = tooltip;
     }
 
     @Override
-    public @NonNull String suggestion() {
-        return this.suggestion;
+    public @NonNull T tooltip() {
+        return this.tooltip;
     }
 
     @Override
-    public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
-        return new SimpleSuggestion(suggestion);
+    public @NonNull TooltipSuggestion<T> withSuggestion(@NonNull final String suggestion) {
+        return new SimpleTooltipSuggestion<>(suggestion, this.tooltip());
+    }
+
+    @Override
+    public @NonNull <U> TooltipSuggestion<U> withTooltip(@NonNull final U tooltip) {
+        return new SimpleTooltipSuggestion<>(this.suggestion(), tooltip);
     }
 
     @Override
@@ -52,17 +58,20 @@ class SimpleSuggestion implements Suggestion {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final SimpleSuggestion that = (SimpleSuggestion) o;
-        return Objects.equals(this.suggestion, that.suggestion);
+        if (!super.equals(o)) {
+            return false;
+        }
+        final SimpleTooltipSuggestion<?> that = (SimpleTooltipSuggestion<?>) o;
+        return Objects.equals(this.suggestion(), that.suggestion()) && Objects.equals(this.tooltip, that.tooltip);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.suggestion);
+        return Objects.hash(super.hashCode(), this.suggestion(), this.tooltip);
     }
 
     @Override
     public @NonNull String toString() {
-        return this.suggestion;
+        return String.format("%s (%s)", this.suggestion(), this.tooltip());
     }
 }

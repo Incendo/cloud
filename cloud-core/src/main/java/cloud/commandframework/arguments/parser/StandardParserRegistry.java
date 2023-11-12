@@ -177,7 +177,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             return new StringArgument.StringParser<>(
                     stringMode,
                     (context, s) -> Arrays.stream(options.get(StandardParameters.COMPLETIONS, new String[0]))
-                            .map(Suggestion::simple)
+                            .map(Suggestion::of)
                             .collect(Collectors.toList())
             );
         });

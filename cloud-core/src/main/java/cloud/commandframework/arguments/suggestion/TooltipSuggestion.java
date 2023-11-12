@@ -23,46 +23,31 @@
 //
 package cloud.commandframework.arguments.suggestion;
 
-import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-class SimpleSuggestion implements Suggestion {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface TooltipSuggestion<T> extends Suggestion {
 
-    private final String suggestion;
+    /**
+     * Returns the tooltip
+     *
+     * @return the tooltip
+     */
+    @NonNull T tooltip();
 
-    SimpleSuggestion(final @NonNull String suggestion) {
-        this.suggestion = suggestion;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public @NonNull String suggestion() {
-        return this.suggestion;
-    }
+    @NonNull TooltipSuggestion<T> withSuggestion(@NonNull String suggestion);
 
-    @Override
-    public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
-        return new SimpleSuggestion(suggestion);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final SimpleSuggestion that = (SimpleSuggestion) o;
-        return Objects.equals(this.suggestion, that.suggestion);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.suggestion);
-    }
-
-    @Override
-    public @NonNull String toString() {
-        return this.suggestion;
-    }
+    /**
+     * Returns a copy of this suggestion instance using the given {@code tooltip}
+     *
+     * @param tooltip the new tooltip
+     * @param <U> the type of the new tooltip
+     * @return the new suggestion
+     */
+    @NonNull <U> TooltipSuggestion<U> withTooltip(@NonNull U tooltip);
 }

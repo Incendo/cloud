@@ -116,7 +116,7 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
             final @NonNull CommandContext<C> commandContext,
             final @NonNull String input
     ) {
-        return this.stringSuggestions(commandContext, input).stream().map(Suggestion::simple).collect(Collectors.toList());
+        return this.stringSuggestions(commandContext, input).stream().map(Suggestion::of).collect(Collectors.toList());
     }
 
     /**

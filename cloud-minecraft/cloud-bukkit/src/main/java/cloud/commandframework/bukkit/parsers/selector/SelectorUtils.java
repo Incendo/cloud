@@ -257,7 +257,7 @@ final class SelectorUtils {
                 if (bukkit instanceof Player && !((Player) bukkit).canSee(player)) {
                     continue;
                 }
-                suggestions.add(Suggestion.simple(player.getName()));
+                suggestions.add(Suggestion.of(player.getName()));
             }
 
             return suggestions;

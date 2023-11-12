@@ -65,7 +65,7 @@ import org.junit.jupiter.api.TestInstance;
 class AnnotationParserTest {
 
     private static final List<Suggestion> NAMED_SUGGESTIONS = Arrays.asList("Dancing-Queen", "Gimme!-Gimme!-Gimme!",
-            "Waterloo").stream().map(Suggestion::simple).collect(Collectors.toList());
+            "Waterloo").stream().map(Suggestion::of).collect(Collectors.toList());
 
     private CommandManager<TestCommandSender> manager;
     private AnnotationParser<TestCommandSender> annotationParser;
@@ -76,7 +76,7 @@ class AnnotationParserTest {
         manager = new TestCommandManager();
         annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
         manager.parserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
-                StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList(Suggestion.simple("potato"))));
+                StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList(Suggestion.of("potato"))));
         /* Register a suggestion provider */
         manager.parserRegistry().registerSuggestionProvider(
                 "some-name",
@@ -162,7 +162,7 @@ class AnnotationParserTest {
                 this.manager.parserRegistry().getSuggestionProvider("cows").orElse(null);
         Assertions.assertNotNull(suggestionProvider);
         Assertions.assertTrue(suggestionProvider.suggestions(new CommandContext<>(new TestCommandSender(), manager), "")
-                .contains(Suggestion.simple("Stella")));
+                .contains(Suggestion.of("Stella")));
     }
 
     @Test
@@ -182,7 +182,7 @@ class AnnotationParserTest {
         Assertions.assertTrue(parser.suggestions(
                 context,
                 ""
-        ).contains(Suggestion.simple("Stella")));
+        ).contains(Suggestion.of("Stella")));
     }
 
     @Test

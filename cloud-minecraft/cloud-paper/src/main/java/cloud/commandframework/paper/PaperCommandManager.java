@@ -31,8 +31,10 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -45,6 +47,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class PaperCommandManager<C> extends BukkitCommandManager<C> {
 
     private PaperBrigadierListener<C> paperBrigadierListener = null;
+    private PaperTooltipConverters paperTooltipConverters = null;
 
     /**
      * Construct a new Paper command manager
@@ -135,6 +138,9 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         } else {
             try {
                 this.paperBrigadierListener = new PaperBrigadierListener<>(this);
+                if (this.hasCapability(CloudBukkitCapabilities.BRIGADIER_COMPLETIONS)) {
+                    this.paperTooltipConverters = new PaperTooltipConverters();
+                }
                 Bukkit.getPluginManager().registerEvents(
                         this.paperBrigadierListener,
                         this.getOwningPlugin()
@@ -159,6 +165,19 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
     }
 
     /**
+     * Returns the {@link PaperTooltipConverters} which handles conversion of tooltip types.
+     * <p>
+     * This will be {@code null} unless {@link #registerBrigadier()} has been invoked.
+     *
+     * @return the tooltip converters
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @Nullable PaperTooltipConverters tooltipConverters() {
+        return this.paperTooltipConverters;
+    }
+
+    /**
      * Register asynchronous completions. This requires all argument parsers to be thread safe, and it
      * is up to the caller to guarantee that such is the case
      *
@@ -170,8 +189,16 @@ public class PaperCommandManager<C> extends BukkitCommandManager<C> {
         if (!this.hasCapability(CloudBukkitCapabilities.ASYNCHRONOUS_COMPLETION)) {
             throw new IllegalStateException("Failed to register asynchronous command completion listener.");
         }
+
+        final Listener listener;
+        if (this.hasCapability(CloudBukkitCapabilities.BRIGADIER_COMPLETIONS)) {
+            listener = new BrigadierAsyncCommandSuggestionsListener<>(this);
+        } else {
+            listener = new LegacyAsyncCommandSuggestionsListener<>(this);
+        }
+
         Bukkit.getServer().getPluginManager().registerEvents(
-                new AsyncCommandSuggestionsListener<>(this),
+                listener,
                 this.getOwningPlugin()
         );
     }

@@ -26,7 +26,6 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -65,12 +64,12 @@ public class DurationArgumentSuggestionsTest {
         final String input4 = "duration 1d2";
         final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
         Assertions.assertTrue(suggestions4.containsAll(suggestionList("1d2h", "1d2m", "1d2s")));
-        Assertions.assertFalse(suggestions4.contains(Suggestion.simple("1d2d")));
+        Assertions.assertFalse(suggestions4.contains(Suggestion.of("1d2d")));
 
         final String input9 = "duration 1d22";
         final List<Suggestion> suggestions9 = manager.suggest(new TestCommandSender(), input9);
         Assertions.assertTrue(suggestions9.containsAll(suggestionList("1d22h", "1d22m", "1d22s")));
-        Assertions.assertFalse(suggestions9.contains(Suggestion.simple("1d22d")));
+        Assertions.assertFalse(suggestions9.contains(Suggestion.of("1d22d")));
 
         final String input5 = "duration d";
         final List<Suggestion> suggestions5 = manager.suggest(new TestCommandSender(), input5);

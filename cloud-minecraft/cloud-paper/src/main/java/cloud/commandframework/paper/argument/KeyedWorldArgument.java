@@ -181,9 +181,9 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
             for (final World world : worlds) {
                 final NamespacedKey key = world.getKey();
                 if (!input.isEmpty() && key.getNamespace().equals(NamespacedKey.MINECRAFT_NAMESPACE)) {
-                    completions.add(Suggestion.simple(key.getKey()));
+                    completions.add(Suggestion.of(key.getKey()));
                 }
-                completions.add(Suggestion.simple(key.getNamespace() + ':' + key.getKey()));
+                completions.add(Suggestion.of(key.getNamespace() + ':' + key.getKey()));
             }
             return completions;
         }

@@ -148,7 +148,7 @@ class LongParserTest {
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Suggestion.simple(Long.toString((long) i)));
+            expectedSuggestions.add(Suggestion.of(Long.toString((long) i)));
         }
 
         // Act
@@ -171,7 +171,7 @@ class LongParserTest {
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
         for (int i = 0; i <= 9; i++) {
-            expectedSuggestions.add(Suggestion.simple(Long.toString((long) -i)));
+            expectedSuggestions.add(Suggestion.of(Long.toString((long) -i)));
         }
 
         // Act

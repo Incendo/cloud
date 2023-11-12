@@ -35,8 +35,48 @@ public interface Suggestion {
      * @param suggestion the suggestion string
      * @return the created suggestion
      */
-    static @NonNull Suggestion simple(final @NonNull String suggestion) {
+    static @NonNull Suggestion of(final @NonNull String suggestion) {
         return new SimpleSuggestion(suggestion);
+    }
+
+    /**
+     * Returns a simple suggestion that returns the given {@code suggestion} together with the given {@code tooltip}
+     * <p>
+     * The supported types of tooltips depends on the platform. All platforms supporting tooltips should support
+     * string tooltips, but they may also offer support for platform-specific tooltip types
+     *
+     * @param suggestion the suggestion string
+     * @param tooltip    the suggestion tooltip
+     * @param <T> the tooltip type
+     * @return the created suggestion
+     */
+    static @NonNull <T> TooltipSuggestion<T> of(final @NonNull String suggestion, final @NonNull T tooltip) {
+        return new SimpleTooltipSuggestion<>(suggestion, tooltip);
+    }
+
+    /**
+     * Returns a simple suggestion that returns the given {@code suggestion}
+     *
+     * @param suggestion the suggestion string
+     * @return the created suggestion
+     */
+    static @NonNull Suggestion suggestion(final @NonNull String suggestion) {
+        return new SimpleSuggestion(suggestion);
+    }
+
+    /**
+     * Returns a simple suggestion that returns the given {@code suggestion} together with the given {@code tooltip}
+     * <p>
+     * The supported types of tooltips depends on the platform. All platforms supporting tooltips should support
+     * string tooltips, but they may also offer support for platform-specific tooltip types
+     *
+     * @param suggestion the suggestion string
+     * @param tooltip    the suggestion tooltip
+     * @param <T> the tooltip type
+     * @return the created suggestion
+     */
+    static @NonNull <T> TooltipSuggestion<T> suggestion(final @NonNull String suggestion, final @NonNull T tooltip) {
+        return new SimpleTooltipSuggestion<>(suggestion, tooltip);
     }
 
     /**

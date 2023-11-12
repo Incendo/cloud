@@ -56,6 +56,7 @@ import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgume
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.examples.bukkit.feature.Tooltip;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
@@ -404,6 +405,10 @@ public final class ExamplePlugin extends JavaPlugin {
             new Mc113(this.manager).registerCommands();
         }
 
+        if (this.manager.hasCapability(CloudBukkitCapabilities.BRIGADIER_COMPLETIONS)) {
+            this.annotationParser.parse(new Tooltip());
+        }
+
         this.registerNamespacedKeyUsingCommand();
 
         //
@@ -419,7 +424,7 @@ public final class ExamplePlugin extends JavaPlugin {
                                 (context, lastString) -> {
                                     final List<String> allArgs = context.getRawInput();
                                     if (allArgs.size() > 1 && allArgs.get(1).equals("curry")) {
-                                        return Collections.singletonList(Suggestion.simple("hot"));
+                                        return Collections.singletonList(Suggestion.of("hot"));
                                     }
                                     return Collections.emptyList();
                                 }

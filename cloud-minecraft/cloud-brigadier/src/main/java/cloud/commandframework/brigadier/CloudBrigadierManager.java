@@ -42,12 +42,15 @@ import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.TooltipConverter;
+import cloud.commandframework.arguments.suggestion.TooltipSuggestion;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
 import cloud.commandframework.types.tuples.Pair;
 import com.mojang.brigadier.LiteralMessage;
+import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -80,6 +83,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -98,8 +102,10 @@ public final class CloudBrigadierManager<C, S> {
 
     private static final SuggestionProvider<?> DELEGATE_TO_CLOUD = (c, b) -> b.buildFuture();
 
-    private final Map<Class<?>, BrigadierMapping<C, ?, S>> mappers;
-    private final Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers;
+    private final Map<Class<?>, BrigadierMapping<C, ?, S>> mappers = new HashMap<>();
+    private final List<@NonNull TooltipConverter<?, Message>> tooltipConverters = new ArrayList<>();
+    private final Map<@NonNull Class<?>, @NonNull Supplier<@Nullable ArgumentType<?>>> defaultArgumentTypeSuppliers =
+            new HashMap<>();
     private final Supplier<CommandContext<C>> dummyContextProvider;
     private final CommandManager<C> commandManager;
     private Function<S, C> brigadierCommandSenderMapper;
@@ -125,8 +131,6 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull CommandManager<C> commandManager,
             final @NonNull Supplier<@NonNull CommandContext<C>> dummyContextProvider
     ) {
-        this.mappers = new HashMap<>();
-        this.defaultArgumentTypeSuppliers = new HashMap<>();
         this.commandManager = commandManager;
         this.dummyContextProvider = dummyContextProvider;
         this.registerInternalMappings();
@@ -376,6 +380,18 @@ public final class CloudBrigadierManager<C, S> {
             final @NonNull Supplier<@Nullable ArgumentType<?>> supplier
     ) {
         this.defaultArgumentTypeSuppliers.put(clazz, supplier);
+    }
+
+    /**
+     * Registers a {@code converter} that converts from {@link T} to a Brigadier {@link Message} for use in suggestion tooltips.
+     *
+     * @param converter the converter
+     * @param <T> the input type
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public <T> void registerTooltipConverter(final @NonNull TooltipConverter<T, Message> converter) {
+        this.tooltipConverters.add(converter);
     }
 
     @SuppressWarnings("all")
@@ -658,15 +674,32 @@ public final class CloudBrigadierManager<C, S> {
         }
 
         for (final Suggestion suggestion : suggestions) {
-            String tooltip = component.argument().getName();
-            if (!(component.argument() instanceof StaticArgument)) {
-                if (component.required()) {
-                    tooltip = '<' + tooltip + '>';
+            final Object tooltip;
+            if (suggestion instanceof TooltipSuggestion) {
+                tooltip = ((TooltipSuggestion) suggestion).tooltip();
+            } else {
+                if (component.argument() instanceof StaticArgument) {
+                    tooltip = component.argument().getName();
+                } else if (component.required()) {
+                    tooltip = String.format("<%s>", component.argument().getName());
                 } else {
-                    tooltip = '[' + tooltip + ']';
+                    tooltip = String.format("[%s]", component.argument().getName());
                 }
             }
-            suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), new LiteralMessage(tooltip));
+
+            final Message message;
+            if (tooltip instanceof Message) {
+                message = (Message) tooltip;
+            } else {
+                message = this.tooltipConverters.stream()
+                        .filter(converter -> converter.canConvert(tooltip))
+                        .findFirst()
+                        .map(converter -> (TooltipConverter) converter)
+                        .map(converter -> (Message) converter.convert(tooltip))
+                        .orElseGet(() -> new LiteralMessage(tooltip.toString()));
+            }
+
+            suggestionsBuilder = suggestionsBuilder.suggest(suggestion.suggestion(), message);
         }
 
         return suggestionsBuilder.buildFuture();

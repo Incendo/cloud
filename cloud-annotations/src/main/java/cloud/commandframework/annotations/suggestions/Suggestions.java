@@ -23,6 +23,8 @@
 //
 package cloud.commandframework.annotations.suggestions;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.context.CommandContext;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,15 +33,18 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * This annotation allows you to create annotated methods that behave like suggestion providers.
- * The method must have a signature matching either: <pre>{@code
+ * <p>
+ * The method must take in the following parameters in the given order: {@link CommandContext} and
+ * {@link String}. The method must return a collection or stream of either {@link String} or {@link Suggestion}.
+ * Example signatures: <pre>{@code
  * ﹫Suggestions("name")
- * public List<String> methodName(CommandContext<YourSender> sender, String input) {
- * }}</pre>
- * or <pre>{@code
+ * public List<String> methodName(CommandContext<YourSender> sender, String input)}</pre>
+ * <pre>{@code
  * ﹫Suggestions("name")
- * public List<Suggestion> methodName(CommandContext<YourSender> sender, String input) {
- * }}</pre>
- *
+ * public List<Suggestion> methodName(CommandContext<YourSender> sender, String input)}</pre>
+ * <pre>{@code
+ * ﹫Suggestions("name")
+ * public Stream<Suggestion> methodName(CommandContext<YourSender> sender, String input)}</pre>
  *
  * @since 1.3.0
  */

@@ -23,46 +23,40 @@
 //
 package cloud.commandframework.arguments.suggestion;
 
-import java.util.Objects;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-class SimpleSuggestion implements Suggestion {
+/**
+ * Converter between a platform type {@link T} and an output type {@link U}
+ *
+ * @param <T> the input type
+ * @param <U> the output type
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public abstract class TooltipConverter<T, U> {
 
-    private final String suggestion;
+    private final Class<T> inputType;
 
-    SimpleSuggestion(final @NonNull String suggestion) {
-        this.suggestion = suggestion;
+    protected TooltipConverter(final @NonNull Class<T> inputType) {
+        this.inputType = inputType;
     }
 
-    @Override
-    public @NonNull String suggestion() {
-        return this.suggestion;
+    /**
+     * Returns whether this converter can convert the given {@code object}
+     *
+     * @param object the object
+     * @return {@code true} if this converter can convert the {@code object}, else {@code false}
+     */
+    public boolean canConvert(final @NonNull Object object) {
+        return this.inputType.isInstance(object);
     }
 
-    @Override
-    public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
-        return new SimpleSuggestion(suggestion);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final SimpleSuggestion that = (SimpleSuggestion) o;
-        return Objects.equals(this.suggestion, that.suggestion);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.suggestion);
-    }
-
-    @Override
-    public @NonNull String toString() {
-        return this.suggestion;
-    }
+    /**
+     * Converts the given {@code tooltip} into the platform type
+     *
+     * @param tooltip the tooltip
+     * @return the converted tooltip
+     */
+    public abstract @NonNull U convert(@NonNull T tooltip);
 }

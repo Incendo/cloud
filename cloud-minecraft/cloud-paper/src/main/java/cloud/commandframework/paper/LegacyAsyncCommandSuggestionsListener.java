@@ -34,11 +34,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class AsyncCommandSuggestionsListener<C> implements Listener {
+final class LegacyAsyncCommandSuggestionsListener<C> implements Listener {
 
     private final PaperCommandManager<C> paperCommandManager;
 
-    AsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
+    LegacyAsyncCommandSuggestionsListener(final @NonNull PaperCommandManager<C> paperCommandManager) {
         this.paperCommandManager = paperCommandManager;
     }
 

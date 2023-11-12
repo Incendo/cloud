@@ -45,7 +45,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class DelegatingCommandSuggestionEngine<C> implements CommandSuggestionEngine<C> {
 
     private static final List<Suggestion> SINGLE_EMPTY_SUGGESTION =
-            Collections.unmodifiableList(Collections.singletonList(Suggestion.simple("")));
+            Collections.unmodifiableList(Collections.singletonList(Suggestion.of("")));
 
     private final CommandManager<C> commandManager;
     private final CommandTree<C> commandTree;

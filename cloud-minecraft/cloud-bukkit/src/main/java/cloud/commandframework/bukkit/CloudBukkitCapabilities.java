@@ -42,6 +42,13 @@ public enum CloudBukkitCapabilities implements CloudCapability {
             && CraftBukkitReflection.findOBCClass("command.BukkitCommandWrapper") != null),
 
     /**
+     * Whether Brigadier is present and cloud can make use of advanced completions.
+     */
+    BRIGADIER_COMPLETIONS(
+            CraftBukkitReflection.classExists("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent$Completion")
+    ),
+
+    /**
      * Whether support for native Brigadier command registration is available
      * through the Paper API ({@code PaperCommandManager#registerBrigadier} from {@code cloud-paper}).
      */

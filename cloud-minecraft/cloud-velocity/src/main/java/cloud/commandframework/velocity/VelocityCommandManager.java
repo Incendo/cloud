@@ -142,6 +142,9 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
             );
         }
 
+        /* Adds support for Adventure components in tooltips. */
+        this.brigadierManager().registerTooltipConverter(new VelocityTooltipConverter());
+
         this.proxyServer.getEventManager().register(plugin, ServerPreConnectEvent.class, ev -> {
             this.lockRegistration();
         });

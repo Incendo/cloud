@@ -231,7 +231,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                         continue;
                     }
 
-                    suggestions.add(Suggestion.simple(String.format("--%s", flag.getName())));
+                    suggestions.add(Suggestion.of(String.format("--%s", flag.getName())));
                 }
                 /* Recommend aliases */
                 final boolean suggestCombined = input.length() > 1 && input.charAt(0) == '-' && input.charAt(1) != '-';
@@ -245,15 +245,15 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
                     for (final String alias : flag.getAliases()) {
                         if (suggestCombined && flag.getCommandArgument() == null) {
-                            suggestions.add(Suggestion.simple(String.format("%s%s", input, alias)));
+                            suggestions.add(Suggestion.of(String.format("%s%s", input, alias)));
                         } else {
-                            suggestions.add(Suggestion.simple(String.format("-%s", alias)));
+                            suggestions.add(Suggestion.of(String.format("-%s", alias)));
                         }
                     }
                 }
                 /* If we are suggesting the combined flag, then also suggest the current input */
                 if (suggestCombined) {
-                    suggestions.add(Suggestion.simple(input));
+                    suggestions.add(Suggestion.of(input));
                 }
                 return suggestions;
             } else {
