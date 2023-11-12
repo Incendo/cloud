@@ -77,6 +77,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -453,7 +454,7 @@ public final class AnnotationParser<C> {
                 method.setAccessible(true);
             }
             if (method.getParameterCount() != 2
-                    || !method.getReturnType().equals(List.class)
+                    || !(Collection.class.isAssignableFrom(method.getReturnType()) || method.getReturnType().equals(Stream.class))
                     || !method.getParameters()[0].getType().equals(CommandContext.class)
                     || !method.getParameters()[1].getType().equals(String.class)
             ) {
