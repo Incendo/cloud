@@ -27,13 +27,12 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -50,11 +49,10 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             final @NonNull String name,
             final double min,
             final double max,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new DoubleParser<>(min, max), Double.class, suggestionsProvider, defaultDescription);
+        super(name, new DoubleParser<>(min, max), Double.class, suggestionProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -159,7 +157,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
                     this.getName(),
                     this.min,
                     this.max,
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

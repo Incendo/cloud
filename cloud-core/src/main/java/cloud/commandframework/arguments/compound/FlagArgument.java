@@ -27,6 +27,8 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
@@ -45,7 +47,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
@@ -184,7 +185,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
         @Override
         @SuppressWarnings({"unchecked", "rawtypes"})
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -220,7 +221,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     }
                 }
                 /* Suggestions */
-                final List<String> strings = new LinkedList<>();
+                final List<Suggestion> suggestions = new LinkedList<>();
                 /* Recommend "primary" flags */
                 for (final CommandFlag<?> flag : this.flags) {
                     if (usedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
@@ -230,7 +231,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                         continue;
                     }
 
-                    strings.add(String.format("--%s", flag.getName()));
+                    suggestions.add(Suggestion.simple(String.format("--%s", flag.getName())));
                 }
                 /* Recommend aliases */
                 final boolean suggestCombined = input.length() > 1 && input.charAt(0) == '-' && input.charAt(1) != '-';
@@ -244,17 +245,17 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
                     for (final String alias : flag.getAliases()) {
                         if (suggestCombined && flag.getCommandArgument() == null) {
-                            strings.add(String.format("%s%s", input, alias));
+                            suggestions.add(Suggestion.simple(String.format("%s%s", input, alias)));
                         } else {
-                            strings.add(String.format("-%s", alias));
+                            suggestions.add(Suggestion.simple(String.format("-%s", alias)));
                         }
                     }
                 }
                 /* If we are suggesting the combined flag, then also suggest the current input */
                 if (suggestCombined) {
-                    strings.add(input);
+                    suggestions.add(Suggestion.simple(input));
                 }
-                return strings;
+                return suggestions;
             } else {
                 CommandFlag<?> currentFlag = null;
                 if (lastArg.startsWith("--")) { // --long
@@ -279,8 +280,8 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 if (currentFlag != null
                         && commandContext.hasPermission(currentFlag.permission())
                         && currentFlag.getCommandArgument() != null) {
-                    return (List<String>) ((BiFunction) currentFlag.getCommandArgument().getSuggestionsProvider())
-                            .apply(commandContext, input);
+                    return (List<Suggestion>) ((SuggestionProvider) currentFlag.getCommandArgument().suggestionProvider())
+                            .suggestions(commandContext, input);
                 }
             }
             commandContext.store(FLAG_META_KEY, "");

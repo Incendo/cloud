@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.NoPermissionException;
@@ -161,13 +162,13 @@ class CommandTreeTest {
         );
 
         // Act
-        final List<String> results = this.commandManager.commandTree().getSuggestions(
+        final List<Suggestion> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
                 new LinkedList<>(Arrays.asList("test", ""))
         );
 
         // Assert
-        assertThat(results).containsExactly("a", "b");
+        assertThat(results).containsExactly(Suggestion.simple("a"), Suggestion.simple("b"));
     }
 
     @Test

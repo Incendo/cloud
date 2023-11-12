@@ -25,9 +25,7 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.function.BiFunction;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import org.apiguardian.api.API;
@@ -47,14 +45,14 @@ public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
 
     MobEffectArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new RegistryEntryArgument.Parser<>(Registries.MOB_EFFECT),
                 MobEffect.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -106,7 +104,7 @@ public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
         public @NonNull MobEffectArgument<C> build() {
             return new MobEffectArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

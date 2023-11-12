@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserRegistry;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.permission.Permission;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
@@ -38,8 +39,6 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -111,7 +110,7 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                                     parameter.getType().getCanonicalName(), flagName, method.getName()
                             ));
                 }
-                final BiFunction<?, @NonNull String, @NonNull List<String>> suggestionProvider;
+                final SuggestionProvider<?> suggestionProvider;
                 final String suggestions = this.annotationParser.processString(flag.suggestions());
                 if (!suggestions.isEmpty()) {
                     suggestionProvider = registry.getSuggestionProvider(suggestions).orElse(null);
@@ -127,7 +126,7 @@ final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNu
                         .withParser(parser);
                 final CommandArgument argument;
                 if (suggestionProvider != null) {
-                    argument = argumentBuilder.withSuggestionsProvider(suggestionProvider).build();
+                    argument = argumentBuilder.withSuggestionProvider(suggestionProvider).build();
                 } else {
                     argument = argumentBuilder.build();
                 }

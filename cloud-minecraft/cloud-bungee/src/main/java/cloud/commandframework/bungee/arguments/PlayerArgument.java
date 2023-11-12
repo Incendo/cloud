@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bungee.BungeeCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
@@ -55,7 +56,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
 
     private PlayerArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
@@ -123,7 +124,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
         public @NonNull CommandArgument<@NonNull C, @NonNull ProxiedPlayer> build() {
             return new PlayerArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()
             );
@@ -159,7 +160,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

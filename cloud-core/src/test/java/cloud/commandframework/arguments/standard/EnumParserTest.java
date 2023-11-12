@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,13 +97,13 @@ class EnumParserTest {
         );
 
         // Act
-        final List<String> suggestions = parser.suggestions(
+        final List<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 ""
         );
 
         // Assert
-        assertThat(suggestions).containsExactly("aaa", "bbb", "ccc");
+        assertThat(suggestions).containsExactlyElementsIn(ArgumentTestHelper.suggestionList("aaa", "bbb", "ccc"));
     }
 
     enum TestEnum {

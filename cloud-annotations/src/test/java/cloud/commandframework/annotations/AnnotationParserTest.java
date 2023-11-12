@@ -35,6 +35,8 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
@@ -53,7 +55,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletionException;
-import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -62,7 +64,8 @@ import org.junit.jupiter.api.TestInstance;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AnnotationParserTest {
 
-    private static final List<String> NAMED_SUGGESTIONS = Arrays.asList("Dancing-Queen", "Gimme!-Gimme!-Gimme!", "Waterloo");
+    private static final List<Suggestion> NAMED_SUGGESTIONS = Arrays.asList("Dancing-Queen", "Gimme!-Gimme!-Gimme!",
+            "Waterloo").stream().map(Suggestion::simple).collect(Collectors.toList());
 
     private CommandManager<TestCommandSender> manager;
     private AnnotationParser<TestCommandSender> annotationParser;
@@ -73,7 +76,7 @@ class AnnotationParserTest {
         manager = new TestCommandManager();
         annotationParser = new AnnotationParser<>(manager, TestCommandSender.class, p -> SimpleCommandMeta.empty());
         manager.parserRegistry().registerNamedParserSupplier("potato", p -> new StringArgument.StringParser<>(
-                StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList("potato")));
+                StringArgument.StringMode.SINGLE, (c, s) -> Collections.singletonList(Suggestion.simple("potato"))));
         /* Register a suggestion provider */
         manager.parserRegistry().registerSuggestionProvider(
                 "some-name",
@@ -154,12 +157,12 @@ class AnnotationParserTest {
     }
 
     @Test
-    void testAnnotatedSuggestionsProviders() {
-        final BiFunction<CommandContext<TestCommandSender>, String, List<String>> suggestionsProvider =
+    void testAnnotatedSuggestionProviders() {
+        final SuggestionProvider<TestCommandSender> suggestionProvider =
                 this.manager.parserRegistry().getSuggestionProvider("cows").orElse(null);
-        Assertions.assertNotNull(suggestionsProvider);
-        Assertions.assertTrue(suggestionsProvider.apply(new CommandContext<>(new TestCommandSender(), manager), "")
-                .contains("Stella"));
+        Assertions.assertNotNull(suggestionProvider);
+        Assertions.assertTrue(suggestionProvider.suggestions(new CommandContext<>(new TestCommandSender(), manager), "")
+                .contains(Suggestion.simple("Stella")));
     }
 
     @Test
@@ -179,7 +182,7 @@ class AnnotationParserTest {
         Assertions.assertTrue(parser.suggestions(
                 context,
                 ""
-        ).contains("Stella"));
+        ).contains(Suggestion.simple("Stella")));
     }
 
     @Test

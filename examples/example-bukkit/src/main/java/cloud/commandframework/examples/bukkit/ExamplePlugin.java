@@ -43,6 +43,7 @@ import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
@@ -418,7 +419,7 @@ public final class ExamplePlugin extends JavaPlugin {
                                 (context, lastString) -> {
                                     final List<String> allArgs = context.getRawInput();
                                     if (allArgs.size() > 1 && allArgs.get(1).equals("curry")) {
-                                        return Collections.singletonList("hot");
+                                        return Collections.singletonList(Suggestion.simple("hot"));
                                     }
                                     return Collections.emptyList();
                                 }

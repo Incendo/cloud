@@ -27,6 +27,8 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.context.CommandContext;
@@ -34,7 +36,6 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -54,10 +55,10 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
 
     KeyedWorldArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new Parser<>(), World.class, suggestionsProvider, defaultDescription);
+        super(name, new Parser<>(), World.class, suggestionProvider, defaultDescription);
     }
 
     /**
@@ -107,7 +108,7 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
         public @NonNull KeyedWorldArgument<C> build() {
             return new KeyedWorldArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }
@@ -167,7 +168,7 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
@@ -176,13 +177,13 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
             }
 
             final List<World> worlds = Bukkit.getWorlds();
-            final List<String> completions = new ArrayList<>(worlds.size() * 2);
+            final List<Suggestion> completions = new ArrayList<>(worlds.size() * 2);
             for (final World world : worlds) {
                 final NamespacedKey key = world.getKey();
                 if (!input.isEmpty() && key.getNamespace().equals(NamespacedKey.MINECRAFT_NAMESPACE)) {
-                    completions.add(key.getKey());
+                    completions.add(Suggestion.simple(key.getKey()));
                 }
-                completions.add(key.getNamespace() + ':' + key.getKey());
+                completions.add(Suggestion.simple(key.getNamespace() + ':' + key.getKey()));
             }
             return completions;
         }

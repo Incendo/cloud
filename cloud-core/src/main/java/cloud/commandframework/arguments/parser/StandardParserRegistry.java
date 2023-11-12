@@ -41,7 +41,8 @@ import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.standard.UUIDArgument;
-import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.arguments.suggestion.Suggestion;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import io.leangen.geantyref.AnnotatedTypeMap;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
@@ -51,13 +52,13 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -90,8 +91,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     private final Map<AnnotatedType, Function<ParserParameters, ArgumentParser<C, ?>>> parserSuppliers = new AnnotatedTypeMap<>();
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, TypeToken<?>, ParserParameters>>
             annotationMappers = new HashMap<>();
-    private final Map<String, BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>>
-            namedSuggestionProviders = new HashMap<>();
+    private final Map<String, SuggestionProvider<C>> namedSuggestionProviders = new HashMap<>();
 
     /**
      * Construct a new {@link StandardParserRegistry} instance. This will also
@@ -176,7 +176,9 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             }
             return new StringArgument.StringParser<>(
                     stringMode,
-                    (context, s) -> Arrays.asList(options.get(StandardParameters.COMPLETIONS, new String[0]))
+                    (context, s) -> Arrays.stream(options.get(StandardParameters.COMPLETIONS, new String[0]))
+                            .map(Suggestion::simple)
+                            .collect(Collectors.toList())
             );
         });
         this.registerParserSupplier(TypeToken.get(Boolean.class), options -> {
@@ -283,17 +285,16 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
     @Override
     public void registerSuggestionProvider(
             final @NonNull String name,
-            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionsProvider
+            final @NonNull SuggestionProvider<C> suggestionProvider
     ) {
-        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionsProvider);
+        this.namedSuggestionProviders.put(name.toLowerCase(Locale.ENGLISH), suggestionProvider);
     }
 
     @Override
-    public @NonNull Optional<BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>>> getSuggestionProvider(
+    public @NonNull Optional<SuggestionProvider<C>> getSuggestionProvider(
             final @NonNull String name
     ) {
-        final BiFunction<@NonNull CommandContext<C>, @NonNull String, @NonNull List<String>> suggestionProvider =
-                this.namedSuggestionProviders.get(name.toLowerCase(Locale.ENGLISH));
+        final SuggestionProvider<C> suggestionProvider = this.namedSuggestionProviders.get(name.toLowerCase(Locale.ENGLISH));
         return Optional.ofNullable(suggestionProvider);
     }
 

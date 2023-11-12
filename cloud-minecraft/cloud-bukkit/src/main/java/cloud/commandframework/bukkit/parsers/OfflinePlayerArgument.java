@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.CaptionVariable;
@@ -36,7 +37,6 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -58,15 +58,14 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
 
     private OfflinePlayerArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new OfflinePlayerParser<>(),
                 OfflinePlayer.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -123,7 +122,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
          */
         @Override
         public @NonNull OfflinePlayerArgument<C> build() {
-            return new OfflinePlayerArgument<>(this.getName(), this.getSuggestionsProvider(), this.getDefaultDescription());
+            return new OfflinePlayerArgument<>(this.getName(), this.suggestionProvider(), this.getDefaultDescription());
         }
     }
 
@@ -155,7 +154,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

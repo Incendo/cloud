@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.BukkitParserParameters;
@@ -39,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import org.bukkit.NamespacedKey;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -54,8 +54,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
 
     private NamespacedKeyArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final boolean requireExplicitNamespace,
             final String defaultNamespace
@@ -64,7 +63,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                 name,
                 new Parser<>(requireExplicitNamespace, defaultNamespace),
                 NamespacedKey.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -147,7 +146,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
         public @NonNull NamespacedKeyArgument<C> build() {
             return new NamespacedKeyArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription(),
                     this.requireExplicitNamespace,
                     this.defaultNamespace
@@ -228,7 +227,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

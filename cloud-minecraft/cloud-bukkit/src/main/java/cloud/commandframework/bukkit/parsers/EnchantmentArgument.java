@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
@@ -35,7 +36,6 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -51,15 +51,14 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
 
     protected EnchantmentArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new EnchantmentParser<>(),
                 Enchantment.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -113,7 +112,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
         public @NonNull CommandArgument<C, Enchantment> build() {
             return new EnchantmentArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }
@@ -156,7 +155,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

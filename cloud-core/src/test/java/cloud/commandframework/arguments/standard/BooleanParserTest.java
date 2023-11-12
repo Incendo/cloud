@@ -25,6 +25,7 @@ package cloud.commandframework.arguments.standard;
 
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import java.util.Locale;
@@ -132,12 +133,12 @@ class BooleanParserTest {
 
     @ParameterizedTest
     @MethodSource("Suggestions_ExpectedSuggestions_Source")
-    void Suggestions_ExpectedSuggestions(final boolean liberal, final List<String> expectedSuggestions) {
+    void Suggestions_ExpectedSuggestions(final boolean liberal, final List<Suggestion> expectedSuggestions) {
         // Arrange
         final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(liberal);
 
         // Act
-        final List<String> suggestions = parser.suggestions(
+        final List<Suggestion> suggestions = parser.suggestions(
                 this.context,
                 ""
         );
@@ -148,8 +149,8 @@ class BooleanParserTest {
 
     static Stream<Arguments> Suggestions_ExpectedSuggestions_Source() {
         return Stream.of(
-                Arguments.arguments(false, ArgumentTestHelper.linkedListOf("true", "false")),
-                Arguments.arguments(true, ArgumentTestHelper.linkedListOf("true", "yes", "on", "false", "no", "off"))
+                Arguments.arguments(false, ArgumentTestHelper.suggestionList("true", "false")),
+                Arguments.arguments(true, ArgumentTestHelper.suggestionList("true", "yes", "on", "false", "no", "off"))
         );
     }
 }

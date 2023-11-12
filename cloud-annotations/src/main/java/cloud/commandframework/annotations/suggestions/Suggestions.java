@@ -30,11 +30,16 @@ import java.lang.annotation.Target;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * This annotation allows you to create annotated methods that behave like suggestions providers.
- * The method must have this exact signature: <pre>{@code
+ * This annotation allows you to create annotated methods that behave like suggestion providers.
+ * The method must have a signature matching either: <pre>{@code
  * ﹫Suggestions("name")
  * public List<String> methodName(CommandContext<YourSender> sender, String input) {
  * }}</pre>
+ * or <pre>{@code
+ * ﹫Suggestions("name")
+ * public List<Suggestion> methodName(CommandContext<YourSender> sender, String input) {
+ * }}</pre>
+ *
  *
  * @since 1.3.0
  */
@@ -43,9 +48,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public @interface Suggestions {
 
     /**
-     * Name of the suggestions provider. This should be the same as the name specified in your command arguments
+     * Name of the suggestion provider. This should be the same as the name specified in your command arguments
      *
-     * @return Suggestions provider name
+     * @return Suggestion provider name
      */
     @NonNull String value();
 }

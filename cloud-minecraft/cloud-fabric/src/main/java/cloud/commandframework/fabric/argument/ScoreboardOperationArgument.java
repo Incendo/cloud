@@ -25,10 +25,8 @@ package cloud.commandframework.fabric.argument;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import java.util.function.BiFunction;
 import net.minecraft.commands.arguments.OperationArgument;
 import net.minecraft.commands.arguments.OperationArgument.Operation;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -46,14 +44,14 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
 
     ScoreboardOperationArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
                 name,
                 new WrappedBrigadierParser<>(OperationArgument.operation()),
                 Operation.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
     }
@@ -105,7 +103,7 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
         public @NonNull ScoreboardOperationArgument<C> build() {
             return new ScoreboardOperationArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

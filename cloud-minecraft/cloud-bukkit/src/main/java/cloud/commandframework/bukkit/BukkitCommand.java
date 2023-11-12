@@ -26,6 +26,7 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -86,7 +88,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     @Override
-    public @NonNull List<String> tabComplete(
+    public @NonNull List<@NonNull String> tabComplete(
             final @NonNull CommandSender sender,
             final @NonNull String alias,
             final @NonNull String @NonNull [] args
@@ -98,7 +100,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         return this.manager.suggest(
                 this.manager.getCommandSenderMapper().apply(sender),
                 builder.toString()
-        );
+        ).stream().map(Suggestion::suggestion).collect(Collectors.toList());
     }
 
     @Override

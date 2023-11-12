@@ -23,10 +23,12 @@
 //
 package cloud.commandframework.paper;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitPluginRegistrationHandler;
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -67,7 +69,7 @@ final class AsyncCommandSuggestionsListener<C> implements Listener {
         final List<String> suggestions = new ArrayList<>(this.paperCommandManager.suggest(
                 cloudSender,
                 inputBuffer
-        ));
+        )).stream().map(Suggestion::suggestion).collect(Collectors.toList());
 
         event.setCompletions(suggestions);
         event.setHandled(true);

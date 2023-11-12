@@ -28,6 +28,7 @@ import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.ArgumentContext;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
@@ -498,13 +499,15 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Get suggestions from the input queue
+     * Returns suggestions from the input queue
      *
      * @param context      Context instance
      * @param commandQueue Input queue
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
+     * @since 2.0.0
      */
-    public @NonNull List<@NonNull String> getSuggestions(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull List<@NonNull Suggestion> getSuggestions(
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<@NonNull String> commandQueue
     ) {
@@ -512,7 +515,7 @@ public final class CommandTree<C> {
     }
 
     @SuppressWarnings("MixedMutabilityReturnType")
-    private @NonNull List<@NonNull String> getSuggestions(
+    private @NonNull List<@NonNull Suggestion> getSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull CommandNode<C> root
@@ -563,7 +566,7 @@ public final class CommandTree<C> {
         }
 
         /* Calculate suggestions for the literal arguments */
-        final List<String> suggestions = new LinkedList<>();
+        final List<Suggestion> suggestions = new LinkedList<>();
         if (commandQueue.size() <= 1) {
             final String literalValue = this.stringOrEmpty(commandQueue.peek());
             for (final CommandNode<C> argument : staticArguments) {
@@ -571,10 +574,10 @@ public final class CommandTree<C> {
                     continue;
                 }
                 commandContext.setCurrentArgument(argument.argument());
-                final List<String> suggestionsToAdd = argument.argument().getSuggestionsProvider()
-                        .apply(commandContext, literalValue);
-                for (String suggestion : suggestionsToAdd) {
-                    if (suggestion.equals(literalValue) || !suggestion.startsWith(literalValue)) {
+                final List<Suggestion> suggestionsToAdd = argument.argument().suggestionProvider()
+                        .suggestions(commandContext, literalValue);
+                for (Suggestion suggestion : suggestionsToAdd) {
+                    if (suggestion.suggestion().equals(literalValue) || !suggestion.suggestion().startsWith(literalValue)) {
                         continue;
                     }
                     suggestions.add(suggestion);
@@ -592,7 +595,7 @@ public final class CommandTree<C> {
         return suggestions;
     }
 
-    private @NonNull List<@NonNull String> suggestionsForDynamicArgument(
+    private @NonNull List<@NonNull Suggestion> suggestionsForDynamicArgument(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull Queue<@NonNull String> commandQueue,
             final @NonNull CommandNode<C> child
@@ -723,14 +726,14 @@ public final class CommandTree<C> {
         return string;
     }
 
-    private @NonNull List<@NonNull String> directSuggestions(
+    private @NonNull List<@NonNull Suggestion> directSuggestions(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandNode<C> current,
             final @NonNull String text) {
         CommandArgument<C, ?> argument = Objects.requireNonNull(current.argument());
 
         commandContext.setCurrentArgument(argument);
-        List<String> suggestions = argument.getSuggestionsProvider().apply(commandContext, text);
+        List<Suggestion> suggestions = argument.suggestionProvider().suggestions(commandContext, text);
 
         // When suggesting a flag, potentially suggest following nodes too
         if (argument instanceof FlagArgument
@@ -741,7 +744,7 @@ public final class CommandTree<C> {
             for (final CommandNode<C> child : current.children()) {
                 argument = Objects.requireNonNull(child.argument());
                 commandContext.setCurrentArgument(argument);
-                suggestions.addAll(argument.getSuggestionsProvider().apply(commandContext, text));
+                suggestions.addAll(argument.suggestionProvider().suggestions(commandContext, text));
             }
         }
 

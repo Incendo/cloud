@@ -21,34 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.execution;
+package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
+import cloud.commandframework.context.CommandContext;
 import java.util.List;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Processor that formats command suggestions
+ * Provider of suggestions
  *
- * @param <C> Command sender type
+ * @param <C> command sender type
+ * @since 2.0.0
  */
-@API(status = API.Status.STABLE)
-public interface CommandSuggestionProcessor<C> extends
-        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Suggestion>, @NonNull List<Suggestion>> {
+@API(status = API.Status.STABLE, since = "2.0.0")
+@FunctionalInterface
+public interface SuggestionProvider<C> {
 
     /**
-     * Create a pass through {@link CommandSuggestionProcessor} that simply returns
-     * the input.
+     * Returns the suggestions for the given {@code input}
      *
-     * @param <C> sender type
-     * @return new processor
-     * @since 1.8.0
+     * @param context the context of the suggestion lookup
+     * @param input   the current input
+     * @return the suggestions
      */
-    @API(status = API.Status.STABLE, since = "1.8.0")
-    static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
-        return (ctx, suggestions) -> suggestions;
-    }
+    @NonNull List<@NonNull Suggestion> suggestions(@NonNull CommandContext<C> context, @NonNull String input);
 }

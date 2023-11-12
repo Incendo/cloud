@@ -21,34 +21,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.execution;
+package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import java.util.List;
-import java.util.function.BiFunction;
-import org.apiguardian.api.API;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Processor that formats command suggestions
- *
- * @param <C> Command sender type
- */
-@API(status = API.Status.STABLE)
-public interface CommandSuggestionProcessor<C> extends
-        BiFunction<@NonNull CommandPreprocessingContext<C>, @NonNull List<Suggestion>, @NonNull List<Suggestion>> {
+final class SimpleSuggestion implements Suggestion {
 
-    /**
-     * Create a pass through {@link CommandSuggestionProcessor} that simply returns
-     * the input.
-     *
-     * @param <C> sender type
-     * @return new processor
-     * @since 1.8.0
-     */
-    @API(status = API.Status.STABLE, since = "1.8.0")
-    static <C> @NonNull CommandSuggestionProcessor<C> passThrough() {
-        return (ctx, suggestions) -> suggestions;
+    private final String suggestion;
+
+    SimpleSuggestion(final @NonNull String suggestion) {
+        this.suggestion = suggestion;
+    }
+
+    @Override
+    public @NonNull String suggestion() {
+        return this.suggestion;
+    }
+
+    @Override
+    public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
+        return new SimpleSuggestion(suggestion);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final SimpleSuggestion that = (SimpleSuggestion) o;
+        return Objects.equals(this.suggestion, that.suggestion);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.suggestion);
+    }
+
+    @Override
+    public String toString() {
+        return this.suggestion;
     }
 }

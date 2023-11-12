@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -53,11 +53,10 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     private BooleanArgument(
             final @NonNull String name,
             final boolean liberal,
-            final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
-                    @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription description
     ) {
-        super(name, new BooleanParser<>(liberal), Boolean.class, suggestionsProvider, description);
+        super(name, new BooleanParser<>(liberal), Boolean.class, suggestionProvider, description);
         this.liberal = liberal;
     }
 
@@ -139,7 +138,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
             return new BooleanArgument<>(
                     this.getName(),
                     this.liberal,
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }
@@ -213,7 +212,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull String> stringSuggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

@@ -27,16 +27,15 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.UUID;
-import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -47,11 +46,10 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
     private UUIDArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new UUIDParser<>(), UUID.class, suggestionsProvider, defaultDescription);
+        super(name, new UUIDParser<>(), UUID.class, suggestionProvider, defaultDescription);
     }
 
     /**
@@ -109,7 +107,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
         public @NonNull UUIDArgument<C> build() {
             return new UUIDArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }

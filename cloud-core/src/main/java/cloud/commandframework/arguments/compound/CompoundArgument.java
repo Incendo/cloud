@@ -26,6 +26,7 @@ package cloud.commandframework.arguments.compound;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.types.tuples.Tuple;
 import io.leangen.geantyref.TypeToken;
@@ -157,7 +158,7 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
 
         @Override
         @SuppressWarnings("unchecked")
-        public @NonNull List<@NonNull String> suggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

@@ -84,7 +84,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
     /**
      * Use a custom Brigadier suggestion provider for this parser.
      *
-     * @param provider the suggestions provider
+     * @param provider the suggestion provider
      * @return this builder
      * @since 1.5.0
      */
@@ -96,7 +96,7 @@ public interface BrigadierMappingBuilder<K extends ArgumentParser<?, ?>, S> {
     /**
      * Use a custom Brigadier suggestion provider for this parser.
      *
-     * @param provider the suggestions provider
+     * @param provider the suggestion provider
      * @return this builder
      * @since 1.5.0
      */

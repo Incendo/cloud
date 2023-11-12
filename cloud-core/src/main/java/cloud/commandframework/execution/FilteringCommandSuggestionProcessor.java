@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.execution;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +66,9 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
     }
 
     @Override
-    public @NonNull List<@NonNull String> apply(
+    public @NonNull List<@NonNull Suggestion> apply(
             final @NonNull CommandPreprocessingContext<C> context,
-            final @NonNull List<@NonNull String> strings
+            final @NonNull List<@NonNull Suggestion> inputSuggestions
     ) {
         final String input;
         if (context.getInputQueue().isEmpty()) {
@@ -75,11 +76,11 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
         } else {
             input = String.join(" ", context.getInputQueue());
         }
-        final List<String> suggestions = new ArrayList<>(strings.size());
-        for (final String suggestion : strings) {
-            final @Nullable String filtered = this.filter.filter(context, suggestion, input);
+        final List<Suggestion> suggestions = new ArrayList<>(inputSuggestions.size());
+        for (final Suggestion suggestion : inputSuggestions) {
+            final @Nullable String filtered = this.filter.filter(context, suggestion.suggestion(), input);
             if (filtered != null) {
-                suggestions.add(filtered);
+                suggestions.add(suggestion.withSuggestion(filtered));
             }
         }
         return suggestions;

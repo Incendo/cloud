@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
@@ -34,7 +35,6 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.List;
 import java.util.Queue;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
@@ -51,10 +51,10 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
 
     protected WorldArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(name, new WorldParser<>(), World.class, suggestionsProvider, defaultDescription);
+        super(name, new WorldParser<>(), World.class, suggestionProvider, defaultDescription);
     }
 
     /**
@@ -106,7 +106,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         public @NonNull CommandArgument<C, World> build() {
             return new WorldArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription()
             );
         }
@@ -138,7 +138,10 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         }
 
         @Override
-        public @NonNull List<String> suggestions(final @NonNull CommandContext<C> commandContext, final @NonNull String input) {
+        public @NonNull List<@NonNull String> stringSuggestions(
+                final @NonNull CommandContext<C> commandContext,
+                final @NonNull String input
+        ) {
             return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
         }
     }

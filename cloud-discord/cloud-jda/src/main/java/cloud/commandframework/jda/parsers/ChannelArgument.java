@@ -27,13 +27,13 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.BiFunction;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -54,8 +54,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
     private ChannelArgument(
             final @NonNull String name,
-            final @Nullable BiFunction<@NonNull CommandContext<C>,
-                    @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
+            final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
@@ -63,7 +62,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
                 name,
                 new MessageParser<>(modes),
                 MessageChannel.class,
-                suggestionsProvider,
+                suggestionProvider,
                 defaultDescription
         );
         this.modes = modes;
@@ -152,7 +151,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
         public @NonNull ChannelArgument<C> build() {
             return new ChannelArgument<>(
                     this.getName(),
-                    this.getSuggestionsProvider(),
+                    this.suggestionProvider(),
                     this.getDefaultDescription(),
                     this.modes
             );

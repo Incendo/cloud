@@ -23,15 +23,24 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class ArgumentTestHelper {
+public final class ArgumentTestHelper {
 
     static @NonNull LinkedList<@NonNull String> linkedListOf(
             final @NonNull String... strings
     ) {
         return new LinkedList<>(Arrays.asList(strings));
+    }
+
+    public static @NonNull List<@NonNull Suggestion> suggestionList(
+            final @NonNull String... strings
+    ) {
+        return Arrays.stream(strings).map(Suggestion::simple).collect(Collectors.toList());
     }
 }

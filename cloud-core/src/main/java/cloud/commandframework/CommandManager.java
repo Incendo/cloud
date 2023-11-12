@@ -35,6 +35,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariableReplacementHandler;
 import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
@@ -206,8 +207,10 @@ public abstract class CommandManager<C> {
      * @param input         Input provided by the sender. Prefixes should be removed before the method is being called, and
      *                      the input here will be passed directly to the command parsing pipeline, after having been tokenized.
      * @return List of suggestions
+     * @since 2.0.0
      */
-    public @NonNull List<@NonNull String> suggest(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull List<@NonNull Suggestion> suggest(
             final @NonNull C commandSender,
             final @NonNull String input
     ) {
@@ -984,19 +987,6 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Get the command suggestions processor instance currently used in this command manager
-     *
-     * @return Command suggestions processor
-     * @see #commandSuggestionProcessor(CommandSuggestionProcessor) Setting the suggestion processor
-     * @deprecated for removal since 1.7.0. Use the non-prefixed getter {@link #commandSuggestionProcessor()} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.7.0")
-    public @NonNull CommandSuggestionProcessor<C> getCommandSuggestionProcessor() {
-        return this.commandSuggestionProcessor();
-    }
-
-    /**
      * Returns the command suggestion processor used in this command manager.
      *
      * @return the command suggestion processor
@@ -1006,21 +996,6 @@ public abstract class CommandManager<C> {
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor() {
         return this.commandSuggestionProcessor;
-    }
-
-    /**
-     * Set the command suggestions processor for this command manager. This will be called every
-     * time {@link #suggest(Object, String)} is called, to process the list of suggestions
-     * before it's returned to the caller
-     *
-     * @param commandSuggestionProcessor New command suggestions processor
-     * @deprecated for removal since 1.7.0. Use the non-prefixed setter
-     * {@link #commandSuggestionProcessor(CommandSuggestionProcessor)} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.7.0")
-    public void setCommandSuggestionProcessor(final @NonNull CommandSuggestionProcessor<C> commandSuggestionProcessor) {
-        this.commandSuggestionProcessor(commandSuggestionProcessor);
     }
 
     /**
