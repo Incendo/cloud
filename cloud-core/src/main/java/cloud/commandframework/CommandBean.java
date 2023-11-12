@@ -26,6 +26,8 @@ package cloud.commandframework;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.meta.CommandMeta;
+import java.util.Collections;
+import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -37,14 +39,15 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * to implement your command handler. You may also provide custom handler when {@link #configure(Command.Builder)} is invoked.
  * <p>
  * Information about the command, such as aliases, should be provided by {@link #properties()}. The command bean may be
- * registered to the command manager by using {@link CommandManager#command(CommandBean)}. This will invoke {@link #configure(Command.Builder)}
+ * registered to the command manager by using {@link CommandManager#command(CommandFactory)}. This will invoke
+ * {@link #configure(Command.Builder)}
  * where you may configure the command. The command meta may be configured by overriding {@link #meta()}.
  *
  * @param <C> the command sender type
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public abstract class CommandBean<C> implements CommandExecutionHandler<C> {
+public abstract class CommandBean<C> implements CommandExecutionHandler<C>, CommandFactory<C> {
 
     protected CommandBean() {
     }
@@ -57,14 +60,15 @@ public abstract class CommandBean<C> implements CommandExecutionHandler<C> {
      * @param commandManager the command manager
      * @return the constructed command
      */
-    public @NonNull Command<C> constructCommand(final @NonNull CommandManager<C> commandManager) {
+    @Override
+    public @NonNull List<@NonNull Command<C>> createCommand(final @NonNull CommandManager<C> commandManager) {
         final Command.Builder<C> builder = commandManager.commandBuilder(
                 this.properties().name(),
                 this.properties().aliases(),
                 this.meta()
         ).handler(this);
         this.configure(builder);
-        return builder.build();
+        return Collections.singletonList(builder.build());
     }
 
     /**
