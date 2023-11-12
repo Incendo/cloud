@@ -122,7 +122,7 @@ public final class ExamplePlugin extends Plugin {
         this.manager.command(
                 this.manager.commandBuilder("player")
                         .senderType(ProxiedPlayer.class)
-                        .argument(playerArgument, RichDescription.of(text("Player ").append(text("name", NamedTextColor.GOLD))))
+                        .required(playerArgument, RichDescription.of(text("Player ").append(text("name", NamedTextColor.GOLD))))
                         .handler(context -> {
                             final ProxiedPlayer player = context.get("player");
                             this.bungeeAudiences.sender(context.getSender()).sendMessage(
@@ -138,7 +138,7 @@ public final class ExamplePlugin extends Plugin {
         this.manager.command(
                 this.manager.commandBuilder("server")
                         .senderType(ProxiedPlayer.class)
-                        .argument(serverArgument, ArgumentDescription.of("Server name"))
+                        .required(serverArgument, ArgumentDescription.of("Server name"))
                         .handler(context -> {
                             final ServerInfo server = context.get("server");
                             this.bungeeAudiences.sender(context.getSender()).sendMessage(

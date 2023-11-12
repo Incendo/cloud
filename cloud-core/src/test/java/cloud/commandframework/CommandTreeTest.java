@@ -89,7 +89,7 @@ class CommandTreeTest {
         ).command(
                 this.commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                         .literal("opt")
-                        .argument(IntegerArgument.optional("num", defaultInputNumber))
+                        .optional(IntegerArgument.of("num"), "" + defaultInputNumber)
                         .build()
         );
 
@@ -134,7 +134,7 @@ class CommandTreeTest {
         final Command<TestCommandSender> command = this.commandManager.commandBuilder(
                         "test", Collections.singleton("other"), SimpleCommandMeta.empty()
                 ).literal("opt", "öpt")
-                .argument(IntegerArgument.optional("num", defaultInputNumber))
+                .optional(IntegerArgument.of("num"), "" + defaultInputNumber)
                 .build();
         this.commandManager.command(command);
 
@@ -178,7 +178,7 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("default")
-                        .argument(this.commandManager.argumentBuilder(Integer.class, "int"))
+                        .required(this.commandManager.argumentBuilder(Integer.class, "int"))
                         .handler(executionHandler)
                         .build()
         );
@@ -210,8 +210,8 @@ class CommandTreeTest {
 
         final Command<TestCommandSender> toProxy = this.commandManager.commandBuilder("test")
                 .literal("unproxied")
-                .argument(StringArgument.of("string"))
-                .argument(IntegerArgument.of("int"))
+                .required(StringArgument.of("string"))
+                .required(IntegerArgument.of("int"))
                 .literal("anotherliteral")
                 .handler(executionHandler)
                 .build();
@@ -409,16 +409,16 @@ class CommandTreeTest {
     void testAmbiguousNodes() {
         // Call setup(); after each time we leave the Tree in an invalid state
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .argument(StringArgument.of("string"))
+                .required(StringArgument.of("string"))
         );
         assertThrows(AmbiguousNodeException.class, () ->
                 this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                        .argument(IntegerArgument.of("integer"))));
+                        .required(IntegerArgument.of("integer"))));
         this.setup();
 
         // Literal and argument can co-exist, not ambiguous
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .argument(StringArgument.of("string"))
+                .required(StringArgument.of("string"))
         );
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
                 .literal("literal"));
@@ -431,7 +431,7 @@ class CommandTreeTest {
                 .literal("literal2"));
 
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .argument(IntegerArgument.of("integer")));
+                .required(IntegerArgument.of("integer")));
         this.setup();
 
         // Two literals with the same name can not co-exist, causes 'duplicate command chains' error
@@ -453,17 +453,12 @@ class CommandTreeTest {
                 .build();
 
         // Verify built command has the repeat argument twice
-        List<CommandArgument<TestCommandSender, ?>> args = command.getArguments();
+        List<CommandComponent<TestCommandSender>> args = command.components();
         assertThat(args.size()).isEqualTo(4);
-        ;
-        assertThat(args.get(0).getName()).isEqualTo("repeatingargscommand");
-        ;
-        assertThat(args.get(1).getName()).isEqualTo("repeat");
-        ;
-        assertThat(args.get(2).getName()).isEqualTo("middle");
-        ;
-        assertThat(args.get(3).getName()).isEqualTo("repeat");
-        ;
+        assertThat(args.get(0).argument().getName()).isEqualTo("repeatingargscommand");
+        assertThat(args.get(1).argument().getName()).isEqualTo("repeat");
+        assertThat(args.get(2).argument().getName()).isEqualTo("middle");
+        assertThat(args.get(3).argument().getName()).isEqualTo("repeat");
 
         // Register
         this.commandManager.command(command);
@@ -483,7 +478,7 @@ class CommandTreeTest {
         /* Build two commands for testing literals overriding variable arguments */
         this.commandManager.command(
                 this.commandManager.commandBuilder("literalwithvariable")
-                        .argument(StringArgument.of("variable"))
+                        .required(StringArgument.of("variable"))
         );
 
         this.commandManager.command(
@@ -497,10 +492,8 @@ class CommandTreeTest {
                 new LinkedList<>(Arrays.asList("literalwithvariable", "argthatdoesnotmatch"))
         );
         assertThat(variableResult.getSecond()).isNull();
-        assertThat(variableResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");
-        ;
-        assertThat(variableResult.getFirst().getArguments().get(1).getName()).isEqualTo("variable");
-        ;
+        assertThat(variableResult.getFirst().components().get(0).argument().getName()).isEqualTo("literalwithvariable");
+        assertThat(variableResult.getFirst().components().get(1).argument().getName()).isEqualTo("variable");
 
         /* Try parsing with the main name literal, which should match the literal command */
         final Pair<Command<TestCommandSender>, Exception> literalResult = this.commandManager.commandTree().parse(
@@ -508,10 +501,8 @@ class CommandTreeTest {
                 new LinkedList<>(Arrays.asList("literalwithvariable", "literal"))
         );
         assertThat(literalResult.getSecond()).isNull();
-        assertThat(literalResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");
-        ;
-        assertThat(literalResult.getFirst().getArguments().get(1).getName()).isEqualTo("literal");
-        ;
+        assertThat(literalResult.getFirst().components().get(0).argument().getName()).isEqualTo("literalwithvariable");
+        assertThat(literalResult.getFirst().components().get(1).argument().getName()).isEqualTo("literal");
 
         /* Try parsing with the alias of the literal, which should match the literal command */
         final Pair<Command<TestCommandSender>, Exception> literalAliasResult = this.commandManager.commandTree().parse(
@@ -519,22 +510,20 @@ class CommandTreeTest {
                 new LinkedList<>(Arrays.asList("literalwithvariable", "literalalias"))
         );
         assertThat(literalAliasResult.getSecond()).isNull();
-        assertThat(literalAliasResult.getFirst().getArguments().get(0).getName()).isEqualTo("literalwithvariable");
-        ;
-        assertThat(literalAliasResult.getFirst().getArguments().get(1).getName()).isEqualTo("literal");
-        ;
+        assertThat(literalAliasResult.getFirst().components().get(0).argument().getName()).isEqualTo("literalwithvariable");
+        assertThat(literalAliasResult.getFirst().components().get(1).argument().getName()).isEqualTo("literal");
     }
 
     @Test
     void testDuplicateArgument() {
         // Arrange
         final CommandArgument<TestCommandSender, String> argument = StringArgument.of("test");
-        this.commandManager.command(this.commandManager.commandBuilder("one").argument(argument));
+        this.commandManager.command(this.commandManager.commandBuilder("one").required(argument));
 
         // Act & Assert
         assertThrows(
                 IllegalArgumentException.class,
-                () -> this.commandManager.command(this.commandManager.commandBuilder("two").argument(argument))
+                () -> this.commandManager.command(this.commandManager.commandBuilder("two").required(argument))
         );
     }
 
@@ -546,7 +535,7 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("float")
-                        .argument(FloatArgument.of("num"))
+                        .required(FloatArgument.of("num"))
                         .handler(executionHandler)
                         .build()
         );
@@ -575,8 +564,8 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("optionals")
-                        .argument(StringArgument.optional("opt1"))
-                        .argument(StringArgument.optional("opt2"))
+                        .optional(StringArgument.of("opt1"))
+                        .optional(StringArgument.of("opt2"))
                         .handler(executionHandler)
                         .build()
         );

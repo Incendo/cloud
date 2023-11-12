@@ -50,13 +50,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class WorldArgument<C> extends CommandArgument<C, World> {
 
     protected WorldArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new WorldParser<>(), defaultValue, World.class, suggestionsProvider, defaultDescription);
+        super(name, new WorldParser<>(), World.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -94,33 +92,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, World> of(final @NonNull String name) {
-        return WorldArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, World> optional(final @NonNull String name) {
-        return WorldArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional argument with a default value
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, World> optional(
-            final @NonNull String name,
-            final @NonNull String defaultValue
-    ) {
-        return WorldArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return WorldArgument.<C>builder(name).build();
     }
 
 
@@ -133,9 +105,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         @Override
         public @NonNull CommandArgument<C, World> build() {
             return new WorldArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

@@ -28,7 +28,6 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
 import java.util.List;
 import java.util.function.BiFunction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import org.apiguardian.api.API;
@@ -47,17 +46,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
 
     MobEffectArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new RegistryEntryArgument.Parser<>(Registries.MOB_EFFECT),
-                defaultValue,
                 MobEffect.class,
                 suggestionsProvider,
                 defaultDescription
@@ -85,35 +80,7 @@ public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
      * @since 1.5.0
      */
     public static <C> @NonNull MobEffectArgument<C> of(final @NonNull String name) {
-        return MobEffectArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link MobEffectArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull MobEffectArgument<C> optional(final @NonNull String name) {
-        return MobEffectArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link MobEffectArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull MobEffectArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull MobEffect defaultValue
-    ) {
-        return MobEffectArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return MobEffectArgument.<C>builder(name).build();
     }
 
 
@@ -138,24 +105,10 @@ public final class MobEffectArgument<C> extends CommandArgument<C, MobEffect> {
         @Override
         public @NonNull MobEffectArgument<C> build() {
             return new MobEffectArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull MobEffect defaultValue) {
-            return this.asOptionalWithDefault(BuiltInRegistries.MOB_EFFECT.getKey(defaultValue).toString());
         }
     }
 }

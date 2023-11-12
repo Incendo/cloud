@@ -42,17 +42,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class MessageArgument<C> extends CommandArgument<C, Message> {
 
     MessageArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.message(),
-                defaultValue,
                 Message.class,
                 suggestionsProvider,
                 defaultDescription
@@ -80,35 +76,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
      * @since 1.5.0
      */
     public static <C> @NonNull MessageArgument<C> of(final @NonNull String name) {
-        return MessageArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link MessageArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull MessageArgument<C> optional(final @NonNull String name) {
-        return MessageArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link MessageArgument} with the specified value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull MessageArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull String defaultValue
-    ) {
-        return MessageArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return MessageArgument.<C>builder(name).build();
     }
 
 
@@ -133,9 +101,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
         @Override
         public @NonNull MessageArgument<C> build() {
             return new MessageArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

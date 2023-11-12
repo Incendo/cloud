@@ -53,14 +53,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
     private PlayerArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new PlayerParser<>(), defaultValue, Player.class, suggestionsProvider, defaultDescription);
+        super(name, new PlayerParser<>(), Player.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -98,33 +96,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
      * @return Created component
      */
     public static <C> @NonNull CommandArgument<C, Player> of(final @NonNull String name) {
-        return PlayerArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command component
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created component
-     */
-    public static <C> @NonNull CommandArgument<C, Player> optional(final @NonNull String name) {
-        return PlayerArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required command component with a default value
-     *
-     * @param name          Component name
-     * @param defaultPlayer Default player
-     * @param <C>           Command sender type
-     * @return Created component
-     */
-    public static <C> @NonNull CommandArgument<C, Player> optional(
-            final @NonNull String name,
-            final @NonNull String defaultPlayer
-    ) {
-        return PlayerArgument.<C>builder(name).asOptionalWithDefault(defaultPlayer).build();
+        return PlayerArgument.<C>builder(name).build();
     }
 
 
@@ -142,9 +114,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         @Override
         public @NonNull PlayerArgument<C> build() {
             return new PlayerArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

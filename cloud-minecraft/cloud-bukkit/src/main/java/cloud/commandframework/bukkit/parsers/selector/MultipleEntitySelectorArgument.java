@@ -46,14 +46,12 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
 
     private MultipleEntitySelectorArgument(
             final boolean allowEmpty,
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new MultipleEntitySelectorParser<>(allowEmpty), defaultValue,
+        super(name, new MultipleEntitySelectorParser<>(allowEmpty),
                 MultipleEntitySelector.class, suggestionsProvider, defaultDescription
         );
     }
@@ -93,33 +91,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @return Created argument
      */
     public static <C> @NonNull MultipleEntitySelectorArgument<C> of(final @NonNull String name) {
-        return MultipleEntitySelectorArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull MultipleEntitySelectorArgument<C> optional(final @NonNull String name) {
-        return MultipleEntitySelectorArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required command argument with a default value
-     *
-     * @param name                  Argument name
-     * @param defaultEntitySelector Default player
-     * @param <C>                   Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull MultipleEntitySelectorArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull String defaultEntitySelector
-    ) {
-        return MultipleEntitySelectorArgument.<C>builder(name).asOptionalWithDefault(defaultEntitySelector).build();
+        return MultipleEntitySelectorArgument.<C>builder(name).build();
     }
 
 
@@ -153,9 +125,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
         public @NonNull MultipleEntitySelectorArgument<C> build() {
             return new MultipleEntitySelectorArgument<>(
                     this.allowEmpty,
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

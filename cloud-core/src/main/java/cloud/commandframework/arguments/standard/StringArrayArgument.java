@@ -49,17 +49,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
 
     private StringArrayArgument(
-            final boolean required,
             final @NonNull String name,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final boolean flagYielding
     ) {
         super(
-                required,
                 name,
                 new StringArrayParser<>(flagYielding),
-                "",
                 TypeToken.get(String[].class),
                 suggestionsProvider,
                 defaultDescription
@@ -79,7 +76,6 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
             final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
     ) {
         return new StringArrayArgument<>(
-                true /* required */,
                 name,
                 suggestionsProvider,
                 ArgumentDescription.empty(),
@@ -104,53 +100,6 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
             final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
     ) {
         return new StringArrayArgument<>(
-                true /* required */,
-                name,
-                suggestionsProvider,
-                ArgumentDescription.empty(),
-                flagYielding
-        );
-    }
-
-    /**
-     * Create a new optional string array argument
-     *
-     * @param name                Argument name
-     * @param suggestionsProvider Suggestions provider
-     * @param <C>                 Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull StringArrayArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
-    ) {
-        return new StringArrayArgument<>(
-                false /* required */,
-                name,
-                suggestionsProvider,
-                ArgumentDescription.empty(),
-                false /* flagYielding */
-        );
-    }
-
-    /**
-     * Create a new optional string array argument
-     *
-     * @param name                Argument name
-     * @param flagYielding        Whether the parser should stop parsing when encountering a potential flag
-     * @param suggestionsProvider Suggestions provider
-     * @param <C>                 Command sender type
-     * @return Created argument
-     * @since 1.7.0
-     */
-    @API(status = API.Status.STABLE, since = "1.7.0")
-    public static <C> @NonNull StringArrayArgument<C> optional(
-            final @NonNull String name,
-            final boolean flagYielding,
-            final @NonNull BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider
-    ) {
-        return new StringArrayArgument<>(
-                false /* required */,
                 name,
                 suggestionsProvider,
                 ArgumentDescription.empty(),

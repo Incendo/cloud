@@ -47,16 +47,14 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     private final long max;
 
     private LongArgument(
-            final boolean required,
             final @NonNull String name,
             final long min,
             final long max,
-            final String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new LongParser<>(min, max), defaultValue, Long.class, suggestionsProvider, defaultDescription);
+        super(name, new LongParser<>(min, max), Long.class, suggestionsProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -96,33 +94,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Long> of(final @NonNull String name) {
-        return LongArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link LongArgument}.
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Long> optional(final @NonNull String name) {
-        return LongArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link LongArgument} with the specified default value.
-     *
-     * @param name       Argument name
-     * @param defaultNum Default num
-     * @param <C>        Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Long> optional(
-            final @NonNull String name,
-            final long defaultNum
-    ) {
-        return LongArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
+        return LongArgument.<C>builder(name).build();
     }
 
     /**
@@ -176,23 +148,10 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
             return this;
         }
 
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        @API(status = API.Status.STABLE, since = "1.5.0")
-        public @NonNull Builder<C> asOptionalWithDefault(final long defaultValue) {
-            return (Builder<C>) this.asOptionalWithDefault(Long.toString(defaultValue));
-        }
-
         @Override
         public @NonNull LongArgument<C> build() {
-            return new LongArgument<>(this.isRequired(), this.getName(), this.min,
-                    this.max, this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
+            return new LongArgument<>(this.getName(), this.min,
+                    this.max, this.getSuggestionsProvider(), this.getDefaultDescription()
             );
         }
     }

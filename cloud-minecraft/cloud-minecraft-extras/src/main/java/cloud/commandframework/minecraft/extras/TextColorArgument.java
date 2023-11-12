@@ -80,16 +80,10 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
             Pair.of('f', NamedTextColor.WHITE)
     );
 
-    private TextColorArgument(
-            final boolean required,
-            final @NonNull String name,
-            final @NonNull String defaultValue
-    ) {
+    private TextColorArgument(final @NonNull String name) {
         super(
-                required,
                 name,
                 new TextColorParser<>(),
-                defaultValue,
                 TypeToken.get(TextColor.class),
                 null,
                 new LinkedList<>()
@@ -104,45 +98,7 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
      * @return Created argument
      */
     public static <C> @NonNull TextColorArgument<C> of(final @NonNull String name) {
-        return new TextColorArgument<>(
-                true,
-                name,
-                ""
-        );
-    }
-
-    /**
-     * Create a new optional TextColor argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull TextColorArgument<C> optional(final @NonNull String name) {
-        return new TextColorArgument<>(
-                false,
-                name,
-                ""
-        );
-    }
-
-    /**
-     * Create a new optional TextColor argument
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull TextColorArgument<C> optionalWithDefault(
-            final @NonNull String name,
-            final @NonNull String defaultValue
-    ) {
-        return new TextColorArgument<>(
-                false,
-                name,
-                defaultValue
-        );
+        return new TextColorArgument<>(name);
     }
 
 

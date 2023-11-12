@@ -54,19 +54,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
 
     private PlayerArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         super(
-                required,
                 name,
                 new PlayerParser<>(),
-                defaultValue,
                 TypeToken.get(ProxiedPlayer.class),
                 suggestionProvider,
                 defaultDescription,
@@ -111,20 +107,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
     public static <C> CommandArgument<C, ProxiedPlayer> of(
             final @NonNull String name
     ) {
-        return PlayerArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional player argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> CommandArgument<C, ProxiedPlayer> optional(
-            final @NonNull String name
-    ) {
-        return PlayerArgument.<C>builder(name).asOptional().build();
+        return PlayerArgument.<C>builder(name).build();
     }
 
 
@@ -139,9 +122,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
         @Override
         public @NonNull CommandArgument<@NonNull C, @NonNull ProxiedPlayer> build() {
             return new PlayerArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()

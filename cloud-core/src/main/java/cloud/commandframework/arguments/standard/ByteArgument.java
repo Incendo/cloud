@@ -47,16 +47,14 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     private final byte max;
 
     private ByteArgument(
-            final boolean required,
             final @NonNull String name,
             final byte min,
             final byte max,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new ByteParser<>(min, max), defaultValue, Byte.class, suggestionsProvider, defaultDescription);
+        super(name, new ByteParser<>(min, max), Byte.class, suggestionsProvider, defaultDescription);
         this.min = min;
         this.max = max;
     }
@@ -96,48 +94,22 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Byte> of(final @NonNull String name) {
-        return ByteArgument.<C>builder(name).asRequired().build();
+        return ByteArgument.<C>builder(name).build();
     }
 
     /**
-     * Create a new optional {@link ByteArgument}.
+     * Get the minimum accepted byte that could have been parsed
      *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Byte> optional(final @NonNull String name) {
-        return ByteArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link ByteArgument} with the specified default value.
-     *
-     * @param name       Argument name
-     * @param defaultNum Default num
-     * @param <C>        Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Byte> optional(
-            final @NonNull String name,
-            final byte defaultNum
-    ) {
-        return ByteArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
-    }
-
-    /**
-     * Get the minimum accepted byteeger that could have been parsed
-     *
-     * @return Minimum byteeger
+     * @return Minimum byte
      */
     public byte getMin() {
         return this.min;
     }
 
     /**
-     * Get the maximum accepted byteeger that could have been parsed
+     * Get the maximum accepted byte that could have been parsed
      *
-     * @return Maximum byteeger
+     * @return Maximum byte
      */
     public byte getMax() {
         return this.max;
@@ -177,28 +149,13 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         }
 
         /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        @API(status = API.Status.STABLE, since = "1.5.0")
-        public @NonNull Builder<C> asOptionalWithDefault(final byte defaultValue) {
-            return (Builder<C>) this.asOptionalWithDefault(Byte.toString(defaultValue));
-        }
-
-        /**
          * Builder a new byte argument
          *
          * @return Constructed argument
          */
         @Override
         public @NonNull ByteArgument<C> build() {
-            return new ByteArgument<>(this.isRequired(), this.getName(), this.min, this.max,
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
-            );
+            return new ByteArgument<>(this.getName(), this.min, this.max, this.getSuggestionsProvider(), this.getDefaultDescription());
         }
     }
 

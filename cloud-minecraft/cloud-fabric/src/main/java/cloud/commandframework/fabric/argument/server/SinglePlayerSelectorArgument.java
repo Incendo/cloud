@@ -43,17 +43,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, SinglePlayerSelector> {
 
     SinglePlayerSelectorArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.singlePlayerSelector(),
-                defaultValue,
                 SinglePlayerSelector.class,
                 suggestionsProvider,
                 defaultDescription
@@ -81,20 +77,9 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
      * @since 1.5.0
      */
     public static <C> @NonNull SinglePlayerSelectorArgument<C> of(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>builder(name).asRequired().build();
+        return SinglePlayerSelectorArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link SinglePlayerSelectorArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull SinglePlayerSelectorArgument<C> optional(final @NonNull String name) {
-        return SinglePlayerSelectorArgument.<C>builder(name).asOptional().build();
-    }
 
     /**
      * Builder for {@link SinglePlayerSelectorArgument}.
@@ -117,9 +102,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
         @Override
         public @NonNull SinglePlayerSelectorArgument<C> build() {
             return new SinglePlayerSelectorArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

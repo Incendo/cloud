@@ -56,19 +56,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class Location2DArgument<C> extends CommandArgument<C, Location2D> {
 
     private Location2DArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @NonNull ArgumentDescription defaultDescription,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>,
                     @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         super(
-                required,
                 name,
                 new Location2DParser<>(),
-                defaultValue,
                 TypeToken.get(Location2D.class),
                 suggestionsProvider,
                 defaultDescription,
@@ -113,20 +109,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
     public static <C> @NonNull CommandArgument<C, Location2D> of(
             final @NonNull String name
     ) {
-        return Location2DArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Constructed argument
-     */
-    public static <C> @NonNull CommandArgument<C, Location2D> optional(
-            final @NonNull String name
-    ) {
-        return Location2DArgument.<C>builder(name).asOptional().build();
+        return Location2DArgument.<C>builder(name).build();
     }
 
 
@@ -144,9 +127,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
         @Override
         public @NonNull CommandArgument<@NonNull C, @NonNull Location2D> build() {
             return new Location2DArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getDefaultDescription(),
                     this.getSuggestionsProvider(),
                     new LinkedList<>()

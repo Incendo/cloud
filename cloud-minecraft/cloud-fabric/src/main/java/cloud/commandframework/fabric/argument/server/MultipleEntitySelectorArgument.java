@@ -43,17 +43,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, MultipleEntitySelector> {
 
     MultipleEntitySelectorArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.multipleEntitySelector(),
-                defaultValue,
                 MultipleEntitySelector.class,
                 suggestionsProvider,
                 defaultDescription
@@ -81,20 +77,9 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
      * @since 1.5.0
      */
     public static <C> @NonNull MultipleEntitySelectorArgument<C> of(final @NonNull String name) {
-        return MultipleEntitySelectorArgument.<C>builder(name).asRequired().build();
+        return MultipleEntitySelectorArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link MultipleEntitySelectorArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull MultipleEntitySelectorArgument<C> optional(final @NonNull String name) {
-        return MultipleEntitySelectorArgument.<C>builder(name).asOptional().build();
-    }
 
     /**
      * Builder for {@link MultipleEntitySelectorArgument}.
@@ -117,9 +102,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
         @Override
         public @NonNull MultipleEntitySelectorArgument<C> build() {
             return new MultipleEntitySelectorArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

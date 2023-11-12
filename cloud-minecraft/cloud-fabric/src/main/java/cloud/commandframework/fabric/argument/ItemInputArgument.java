@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.ItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,17 +42,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
 
     ItemInputArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.contextual(ItemArgument::item),
-                defaultValue,
                 ItemInput.class,
                 suggestionsProvider,
                 defaultDescription
@@ -82,33 +76,9 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
      * @since 1.5.0
      */
     public static <C> @NonNull ItemInputArgument<C> of(final @NonNull String name) {
-        return ItemInputArgument.<C>builder(name).asRequired().build();
+        return ItemInputArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link ItemInputArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ItemInputArgument<C> optional(final @NonNull String name) {
-        return ItemInputArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link ItemInputArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ItemInputArgument<C> optional(final @NonNull String name, final @NonNull ItemStack defaultValue) {
-        return ItemInputArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
-    }
 
     /**
      * Builder for {@link ItemInputArgument}.
@@ -131,30 +101,10 @@ public final class ItemInputArgument<C> extends CommandArgument<C, ItemInput> {
         @Override
         public @NonNull ItemInputArgument<C> build() {
             return new ItemInputArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ItemStack defaultValue) {
-            final String serializedDefault;
-            if (defaultValue.hasTag()) {
-                serializedDefault = BuiltInRegistries.ITEM.getKey(defaultValue.getItem()) + defaultValue.getTag().toString();
-            } else {
-                serializedDefault = BuiltInRegistries.ITEM.getKey(defaultValue.getItem()).toString();
-            }
-            return this.asOptionalWithDefault(serializedDefault);
         }
     }
 }

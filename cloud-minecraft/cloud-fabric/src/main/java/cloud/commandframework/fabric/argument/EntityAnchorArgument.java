@@ -42,17 +42,13 @@ public final class EntityAnchorArgument<C> extends
         CommandArgument<C, net.minecraft.commands.arguments.EntityAnchorArgument.Anchor> {
 
     EntityAnchorArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new WrappedBrigadierParser<>(net.minecraft.commands.arguments.EntityAnchorArgument.anchor()),
-                defaultValue,
                 net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.class,
                 suggestionsProvider,
                 defaultDescription
@@ -80,35 +76,7 @@ public final class EntityAnchorArgument<C> extends
      * @since 1.5.0
      */
     public static <C> @NonNull EntityAnchorArgument<C> of(final @NonNull String name) {
-        return EntityAnchorArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link EntityAnchorArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull EntityAnchorArgument<C> optional(final @NonNull String name) {
-        return EntityAnchorArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link EntityAnchorArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull EntityAnchorArgument<C> optional(
-            final @NonNull String name,
-            final net.minecraft.commands.arguments.EntityAnchorArgument.@NonNull Anchor defaultValue
-    ) {
-        return EntityAnchorArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return EntityAnchorArgument.<C>builder(name).build();
     }
 
 
@@ -134,26 +102,10 @@ public final class EntityAnchorArgument<C> extends
         @Override
         public @NonNull EntityAnchorArgument<C> build() {
             return new EntityAnchorArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(
-                final net.minecraft.commands.arguments.EntityAnchorArgument.@NonNull Anchor defaultValue
-        ) {
-            return this.asOptionalWithDefault(defaultValue.name());
         }
     }
 }

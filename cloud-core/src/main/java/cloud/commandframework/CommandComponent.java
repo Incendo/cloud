@@ -27,6 +27,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A single literal or argument component of a command
@@ -39,19 +40,28 @@ public final class CommandComponent<C> {
 
     private final CommandArgument<C, ?> argument;
     private final ArgumentDescription description;
+    private final boolean required;
+    private final String defaultValue;
 
     /**
      * Initializes a new CommandComponent
      *
-     * @param commandArgument    Command Component Argument
-     * @param commandDescription Command Component Description
+     * @param argument     Command Component Argument
+     * @param description  Command Component Description
+     * @param required     Whether the command is required
+     * @param defaultValue Default value used when an optional argument is omitted, should be {@code null} of
+     * {@link #required()} is {@code true}
      */
     private CommandComponent(
-            final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
+            final @NonNull CommandArgument<C, ?> argument,
+            final @NonNull ArgumentDescription description,
+            final boolean required,
+            final @Nullable String defaultValue
     ) {
-        this.argument = commandArgument;
-        this.description = commandDescription;
+        this.argument = argument;
+        this.description = description;
+        this.required = required;
+        this.defaultValue = defaultValue;
     }
 
     /**
@@ -59,7 +69,7 @@ public final class CommandComponent<C> {
      *
      * @return command component argument details
      */
-    public @NonNull CommandArgument<C, ?> getArgument() {
+    public @NonNull CommandArgument<C, ?> argument() {
         return this.argument;
     }
 
@@ -67,11 +77,11 @@ public final class CommandComponent<C> {
      * Gets the command component description
      *
      * @return command component description
-     * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
+     * @deprecated for removal since 1.4.0. Use {@link #argumentDescription()} instead.
      */
     @Deprecated
     @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public @NonNull Description getDescription() {
+    public @NonNull Description description() {
         if (this.description instanceof Description) {
             return (Description) this.description;
         } else {
@@ -86,13 +96,63 @@ public final class CommandComponent<C> {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @NonNull ArgumentDescription getArgumentDescription() {
+    public @NonNull ArgumentDescription argumentDescription() {
         return this.description;
+    }
+
+    /**
+     * Returns whether the argument is required
+     * <p>
+     * This always returns the opposite of {@link #optional()}.
+     *
+     * @return whether the argument is required
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public boolean required() {
+        return this.required;
+    }
+
+    /**
+     * Returns whether the argument is optional
+     * <p>
+     * This always returns the opposite of {@link #required()}.
+     *
+     * @return whether the argument is optional
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public boolean optional() {
+        return !this.required;
+    }
+
+    /**
+     * Returns the default value, if specified
+     * <p>
+     * This should always return {@code null} if {@link #required()} is {@code true}.
+     *
+     * @return the default value if specified, else {@code null}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @Nullable String defaultValue() {
+        return this.defaultValue;
+    }
+
+    /**
+     * Returns whether this component has a default value
+     *
+     * @return {@code true} if the component has a default value, else {@code false}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public boolean hasDefaultValue() {
+        return this.optional() && this.defaultValue() != null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getArgument(), this.getArgumentDescription());
+        return Objects.hash(this.argument(), this.argumentDescription());
     }
 
     @Override
@@ -101,8 +161,8 @@ public final class CommandComponent<C> {
             return true;
         } else if (o instanceof CommandComponent) {
             final CommandComponent<?> that = (CommandComponent<?>) o;
-            return this.getArgument().equals(that.getArgument())
-                    && this.getArgumentDescription().equals(that.getArgumentDescription());
+            return this.argument().equals(that.argument())
+                    && this.argumentDescription().equals(that.argumentDescription());
         } else {
             return false;
         }
@@ -110,41 +170,77 @@ public final class CommandComponent<C> {
 
     @Override
     public @NonNull String toString() {
-        return String.format("%s{argument=%s,description=%s}", this.getClass().getSimpleName(),
-                this.argument, this.description
+        return String.format("%s{argument=%s,description=%s,required=%s,defaultValue=%s}", this.getClass().getSimpleName(),
+                this.argument, this.description, this.required, this.defaultValue
         );
     }
 
     /**
-     * Creates a new CommandComponent with the provided argument and description
+     * Returns a deep copy of this component.
      *
-     * @param <C>                Command sender type
-     * @param commandArgument    Command Component Argument
-     * @param commandDescription Command Component Description
-     * @return new CommandComponent
-     * @deprecated for removal since 1.4.0. Use {@link #of(CommandArgument, ArgumentDescription)} instead.
+     * @return copy of the component
+     * @since 2.0.0
      */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public static <C> @NonNull CommandComponent<C> of(
-            final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull Description commandDescription
-    ) {
-        return new CommandComponent<C>(commandArgument, commandDescription);
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandComponent<C> copy() {
+        return new CommandComponent<>(
+                this.argument().copy(),
+                this.description(),
+                this.required(),
+                this.defaultValue()
+        );
     }
 
     /**
-     * Creates a new CommandComponent with the provided argument and description
+     * Creates a new required component with the provided argument and description
      *
      * @param <C>                Command sender type
      * @param commandArgument    Command Component Argument
      * @param commandDescription Command Component Description
      * @return new CommandComponent
+     * @since 2.0.0
      */
-    public static <C> @NonNull CommandComponent<C> of(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> @NonNull CommandComponent<C> required(
             final @NonNull CommandArgument<C, ?> commandArgument,
             final @NonNull ArgumentDescription commandDescription
     ) {
-        return new CommandComponent<C>(commandArgument, commandDescription);
+        return new CommandComponent<C>(commandArgument, commandDescription, true, null);
+    }
+
+    /**
+     * Creates a new optional component with the provided argument, description and default value
+     *
+     * @param <C>                Command sender type
+     * @param commandArgument    Command Component Argument
+     * @param commandDescription Command Component Description
+     * @param defaultValue       The default value, or {@code null}
+     * @return new CommandComponent
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> @NonNull CommandComponent<C> optional(
+            final @NonNull CommandArgument<C, ?> commandArgument,
+            final @NonNull ArgumentDescription commandDescription,
+            final @Nullable String defaultValue
+    ) {
+        return new CommandComponent<C>(commandArgument, commandDescription, false, defaultValue);
+    }
+
+    /**
+     * Creates a new optional component with the provided argument and description, and no default value
+     *
+     * @param <C>                Command sender type
+     * @param commandArgument    Command Component Argument
+     * @param commandDescription Command Component Description
+     * @return new CommandComponent
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C> @NonNull CommandComponent<C> optional(
+            final @NonNull CommandArgument<C, ?> commandArgument,
+            final @NonNull ArgumentDescription commandDescription
+    ) {
+        return new CommandComponent<C>(commandArgument, commandDescription, false, null);
     }
 }

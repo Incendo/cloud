@@ -95,7 +95,7 @@ public final class FabricClientExample implements ClientModInitializer {
                 }));
 
         commandManager.command(base.literal("say")
-                .argument(StringArgument.greedy("message"))
+                .required(StringArgument.greedy("message"))
                 .handler(ctx -> ctx.getSender().sendFeedback(
                         Component.literal("Cloud client commands says: " + ctx.get("message"))
                 )));
@@ -116,7 +116,7 @@ public final class FabricClientExample implements ClientModInitializer {
 
         // Test argument which requires CommandBuildContext/RegistryAccess
         commandManager.command(base.literal("show_item")
-                .argument(ItemInputArgument.of("item"))
+                .required(ItemInputArgument.of("item"))
                 .handler(ctx -> {
                     try {
                         ctx.getSender().sendFeedback(
@@ -128,7 +128,7 @@ public final class FabricClientExample implements ClientModInitializer {
                 }));
 
         commandManager.command(base.literal("flag_test")
-                .argument(StringArgument.optional("parameter"))
+                .optional(StringArgument.of("parameter"))
                 .flag(CommandFlag.builder("flag").withAliases("f"))
                 .handler(ctx -> ctx.getSender().sendFeedback(Component.literal("Had flag: " + ctx.flags().isPresent("flag")))));
     }

@@ -46,7 +46,7 @@ final class SpongePluginRegistrationHandler<C> implements CommandRegistrationHan
     @Override
     @SuppressWarnings("unchecked")
     public boolean registerCommand(final @NonNull Command<?> command) {
-        final StaticArgument<?> commandArgument = (StaticArgument<?>) command.getArguments().get(0);
+        final StaticArgument<?> commandArgument = (StaticArgument<?>) command.components().get(0).argument();
         if (this.registeredCommands.containsKey(commandArgument)) {
             return false;
         }

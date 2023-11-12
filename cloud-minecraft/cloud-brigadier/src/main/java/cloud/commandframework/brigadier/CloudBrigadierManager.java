@@ -24,9 +24,9 @@
 package cloud.commandframework.brigadier;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
@@ -434,28 +434,28 @@ public final class CloudBrigadierManager<C, S> {
             final boolean forceRegister,
             final com.mojang.brigadier.@NonNull Command<S> executor
     ) {
-        final CommandTree.Node<CommandArgument<C, ?>> node = this.commandManager
-                .commandTree().getNamedNode(cloudCommand.getArguments().get(0).getName());
+        final CommandTree.CommandNode<C> node = this.commandManager
+                .commandTree().getNamedNode(cloudCommand.components().get(0).argument().getName());
         final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(
                 context,
                 null, /* parent node, null for the literal command node root */
-                node.getValue(),
+                node.component(),
                 builder
         );
 
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder
                 .<S>literal(label)
-                .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.getNodeMeta()
+                .requires(sender -> permissionChecker.test(sender, (CommandPermission) node.nodeMeta()
                         .getOrDefault(
                                 "permission",
                                 Permission.empty()
                         )));
-        if (forceRegister || (node.getValue() != null && node.getValue().getOwningCommand() != null)) {
+        if (forceRegister || (node.argument() != null && node.argument().getOwningCommand() != null)) {
             literalArgumentBuilder.executes(executor);
         }
         literalArgumentBuilder.executes(executor);
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
-        for (final CommandTree.Node<CommandArgument<C, ?>> child : node.getChildren()) {
+        for (final CommandTree.CommandNode<C> child : node.children()) {
             constructedRoot.addChild(this.constructCommandNode(forceRegister, child,
                     permissionChecker, executor, provider
             ).build());
@@ -474,7 +474,7 @@ public final class CloudBrigadierManager<C, S> {
      * @return Constructed literal command node
      */
     public @NonNull LiteralCommandNode<S> createLiteralCommandNode(
-            final CommandTree.@NonNull Node<@NonNull CommandArgument<C, ?>> cloudCommand,
+            final CommandTree.@NonNull CommandNode<C> cloudCommand,
             final @NonNull LiteralCommandNode<S> root,
             final @NonNull SuggestionProvider<S> suggestionProvider,
             final com.mojang.brigadier.@NonNull Command<S> executor,
@@ -483,17 +483,17 @@ public final class CloudBrigadierManager<C, S> {
         final LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(root.getLiteral())
                 .requires(sender -> permissionChecker.test(
                         sender,
-                        (CommandPermission) cloudCommand.getNodeMeta()
+                        (CommandPermission) cloudCommand.nodeMeta()
                                 .getOrDefault(
                                         "permission",
                                         Permission.empty()
                                 )
                 ));
-        if (cloudCommand.getValue() != null && cloudCommand.getValue().getOwningCommand() != null) {
+        if (cloudCommand.argument() != null && cloudCommand.argument().getOwningCommand() != null) {
             literalArgumentBuilder.executes(executor);
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
-        for (final CommandTree.Node<CommandArgument<C, ?>> child : cloudCommand.getChildren()) {
+        for (final CommandTree.CommandNode<C> child : cloudCommand.children()) {
             constructedRoot.addChild(this.constructCommandNode(true, child, permissionChecker,
                     executor, suggestionProvider
             ).build());
@@ -503,13 +503,14 @@ public final class CloudBrigadierManager<C, S> {
 
     private @NonNull ArgumentBuilder<S, ?> constructCommandNode(
             final boolean forceExecutor,
-            final CommandTree.@NonNull Node<CommandArgument<C, ?>> root,
+            final CommandTree.@NonNull CommandNode<C> root,
             final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker,
             final com.mojang.brigadier.@NonNull Command<S> executor,
             final SuggestionProvider<S> suggestionProvider
     ) {
-        if (root.getValue() instanceof CompoundArgument) {
-            @SuppressWarnings("unchecked") final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) root.getValue();
+        if (root.argument() instanceof CompoundArgument) {
+            @SuppressWarnings("unchecked") final CompoundArgument<?, C, ?> compoundArgument =
+                    (CompoundArgument<?, C, ?>) root.argument();
             final Object[] parsers = compoundArgument.getParserTuple().toArray();
             final Object[] types = compoundArgument.getTypes().toArray();
             final Object[] names = compoundArgument.getNames().toArray();
@@ -531,7 +532,7 @@ public final class CloudBrigadierManager<C, S> {
                         .suggests(provider)
                         .requires(sender -> permissionChecker.test(
                                 sender,
-                                (CommandPermission) root.getNodeMeta()
+                                (CommandPermission) root.nodeMeta()
                                         .getOrDefault(
                                                 "permission",
                                                 Permission.empty()
@@ -539,7 +540,7 @@ public final class CloudBrigadierManager<C, S> {
                         ));
                 argumentBuilders[i] = fragmentBuilder;
 
-                if (forceExecutor || ((i == parsers.length - 1) && (root.isLeaf() || !root.getValue().isRequired()))) {
+                if (forceExecutor || ((i == parsers.length - 1) && (root.isLeaf() || !root.component().required()))) {
                     fragmentBuilder.executes(executor);
                 }
 
@@ -549,7 +550,7 @@ public final class CloudBrigadierManager<C, S> {
                 }
             }
 
-            for (final CommandTree.Node<CommandArgument<C, ?>> node : root.getChildren()) {
+            for (final CommandTree.CommandNode<C> node : root.children()) {
                 argumentBuilders[parsers.length - 1]
                         .then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
             }
@@ -557,9 +558,9 @@ public final class CloudBrigadierManager<C, S> {
             return argumentBuilders[0];
         }
         final ArgumentBuilder<S, ?> argumentBuilder;
-        if (root.getValue() instanceof StaticArgument) {
-            argumentBuilder = LiteralArgumentBuilder.<S>literal(root.getValue().getName())
-                    .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.getNodeMeta()
+        if (root.argument() instanceof StaticArgument) {
+            argumentBuilder = LiteralArgumentBuilder.<S>literal(root.argument().getName())
+                    .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.nodeMeta()
                             .getOrDefault(
                                     "permission",
                                     Permission.empty()
@@ -568,35 +569,35 @@ public final class CloudBrigadierManager<C, S> {
         } else {
             // Register argument
             final Pair<ArgumentType<?>, SuggestionProvider<S>> pair = this.getArgument(
-                    root.getValue().getValueType(),
-                    root.getValue().getParser()
+                    root.argument().getValueType(),
+                    root.argument().getParser()
             );
             final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions()
                     ? (context, builder) -> this.buildSuggestions(
                     context,
-                    root.getParent(),
-                    root.getValue(),
+                    root.parent(),
+                    root.component(),
                     builder
             ) : pair.getSecond();
             argumentBuilder = RequiredArgumentBuilder
-                    .<S, Object>argument(root.getValue().getName(), (ArgumentType<Object>) pair.getFirst())
+                    .<S, Object>argument(root.argument().getName(), (ArgumentType<Object>) pair.getFirst())
                     .suggests(provider)
                     .requires(sender -> permissionChecker.test(
                             sender,
-                            (CommandPermission) root.getNodeMeta()
+                            (CommandPermission) root.nodeMeta()
                                     .getOrDefault(
                                             "permission",
                                             Permission.empty()
                                     )
                     ));
         }
-        if (forceExecutor || root.isLeaf() || !root.getValue().isRequired()) {
+        if (forceExecutor || root.isLeaf() || root.component().optional()) {
             argumentBuilder.executes(executor);
         }
-        if (root.getChildren().stream().noneMatch(node -> node.getValue().isRequired())) {
+        if (root.children().stream().noneMatch(node -> node.component().required())) {
             argumentBuilder.executes(executor);
         }
-        for (final CommandTree.Node<CommandArgument<C, ?>> node : root.getChildren()) {
+        for (final CommandTree.CommandNode<C> node : root.children()) {
             argumentBuilder.then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
         }
         return argumentBuilder;
@@ -604,8 +605,8 @@ public final class CloudBrigadierManager<C, S> {
 
     private @NonNull CompletableFuture<Suggestions> buildSuggestions(
             final com.mojang.brigadier.context.@Nullable CommandContext<S> senderContext,
-            final CommandTree.@Nullable Node<CommandArgument<C, ?>> parentNode,
-            final @NonNull CommandArgument<C, ?> argument,
+            final CommandTree.@Nullable CommandNode<C> parentNode,
+            final @NonNull CommandComponent<C> component,
             final @NonNull SuggestionsBuilder builder
     ) {
         final CommandContext<C> commandContext;
@@ -639,8 +640,8 @@ public final class CloudBrigadierManager<C, S> {
         /* Filter suggestions that are literal arguments to avoid duplicates, except for root arguments */
         final List<String> suggestions = new ArrayList<>(suggestionsUnfiltered);
         if (parentNode != null) {
-            final Set<String> siblingLiterals = parentNode.getChildren().stream()
-                    .map(CommandTree.Node::getValue)
+            final Set<String> siblingLiterals = parentNode.children().stream()
+                    .map(CommandTree.CommandNode::argument)
                     .flatMap(arg -> (arg instanceof StaticArgument)
                             ? ((StaticArgument<C>) arg).getAliases().stream() : Stream.empty())
                     .collect(Collectors.toSet());
@@ -656,9 +657,9 @@ public final class CloudBrigadierManager<C, S> {
         }
 
         for (final String suggestion : suggestions) {
-            String tooltip = argument.getName();
-            if (!(argument instanceof StaticArgument)) {
-                if (argument.isRequired()) {
+            String tooltip = component.argument().getName();
+            if (!(component.argument() instanceof StaticArgument)) {
+                if (component.required()) {
                     tooltip = '<' + tooltip + '>';
                 } else {
                     tooltip = '[' + tooltip + ']';

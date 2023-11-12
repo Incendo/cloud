@@ -41,17 +41,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
 
     TimeArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.time(),
-                defaultValue,
                 MinecraftTime.class,
                 suggestionsProvider,
                 defaultDescription
@@ -79,35 +75,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
      * @since 1.5.0
      */
     public static <C> @NonNull TimeArgument<C> of(final @NonNull String name) {
-        return TimeArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link TimeArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull TimeArgument<C> optional(final @NonNull String name) {
-        return TimeArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link TimeArgument} with the specified default value.
-     *
-     * @param name        Argument name
-     * @param defaultTime Default time, in ticks
-     * @param <C>         Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull TimeArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull MinecraftTime defaultTime
-    ) {
-        return TimeArgument.<C>builder(name).asOptionalWithDefault(defaultTime).build();
+        return TimeArgument.<C>builder(name).build();
     }
 
 
@@ -132,24 +100,10 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
         @Override
         public @NonNull TimeArgument<C> build() {
             return new TimeArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull MinecraftTime defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.toString());
         }
     }
 }

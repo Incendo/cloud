@@ -50,18 +50,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
 
     protected EnchantmentArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new EnchantmentParser<>(),
-                defaultValue,
                 Enchantment.class,
                 suggestionsProvider,
                 defaultDescription
@@ -103,34 +99,9 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Enchantment> of(final @NonNull String name) {
-        return EnchantmentArgument.<C>builder(name).asRequired().build();
+        return EnchantmentArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Enchantment> optional(final @NonNull String name) {
-        return EnchantmentArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional argument with a default value
-     *
-     * @param name        Argument name
-     * @param enchantment Default value
-     * @param <C>         Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Enchantment> optional(
-            final @NonNull String name,
-            final @NonNull Enchantment enchantment
-    ) {
-        return EnchantmentArgument.<C>builder(name).asOptionalWithDefault(enchantment.getKey().toString()).build();
-    }
 
     public static final class Builder<C> extends CommandArgument.Builder<C, Enchantment> {
 
@@ -141,9 +112,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
         @Override
         public @NonNull CommandArgument<C, Enchantment> build() {
             return new EnchantmentArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

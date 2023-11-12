@@ -45,14 +45,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class CharArgument<C> extends CommandArgument<C, Character> {
 
     private CharArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>,
                     @NonNull String, @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new CharacterParser<>(), defaultValue, Character.class, suggestionsProvider, defaultDescription);
+        super(name, new CharacterParser<>(), Character.class, suggestionsProvider, defaultDescription);
     }
 
     /**
@@ -90,33 +88,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Character> of(final @NonNull String name) {
-        return CharArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Character> optional(final @NonNull String name) {
-        return CharArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required command argument with a default value
-     *
-     * @param name       Argument name
-     * @param defaultNum Default num
-     * @param <C>        Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Character> optional(
-            final @NonNull String name,
-            final @NonNull String defaultNum
-    ) {
-        return CharArgument.<C>builder(name).asOptionalWithDefault(defaultNum).build();
+        return CharArgument.<C>builder(name).build();
     }
 
 
@@ -134,9 +106,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
          */
         @Override
         public @NonNull CharArgument<C> build() {
-            return new CharArgument<>(this.isRequired(), this.getName(),
-                    this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription()
-            );
+            return new CharArgument<>(this.getName(), this.getSuggestionsProvider(), this.getDefaultDescription());
         }
     }
 

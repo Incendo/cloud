@@ -30,7 +30,6 @@ import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates;
 import java.util.List;
 import java.util.function.BiFunction;
-import net.minecraft.world.phys.Vec3;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -45,18 +44,14 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
     private final boolean centerIntegers;
 
     Vec2dArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final boolean centerIntegers
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.vec2(centerIntegers),
-                defaultValue,
                 Coordinates.CoordinatesXZ.class,
                 suggestionsProvider,
                 defaultDescription
@@ -95,7 +90,7 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
      * @since 1.5.0
      */
     public static <C> @NonNull Vec2dArgument<C> of(final @NonNull String name) {
-        return Vec2dArgument.<C>builder(name).asRequired().build();
+        return Vec2dArgument.<C>builder(name).build();
     }
 
     /**
@@ -108,64 +103,9 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
      * @since 1.5.0
      */
     public static <C> @NonNull Vec2dArgument<C> of(final @NonNull String name, final boolean centerIntegers) {
-        return Vec2dArgument.<C>builder(name).centerIntegers(centerIntegers).asRequired().build();
+        return Vec2dArgument.<C>builder(name).centerIntegers(centerIntegers).build();
     }
 
-    /**
-     * Create a new optional {@link Vec2dArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull Vec2dArgument<C> optional(final @NonNull String name) {
-        return Vec2dArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link Vec2dArgument}.
-     *
-     * @param name           Component name
-     * @param centerIntegers whether to center integers to x.5.
-     * @param <C>            Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull Vec2dArgument<C> optional(final @NonNull String name, final boolean centerIntegers) {
-        return Vec2dArgument.<C>builder(name).centerIntegers(centerIntegers).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link Vec2dArgument} with the specified default value.
-     *
-     * @param name         Component name
-     * @param defaultValue default value, y will be ignored as it is always 0
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull Vec2dArgument<C> optional(final @NonNull String name, final @NonNull Vec3 defaultValue) {
-        return Vec2dArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
-    }
-
-    /**
-     * Create a new optional {@link Vec2dArgument} with the specified default value.
-     *
-     * @param name           Component name
-     * @param defaultValue   default value, y will be ignored as it is always 0
-     * @param centerIntegers whether to center integers to x.5.
-     * @param <C>            Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull Vec2dArgument<C> optional(
-            final @NonNull String name,
-            final boolean centerIntegers,
-            final @NonNull Vec3 defaultValue
-    ) {
-        return Vec2dArgument.<C>builder(name).centerIntegers(centerIntegers).asOptionalWithDefault(defaultValue).build();
-    }
 
     /**
      * Builder for {@link Vec2dArgument}.
@@ -204,22 +144,6 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
         }
 
         /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value, y will be ignored as it is always 0
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull Vec3 defaultValue) {
-            return this.asOptionalWithDefault(String.format(
-                    "%.10f %.10f",
-                    defaultValue.x,
-                    defaultValue.z
-            ));
-        }
-
-        /**
          * Build a new {@link Vec2dArgument}.
          *
          * @return Constructed argument
@@ -228,9 +152,7 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
         @Override
         public @NonNull Vec2dArgument<C> build() {
             return new Vec2dArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription(),
                     this.centerIntegers()

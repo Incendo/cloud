@@ -113,7 +113,7 @@ class CommandDeletionTest {
         final Command<TestCommandSender> command3 = this.commandManager
                 .commandBuilder("test")
                 .literal("literal")
-                .argument(StringArgument.of("string"))
+                .required(StringArgument.of("string"))
                 .handler(handler3)
                 .build();
         this.commandManager.command(command3);

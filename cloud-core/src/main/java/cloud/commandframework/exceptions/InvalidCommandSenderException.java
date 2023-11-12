@@ -24,7 +24,7 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -52,7 +52,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
     public InvalidCommandSenderException(
             final @NonNull Object commandSender,
             final @NonNull Class<?> requiredSender,
-            final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain
+            final @NonNull List<@NonNull CommandComponent<?>> currentChain
     ) {
         this(commandSender, requiredSender, currentChain, null);
     }
@@ -70,7 +70,7 @@ public final class InvalidCommandSenderException extends CommandParseException {
     public InvalidCommandSenderException(
             final @NonNull Object commandSender,
             final @NonNull Class<?> requiredSender,
-            final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain,
+            final @NonNull List<@NonNull CommandComponent<?>> currentChain,
             final @Nullable Command<?> command
     ) {
         super(commandSender, currentChain);

@@ -54,19 +54,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class PlayerArgument<C> extends CommandArgument<C, Player> {
 
     private PlayerArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         super(
-                required,
                 name,
                 new PlayerParser<>(),
-                defaultValue,
                 TypeToken.get(Player.class),
                 suggestionsProvider,
                 defaultDescription,
@@ -111,7 +107,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     public static <C> @NonNull CommandArgument<C, Player> of(
             final @NonNull String name
     ) {
-        return PlayerArgument.<C>builder(name).asRequired().build();
+        return PlayerArgument.<C>builder(name).build();
     }
 
     /**
@@ -124,7 +120,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     public static <C> @NonNull CommandArgument<C, Player> optional(
             final @NonNull String name
     ) {
-        return PlayerArgument.<C>builder(name).asOptional().build();
+        return PlayerArgument.<C>builder(name).build();
     }
 
 
@@ -137,9 +133,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         @Override
         public @NonNull CommandArgument<@NonNull C, @NonNull Player> build() {
             return new PlayerArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription(),
                     new LinkedList<>()

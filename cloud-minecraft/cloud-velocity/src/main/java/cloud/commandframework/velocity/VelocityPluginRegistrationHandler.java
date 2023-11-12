@@ -60,11 +60,11 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
     @Override
     @SuppressWarnings("unchecked")
     public boolean registerCommand(final @NonNull Command<?> command) {
-        final CommandArgument<?, ?> argument = command.getArguments().get(0);
+        final CommandArgument<?, ?> argument = command.components().get(0).argument();
         final List<String> aliases = ((StaticArgument<C>) argument).getAlternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
                 this.brigadierManager.createLiteralCommandNode(
-                        command.getArguments().get(0).getName(),
+                        command.components().get(0).argument().getName(),
                         (Command<C>) command,
                         (c, p) -> this.manager.hasPermission(
                                 this.manager.commandSenderMapper().apply(c),

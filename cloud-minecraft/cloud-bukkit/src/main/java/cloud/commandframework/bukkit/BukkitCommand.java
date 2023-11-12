@@ -197,20 +197,20 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     @Override
     public @NonNull String getUsage() {
         return this.manager.commandSyntaxFormatter().apply(
-                Collections.singletonList(Objects.requireNonNull(this.namedNode().getValue())),
+                Collections.singletonList(Objects.requireNonNull(this.namedNode().component())),
                 this.namedNode()
         );
     }
 
     @Override
     public boolean testPermissionSilent(final @NonNull CommandSender target) {
-        final CommandTree.Node<CommandArgument<C, ?>> node = this.namedNode();
+        final CommandTree.CommandNode<C> node = this.namedNode();
         if (this.disabled || node == null) {
             return false;
         }
 
         final CommandPermission permission = (CommandPermission) node
-                .getNodeMeta()
+                .nodeMeta()
                 .getOrDefault("permission", Permission.empty());
 
         return this.manager.hasPermission(this.manager.getCommandSenderMapper().apply(target), permission);
@@ -228,7 +228,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         return !this.disabled;
     }
 
-    private CommandTree.@Nullable Node<CommandArgument<C, ?>> namedNode() {
+    private CommandTree.@Nullable CommandNode<C> namedNode() {
         return this.manager.commandTree().getNamedNode(this.command.getName());
     }
 }

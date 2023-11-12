@@ -53,9 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class NamespacedKeyArgument<C> extends CommandArgument<C, NamespacedKey> {
 
     private NamespacedKeyArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription,
@@ -63,10 +61,8 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
             final String defaultNamespace
     ) {
         super(
-                required,
                 name,
                 new Parser<>(requireExplicitNamespace, defaultNamespace),
-                defaultValue,
                 NamespacedKey.class,
                 suggestionsProvider,
                 defaultDescription
@@ -94,35 +90,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
      * @since 1.7.0
      */
     public static <C> @NonNull NamespacedKeyArgument<C> of(final @NonNull String name) {
-        return NamespacedKeyArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link NamespacedKeyArgument}.
-     *
-     * @param name argument name
-     * @param <C>  sender type
-     * @return argument instance
-     * @since 1.7.0
-     */
-    public static <C> @NonNull NamespacedKeyArgument<C> optional(final @NonNull String name) {
-        return NamespacedKeyArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link NamespacedKeyArgument} using the provided default value.
-     *
-     * @param name         argument name
-     * @param defulatValue default name
-     * @param <C>          sender type
-     * @return argument instance
-     * @since 1.7.0
-     */
-    public static <C> @NonNull NamespacedKeyArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull NamespacedKey defulatValue
-    ) {
-        return NamespacedKeyArgument.<C>builder(name).asOptionalWithDefault(defulatValue).build();
+        return NamespacedKeyArgument.<C>builder(name).build();
     }
 
 
@@ -175,24 +143,10 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
             return this;
         }
 
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.7.0
-         */
-        public Builder<C> asOptionalWithDefault(final NamespacedKey defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.getNamespace() + ':' + defaultValue.getKey());
-        }
-
         @Override
         public @NonNull NamespacedKeyArgument<C> build() {
             return new NamespacedKeyArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription(),
                     this.requireExplicitNamespace,

@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.exceptions;
 
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -49,7 +49,7 @@ public class InvalidSyntaxException extends CommandParseException {
     public InvalidSyntaxException(
             final @NonNull String correctSyntax,
             final @NonNull Object commandSender,
-            final @NonNull List<@NonNull CommandArgument<?, ?>> currentChain
+            final @NonNull List<@NonNull CommandComponent<?>> currentChain
     ) {
         super(commandSender, currentChain);
         this.correctSyntax = correctSyntax;

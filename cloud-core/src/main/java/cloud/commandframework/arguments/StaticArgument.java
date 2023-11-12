@@ -46,8 +46,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public final class StaticArgument<C> extends CommandArgument<C, String> {
 
-    private StaticArgument(final boolean required, final @NonNull String name, final @NonNull String... aliases) {
-        super(required, name, new StaticArgumentParser<>(name, aliases), String.class);
+    private StaticArgument(final @NonNull String name, final @NonNull String... aliases) {
+        super(name, new StaticArgumentParser<>(name, aliases), String.class);
     }
 
     /**
@@ -62,7 +62,7 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
             final @NonNull String name,
             final @NonNull String... aliases
     ) {
-        return new StaticArgument<>(true, name, aliases);
+        return new StaticArgument<>(name, aliases);
     }
 
     /**

@@ -112,8 +112,8 @@ public final class ExampleBot {
 
         commandManager.command(builder
                 .literal("add")
-                .argument(UserArgument.of("user"))
-                .argument(StringArgument.single("perm"))
+                .required(UserArgument.of("user"))
+                .required(StringArgument.single("perm"))
                 .handler(context -> {
                     final User user = context.get("user");
                     final String perm = context.get("perm");
@@ -124,8 +124,8 @@ public final class ExampleBot {
 
         commandManager.command(builder
                 .literal("remove")
-                .argument(UserArgument.of("user"))
-                .argument(StringArgument.single("perm"))
+                .required(UserArgument.of("user"))
+                .required(StringArgument.single("perm"))
                 .handler(context -> {
                     final User user = context.get("user");
                     final String perm = context.get("perm");
@@ -138,7 +138,7 @@ public final class ExampleBot {
                 .commandBuilder("kick")
                 .senderType(GuildUser.class)
                 .permission("kick")
-                .argument(UserArgument.of("user"))
+                .required(UserArgument.of("user"))
                 .handler(context -> {
                     final GuildUser guildUser = (GuildUser) context.getSender();
                     final TextChannel textChannel = guildUser.getTextChannel();

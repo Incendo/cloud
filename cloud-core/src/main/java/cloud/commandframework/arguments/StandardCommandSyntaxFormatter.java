@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments;
 
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
@@ -52,44 +53,44 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
     @Override
     @SuppressWarnings("unchecked")
     public final @NonNull String apply(
-            final @NonNull List<@NonNull CommandArgument<C, ?>> commandArguments,
-            final CommandTree.@Nullable Node<@Nullable CommandArgument<C, ?>> node
+            final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
+            final CommandTree.@Nullable CommandNode<C> node
     ) {
         final FormattingInstance formattingInstance = this.createInstance();
-        final Iterator<CommandArgument<C, ?>> iterator = commandArguments.iterator();
+        final Iterator<CommandComponent<C>> iterator = commandComponents.iterator();
         while (iterator.hasNext()) {
-            final CommandArgument<?, ?> commandArgument = iterator.next();
-            if (commandArgument instanceof StaticArgument) {
-                formattingInstance.appendLiteral((StaticArgument<C>) commandArgument);
-            } else if (commandArgument instanceof CompoundArgument) {
-                formattingInstance.appendCompound((CompoundArgument<?, ?, ?>) commandArgument);
-            } else if (commandArgument instanceof FlagArgument) {
-                formattingInstance.appendFlag((FlagArgument<?>) commandArgument);
+            final CommandComponent<C> commandComponent = iterator.next();
+            if (commandComponent.argument() instanceof StaticArgument) {
+                formattingInstance.appendLiteral((StaticArgument<C>) commandComponent.argument());
+            } else if (commandComponent.argument() instanceof CompoundArgument) {
+                formattingInstance.appendCompound(commandComponent, (CompoundArgument<?, ?, ?>) commandComponent.argument());
+            } else if (commandComponent.argument() instanceof FlagArgument) {
+                formattingInstance.appendFlag((FlagArgument<?>) commandComponent.argument());
             } else {
-                if (commandArgument.isRequired()) {
-                    formattingInstance.appendRequired(commandArgument);
+                if (commandComponent.required()) {
+                    formattingInstance.appendRequired(commandComponent.argument());
                 } else {
-                    formattingInstance.appendOptional(commandArgument);
+                    formattingInstance.appendOptional(commandComponent.argument());
                 }
             }
             if (iterator.hasNext()) {
                 formattingInstance.appendBlankSpace();
             }
         }
-        CommandTree.Node<CommandArgument<C, ?>> tail = node;
+        CommandTree.CommandNode<C> tail = node;
         while (tail != null && !tail.isLeaf()) {
-            if (tail.getChildren().size() > 1) {
+            if (tail.children().size() > 1) {
                 formattingInstance.appendBlankSpace();
-                final Iterator<CommandTree.Node<CommandArgument<C, ?>>> childIterator = tail.getChildren().iterator();
+                final Iterator<CommandTree.CommandNode<C>> childIterator = tail.children().iterator();
                 while (childIterator.hasNext()) {
-                    final CommandTree.Node<CommandArgument<C, ?>> child = childIterator.next();
+                    final CommandTree.CommandNode<C> child = childIterator.next();
 
-                    if (child.getValue() instanceof StaticArgument) {
-                        formattingInstance.appendName(child.getValue().getName());
-                    } else if (child.getValue().isRequired()) {
-                        formattingInstance.appendRequired(child.getValue());
+                    if (child.argument() instanceof StaticArgument) {
+                        formattingInstance.appendName(child.argument().getName());
+                    } else if (child.component().required()) {
+                        formattingInstance.appendRequired(child.argument());
                     } else {
-                        formattingInstance.appendOptional(child.getValue());
+                        formattingInstance.appendOptional(child.argument());
                     }
 
                     if (childIterator.hasNext()) {
@@ -98,25 +99,25 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 }
                 break;
             }
-            final CommandArgument<C, ?> argument = tail.getChildren().get(0).getValue();
-            if (argument instanceof CompoundArgument) {
+            final CommandComponent<C> component = tail.children().get(0).component();
+            if (component.argument() instanceof CompoundArgument) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendCompound((CompoundArgument<?, ?, ?>) argument);
-            } else if (argument instanceof FlagArgument) {
+                formattingInstance.appendCompound(component, (CompoundArgument<?, ?, ?>) component.argument());
+            } else if (component.argument() instanceof FlagArgument) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendFlag((FlagArgument<?>) argument);
-            } else if (argument instanceof StaticArgument) {
+                formattingInstance.appendFlag((FlagArgument<?>) component.argument());
+            } else if (component.argument() instanceof StaticArgument) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendLiteral((StaticArgument<?>) argument);
+                formattingInstance.appendLiteral((StaticArgument<?>) component.argument());
             } else {
                 formattingInstance.appendBlankSpace();
-                if (argument.isRequired()) {
-                    formattingInstance.appendRequired(argument);
+                if (component.required()) {
+                    formattingInstance.appendRequired(component.argument());
                 } else {
-                    formattingInstance.appendOptional(argument);
+                    formattingInstance.appendOptional(component.argument());
                 }
             }
-            tail = tail.getChildren().get(0);
+            tail = tail.children().get(0);
         }
         return formattingInstance.toString();
     }
@@ -163,11 +164,17 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
         /**
          * Append a compound argument to the syntax string
          *
-         * @param argument Compound argument to append
+         * @param component The component that contained the argument
+         * @param argument  Compound argument to append
+         * @since 2.0.0
          */
-        public void appendCompound(final @NonNull CompoundArgument<?, ?, ?> argument) {
-            final String prefix = argument.isRequired() ? this.getRequiredPrefix() : this.getOptionalPrefix();
-            final String suffix = argument.isRequired() ? this.getRequiredSuffix() : this.getOptionalSuffix();
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public void appendCompound(
+                final @NonNull CommandComponent<?> component,
+                final @NonNull CompoundArgument<?, ?, ?> argument
+        ) {
+            final String prefix = component.required() ? this.getRequiredPrefix() : this.getOptionalPrefix();
+            final String suffix = component.required() ? this.getRequiredSuffix() : this.getOptionalSuffix();
             this.builder.append(prefix);
             final Object[] names = argument.getNames().toArray();
             for (int i = 0; i < names.length; i++) {

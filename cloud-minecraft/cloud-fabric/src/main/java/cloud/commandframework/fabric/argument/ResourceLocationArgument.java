@@ -42,17 +42,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ResourceLocationArgument<C> extends CommandArgument<C, ResourceLocation> {
 
     ResourceLocationArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new WrappedBrigadierParser<>(net.minecraft.commands.arguments.ResourceLocationArgument.id()),
-                defaultValue,
                 ResourceLocation.class,
                 suggestionsProvider,
                 defaultDescription
@@ -80,35 +76,7 @@ public final class ResourceLocationArgument<C> extends CommandArgument<C, Resour
      * @since 1.5.0
      */
     public static <C> @NonNull ResourceLocationArgument<C> of(final @NonNull String name) {
-        return ResourceLocationArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link ResourceLocationArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ResourceLocationArgument<C> optional(final @NonNull String name) {
-        return ResourceLocationArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link ResourceLocationArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultValue Default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull ResourceLocationArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull ResourceLocation defaultValue
-    ) {
-        return ResourceLocationArgument.<C>builder(name).asOptionalWithDefault(defaultValue).build();
+        return ResourceLocationArgument.<C>builder(name).build();
     }
 
 
@@ -133,24 +101,10 @@ public final class ResourceLocationArgument<C> extends CommandArgument<C, Resour
         @Override
         public @NonNull ResourceLocationArgument<C> build() {
             return new ResourceLocationArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull ResourceLocation defaultValue) {
-            return this.asOptionalWithDefault(defaultValue.toString());
         }
     }
 }

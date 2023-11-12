@@ -51,15 +51,13 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     private final boolean liberal;
 
     private BooleanArgument(
-            final boolean required,
             final @NonNull String name,
             final boolean liberal,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription description
     ) {
-        super(required, name, new BooleanParser<>(liberal), defaultValue, Boolean.class, suggestionsProvider, description);
+        super(name, new BooleanParser<>(liberal), Boolean.class, suggestionsProvider, description);
         this.liberal = liberal;
     }
 
@@ -98,33 +96,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
      * @return Created argument
      */
     public static <C> @NonNull CommandArgument<C, Boolean> of(final @NonNull String name) {
-        return BooleanArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Boolean> optional(final @NonNull String name) {
-        return BooleanArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required command argument with a default value
-     *
-     * @param name           Argument name
-     * @param defaultBoolean Default num
-     * @param <C>            Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull CommandArgument<C, Boolean> optional(
-            final @NonNull String name,
-            final boolean defaultBoolean
-    ) {
-        return BooleanArgument.<C>builder(name).asOptionalWithDefault(Boolean.toString(defaultBoolean)).build();
+        return BooleanArgument.<C>builder(name).build();
     }
 
     /**
@@ -165,10 +137,8 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         @Override
         public @NonNull BooleanArgument<C> build() {
             return new BooleanArgument<>(
-                    this.isRequired(),
                     this.getName(),
                     this.liberal,
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );

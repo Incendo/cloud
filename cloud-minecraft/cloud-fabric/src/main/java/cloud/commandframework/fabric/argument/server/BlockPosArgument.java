@@ -30,7 +30,6 @@ import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.fabric.data.Coordinates.BlockCoordinates;
 import java.util.List;
 import java.util.function.BiFunction;
-import net.minecraft.core.BlockPos;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -43,17 +42,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinates> {
 
     BlockPosArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 FabricArgumentParsers.blockPos(),
-                defaultValue,
                 BlockCoordinates.class,
                 suggestionsProvider,
                 defaultDescription
@@ -81,35 +76,9 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
      * @since 1.5.0
      */
     public static <C> @NonNull BlockPosArgument<C> of(final @NonNull String name) {
-        return BlockPosArgument.<C>builder(name).asRequired().build();
+        return BlockPosArgument.<C>builder(name).build();
     }
 
-    /**
-     * Create a new optional {@link BlockPosArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull BlockPosArgument<C> optional(final @NonNull String name) {
-        return BlockPosArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link BlockPosArgument} with the specified default value.
-     *
-     * @param name         Component name
-     * @param defaultValue default value
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull BlockPosArgument<C> optional(final @NonNull String name, final @NonNull BlockPos defaultValue) {
-        return BlockPosArgument.<C>builder(name)
-                .asOptionalWithDefault(defaultValue)
-                .build();
-    }
 
     /**
      * Builder for {@link BlockPosArgument}.
@@ -132,29 +101,10 @@ public final class BlockPosArgument<C> extends CommandArgument<C, BlockCoordinat
         @Override
         public @NonNull BlockPosArgument<C> build() {
             return new BlockPosArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final @NonNull BlockPos defaultValue) {
-            return this.asOptionalWithDefault(String.format(
-                    "%s %s %s",
-                    defaultValue.getX(),
-                    defaultValue.getY(),
-                    defaultValue.getZ()
-            ));
         }
     }
 }

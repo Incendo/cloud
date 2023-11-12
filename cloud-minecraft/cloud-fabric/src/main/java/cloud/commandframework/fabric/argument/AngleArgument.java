@@ -41,17 +41,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.commands.arguments.AngleArgument.SingleAngle> {
 
     AngleArgument(
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
         super(
-                required,
                 name,
                 new WrappedBrigadierParser<>(net.minecraft.commands.arguments.AngleArgument.angle()),
-                defaultValue,
                 net.minecraft.commands.arguments.AngleArgument.SingleAngle.class,
                 suggestionsProvider,
                 defaultDescription
@@ -79,35 +75,7 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
      * @since 1.5.0
      */
     public static <C> @NonNull AngleArgument<C> of(final @NonNull String name) {
-        return AngleArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional {@link AngleArgument}.
-     *
-     * @param name Component name
-     * @param <C>  Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull AngleArgument<C> optional(final @NonNull String name) {
-        return AngleArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new optional {@link AngleArgument} with the specified default value.
-     *
-     * @param name         Argument name
-     * @param defaultAngle Default angle, in degrees
-     * @param <C>          Command sender type
-     * @return Created argument
-     * @since 1.5.0
-     */
-    public static <C> @NonNull AngleArgument<C> optional(
-            final @NonNull String name,
-            final float defaultAngle
-    ) {
-        return AngleArgument.<C>builder(name).asOptionalWithDefault(defaultAngle).build();
+        return AngleArgument.<C>builder(name).build();
     }
 
 
@@ -133,24 +101,10 @@ public final class AngleArgument<C> extends CommandArgument<C, net.minecraft.com
         @Override
         public @NonNull AngleArgument<C> build() {
             return new AngleArgument<>(
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
-        }
-
-        /**
-         * Sets the command argument to be optional, with the specified default value.
-         *
-         * @param defaultValue default value
-         * @return this builder
-         * @see CommandArgument.Builder#asOptionalWithDefault(String)
-         * @since 1.5.0
-         */
-        public @NonNull Builder<C> asOptionalWithDefault(final float defaultValue) {
-            return this.asOptionalWithDefault(Float.toString(defaultValue));
         }
     }
 }

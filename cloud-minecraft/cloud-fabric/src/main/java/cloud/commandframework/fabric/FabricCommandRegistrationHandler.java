@@ -161,7 +161,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 final Command<C> command
         ) {
             final RootCommandNode<FabricClientCommandSource> rootNode = dispatcher.getRoot();
-            final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
+            final StaticArgument<C> first = ((StaticArgument<C>) command.components().get(0).argument());
             final CommandNode<FabricClientCommandSource> baseNode = this.commandManager()
                     .brigadierManager()
                     .createLiteralCommandNode(
@@ -232,7 +232,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         }
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
-            @SuppressWarnings("unchecked") final StaticArgument<C> first = ((StaticArgument<C>) command.getArguments().get(0));
+            @SuppressWarnings("unchecked") final StaticArgument<C> first = ((StaticArgument<C>) command.components().get(0).argument());
             final CommandNode<CommandSourceStack> baseNode = this.commandManager().brigadierManager().createLiteralCommandNode(
                     first.getName(),
                     command,

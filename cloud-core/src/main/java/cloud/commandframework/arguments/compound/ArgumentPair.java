@@ -47,7 +47,6 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
     /**
      * Create a new argument pair.
      *
-     * @param required   Whether or not the argument is required
      * @param name       The argument name
      * @param names      Names of the sub-arguments (in order)
      * @param types      Types of the sub-arguments (in order)
@@ -57,7 +56,6 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
      */
     @SuppressWarnings("unchecked")
     protected ArgumentPair(
-            final boolean required,
             final @NonNull String name,
             final @NonNull Pair<@NonNull String, @NonNull String> names,
             final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> types,
@@ -65,7 +63,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
             final @NonNull BiFunction<@NonNull C, @NonNull Pair<@NonNull U, @NonNull V>, @NonNull O> mapper,
             final @NonNull TypeToken<O> valueType
     ) {
-        super(required, name, names, parserPair, types, mapper, o -> Pair.of((U) o[0], (V) o[1]), valueType);
+        super(name, names, parserPair, types, mapper, o -> Pair.of((U) o[0], (V) o[1]), valueType);
     }
 
     /**
@@ -103,7 +101,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
         ).orElseThrow(() ->
                 new IllegalArgumentException(
                         "Could not create parser for secondary type"));
-        return new ArgumentPairIntermediaryBuilder<>(true, name, names, Pair.of(firstParser, secondaryParser), types);
+        return new ArgumentPairIntermediaryBuilder<>(name, names, Pair.of(firstParser, secondaryParser), types);
     }
 
 
@@ -111,21 +109,18 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
     @API(status = API.Status.STABLE)
     public static final class ArgumentPairIntermediaryBuilder<C, U, V> {
 
-        private final boolean required;
         private final String name;
         private final Pair<ArgumentParser<C, U>, ArgumentParser<C, V>> parserPair;
         private final Pair<String, String> names;
         private final Pair<Class<U>, Class<V>> types;
 
         private ArgumentPairIntermediaryBuilder(
-                final boolean required,
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull ArgumentParser<@NonNull C, @NonNull U>,
                         @NonNull ArgumentParser<@NonNull C, @NonNull V>> parserPair,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> types
         ) {
-            this.required = required;
             this.name = name;
             this.names = names;
             this.parserPair = parserPair;
@@ -139,7 +134,6 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
          */
         public @NonNull ArgumentPair<@NonNull C, @NonNull U, @NonNull V, @NonNull Pair<@NonNull U, @NonNull V>> simple() {
             return new ArgumentPair<C, U, V, Pair<U, V>>(
-                    this.required,
                     this.name,
                     this.names,
                     this.types,
@@ -163,7 +157,7 @@ public class ArgumentPair<C, U, V, O> extends CompoundArgument<Pair<U, V>, C, O>
                 final @NonNull BiFunction<@NonNull C, @NonNull Pair<@NonNull U,
                         @NonNull V>, @NonNull O> mapper
         ) {
-            return new ArgumentPair<C, U, V, O>(this.required, this.name, this.names, this.types, this.parserPair, mapper, clazz);
+            return new ArgumentPair<C, U, V, O>(this.name, this.names, this.types, this.parserPair, mapper, clazz);
         }
 
         /**

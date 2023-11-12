@@ -480,17 +480,25 @@ public class MutableCommandBuilder<C : Any>(
      * @param argument argument to add
      * @param description description of the argument
      * @return this mutable builder
-     * @since 1.3.0
+     * @since 2.0.0
      */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN
-    )
-    public fun argument(
+    public fun required(
         argument: CommandArgument<C, *>,
-        description: Description = Description.empty()
-    ): MutableCommandBuilder<C> = mutate { it.argument(argument, description) }
+        description: ArgumentDescription = ArgumentDescription.empty()
+    ): MutableCommandBuilder<C> = mutate { it.required(argument, description) }
+
+    /**
+     * Add a new argument to this command
+     *
+     * @param argument argument to add
+     * @param description description of the argument
+     * @return this mutable builder
+     * @since 2.0.0
+     */
+    public fun optional(
+        argument: CommandArgument<C, *>,
+        description: ArgumentDescription = ArgumentDescription.empty()
+    ): MutableCommandBuilder<C> = mutate { it.optional(argument, description) }
 
     /**
      * Add a new argument to this command
@@ -500,28 +508,10 @@ public class MutableCommandBuilder<C : Any>(
      * @return this mutable builder
      * @since 1.4.0
      */
-    public fun argument(
-        argument: CommandArgument<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
-    ): MutableCommandBuilder<C> = mutate { it.argument(argument, description) }
-
-    /**
-     * Add a new argument to this command
-     *
-     * @param argument argument to add
-     * @param description description of the argument
-     * @return this mutable builder
-     * @since 1.3.0
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN
-    )
-    public fun argument(
+    public fun required(
         argument: CommandArgument.Builder<C, *>,
-        description: Description = Description.empty()
-    ): MutableCommandBuilder<C> = mutate { it.argument(argument, description) }
+        description: ArgumentDescription = ArgumentDescription.empty()
+    ): MutableCommandBuilder<C> = mutate { it.required(argument, description) }
 
     /**
      * Add a new argument to this command
@@ -531,10 +521,10 @@ public class MutableCommandBuilder<C : Any>(
      * @return this mutable builder
      * @since 1.4.0
      */
-    public fun argument(
+    public fun optional(
         argument: CommandArgument.Builder<C, *>,
         description: ArgumentDescription = ArgumentDescription.empty()
-    ): MutableCommandBuilder<C> = mutate { it.argument(argument, description) }
+    ): MutableCommandBuilder<C> = mutate { it.optional(argument, description) }
 
     /**
      * Add a new argument to this command
@@ -542,50 +532,25 @@ public class MutableCommandBuilder<C : Any>(
      * @param description description of the argument
      * @param argumentSupplier supplier of the argument to add
      * @return this mutable builder
-     * @since 1.3.0
+     * @since 2.0.0
      */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN
-    )
-    public fun argument(
-        description: Description = Description.empty(),
-        argumentSupplier: () -> CommandArgument<C, *>
-    ): MutableCommandBuilder<C> = mutate { it.argument(argumentSupplier(), description) }
-
-    /**
-     * Add a new argument to this command
-     *
-     * @param description description of the argument
-     * @param argumentSupplier supplier of the argument to add
-     * @return this mutable builder
-     * @since 1.4.0
-     */
-    public fun argument(
+    public fun required(
         description: ArgumentDescription = ArgumentDescription.empty(),
         argumentSupplier: () -> CommandArgument<C, *>
-    ): MutableCommandBuilder<C> = mutate { it.argument(argumentSupplier(), description) }
+    ): MutableCommandBuilder<C> = mutate { it.required(argumentSupplier(), description) }
 
     /**
-     * Add a new literal argument to this command
+     * Add a new argument to this command
      *
-     * @param name main argument name
-     * @param description literal description
-     * @param aliases argument aliases
+     * @param description description of the argument
+     * @param argumentSupplier supplier of the argument to add
      * @return this mutable builder
-     * @since 1.3.0
+     * @since 2.0.0
      */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN
-    )
-    public fun literal(
-        name: String,
-        description: Description = Description.empty(),
-        vararg aliases: String
-    ): MutableCommandBuilder<C> = mutate { it.literal(name, description, *aliases) }
+    public fun optional(
+        description: ArgumentDescription = ArgumentDescription.empty(),
+        argumentSupplier: () -> CommandArgument<C, *>
+    ): MutableCommandBuilder<C> = mutate { it.optional(argumentSupplier(), description) }
 
     /**
      * Add a new literal argument to this command

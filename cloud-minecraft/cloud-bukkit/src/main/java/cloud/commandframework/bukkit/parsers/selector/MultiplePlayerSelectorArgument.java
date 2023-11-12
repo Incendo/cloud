@@ -52,14 +52,12 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
 
     private MultiplePlayerSelectorArgument(
             final boolean allowEmpty,
-            final boolean required,
             final @NonNull String name,
-            final @NonNull String defaultValue,
             final @Nullable BiFunction<@NonNull CommandContext<C>, @NonNull String,
                     @NonNull List<@NonNull String>> suggestionsProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        super(required, name, new MultiplePlayerSelectorParser<>(allowEmpty), defaultValue, MultiplePlayerSelector.class,
+        super(name, new MultiplePlayerSelectorParser<>(allowEmpty), MultiplePlayerSelector.class,
                 suggestionsProvider, defaultDescription
         );
     }
@@ -99,33 +97,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
      * @return Created argument
      */
     public static <C> @NonNull MultiplePlayerSelectorArgument<C> of(final @NonNull String name) {
-        return MultiplePlayerSelectorArgument.<C>builder(name).asRequired().build();
-    }
-
-    /**
-     * Create a new optional command argument
-     *
-     * @param name Argument name
-     * @param <C>  Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(final @NonNull String name) {
-        return MultiplePlayerSelectorArgument.<C>builder(name).asOptional().build();
-    }
-
-    /**
-     * Create a new required command argument with a default value
-     *
-     * @param name                  Argument name
-     * @param defaultEntitySelector Default player
-     * @param <C>                   Command sender type
-     * @return Created argument
-     */
-    public static <C> @NonNull MultiplePlayerSelectorArgument<C> optional(
-            final @NonNull String name,
-            final @NonNull String defaultEntitySelector
-    ) {
-        return MultiplePlayerSelectorArgument.<C>builder(name).asOptionalWithDefault(defaultEntitySelector).build();
+        return MultiplePlayerSelectorArgument.<C>builder(name).build();
     }
 
 
@@ -159,9 +131,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         public @NonNull MultiplePlayerSelectorArgument<C> build() {
             return new MultiplePlayerSelectorArgument<>(
                     this.allowEmpty,
-                    this.isRequired(),
                     this.getName(),
-                    this.getDefaultValue(),
                     this.getSuggestionsProvider(),
                     this.getDefaultDescription()
             );
