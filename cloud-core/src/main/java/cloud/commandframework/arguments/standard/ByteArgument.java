@@ -116,7 +116,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, Byte> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Byte, Builder<C>> {
 
         private byte min = ByteParser.DEFAULT_MINIMUM;
         private byte max = ByteParser.DEFAULT_MAXIMUM;

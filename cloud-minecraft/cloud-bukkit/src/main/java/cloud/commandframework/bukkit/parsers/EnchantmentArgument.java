@@ -102,7 +102,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Enchantment> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Enchantment, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(Enchantment.class, name);

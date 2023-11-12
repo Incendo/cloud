@@ -109,7 +109,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, OfflinePlayer> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, OfflinePlayer, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(OfflinePlayer.class, name);

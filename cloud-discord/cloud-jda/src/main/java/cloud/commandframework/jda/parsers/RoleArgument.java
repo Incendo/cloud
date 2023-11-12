@@ -116,7 +116,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Role> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Role, Builder<C>> {
 
         private Set<ParserMode> modes = new HashSet<>();
 

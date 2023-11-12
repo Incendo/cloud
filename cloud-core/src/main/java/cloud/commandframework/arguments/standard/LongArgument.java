@@ -116,7 +116,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, Long> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Long, Builder<C>> {
 
         private long min = LongParser.DEFAULT_MINIMUM;
         private long max = LongParser.DEFAULT_MAXIMUM;

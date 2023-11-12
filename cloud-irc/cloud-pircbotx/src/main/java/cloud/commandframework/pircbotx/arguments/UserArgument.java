@@ -103,7 +103,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, User> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, User, Builder<C>> {
 
         private Builder(
                 final @NonNull String name

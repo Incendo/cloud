@@ -115,7 +115,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, Float> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Float, Builder<C>> {
 
         private float min = FloatParser.DEFAULT_MINIMUM;
         private float max = FloatParser.DEFAULT_MAXIMUM;

@@ -112,7 +112,7 @@ public final class ServerArgument<C> extends CommandArgument<C, ServerInfo> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, ServerInfo> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, ServerInfo, Builder<C>> {
 
         private Builder(
                 final @NonNull String name

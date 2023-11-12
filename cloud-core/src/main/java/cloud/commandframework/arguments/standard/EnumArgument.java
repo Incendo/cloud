@@ -116,7 +116,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C, E extends Enum<E>> extends CommandArgument.Builder<C, E> {
+    public static final class Builder<C, E extends Enum<E>> extends CommandArgument.TypedBuilder<C, E, Builder<C, E>> {
 
         private final Class<E> enumClass;
 

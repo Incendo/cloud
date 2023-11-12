@@ -109,7 +109,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, Boolean> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Boolean, Builder<C>> {
 
         private boolean liberal = false;
 

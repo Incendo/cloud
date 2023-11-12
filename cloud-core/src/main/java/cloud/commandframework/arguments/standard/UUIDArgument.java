@@ -92,7 +92,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, UUID> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, UUID, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(UUID.class, name);

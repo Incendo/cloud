@@ -91,7 +91,7 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, Character> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Character, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(Character.class, name);

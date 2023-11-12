@@ -479,7 +479,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
 
 
     /**
-     * Mutable builder for {@link CommandArgument} instances
+     * Mutable builder for {@link CommandArgument} instances. Builders should extend {@link TypedBuilder} instead of this class.
      *
      * @param <C> Command sender type
      * @param <T> Argument value type
@@ -498,7 +498,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         private final Collection<BiFunction<@NonNull CommandContext<C>,
                 @NonNull String, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors = new LinkedList<>();
 
-        protected Builder(
+        private Builder(
                 final @NonNull TypeToken<T> valueType,
                 final @NonNull String name
         ) {
@@ -506,7 +506,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             this.name = name;
         }
 
-        protected Builder(
+        private Builder(
                 final @NonNull Class<T> valueType,
                 final @NonNull String name
         ) {

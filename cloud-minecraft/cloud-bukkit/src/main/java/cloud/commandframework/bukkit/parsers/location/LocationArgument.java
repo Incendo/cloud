@@ -119,7 +119,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, Location> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Location, Builder<C>> {
 
         private Builder(
                 final @NonNull String name
