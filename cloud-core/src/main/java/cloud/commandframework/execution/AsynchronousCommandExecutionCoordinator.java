@@ -61,7 +61,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
         super(commandTree);
         this.executor = executor == null ? ForkJoinPool.commonPool() : executor;
         this.synchronizeParsing = synchronizeParsing;
-        this.commandManager = commandTree.getCommandManager();
+        this.commandManager = commandTree.commandManager();
     }
 
     /**

@@ -26,7 +26,6 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
@@ -435,7 +434,7 @@ public final class CloudBrigadierManager<C, S> {
             final boolean forceRegister,
             final com.mojang.brigadier.@NonNull Command<S> executor
     ) {
-        final CommandTree.CommandNode<C> node = this.commandManager
+        final cloud.commandframework.internal.CommandNode<C> node = this.commandManager
                 .commandTree().getNamedNode(cloudCommand.components().get(0).argument().getName());
         final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(
                 context,
@@ -456,7 +455,7 @@ public final class CloudBrigadierManager<C, S> {
         }
         literalArgumentBuilder.executes(executor);
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
-        for (final CommandTree.CommandNode<C> child : node.children()) {
+        for (final cloud.commandframework.internal.CommandNode<C> child : node.children()) {
             constructedRoot.addChild(this.constructCommandNode(forceRegister, child,
                     permissionChecker, executor, provider
             ).build());
@@ -475,7 +474,7 @@ public final class CloudBrigadierManager<C, S> {
      * @return Constructed literal command node
      */
     public @NonNull LiteralCommandNode<S> createLiteralCommandNode(
-            final CommandTree.@NonNull CommandNode<C> cloudCommand,
+            final cloud.commandframework.internal.@NonNull CommandNode<C> cloudCommand,
             final @NonNull LiteralCommandNode<S> root,
             final @NonNull SuggestionProvider<S> suggestionProvider,
             final com.mojang.brigadier.@NonNull Command<S> executor,
@@ -494,7 +493,7 @@ public final class CloudBrigadierManager<C, S> {
             literalArgumentBuilder.executes(executor);
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
-        for (final CommandTree.CommandNode<C> child : cloudCommand.children()) {
+        for (final cloud.commandframework.internal.CommandNode<C> child : cloudCommand.children()) {
             constructedRoot.addChild(this.constructCommandNode(true, child, permissionChecker,
                     executor, suggestionProvider
             ).build());
@@ -504,7 +503,7 @@ public final class CloudBrigadierManager<C, S> {
 
     private @NonNull ArgumentBuilder<S, ?> constructCommandNode(
             final boolean forceExecutor,
-            final CommandTree.@NonNull CommandNode<C> root,
+            final cloud.commandframework.internal.@NonNull CommandNode<C> root,
             final @NonNull BiPredicate<@NonNull S, @NonNull CommandPermission> permissionChecker,
             final com.mojang.brigadier.@NonNull Command<S> executor,
             final SuggestionProvider<S> suggestionProvider
@@ -551,7 +550,7 @@ public final class CloudBrigadierManager<C, S> {
                 }
             }
 
-            for (final CommandTree.CommandNode<C> node : root.children()) {
+            for (final cloud.commandframework.internal.CommandNode<C> node : root.children()) {
                 argumentBuilders[parsers.length - 1]
                         .then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
             }
@@ -598,7 +597,7 @@ public final class CloudBrigadierManager<C, S> {
         if (root.children().stream().noneMatch(node -> node.component().required())) {
             argumentBuilder.executes(executor);
         }
-        for (final CommandTree.CommandNode<C> node : root.children()) {
+        for (final cloud.commandframework.internal.CommandNode<C> node : root.children()) {
             argumentBuilder.then(this.constructCommandNode(forceExecutor, node, permissionChecker, executor, suggestionProvider));
         }
         return argumentBuilder;
@@ -606,7 +605,7 @@ public final class CloudBrigadierManager<C, S> {
 
     private @NonNull CompletableFuture<Suggestions> buildSuggestions(
             final com.mojang.brigadier.context.@Nullable CommandContext<S> senderContext,
-            final CommandTree.@Nullable CommandNode<C> parentNode,
+            final cloud.commandframework.internal.@Nullable CommandNode<C> parentNode,
             final @NonNull CommandComponent<C> component,
             final @NonNull SuggestionsBuilder builder
     ) {
@@ -642,7 +641,7 @@ public final class CloudBrigadierManager<C, S> {
         final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
         if (parentNode != null) {
             final Set<String> siblingLiterals = parentNode.children().stream()
-                    .map(CommandTree.CommandNode::argument)
+                    .map(cloud.commandframework.internal.CommandNode::argument)
                     .flatMap(arg -> (arg instanceof StaticArgument)
                             ? ((StaticArgument<C>) arg).getAliases().stream() : Stream.empty())
                     .collect(Collectors.toSet());

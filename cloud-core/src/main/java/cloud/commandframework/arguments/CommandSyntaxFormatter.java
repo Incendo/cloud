@@ -24,7 +24,7 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.CommandTree;
+import cloud.commandframework.internal.CommandNode;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -52,6 +52,6 @@ public interface CommandSyntaxFormatter<C> {
      */
     @NonNull String apply(
             @NonNull List<@NonNull CommandComponent<C>> commandComponents,
-            CommandTree.@Nullable CommandNode<C> node
+            @Nullable CommandNode<C> node
     );
 }

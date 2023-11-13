@@ -118,7 +118,7 @@ public abstract class CommandExecutionCoordinator<C> {
                     completableFuture.completeExceptionally(pair.getSecond());
                 } else {
                     final Command<C> command = Objects.requireNonNull(pair.getFirst());
-                    if (this.getCommandTree().getCommandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
+                    if (this.getCommandTree().commandManager().postprocessContext(commandContext, command) == State.ACCEPTED) {
                         try {
                             command.getCommandExecutionHandler().executeFuture(commandContext).get();
                         } catch (final java.util.concurrent.ExecutionException exception) {

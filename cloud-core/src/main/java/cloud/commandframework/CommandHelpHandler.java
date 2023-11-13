@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.meta.CommandMeta;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,7 +89,7 @@ public final class CommandHelpHandler<C> {
      */
     public @NonNull List<@NonNull String> getLongestSharedChains() {
         final List<String> chains = new ArrayList<>();
-        this.commandManager.commandTree().getRootNodes().forEach(node ->
+        this.commandManager.commandTree().rootNodes().forEach(node ->
                 chains.add(Objects.requireNonNull(node.argument())
                         .getName() + this.commandManager
                         .commandSyntaxFormatter()
@@ -203,11 +204,11 @@ public final class CommandHelpHandler<C> {
         }
 
         /* Traverse command to find the most specific help topic */
-        final CommandTree.CommandNode<C> node = this.commandManager.commandTree()
+        final CommandNode<C> node = this.commandManager.commandTree()
                 .getNamedNode(availableCommandLabels.iterator().next());
 
         final List<CommandComponent<C>> traversedNodes = new LinkedList<>();
-        CommandTree.CommandNode<C> head = node;
+        CommandNode<C> head = node;
         int index = 0;
 
         outer:
@@ -230,8 +231,8 @@ public final class CommandHelpHandler<C> {
             } else {
                 if (index < queryFragments.length) {
                     /* We might still be able to match an argument */
-                    CommandTree.CommandNode<C> potentialVariable = null;
-                    for (final CommandTree.CommandNode<C> child : head.children()) {
+                    CommandNode<C> potentialVariable = null;
+                    for (final CommandNode<C> child : head.children()) {
                         if (!(child.argument() instanceof StaticArgument)) {
                             if (child.argument() != null) {
                                 potentialVariable = child;
@@ -255,7 +256,7 @@ public final class CommandHelpHandler<C> {
                 final String currentDescription = this.commandManager.commandSyntaxFormatter().apply(traversedNodes, null);
                 /* Attempt to parse the longest possible description for the children */
                 final List<String> childSuggestions = new LinkedList<>();
-                for (final CommandTree.CommandNode<C> child : head.children()) {
+                for (final CommandNode<C> child : head.children()) {
                     /* Check filtered by predicate */
                     if (!this.isNodeVisible(child)) {
                         continue;
@@ -282,7 +283,7 @@ public final class CommandHelpHandler<C> {
 
     /* Checks using the predicate whether a command node or one of its children is visible */
     private boolean isNodeVisible(
-            final CommandTree.@NonNull CommandNode<C> node
+            final @NonNull CommandNode<C> node
     ) {
         /* Check node is itself a command that is visible */
         final CommandComponent<C> component = node.component();
@@ -294,7 +295,7 @@ public final class CommandHelpHandler<C> {
         }
 
         /* Query the children recursively */
-        for (CommandTree.CommandNode<C> childNode : node.children()) {
+        for (CommandNode<C> childNode : node.children()) {
             if (this.isNodeVisible(childNode)) {
                 return true;
             }

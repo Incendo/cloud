@@ -88,7 +88,7 @@ class CommandDeletionTest {
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
         assertThat(this.commandManager.suggest(new TestCommandSender(), "")).isEmpty();
-        assertThat(this.commandManager.commandTree().getRootNodes()).isEmpty();
+        assertThat(this.commandManager.commandTree().rootNodes()).isEmpty();
     }
 
     @Test
@@ -145,7 +145,7 @@ class CommandDeletionTest {
         verifyNoMoreInteractions(handler2);
         verifyNoMoreInteractions(handler3);
 
-        assertThat(this.commandManager.commandTree().getRootNodes()).isEmpty();
+        assertThat(this.commandManager.commandTree().rootNodes()).isEmpty();
     }
 
     @Test
@@ -170,6 +170,6 @@ class CommandDeletionTest {
         assertThat(completionException).hasCauseThat().isInstanceOf(NoSuchCommandException.class);
 
         assertThat(this.commandManager.suggest(new TestCommandSender(), "")).contains(Suggestion.simple("test"));
-        assertThat(this.commandManager.commandTree().getRootNodes()).hasSize(1);
+        assertThat(this.commandManager.commandTree().rootNodes()).hasSize(1);
     }
 }
