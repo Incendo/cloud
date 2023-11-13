@@ -28,7 +28,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class CommandInputImpl implements CommandInput {
 
-    private String input;
+    private final String input;
     private int cursor;
 
     CommandInputImpl(final @NonNull String input) {
@@ -46,13 +46,12 @@ final class CommandInputImpl implements CommandInput {
     }
 
     @Override
-    public void appendString(final @NonNull String string) {
+    public @NonNull CommandInput appendString(final @NonNull String string) {
         if (this.hasRemainingInput() && !this.remainingInput().endsWith(" ")) {
-            this.input = String.format("%s %s", this.input, string);
+            return new CommandInputImpl(String.format("%s %s", this.input, string), this.cursor);
         } else {
-            this.input += string;
+            return new CommandInputImpl(this.input + string, this.cursor);
         }
-        System.out.println("Input after: " + this.input());
     }
 
     @Override

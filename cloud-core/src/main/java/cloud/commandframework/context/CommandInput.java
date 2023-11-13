@@ -137,11 +137,13 @@ public interface CommandInput extends Cloneable {
     }
 
     /**
-     * Suffixes the {@link #input() input} with the given {@code string}.
+     * Suffixes the {@link #input() input} with the given {@code string} and return a new command input containing the updated
+     * string. This does not modify {@code this} instance.
      *
      * @param string the string
+     * @return the command input with the appended string
      */
-    void appendString(@NonNull String string);
+    @NonNull CommandInput appendString(@NonNull String string);
 
     /**
      * Returns whether there is any {@link #remainingInput() remaining input} left to read.

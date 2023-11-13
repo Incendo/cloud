@@ -388,7 +388,12 @@ public final class CommandTree<C> {
         if (commandInput.isEmpty() && !(child.argument() instanceof FlagArgument)) {
             final CommandComponent<C> childComponent = Objects.requireNonNull(child.component());
             if (childComponent.hasDefaultValue()) {
-                commandInput.appendString(childComponent.defaultValue());
+                return this.attemptParseUnambiguousChild(
+                        parsedArguments,
+                        commandContext,
+                        root,
+                        commandInput.appendString(childComponent.defaultValue())
+                );
             } else if (!child.component().required()) {
                 if (childComponent.argument().getOwningCommand() == null) {
                     // If there are multiple children with different owning commands then it's ambiguous and
