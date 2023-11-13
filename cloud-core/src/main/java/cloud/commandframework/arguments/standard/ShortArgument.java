@@ -116,7 +116,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, Short> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Short, Builder<C>> {
 
         private short min = ShortParser.DEFAULT_MINIMUM;
         private short max = ShortParser.DEFAULT_MAXIMUM;

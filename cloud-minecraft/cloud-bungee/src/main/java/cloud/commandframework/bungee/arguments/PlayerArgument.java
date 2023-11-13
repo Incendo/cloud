@@ -112,7 +112,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, ProxiedPlayer> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, ProxiedPlayer, Builder<C>> {
 
         private Builder(
                 final @NonNull String name

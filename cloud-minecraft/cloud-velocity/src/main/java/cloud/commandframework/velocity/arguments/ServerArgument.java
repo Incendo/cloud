@@ -112,7 +112,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, RegisteredServer> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, RegisteredServer, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(TypeToken.get(RegisteredServer.class), name);

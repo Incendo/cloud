@@ -191,7 +191,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, String> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, String, Builder<C>> {
 
         private StringMode stringMode = StringMode.SINGLE;
         private SuggestionProvider<C> suggestionProvider = (v1, v2) -> Collections.emptyList();

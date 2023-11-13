@@ -96,7 +96,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, World> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, World, Builder<C>> {
 
         private Builder(final @NonNull String name) {
             super(World.class, name);

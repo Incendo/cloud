@@ -115,7 +115,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, Double> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Double, Builder<C>> {
 
         private double min = DoubleParser.DEFAULT_MINIMUM;
         private double max = DoubleParser.DEFAULT_MAXIMUM;

@@ -123,7 +123,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
     }
 
 
-    public static final class Builder<C> extends CommandArgument.Builder<C, MessageChannel> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, MessageChannel, Builder<C>> {
 
         private Set<ParserMode> modes = new HashSet<>();
 

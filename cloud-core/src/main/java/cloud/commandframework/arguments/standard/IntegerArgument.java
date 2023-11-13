@@ -129,7 +129,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<C> extends CommandArgument.Builder<C, Integer> {
+    public static final class Builder<C> extends CommandArgument.TypedBuilder<C, Integer, Builder<C>> {
 
         private int min = IntegerParser.DEFAULT_MINIMUM;
         private int max = IntegerParser.DEFAULT_MAXIMUM;
