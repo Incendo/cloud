@@ -29,9 +29,12 @@ import cloud.commandframework.context.CommandContext;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -62,18 +65,36 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
     @SuppressWarnings("unchecked")
     public @NonNull List<@NonNull Suggestion> suggestions(final @NonNull CommandContext<C> context, final @NonNull String input) {
         try {
-            final List<?> suggestions = (List<?>) this.methodHandle.invokeWithArguments(context, input);
+            final Object output = this.methodHandle.invokeWithArguments(context, input);
+
+            final List<?> suggestions;
+            if (output instanceof List) {
+                suggestions = (List<?>) output;
+            } else if (output instanceof Collection) {
+                suggestions = new ArrayList<>((Collection<?>) output);
+            } else if (output instanceof Stream) {
+                suggestions = ((Stream<?>) output).collect(Collectors.toList());
+            } else {
+                throw new IllegalArgumentException(
+                        String.format("Cannot handle suggestion output of type %s",
+                                output.getClass().getName())
+                );
+            }
+
             if (suggestions.isEmpty()) {
                 return Collections.emptyList();
             }
+
             final Object suggestion = suggestions.get(0);
             if (suggestion instanceof Suggestion) {
                 return (List<Suggestion>) suggestions;
             } else if (suggestion instanceof String) {
                 return suggestions.stream().map(Object::toString).map(Suggestion::simple).collect(Collectors.toList());
             } else {
-                throw new IllegalArgumentException(String.format("Cannot handle suggestions of type: %s",
-                        suggestion.getClass().getName()));
+                throw new IllegalArgumentException(
+                        String.format("Cannot handle suggestions of type: %s",
+                                suggestion.getClass().getName())
+                );
             }
         } catch (final Throwable t) {
             throw new RuntimeException(t);
