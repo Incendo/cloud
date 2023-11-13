@@ -78,7 +78,7 @@ include(":cloud-core")
 include(":cloud-services")
 include(":cloud-tasks")
 include(":cloud-annotations")
-
+/*
 // Kotlin Extensions
 setupKotlinModule("cloud-kotlin-extensions")
 setupKotlinModule("cloud-kotlin-coroutines")
@@ -107,7 +107,7 @@ setupIrcModule("cloud-pircbotx")
 setupExampleModule("example-bukkit")
 setupExampleModule("example-bungee")
 setupExampleModule("example-jda")
-setupExampleModule("example-velocity")
+setupExampleModule("example-velocity")/*
 
 fun setupIrcModule(name: String) =
         setupSubproject(name, file("cloud-irc/$name"))

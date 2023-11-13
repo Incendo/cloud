@@ -27,8 +27,8 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.Test;
@@ -54,19 +54,19 @@ class ByteParserTest {
         );
 
         final byte byteInput = (byte) ThreadLocalRandom.current().nextInt(Byte.MAX_VALUE);
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(Byte.toString(byteInput));
+        final CommandInput commandInput = CommandInput.of(Byte.toString(byteInput));
 
         // Act
         final ArgumentParseResult<Byte> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(byteInput);
 
-        assertThat(input).isEmpty();
+        assertThat(commandInput.isEmpty()).isTrue();
     }
 
     @Test
@@ -80,7 +80,7 @@ class ByteParserTest {
         // Act
         final ArgumentParseResult<Byte> result = parser.parse(
                 this.context,
-                ArgumentTestHelper.linkedListOf("4")
+                CommandInput.of("4")
         );
 
         // Assert
@@ -103,7 +103,7 @@ class ByteParserTest {
         // Act
         final ArgumentParseResult<Byte> result = parser.parse(
                 this.context,
-                ArgumentTestHelper.linkedListOf("6")
+                CommandInput.of("6")
         );
 
         // Assert
@@ -126,7 +126,7 @@ class ByteParserTest {
         // Act
         final ArgumentParseResult<Byte> result = parser.parse(
                 this.context,
-                ArgumentTestHelper.linkedListOf("cow")
+                CommandInput.of("cow")
         );
 
         // Assert

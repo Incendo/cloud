@@ -27,7 +27,7 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
-import java.util.LinkedList;
+import cloud.commandframework.context.CommandInput;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,19 +52,18 @@ class EnumParserTest {
         final EnumArgument.EnumParser<TestCommandSender, TestEnum> parser = new EnumArgument.EnumParser<>(
                 TestEnum.class
         );
+        CommandInput commandInput = CommandInput.of(value.name());
 
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(value.name());
         // Act
         final ArgumentParseResult<TestEnum> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(value);
-
-        assertThat(input).isEmpty();
+        assertThat(commandInput.isEmpty()).isTrue();
     }
 
     @Test
@@ -77,7 +76,7 @@ class EnumParserTest {
         // Act
         final ArgumentParseResult<TestEnum> result = parser.parse(
                 this.context,
-                ArgumentTestHelper.linkedListOf("not-an-enum-value")
+                CommandInput.of("not-an-enum-value")
         );
 
         // Assert

@@ -29,10 +29,10 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import io.leangen.geantyref.TypeToken;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -141,27 +141,26 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
         @Override
         public @NonNull ArgumentParseResult<String @NonNull []> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
+            final int size = commandInput.tokenize().size();
+
             if (this.flagYielding) {
                 final List<String> result = new LinkedList<>();
-                final int size = inputQueue.size();
 
                 for (int i = 0; i < size; i++) {
-                    final String string = inputQueue.peek();
-                    if (string == null || FLAG_PATTERN.matcher(string).matches()) {
+                    final String string = commandInput.peekString();
+                    if (string.isEmpty() || FLAG_PATTERN.matcher(string).matches()) {
                         break;
                     }
-                    inputQueue.remove();
-
-                    result.add(string);
+                    result.add(commandInput.readString());
                 }
 
                 return ArgumentParseResult.success(result.toArray(new String[0]));
             } else {
-                final String[] result = new String[inputQueue.size()];
+                final String[] result = new String[size];
                 for (int i = 0; i < result.length; i++) {
-                    result[i] = inputQueue.remove();
+                    result[i] = commandInput.readString();
                 }
                 return ArgumentParseResult.success(result);
             }

@@ -31,13 +31,13 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -142,10 +142,10 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
         @Override
         public @NonNull ArgumentParseResult<Duration> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         DurationArgument.DurationParseException.class,
                         commandContext
@@ -182,7 +182,7 @@ public final class DurationArgument<C> extends CommandArgument<C, Duration> {
                 return ArgumentParseResult.failure(new DurationArgument.DurationParseException(input, commandContext));
             }
 
-            inputQueue.remove();
+            commandInput.readString();
             return ArgumentParseResult.success(duration);
         }
 

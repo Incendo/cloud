@@ -27,6 +27,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.types.tuples.Pair;
 import java.util.Arrays;
@@ -43,15 +44,15 @@ import static com.google.common.truth.Truth.assertThat;
 class Issue337 {
 
     @Test
-    void emptyCommandThreeThrowsNoSuchCommandException() {
+    void emptyCommandTreeThrowsNoSuchCommandException() {
         // Arrange
         final TestCommandSender commandSender = new TestCommandSender();
         final CommandManager<TestCommandSender> commandManager = createManager();
         final CommandTree<TestCommandSender> commandTree = CommandTree.newTree(commandManager);
-        final Queue<String> strings = new LinkedList<>(Arrays.asList("test", "this", "thing"));
+        final CommandInput commandInput = CommandInput.of("test this thing");
 
         // Act
-        final Pair<?, Exception> result = commandTree.parse(new CommandContext<>(commandSender, commandManager), strings);
+        final Pair<?, Exception> result = commandTree.parse(new CommandContext<>(commandSender, commandManager), commandInput);
 
         // Assert
         assertThat(result.getFirst()).isNull();

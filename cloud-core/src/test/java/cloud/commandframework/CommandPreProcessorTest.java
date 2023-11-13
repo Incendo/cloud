@@ -77,7 +77,7 @@ public class CommandPreProcessorTest {
         @Override
         public void accept(final @NonNull CommandPreprocessingContext<TestCommandSender> context) {
             try {
-                final int num = Integer.parseInt(context.getInputQueue().removeFirst());
+                final int num = context.commandInput().readInteger();
                 context.getCommandContext().store("int", num);
             } catch (final Exception ignored) {
                 /* Will prevent execution */

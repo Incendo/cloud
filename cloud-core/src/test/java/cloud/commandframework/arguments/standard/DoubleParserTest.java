@@ -26,7 +26,7 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
-import java.util.LinkedList;
+import cloud.commandframework.context.CommandInput;
 import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,19 +51,19 @@ class DoubleParserTest {
         );
 
         final double doubleInput = ThreadLocalRandom.current().nextDouble();
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(Double.toString(doubleInput));
+        final CommandInput commandInput = CommandInput.of(Double.toString(doubleInput));
 
         // Act
         final ArgumentParseResult<Double> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(doubleInput);
 
-        assertThat(input).isEmpty();
+        assertThat(commandInput.isEmpty()).isTrue();
     }
 
     @Test
@@ -77,7 +77,7 @@ class DoubleParserTest {
         // Act
         final ArgumentParseResult<Double> result = parser.parse(
                 this.context,
-                ArgumentTestHelper.linkedListOf("4.0")
+                CommandInput.of("4.0")
         );
 
         // Assert
@@ -100,7 +100,7 @@ class DoubleParserTest {
         // Act
         final ArgumentParseResult<Double> result = parser.parse(
                 this.context,
-                ArgumentTestHelper.linkedListOf("6.0")
+                CommandInput.of("6.0")
         );
 
         // Assert
@@ -123,7 +123,7 @@ class DoubleParserTest {
         // Act
         final ArgumentParseResult<Double> result = parser.parse(
                 this.context,
-                ArgumentTestHelper.linkedListOf("cow")
+                CommandInput.of("cow")
         );
 
         // Assert

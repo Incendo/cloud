@@ -31,6 +31,7 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.execution.CommandExecutionHandler;
@@ -38,9 +39,7 @@ import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.TypeToken;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -97,19 +96,19 @@ class CommandTreeTest {
         // Act
         final Pair<Command<TestCommandSender>, Exception> command1 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("test", "one"))
+                CommandInput.of("test one")
         );
         final Pair<Command<TestCommandSender>, Exception> command2 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("test", "two"))
+                CommandInput.of("test two")
         );
         final Pair<Command<TestCommandSender>, Exception> command3 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("test", "opt"))
+                CommandInput.of("test opt")
         );
         final Pair<Command<TestCommandSender>, Exception> command4 = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("test", "opt", "12"))
+                CommandInput.of("test opt 12")
         );
 
         // Assert
@@ -142,7 +141,7 @@ class CommandTreeTest {
         // Act
         final Command<TestCommandSender> result = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("other", "öpt", "12"))
+                CommandInput.of("other öpt 12")
         ).getFirst();
 
         // Assert
@@ -164,7 +163,7 @@ class CommandTreeTest {
         // Act
         final List<Suggestion> results = this.commandManager.commandTree().getSuggestions(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("test", ""))
+                CommandInput.of("test ")
         );
 
         // Assert
@@ -490,7 +489,7 @@ class CommandTreeTest {
         /* Try parsing as a variable, which should match the variable command */
         final Pair<Command<TestCommandSender>, Exception> variableResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("literalwithvariable", "argthatdoesnotmatch"))
+                CommandInput.of("literalwithvariable argthatdoesnotmatch")
         );
         assertThat(variableResult.getSecond()).isNull();
         assertThat(variableResult.getFirst().components().get(0).argument().getName()).isEqualTo("literalwithvariable");
@@ -499,7 +498,7 @@ class CommandTreeTest {
         /* Try parsing with the main name literal, which should match the literal command */
         final Pair<Command<TestCommandSender>, Exception> literalResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("literalwithvariable", "literal"))
+                CommandInput.of("literalwithvariable literal")
         );
         assertThat(literalResult.getSecond()).isNull();
         assertThat(literalResult.getFirst().components().get(0).argument().getName()).isEqualTo("literalwithvariable");
@@ -508,7 +507,7 @@ class CommandTreeTest {
         /* Try parsing with the alias of the literal, which should match the literal command */
         final Pair<Command<TestCommandSender>, Exception> literalAliasResult = this.commandManager.commandTree().parse(
                 new CommandContext<>(new TestCommandSender(), this.commandManager),
-                new LinkedList<>(Arrays.asList("literalwithvariable", "literalalias"))
+                CommandInput.of("literalwithvariable literalalias")
         );
         assertThat(literalAliasResult.getSecond()).isNull();
         assertThat(literalAliasResult.getFirst().components().get(0).argument().getName()).isEqualTo("literalwithvariable");

@@ -26,9 +26,9 @@ package cloud.commandframework.arguments.parser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -71,12 +71,12 @@ public interface ArgumentParser<C, T> extends SuggestionProvider<C> {
      * {@link CommandContext}.
      *
      * @param commandContext Command context
-     * @param inputQueue     The queue of arguments
+     * @param commandInput   Command Input
      * @return Parsed command result
      */
     @NonNull ArgumentParseResult<@NonNull T> parse(
             @NonNull CommandContext<@NonNull C> commandContext,
-            @NonNull Queue<@NonNull String> inputQueue
+            @NonNull CommandInput commandInput
     );
 
     /**

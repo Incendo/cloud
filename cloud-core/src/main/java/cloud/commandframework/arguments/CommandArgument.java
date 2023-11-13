@@ -31,6 +31,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.keys.SimpleCloudKey;
@@ -39,7 +40,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
@@ -88,8 +88,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * Argument preprocessors that allows for extensions to existing argument types
      * without having to update all parsers
      */
-    private final Collection<BiFunction<@NonNull CommandContext<C>,
-            @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors;
+    private final Collection<BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput, @NonNull ArgumentParseResult<Boolean>>>
+            argumentPreprocessors;
 
     /**
      * A description that will be used when registering this argument if no override is provided.
@@ -121,7 +121,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull TypeToken<T> valueType,
             final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
-            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         this.name = Objects.requireNonNull(name, "Name may not be null");
@@ -152,7 +152,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull ArgumentParser<C, T> parser,
             final @NonNull TypeToken<T> valueType,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         this(
@@ -331,8 +331,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * @return {@code this}
      */
     public @NonNull @This CommandArgument<C, T> addPreprocessor(
-            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
-                    @NonNull ArgumentParseResult<Boolean>> preprocessor
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput, @NonNull ArgumentParseResult<Boolean>> preprocessor
     ) {
         this.argumentPreprocessors.add(preprocessor);
         return this;
@@ -348,9 +347,9 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      */
     public @NonNull ArgumentParseResult<Boolean> preprocess(
             final @NonNull CommandContext<C> context,
-            final @NonNull Queue<String> input
+            final @NonNull CommandInput input
     ) {
-        for (final BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
+        for (final BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                 @NonNull ArgumentParseResult<Boolean>> preprocessor : this.argumentPreprocessors) {
             final ArgumentParseResult<Boolean> result = preprocessor.apply(
                     context,

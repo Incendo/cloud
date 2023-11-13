@@ -26,6 +26,7 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -64,26 +65,27 @@ class StringArrayParserTest {
                             .collect(Collectors.joining())
             );
         }
+        final CommandInput commandInput = CommandInput.of(input);
         final LinkedList<String> inputCopy = new LinkedList<>(input);
 
         // Act
         final ArgumentParseResult<String[]> result = this.parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(inputCopy.toArray(new String[0]));
 
-        assertThat(input).isEmpty();
+        assertThat(commandInput.isEmpty()).isTrue();
     }
 
     @Test
     void Parse_GreedyFlagAwareLongFormFlag_EndsAfterFlag() {
         // Arrange
         final StringArrayArgument.StringArrayParser<TestCommandSender> parser = new StringArrayArgument.StringArrayParser<>(true);
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(
+        final CommandInput commandInput = CommandInput.of(ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",
                 "a",
@@ -92,26 +94,26 @@ class StringArrayParserTest {
                 "more",
                 "flag",
                 "content"
-        );
+        ));
 
         // Act
         final ArgumentParseResult<String[]> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(new String[]{"this", "is", "a", "string"});
 
-        assertThat(input).containsExactly("--flag", "more", "flag", "content");
+        assertThat(commandInput.tokenize()).containsExactly("--flag", "more", "flag", "content");
     }
 
     @Test
     void Parse_GreedyFlagAwareShortFormFlag_EndsAfterFlag() {
         // Arrange
         final StringArrayArgument.StringArrayParser<TestCommandSender> parser = new StringArrayArgument.StringArrayParser<>(true);
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(
+        final CommandInput commandInput = CommandInput.of(ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",
                 "a",
@@ -120,18 +122,18 @@ class StringArrayParserTest {
                 "-l",
                 "-a",
                 "-g"
-        );
+        ));
 
         // Act
         final ArgumentParseResult<String[]> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(new String[]{"this", "is", "a", "string"});
 
-        assertThat(input).containsExactly("-f", "-l", "-a", "-g");
+        assertThat(commandInput.tokenize()).containsExactly("-f", "-l", "-a", "-g");
     }
 }

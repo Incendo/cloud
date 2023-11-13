@@ -42,6 +42,7 @@ import cloud.commandframework.captions.SimpleCaptionRegistryFactory;
 import cloud.commandframework.captions.SimpleCaptionVariableReplacementHandler;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandContextFactory;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandResult;
@@ -53,7 +54,6 @@ import cloud.commandframework.execution.postprocessor.CommandPostprocessor;
 import cloud.commandframework.execution.preprocessor.AcceptingCommandPreprocessor;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
-import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
@@ -183,12 +183,12 @@ public abstract class CommandManager<C> {
                 commandSender,
                 this
         );
-        final LinkedList<String> inputQueue = new CommandInputTokenizer(input).tokenize();
+        final CommandInput commandInput = CommandInput.of(input);
         /* Store a copy of the input queue in the context */
-        context.store("__raw_input__", new LinkedList<>(inputQueue));
+        context.store("__raw_input__", commandInput.copy());
         try {
-            if (this.preprocessContext(context, inputQueue) == State.ACCEPTED) {
-                return this.commandExecutionCoordinator.coordinateExecution(context, inputQueue);
+            if (this.preprocessContext(context, commandInput) == State.ACCEPTED) {
+                return this.commandExecutionCoordinator.coordinateExecution(context, commandInput);
             }
         } catch (final Exception e) {
             final CompletableFuture<CommandResult<C>> future = new CompletableFuture<>();
@@ -940,7 +940,7 @@ public abstract class CommandManager<C> {
      * are called in LIFO order
      *
      * @param processor Processor to register
-     * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
+     * @see #preprocessContext(CommandContext, CommandInput) Preprocess a context
      */
     public void registerCommandPreProcessor(final @NonNull CommandPreprocessor<C> processor) {
         this.servicePipeline.registerServiceImplementation(
@@ -956,7 +956,7 @@ public abstract class CommandManager<C> {
      * are called in LIFO order
      *
      * @param processor Processor to register
-     * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
+     * @see #preprocessContext(CommandContext, CommandInput) Preprocess a context
      */
     public void registerCommandPostProcessor(final @NonNull CommandPostprocessor<C> processor) {
         this.servicePipeline.registerServiceImplementation(new TypeToken<CommandPostprocessor<C>>() {
@@ -968,16 +968,18 @@ public abstract class CommandManager<C> {
     /**
      * Preprocess a command context instance
      *
-     * @param context    Command context
-     * @param inputQueue Command input as supplied by sender
+     * @param context      Command context
+     * @param commandInput Command input as supplied by sender
      * @return {@link State#ACCEPTED} if the command should be parsed and executed, else {@link State#REJECTED}
      * @see #registerCommandPreProcessor(CommandPreprocessor) Register a command preprocessor
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public State preprocessContext(
             final @NonNull CommandContext<C> context,
-            final @NonNull LinkedList<@NonNull String> inputQueue
-    ) {
-        this.servicePipeline.pump(new CommandPreprocessingContext<>(context, inputQueue))
+            final @NonNull CommandInput commandInput
+            ) {
+        this.servicePipeline.pump(new CommandPreprocessingContext<>(context, commandInput))
                 .through(new TypeToken<CommandPreprocessor<C>>() {
                 })
                 .getResult();

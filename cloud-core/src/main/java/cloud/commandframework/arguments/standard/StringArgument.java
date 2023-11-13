@@ -32,12 +32,12 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -307,10 +307,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
         @Override
         public @NonNull ArgumentParseResult<String> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         StringParser.class,
                         commandContext
@@ -318,30 +318,24 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             }
 
             if (this.stringMode == StringMode.SINGLE) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(input);
+                return ArgumentParseResult.success(commandInput.readString());
             } else if (this.stringMode == StringMode.QUOTED) {
-                return this.parseQuoted(commandContext, inputQueue);
+                return this.parseQuoted(commandContext, commandInput);
             } else {
-                return this.parseGreedy(commandContext, inputQueue);
+                return this.parseGreedy(commandContext, commandInput);
             }
         }
 
         private @NonNull ArgumentParseResult<String> parseQuoted(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String peek = inputQueue.peek();
-            if (peek != null && !peek.startsWith("'") && !peek.startsWith("\"")) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(peek);
+            final char peek = commandInput.peek();
+            if (peek != '\'' && peek != '"') {
+                return ArgumentParseResult.success(commandInput.readString());
             }
 
-            final StringJoiner sj = new StringJoiner(" ");
-            for (final String string : inputQueue) {
-                sj.add(string);
-            }
-            final String string = sj.toString();
+            final String string = commandInput.remainingInput();
 
             final Matcher doubleMatcher = QUOTED_DOUBLE.matcher(string);
             String doubleMatch = null;
@@ -368,16 +362,17 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             if (inner != null) {
                 final int numSpaces = StringUtils.countCharOccurrences(inner, ' ');
                 for (int i = 0; i <= numSpaces; i++) {
-                    inputQueue.remove();
+                    commandInput.readString();
                 }
             } else {
-                inner = inputQueue.peek();
+                inner = commandInput.peekString();
                 if (inner.startsWith("\"") || inner.startsWith("'")) {
-                    return ArgumentParseResult.failure(new StringParseException(sj.toString(),
+                    return ArgumentParseResult.failure(new StringParseException(
+                            commandInput.remainingInput(),
                             StringMode.QUOTED, commandContext
                     ));
                 } else {
-                    inputQueue.remove();
+                    commandInput.readString();
                 }
             }
 
@@ -388,15 +383,15 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
 
         private @NonNull ArgumentParseResult<String> parseGreedy(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final StringJoiner sj = new StringJoiner(" ");
-            final int size = inputQueue.size();
+            final int size = commandInput.tokenize().size();
+            final StringJoiner stringJoiner = new StringJoiner(" ");
 
             for (int i = 0; i < size; i++) {
-                final String string = inputQueue.peek();
+                final String string = commandInput.peekString();
 
-                if (string == null) {
+                if (string.isEmpty()) {
                     break;
                 }
 
@@ -407,11 +402,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     }
                 }
 
-                sj.add(string);
-                inputQueue.remove();
+                stringJoiner.add(commandInput.readString(false /* preserveSingleSpace */));
             }
 
-            return ArgumentParseResult.success(sj.toString());
+            return ArgumentParseResult.success(stringJoiner.toString());
         }
 
         @Override

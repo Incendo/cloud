@@ -26,13 +26,13 @@ package cloud.commandframework.arguments;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apiguardian.api.API;
@@ -110,17 +110,17 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         @Override
         public @NonNull ArgumentParseResult<String> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String string = inputQueue.peek();
-            if (string == null) {
+            final String string = commandInput.peekString();
+            if (string.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         StaticArgumentParser.class,
                         commandContext
                 ));
             }
             if (this.allAcceptedAliases.contains(string)) {
-                inputQueue.remove();
+                commandInput.readString();
                 return ArgumentParseResult.success(this.name);
             }
             return ArgumentParseResult.failure(new IllegalArgumentException(string));

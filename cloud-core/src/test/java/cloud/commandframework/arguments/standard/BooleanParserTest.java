@@ -27,6 +27,7 @@ import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
@@ -56,18 +57,19 @@ class BooleanParserTest {
     ) {
         // Arrange
         final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(false /* liberal */);
+        final CommandInput commandInput = CommandInput.of(input);
 
         // Act
         final ArgumentParseResult<Boolean> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(expectedResult);
 
-        assertThat(input).isEmpty();
+        assertThat(commandInput.isEmpty()).isTrue();
     }
 
     static Stream<Arguments> Parse_NonLiberal_ValidInputs_SuccessfulParse_Source() {
@@ -80,33 +82,34 @@ class BooleanParserTest {
     @ParameterizedTest
     @MethodSource("Parse_Liberal_ValidInputs_SuccessfulParse_Source")
     void Parse_Liberal_ValidInputs_SuccessfulParse(
-            final Queue<String> input,
+            final String input,
             final boolean expectedResult
     ) {
         // Arrange
         final BooleanArgument.BooleanParser<TestCommandSender> parser = new BooleanArgument.BooleanParser<>(true /* liberal */);
+        final CommandInput commandInput = CommandInput.of(input);
 
         // Act
         final ArgumentParseResult<Boolean> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(expectedResult);
 
-        assertThat(input).isEmpty();
+        assertThat(commandInput.isEmpty()).isTrue();
     }
 
     static Stream<Arguments> Parse_Liberal_ValidInputs_SuccessfulParse_Source() {
         return Stream.concat(
                 Stream.of("true", "yes", "on")
                         .flatMap(input -> Stream.of(input, input.toUpperCase(Locale.ROOT)))
-                        .map(input -> Arguments.arguments(ArgumentTestHelper.linkedListOf(input), true)),
+                        .map(input -> Arguments.arguments(input, true)),
                 Stream.of("false", "no", "off")
                         .flatMap(input -> Stream.of(input, input.toUpperCase(Locale.ROOT)))
-                        .map(input -> Arguments.arguments(ArgumentTestHelper.linkedListOf(input), false))
+                        .map(input -> Arguments.arguments(input, false))
         );
     }
 
@@ -119,7 +122,7 @@ class BooleanParserTest {
         // Act
         final ArgumentParseResult<Boolean> result = parser.parse(
                 this.context,
-                ArgumentTestHelper.linkedListOf("not-a-boolean")
+                CommandInput.of("not-a-boolean")
         );
 
         // Assert

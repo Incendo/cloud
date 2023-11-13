@@ -27,10 +27,10 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.services.State;
 import cloud.commandframework.types.tuples.Pair;
-import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
@@ -92,7 +92,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
     @Override
     public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull Queue<@NonNull String> input
+            final @NonNull CommandInput commandInput
     ) {
         final CompletableFuture<CommandResult<C>> resultFuture = new CompletableFuture<>();
 
@@ -114,7 +114,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
 
         if (this.synchronizeParsing) {
             final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
-                    this.getCommandTree().parse(commandContext, input);
+                    this.getCommandTree().parse(commandContext, commandInput);
             if (pair.getSecond() != null) {
                 resultFuture.completeExceptionally(pair.getSecond());
             } else {
@@ -124,7 +124,7 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
             this.executor.execute(() -> {
                 try {
                     final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
-                            this.getCommandTree().parse(commandContext, input);
+                            this.getCommandTree().parse(commandContext, commandInput);
                     if (pair.getSecond() != null) {
                         resultFuture.completeExceptionally(pair.getSecond());
                     } else {

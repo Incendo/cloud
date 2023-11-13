@@ -27,11 +27,10 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
-import cloud.commandframework.internal.CommandInputTokenizer;
 import cloud.commandframework.services.State;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -69,16 +68,16 @@ public final class DelegatingCommandSuggestionEngine<C> implements CommandSugges
             final @NonNull CommandContext<C> context,
             final @NonNull String input
     ) {
-        final @NonNull LinkedList<@NonNull String> inputQueue = new CommandInputTokenizer(input).tokenize();
+        final @NonNull CommandInput commandInput = CommandInput.of(input);
         /* Store a copy of the input queue in the context */
-        context.store("__raw_input__", new LinkedList<>(inputQueue));
+        context.store("__raw_input__", commandInput.copy());
         final List<Suggestion> suggestions;
-        if (this.commandManager.preprocessContext(context, inputQueue) == State.ACCEPTED) {
+        if (this.commandManager.preprocessContext(context, commandInput) == State.ACCEPTED) {
             suggestions = this.commandManager.commandSuggestionProcessor().apply(
-                    new CommandPreprocessingContext<>(context, inputQueue),
+                    new CommandPreprocessingContext<>(context, commandInput),
                     this.commandTree.getSuggestions(
                             context,
-                            inputQueue
+                            commandInput
                     )
             );
         } else {

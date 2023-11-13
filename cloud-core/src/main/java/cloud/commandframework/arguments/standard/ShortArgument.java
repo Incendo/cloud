@@ -29,11 +29,10 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -192,22 +191,12 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         @Override
         public @NonNull ArgumentParseResult<Short> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(ShortParser.class, commandContext));
+            if (!commandInput.isValidShort(this.min, this.max)) {
+                return ArgumentParseResult.failure(new ShortParseException(commandInput.peekString(), this, commandContext));
             }
-            try {
-                final short value = Short.parseShort(input);
-                if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new ShortParseException(input, this, commandContext));
-                }
-                inputQueue.remove();
-                return ArgumentParseResult.success(value);
-            } catch (final Exception e) {
-                return ArgumentParseResult.failure(new ShortParseException(input, this, commandContext));
-            }
+            return ArgumentParseResult.success(commandInput.readShort());
         }
 
         @Override

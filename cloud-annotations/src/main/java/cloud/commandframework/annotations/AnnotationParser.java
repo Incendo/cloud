@@ -47,6 +47,7 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
@@ -165,7 +166,7 @@ public final class AnnotationParser<C> {
                 String[].class,
                 (context, annotations) -> annotations.annotation(RawArgs.class) == null
                         ? null
-                        : context.getRawInput().toArray(new String[0])
+                        : context.rawInput().tokenize().toArray(new String[0])
         );
         this.stringProcessor = StringProcessor.noOp();
     }
@@ -488,7 +489,7 @@ public final class AnnotationParser<C> {
             if (method.getParameterCount() != 2
                     || method.getReturnType().equals(Void.class)
                     || !method.getParameters()[0].getType().equals(CommandContext.class)
-                    || !method.getParameters()[1].getType().equals(Queue.class)
+                    || !method.getParameters()[1].getType().equals(CommandInput.class)
             ) {
                 throw new IllegalArgumentException(String.format(
                         "@Parser annotated method '%s' in class '%s' does not have the correct signature",
@@ -774,9 +775,9 @@ public final class AnnotationParser<C> {
             @SuppressWarnings("rawtypes") final Function preprocessorMapper =
                     this.preprocessorMappers.get(annotation.annotationType());
             if (preprocessorMapper != null) {
-                final BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+                final BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                         @NonNull ArgumentParseResult<Boolean>> preprocessor = (BiFunction<CommandContext<C>,
-                        Queue<String>, ArgumentParseResult<Boolean>>) preprocessorMapper.apply(annotation);
+                        CommandInput, ArgumentParseResult<Boolean>>) preprocessorMapper.apply(annotation);
                 builtArgument.addPreprocessor(preprocessor);
             }
         }

@@ -71,10 +71,10 @@ public final class FilteringCommandSuggestionProcessor<C> implements CommandSugg
             final @NonNull List<@NonNull Suggestion> inputSuggestions
     ) {
         final String input;
-        if (context.getInputQueue().isEmpty()) {
+        if (context.commandInput().isEmpty(true /* ignoreWhitespace */)) {
             input = "";
         } else {
-            input = String.join(" ", context.getInputQueue());
+            input = context.commandInput().remainingInput();
         }
         final List<Suggestion> suggestions = new ArrayList<>(inputSuggestions.size());
         for (final Suggestion suggestion : inputSuggestions) {

@@ -24,7 +24,7 @@
 package cloud.commandframework.execution.preprocessor;
 
 import cloud.commandframework.context.CommandContext;
-import java.util.LinkedList;
+import cloud.commandframework.context.CommandInput;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -38,20 +38,20 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class CommandPreprocessingContext<C> {
 
     private final CommandContext<C> commandContext;
-    private final LinkedList<String> inputQueue;
+    private final CommandInput commandInput;
 
     /**
      * Construct a new command preprocessing context
      *
      * @param commandContext Command context
-     * @param inputQueue     Command input as supplied by sender
+     * @param commandInput   The command input
      */
     public CommandPreprocessingContext(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull LinkedList<@NonNull String> inputQueue
+            final @NonNull CommandInput commandInput
     ) {
         this.commandContext = commandContext;
-        this.inputQueue = inputQueue;
+        this.commandInput = commandInput;
     }
 
     /**
@@ -64,13 +64,15 @@ public final class CommandPreprocessingContext<C> {
     }
 
     /**
-     * Get the original input queue. All changes will persist and will be
+     * Returns the original input. All changes will persist and will be
      * used during parsing
      *
      * @return Input queue
+     * @since 2.0.0
      */
-    public @NonNull LinkedList<@NonNull String> getInputQueue() {
-        return this.inputQueue;
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandInput commandInput() {
+        return this.commandInput;
     }
 
     @Override
@@ -83,11 +85,11 @@ public final class CommandPreprocessingContext<C> {
         }
         final CommandPreprocessingContext<?> that = (CommandPreprocessingContext<?>) o;
         return Objects.equals(this.getCommandContext(), that.getCommandContext())
-                && Objects.equals(this.getInputQueue(), that.getInputQueue());
+                && Objects.equals(this.commandInput(), that.commandInput());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getCommandContext(), this.getInputQueue());
+        return Objects.hash(this.getCommandContext(), this.commandInput());
     }
 }
