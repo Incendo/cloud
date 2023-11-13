@@ -33,7 +33,6 @@ import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.ParserException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -147,14 +146,9 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     @API(status = API.Status.STABLE)
     public static final class BooleanParser<C> implements ArgumentParser<C, Boolean> {
 
-        public static final List<String> STRICT = Arrays.asList("TRUE", "FALSE");
-        public static final List<String> LIBERAL = Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF");
-        public static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");
-        public static final List<String> LIBERAL_FALSE = Arrays.asList("FALSE", "NO", "OFF");
-
-        private static final List<String> STRICT_LOWER = STRICT
+        private static final List<String> STRICT_LOWER = CommandInput.BOOLEAN_STRICT
                 .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
-        private static final List<String> LIBERAL_LOWER = LIBERAL
+        private static final List<String> LIBERAL_LOWER = CommandInput.BOOLEAN_LIBERAL
                 .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
 
         private final boolean liberal;

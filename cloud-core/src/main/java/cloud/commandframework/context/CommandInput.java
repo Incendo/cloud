@@ -23,7 +23,12 @@
 //
 package cloud.commandframework.context;
 
+import cloud.commandframework.internal.CommandInputTokenizer;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import org.apiguardian.api.API;
@@ -34,6 +39,10 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
 
 @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
 public interface CommandInput extends Cloneable {
+
+    List<String> BOOLEAN_STRICT = Collections.unmodifiableList(Arrays.asList("TRUE", "FALSE"));
+    List<String> BOOLEAN_LIBERAL = Collections.unmodifiableList(Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF"));
+    List<String> BOOLEAN_LIBERAL_TRUE = Collections.unmodifiableList(Arrays.asList("TRUE", "YES", "ON"));
 
     /**
      * Returns a new {@link CommandInput} instance from the given {@code input}.
@@ -72,13 +81,6 @@ public interface CommandInput extends Cloneable {
     @Pure @NonNull String input();
 
     /**
-     * Overrides the input.
-     *
-     * @param input the new input
-     */
-    void input(@NonNull String input);
-
-    /**
      * Returns the cursor position.
      * <p>
      * This must always be non-negative, and less than {@link #length()}.
@@ -94,7 +96,9 @@ public interface CommandInput extends Cloneable {
      *
      * @return the length of the input string
      */
-    @Pure @NonNegative int length();
+    default @Pure @NonNegative int length() {
+        return this.input().length();
+    }
 
     /**
      * Returns the length of the remaining input.
@@ -133,11 +137,13 @@ public interface CommandInput extends Cloneable {
     }
 
     /**
-     * Suffixes the {@link #input() input} with the given {@code string}.
+     * Suffixes the {@link #input() input} with the given {@code string} and return a new command input containing the updated
+     * string. This does not modify {@code this} instance.
      *
      * @param string the string
+     * @return the command input with the appended string
      */
-    void appendString(@NonNull String string);
+    @NonNull CommandInput appendString(@NonNull String string);
 
     /**
      * Returns whether there is any {@link #remainingInput() remaining input} left to read.
@@ -359,7 +365,14 @@ public interface CommandInput extends Cloneable {
      * @param max the max value
      * @return whether the input until the next whitespace contains a valid {@link Byte}
      */
-    @SideEffectFree boolean isValidByte(byte min, byte max);
+    default @SideEffectFree boolean isValidByte(final byte min, final byte max) {
+        try {
+            final byte parsedByte = Byte.parseByte(this.peekString());
+            return parsedByte >= min && parsedByte <= max;
+        } catch (final NumberFormatException ignored) {
+            return false;
+        }
+    }
 
     /**
      * Reads the {@link #readString() string until the next whitespace} and parses
@@ -368,7 +381,9 @@ public interface CommandInput extends Cloneable {
      * @return the parsed byte
      * @throws NumberFormatException If the string cannot be parsed into a {@link Byte}.
      */
-    byte readByte();
+    default byte readByte() {
+        return Byte.parseByte(this.readString());
+    }
 
     /**
      * Returns whether {@link #peekString()} contain a valid {@link Short}
@@ -378,7 +393,14 @@ public interface CommandInput extends Cloneable {
      * @param max the max value
      * @return whether the input until the next whitespace contains a valid {@link Short}
      */
-    @SideEffectFree boolean isValidShort(short min, short max);
+    default @SideEffectFree boolean isValidShort(final short min, final short max) {
+        try {
+            final short parsedShort = Short.parseShort(this.peekString());
+            return parsedShort >= min && parsedShort <= max;
+        } catch (final NumberFormatException ignored) {
+            return false;
+        }
+    }
 
     /**
      * Reads the {@link #readString() string until the next whitespace} and parses
@@ -387,7 +409,9 @@ public interface CommandInput extends Cloneable {
      * @return the parsed short
      * @throws NumberFormatException If the string cannot be parsed into a {@link Short}.
      */
-    short readShort();
+    default short readShort() {
+        return Short.parseShort(this.readString());
+    }
 
     /**
      * Returns whether {@link #peekString()} contain a valid {@link Integer}
@@ -397,7 +421,14 @@ public interface CommandInput extends Cloneable {
      * @param max the max value
      * @return whether the input until the next whitespace contains a valid {@link Integer}
      */
-    @SideEffectFree boolean isValidInteger(int min, int max);
+    default @SideEffectFree boolean isValidInteger(final int min, final int max) {
+        try {
+            final int parsedInteger = Integer.parseInt(this.peekString());
+            return parsedInteger >= min && parsedInteger <= max;
+        } catch (final NumberFormatException ignored) {
+            return false;
+        }
+    }
 
     /**
      * Reads the {@link #readString() string until the next whitespace} and parses
@@ -406,7 +437,9 @@ public interface CommandInput extends Cloneable {
      * @return the parsed integer
      * @throws NumberFormatException If the string cannot be parsed into a {@link Integer}.
      */
-    int readInteger();
+    default int readInteger() {
+        return Integer.parseInt(this.readString());
+    }
 
     /**
      * Returns whether {@link #peekString()} contain a valid {@link Long}
@@ -416,7 +449,14 @@ public interface CommandInput extends Cloneable {
      * @param max the max value
      * @return whether the input until the next whitespace contains a valid {@link Long}
      */
-    @SideEffectFree boolean isValidLong(long min, long max);
+    default @SideEffectFree boolean isValidLong(final long min, final long max) {
+        try {
+            final long parsedLong = Long.parseLong(this.peekString());
+            return parsedLong >= min && parsedLong <= max;
+        } catch (final NumberFormatException ignored) {
+            return false;
+        }
+    }
 
     /**
      * Reads the {@link #readString() string until the next whitespace} and parses
@@ -425,7 +465,9 @@ public interface CommandInput extends Cloneable {
      * @return the parsed long
      * @throws NumberFormatException If the string cannot be parsed into a {@link Long}.
      */
-    long readLong();
+    default long readLong() {
+        return Long.parseLong(this.readString());
+    }
 
     /**
      * Returns whether {@link #peekString()} contain a valid {@link Double}
@@ -435,7 +477,14 @@ public interface CommandInput extends Cloneable {
      * @param max the max value
      * @return whether the input until the next whitespace contains a valid {@link Double}
      */
-    @SideEffectFree boolean isValidDouble(double min, double max);
+    default @SideEffectFree boolean isValidDouble(final double min, final double max) {
+        try {
+            final double parsedDouble = Double.parseDouble(this.peekString());
+            return parsedDouble >= min && parsedDouble <= max;
+        } catch (final NumberFormatException ignored) {
+            return false;
+        }
+    }
 
     /**
      * Reads the {@link #readString() string until the next whitespace} and parses
@@ -444,7 +493,9 @@ public interface CommandInput extends Cloneable {
      * @return the parsed double
      * @throws NumberFormatException If the string cannot be parsed into a {@link Double}.
      */
-    double readDouble();
+    default double readDouble() {
+        return Double.parseDouble(this.readString());
+    }
 
     /**
      * Returns whether {@link #peekString()} contain a valid {@link Float}
@@ -454,7 +505,14 @@ public interface CommandInput extends Cloneable {
      * @param max the max value
      * @return whether the input until the next whitespace contains a valid {@link Float}
      */
-    @SideEffectFree boolean isValidFloat(float min, float max);
+    default @SideEffectFree boolean isValidFloat(final float min, final float max) {
+        try {
+            final float parsedFloat = Float.parseFloat(this.peekString());
+            return parsedFloat >= min && parsedFloat <= max;
+        } catch (final NumberFormatException ignored) {
+            return false;
+        }
+    }
 
     /**
      * Reads the {@link #readString() string until the next whitespace} and parses
@@ -463,7 +521,9 @@ public interface CommandInput extends Cloneable {
      * @return the parsed float
      * @throws NumberFormatException If the string cannot be parsed into a {@link Float}.
      */
-    float readFloat();
+    default float readFloat() {
+        return Float.parseFloat(this.readString());
+    }
 
     /**
      * Returns whether {@link #peekString()} contain a valid {@link Boolean}
@@ -472,7 +532,13 @@ public interface CommandInput extends Cloneable {
      * @param liberal whether non-strict boolean values like "yes", "no", "on" and "off" should be allowed
      * @return whether the input until the next whitespace contains a valid {@link Boolean}
      */
-    @SideEffectFree boolean isValidBoolean(boolean liberal);
+    default @SideEffectFree boolean isValidBoolean(final boolean liberal) {
+        if (liberal) {
+            return BOOLEAN_LIBERAL.contains(this.peekString().toUpperCase(Locale.ROOT));
+        } else {
+            return BOOLEAN_STRICT.contains(this.peekString().toUpperCase(Locale.ROOT));
+        }
+    }
 
     /**
      * Reads the {@link #readString() string until the next whitespace} and parses
@@ -481,7 +547,9 @@ public interface CommandInput extends Cloneable {
      * @return the parsed boolean
      * @throws IllegalArgumentException If the string cannot be parsed into a {@link Boolean}.
      */
-    boolean readBoolean();
+    default boolean readBoolean() {
+        return BOOLEAN_LIBERAL_TRUE.contains(this.readString().toUpperCase(Locale.ROOT));
+    }
 
     /**
      * Returns a {@link Queue} that wraps this instance.
@@ -490,7 +558,12 @@ public interface CommandInput extends Cloneable {
      *
      * @return the wrapping queue
      */
-    @NonNull LinkedList<@NonNull String> tokenize();
+    default @NonNull LinkedList<@NonNull String> tokenize() {
+        if (this.isEmpty()) {
+            return new LinkedList<>();
+        }
+        return new CommandInputTokenizer(this.remainingInput()).tokenize();
+    }
 
     /**
      * Returns a copy of this instance.
@@ -498,16 +571,6 @@ public interface CommandInput extends Cloneable {
      * @return copy of this instance
      */
     @NonNull CommandInput copy();
-
-    /**
-     * Overrides the cursor and input of {@code this} input with the {@code other} input.
-     *
-     * @param other the other input
-     */
-    default void copy(@NonNull CommandInput other) {
-        this.cursor(other.cursor());
-        this.input(other.input());
-    }
 
     @SuppressWarnings("serial")
     @API(status = API.Status.STABLE, since = "1.7.0")

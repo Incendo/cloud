@@ -23,16 +23,12 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.arguments.standard.BooleanArgument;
-import cloud.commandframework.internal.CommandInputTokenizer;
-import java.util.LinkedList;
-import java.util.Locale;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class CommandInputImpl implements CommandInput {
 
-    private String input;
+    private final String input;
     private int cursor;
 
     CommandInputImpl(final @NonNull String input) {
@@ -50,28 +46,17 @@ final class CommandInputImpl implements CommandInput {
     }
 
     @Override
-    public void input(final @NonNull String input) {
-        this.input = input;
-    }
-
-    @Override
-    public void appendString(final @NonNull String string) {
+    public @NonNull CommandInput appendString(final @NonNull String string) {
         if (this.hasRemainingInput() && !this.remainingInput().endsWith(" ")) {
-            this.input = String.format("%s %s", this.input, string);
+            return new CommandInputImpl(String.format("%s %s", this.input, string), this.cursor);
         } else {
-            this.input += string;
+            return new CommandInputImpl(this.input + string, this.cursor);
         }
-        System.out.println("Input after: " + this.input());
     }
 
     @Override
     public @NonNegative int cursor() {
         return this.cursor;
-    }
-
-    @Override
-    public @NonNegative int length() {
-        return this.input.length();
     }
 
     @Override
@@ -91,119 +76,7 @@ final class CommandInputImpl implements CommandInput {
     }
 
     @Override
-    public boolean isValidByte(final byte min, final byte max) {
-        try {
-            final byte parsedByte = Byte.parseByte(this.peekString());
-            return parsedByte >= min && parsedByte <= max;
-        } catch (final NumberFormatException ignored) {
-            return false;
-        }
-    }
-
-    @Override
-    public byte readByte() {
-        return Byte.parseByte(this.readString());
-    }
-
-    @Override
-    public boolean isValidShort(final short min, final short max) {
-        try {
-            final short parsedShort = Short.parseShort(this.peekString());
-            return parsedShort >= min && parsedShort <= max;
-        } catch (final NumberFormatException ignored) {
-            return false;
-        }
-    }
-
-    @Override
-    public short readShort() {
-        return Short.parseShort(this.readString());
-    }
-
-    @Override
-    public boolean isValidInteger(final int min, final int max) {
-        try {
-            final int parsedInteger = Integer.parseInt(this.peekString());
-            return parsedInteger >= min && parsedInteger <= max;
-        } catch (final NumberFormatException ignored) {
-            return false;
-        }
-    }
-
-    @Override
-    public int readInteger() {
-        return Integer.parseInt(this.readString());
-    }
-
-    @Override
-    public boolean isValidLong(final long min, final long max) {
-        try {
-            final long parsedLong = Long.parseLong(this.peekString());
-            return parsedLong >= min && parsedLong <= max;
-        } catch (final NumberFormatException ignored) {
-            return false;
-        }
-    }
-
-    @Override
-    public long readLong() {
-        return Long.parseLong(this.readString());
-    }
-
-    @Override
-    public boolean isValidDouble(final double min, final double max) {
-        try {
-            final double parsedDouble = Double.parseDouble(this.peekString());
-            return parsedDouble >= min && parsedDouble <= max;
-        } catch (final NumberFormatException ignored) {
-            return false;
-        }
-    }
-
-    @Override
-    public double readDouble() {
-        return Double.parseDouble(this.readString());
-    }
-
-    @Override
-    public boolean isValidFloat(final float min, final float max) {
-        try {
-            final float parsedFloat = Float.parseFloat(this.peekString());
-            return parsedFloat >= min && parsedFloat <= max;
-        } catch (final NumberFormatException ignored) {
-            return false;
-        }
-    }
-
-    @Override
-    public float readFloat() {
-        return Float.parseFloat(this.readString());
-    }
-
-    @Override
-    public boolean isValidBoolean(final boolean liberal) {
-        if (liberal) {
-            return BooleanArgument.BooleanParser.LIBERAL.contains(this.peekString().toUpperCase(Locale.ROOT));
-        } else {
-            return BooleanArgument.BooleanParser.STRICT.contains(this.peekString().toUpperCase(Locale.ROOT));
-        }
-    }
-
-    @Override
-    public boolean readBoolean() {
-        return BooleanArgument.BooleanParser.LIBERAL_TRUE.contains(this.readString().toUpperCase(Locale.ROOT));
-    }
-
-    @Override
     public @NonNull CommandInput copy() {
         return new CommandInputImpl(this.input, this.cursor);
-    }
-
-    @Override
-    public @NonNull LinkedList<@NonNull String> tokenize() {
-        if (this.isEmpty()) {
-            return new LinkedList<>();
-        }
-        return new CommandInputTokenizer(this.remainingInput()).tokenize();
     }
 }
