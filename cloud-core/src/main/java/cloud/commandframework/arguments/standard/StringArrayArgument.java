@@ -153,14 +153,14 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
                     if (string.isEmpty() || FLAG_PATTERN.matcher(string).matches()) {
                         break;
                     }
-                    result.add(commandInput.readString());
+                    result.add(commandInput.readStringSkipWhitespace());
                 }
 
                 return ArgumentParseResult.success(result.toArray(new String[0]));
             } else {
                 final String[] result = new String[size];
                 for (int i = 0; i < result.length; i++) {
-                    result[i] = commandInput.readString();
+                    result[i] = commandInput.readStringSkipWhitespace();
                 }
                 return ArgumentParseResult.success(result);
             }

@@ -362,7 +362,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
             if (inner != null) {
                 final int numSpaces = StringUtils.countCharOccurrences(inner, ' ');
                 for (int i = 0; i <= numSpaces; i++) {
-                    commandInput.readString();
+                    commandInput.readStringSkipWhitespace();
                 }
             } else {
                 inner = commandInput.peekString();
@@ -372,7 +372,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                             StringMode.QUOTED, commandContext
                     ));
                 } else {
-                    commandInput.readString();
+                    commandInput.readStringSkipWhitespace();
                 }
             }
 
@@ -402,7 +402,7 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                     }
                 }
 
-                stringJoiner.add(commandInput.readString(false /* preserveSingleSpace */));
+                stringJoiner.add(commandInput.readStringSkipWhitespace(false /* preserveSingleSpace */));
             }
 
             return ArgumentParseResult.success(stringJoiner.toString());

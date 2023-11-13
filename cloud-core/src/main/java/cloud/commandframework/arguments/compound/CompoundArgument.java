@@ -135,6 +135,10 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
             for (int i = 0; i < this.parsers.length; i++) {
                 @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) this.parsers[i];
                 final ArgumentParseResult<?> result = parser.parse(commandContext, commandInput);
+
+                // Trim any trailing whitespace after parsing.
+                commandInput.skipWhitespace();
+
                 if (result.getFailure().isPresent()) {
                     /* Return the failure */
                     return ArgumentParseResult.failure(result.getFailure().get());

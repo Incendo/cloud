@@ -315,7 +315,8 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                         commandInput.moveCursor(1);
                     }
 
-                    final String flagName = commandInput.readString();
+                    final String flagName = commandInput.readStringSkipWhitespace();
+
                     CommandFlag<?> flag = null;
 
                     if (string.startsWith("--")) {
@@ -436,6 +437,9 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                                             commandContext,
                                             commandInput
                                     );
+
+                    // Trim any trailing whitespace after parsing.
+                    commandInput.skipWhitespace();
 
                     if (result.getFailure().isPresent()) {
                         return ArgumentParseResult.failure(result.getFailure().get());

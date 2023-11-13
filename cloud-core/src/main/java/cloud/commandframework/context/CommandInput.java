@@ -278,11 +278,11 @@ public interface CommandInput extends Cloneable {
      * {@link #read() Reads} until the next whitespace is encountered. Any
      * trailing whitespace will be skipped.
      *
-     * @param preserveSingleSpace whether a single trailing space should be preserved
+     * @param preserveSingleSpace whether a single trailing space should be preserved if it makes up the entire remaining input
      * @return the read string
      */
-    default @NonNull String readString(final boolean preserveSingleSpace) {
-        final String readString = this.readStringPreserveWhitespace();
+    default @NonNull String readStringSkipWhitespace(final boolean preserveSingleSpace) {
+        final String readString = this.readString();
         this.skipWhitespace(preserveSingleSpace);
         return readString;
     }
@@ -293,16 +293,16 @@ public interface CommandInput extends Cloneable {
      *
      * @return the read string
      */
-    default @NonNull String readString() {
-        return this.readString(true /* preserveSingleSpace */);
+    default @NonNull String readStringSkipWhitespace() {
+        return this.readStringSkipWhitespace(true /* preserveSingleSpace */);
     }
 
     /**
-     * Like {@link #readString()}, but whitespace is preserved.
+     * {@link #read() Reads} until the next whitespace is encountered. Any trailing whitespace will be preserved.
      *
      * @return the read string
      */
-    default @NonNull String readStringPreserveWhitespace() {
+    default @NonNull String readString() {
         if (!this.hasRemainingInput()) {
             return "";
         }
@@ -322,7 +322,7 @@ public interface CommandInput extends Cloneable {
     /**
      * Skips any whitespace characters at the head of the input.
      *
-     * @param preserveSingleSpace whether a single space should be ignored
+     * @param preserveSingleSpace whether a single trailing space should be preserved if it makes up the entire remaining input
      */
     default void skipWhitespace(final boolean preserveSingleSpace) {
         // We only skip the whitespace if the input doesn't end with a space. If it does, we do not want to consume it.

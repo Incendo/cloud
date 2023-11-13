@@ -78,6 +78,7 @@ public class CommandPreProcessorTest {
         public void accept(final @NonNull CommandPreprocessingContext<TestCommandSender> context) {
             try {
                 final int num = context.commandInput().readInteger();
+                context.commandInput().skipWhitespace();
                 context.getCommandContext().store("int", num);
             } catch (final Exception ignored) {
                 /* Will prevent execution */

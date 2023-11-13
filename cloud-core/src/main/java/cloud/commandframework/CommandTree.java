@@ -284,6 +284,10 @@ public final class CommandTree<C> {
                 commandContext.setCurrentArgument(argument);
 
                 final ArgumentParseResult<?> result = argument.getParser().parse(commandContext, commandInput);
+
+                // Trim any trailing whitespace after parsing.
+                commandInput.skipWhitespace();
+
                 argumentContext.markEnd();
                 argumentContext.success(!result.getFailure().isPresent());
 
@@ -535,6 +539,9 @@ public final class CommandTree<C> {
 
             result = argument.getParser().parse(commandContext, commandInput);
 
+            // Trim any trailing whitespace after parsing.
+            commandInput.skipWhitespace();
+
             // We remove all remaining queue, and then we'll have a list of the captured input.
             final List<String> consumedInput = currentInput.tokenize();
             consumedInput.removeAll(commandInput.tokenize());
@@ -597,6 +604,9 @@ public final class CommandTree<C> {
                         context.commandContext(),
                         commandInput
                 );
+
+                // Trim any trailing whitespace after parsing.
+                commandInput.skipWhitespace();
 
                 if (!result.getParsedValue().isPresent()) {
                     continue;
@@ -725,6 +735,9 @@ public final class CommandTree<C> {
             // START: Parsing
             context.commandContext().setCurrentArgument(child.argument());
             final ArgumentParseResult<?> result = child.argument().getParser().parse(context.commandContext(), commandInput);
+
+            commandInput.skipWhitespace();
+
             final Optional<?> parsedValue = result.getParsedValue();
             final boolean parseSuccess = parsedValue.isPresent();
 
