@@ -611,7 +611,7 @@ public final class CommandTree<C> {
             }
 
             // Restore original queue
-            commandInput.copy(commandInputCopy);
+            commandInput.cursor(commandInputCopy.cursor());
         }
 
         // Calculate suggestions for the literal arguments
@@ -735,7 +735,7 @@ public final class CommandTree<C> {
                 }
 
                 // Greedy parser took all the input, we can restore and just ask for suggestions
-                commandInput.copy(commandInputOriginal);
+                commandInput.cursor(commandInputOriginal.cursor());
                 this.addArgumentSuggestions(context, child, commandInput.remainingInput());
             }
 
@@ -746,7 +746,7 @@ public final class CommandTree<C> {
             } else if (!parseSuccess && commandInputOriginal.remainingTokens() > 1) {
                 // at this point there should normally be no need to reset the command queue as we expect
                 // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway
-                commandInput.copy(commandInputOriginal);
+                commandInput.cursor(commandInputOriginal.cursor());
 
                 // there are more arguments following but the current argument isn't matching - there
                 // is no need to collect any further suggestions
@@ -756,7 +756,7 @@ public final class CommandTree<C> {
         }
 
         // Restore original command input queue
-        commandInput.copy(commandInputOriginal);
+        commandInput.cursor(commandInputOriginal.cursor());
 
         if (!preParseSuccess && commandInput.remainingTokens() > 1) {
             // The preprocessor denied the argument, and there are more arguments following the current one
