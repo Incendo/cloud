@@ -28,6 +28,7 @@ import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.BukkitBrigadierMapper;
 import cloud.commandframework.bukkit.internal.BukkitBackwardsBrigadierSenderMapper;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.permission.CommandPermission;
 import com.destroystokyo.paper.brigadier.BukkitBrigadierCommandSource;
 import java.lang.reflect.Method;
@@ -99,7 +100,7 @@ class PaperBrigadierListener<C> implements Listener {
             label = event.getCommandLabel();
         }
 
-        final CommandTree.CommandNode<C> node = commandTree.getNamedNode(label);
+        final CommandNode<C> node = commandTree.getNamedNode(label);
         if (node == null) {
             return;
         }

@@ -24,7 +24,6 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.ArgumentParseException;
@@ -33,6 +32,7 @@ import cloud.commandframework.exceptions.InvalidCommandSenderException;
 import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
+import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
@@ -206,7 +206,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
 
     @Override
     public boolean testPermissionSilent(final @NonNull CommandSender target) {
-        final CommandTree.CommandNode<C> node = this.namedNode();
+        final CommandNode<C> node = this.namedNode();
         if (this.disabled || node == null) {
             return false;
         }
@@ -230,7 +230,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         return !this.disabled;
     }
 
-    private CommandTree.@Nullable CommandNode<C> namedNode() {
+    private @Nullable CommandNode<C> namedNode() {
         return this.manager.commandTree().getNamedNode(this.command.getName());
     }
 }

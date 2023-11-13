@@ -24,10 +24,10 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.CommandTree;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.internal.CommandNode;
 import java.util.Iterator;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -54,7 +54,7 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
     @SuppressWarnings("unchecked")
     public final @NonNull String apply(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
-            final CommandTree.@Nullable CommandNode<C> node
+            final @Nullable CommandNode<C> node
     ) {
         final FormattingInstance formattingInstance = this.createInstance();
         final Iterator<CommandComponent<C>> iterator = commandComponents.iterator();
@@ -77,13 +77,13 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 formattingInstance.appendBlankSpace();
             }
         }
-        CommandTree.CommandNode<C> tail = node;
+        CommandNode<C> tail = node;
         while (tail != null && !tail.isLeaf()) {
             if (tail.children().size() > 1) {
                 formattingInstance.appendBlankSpace();
-                final Iterator<CommandTree.CommandNode<C>> childIterator = tail.children().iterator();
+                final Iterator<CommandNode<C>> childIterator = tail.children().iterator();
                 while (childIterator.hasNext()) {
-                    final CommandTree.CommandNode<C> child = childIterator.next();
+                    final CommandNode<C> child = childIterator.next();
 
                     if (child.argument() instanceof StaticArgument) {
                         formattingInstance.appendName(child.argument().getName());

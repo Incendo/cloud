@@ -54,6 +54,7 @@ import cloud.commandframework.execution.preprocessor.AcceptingCommandPreprocesso
 import cloud.commandframework.execution.preprocessor.CommandPreprocessingContext;
 import cloud.commandframework.execution.preprocessor.CommandPreprocessor;
 import cloud.commandframework.internal.CommandInputTokenizer;
+import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.permission.AndPermission;
@@ -559,7 +560,7 @@ public abstract class CommandManager<C> {
         }
 
         // Mark the command for deletion.
-        final CommandTree.CommandNode<C> node = this.commandTree.getNamedNode(rootCommand);
+        final CommandNode<C> node = this.commandTree.getNamedNode(rootCommand);
         if (node == null) {
             // If the node doesn't exist, we don't really need to delete it...
             return;
@@ -584,9 +585,9 @@ public abstract class CommandManager<C> {
     @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull Collection<@NonNull String> rootCommands() {
-        return this.commandTree.getRootNodes()
+        return this.commandTree.rootNodes()
                 .stream()
-                .map(CommandTree.CommandNode::argument)
+                .map(CommandNode::argument)
                 .filter(arg -> arg instanceof StaticArgument)
                 .map(arg -> (StaticArgument<C>) arg)
                 .map(StaticArgument::getName)

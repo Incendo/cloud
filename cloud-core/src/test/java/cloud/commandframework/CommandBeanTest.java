@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.meta.CommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +56,7 @@ class CommandBeanTest {
         this.commandManager.command(testCommandBean);
 
         // Assert
-        final CommandTree.CommandNode<TestCommandSender> node = this.commandManager.commandTree().getNamedNode("test");
+        final CommandNode<TestCommandSender> node = this.commandManager.commandTree().getNamedNode("test");
         assertThat(node).isNotNull();
 
         final CommandArgument<TestCommandSender, ?> argument = node.argument();
