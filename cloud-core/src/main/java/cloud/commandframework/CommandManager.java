@@ -246,6 +246,26 @@ public abstract class CommandManager<C> {
     }
 
     /**
+     * Creates a command using the given {@code commandFactory} and inserts it into the underlying command tree. The command
+     * will be forwarded to the {@link CommandRegistrationHandler} and will, depending on the platform, be forwarded to the
+     * platform.
+     * <p>
+     * Different command manager implementations have different requirements for the command registration. It is possible
+     * that a command manager may only allow registration during certain stages of the application lifetime. Read the platform
+     * command manager documentation to find out more about your particular platform
+     *
+     * @param commandFactory the command factory to register
+     * @return The command manager instance. This is returned so that these method calls may be chained. This will always
+     *         return {@code this}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This CommandManager<C> command(final @NonNull CommandFactory<C> commandFactory) {
+        commandFactory.createCommand(this).forEach(this::command);
+        return this;
+    }
+
+    /**
      * Register a new command
      *
      * @param command Command to register. {@link Command.Builder#build()}} will be invoked.
