@@ -34,12 +34,12 @@ import cloud.commandframework.bukkit.BukkitParserParameters;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import org.bukkit.NamespacedKey;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -184,9 +184,9 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
         @Override
         public @NonNull ArgumentParseResult<NamespacedKey> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
+            final String input = commandInput.peekString();
             final String[] split = input.split(":");
             final int maxSemi = split.length > 1 ? 1 : 0;
             if (input.length() - input.replace(":", "").length() > maxSemi) {
@@ -204,9 +204,9 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                                 BukkitCaptionKeys.ARGUMENT_PARSE_FAILURE_NAMESPACED_KEY_NEED_NAMESPACE, input, commandContext
                         ));
                     }
-                    ret = new NamespacedKey(this.defaultNamespace, split[0]);
+                    ret = new NamespacedKey(this.defaultNamespace, commandInput.readString());
                 } else if (split.length == 2) {
-                    ret = new NamespacedKey(split[0], split[1]);
+                    ret = new NamespacedKey(commandInput.readUntilAndSkip(':'), commandInput.readString());
                 } else {
                     // Too many parts, ie not:valid:input
                     return ArgumentParseResult.failure(new NamespacedKeyParseException(
@@ -215,7 +215,6 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
                 }
 
                 // Success!
-                inputQueue.remove();
                 return ArgumentParseResult.success(ret);
             } catch (final IllegalArgumentException ex) {
                 final Caption caption = ex.getMessage().contains("namespace") // stupid but works

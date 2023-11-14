@@ -30,10 +30,10 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -176,15 +176,15 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
         @Override
         protected @NonNull ArgumentParseResult<MultiplePlayerSelector> legacyParse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
+            final String input = commandInput.peekString();
             @SuppressWarnings("deprecation") final @Nullable Player player = Bukkit.getPlayer(input);
 
             if (player == null) {
                 return ArgumentParseResult.failure(new PlayerArgument.PlayerParseException(input, commandContext));
             }
-            inputQueue.remove();
+            commandInput.readString();
             return ArgumentParseResult.success(new MultiplePlayerSelector(input, ImmutableList.of(player)));
         }
     }
