@@ -10,6 +10,7 @@ dependencies {
     compileOnly(libs.commodore)
     compileOnly(libs.jetbrainsAnnotations)
     compileOnly(libs.guava)
+    testImplementation(libs.bukkit)
 }
 
 spotless {

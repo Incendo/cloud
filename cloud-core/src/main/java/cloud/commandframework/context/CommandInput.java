@@ -621,9 +621,18 @@ public interface CommandInput extends Cloneable {
     default @NonNull String difference(final @NonNull CommandInput that) {
         // If the inputs are different then there's nothing to compare.
         if (!this.input().equals(that.input())) {
-            return that.input();
+            return this.input();
         }
-        return this.input().substring(0, that.cursor());
+        return this.input().substring(this.cursor(), that.cursor());
+    }
+
+    /**
+     * Returns the input that has been parsed.
+     *
+     * @return the parsed input
+     */
+    default @NonNull String parsed() {
+        return this.input().substring(0, this.cursor());
     }
 
     @SuppressWarnings("serial")
