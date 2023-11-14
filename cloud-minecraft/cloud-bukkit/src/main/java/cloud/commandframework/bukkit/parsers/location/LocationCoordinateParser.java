@@ -67,7 +67,14 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
 
         final double coordinate;
         try {
-            coordinate = commandInput.isEmpty() ? 0 : commandInput.readDouble();
+            final boolean empty = commandInput.peekString().isEmpty() || commandInput.peek() == ' ';
+            coordinate = empty ? 0 : commandInput.readDouble();
+
+            // You can have a prefix without a number, in which case we wouldn't consume the
+            // subsequent whitespace. We do it manually.
+            if (commandInput.hasRemainingInput() && commandInput.peek() == ' ') {
+                commandInput.read();
+            }
         } catch (final Exception e) {
             return ArgumentParseResult.failure(new DoubleArgument.DoubleParseException(
                     input,

@@ -24,90 +24,75 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.bukkit.parsers.EnchantmentArgument;
+import cloud.commandframework.bukkit.parsers.location.Location2D;
+import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
 import cloud.commandframework.bukkit.util.ServerTest;
 import cloud.commandframework.context.CommandInput;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.stream.Stream;
-import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("deprecation")
-class EnchantmentArgumentTest extends ServerTest {
+class Location2DArgumentTest extends ServerTest {
 
-    @BeforeAll
-    static void setupEnchantments() throws Exception {
-        final Field keyField = Enchantment.class.getDeclaredField("key");
-        keyField.setAccessible(true);
-
-        for (final Field field : Enchantment.class.getDeclaredFields()) {
-            if (Modifier.isStatic(field.getModifiers()) && field.getType().isAssignableFrom(Enchantment.class)) {
-                final Enchantment mockEnchantment = Mockito.mock(Enchantment.class);
-                final NamespacedKey enchantmentKey = ((Enchantment) field.get(null)).getKey();
-                when(mockEnchantment.getKey()).thenReturn(enchantmentKey);
-                when(mockEnchantment.getName()).thenReturn(enchantmentKey.getKey());
-
-                // Bukkit is bad and accesses this field directly, so we cannot just mock "getKey" but we must also override
-                // the inner key.
-                keyField.set(mockEnchantment, enchantmentKey);
-                try {
-                    Enchantment.registerEnchantment(mockEnchantment);
-                } catch (final Exception ignored) {
-                }
-            }
-        }
-    }
+    @Mock
+    private World world;
 
     @ParameterizedTest
     @MethodSource("Parse_HappyFlow_Success_Source")
-    void Parse_HappyFlow_Success(final @NonNull String input, final @NonNull Enchantment enchantment) {
+    void Parse_HappyFlow_Success(final @NonNull String input, final @NonNull Vector expectedLocation) {
         // Arrange
-        final EnchantmentArgument.EnchantmentParser<CommandSender> parser = new EnchantmentArgument.EnchantmentParser<>();
+        when(this.server().getWorlds()).thenReturn(Collections.singletonList(this.world));
+        final Location2DArgument.Location2DParser<CommandSender> parser = new Location2DArgument.Location2DParser<>();
         final CommandInput commandInput = CommandInput.of(input);
 
         // Act
-        final ArgumentParseResult<Enchantment> result = parser.parse(
+        final ArgumentParseResult<Location2D> result = parser.parse(
                 this.commandContext(),
                 commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
-        assertThat(result.getParsedValue()).hasValue(enchantment);
+        assertThat(result.getParsedValue().isPresent()).isTrue();
+        assertThat(result.getParsedValue().get().toVector()).isEqualTo(expectedLocation);
         assertThat(commandInput.remainingInput()).isEmpty();
     }
 
     static @NonNull Stream<@NonNull Arguments> Parse_HappyFlow_Success_Source() {
-        return Arrays.stream(Enchantment.values())
-                .flatMap(
-                        enchantment -> Stream.of(enchantment.getKey().getKey(), enchantment.getKey().toString())
-                                .map(input -> arguments(input, enchantment))
-                );
+        return Stream.of(
+                arguments("~ ~", new Vector(0, 0, 0)),
+                arguments("~10 ~10", new Vector(10, 0, 10)),
+                arguments("~-10 ~-10", new Vector(-10, 0, -10)),
+                arguments("^ ^", new Vector(0, 0, 0)),
+                arguments("^0 ^0", new Vector(0, 0, 0)),
+                arguments("0 0", new Vector(0, 0, 0)),
+                arguments("10 10", new Vector(10, 0, 10)),
+                arguments("-10 -10", new Vector(-10, 0, -10))
+        );
     }
 
-    @Test
-    void Parse_NonExistentEnchantment_Failure() {
+    @ParameterizedTest
+    @ValueSource(strings = { "0 ", "not location" })
+    void Parse_InvalidLocation_Failure(final @NonNull String input) {
         // Arrange
-        final EnchantmentArgument.EnchantmentParser<CommandSender> parser = new EnchantmentArgument.EnchantmentParser<>();
-        final CommandInput commandInput = CommandInput.of("enchantment");
+        final Location2DArgument.Location2DParser<CommandSender> parser = new Location2DArgument.Location2DParser<>();
+        final CommandInput commandInput = CommandInput.of(input);
 
         // Act
-        final ArgumentParseResult<Enchantment> result = parser.parse(
+        final ArgumentParseResult<Location2D> result = parser.parse(
                 this.commandContext(),
                 commandInput
         );
