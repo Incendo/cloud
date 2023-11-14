@@ -11,6 +11,7 @@ dependencies {
     compileOnly(libs.jetbrainsAnnotations)
     compileOnly(libs.guava)
     testImplementation(libs.bukkit)
+    testImplementation(libs.jetbrainsAnnotations)
 }
 
 spotless {
