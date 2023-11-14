@@ -126,7 +126,7 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull CommandInput commandInput
         ) {
-            final String input = commandInput.readString();
+            final String input = commandInput.peekString();
             if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         EnchantmentParser.class,
