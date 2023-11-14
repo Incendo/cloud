@@ -38,6 +38,7 @@ final class CloudStringReader extends StringReader {
     private CloudStringReader(final @NonNull CommandInput commandInput) {
         super(commandInput.input());
         this.commandInput = commandInput;
+        super.setCursor(commandInput.cursor());
     }
 
     @Override

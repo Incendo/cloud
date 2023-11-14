@@ -28,8 +28,8 @@ import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
         @NonNull ArgumentParseResult<Boolean>> {
 
     private final String rawPattern;
@@ -88,10 +88,11 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
 
     @Override
     public @NonNull ArgumentParseResult<Boolean> apply(
-            final @NonNull CommandContext<C> context, final @NonNull Queue<@NonNull String> strings
+            final @NonNull CommandContext<C> context,
+            final @NonNull CommandInput commandInput
     ) {
-        final String head = strings.peek();
-        if (head == null) {
+        final String head = commandInput.peekString();
+        if (head.isEmpty()) {
             return ArgumentParseResult.failure(new NoInputProvidedException(
                     RegexPreprocessor.class,
                     context
