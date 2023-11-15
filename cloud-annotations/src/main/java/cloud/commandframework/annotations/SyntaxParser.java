@@ -23,55 +23,26 @@
 //
 package cloud.commandframework.annotations;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Method;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Parses command syntax into syntax fragments.
- * <p>
- * Public since 1.7.0.
+ * Parser that produces {@link SyntaxFragment syntax fragments} from command methods.
+ *
+ * @since 2.0.0
  */
-public final class SyntaxParser implements Function<@NonNull String, @NonNull List<@NonNull SyntaxFragment>> {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface SyntaxParser {
 
-    private static final Predicate<String> PATTERN_ARGUMENT_LITERAL = Pattern.compile("([A-Za-z0-9\\-_]+)(|([A-Za-z0-9\\-_]+))*")
-            .asPredicate();
-    private static final Predicate<String> PATTERN_ARGUMENT_REQUIRED = Pattern.compile("<([A-Za-z0-9\\-_]+)>")
-            .asPredicate();
-    private static final Predicate<String> PATTERN_ARGUMENT_OPTIONAL = Pattern.compile("\\[([A-Za-z0-9\\-_]+)]")
-            .asPredicate();
-
-    @Override
-    public @NonNull List<@NonNull SyntaxFragment> apply(final @NonNull String syntax) {
-        final StringTokenizer stringTokenizer = new StringTokenizer(syntax, " ");
-        final List<SyntaxFragment> syntaxFragments = new ArrayList<>();
-        while (stringTokenizer.hasMoreTokens()) {
-            final String token = stringTokenizer.nextToken();
-            String major;
-            List<String> minor = new ArrayList<>();
-            ArgumentMode mode;
-            if (PATTERN_ARGUMENT_REQUIRED.test(token)) {
-                major = token.substring(1, token.length() - 1);
-                mode = ArgumentMode.REQUIRED;
-            } else if (PATTERN_ARGUMENT_OPTIONAL.test(token)) {
-                major = token.substring(1, token.length() - 1);
-                mode = ArgumentMode.OPTIONAL;
-            } else if (PATTERN_ARGUMENT_LITERAL.test(token)) {
-                final String[] literals = token.split("\\|");
-                /* Actually use the other literals as well */
-                major = literals[0];
-                minor.addAll(Arrays.asList(literals).subList(1, literals.length));
-                mode = ArgumentMode.LITERAL;
-            } else {
-                throw new IllegalArgumentException(String.format("Unrecognizable syntax token '%s'", syntax));
-            }
-            syntaxFragments.add(new SyntaxFragment(major, minor, mode));
-        }
-        return syntaxFragments;
-    }
+    /**
+     * Parses the given {@code string} into {@link SyntaxFragment syntax fragements}.
+     *
+     * @param method the method that the syntax is being parsed for, {@code null} if not method is available
+     * @param string the string to parsed
+     * @return the parsed fragments
+     */
+    @NonNull List<@NonNull SyntaxFragment> parseSyntax(@Nullable Method method, @NonNull String string);
 }

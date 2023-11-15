@@ -232,6 +232,19 @@ public final class CommandFlag<T> {
          * @return New builder instance
          */
         public @NonNull Builder<T> withAliases(final @NonNull String... aliases) {
+            return this.withAliases(Arrays.asList(aliases));
+        }
+
+        /**
+         * Create a new builder instance using the given flag aliases.
+         * These may at most be one character in length
+         *
+         * @param aliases Flag aliases
+         * @return New builder instance
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<T> withAliases(final @NonNull Collection<@NonNull String> aliases) {
             final Set<String> filteredAliases = new HashSet<>();
             for (final String alias : aliases) {
                 if (alias.isEmpty()) {

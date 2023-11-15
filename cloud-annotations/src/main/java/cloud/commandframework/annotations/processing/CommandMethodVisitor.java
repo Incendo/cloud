@@ -27,7 +27,7 @@ import cloud.commandframework.annotations.Argument;
 import cloud.commandframework.annotations.ArgumentMode;
 import cloud.commandframework.annotations.CommandMethod;
 import cloud.commandframework.annotations.SyntaxFragment;
-import cloud.commandframework.annotations.SyntaxParser;
+import cloud.commandframework.annotations.SyntaxParserImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,11 +47,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 class CommandMethodVisitor implements ElementVisitor<Void, Void> {
 
     private final ProcessingEnvironment processingEnvironment;
-    private final SyntaxParser syntaxParser;
+    private final SyntaxParserImpl syntaxParser;
 
     CommandMethodVisitor(final @NonNull ProcessingEnvironment processingEnvironment) {
         this.processingEnvironment = processingEnvironment;
-        this.syntaxParser = new SyntaxParser();
+        this.syntaxParser = new SyntaxParserImpl();
     }
 
     @Override
@@ -123,7 +123,7 @@ class CommandMethodVisitor implements ElementVisitor<Void, Void> {
                 .collect(Collectors.toList());
         final List<String> parsedArgumentNames = new ArrayList<>(parameterArgumentNames.size());
 
-        final List<SyntaxFragment> syntaxFragments = this.syntaxParser.apply(commandMethod.value());
+        final List<SyntaxFragment> syntaxFragments = this.syntaxParser.parseSyntax(null, commandMethod.value());
 
         boolean foundOptional = false;
         for (final SyntaxFragment fragment : syntaxFragments) {
