@@ -95,7 +95,7 @@ class CommandInputTest {
         commandInput.moveCursor(6);
 
         // Act
-        final String result = commandInput.peek(5);
+        final String result = commandInput.peekString(5);
 
         // Assert
         assertThat(result).isEqualTo("world");
@@ -111,7 +111,7 @@ class CommandInputTest {
         // Act
         final CommandInput.CursorOutOfBoundsException exception = assertThrows(
                 CommandInput.CursorOutOfBoundsException.class,
-                () -> commandInput.peek(6)
+                () -> commandInput.peekString(6)
         );
 
         // Assert

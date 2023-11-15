@@ -214,7 +214,7 @@ public interface CommandInput extends Cloneable {
      * @return the read characters
      * @throws CursorOutOfBoundsException If {@code chars} exceeds {@link #remainingLength()}
      */
-    default @SideEffectFree @NonNull String peek(final @NonNegative int chars) {
+    default @SideEffectFree @NonNull String peekString(final @NonNegative int chars) {
         final String remainingInput = this.remainingInput();
         if (chars > remainingInput.length()) {
             throw new CursorOutOfBoundsException(
@@ -234,7 +234,7 @@ public interface CommandInput extends Cloneable {
      * @throws CursorOutOfBoundsException If {@code chars} exceeds {@link #remainingLength()}
      */
     default @NonNull String read(final @NonNegative int chars) {
-        final String readString = this.peek(chars);
+        final String readString = this.peekString(chars);
         this.moveCursor(chars);
         return readString;
     }
@@ -283,7 +283,7 @@ public interface CommandInput extends Cloneable {
         } else {
             // We want to read until the whitespace. Thus, we do add
             // to account for the 0-indexing.
-            return this.peek(indexOfWhitespace);
+            return this.peekString(indexOfWhitespace);
         }
     }
 
