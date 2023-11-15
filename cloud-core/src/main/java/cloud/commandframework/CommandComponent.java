@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.DefaultValue;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -41,7 +42,7 @@ public final class CommandComponent<C> {
     private final CommandArgument<C, ?> argument;
     private final ArgumentDescription description;
     private final boolean required;
-    private final String defaultValue;
+    private final DefaultValue<C, ?> defaultValue;
 
     /**
      * Initializes a new CommandComponent
@@ -56,7 +57,7 @@ public final class CommandComponent<C> {
             final @NonNull CommandArgument<C, ?> argument,
             final @NonNull ArgumentDescription description,
             final boolean required,
-            final @Nullable String defaultValue
+            final @Nullable DefaultValue<C, ?> defaultValue
     ) {
         this.argument = argument;
         this.description = description;
@@ -135,7 +136,7 @@ public final class CommandComponent<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @Nullable String defaultValue() {
+    public @Nullable DefaultValue<C, ?> defaultValue() {
         return this.defaultValue;
     }
 
@@ -222,7 +223,7 @@ public final class CommandComponent<C> {
     public static <C> @NonNull CommandComponent<C> optional(
             final @NonNull CommandArgument<C, ?> commandArgument,
             final @NonNull ArgumentDescription commandDescription,
-            final @Nullable String defaultValue
+            final @Nullable DefaultValue<C, ?> defaultValue
     ) {
         return new CommandComponent<C>(commandArgument, commandDescription, false, defaultValue);
     }

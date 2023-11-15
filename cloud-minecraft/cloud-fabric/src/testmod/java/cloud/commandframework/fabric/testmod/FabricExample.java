@@ -25,6 +25,7 @@ package cloud.commandframework.fabric.testmod;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
@@ -84,7 +85,7 @@ public final class FabricExample implements ModInitializer {
         manager.command(base
                 .literal("hugs")
                 .required(name)
-                .optional(hugs, "1")
+                .optional(hugs, DefaultValue.constant(1))
                 .handler(ctx -> {
                     ctx.getSender().sendSuccess(Component.literal("Hello, ")
                             .append(ctx.get(name))
@@ -148,7 +149,7 @@ public final class FabricExample implements ModInitializer {
                 .required(MultiplePlayerSelectorArgument.of("targets"))
                 .required(ItemInputArgument.of("item"))
                 .optional(IntegerArgument.<CommandSourceStack>builder("amount")
-                        .withMin(1), "1")
+                        .withMin(1), DefaultValue.constant(1))
                 .handler(ctx -> {
                     final ItemInput item = ctx.get("item");
                     final MultiplePlayerSelector targets = ctx.get("targets");

@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
@@ -90,7 +91,7 @@ class CommandTreeTest {
         ).command(
                 this.commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                         .literal("opt")
-                        .optional(IntegerArgument.of("num"), "" + defaultInputNumber)
+                        .optional(IntegerArgument.of("num"), DefaultValue.constant(defaultInputNumber))
                         .build()
         );
 
@@ -135,7 +136,7 @@ class CommandTreeTest {
         final Command<TestCommandSender> command = this.commandManager.commandBuilder(
                         "test", Collections.singleton("other"), SimpleCommandMeta.empty()
                 ).literal("opt", "öpt")
-                .optional(IntegerArgument.of("num"), "" + defaultInputNumber)
+                .optional(IntegerArgument.of("num"), DefaultValue.constant(defaultInputNumber))
                 .build();
         this.commandManager.command(command);
 

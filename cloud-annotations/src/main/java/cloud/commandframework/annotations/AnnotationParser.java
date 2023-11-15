@@ -36,6 +36,7 @@ import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -787,7 +788,7 @@ public final class AnnotationParser<C> {
         } else if (argument.defaultValue().isEmpty()) {
             return CommandComponent.optional(builtArgument, description);
         } else {
-            return CommandComponent.optional(builtArgument, description, this.processString(argument.defaultValue()));
+            return CommandComponent.optional(builtArgument, description, DefaultValue.parsed(this.processString(argument.defaultValue())));
         }
     }
 

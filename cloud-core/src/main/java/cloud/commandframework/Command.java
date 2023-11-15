@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
@@ -656,7 +657,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CommandArgument<C, T> argument,
                 final @NonNull ArgumentDescription description,
-                final @NonNull String defaultValue
+                final @NonNull DefaultValue<C, T> defaultValue
         ) {
             return this.argument(CommandComponent.optional(argument, description, defaultValue));
         }
@@ -678,7 +679,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final CommandArgument.@NonNull Builder<C, T> argument,
                 final @NonNull ArgumentDescription description,
-                final @NonNull String defaultValue
+                final @NonNull DefaultValue<C, T> defaultValue
         ) {
             return this.argument(CommandComponent.optional(argument.build(), description, defaultValue));
         }
@@ -770,7 +771,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CommandArgument<C, T> argument,
-                final @NonNull String defaultValue
+                final @NonNull DefaultValue<C, T> defaultValue
         ) {
             return this.argument(CommandComponent.optional(argument, argument.getDefaultDescription(), defaultValue));
         }
@@ -790,7 +791,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final CommandArgument.@NonNull Builder<C, T> argument,
-                final @NonNull String defaultValue
+                final @NonNull DefaultValue<C, T> defaultValue
         ) {
             return this.optional(argument.build(), defaultValue);
         }
