@@ -31,11 +31,11 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument.LocationParseException;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
@@ -61,7 +61,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
             final @NonNull ArgumentDescription defaultDescription,
             final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>,
-                    @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
+                    @NonNull CommandInput, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         super(
                 name,
@@ -146,18 +146,14 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
         @Override
         public @NonNull ArgumentParseResult<@NonNull Location2D> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            if (inputQueue.size() < 2) {
-                final StringBuilder input = new StringBuilder();
-                for (int i = 0; i < inputQueue.size(); i++) {
-                    input.append(((LinkedList<String>) inputQueue).get(i));
-                }
+            if (commandInput.remainingTokens() < 2) {
                 return ArgumentParseResult.failure(
                         new LocationParseException(
                                 commandContext,
                                 LocationParseException.FailureReason.WRONG_FORMAT,
-                                input.toString()
+                                commandInput.remainingInput()
                         )
                 );
             }
@@ -165,7 +161,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
             for (int i = 0; i < 2; i++) {
                 final ArgumentParseResult<@NonNull LocationCoordinate> coordinate = this.locationCoordinateParser.parse(
                         commandContext,
-                        inputQueue
+                        commandInput
                 );
                 if (coordinate.getFailure().isPresent()) {
                     return ArgumentParseResult.failure(

@@ -28,8 +28,8 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.bukkit.parsers.PlayerArgument;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import java.util.Queue;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -43,11 +43,10 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
     @Override
     public @NonNull ArgumentParseResult<@NonNull LocationCoordinate> parse(
             final @NonNull CommandContext<@NonNull C> commandContext,
-            final @NonNull Queue<@NonNull String> inputQueue
+            final @NonNull CommandInput commandInput
     ) {
-        String input = inputQueue.peek();
-
-        if (input == null) {
+        final String input = commandInput.peekString();
+        if (input.isEmpty()) {
             return ArgumentParseResult.failure(new NoInputProvidedException(
                     PlayerArgument.PlayerParser.class,
                     commandContext
@@ -56,19 +55,26 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
 
         /* Determine the type */
         final LocationCoordinateType locationCoordinateType;
-        if (input.startsWith("^")) {
+        if (commandInput.peek() == '^') {
             locationCoordinateType = LocationCoordinateType.LOCAL;
-            input = input.substring(1);
-        } else if (input.startsWith("~")) {
+            commandInput.moveCursor(1);
+        } else if (commandInput.peek() == '~') {
             locationCoordinateType = LocationCoordinateType.RELATIVE;
-            input = input.substring(1);
+            commandInput.moveCursor(1);
         } else {
             locationCoordinateType = LocationCoordinateType.ABSOLUTE;
         }
 
         final double coordinate;
         try {
-            coordinate = input.isEmpty() ? 0 : Double.parseDouble(input);
+            final boolean empty = commandInput.peekString().isEmpty() || commandInput.peek() == ' ';
+            coordinate = empty ? 0 : commandInput.readDouble();
+
+            // You can have a prefix without a number, in which case we wouldn't consume the
+            // subsequent whitespace. We do it manually.
+            if (commandInput.hasRemainingInput() && commandInput.peek() == ' ') {
+                commandInput.read();
+            }
         } catch (final Exception e) {
             return ArgumentParseResult.failure(new DoubleArgument.DoubleParseException(
                     input,
@@ -80,7 +86,6 @@ public final class LocationCoordinateParser<C> implements ArgumentParser<C, Loca
             ));
         }
 
-        inputQueue.remove();
         return ArgumentParseResult.success(
                 LocationCoordinate.of(
                         locationCoordinateType,

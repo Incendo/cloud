@@ -72,7 +72,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -102,7 +101,7 @@ public final class AnnotationParser<C> {
     private final CommandManager<C> manager;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, BiFunction<@NonNull CommandContext<C>,
-            @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>>> preprocessorMappers;
+            @NonNull CommandInput, @NonNull ArgumentParseResult<Boolean>>>> preprocessorMappers;
     private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, Command.Builder<C>, Command.Builder<C>>>
             builderModifiers;
     private final Map<Predicate<Method>, Function<MethodCommandExecutionHandler.CommandMethodContext<C>,
@@ -294,7 +293,7 @@ public final class AnnotationParser<C> {
      */
     public <A extends Annotation> void registerPreprocessorMapper(
             final @NonNull Class<A> annotation,
-            final @NonNull Function<A, BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+            final @NonNull Function<A, BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>>> preprocessorMapper
     ) {
         this.preprocessorMappers.put(annotation, preprocessorMapper);

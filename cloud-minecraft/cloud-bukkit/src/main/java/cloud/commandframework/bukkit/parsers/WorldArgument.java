@@ -31,10 +31,10 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.List;
-import java.util.Queue;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
@@ -118,22 +118,21 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
         @Override
         public @NonNull ArgumentParseResult<World> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            if (commandInput.peekString().isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         WorldParser.class,
                         commandContext
                 ));
             }
 
+            final String input = commandInput.readString();
             final World world = Bukkit.getWorld(input);
             if (world == null) {
                 return ArgumentParseResult.failure(new WorldParseException(input, commandContext));
             }
 
-            inputQueue.remove();
             return ArgumentParseResult.success(world);
         }
 

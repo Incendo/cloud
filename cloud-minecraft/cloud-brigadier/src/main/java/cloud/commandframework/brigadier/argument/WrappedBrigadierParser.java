@@ -26,6 +26,7 @@ package cloud.commandframework.brigadier.argument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.context.StringRange;
@@ -36,7 +37,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import org.apiguardian.api.API;
@@ -140,18 +140,16 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
 
     @Override
     public @NonNull ArgumentParseResult<@NonNull T> parse(
-            @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final Queue<@NonNull String> inputQueue
+            final @NonNull CommandContext<@NonNull C> commandContext,
+            final @NonNull CommandInput commandInput
     ) {
         // Convert to a brig reader
         final StringReader reader;
 
-        if (inputQueue instanceof StringReader) {
-            reader = (StringReader) inputQueue;
-        } else if (inputQueue instanceof StringReaderAsQueue) {
-            reader = ((StringReaderAsQueue) inputQueue).getOriginal();
+        if (commandInput instanceof StringReader) {
+            reader = (StringReader) commandInput;
         } else {
-            reader = new QueueAsStringReader(inputQueue);
+            reader = CloudStringReader.of(commandInput);
         }
 
         // Then try to parse
@@ -159,13 +157,11 @@ public final class WrappedBrigadierParser<C, T> implements ArgumentParser<C, T> 
             final T result = this.parse != null
                     ? this.parse.apply(this.nativeType.get(), reader)
                     : this.nativeType.get().parse(reader);
+            // Brigadier doesn't automatically do this, whereas Cloud does.
+            commandInput.skipWhitespace();
             return ArgumentParseResult.success(result);
         } catch (final CommandSyntaxException ex) {
             return ArgumentParseResult.failure(ex);
-        } finally {
-            if (reader instanceof QueueAsStringReader) {
-                ((QueueAsStringReader) reader).updateQueue();
-            }
         }
     }
 

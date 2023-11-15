@@ -78,6 +78,15 @@ include(":cloud-core")
 include(":cloud-services")
 include(":cloud-tasks")
 include(":cloud-annotations")
+
+// Minecraft Modules
+setupMinecraftModule("cloud-brigadier")
+setupMinecraftModule("cloud-bukkit")
+setupMinecraftModule("cloud-paper")
+setupMinecraftModule("cloud-minecraft-extras")
+
+// Example Modules
+setupExampleModule("example-bukkit")
 /*
 // Kotlin Extensions
 setupKotlinModule("cloud-kotlin-extensions")
@@ -89,10 +98,7 @@ setupDiscordModule("cloud-javacord")
 setupDiscordModule("cloud-jda")
 
 // Minecraft Modules
-setupMinecraftModule("cloud-brigadier")
-setupMinecraftModule("cloud-bukkit")
 setupMinecraftModule("cloud-fabric")
-setupMinecraftModule("cloud-paper")
 setupMinecraftModule("cloud-velocity")
 //setupMinecraftModule("cloud-sponge")
 setupMinecraftModule("cloud-sponge7")
@@ -107,7 +113,7 @@ setupIrcModule("cloud-pircbotx")
 setupExampleModule("example-bukkit")
 setupExampleModule("example-bungee")
 setupExampleModule("example-jda")
-setupExampleModule("example-velocity")/*
+setupExampleModule("example-velocity")*/
 
 fun setupIrcModule(name: String) =
         setupSubproject(name, file("cloud-irc/$name"))

@@ -309,12 +309,22 @@ public interface CommandInput extends Cloneable {
      * @return the read string
      */
     default @NonNull String readStringPreserveWhitespace() {
+        return this.readUntil(' ');
+    }
+
+    /**
+     * Reads until the {@code separator}, and then preserves it.
+     *
+     * @param separator the separator to read until
+     * @return the read string
+     */
+    default @NonNull String readUntil(final char separator) {
         if (!this.hasRemainingInput()) {
             return "";
         }
 
         final String remainingInput = this.remainingInput();
-        final int indexOfWhitespace = remainingInput.indexOf(' ');
+        final int indexOfWhitespace = remainingInput.indexOf(separator);
         if (indexOfWhitespace == -1) {
             this.moveCursor(this.remainingLength());
             return remainingInput;
@@ -323,6 +333,24 @@ public interface CommandInput extends Cloneable {
             // to account for the 0-indexing.
             return this.read(indexOfWhitespace);
         }
+    }
+
+    /**
+     * Reads until the {@code separator}, and then skips the separator.
+     *
+     * @param separator the separator to read until
+     * @return the read string
+     */
+    default @NonNull String readUntilAndSkip(final char separator) {
+        final String readString = this.readUntil(separator);
+        if (readString.isEmpty()) {
+            return readString;
+        }
+        final char readChar = this.read();
+        if (readChar != separator) {
+            this.moveCursor(-1);
+        }
+        return readString;
     }
 
     /**
@@ -439,6 +467,18 @@ public interface CommandInput extends Cloneable {
      */
     default int readInteger() {
         return Integer.parseInt(this.readString());
+    }
+
+    /**
+     * Reads the {@link #readString() string until the next whitespace} and parses
+     * in into a {@link Integer}.
+     *
+     * @param radix radix
+     * @return the parsed integer
+     * @throws NumberFormatException If the string cannot be parsed into a {@link Integer}.
+     */
+    default int readInteger(final int radix) {
+        return Integer.parseInt(this.readString(), radix);
     }
 
     /**
@@ -571,6 +611,29 @@ public interface CommandInput extends Cloneable {
      * @return copy of this instance
      */
     @NonNull CommandInput copy();
+
+    /**
+     * Returns the input that has been consumed by {@code that} input that has not been consumed by {@code input}.
+     *
+     * @param that the input to compare to
+     * @return the difference in consumed input
+     */
+    default @NonNull String difference(final @NonNull CommandInput that) {
+        // If the inputs are different then there's nothing to compare.
+        if (!this.input().equals(that.input())) {
+            return this.input();
+        }
+        return this.input().substring(this.cursor(), that.cursor());
+    }
+
+    /**
+     * Returns the input that has been parsed.
+     *
+     * @return the parsed input
+     */
+    default @NonNull String parsed() {
+        return this.input().substring(0, this.cursor());
+    }
 
     @SuppressWarnings("serial")
     @API(status = API.Status.STABLE, since = "1.7.0")

@@ -294,6 +294,8 @@ public final class CommandTree<C> {
                 if (result.getParsedValue().isPresent()) {
                     parsedArguments.add(component);
                     return this.parseCommand(parsedArguments, commandContext, commandInput, child);
+                } else if (result.getFailure().isPresent()) {
+                    commandInput.cursor(currentInput.cursor());
                 }
             }
         }
@@ -544,6 +546,10 @@ public final class CommandTree<C> {
             final List<String> consumedInput = currentInput.tokenize();
             consumedInput.removeAll(commandInput.tokenize());
             argumentContext.consumedInput(consumedInput);
+
+            if (result.getFailure().isPresent()) {
+                commandInput.cursor(currentInput.cursor());
+            }
         } else {
             result = preParseResult;
         }
@@ -602,6 +608,10 @@ public final class CommandTree<C> {
                         context.commandContext(),
                         commandInput
                 );
+
+                if (result.getFailure().isPresent()) {
+                    commandInput.cursor(commandInputCopy.cursor());
+                }
 
                 if (!result.getParsedValue().isPresent()) {
                     continue;
@@ -729,9 +739,16 @@ public final class CommandTree<C> {
         if (preParseSuccess) {
             // START: Parsing
             context.commandContext().setCurrentArgument(child.argument());
+
+            final CommandInput preParseInput = commandInput.copy();
+
             final ArgumentParseResult<?> result = child.argument().getParser().parse(context.commandContext(), commandInput);
             final Optional<?> parsedValue = result.getParsedValue();
             final boolean parseSuccess = parsedValue.isPresent();
+
+            if (result.getFailure().isPresent()) {
+                commandInput.cursor(preParseInput.cursor());
+            }
 
             // It's the last node, we don't care for success or not as we don't need to delegate to a child
             if (child.isLeaf()) {

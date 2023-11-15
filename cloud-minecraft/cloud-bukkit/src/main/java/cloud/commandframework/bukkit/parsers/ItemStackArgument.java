@@ -36,6 +36,7 @@ import cloud.commandframework.bukkit.internal.CommandBuildContextSupplier;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.lang.reflect.Constructor;
@@ -45,7 +46,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 import java.util.stream.Collectors;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -148,9 +148,9 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         @Override
         public @NonNull ArgumentParseResult<ProtoItemStack> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            return this.parser.parse(commandContext, inputQueue);
+            return this.parser.parse(commandContext, commandInput);
         }
 
         @Override
@@ -248,10 +248,10 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                @NonNull final CommandInput commandInput
         ) {
             // Minecraft has a parser for this - just use it
-            return this.parser.parse(commandContext, inputQueue);
+            return this.parser.parse(commandContext, commandInput);
         }
 
         @Override
@@ -325,9 +325,9 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProtoItemStack> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                @NonNull final CommandInput commandInput
         ) {
-            return this.parser.parse(commandContext, inputQueue);
+            return this.parser.parse(commandContext, commandInput);
         }
 
         @Override

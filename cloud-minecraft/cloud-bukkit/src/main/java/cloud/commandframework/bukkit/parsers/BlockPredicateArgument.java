@@ -37,13 +37,13 @@ import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.bukkit.internal.RegistryReflection;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import com.mojang.brigadier.arguments.ArgumentType;
 import io.leangen.geantyref.TypeToken;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.function.Predicate;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -255,9 +255,9 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
         @Override
         public @NonNull ArgumentParseResult<@NonNull BlockPredicate> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                @NonNull final CommandInput commandInput
         ) {
-            return this.parser.parse(commandContext, inputQueue);
+            return this.parser.parse(commandContext, commandInput);
         }
 
         @Override

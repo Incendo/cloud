@@ -69,7 +69,7 @@ final class CommandInputImpl implements CommandInput {
 
     @Override
     public void cursor(final int cursor) {
-        if (cursor < 0 || cursor >= this.length()) {
+        if (cursor < 0 || cursor > this.length()) {
             throw new CursorOutOfBoundsException(cursor, this.length());
         }
         this.cursor = cursor;

@@ -583,14 +583,14 @@ public class CommandContext<C> {
     }
 
     /**
-     * Returns the raw input
+     * Returns a copy of the raw input
      *
      * @return raw input
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull CommandInput rawInput() {
-        return this.getOrDefault("__raw_input__", CommandInput.empty());
+        return this.getOrDefault("__raw_input__", CommandInput.empty()).copy();
     }
 
     /**
