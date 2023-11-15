@@ -454,7 +454,7 @@ public final class AnnotationParser<C> {
                 method.setAccessible(true);
             }
             if (method.getParameterCount() != 2
-                    || !(Collection.class.isAssignableFrom(method.getReturnType()) || method.getReturnType().equals(Stream.class))
+                    || !(Iterable.class.isAssignableFrom(method.getReturnType()) || method.getReturnType().equals(Stream.class))
                     || !method.getParameters()[0].getType().equals(CommandContext.class)
                     || !method.getParameters()[1].getType().equals(String.class)
             ) {
