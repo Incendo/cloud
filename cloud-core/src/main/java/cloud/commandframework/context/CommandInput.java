@@ -243,8 +243,15 @@ public interface CommandInput extends Cloneable {
      * Reads the character at the cursor without moving the cursor.
      *
      * @return the character at the cursor.
+     * @throws CursorOutOfBoundsException If the cursor has exceeded the input
      */
     default @SideEffectFree char peek() {
+        if (this.cursor() >= this.input().length()) {
+            throw new CursorOutOfBoundsException(
+                    this.cursor(),
+                    this.length()
+            );
+        }
         return this.input().charAt(this.cursor());
     }
 
@@ -343,7 +350,7 @@ public interface CommandInput extends Cloneable {
      */
     default @NonNull String readUntilAndSkip(final char separator) {
         final String readString = this.readUntil(separator);
-        if (readString.isEmpty()) {
+        if (readString.isEmpty() || !this.hasRemainingInput()) {
             return readString;
         }
         final char readChar = this.read();
@@ -623,16 +630,12 @@ public interface CommandInput extends Cloneable {
         if (!this.input().equals(that.input())) {
             return this.input();
         }
-        return this.input().substring(this.cursor(), that.cursor());
-    }
-
-    /**
-     * Returns the input that has been parsed.
-     *
-     * @return the parsed input
-     */
-    default @NonNull String parsed() {
-        return this.input().substring(0, this.cursor());
+        final String difference = this.input().substring(this.cursor(), that.cursor());
+        if (difference.endsWith(" ")) {
+            return difference.substring(0, difference.length() - 1);
+        } else {
+            return difference;
+        }
     }
 
     @SuppressWarnings("serial")
