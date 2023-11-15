@@ -21,38 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-final class DelegatingSuggestionProvider<C> implements SuggestionProvider<C> {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface TypedSuggestion<T> extends Suggestion {
 
-    private final String argumentName;
-    private final SuggestionProvider<C> suggestionProvider;
+    /**
+     * Returns the value of this suggestion
+     *
+     * @return the suggestions
+     */
+    @NonNull T typedSuggestion();
 
-    DelegatingSuggestionProvider(final @NonNull String argumentName, final @NonNull SuggestionProvider<C> suggestionProvider) {
-        this.argumentName = argumentName;
-        this.suggestionProvider = suggestionProvider;
-    }
-
-    @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
-            final @NonNull CommandContext<C> context,
-            final @NonNull String s
-    ) {
-        return this.suggestionProvider.suggestions(context, s);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("DelegatingSuggestionProvider{name='%s',parser='%s'}", this.argumentName,
-                this.suggestionProvider.getClass().getCanonicalName()
-        );
-    }
+    /**
+     * Returns a copy of this suggestion instance using the given {@code typedSuggestion}
+     *
+     * @param typedSuggestion the typed suggestion
+     * @param suggestion      the string representation of the suggestion
+     * @return the new suggestion
+     */
+    @NonNull TypedSuggestion<T> withTypedSuggestion(@NonNull T typedSuggestion, @NonNull String suggestion);
 }

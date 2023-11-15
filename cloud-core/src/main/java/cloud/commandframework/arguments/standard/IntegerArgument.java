@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -38,6 +39,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -205,16 +207,19 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         /**
          * Get integer suggestions. This supports both positive and negative numbers
          *
-         * @param min   Minimum value
-         * @param max   Maximum value
-         * @param input Input
+         * @param min             Minimum value
+         * @param max             Maximum value
+         * @param input           Input
+         * @param numberConverter Converter from long to T
+         * @param <T> The type of the numbers
          * @return List of suggestions
          */
         @SuppressWarnings("MixedMutabilityReturnType")
-        public static @NonNull List<@NonNull String> getSuggestions(
+        public static <T extends Number> @NonNull List<@NonNull Suggestion> getSuggestions(
                 final long min,
                 final long max,
-                final @NonNull String input
+                final @NonNull String input,
+                final Function<Long, T> numberConverter
         ) {
             final Set<Long> numbers = new TreeSet<>();
 
@@ -228,7 +233,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
                     numbers.add((inputNumAbsolute * NUMBER_SHIFT_MULTIPLIER) + i);
                 }
 
-                final List<String> suggestions = new LinkedList<>();
+                final List<Suggestion> suggestions = new LinkedList<>();
                 for (long number : numbers) {
                     if (input.startsWith("-")) {
                         number = -number; /* Preserve sign */
@@ -236,7 +241,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
                     if (number < min || number > max) {
                         continue;
                     }
-                    suggestions.add(String.valueOf(number));
+                    suggestions.add(Suggestion.typed(numberConverter.apply(number)));
                 }
 
                 return suggestions;
@@ -312,11 +317,11 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> stringSuggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return getSuggestions(this.min, this.max, input);
+            return getSuggestions(this.min, this.max, input, Long::intValue);
         }
     }
 

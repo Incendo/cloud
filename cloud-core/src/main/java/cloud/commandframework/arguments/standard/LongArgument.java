@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -34,6 +35,7 @@ import cloud.commandframework.exceptions.parsing.NumberParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -258,11 +260,11 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> stringSuggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
+            return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input, Function.identity());
         }
     }
 

@@ -27,18 +27,21 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.arguments.suggestion.TypedSuggestion;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -153,10 +156,18 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         private static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");
         private static final List<String> LIBERAL_FALSE = Arrays.asList("FALSE", "NO", "OFF");
 
-        private static final List<String> STRICT_LOWER = STRICT
-                .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
-        private static final List<String> LIBERAL_LOWER = LIBERAL
-                .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+        private static final List<Suggestion> STRICT_LOWER = Arrays.asList(
+                Suggestion.typed(true),
+                Suggestion.typed(false)
+        );
+        private static final List<Suggestion> LIBERAL_LOWER;
+
+        static {
+            final List<TypedSuggestion<Boolean>> liberalLower = new ArrayList<>();
+            LIBERAL_TRUE.forEach(string -> liberalLower.add(Suggestion.typed(true, string.toLowerCase(Locale.ROOT))));
+            LIBERAL_FALSE.forEach(string -> liberalLower.add(Suggestion.typed(false, string.toLowerCase(Locale.ROOT))));
+            LIBERAL_LOWER = Collections.unmodifiableList(liberalLower);
+        }
 
         private final boolean liberal;
 
@@ -212,7 +223,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> stringSuggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {

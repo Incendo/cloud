@@ -287,7 +287,8 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
             return IntegerArgument.IntegerParser.getSuggestions(
                     Integer.MIN_VALUE,
                     Integer.MAX_VALUE,
-                    workingInput
+                    workingInput,
+                    Long::intValue
             ).stream().map(string -> prefix + string).collect(Collectors.toList());
         }
 

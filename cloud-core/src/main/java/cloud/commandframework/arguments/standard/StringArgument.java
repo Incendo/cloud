@@ -41,6 +41,7 @@ import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -419,7 +420,10 @@ public final class StringArgument<C> extends CommandArgument<C, String> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return this.suggestionProvider.suggestions(commandContext, input);
+            return this.suggestionProvider.suggestions(commandContext, input)
+                    .stream()
+                    .map(Suggestion::typed)
+                    .collect(Collectors.toList());
         }
 
         @Override

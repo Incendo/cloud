@@ -35,6 +35,7 @@ import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
 import cloud.commandframework.types.tuples.Pair;
 import cloud.commandframework.types.tuples.Triplet;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -180,10 +181,11 @@ class CommandSuggestionsTest {
         Assertions.assertEquals(suggestionList("one"), suggestions2);
         final String input3 = "test var one f";
         final List<Suggestion> suggestions3 = manager.suggest(new TestCommandSender(), input3);
-        Assertions.assertEquals(suggestionList("foo"), suggestions3);
+        Assertions.assertEquals(Arrays.asList(Suggestion.typed(TestEnum.FOO, "foo")), suggestions3);
         final String input4 = "test var one ";
         final List<Suggestion> suggestions4 = manager.suggest(new TestCommandSender(), input4);
-        Assertions.assertEquals(suggestionList("foo", "bar"), suggestions4);
+        Assertions.assertEquals(Arrays.asList(Suggestion.typed(TestEnum.FOO, "foo"),
+                        Suggestion.typed(TestEnum.BAR, "bar")), suggestions4);
     }
 
     @Test

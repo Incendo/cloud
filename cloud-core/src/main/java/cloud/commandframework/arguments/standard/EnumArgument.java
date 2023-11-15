@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
@@ -172,11 +173,14 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> stringSuggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return EnumSet.allOf(this.enumClass).stream().map(e -> e.name().toLowerCase()).collect(Collectors.toList());
+            return EnumSet.allOf(this.enumClass)
+                    .stream()
+                    .map(e -> Suggestion.typed(e, e.name().toLowerCase()))
+                    .collect(Collectors.toList());
         }
 
         @Override

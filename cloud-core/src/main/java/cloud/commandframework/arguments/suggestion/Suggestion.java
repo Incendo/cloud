@@ -36,7 +36,30 @@ public interface Suggestion {
      * @return the created suggestion
      */
     static @NonNull Suggestion simple(final @NonNull String suggestion) {
-        return new SimpleSuggestion(suggestion);
+        return new SuggestionImpl(suggestion);
+    }
+
+    /**
+     * Returns a typed {@code suggestion} with an accompanying {@code stringRepresentation}
+     *
+     * @param suggestion           the typed suggestion
+     * @param stringRepresentation the string representation of the suggestion
+     * @return the typed suggestion
+     * @param <T> the type of the suggestion
+     */
+    static <T> @NonNull TypedSuggestion<T> typed(final @NonNull T suggestion, final @NonNull String stringRepresentation) {
+        return new TypedSuggestionImpl<>(suggestion, stringRepresentation);
+    }
+
+    /**
+     * Returns a typed {@code suggestion} using {@code suggestion.toString()} as the string representation
+     *
+     * @param suggestion the typed suggestion
+     * @return the typed suggestion
+     * @param <T> the type of the suggestion
+     */
+    static <T> @NonNull TypedSuggestion<T> typed(final @NonNull T suggestion) {
+        return new TypedSuggestionImpl<>(suggestion);
     }
 
     /**

@@ -21,38 +21,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.arguments;
+package cloud.commandframework.arguments.suggestion;
 
-import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.context.CommandContext;
-import java.util.List;
-import org.apiguardian.api.API;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-final class DelegatingSuggestionProvider<C> implements SuggestionProvider<C> {
+class SuggestionImpl implements Suggestion {
 
-    private final String argumentName;
-    private final SuggestionProvider<C> suggestionProvider;
+    private final String suggestion;
 
-    DelegatingSuggestionProvider(final @NonNull String argumentName, final @NonNull SuggestionProvider<C> suggestionProvider) {
-        this.argumentName = argumentName;
-        this.suggestionProvider = suggestionProvider;
+    SuggestionImpl(final @NonNull String suggestion) {
+        this.suggestion = suggestion;
     }
 
     @Override
-    public @NonNull List<@NonNull Suggestion> suggestions(
-            final @NonNull CommandContext<C> context,
-            final @NonNull String s
-    ) {
-        return this.suggestionProvider.suggestions(context, s);
+    public @NonNull String suggestion() {
+        return this.suggestion;
+    }
+
+    @Override
+    public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
+        return new SuggestionImpl(suggestion);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Suggestion)) {
+            return false;
+        }
+        final Suggestion that = (Suggestion) o;
+        return Objects.equals(this.suggestion(), that.suggestion());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.suggestion);
     }
 
     @Override
     public String toString() {
-        return String.format("DelegatingSuggestionProvider{name='%s',parser='%s'}", this.argumentName,
-                this.suggestionProvider.getClass().getCanonicalName()
-        );
+        return this.suggestion;
     }
 }

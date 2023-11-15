@@ -23,46 +23,34 @@
 //
 package cloud.commandframework.arguments.suggestion;
 
-import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class SimpleSuggestion implements Suggestion {
+final class TypedSuggestionImpl<T> extends SuggestionImpl implements TypedSuggestion<T> {
 
-    private final String suggestion;
+    private final T value;
 
-    SimpleSuggestion(final @NonNull String suggestion) {
-        this.suggestion = suggestion;
+    TypedSuggestionImpl(final @NonNull T value) {
+        super(value.toString());
+        this.value = value;
+    }
+
+    TypedSuggestionImpl(final @NonNull T value, final @NonNull String suggestion) {
+        super(suggestion);
+        this.value = value;
     }
 
     @Override
-    public @NonNull String suggestion() {
-        return this.suggestion;
+    public @NonNull Suggestion withSuggestion(final @NonNull String suggestion) {
+        return new TypedSuggestionImpl<>(this.value, suggestion);
     }
 
     @Override
-    public @NonNull Suggestion withSuggestion(@NonNull final String suggestion) {
-        return new SimpleSuggestion(suggestion);
+    public @NonNull TypedSuggestion<T> withTypedSuggestion(final @NonNull T typedSuggestion, final @NonNull String suggestion) {
+        return new TypedSuggestionImpl<>(typedSuggestion, suggestion);
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final SimpleSuggestion that = (SimpleSuggestion) o;
-        return Objects.equals(this.suggestion, that.suggestion);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.suggestion);
-    }
-
-    @Override
-    public String toString() {
-        return this.suggestion;
+    public @NonNull T typedSuggestion() {
+        return this.value;
     }
 }

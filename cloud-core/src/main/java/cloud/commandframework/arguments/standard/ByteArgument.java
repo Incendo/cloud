@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
@@ -219,11 +220,11 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         }
 
         @Override
-        public @NonNull List<@NonNull String> stringSuggestions(
+        public @NonNull List<@NonNull Suggestion> suggestions(
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
+            return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input, Long::byteValue);
         }
 
         /**
