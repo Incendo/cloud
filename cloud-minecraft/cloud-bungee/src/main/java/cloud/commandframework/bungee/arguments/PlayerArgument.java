@@ -31,13 +31,13 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bungee.BungeeCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.ProxyServer;
@@ -58,7 +58,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
-            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         super(
@@ -137,16 +137,16 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
         @Override
         public @NonNull ArgumentParseResult<@NonNull ProxiedPlayer> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         PlayerParser.class,
                         commandContext
                 ));
             }
-            final ProxiedPlayer player = commandContext.<ProxyServer>get("ProxyServer").getPlayer(input);
+            final ProxiedPlayer player = commandContext.<ProxyServer>get("ProxyServer").getPlayer(commandInput.readString());
             if (player == null) {
                 return ArgumentParseResult.failure(
                         new PlayerParseException(
@@ -155,7 +155,6 @@ public final class PlayerArgument<C> extends CommandArgument<C, ProxiedPlayer> {
                         )
                 );
             }
-            inputQueue.remove();
             return ArgumentParseResult.success(player);
         }
 

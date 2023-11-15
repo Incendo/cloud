@@ -92,6 +92,7 @@ setupDiscordModule("cloud-jda")
 setupMinecraftModule("cloud-brigadier")
 setupMinecraftModule("cloud-bukkit")
 setupMinecraftModule("cloud-paper")
+setupMinecraftModule("cloud-bungee")
 setupMinecraftModule("cloud-minecraft-extras")
 
 // IRC Modules
@@ -99,6 +100,7 @@ setupIrcModule("cloud-pircbotx")
 
 // Example Modules
 setupExampleModule("example-bukkit")
+setupExampleModule("example-bungee")
 setupExampleModule("example-jda")
 /*
 
@@ -107,11 +109,9 @@ setupMinecraftModule("cloud-fabric")
 setupMinecraftModule("cloud-velocity")
 //setupMinecraftModule("cloud-sponge")
 setupMinecraftModule("cloud-sponge7")
-setupMinecraftModule("cloud-bungee")
 setupMinecraftModule("cloud-cloudburst")
 
 // Example Modules
-setupExampleModule("example-bungee")
 setupExampleModule("example-velocity")*/
 
 fun setupIrcModule(name: String) =
