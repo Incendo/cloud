@@ -29,11 +29,11 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Member;
@@ -230,10 +230,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         @Override
         public @NonNull ArgumentParseResult<User> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         UserParser.class,
                         commandContext
@@ -260,7 +260,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
 
                     try {
                         final ArgumentParseResult<User> result = this.userFromId(event, input, id);
-                        inputQueue.remove();
+                        commandInput.readString();
                         return result;
                     } catch (final UserNotFoundParseException | NumberFormatException e) {
                         exception = e;
@@ -275,7 +275,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             if (this.modes.contains(ParserMode.ID)) {
                 try {
                     final ArgumentParseResult<User> result = this.userFromId(event, input, input);
-                    inputQueue.remove();
+                    commandInput.readString();
                     return result;
                 } catch (final UserNotFoundParseException | NumberFormatException e) {
                     exception = e;
@@ -297,12 +297,12 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
                     users = Collections.emptyList();
                 }
 
-                if (users.size() == 0) {
+                if (users.isEmpty()) {
                     exception = new UserNotFoundParseException(input);
                 } else if (users.size() > 1) {
                     exception = new TooManyUsersFoundParseException(input);
                 } else {
-                    inputQueue.remove();
+                    commandInput.readString();
                     return ArgumentParseResult.success(users.get(0));
                 }
             }

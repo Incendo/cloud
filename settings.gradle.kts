@@ -79,15 +79,6 @@ include(":cloud-services")
 include(":cloud-tasks")
 include(":cloud-annotations")
 
-// Minecraft Modules
-setupMinecraftModule("cloud-brigadier")
-setupMinecraftModule("cloud-bukkit")
-setupMinecraftModule("cloud-paper")
-setupMinecraftModule("cloud-minecraft-extras")
-
-// Example Modules
-setupExampleModule("example-bukkit")
-/*
 // Kotlin Extensions
 setupKotlinModule("cloud-kotlin-extensions")
 setupKotlinModule("cloud-kotlin-coroutines")
@@ -98,12 +89,9 @@ setupDiscordModule("cloud-javacord")
 setupDiscordModule("cloud-jda")
 
 // Minecraft Modules
-setupMinecraftModule("cloud-fabric")
-setupMinecraftModule("cloud-velocity")
-//setupMinecraftModule("cloud-sponge")
-setupMinecraftModule("cloud-sponge7")
-setupMinecraftModule("cloud-bungee")
-setupMinecraftModule("cloud-cloudburst")
+setupMinecraftModule("cloud-brigadier")
+setupMinecraftModule("cloud-bukkit")
+setupMinecraftModule("cloud-paper")
 setupMinecraftModule("cloud-minecraft-extras")
 
 // IRC Modules
@@ -111,8 +99,19 @@ setupIrcModule("cloud-pircbotx")
 
 // Example Modules
 setupExampleModule("example-bukkit")
-setupExampleModule("example-bungee")
 setupExampleModule("example-jda")
+/*
+
+// Minecraft Modules
+setupMinecraftModule("cloud-fabric")
+setupMinecraftModule("cloud-velocity")
+//setupMinecraftModule("cloud-sponge")
+setupMinecraftModule("cloud-sponge7")
+setupMinecraftModule("cloud-bungee")
+setupMinecraftModule("cloud-cloudburst")
+
+// Example Modules
+setupExampleModule("example-bungee")
 setupExampleModule("example-velocity")*/
 
 fun setupIrcModule(name: String) =

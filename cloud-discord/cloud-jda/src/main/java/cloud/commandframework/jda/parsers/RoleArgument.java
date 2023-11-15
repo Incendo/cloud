@@ -29,10 +29,10 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -173,10 +173,10 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
         @Override
         public @NonNull ArgumentParseResult<Role> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         RoleParser.class,
                         commandContext
@@ -202,7 +202,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
 
                     try {
                         final ArgumentParseResult<Role> role = this.roleFromId(event, input, id);
-                        inputQueue.remove();
+                        commandInput.readString();
                         return role;
                     } catch (final RoleNotFoundException | NumberFormatException e) {
                         exception = e;
@@ -217,7 +217,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
             if (this.modes.contains(ParserMode.ID)) {
                 try {
                     final ArgumentParseResult<Role> result = this.roleFromId(event, input, input);
-                    inputQueue.remove();
+                    commandInput.readString();
                     return result;
                 } catch (final RoleNotFoundException | NumberFormatException e) {
                     exception = e;
@@ -227,12 +227,12 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
             if (this.modes.contains(ParserMode.NAME)) {
                 final List<Role> roles = event.getGuild().getRolesByName(input, true);
 
-                if (roles.size() == 0) {
+                if (roles.isEmpty()) {
                     exception = new RoleNotFoundException(input);
                 } else if (roles.size() > 1) {
                     exception = new TooManyRolesFoundParseException(input);
                 } else {
-                    inputQueue.remove();
+                    commandInput.readString();
                     return ArgumentParseResult.success(roles.get(0));
                 }
             }
