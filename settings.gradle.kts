@@ -93,6 +93,10 @@ setupMinecraftModule("cloud-brigadier")
 setupMinecraftModule("cloud-bukkit")
 setupMinecraftModule("cloud-paper")
 setupMinecraftModule("cloud-bungee")
+setupMinecraftModule("cloud-cloudburst")
+setupMinecraftModule("cloud-velocity")
+//setupMinecraftModule("cloud-sponge")
+setupMinecraftModule("cloud-sponge7")
 setupMinecraftModule("cloud-minecraft-extras")
 
 // IRC Modules
@@ -101,18 +105,13 @@ setupIrcModule("cloud-pircbotx")
 // Example Modules
 setupExampleModule("example-bukkit")
 setupExampleModule("example-bungee")
+setupExampleModule("example-velocity")
 setupExampleModule("example-jda")
 /*
 
 // Minecraft Modules
 setupMinecraftModule("cloud-fabric")
-setupMinecraftModule("cloud-velocity")
-//setupMinecraftModule("cloud-sponge")
-setupMinecraftModule("cloud-sponge7")
-setupMinecraftModule("cloud-cloudburst")
-
-// Example Modules
-setupExampleModule("example-velocity")*/
+*/
 
 fun setupIrcModule(name: String) =
         setupSubproject(name, file("cloud-irc/$name"))
