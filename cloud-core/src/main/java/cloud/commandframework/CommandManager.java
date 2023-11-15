@@ -978,7 +978,7 @@ public abstract class CommandManager<C> {
     public State preprocessContext(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput
-            ) {
+    ) {
         this.servicePipeline.pump(new CommandPreprocessingContext<>(context, commandInput))
                 .through(new TypeToken<CommandPreprocessor<C>>() {
                 })
