@@ -30,7 +30,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class CommandDescriptor {
+public final class CommandDescriptor implements Descriptor {
 
     private final Method method;
     private final List<@NonNull SyntaxFragment> syntax;
@@ -64,6 +64,11 @@ public final class CommandDescriptor {
      */
     public @NonNull Method method() {
         return this.method;
+    }
+
+    @Override
+    public @NonNull String name() {
+        return this.commandToken;
     }
 
     /**

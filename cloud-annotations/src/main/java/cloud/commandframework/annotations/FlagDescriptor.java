@@ -37,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class FlagDescriptor {
+public final class FlagDescriptor implements Descriptor {
 
     private final Parameter parameter;
     private final String name;
@@ -91,6 +91,7 @@ public final class FlagDescriptor {
      *
      * @return the flag name
      */
+    @Override
     public @NonNull String name() {
         if (this.name.equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
             return this.parameter.getName();

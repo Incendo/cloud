@@ -25,12 +25,15 @@ package cloud.commandframework.kotlin.coroutines.annotations
 
 import cloud.commandframework.CommandManager
 import cloud.commandframework.annotations.AnnotationParser
+import cloud.commandframework.annotations.Argument
 import cloud.commandframework.annotations.CommandMethod
+import cloud.commandframework.context.CommandContext
 import cloud.commandframework.exceptions.CommandExecutionException
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator
 import cloud.commandframework.internal.CommandRegistrationHandler
 import cloud.commandframework.meta.CommandMeta
 import cloud.commandframework.meta.SimpleCommandMeta
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.runBlocking
@@ -84,7 +87,19 @@ class KotlinAnnotatedMethodsTest {
         }
     }
 
-    private class TestCommandSender
+    @Test
+    fun `test method with default value`(): Unit = runBlocking {
+        AnnotationParser(commandManager, TestCommandSender::class.java) {
+            SimpleCommandMeta.empty()
+        }
+            .installCoroutineSupport()
+            .parse(CommandMethods())
+
+        val result = commandManager.executeCommand(TestCommandSender(), "with-default").await()
+        assertThat(result.commandContext.get<Int>("the-value")).isEqualTo(5)
+    }
+
+    public class TestCommandSender
 
     private class TestCommandManager : CommandManager<TestCommandSender>(
         AsynchronousCommandExecutionCoordinator.builder<TestCommandSender>()
@@ -108,5 +123,10 @@ class KotlinAnnotatedMethodsTest {
 
         @CommandMethod("test-exception")
         public suspend fun suspendingCommandWithException(): Unit = throw IllegalStateException()
+
+        @CommandMethod("with-default [value]")
+        public fun commandWithDefault(@Argument("value") value: Int = 5, context: CommandContext<TestCommandSender>) {
+            context["the-value"] = value
+        }
     }
 }

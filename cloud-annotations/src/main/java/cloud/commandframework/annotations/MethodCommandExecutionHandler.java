@@ -39,8 +39,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A command execution handler that invokes a method.
@@ -84,7 +86,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                             commandContext,
                             commandContext.flags(),
                             this.parameters
-                    )
+                    ).stream().map(ParameterValue::value).collect(Collectors.toList())
             );
         } catch (final Error e) {
             throw e;
@@ -102,12 +104,12 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      * @return A list containing all parameters, in order
      * @since 1.6.0
      */
-    protected final List<Object> createParameterValues(
+    protected final @NonNull List<@NonNull ParameterValue> createParameterValues(
             final CommandContext<C> commandContext,
             final FlagContext flagContext,
             final Parameter[] parameters
     ) {
-        final List<Object> arguments = new ArrayList<>(parameters.length);
+        final List<ParameterValue> arguments = new ArrayList<>(parameters.length);
         for (final Parameter parameter : parameters) {
             final ArgumentDescriptor argumentDescriptor = this.context.argumentDescriptors.stream()
                     .filter(descriptor -> descriptor.parameter().equals(parameter))
@@ -128,22 +130,40 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
 
                 final CommandComponent<C> commandComponent = this.context.commandComponents.get(argumentName);
                 if (commandComponent.required()) {
-                    arguments.add(commandContext.get(argumentName));
+                    arguments.add(new ParameterValue(parameter, argumentDescriptor, commandContext.get(argumentName)));
                 } else {
                     final Object optional = commandContext.getOptional(argumentName).orElse(null);
-                    arguments.add(optional);
+                    arguments.add(new ParameterValue(parameter, argumentDescriptor, optional));
                 }
             } else if (flagDescriptor != null) {
                 if (parameter.getType().equals(boolean.class)) {
-                    arguments.add(flagContext.isPresent(flagDescriptor.name()));
+                    arguments.add(
+                            new ParameterValue(
+                                    parameter,
+                                    flagDescriptor,
+                                    flagContext.isPresent(flagDescriptor.name())
+                            )
+                    );
                 } else if (flagDescriptor.repeatable() && parameter.getType().isAssignableFrom(List.class)) {
-                    arguments.add(flagContext.getAll(flagDescriptor.name()));
+                    arguments.add(
+                            new ParameterValue(
+                                    parameter,
+                                    flagDescriptor,
+                                    flagContext.getAll(flagDescriptor.name())
+                            )
+                    );
                 } else {
-                    arguments.add(flagContext.getValue(flagDescriptor.name(), null));
+                    arguments.add(
+                            new ParameterValue(
+                                    parameter,
+                                    flagDescriptor,
+                                    flagContext.getValue(flagDescriptor.name(), null)
+                            )
+                    );
                 }
             } else {
                 if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
-                    arguments.add(commandContext.getSender());
+                    arguments.add(new ParameterValue(parameter, null, commandContext.getSender()));
                 } else {
                     final Optional<?> value = this.context.injectorRegistry.getInjectable(
                             parameter.getType(),
@@ -151,9 +171,9 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                             AnnotationAccessor.of(AnnotationAccessor.of(parameter), this.annotationAccessor)
                     );
                     if (value.isPresent()) {
-                        arguments.add(value.get());
+                        arguments.add(new ParameterValue(parameter, null, value.get()));
                     } else if (parameter.getType() == String.class) {
-                        arguments.add(parameter.getName());
+                        arguments.add(new ParameterValue(parameter, null, parameter.getName()));
                     } else {
                         throw new IllegalArgumentException(String.format(
                                 "Could not create value for parameter '%s' of type '%s' in method '%s'",
@@ -312,6 +332,51 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         @API(status = API.Status.STABLE, since = "2.0.0")
         public @NonNull Collection<@NonNull FlagDescriptor> flagDescriptors() {
             return Collections.unmodifiableCollection(this.flagDescriptors);
+        }
+    }
+
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static final class ParameterValue {
+
+        private final Parameter parameter;
+        private final Descriptor descriptor;
+        private final Object value;
+
+        private ParameterValue(
+                final @NonNull Parameter parameter,
+                final @Nullable Descriptor descriptor,
+                final @Nullable Object value
+        ) {
+            this.parameter = parameter;
+            this.descriptor = descriptor;
+            this.value = value;
+        }
+
+        /**
+         * Returns the name of the parameter.
+         *
+         * @return the parameter
+         */
+        public @NonNull Parameter parameter() {
+            return this.parameter;
+        }
+
+        /**
+         * Returns the associated descriptor.
+         *
+         * @return the descriptor, or {@code null}
+         */
+        public @Nullable Descriptor descriptor() {
+            return this.descriptor;
+        }
+
+        /**
+         * Returns the parameter value.
+         *
+         * @return the value
+         */
+        public @Nullable Object value() {
+            return this.value;
         }
     }
 }
