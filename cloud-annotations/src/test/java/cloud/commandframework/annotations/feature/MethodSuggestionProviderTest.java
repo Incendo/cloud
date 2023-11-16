@@ -88,6 +88,7 @@ class MethodSuggestionProviderTest {
                 new TestClassList(),
                 new TestClassSet(),
                 new TestClassStream(),
+                new TestClassIterable(),
                 new TestClassListString()
         );
     }
@@ -123,6 +124,17 @@ class MethodSuggestionProviderTest {
                 final @NonNull String input
         ) {
             return Stream.of(Suggestion.simple("foo"));
+        }
+    }
+
+    public static final class TestClassIterable {
+
+        @Suggestions("suggestions")
+        public @NonNull Iterable<@NonNull Suggestion> suggestions(
+                final @NonNull CommandContext<TestCommandSender> context,
+                final @NonNull String input
+        ) {
+            return Collections.singleton(Suggestion.simple("foo"));
         }
     }
 

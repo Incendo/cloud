@@ -23,35 +23,21 @@
 //
 package cloud.commandframework.annotations;
 
-import java.lang.reflect.Parameter;
+import java.util.Collection;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class ArgumentParameterPair {
+/**
+ * Extracts {@link CommandDescriptor command descriptors} from command class instances.
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface CommandExtractor {
 
-    private final Parameter parameter;
-    private final Argument argument;
-
-    ArgumentParameterPair(
-            final @NonNull Parameter parameter,
-            final @NonNull Argument argument
-    ) {
-        this.parameter = parameter;
-        this.argument = argument;
-    }
-
-    @NonNull Parameter getParameter() {
-        return this.parameter;
-    }
-
-    @NonNull Argument getArgument() {
-        return this.argument;
-    }
-
-    @NonNull String argumentName() {
-        if (this.argument.value().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
-            return this.parameter.getName();
-        } else {
-            return this.argument.value();
-        }
-    }
+    /**
+     * Extracts the commands from the given {@code instance}.
+     *
+     * @param instance the class instance
+     * @return the extracted commands
+     */
+    @NonNull Collection<@NonNull CommandDescriptor> extractCommands(@NonNull Object instance);
 }

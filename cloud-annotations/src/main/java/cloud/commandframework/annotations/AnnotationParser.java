@@ -58,7 +58,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -95,9 +94,6 @@ public final class AnnotationParser<C> {
      */
     public static final String INFERRED_ARGUMENT_NAME = "__INFERRED_ARGUMENT_NAME__";
 
-    private final SyntaxParser syntaxParser = new SyntaxParser();
-    private final ArgumentExtractor argumentExtractor = new ArgumentExtractor();
-
     private final CommandManager<C> manager;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
     private final Map<Class<? extends Annotation>, Function<? extends Annotation, BiFunction<@NonNull CommandContext<C>,
@@ -108,9 +104,13 @@ public final class AnnotationParser<C> {
             MethodCommandExecutionHandler<C>>> commandMethodFactories;
     private final TypeToken<C> commandSenderType;
     private final MetaFactory metaFactory;
-    private final FlagExtractor flagExtractor;
 
     private StringProcessor stringProcessor;
+    private SyntaxParser syntaxParser;
+    private ArgumentExtractor argumentExtractor;
+    private FlagExtractor flagExtractor;
+    private FlagAssembler flagAssembler;
+    private CommandExtractor commandExtractor;
 
     /**
      * Construct a new annotation parser
@@ -154,7 +154,11 @@ public final class AnnotationParser<C> {
         this.preprocessorMappers = new HashMap<>();
         this.builderModifiers = new HashMap<>();
         this.commandMethodFactories = new HashMap<>();
-        this.flagExtractor = new FlagExtractor(manager, this);
+        this.flagExtractor = new FlagExtractorImpl(this);
+        this.flagAssembler = new FlagAssemblerImpl(manager);
+        this.syntaxParser = new SyntaxParserImpl();
+        this.argumentExtractor = new ArgumentExtractorImpl();
+        this.commandExtractor = new CommandExtractorImpl(this);
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, this.processString(d.value())));
         this.registerPreprocessorMapper(Regex.class, annotation -> RegexPreprocessor.of(
@@ -239,7 +243,7 @@ public final class AnnotationParser<C> {
      * Registers a new command execution method factory. This allows for the registration of
      * custom command method execution strategies.
      *
-     * @param predicate The predicate that decides whether or not to apply the custom execution handler to the given method
+     * @param predicate The predicate that decides whether to apply the custom execution handler to the given method
      * @param function  The function that produces the command execution handler
      * @since 1.6.0
      */
@@ -353,6 +357,127 @@ public final class AnnotationParser<C> {
     }
 
     /**
+     * Processes the input {@code strings} and returns the processed result.
+     *
+     * @param strings the input strings
+     * @return the processed strings
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull List<@NonNull String> processStrings(final @NonNull Collection<@NonNull String> strings) {
+        return strings.stream().map(this::processString).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the syntax parser.
+     *
+     * @return the syntax parser
+     * @since 2.0.0
+     */
+    public @NonNull SyntaxParser syntaxParser() {
+        return this.syntaxParser;
+    }
+
+    /**
+     * Sets the syntax parser.
+     *
+     * @param syntaxParser new syntax parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void syntaxParser(final @NonNull SyntaxParser syntaxParser) {
+        this.syntaxParser = syntaxParser;
+    }
+
+    /**
+     * Returns the argument extractor.
+     *
+     * @return the argument extractor
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull ArgumentExtractor argumentExtractor() {
+        return this.argumentExtractor;
+    }
+
+    /**
+     * Sets the argument extractor.
+     *
+     * @param argumentExtractor new argument extractor
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void argumentExtractor(final @NonNull ArgumentExtractor argumentExtractor) {
+        this.argumentExtractor = argumentExtractor;
+    }
+
+    /**
+     * Returns the flag extractor.
+     *
+     * @return the flag extractor
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull FlagExtractor flagExtractor() {
+        return this.flagExtractor;
+    }
+
+    /**
+     * Sets the flag extractor.
+     *
+     * @param flagExtractor new flag extractor
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void flagExtractor(final @NonNull FlagExtractor flagExtractor) {
+        this.flagExtractor = flagExtractor;
+    }
+
+    /**
+     * Returns the flag assembler.
+     *
+     * @return the flag assembler
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull FlagAssembler flagAssembler() {
+        return this.flagAssembler;
+    }
+
+    /**
+     * Sets the flag assembler
+     *
+     * @param flagAssembler new flag assembler
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void flagAssembler(final @NonNull FlagAssembler flagAssembler) {
+        this.flagAssembler = flagAssembler;
+    }
+
+    /**
+     * Returns the command extractor.
+     *
+     * @return the command extractor
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandExtractor commandExtractor() {
+        return this.commandExtractor;
+    }
+
+    /**
+     * Sets the command extractor.
+     *
+     * @param commandExtractor new command extractor
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void commandExtractor(final @NonNull CommandExtractor commandExtractor) {
+        this.commandExtractor = commandExtractor;
+    }
+
+    /**
      * Parses all known {@link cloud.commandframework.annotations.processing.CommandContainer command containers}.
      *
      * @return Collection of parsed commands
@@ -411,32 +536,13 @@ public final class AnnotationParser<C> {
      * @param <T>      Type of the instance
      * @return Collection of parsed commands
      */
-    @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> @NonNull Collection<@NonNull Command<C>> parse(final @NonNull T instance) {
-        /* Start by registering all @Suggestion annotated methods */
         this.parseSuggestions(instance);
-        /* Then register all parsers */
         this.parseParsers(instance);
-        /* Then construct commands from @CommandMethod annotated classes */
-        final Method[] methods = instance.getClass().getDeclaredMethods();
-        final Collection<CommandMethodPair> commandMethodPairs = new ArrayList<>();
-        for (final Method method : methods) {
-            final CommandMethod commandMethod = method.getAnnotation(CommandMethod.class);
-            if (commandMethod == null) {
-                continue;
-            }
-            if (!method.isAccessible()) {
-                method.setAccessible(true);
-            }
-            if (Modifier.isStatic(method.getModifiers())) {
-                throw new IllegalArgumentException(String.format(
-                        "@CommandMethod annotated method '%s' is static! @CommandMethod annotated methods should not be static.",
-                        method.getName()
-                ));
-            }
-            commandMethodPairs.add(new CommandMethodPair(method, commandMethod));
-        }
-        final Collection<Command<C>> commands = this.construct(instance, commandMethodPairs);
+
+        final Collection<CommandDescriptor> commandDescriptors = this.commandExtractor.extractCommands(instance);
+        final Collection<Command<C>> commands = this.construct(instance, commandDescriptors);
         for (final Command<C> command : commands) {
             ((CommandManager) this.manager).command(command);
         }
@@ -454,7 +560,7 @@ public final class AnnotationParser<C> {
                 method.setAccessible(true);
             }
             if (method.getParameterCount() != 2
-                    || !(Collection.class.isAssignableFrom(method.getReturnType()) || method.getReturnType().equals(Stream.class))
+                    || !(Iterable.class.isAssignableFrom(method.getReturnType()) || method.getReturnType().equals(Stream.class))
                     || !method.getParameters()[0].getType().equals(CommandContext.class)
                     || !method.getParameters()[1].getType().equals(String.class)
             ) {
@@ -538,19 +644,12 @@ public final class AnnotationParser<C> {
     @SuppressWarnings("unchecked")
     private @NonNull Collection<@NonNull Command<C>> construct(
             final @NonNull Object instance,
-            final @NonNull Collection<@NonNull CommandMethodPair> methodPairs
+            final @NonNull Collection<@NonNull CommandDescriptor> commandDescriptors
     ) {
         final AnnotationAccessor classAnnotations = AnnotationAccessor.of(instance.getClass());
-        final CommandMethod classCommandMethod = classAnnotations.annotation(CommandMethod.class);
-        final String syntaxPrefix = classCommandMethod == null ? "" : (this.processString(classCommandMethod.value()) + " ");
         final Collection<Command<C>> commands = new ArrayList<>();
-        for (final CommandMethodPair commandMethodPair : methodPairs) {
-            final CommandMethod commandMethod = commandMethodPair.getCommandMethod();
-            final Method method = commandMethodPair.getMethod();
-            final String syntax = syntaxPrefix + this.processString(commandMethod.value());
-            final List<SyntaxFragment> tokens = this.syntaxParser.apply(syntax);
-            /* Determine command name */
-            final String commandToken = syntax.split(" ")[0].split("\\|")[0];
+        for (final CommandDescriptor commandDescriptor : commandDescriptors) {
+            final Method method = commandDescriptor.method();
             @SuppressWarnings("rawtypes") final CommandManager manager = this.manager;
             final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
                     .with(this.metaFactory.apply(method));
@@ -560,26 +659,30 @@ public final class AnnotationParser<C> {
 
             @SuppressWarnings("rawtypes")
             Command.Builder builder = manager.commandBuilder(
-                    commandToken,
-                    tokens.get(0).getMinor(),
+                    commandDescriptor.commandToken(),
+                    commandDescriptor.syntax().get(0).getMinor(),
                     metaBuilder.build()
             );
-            final Collection<ArgumentParameterPair> arguments = this.argumentExtractor.apply(method);
-            final Collection<CommandFlag<?>> flags = this.flagExtractor.apply(method);
+            final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(commandDescriptor.syntax(), method);
+            final Collection<FlagDescriptor> flagDescriptors = this.flagExtractor.extractFlags(method);
+            final Collection<CommandFlag<?>> flags = flagDescriptors.stream()
+                    .map(this.flagAssembler()::assembleFlag)
+                    .collect(Collectors.toList());
+
             final Map<String, CommandComponent<C>> commandComponents = new HashMap<>();
             /* Go through all annotated parameters and build up the argument tree */
-            for (final ArgumentParameterPair argumentPair : arguments) {
-                final String argumentName = this.processString(argumentPair.argumentName());
+            for (final ArgumentDescriptor argumentPair : arguments) {
+                final String argumentName = this.processString(argumentPair.name());
                 final CommandComponent<C> component = this.buildComponent(
                         method,
-                        this.findSyntaxFragment(tokens, argumentName),
+                        this.findSyntaxFragment(commandDescriptor.syntax(), argumentName),
                         argumentPair
                 );
                 commandComponents.put(component.argument().getName(), component);
             }
             boolean commandNameFound = false;
             /* Build the command tree */
-            for (final SyntaxFragment token : tokens) {
+            for (final SyntaxFragment token : commandDescriptor.syntax()) {
                 if (!commandNameFound) {
                     commandNameFound = true;
                     continue;
@@ -615,8 +718,8 @@ public final class AnnotationParser<C> {
                 builder = builder.permission(this.processString(commandPermission.value()));
             }
 
-            if (commandMethod.requiredSender() != Object.class) {
-                builder = builder.senderType(commandMethod.requiredSender());
+            if (commandDescriptor.requiredSender() != Object.class) {
+                builder = builder.senderType(commandDescriptor.requiredSender());
             } else if (senderType != null) {
                 builder = builder.senderType(senderType);
             }
@@ -625,6 +728,8 @@ public final class AnnotationParser<C> {
                         new MethodCommandExecutionHandler.CommandMethodContext<>(
                                 instance,
                                 commandComponents,
+                                arguments,
+                                flagDescriptors,
                                 method,
                                 this /* annotationParser */
                         );
@@ -705,16 +810,16 @@ public final class AnnotationParser<C> {
     private @NonNull CommandComponent<C> buildComponent(
             final @NonNull Method method,
             final @Nullable SyntaxFragment syntaxFragment,
-            final @NonNull ArgumentParameterPair argumentPair
+            final @NonNull ArgumentDescriptor argumentDescriptor
     ) {
-        final Parameter parameter = argumentPair.getParameter();
+        final Parameter parameter = argumentDescriptor.parameter();
         final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
         final TypeToken<?> token = TypeToken.get(parameter.getParameterizedType());
         final ParserParameters parameters = this.manager.parserRegistry()
                 .parseAnnotations(token, annotations);
         /* Create the argument parser */
         final ArgumentParser<C, ?> parser;
-        if (argumentPair.getArgument().parserName().isEmpty()) {
+        if (argumentDescriptor.parserName() == null) {
             parser = this.manager.parserRegistry()
                     .createParser(token, parameters)
                     .orElseThrow(() -> new IllegalArgumentException(
@@ -726,7 +831,7 @@ public final class AnnotationParser<C> {
                             )));
         } else {
             parser = this.manager.parserRegistry()
-                    .createParser(this.processString(argumentPair.getArgument().parserName()), parameters)
+                    .createParser(this.processString(argumentDescriptor.parserName()), parameters)
                     .orElseThrow(() -> new IllegalArgumentException(
                             String.format("Parameter '%s' in method '%s' "
                                             + "has parser '%s' but no parser exists "
@@ -735,14 +840,13 @@ public final class AnnotationParser<C> {
                                     token.getType().getTypeName()
                             )));
         }
-        /* Check whether or not the corresponding method parameter actually exists */
-        final String argumentName = this.processString(argumentPair.argumentName());
+        /* Check whether the corresponding method parameter actually exists */
+        final String argumentName = this.processString(argumentDescriptor.name());
         if (syntaxFragment == null || syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
             throw new IllegalArgumentException(String.format(
                     "Invalid command argument '%s' in method '%s': "
                             + "Missing syntax mapping", argumentName, method.getName()));
         }
-        final Argument argument = argumentPair.getArgument();
         /* Create the argument builder */
         @SuppressWarnings("rawtypes") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
                 parameter.getType(),
@@ -755,8 +859,8 @@ public final class AnnotationParser<C> {
                     completions.value().replace(" ", "").split(",")
             ).map(Suggestion::simple).collect(Collectors.toList());
             argumentBuilder.withSuggestionProvider((commandContext, input) -> suggestions);
-        } else if (!argument.suggestions().isEmpty()) { /* Check whether a suggestion provider should be set */
-            final String suggestionProviderName = this.processString(argument.suggestions());
+        } else if (argumentDescriptor.suggestions() != null) {
+            final String suggestionProviderName = this.processString(argumentDescriptor.suggestions());
             final Optional<SuggestionProvider<C>> suggestionsFunction =
                     this.manager.parserRegistry().getSuggestionProvider(suggestionProviderName);
             argumentBuilder.withSuggestionProvider(
@@ -781,13 +885,19 @@ public final class AnnotationParser<C> {
             }
         }
 
-        final ArgumentDescription description = ArgumentDescription.of(this.processString(argumentPair.getArgument().description()));
+        final ArgumentDescription description;
+        if (argumentDescriptor.description() == null) {
+            description = ArgumentDescription.empty();
+        } else {
+            description = argumentDescriptor.description();
+        }
+
         if (syntaxFragment.getArgumentMode() == ArgumentMode.REQUIRED) {
             return CommandComponent.required(builtArgument, description);
-        } else if (argument.defaultValue().isEmpty()) {
+        } else if (argumentDescriptor.defaultValue() == null) {
             return CommandComponent.optional(builtArgument, description);
         } else {
-            return CommandComponent.optional(builtArgument, description, this.processString(argument.defaultValue()));
+            return CommandComponent.optional(builtArgument, description, this.processString(argumentDescriptor.defaultValue()));
         }
     }
 
