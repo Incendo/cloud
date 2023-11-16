@@ -48,6 +48,7 @@ fabricMinecraft = "1.19.4"
 fabricLoader = "0.14.22"
 fabricApi = "0.87.0+1.19.4"
 fabricPermissionsApi = "0.2-SNAPSHOT"
+minestom = "6c1946c"
 
 # testing
 jupiterEngine = "5.10.0"
@@ -106,6 +107,7 @@ velocityApi = { group = "com.velocitypowered", name = "velocity-api", version.re
 fabricMinecraft = { group = "com.mojang", name = "minecraft", version.ref = "fabricMinecraft" }
 fabricLoader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fabricLoader" }
 fabricPermissionsApi = { group = "me.lucko", name = "fabric-permissions-api", version.ref = "fabricPermissionsApi" }
+minestom = { group = "com.github.Minestom", name = "Minestom", version.ref = "minestom" }
 
 # testing
 jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiterEngine" }

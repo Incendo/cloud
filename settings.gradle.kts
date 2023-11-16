@@ -11,6 +11,7 @@ pluginManagement {
             name = "jmpSnapshots"
             mavenContent { snapshotsOnly() }
         }
+        maven("https://jitpack.io")
     }
     includeBuild("build-logic")
 }
