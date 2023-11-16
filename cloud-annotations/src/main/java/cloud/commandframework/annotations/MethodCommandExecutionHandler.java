@@ -34,9 +34,12 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -106,14 +109,21 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
     ) {
         final List<Object> arguments = new ArrayList<>(parameters.length);
         for (final Parameter parameter : parameters) {
-            if (parameter.isAnnotationPresent(Argument.class)) {
-                final Argument argument = parameter.getAnnotation(Argument.class);
+            final ArgumentDescriptor argumentDescriptor = this.context.argumentDescriptors.stream()
+                    .filter(descriptor -> descriptor.parameter().equals(parameter))
+                    .findFirst()
+                    .orElse(null);
+            final FlagDescriptor flagDescriptor = this.context.flagDescriptors.stream()
+                    .filter(descriptor -> descriptor.parameter().equals(parameter))
+                    .findFirst()
+                    .orElse(null);
 
+            if (argumentDescriptor != null) {
                 final String argumentName;
-                if (argument.value().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
+                if (argumentDescriptor.name().equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
                     argumentName = parameter.getName();
                 } else {
-                    argumentName = this.annotationParser.processString(argument.value());
+                    argumentName = this.annotationParser.processString(argumentDescriptor.name());
                 }
 
                 final CommandComponent<C> commandComponent = this.context.commandComponents.get(argumentName);
@@ -123,15 +133,13 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                     final Object optional = commandContext.getOptional(argumentName).orElse(null);
                     arguments.add(optional);
                 }
-            } else if (parameter.isAnnotationPresent(Flag.class)) {
-                final Flag flag = parameter.getAnnotation(Flag.class);
-                final String flagName = this.annotationParser.processString(flag.value());
+            } else if (flagDescriptor != null) {
                 if (parameter.getType().equals(boolean.class)) {
-                    arguments.add(flagContext.isPresent(flagName));
-                } else if (flag.repeatable() && parameter.getType().isAssignableFrom(List.class)) {
-                    arguments.add(flagContext.getAll(flagName));
+                    arguments.add(flagContext.isPresent(flagDescriptor.name()));
+                } else if (flagDescriptor.repeatable() && parameter.getType().isAssignableFrom(List.class)) {
+                    arguments.add(flagContext.getAll(flagDescriptor.name()));
                 } else {
-                    arguments.add(flagContext.getValue(flagName, null));
+                    arguments.add(flagContext.getValue(flagDescriptor.name(), null));
                 }
             } else {
                 if (parameter.getType().isAssignableFrom(commandContext.getSender().getClass())) {
@@ -144,6 +152,8 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
                     );
                     if (value.isPresent()) {
                         arguments.add(value.get());
+                    } else if (parameter.getType() == String.class) {
+                        arguments.add(parameter.getName());
                     } else {
                         throw new IllegalArgumentException(String.format(
                                 "Could not create value for parameter '%s' of type '%s' in method '%s'",
@@ -211,10 +221,14 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         private final Method method;
         private final ParameterInjectorRegistry<C> injectorRegistry;
         private final AnnotationParser<C> annotationParser;
+        private final Collection<@NonNull ArgumentDescriptor> argumentDescriptors;
+        private final Collection<@NonNull FlagDescriptor> flagDescriptors;
 
         CommandMethodContext(
                 final @NonNull Object instance,
                 final @NonNull Map<@NonNull String, @NonNull CommandComponent<C>> commandComponents,
+                final @NonNull Collection<@NonNull ArgumentDescriptor> argumentDescriptors,
+                final @NonNull Collection<@NonNull FlagDescriptor> flagDescriptors,
                 final @NonNull Method method,
                 final @NonNull AnnotationParser<C> annotationParser
         ) {
@@ -224,6 +238,8 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
             this.method.setAccessible(true);
             this.injectorRegistry = annotationParser.getParameterInjectorRegistry();
             this.annotationParser = annotationParser;
+            this.argumentDescriptors = argumentDescriptors;
+            this.flagDescriptors = flagDescriptors;
         }
 
         /**
@@ -274,6 +290,28 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
          */
         public @NonNull AnnotationParser<C> annotationParser() {
             return this.annotationParser;
+        }
+
+        /**
+         * Returns the argument descriptors
+         *
+         * @return the argument descriptors
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Collection<@NonNull ArgumentDescriptor> argumentDescriptors() {
+            return Collections.unmodifiableCollection(this.argumentDescriptors);
+        }
+
+        /**
+         * Returns the flag descriptors
+         *
+         * @return the flag descriptors
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Collection<@NonNull FlagDescriptor> flagDescriptors() {
+            return Collections.unmodifiableCollection(this.flagDescriptors);
         }
     }
 }
