@@ -56,7 +56,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
             final @NonNull Class<E> enumClass,
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new EnumParser<>(enumClass), enumClass, suggestionProvider, defaultDescription);
     }

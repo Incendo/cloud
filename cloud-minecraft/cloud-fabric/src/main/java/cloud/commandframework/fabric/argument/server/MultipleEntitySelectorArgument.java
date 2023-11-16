@@ -43,7 +43,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
     MultipleEntitySelectorArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

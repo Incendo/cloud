@@ -64,7 +64,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
     private LocationArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>,
                     @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {

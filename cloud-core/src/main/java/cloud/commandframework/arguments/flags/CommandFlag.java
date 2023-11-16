@@ -41,26 +41,27 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * and is identified by its name. Essentially, it's a mixture of a command literal
  * and an optional variable command argument.
  *
+ * @param <C> Command sender type.
  * @param <T> Command argument type. {@link Void} is used when no argument is present.
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public final class CommandFlag<T> {
+public final class CommandFlag<C, T> {
 
     private final @NonNull String name;
     private final @NonNull String @NonNull [] aliases;
-    private final @NonNull ArgumentDescription description;
+    private final @NonNull ArgumentDescription<?> description;
     private final @NonNull CommandPermission permission;
     private final @NonNull FlagMode mode;
 
-    private final @Nullable CommandArgument<?, T> commandArgument;
+    private final @Nullable CommandArgument<C, T> commandArgument;
 
     private CommandFlag(
             final @NonNull String name,
             final @NonNull String @NonNull [] aliases,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final @NonNull CommandPermission permission,
-            final @Nullable CommandArgument<?, T> commandArgument,
+            final @Nullable CommandArgument<C, T> commandArgument,
             final @NonNull FlagMode mode
     ) {
         this.name = Objects.requireNonNull(name, "name cannot be null");
@@ -74,25 +75,13 @@ public final class CommandFlag<T> {
     /**
      * Create a new {@link Builder}.
      *
+     * @param <C> command sender type
      * @param name flag name
      * @return new {@link Builder}
      * @since 1.8.0
      */
     @API(status = API.Status.STABLE, since = "1.8.0")
-    public static @NonNull Builder<Void> builder(final @NonNull String name) {
-        return new Builder<>(name);
-    }
-
-    /**
-     * Create a new flag builder
-     *
-     * @param name Flag name
-     * @return Flag builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static @NonNull Builder<Void> newBuilder(final @NonNull String name) {
+    public static <C> @NonNull Builder<C, Void> builder(final @NonNull String name) {
         return new Builder<>(name);
     }
 
@@ -125,29 +114,13 @@ public final class CommandFlag<T> {
     }
 
     /**
-     * Get the flag description
-     *
-     * @return Flag description
-     * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public cloud.commandframework.@NonNull Description getDescription() {
-        if (this.description instanceof cloud.commandframework.Description) {
-            return ((cloud.commandframework.Description) this.description);
-        } else {
-            return cloud.commandframework.Description.of(this.description.getDescription());
-        }
-    }
-
-    /**
      * Get the flag description.
      *
      * @return Flag description
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @NonNull ArgumentDescription getArgumentDescription() {
+    public @NonNull ArgumentDescription<?> getArgumentDescription() {
         return this.description;
     }
 
@@ -184,7 +157,7 @@ public final class CommandFlag<T> {
         if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
-        final CommandFlag<?> that = (CommandFlag<?>) o;
+        final CommandFlag<?, ?> that = (CommandFlag<?, ?>) o;
         return this.getName().equals(that.getName());
     }
 
@@ -195,21 +168,21 @@ public final class CommandFlag<T> {
 
 
     @API(status = API.Status.STABLE)
-    public static final class Builder<T> {
+    public static final class Builder<C, T> {
 
         private final String name;
         private final String[] aliases;
-        private final ArgumentDescription description;
+        private final ArgumentDescription<C> description;
         private final CommandPermission permission;
-        private final CommandArgument<?, T> commandArgument;
+        private final CommandArgument<C, T> commandArgument;
         private final FlagMode mode;
 
         private Builder(
                 final @NonNull String name,
                 final @NonNull String[] aliases,
-                final @NonNull ArgumentDescription description,
+                final @NonNull ArgumentDescription<C> description,
                 final @NonNull CommandPermission permission,
-                final @Nullable CommandArgument<?, T> commandArgument,
+                final @Nullable CommandArgument<C, T> commandArgument,
                 final @NonNull FlagMode mode
         ) {
             this.name = name;
@@ -231,7 +204,7 @@ public final class CommandFlag<T> {
          * @param aliases Flag aliases
          * @return New builder instance
          */
-        public @NonNull Builder<T> withAliases(final @NonNull String... aliases) {
+        public @NonNull Builder<C, T> withAliases(final @NonNull String... aliases) {
             return this.withAliases(Arrays.asList(aliases));
         }
 
@@ -244,7 +217,7 @@ public final class CommandFlag<T> {
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
-        public @NonNull Builder<T> withAliases(final @NonNull Collection<@NonNull String> aliases) {
+        public @NonNull Builder<C, T> withAliases(final @NonNull Collection<@NonNull String> aliases) {
             final Set<String> filteredAliases = new HashSet<>();
             for (final String alias : aliases) {
                 if (alias.isEmpty()) {
@@ -275,23 +248,10 @@ public final class CommandFlag<T> {
          *
          * @param description Flag description
          * @return New builder instance
-         * @deprecated for removal since 1.4.0. Use {@link #withDescription(ArgumentDescription)} instead.
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public @NonNull Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
-            return this.withDescription((ArgumentDescription) description);
-        }
-
-        /**
-         * Create a new builder instance using the given flag description
-         *
-         * @param description Flag description
-         * @return New builder instance
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
-        public @NonNull Builder<T> withDescription(final @NonNull ArgumentDescription description) {
+        public @NonNull Builder<C, T> withDescription(final @NonNull ArgumentDescription<C> description) {
             return new Builder<>(this.name, this.aliases, description, this.permission, this.commandArgument, this.mode);
         }
 
@@ -302,7 +262,7 @@ public final class CommandFlag<T> {
          * @param <N>      New argument type
          * @return New builder instance
          */
-        public <N> @NonNull Builder<N> withArgument(final @NonNull CommandArgument<?, N> argument) {
+        public <N> @NonNull Builder<C, N> withArgument(final @NonNull CommandArgument<C, N> argument) {
             return new Builder<>(this.name, this.aliases, this.description, this.permission, argument, this.mode);
         }
 
@@ -313,7 +273,7 @@ public final class CommandFlag<T> {
          * @param <N>     New argument type
          * @return New builder instance
          */
-        public <N> @NonNull Builder<N> withArgument(final CommandArgument.@NonNull Builder<?, N> builder) {
+        public <N> @NonNull Builder<C, N> withArgument(final CommandArgument.@NonNull Builder<C, N> builder) {
             return this.withArgument(builder.build());
         }
 
@@ -325,7 +285,7 @@ public final class CommandFlag<T> {
          * @since 1.6.0
          */
         @API(status = API.Status.STABLE, since = "1.6.0")
-        public @NonNull Builder<T> withPermission(final @NonNull CommandPermission permission) {
+        public @NonNull Builder<C, T> withPermission(final @NonNull CommandPermission permission) {
             return new Builder<>(this.name, this.aliases, this.description, permission, this.commandArgument, this.mode);
         }
 
@@ -336,7 +296,7 @@ public final class CommandFlag<T> {
          * @since 1.7.0
          */
         @API(status = API.Status.STABLE, since = "1.7.0")
-        public @NonNull Builder<T> asRepeatable() {
+        public @NonNull Builder<C, T> asRepeatable() {
             return new Builder<>(
                     this.name,
                     this.aliases,
@@ -352,7 +312,7 @@ public final class CommandFlag<T> {
          *
          * @return Constructed instance
          */
-        public @NonNull CommandFlag<T> build() {
+        public @NonNull CommandFlag<C, T> build() {
             return new CommandFlag<>(
                     this.name,
                     this.aliases,

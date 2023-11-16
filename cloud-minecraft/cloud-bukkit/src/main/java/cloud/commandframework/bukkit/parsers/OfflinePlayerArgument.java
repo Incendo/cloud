@@ -59,7 +59,7 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
     private OfflinePlayerArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

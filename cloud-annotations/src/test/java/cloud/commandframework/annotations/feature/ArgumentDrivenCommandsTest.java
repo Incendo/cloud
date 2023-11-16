@@ -79,13 +79,13 @@ class ArgumentDrivenCommandsTest {
         this.commandManager.executeCommand(new TestCommandSender(), "test 3 literal").get();
     }
 
-    private static class TestArgumentExtractor implements ArgumentExtractor {
+    private static class TestArgumentExtractor implements ArgumentExtractor<TestCommandSender> {
         @Override
-        public @NonNull Collection<@NonNull ArgumentDescriptor> extractArguments(
+        public @NonNull Collection<@NonNull ArgumentDescriptor<TestCommandSender>> extractArguments(
                 final @NonNull List<@NonNull SyntaxFragment> syntax,
                 final @NonNull Method method
         ) {
-            final Collection<ArgumentDescriptor> arguments = new ArrayList<>();
+            final Collection<ArgumentDescriptor<TestCommandSender>> arguments = new ArrayList<>();
             for (final Parameter parameter : method.getParameters()) {
                 if (!parameter.isAnnotationPresent(Argument.class)) {
                     continue;
@@ -94,7 +94,7 @@ class ArgumentDrivenCommandsTest {
                 if (argument.literal()) {
                     continue;
                 }
-                final ArgumentDescriptor argumentDescriptor = ArgumentDescriptor.builder()
+                final ArgumentDescriptor<TestCommandSender> argumentDescriptor = ArgumentDescriptor.<TestCommandSender>builder()
                         .parameter(parameter)
                         .name(AnnotationParser.INFERRED_ARGUMENT_NAME)
                         .build();

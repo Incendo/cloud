@@ -70,7 +70,7 @@ public final class ItemStackArgument<C> extends CommandArgument<C, ProtoItemStac
     private ItemStackArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new Parser<>(), ProtoItemStack.class, suggestionProvider, defaultDescription);
     }

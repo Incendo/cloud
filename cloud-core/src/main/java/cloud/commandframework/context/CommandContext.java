@@ -61,7 +61,7 @@ public class CommandContext<C> {
 
     private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
     private final List<ArgumentContext<C, ?>> argumentContexts = new LinkedList<>();
-    private final FlagContext flagContext = FlagContext.create();
+    private final FlagContext<C> flagContext = FlagContext.create();
     private final Map<CloudKey<?>, Object> internalStorage = new HashMap<>();
     private final C commandSender;
     private final boolean suggestions;
@@ -711,7 +711,7 @@ public class CommandContext<C> {
      *
      * @return Flag context
      */
-    public @NonNull FlagContext flags() {
+    public @NonNull FlagContext<C> flags() {
         return this.flagContext;
     }
 

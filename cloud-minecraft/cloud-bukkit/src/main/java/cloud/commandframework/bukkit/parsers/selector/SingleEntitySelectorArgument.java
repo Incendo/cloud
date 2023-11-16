@@ -45,7 +45,7 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
     private SingleEntitySelectorArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

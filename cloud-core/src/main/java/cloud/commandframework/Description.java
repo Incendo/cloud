@@ -23,23 +23,12 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
+import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * {@link CommandArgument} description
- *
- * @deprecated to become package-private since 1.4.0. Use {@link ArgumentDescription} instead.
- */
-@Deprecated
-@API(status = API.Status.DEPRECATED, since = "1.4.0")
-public final class Description implements ArgumentDescription {
-
-    /**
-     * Empty command description
-     */
-    static final Description EMPTY = new Description("");
+@API(status = API.Status.INTERNAL, since = "1.4.0")
+final class Description<C> implements ArgumentDescription<C> {
 
     private final String description;
 
@@ -47,46 +36,30 @@ public final class Description implements ArgumentDescription {
         this.description = description;
     }
 
-    /**
-     * Get an empty command description
-     *
-     * @return Command description
-     * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#empty()}
-     */
-    @Deprecated
-    public static @NonNull Description empty() {
-        return EMPTY;
-    }
-
-    /**
-     * Create a command description instance
-     *
-     * @param string Command description
-     * @return Created command description
-     * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#of(String)}
-     */
-    @Deprecated
-    public static @NonNull Description of(final @NonNull String string) {
-        return new Description(string);
-    }
-
-    /**
-     * Get the command description
-     *
-     * @return Command description
-     */
     @Override
-    public @NonNull String getDescription() {
+    public @NonNull String description(final @NonNull C commandSender) {
         return this.description;
     }
 
-    /**
-     * Get the command description
-     *
-     * @return Command description
-     */
     @Override
     public @NonNull String toString() {
         return this.description;
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        final Description<?> that = (Description<?>) object;
+        return Objects.equals(this.description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.description);
     }
 }

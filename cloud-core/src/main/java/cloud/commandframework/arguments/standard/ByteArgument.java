@@ -51,7 +51,7 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
             final byte min,
             final byte max,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new ByteParser<>(min, max), Byte.class, suggestionProvider, defaultDescription);
         this.min = min;

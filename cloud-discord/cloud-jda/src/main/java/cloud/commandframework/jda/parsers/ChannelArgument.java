@@ -55,7 +55,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
     private ChannelArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
         super(

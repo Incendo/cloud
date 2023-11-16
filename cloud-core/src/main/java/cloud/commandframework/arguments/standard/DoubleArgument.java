@@ -50,7 +50,7 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
             final double min,
             final double max,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new DoubleParser<>(min, max), Double.class, suggestionProvider, defaultDescription);
         this.min = min;

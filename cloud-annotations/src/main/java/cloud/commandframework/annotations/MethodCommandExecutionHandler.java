@@ -104,12 +104,12 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
      */
     protected final List<Object> createParameterValues(
             final CommandContext<C> commandContext,
-            final FlagContext flagContext,
+            final FlagContext<C> flagContext,
             final Parameter[] parameters
     ) {
         final List<Object> arguments = new ArrayList<>(parameters.length);
         for (final Parameter parameter : parameters) {
-            final ArgumentDescriptor argumentDescriptor = this.context.argumentDescriptors.stream()
+            final ArgumentDescriptor<C> argumentDescriptor = this.context.argumentDescriptors.stream()
                     .filter(descriptor -> descriptor.parameter().equals(parameter))
                     .findFirst()
                     .orElse(null);
@@ -221,13 +221,13 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
         private final Method method;
         private final ParameterInjectorRegistry<C> injectorRegistry;
         private final AnnotationParser<C> annotationParser;
-        private final Collection<@NonNull ArgumentDescriptor> argumentDescriptors;
+        private final Collection<@NonNull ArgumentDescriptor<C>> argumentDescriptors;
         private final Collection<@NonNull FlagDescriptor> flagDescriptors;
 
         CommandMethodContext(
                 final @NonNull Object instance,
                 final @NonNull Map<@NonNull String, @NonNull CommandComponent<C>> commandComponents,
-                final @NonNull Collection<@NonNull ArgumentDescriptor> argumentDescriptors,
+                final @NonNull Collection<@NonNull ArgumentDescriptor<C>> argumentDescriptors,
                 final @NonNull Collection<@NonNull FlagDescriptor> flagDescriptors,
                 final @NonNull Method method,
                 final @NonNull AnnotationParser<C> annotationParser
@@ -299,7 +299,7 @@ public class MethodCommandExecutionHandler<C> implements CommandExecutionHandler
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
-        public @NonNull Collection<@NonNull ArgumentDescriptor> argumentDescriptors() {
+        public @NonNull Collection<@NonNull ArgumentDescriptor<C>> argumentDescriptors() {
             return Collections.unmodifiableCollection(this.argumentDescriptors);
         }
 

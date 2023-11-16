@@ -53,7 +53,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
     private UserArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

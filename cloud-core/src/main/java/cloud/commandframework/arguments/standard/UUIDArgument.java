@@ -47,7 +47,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
     private UUIDArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new UUIDParser<>(), UUID.class, suggestionProvider, defaultDescription);
     }

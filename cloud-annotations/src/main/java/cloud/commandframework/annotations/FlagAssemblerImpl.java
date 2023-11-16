@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class FlagAssemblerImpl implements FlagAssembler {
+final class FlagAssemblerImpl<C> implements FlagAssembler<C> {
 
     private final CommandManager<?> commandManager;
 
@@ -49,7 +49,7 @@ final class FlagAssemblerImpl implements FlagAssembler {
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public @NonNull CommandFlag<?> assembleFlag(@NonNull final FlagDescriptor descriptor) {
+    public @NonNull CommandFlag<C, ?> assembleFlag(@NonNull final FlagDescriptor descriptor) {
         final ArgumentDescription description;
         if (descriptor.description() == null) {
             description = ArgumentDescription.empty();
@@ -64,7 +64,7 @@ final class FlagAssemblerImpl implements FlagAssembler {
             permission = descriptor.permission();
         }
 
-        CommandFlag.Builder<Void> builder = this.commandManager
+        CommandFlag.Builder<C, Void> builder = this.commandManager
                 .flagBuilder(descriptor.name())
                 .withDescription(description)
                 .withAliases(descriptor.aliases())

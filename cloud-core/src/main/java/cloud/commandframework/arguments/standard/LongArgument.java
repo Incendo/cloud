@@ -51,7 +51,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
             final long min,
             final long max,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new LongParser<>(min, max), Long.class, suggestionProvider, defaultDescription);
         this.min = min;

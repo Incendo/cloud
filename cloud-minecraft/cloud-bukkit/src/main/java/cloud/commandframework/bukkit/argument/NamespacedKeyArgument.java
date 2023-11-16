@@ -55,7 +55,7 @@ public final class NamespacedKeyArgument<C> extends CommandArgument<C, Namespace
     private NamespacedKeyArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final boolean requireExplicitNamespace,
             final String defaultNamespace
     ) {

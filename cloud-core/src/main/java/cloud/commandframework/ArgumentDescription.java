@@ -32,49 +32,52 @@ import static java.util.Objects.requireNonNull;
 /**
  * A description for a {@link CommandArgument}
  *
+ * @param <C> command sender
  * @since 1.4.0
  */
 @API(status = API.Status.STABLE, since = "1.4.0")
-public interface ArgumentDescription {
+public interface ArgumentDescription<C> {
 
     /**
      * Get an empty command description.
      *
+     * @param <C> command sender type
      * @return Command description
      */
-    @SuppressWarnings("deprecation")
-    static @NonNull ArgumentDescription empty() {
-        return Description.EMPTY;
+    static <C> @NonNull ArgumentDescription<C> empty() {
+        return new Description<>("");
     }
 
     /**
      * Create a command description instance.
      *
+     * @param <C> command sender type
      * @param string Command description
      * @return Created command description
      */
-    @SuppressWarnings("deprecation")
-    static @NonNull ArgumentDescription of(final @NonNull String string) {
+    static <C> @NonNull ArgumentDescription<C> of(final @NonNull String string) {
         if (requireNonNull(string, "string").isEmpty()) {
-            return Description.EMPTY;
+            return empty();
         } else {
-            return new Description(string);
+            return new Description<>(string);
         }
     }
 
     /**
      * Get the plain-text description.
      *
+     * @param commandSender the command sender that is viewing the description
      * @return Command description
      */
-    @NonNull String getDescription();
+    @NonNull String description(@NonNull C commandSender);
 
     /**
-     * Get whether or not this description contains contents.
+     * Get whether this description contains contents.
      *
+     * @param commandSender the command sender that is viewing the description
      * @return if this description is empty or not
      */
-    default boolean isEmpty() {
-        return this.getDescription().isEmpty();
+    default boolean isEmpty(@NonNull C commandSender) {
+        return this.description(commandSender).isEmpty();
     }
 }

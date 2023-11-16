@@ -45,7 +45,7 @@ public final class FlagDescriptor {
     private final String parserName;
     private final String suggestions;
     private final CommandPermission permission;
-    private final ArgumentDescription description;
+    private final ArgumentDescription<?> description;
     private final boolean repeatable;
 
     /**
@@ -64,7 +64,7 @@ public final class FlagDescriptor {
             final @Nullable String parserName,
             final @Nullable String suggestions,
             final @Nullable CommandPermission permission,
-            final @Nullable ArgumentDescription description,
+            final @Nullable ArgumentDescription<?> description,
             final boolean repeatable
     ) {
         this.parameter = parameter;
@@ -146,7 +146,7 @@ public final class FlagDescriptor {
      *
      * @return the flag description, or {@code null}
      */
-    public @Nullable ArgumentDescription description() {
+    public @Nullable ArgumentDescription<?> description() {
         return this.description;
     }
 
@@ -202,7 +202,7 @@ public final class FlagDescriptor {
         private final String parserName;
         private final String suggestions;
         private final CommandPermission permission;
-        private final ArgumentDescription description;
+        private final ArgumentDescription<?> description;
         private final boolean repeatable;
 
         private Builder(
@@ -212,7 +212,7 @@ public final class FlagDescriptor {
                 final @Nullable String parserName,
                 final @Nullable String suggestions,
                 final @Nullable CommandPermission permission,
-                final @Nullable ArgumentDescription description,
+                final @Nullable ArgumentDescription<?> description,
                 final boolean repeatable
         ) {
             this.parameter = parameter;
@@ -364,7 +364,7 @@ public final class FlagDescriptor {
          * @param description the new description
          * @return the builder containing the updated description
          */
-        public @NonNull Builder description(final @Nullable ArgumentDescription description) {
+        public @NonNull Builder description(final @Nullable ArgumentDescription<?> description) {
             return new Builder(
                     this.parameter,
                     this.name,

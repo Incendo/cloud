@@ -609,42 +609,13 @@ public abstract class CommandManager<C> {
      * @param description Description for the root literal
      * @param meta        Command meta
      * @return Builder instance
-     * @deprecated for removal since 1.4.0. Use
-     *         {@link #commandBuilder(String, Collection, ArgumentDescription, CommandMeta)} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull Collection<String> aliases,
-            final @NonNull Description description,
-            final @NonNull CommandMeta meta
-    ) {
-        return this.commandBuilder(name, aliases, (ArgumentDescription) description, meta);
-    }
-
-    /**
-     * Create a new command builder. This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name        Command name
-     * @param aliases     Command aliases
-     * @param description Description for the root literal
-     * @param meta        Command meta
-     * @return Builder instance
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull Collection<String> aliases,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final @NonNull CommandMeta meta
     ) {
         return Command.<C>newBuilder(
@@ -700,42 +671,13 @@ public abstract class CommandManager<C> {
      * @param description Description for the root literal
      * @param aliases     Command aliases
      * @return Builder instance
-     * @deprecated for removal since 1.4.0. Use {@link #commandBuilder(String, CommandMeta, ArgumentDescription, String...)}
-     *         instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull CommandMeta meta,
-            final @NonNull Description description,
-            final @NonNull String... aliases
-    ) {
-        return this.commandBuilder(name, meta, (ArgumentDescription) description, aliases);
-    }
-
-    /**
-     * Create a new command builder. This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name        Command name
-     * @param meta        Command meta
-     * @param description Description for the root literal
-     * @param aliases     Command aliases
-     * @return Builder instance
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
             final @NonNull CommandMeta meta,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final @NonNull String... aliases
     ) {
         return Command.<C>newBuilder(
@@ -794,42 +736,12 @@ public abstract class CommandManager<C> {
      * @return Builder instance
      * @throws UnsupportedOperationException If the command manager does not support default command meta creation
      * @see #createDefaultCommandMeta() Default command meta creation
-     * @deprecated for removal since 1.4.0. Use {@link #commandBuilder(String, ArgumentDescription, String...)} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public Command.@NonNull Builder<C> commandBuilder(
-            final @NonNull String name,
-            final @NonNull Description description,
-            final @NonNull String... aliases
-    ) {
-        return this.commandBuilder(name, (ArgumentDescription) description, aliases);
-    }
-
-    /**
-     * Create a new command builder using default command meta created by {@link #createDefaultCommandMeta()}.
-     * <p>
-     * This will also register the creating manager in the command
-     * builder using {@link Command.Builder#manager(CommandManager)}, so that the command
-     * builder is associated with the creating manager. This allows for parser inference based on
-     * the type, with the help of the {@link ParserRegistry parser registry}
-     * <p>
-     * This method will not register the command in the manager. To do that, {@link #command(Command.Builder)}
-     * or {@link #command(Command)} has to be invoked with either the {@link Command.Builder} instance, or the constructed
-     * {@link Command command} instance
-     *
-     * @param name        Command name
-     * @param description Description for the root literal
-     * @param aliases     Command aliases
-     * @return Builder instance
-     * @throws UnsupportedOperationException If the command manager does not support default command meta creation
-     * @see #createDefaultCommandMeta() Default command meta creation
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public Command.@NonNull Builder<C> commandBuilder(
             final @NonNull String name,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final @NonNull String... aliases
     ) {
         return Command.<C>newBuilder(
@@ -896,7 +808,7 @@ public abstract class CommandManager<C> {
      * @param name Flag name
      * @return Flag builder
      */
-    public CommandFlag.@NonNull Builder<Void> flagBuilder(final @NonNull String name) {
+    public CommandFlag.@NonNull Builder<C, Void> flagBuilder(final @NonNull String name) {
         return CommandFlag.builder(name);
     }
 

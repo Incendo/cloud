@@ -24,7 +24,6 @@
 package cloud.commandframework.fabric.testmod;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.fabric.FabricClientCommandManager;
@@ -129,7 +128,7 @@ public final class FabricClientExample implements ClientModInitializer {
 
         commandManager.command(base.literal("flag_test")
                 .optional(StringArgument.of("parameter"))
-                .flag(CommandFlag.builder("flag").withAliases("f"))
+                .flag(commandManager.flagBuilder("flag").withAliases("f"))
                 .handler(ctx -> ctx.getSender().sendFeedback(Component.literal("Had flag: " + ctx.flags().isPresent("flag")))));
     }
 

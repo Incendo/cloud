@@ -51,7 +51,7 @@ public final class StringArrayArgument<C> extends CommandArgument<C, String[]> {
     private StringArrayArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final boolean flagYielding
     ) {
         super(

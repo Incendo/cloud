@@ -55,7 +55,7 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
     private PlayerArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new PlayerParser<>(), Player.class, suggestionProvider, defaultDescription);
     }

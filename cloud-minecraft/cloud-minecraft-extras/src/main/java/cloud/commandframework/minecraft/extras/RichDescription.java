@@ -35,11 +35,10 @@ import static java.util.Objects.requireNonNull;
 /**
  * An argument description implementation that uses Adventure components.
  *
+ * @param <C> command sender type
  * @since 1.4.0
  */
-public final class RichDescription implements ArgumentDescription {
-
-    private static final RichDescription EMPTY = new RichDescription(Component.empty());
+public final class RichDescription<C> implements ArgumentDescription<C> {
 
     private final Component contents;
 
@@ -50,25 +49,27 @@ public final class RichDescription implements ArgumentDescription {
     /**
      * Get an empty description.
      *
+     * @param <C> command sender type
      * @return the empty description
      */
-    public static @NonNull RichDescription empty() {
-        return EMPTY;
+    public static <C> @NonNull RichDescription<C> empty() {
+        return of(Component.empty());
     }
 
     /**
      * Create a new rich description from the provided component.
      *
+     * @param <C> command sender type
      * @param contents the rich contents
      * @return a new rich description
      */
-    public static @NonNull RichDescription of(final @NonNull ComponentLike contents) {
+    public static <C> @NonNull RichDescription<C> of(final @NonNull ComponentLike contents) {
         final Component componentContents = requireNonNull(contents, "contents").asComponent();
         if (Component.empty().equals(componentContents)) {
-            return EMPTY;
+            return empty();
         }
 
-        return new RichDescription(componentContents);
+        return new RichDescription<>(componentContents);
     }
 
     /* Translatable helper methods */
@@ -76,30 +77,32 @@ public final class RichDescription implements ArgumentDescription {
     /**
      * Create a rich description pointing to a translation key.
      *
+     * @param <C> command sender type
      * @param key the translation key
      * @return a new rich description
      */
-    public static @NonNull RichDescription translatable(final @NonNull String key) {
+    public static <C> @NonNull RichDescription<C> translatable(final @NonNull String key) {
         requireNonNull(key, "key");
 
-        return new RichDescription(Component.translatable(key));
+        return new RichDescription<>(Component.translatable(key));
     }
 
     /**
      * Create a rich description pointing to a translation key.
      *
+     * @param <C> command sender type
      * @param key  the translation key
      * @param args the arguments to use with the translation key
      * @return a new rich description
      */
-    public static @NonNull RichDescription translatable(
+    public static <C> @NonNull RichDescription<C> translatable(
             final @NonNull String key,
             final @NonNull ComponentLike @NonNull... args
     ) {
         requireNonNull(key, "key");
         requireNonNull(args, "args");
 
-        return new RichDescription(Component.translatable(key, args));
+        return new RichDescription<>(Component.translatable(key, args));
     }
 
     /**
@@ -110,7 +113,7 @@ public final class RichDescription implements ArgumentDescription {
      */
     @Override
     @Deprecated
-    public @NonNull String getDescription() {
+    public @NonNull String description(final @NonNull C commandSender) {
         return net.kyori.adventure.text.serializer.plain.PlainComponentSerializer.plain()
                 .serialize(GlobalTranslator.render(this.contents, Locale.getDefault()));
     }
@@ -125,7 +128,7 @@ public final class RichDescription implements ArgumentDescription {
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty(final @NonNull C commandSender) {
         return Component.empty().equals(this.contents);
     }
 }

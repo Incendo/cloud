@@ -56,16 +56,16 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @Nullable CommandNode<C> node
     ) {
-        final FormattingInstance formattingInstance = this.createInstance();
+        final FormattingInstance<C> formattingInstance = this.createInstance();
         final Iterator<CommandComponent<C>> iterator = commandComponents.iterator();
         while (iterator.hasNext()) {
             final CommandComponent<C> commandComponent = iterator.next();
             if (commandComponent.argument() instanceof StaticArgument) {
                 formattingInstance.appendLiteral((StaticArgument<C>) commandComponent.argument());
             } else if (commandComponent.argument() instanceof CompoundArgument) {
-                formattingInstance.appendCompound(commandComponent, (CompoundArgument<?, ?, ?>) commandComponent.argument());
+                formattingInstance.appendCompound(commandComponent, (CompoundArgument<?, C, ?>) commandComponent.argument());
             } else if (commandComponent.argument() instanceof FlagArgument) {
-                formattingInstance.appendFlag((FlagArgument<?>) commandComponent.argument());
+                formattingInstance.appendFlag((FlagArgument<C>) commandComponent.argument());
             } else {
                 if (commandComponent.required()) {
                     formattingInstance.appendRequired(commandComponent.argument());
@@ -102,13 +102,13 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             final CommandComponent<C> component = tail.children().get(0).component();
             if (component.argument() instanceof CompoundArgument) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendCompound(component, (CompoundArgument<?, ?, ?>) component.argument());
+                formattingInstance.appendCompound(component, (CompoundArgument<?, C, ?>) component.argument());
             } else if (component.argument() instanceof FlagArgument) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendFlag((FlagArgument<?>) component.argument());
+                formattingInstance.appendFlag((FlagArgument<C>) component.argument());
             } else if (component.argument() instanceof StaticArgument) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendLiteral((StaticArgument<?>) component.argument());
+                formattingInstance.appendLiteral((StaticArgument<C>) component.argument());
             } else {
                 formattingInstance.appendBlankSpace();
                 if (component.required()) {
@@ -127,16 +127,18 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
      *
      * @return Formatting instance
      */
-    protected @NonNull FormattingInstance createInstance() {
-        return new FormattingInstance();
+    protected @NonNull FormattingInstance<C> createInstance() {
+        return new FormattingInstance<>();
     }
 
 
     /**
      * Instance that is used when building command syntax
+     *
+     * @param <C> command sender type
      */
     @API(status = API.Status.STABLE)
-    public static class FormattingInstance {
+    public static class FormattingInstance<C> {
 
         private final StringBuilder builder;
 
@@ -193,15 +195,15 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @param flagArgument Flag argument
          */
-        public void appendFlag(final @NonNull FlagArgument<?> flagArgument) {
+        public void appendFlag(final @NonNull FlagArgument<C> flagArgument) {
             this.builder.append(this.getOptionalPrefix());
 
-            final Iterator<CommandFlag<?>> flagIterator = flagArgument
+            final Iterator<CommandFlag<C, ?>> flagIterator = flagArgument
                     .getFlags()
                     .iterator();
 
             while (flagIterator.hasNext()) {
-                final CommandFlag<?> flag = flagIterator.next();
+                final CommandFlag<C, ?> flag = flagIterator.next();
                 this.appendName(String.format("--%s", flag.getName()));
 
                 if (flag.getCommandArgument() != null) {

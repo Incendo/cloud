@@ -68,7 +68,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final @NonNull ResourceKey<? extends Registry<V>> registry,
             final @NonNull TypeToken<V> valueType,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

@@ -52,7 +52,7 @@ public final class SinglePlayerSelectorArgument<C> extends CommandArgument<C, Si
     private SinglePlayerSelectorArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

@@ -51,7 +51,7 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
     protected MaterialArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new MaterialParser<>(), Material.class, suggestionProvider, defaultDescription);
     }

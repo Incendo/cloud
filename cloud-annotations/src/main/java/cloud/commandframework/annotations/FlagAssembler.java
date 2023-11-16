@@ -30,10 +30,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Assembles {@link CommandFlag flags} from {@link FlagDescriptor flag descriptors}.
  *
+ * @param <C> command sender type
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface FlagAssembler {
+public interface FlagAssembler<C> {
 
     /**
      * Assembles a flag from the given {@code descriptor}.
@@ -41,5 +42,5 @@ public interface FlagAssembler {
      * @param descriptor the descriptor
      * @return the assembled flag
      */
-    @NonNull CommandFlag<?> assembleFlag(@NonNull FlagDescriptor descriptor);
+    @NonNull CommandFlag<C, ?> assembleFlag(@NonNull FlagDescriptor descriptor);
 }

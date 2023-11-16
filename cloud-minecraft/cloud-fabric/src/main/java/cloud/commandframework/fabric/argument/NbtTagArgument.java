@@ -42,7 +42,7 @@ public final class NbtTagArgument<C> extends CommandArgument<C, Tag> {
     NbtTagArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

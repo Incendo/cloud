@@ -32,10 +32,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 /**
  * Extracts {@link ArgumentDescriptor argument descriptors} from {@link Method methods}.
  *
+ * @param <C> command sender type
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface ArgumentExtractor {
+public interface ArgumentExtractor<C> {
 
     /**
      * Extracts the arguments from the given {@code method}.
@@ -44,7 +45,7 @@ public interface ArgumentExtractor {
      * @param method the method
      * @return the extracted arguments
      */
-    @NonNull Collection<@NonNull ArgumentDescriptor> extractArguments(
+    @NonNull Collection<@NonNull ArgumentDescriptor<C>> extractArguments(
             @NonNull List<@NonNull SyntaxFragment> syntax,
             @NonNull Method method
     );

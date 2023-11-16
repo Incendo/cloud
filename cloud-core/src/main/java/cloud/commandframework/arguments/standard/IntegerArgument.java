@@ -58,7 +58,7 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
             final int min,
             final int max,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

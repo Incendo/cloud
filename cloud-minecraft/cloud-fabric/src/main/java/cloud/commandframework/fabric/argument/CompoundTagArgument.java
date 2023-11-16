@@ -42,7 +42,7 @@ public final class CompoundTagArgument<C> extends CommandArgument<C, CompoundTag
     CompoundTagArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

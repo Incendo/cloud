@@ -45,7 +45,7 @@ public final class ScoreboardOperationArgument<C> extends CommandArgument<C, Ope
     ScoreboardOperationArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
@@ -247,7 +246,7 @@ class CommandHelpHandlerTest {
         while (iterator.hasNext()) {
             final CommandComponent<TestCommandSender> component = iterator.next();
 
-            String description = component.argumentDescription().getDescription();
+            String description = component.argumentDescription().description(new TestCommandSender());
             if (!description.isEmpty()) {
                 description = ": " + description;
             }

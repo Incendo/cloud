@@ -42,7 +42,7 @@ public final class MessageArgument<C> extends CommandArgument<C, Message> {
     MessageArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

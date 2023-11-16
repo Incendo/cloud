@@ -33,30 +33,26 @@ import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-/**
- * Utility that extract {@link Argument arguments} from
- * {@link java.lang.reflect.Method method} {@link java.lang.reflect.Parameter parameters}
- */
-class ArgumentExtractorImpl implements ArgumentExtractor {
+class ArgumentExtractorImpl<C> implements ArgumentExtractor<C> {
 
-    private final Function<@NonNull Argument, @Nullable ArgumentDescription> descriptionMapper;
+    private final Function<@NonNull Argument, @Nullable ArgumentDescription<C>> descriptionMapper;
 
     ArgumentExtractorImpl() {
         this.descriptionMapper = argument -> ArgumentDescription.of(argument.description());
     }
 
     @Override
-    public @NonNull Collection<@NonNull ArgumentDescriptor> extractArguments(
+    public @NonNull Collection<@NonNull ArgumentDescriptor<C>> extractArguments(
             final @NonNull List<@NonNull SyntaxFragment> syntax,
             final @NonNull Method method
     ) {
-        final Collection<ArgumentDescriptor> arguments = new ArrayList<>();
+        final Collection<ArgumentDescriptor<C>> arguments = new ArrayList<>();
         for (final Parameter parameter : method.getParameters()) {
             if (!parameter.isAnnotationPresent(Argument.class)) {
                 continue;
             }
             final Argument argument = parameter.getAnnotation(Argument.class);
-            final ArgumentDescriptor argumentDescriptor = ArgumentDescriptor.builder()
+            final ArgumentDescriptor<C> argumentDescriptor = ArgumentDescriptor.<C>builder()
                     .parameter(parameter)
                     .name(argument.value())
                     .parserName(argument.parserName())

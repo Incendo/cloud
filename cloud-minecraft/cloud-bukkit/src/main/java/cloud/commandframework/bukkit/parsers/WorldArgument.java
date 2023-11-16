@@ -52,7 +52,7 @@ public class WorldArgument<C> extends CommandArgument<C, World> {
     protected WorldArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new WorldParser<>(), World.class, suggestionProvider, defaultDescription);
     }

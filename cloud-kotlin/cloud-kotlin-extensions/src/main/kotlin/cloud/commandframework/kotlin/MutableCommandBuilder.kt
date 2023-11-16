@@ -26,7 +26,6 @@ package cloud.commandframework.kotlin
 import cloud.commandframework.ArgumentDescription
 import cloud.commandframework.Command
 import cloud.commandframework.CommandManager
-import cloud.commandframework.Description
 import cloud.commandframework.arguments.CommandArgument
 import cloud.commandframework.execution.CommandExecutionHandler
 import cloud.commandframework.kotlin.extension.command
@@ -63,60 +62,14 @@ public class MutableCommandBuilder<C : Any>(
      * @param description description for the root command node
      * @param aliases aliases for the root command node
      * @param commandManager the command manager which will own this command
-     * @since 1.3.0
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN
-    )
-    public constructor(
-        name: String,
-        description: Description = Description.empty(),
-        aliases: Array<String> = emptyArray(),
-        commandManager: CommandManager<C>
-    ) : this(commandManager.commandBuilder(name, description, *aliases), commandManager)
-
-    /**
-     * Create a new [MutableCommandBuilder]
-     *
-     * @param name name for the root command node
-     * @param description description for the root command node
-     * @param aliases aliases for the root command node
-     * @param commandManager the command manager which will own this command
      * @since 1.4.0
      */
     public constructor(
         name: String,
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         aliases: Array<String> = emptyArray(),
         commandManager: CommandManager<C>
     ) : this(commandManager.commandBuilder(name, description, *aliases), commandManager)
-
-    /**
-     * Create a new [MutableCommandBuilder] and invoke the provided receiver lambda on it
-     *
-     * @param name name for the root command node
-     * @param description description for the root command node
-     * @param aliases aliases for the root command node
-     * @param commandManager the command manager which will own this command
-     * @param lambda receiver lambda which will be invoked on the new builder
-     * @since 1.3.0
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN
-    )
-    public constructor(
-        name: String,
-        description: Description = Description.empty(),
-        aliases: Array<String> = emptyArray(),
-        commandManager: CommandManager<C>,
-        lambda: MutableCommandBuilder<C>.() -> Unit
-    ) : this(name, description, aliases, commandManager) {
-        lambda(this)
-    }
 
     /**
      * Create a new [MutableCommandBuilder] and invoke the provided receiver lambda on it
@@ -130,7 +83,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public constructor(
         name: String,
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         aliases: Array<String> = emptyArray(),
         commandManager: CommandManager<C>,
         lambda: MutableCommandBuilder<C>.() -> Unit
@@ -204,36 +157,11 @@ public class MutableCommandBuilder<C : Any>(
      * @param description description for the literal
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return a copy of this mutable builder
-     * @since 1.3.0
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN
-    )
-    public fun copy(
-        literal: String,
-        description: Description,
-        lambda: MutableCommandBuilder<C>.() -> Unit
-    ): MutableCommandBuilder<C> =
-        copy().apply {
-            literal(literal, description)
-            lambda(this)
-        }
-
-    /**
-     * Make a new copy of this [MutableCommandBuilder], append a literal, and invoke the provided
-     * receiver lambda on it
-     *
-     * @param literal name for the literal
-     * @param description description for the literal
-     * @param lambda receiver lambda which will be invoked on the new builder
-     * @return a copy of this mutable builder
      * @since 1.4.0
      */
     public fun copy(
         literal: String,
-        description: ArgumentDescription,
+        description: ArgumentDescription<C>,
         lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> =
         copy().apply {
@@ -304,33 +232,11 @@ public class MutableCommandBuilder<C : Any>(
      * @param lambda receiver lambda which will be invoked on the new builder
      * @return the new mutable builder
      * @see [CommandManager.command]
-     * @since 1.3.0
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        message = "ArgumentDescription should be used over Description",
-        level = DeprecationLevel.HIDDEN
-    )
-    public fun registerCopy(
-        literal: String,
-        description: Description,
-        lambda: MutableCommandBuilder<C>.() -> Unit
-    ): MutableCommandBuilder<C> = copy(literal, description, lambda).register()
-
-    /**
-     * Create a new copy of this mutable builder, append a literal, act on it with a receiver
-     * lambda, and then register it with the owning command manager
-     *
-     * @param literal name for the literal
-     * @param description description for the literal
-     * @param lambda receiver lambda which will be invoked on the new builder
-     * @return the new mutable builder
-     * @see [CommandManager.command]
      * @since 1.4.0
      */
     public fun registerCopy(
         literal: String,
-        description: ArgumentDescription,
+        description: ArgumentDescription<C>,
         lambda: MutableCommandBuilder<C>.() -> Unit
     ): MutableCommandBuilder<C> = copy(literal, description, lambda).register()
 
@@ -484,7 +390,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun required(
         argument: CommandArgument<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
+        description: ArgumentDescription<C> = ArgumentDescription.empty()
     ): MutableCommandBuilder<C> = mutate { it.required(argument, description) }
 
     /**
@@ -497,7 +403,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun optional(
         argument: CommandArgument<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
+        description: ArgumentDescription<C> = ArgumentDescription.empty()
     ): MutableCommandBuilder<C> = mutate { it.optional(argument, description) }
 
     /**
@@ -510,7 +416,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun required(
         argument: CommandArgument.Builder<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
+        description: ArgumentDescription<C> = ArgumentDescription.empty()
     ): MutableCommandBuilder<C> = mutate { it.required(argument, description) }
 
     /**
@@ -523,7 +429,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun optional(
         argument: CommandArgument.Builder<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
+        description: ArgumentDescription<C> = ArgumentDescription.empty()
     ): MutableCommandBuilder<C> = mutate { it.optional(argument, description) }
 
     /**
@@ -535,7 +441,7 @@ public class MutableCommandBuilder<C : Any>(
      * @since 2.0.0
      */
     public fun required(
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         argumentSupplier: () -> CommandArgument<C, *>
     ): MutableCommandBuilder<C> = mutate { it.required(argumentSupplier(), description) }
 
@@ -548,7 +454,7 @@ public class MutableCommandBuilder<C : Any>(
      * @since 2.0.0
      */
     public fun optional(
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         argumentSupplier: () -> CommandArgument<C, *>
     ): MutableCommandBuilder<C> = mutate { it.optional(argumentSupplier(), description) }
 
@@ -563,7 +469,7 @@ public class MutableCommandBuilder<C : Any>(
      */
     public fun literal(
         name: String,
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         vararg aliases: String
     ): MutableCommandBuilder<C> = mutate { it.literal(name, description, *aliases) }
 
@@ -591,7 +497,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         argumentSupplier: () -> CommandArgument<C, *>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
@@ -617,7 +523,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         argument: CommandArgument<C, *>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
@@ -643,7 +549,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty(),
+        description: ArgumentDescription<C> = ArgumentDescription.empty(),
         argumentBuilder: CommandArgument.Builder<C, *>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
@@ -668,7 +574,7 @@ public class MutableCommandBuilder<C : Any>(
     public fun flag(
         name: String,
         aliases: Array<String> = emptyArray(),
-        description: ArgumentDescription = ArgumentDescription.empty()
+        description: ArgumentDescription<C> = ArgumentDescription.empty()
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
             this.commandManager

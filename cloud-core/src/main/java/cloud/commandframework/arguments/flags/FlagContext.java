@@ -36,17 +36,19 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Flag value mappings
+ *
+ * @param <C> command sender type
  */
 @API(status = API.Status.STABLE)
-@SuppressWarnings({"rawtypes", "unchecked"})
-public final class FlagContext {
+@SuppressWarnings({"unchecked"})
+public final class FlagContext<C> {
 
     /**
      * Dummy object stored as a flag value when the flag has no associated parser
      */
     public static final Object FLAG_PRESENCE_VALUE = new Object();
 
-    private final Map<String, List> flagValues;
+    private final Map<String, List<Object>> flagValues;
 
     private FlagContext() {
         this.flagValues = new HashMap<>();
@@ -55,10 +57,11 @@ public final class FlagContext {
     /**
      * Create a new flag context instance
      *
+     * @param <C> command sender type
      * @return Constructed instance
      */
-    public static @NonNull FlagContext create() {
-        return new FlagContext();
+    public static <C> @NonNull FlagContext<C> create() {
+        return new FlagContext<>();
     }
 
     /**
@@ -66,11 +69,11 @@ public final class FlagContext {
      *
      * @param flag Flag instance
      */
-    public void addPresenceFlag(final @NonNull CommandFlag<?> flag) {
-        ((List<Object>) this.flagValues.computeIfAbsent(
+    public void addPresenceFlag(final @NonNull CommandFlag<C, ?> flag) {
+        this.flagValues.computeIfAbsent(
                 flag.getName(),
                 $ -> new ArrayList<>()
-        )).add(FLAG_PRESENCE_VALUE);
+        ).add(FLAG_PRESENCE_VALUE);
     }
 
     /**
@@ -81,13 +84,13 @@ public final class FlagContext {
      * @param <T>   Value type
      */
     public <T> void addValueFlag(
-            final @NonNull CommandFlag<T> flag,
+            final @NonNull CommandFlag<C, T> flag,
             final @NonNull T value
     ) {
-        ((List<T>) this.flagValues.computeIfAbsent(
+        this.flagValues.computeIfAbsent(
                 flag.getName(),
                 $ -> new ArrayList<>()
-        )).add(value);
+        ).add(value);
     }
 
     /**
@@ -99,7 +102,7 @@ public final class FlagContext {
      * @since 1.7.0
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
-    public <T> int count(final @NonNull CommandFlag<T> flag) {
+    public <T> int count(final @NonNull CommandFlag<C, T> flag) {
         return this.getAll(flag).size();
     }
 
@@ -124,7 +127,7 @@ public final class FlagContext {
      *         else {@code false}
      */
     public boolean isPresent(final @NonNull String flag) {
-        final List value = this.flagValues.get(flag);
+        final List<?> value = this.flagValues.get(flag);
         return value != null && !value.isEmpty();
     }
 
@@ -138,7 +141,7 @@ public final class FlagContext {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public boolean isPresent(final @NonNull CommandFlag<Void> flag) {
+    public boolean isPresent(final @NonNull CommandFlag<C, Void> flag) {
         return this.isPresent(flag.getName());
     }
 
@@ -159,7 +162,7 @@ public final class FlagContext {
     public <T> @NonNull Optional<T> getValue(
             final @NonNull String name
     ) {
-        final List value = this.flagValues.get(name);
+        final List<?> value = this.flagValues.get(name);
         if (value == null || value.isEmpty()) {
             return Optional.empty();
         }
@@ -181,7 +184,7 @@ public final class FlagContext {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @NonNull Optional<T> getValue(
-            final @NonNull CommandFlag<T> flag
+            final @NonNull CommandFlag<C, T> flag
     ) {
         return this.getValue(flag.getName());
     }
@@ -222,7 +225,7 @@ public final class FlagContext {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @Nullable T getValue(
-            final @NonNull CommandFlag<T> name,
+            final @NonNull CommandFlag<C, T> name,
             final @Nullable T defaultValue
     ) {
         return this.getValue(name).orElse(defaultValue);
@@ -255,7 +258,7 @@ public final class FlagContext {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public boolean hasFlag(
-            final @NonNull CommandFlag<?> flag
+            final @NonNull CommandFlag<C, ?> flag
     ) {
         return this.getValue(flag).isPresent();
     }
@@ -284,7 +287,7 @@ public final class FlagContext {
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public boolean contains(final @NonNull CommandFlag<?> flag) {
+    public boolean contains(final @NonNull CommandFlag<C, ?> flag) {
         return this.hasFlag(flag);
     }
 
@@ -324,7 +327,7 @@ public final class FlagContext {
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> @Nullable T get(
-            final @NonNull CommandFlag<T> flag
+            final @NonNull CommandFlag<C, T> flag
     ) {
         return this.getValue(flag).orElse(null);
     }
@@ -339,9 +342,9 @@ public final class FlagContext {
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
     public <T> @NonNull Collection<T> getAll(
-            final @NonNull CommandFlag<T> flag
+            final @NonNull CommandFlag<C, T> flag
     ) {
-        final List values = this.flagValues.get(flag.getName());
+        final List<?> values = this.flagValues.get(flag.getName());
         if (values != null) {
             return Collections.unmodifiableList((List<T>) values);
         }
@@ -360,7 +363,7 @@ public final class FlagContext {
     public <T> @NonNull Collection<T> getAll(
             final @NonNull String flag
     ) {
-        final List values = this.flagValues.get(flag);
+        final List<?> values = this.flagValues.get(flag);
         if (values != null) {
             return Collections.unmodifiableList((List<T>) values);
         }

@@ -56,6 +56,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
+@SuppressWarnings("overloads")
 @API(status = API.Status.STABLE)
 public class Command<C> {
 
@@ -167,36 +168,13 @@ public class Command<C> {
      * @param aliases     Command aliases
      * @param <C>         Command sender type
      * @return Command builder
-     * @deprecated for removal since 1.4.0. Use {@link #newBuilder(String, CommandMeta, ArgumentDescription, String...)} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public static <C> @NonNull Builder<C> newBuilder(
-            final @NonNull String commandName,
-            final @NonNull CommandMeta commandMeta,
-            final @NonNull Description description,
-            final @NonNull String... aliases
-    ) {
-        return newBuilder(commandName, commandMeta, (ArgumentDescription) description, aliases);
-    }
-
-    /**
-     * Create a new command builder. Is recommended to use the builder methods
-     * in {@link CommandManager} rather than invoking this method directly.
-     *
-     * @param commandName Base command argument
-     * @param commandMeta Command meta instance
-     * @param description Command description
-     * @param aliases     Command aliases
-     * @param <C>         Command sender type
-     * @return Command builder
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public static <C> @NonNull Builder<C> newBuilder(
             final @NonNull String commandName,
             final @NonNull CommandMeta commandMeta,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
@@ -328,26 +306,6 @@ public class Command<C> {
         return this.commandMeta;
     }
 
-    /**
-     * Get the description for an argument
-     *
-     * @param argument Argument
-     * @return Argument description
-     * @throws IllegalArgumentException If the command argument does not exist
-     * @deprecated More than one matching command argument may exist per command.
-     *         Use {@link #components()} and search in that, instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED)
-    public @NonNull String getArgumentDescription(final @NonNull CommandArgument<C, ?> argument) {
-        for (final CommandComponent<C> component : this.components) {
-            if (component.argument().equals(argument)) {
-                return component.argumentDescription().getDescription();
-            }
-        }
-        throw new IllegalArgumentException("Command argument not found: " + argument);
-    }
-
     @Override
     public final String toString() {
         final StringBuilder stringBuilder = new StringBuilder();
@@ -383,7 +341,7 @@ public class Command<C> {
         private final Class<? extends C> senderType;
         private final CommandPermission commandPermission;
         private final CommandManager<C> commandManager;
-        private final Collection<CommandFlag<?>> flags;
+        private final Collection<CommandFlag<C, ?>> flags;
 
         private Builder(
                 final @Nullable CommandManager<C> commandManager,
@@ -392,7 +350,7 @@ public class Command<C> {
                 final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
                 final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
                 final @NonNull CommandPermission commandPermission,
-                final @NonNull Collection<CommandFlag<?>> flags
+                final @NonNull Collection<CommandFlag<C, ?>> flags
         ) {
             this.commandManager = commandManager;
             this.senderType = senderType;
@@ -530,31 +488,12 @@ public class Command<C> {
          * @param description Literal description
          * @param aliases     Argument aliases
          * @return New builder instance with the modified command chain
-         * @deprecated for removal since 1.4.0. Use {@link #literal(String, ArgumentDescription, String...)} instead.
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public @NonNull Builder<C> literal(
-                final @NonNull String main,
-                final @NonNull Description description,
-                final @NonNull String... aliases
-        ) {
-            return this.required(StaticArgument.of(main, aliases), description);
-        }
-
-        /**
-         * Inserts a required {@link StaticArgument} into the command chain
-         *
-         * @param main        Main argument name
-         * @param description Literal description
-         * @param aliases     Argument aliases
-         * @return New builder instance with the modified command chain
          * @since 1.4.0
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
         public @NonNull Builder<C> literal(
                 final @NonNull String main,
-                final @NonNull ArgumentDescription description,
+                final @NonNull ArgumentDescription<C> description,
                 final @NonNull String... aliases
         ) {
             return this.required(StaticArgument.of(main, aliases), description);
@@ -575,7 +514,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final @NonNull CommandArgument<C, T> argument,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             return this.argument(CommandComponent.required(argument, description));
         }
@@ -595,7 +534,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> required(
                 final CommandArgument.@NonNull Builder<C, T> argument,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             return this.argument(CommandComponent.required(argument.build(), description));
         }
@@ -615,7 +554,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CommandArgument<C, T> argument,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             return this.argument(CommandComponent.optional(argument, description));
         }
@@ -635,7 +574,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final CommandArgument.@NonNull Builder<C, T> argument,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             return this.argument(CommandComponent.optional(argument.build(), description));
         }
@@ -656,7 +595,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CommandArgument<C, T> argument,
-                final @NonNull ArgumentDescription description,
+                final @NonNull ArgumentDescription<C> description,
                 final @NonNull DefaultValue<C, T> defaultValue
         ) {
             return this.argument(CommandComponent.optional(argument, description, defaultValue));
@@ -678,7 +617,7 @@ public class Command<C> {
         @API(status = API.Status.STABLE, since = "2.0.0")
         public <T> @NonNull Builder<C> optional(
                 final CommandArgument.@NonNull Builder<C, T> argument,
-                final @NonNull ArgumentDescription description,
+                final @NonNull ArgumentDescription<C> description,
                 final @NonNull DefaultValue<C, T> defaultValue
         ) {
             return this.argument(CommandComponent.optional(argument.build(), description, defaultValue));
@@ -901,7 +840,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -932,7 +871,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull Pair<@NonNull String, @NonNull String> names,
                 final @NonNull Pair<@NonNull Class<U>, @NonNull Class<V>> parserPair,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -968,7 +907,7 @@ public class Command<C> {
                 final @NonNull Pair<String, String> names,
                 final @NonNull Pair<Class<U>, Class<V>> parserPair,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1007,7 +946,7 @@ public class Command<C> {
                 final @NonNull Pair<String, String> names,
                 final @NonNull Pair<Class<U>, Class<V>> parserPair,
                 final @NonNull BiFunction<C, Pair<U, V>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1042,7 +981,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1074,7 +1013,7 @@ public class Command<C> {
                 final @NonNull String name,
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1111,7 +1050,7 @@ public class Command<C> {
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1151,7 +1090,7 @@ public class Command<C> {
                 final @NonNull Triplet<String, String, String> names,
                 final @NonNull Triplet<Class<U>, Class<V>, Class<W>> parserTriplet,
                 final @NonNull BiFunction<C, Triplet<U, V, W>, O> mapper,
-                final @NonNull ArgumentDescription description
+                final @NonNull ArgumentDescription<C> description
         ) {
             if (this.commandManager == null) {
                 throw new IllegalStateException("This cannot be called from a command that has no command manager attached");
@@ -1308,8 +1247,8 @@ public class Command<C> {
          * @param <T>  Flag value type
          * @return New builder instance that uses the provided flag
          */
-        public @NonNull <T> Builder<C> flag(final @NonNull CommandFlag<T> flag) {
-            final List<CommandFlag<?>> flags = new ArrayList<>(this.flags);
+        public @NonNull <T> Builder<C> flag(final @NonNull CommandFlag<C, T> flag) {
+            final List<CommandFlag<C, ?>> flags = new ArrayList<>(this.flags);
             flags.add(flag);
             return new Builder<>(
                     this.commandManager,
@@ -1329,7 +1268,7 @@ public class Command<C> {
          * @param <T>     Flag value type
          * @return New builder instance that uses the provided flag
          */
-        public @NonNull <T> Builder<C> flag(final CommandFlag.@NonNull Builder<T> builder) {
+        public @NonNull <T> Builder<C> flag(final CommandFlag.@NonNull Builder<C, T> builder) {
             return this.flag(builder.build());
         }
 

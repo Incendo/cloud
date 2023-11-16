@@ -232,7 +232,7 @@ class CommandTreeTest {
         final CommandExecutionHandler<TestCommandSender> executionHandler = mock(CommandExecutionHandler.class);
         when(executionHandler.executeFuture(any())).thenReturn(CompletableFuture.completedFuture(null));
 
-        final CommandFlag<Integer> num = this.commandManager.flagBuilder("num")
+        final CommandFlag<TestCommandSender, Integer> num = this.commandManager.flagBuilder("num")
                 .withArgument(IntegerArgument.of("num"))
                 .build();
 

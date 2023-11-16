@@ -54,7 +54,7 @@ public final class MultiplePlayerSelectorArgument<C> extends CommandArgument<C, 
             final boolean allowEmpty,
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new MultiplePlayerSelectorParser<>(allowEmpty), MultiplePlayerSelector.class,
                 suggestionProvider, defaultDescription

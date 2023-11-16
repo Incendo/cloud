@@ -44,7 +44,7 @@ public final class Vec2dArgument<C> extends CommandArgument<C, Coordinates.Coord
     Vec2dArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final boolean centerIntegers
     ) {
         super(

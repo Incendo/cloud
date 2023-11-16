@@ -58,7 +58,7 @@ public final class Location2DArgument<C> extends CommandArgument<C, Location2D> 
 
     private Location2DArgument(
             final @NonNull String name,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>,
                     @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors

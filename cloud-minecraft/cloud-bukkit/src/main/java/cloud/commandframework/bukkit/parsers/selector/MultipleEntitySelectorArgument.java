@@ -47,7 +47,7 @@ public final class MultipleEntitySelectorArgument<C> extends CommandArgument<C, 
             final boolean allowEmpty,
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new MultipleEntitySelectorParser<>(allowEmpty),
                 MultipleEntitySelector.class, suggestionProvider, defaultDescription

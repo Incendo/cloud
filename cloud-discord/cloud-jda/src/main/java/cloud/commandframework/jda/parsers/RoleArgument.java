@@ -54,7 +54,7 @@ public final class RoleArgument<C> extends CommandArgument<C, Role> {
     private RoleArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final @NonNull Set<ParserMode> modes
     ) {
         super(name, new RoleParser<>(modes), Role.class, suggestionProvider, defaultDescription);

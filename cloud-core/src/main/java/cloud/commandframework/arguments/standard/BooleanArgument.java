@@ -54,7 +54,7 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
             final @NonNull String name,
             final boolean liberal,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription description
+            final @NonNull ArgumentDescription<C> description
     ) {
         super(name, new BooleanParser<>(liberal), Boolean.class, suggestionProvider, description);
         this.liberal = liberal;

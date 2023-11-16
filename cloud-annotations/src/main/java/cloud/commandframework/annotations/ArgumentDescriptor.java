@@ -32,22 +32,23 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class ArgumentDescriptor {
+public final class ArgumentDescriptor<C> {
 
     private final Parameter parameter;
     private final String name;
     private final String parserName;
     private final String suggestions;
     private final String defaultValue;
-    private final ArgumentDescription description;
+    private final ArgumentDescription<C> description;
 
     /**
      * Creates a new builder.
      *
+     * @param <C> command sender type
      * @return the created builder
      */
-    public static @NonNull Builder builder() {
-        return new Builder();
+    public static <C> @NonNull Builder<C> builder() {
+        return new Builder<>();
     }
 
     private ArgumentDescriptor(
@@ -56,7 +57,7 @@ public final class ArgumentDescriptor {
             final @Nullable String parserName,
             final @Nullable String suggestions,
             final @Nullable String defaultValue,
-            final @Nullable ArgumentDescription description
+            final @Nullable ArgumentDescription<C> description
     ) {
         this.parameter = parameter;
         this.name = name;
@@ -126,7 +127,7 @@ public final class ArgumentDescriptor {
      *
      * @return the argument description, or {@code null}
      */
-    public @Nullable ArgumentDescription description() {
+    public @Nullable ArgumentDescription<C> description() {
         return this.description;
     }
 
@@ -138,7 +139,7 @@ public final class ArgumentDescriptor {
         if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        ArgumentDescriptor that = (ArgumentDescriptor) object;
+        ArgumentDescriptor<?> that = (ArgumentDescriptor<?>) object;
         return Objects.equals(this.parameter, that.parameter)
                 && Objects.equals(this.name, that.name)
                 && Objects.equals(this.parserName, that.parserName)
@@ -153,14 +154,14 @@ public final class ArgumentDescriptor {
     }
 
 
-    public static final class Builder {
+    public static final class Builder<C> {
 
         private final Parameter parameter;
         private final String name;
         private final String parserName;
         private final String suggestions;
         private final String defaultValue;
-        private final ArgumentDescription description;
+        private final ArgumentDescription<C> description;
 
         private Builder(
                 final @Nullable Parameter parameter,
@@ -168,7 +169,7 @@ public final class ArgumentDescriptor {
                 final @Nullable String parserName,
                 final @Nullable String suggestions,
                 final @Nullable String defaultValue,
-                final @Nullable ArgumentDescription description
+                final @Nullable ArgumentDescription<C> description
         ) {
             this.parameter = parameter;
             this.name = name;
@@ -188,8 +189,8 @@ public final class ArgumentDescriptor {
          * @param parameter the new parameter
          * @return the builder containing the updated parameter
          */
-        public @NonNull Builder parameter(final @NonNull Parameter parameter) {
-            return new Builder(parameter, this.name, this.parserName, this.suggestions, this.defaultValue, this.description);
+        public @NonNull Builder<C> parameter(final @NonNull Parameter parameter) {
+            return new Builder<>(parameter, this.name, this.parserName, this.suggestions, this.defaultValue, this.description);
         }
 
         /**
@@ -201,8 +202,8 @@ public final class ArgumentDescriptor {
          * @param name the new name
          * @return the builder containing the updated name
          */
-        public @NonNull Builder name(final @NonNull String name) {
-            return new Builder(this.parameter, name, this.parserName, this.suggestions, this.defaultValue, this.description);
+        public @NonNull Builder<C> name(final @NonNull String name) {
+            return new Builder<>(this.parameter, name, this.parserName, this.suggestions, this.defaultValue, this.description);
         }
 
         /**
@@ -211,14 +212,14 @@ public final class ArgumentDescriptor {
          * @param parserName the new parserName
          * @return the builder containing the updated parserName
          */
-        public @NonNull Builder parserName(final @Nullable String parserName) {
+        public @NonNull Builder<C> parserName(final @Nullable String parserName) {
             final String nullableName;
             if (parserName != null && parserName.isEmpty()) {
                 nullableName = null;
             } else {
                 nullableName = parserName;
             }
-            return new Builder(this.parameter, this.name, nullableName, this.suggestions, this.defaultValue, this.description);
+            return new Builder<>(this.parameter, this.name, nullableName, this.suggestions, this.defaultValue, this.description);
         }
 
         /**
@@ -227,14 +228,14 @@ public final class ArgumentDescriptor {
          * @param suggestions the new suggestions
          * @return the builder containing the updated suggestions
          */
-        public @NonNull Builder suggestions(final @Nullable String suggestions) {
+        public @NonNull Builder<C> suggestions(final @Nullable String suggestions) {
             final String nullableName;
             if (suggestions != null && suggestions.isEmpty()) {
                 nullableName = null;
             } else {
                 nullableName = suggestions;
             }
-            return new Builder(this.parameter, this.name, this.parserName, nullableName, this.defaultValue, this.description);
+            return new Builder<>(this.parameter, this.name, this.parserName, nullableName, this.defaultValue, this.description);
         }
 
         /**
@@ -243,14 +244,14 @@ public final class ArgumentDescriptor {
          * @param defaultValue the new default value
          * @return the builder containing the updated default value
          */
-        public @NonNull Builder defaultValue(final @Nullable String defaultValue) {
+        public @NonNull Builder<C> defaultValue(final @Nullable String defaultValue) {
             final String nullableName;
             if (defaultValue != null && defaultValue.isEmpty()) {
                 nullableName = null;
             } else {
                 nullableName = defaultValue;
             }
-            return new Builder(this.parameter, this.name, this.parserName, this.suggestions, nullableName, this.description);
+            return new Builder<>(this.parameter, this.name, this.parserName, this.suggestions, nullableName, this.description);
         }
 
         /**
@@ -259,8 +260,8 @@ public final class ArgumentDescriptor {
          * @param description the new description
          * @return the builder containing the updated description
          */
-        public @NonNull Builder description(final @Nullable ArgumentDescription description) {
-            return new Builder(this.parameter, this.name, this.parserName, this.suggestions, this.defaultValue, description);
+        public @NonNull Builder<C> description(final @Nullable ArgumentDescription<C> description) {
+            return new Builder<>(this.parameter, this.name, this.parserName, this.suggestions, this.defaultValue, description);
         }
 
         /**
@@ -268,8 +269,8 @@ public final class ArgumentDescriptor {
          *
          * @return the argument descriptor
          */
-        public @NonNull ArgumentDescriptor build() {
-            return new ArgumentDescriptor(
+        public @NonNull ArgumentDescriptor<C> build() {
+            return new ArgumentDescriptor<>(
                     Objects.requireNonNull(this.parameter, "parameter"),
                     Objects.requireNonNull(this.name, "name"),
                     this.parserName,

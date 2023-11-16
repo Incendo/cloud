@@ -67,7 +67,7 @@ public final class ItemStackPredicateArgument<C> extends CommandArgument<C, Item
     private ItemStackPredicateArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new Parser<>(), ItemStackPredicate.class, suggestionProvider, defaultDescription);
     }

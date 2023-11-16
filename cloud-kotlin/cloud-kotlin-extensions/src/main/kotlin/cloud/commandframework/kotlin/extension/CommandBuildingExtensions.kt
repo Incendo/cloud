@@ -26,7 +26,6 @@ package cloud.commandframework.kotlin.extension
 import cloud.commandframework.ArgumentDescription
 import cloud.commandframework.Command
 import cloud.commandframework.CommandManager
-import cloud.commandframework.Description
 import cloud.commandframework.kotlin.MutableCommandBuilder
 import kotlin.reflect.KClass
 
@@ -37,57 +36,14 @@ import kotlin.reflect.KClass
  * @param description description for the root command node
  * @param aliases aliases for the root command node
  * @param lambda receiver lambda which will be invoked on the new builder
- * @since 1.3.0
- */
-@Suppress("DEPRECATION")
-@Deprecated(
-    message = "ArgumentDescription should be used over Description",
-    level = DeprecationLevel.HIDDEN
-)
-public fun <C : Any> CommandManager<C>.commandBuilder(
-    name: String,
-    description: Description = Description.empty(),
-    aliases: Array<String> = emptyArray(),
-    lambda: MutableCommandBuilder<C>.() -> Unit
-): MutableCommandBuilder<C> = MutableCommandBuilder(name, description, aliases, this, lambda)
-
-/**
- * Create a new [MutableCommandBuilder] and invoke the provided receiver lambda on it
- *
- * @param name name for the root command node
- * @param description description for the root command node
- * @param aliases aliases for the root command node
- * @param lambda receiver lambda which will be invoked on the new builder
  * @since 1.4.0
  */
 public fun <C : Any> CommandManager<C>.commandBuilder(
     name: String,
-    description: ArgumentDescription = ArgumentDescription.empty(),
+    description: ArgumentDescription<C> = ArgumentDescription.empty(),
     aliases: Array<String> = emptyArray(),
     lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> = MutableCommandBuilder(name, description, aliases, this, lambda)
-
-/**
- * Create a new [MutableCommandBuilder] which will invoke the provided receiver lambda, and then
- * register itself with the owning [CommandManager]
- *
- * @param name name for the root command node
- * @param description description for the root command node
- * @param aliases aliases for the root command node
- * @param lambda receiver lambda which will be invoked on the new builder
- * @since 1.3.0
- */
-@Suppress("DEPRECATION")
-@Deprecated(
-    message = "ArgumentDescription should be used over Description",
-    level = DeprecationLevel.HIDDEN
-)
-public fun <C : Any> CommandManager<C>.buildAndRegister(
-    name: String,
-    description: Description = Description.empty(),
-    aliases: Array<String> = emptyArray(),
-    lambda: MutableCommandBuilder<C>.() -> Unit
-): MutableCommandBuilder<C> = commandBuilder(name, description, aliases, lambda).register()
 
 /**
  * Create a new [MutableCommandBuilder] which will invoke the provided receiver lambda, and then
@@ -101,7 +57,7 @@ public fun <C : Any> CommandManager<C>.buildAndRegister(
  */
 public fun <C : Any> CommandManager<C>.buildAndRegister(
     name: String,
-    description: ArgumentDescription = ArgumentDescription.empty(),
+    description: ArgumentDescription<C> = ArgumentDescription.empty(),
     aliases: Array<String> = emptyArray(),
     lambda: MutableCommandBuilder<C>.() -> Unit
 ): MutableCommandBuilder<C> = commandBuilder(name, description, aliases, lambda).register()
@@ -152,26 +108,12 @@ public fun <C : Any> Command.Builder<C>.mutate(
 ): MutableCommandBuilder<C> = MutableCommandBuilder(this, commandManager).also(lambda)
 
 /**
- * Get a [Description], defaulting to [Description.empty]
- *
- * @param description description string
- * @return the description
- * @since 1.3.0
- */
-@Suppress("DEPRECATION")
-@Deprecated(
-    message = "Use interface variant that allows for rich text",
-    replaceWith = ReplaceWith("argumentDescription(description)")
-)
-public fun description(description: String = ""): Description =
-    if (description.isEmpty()) Description.empty() else Description.of(description)
-
-/**
  * Get a [ArgumentDescription], defaulting to [ArgumentDescription.empty]
  *
+ * @param <C> command sender type
  * @param description description string
  * @return the description
  * @since 1.4.0
  */
-public fun argumentDescription(description: String = ""): ArgumentDescription =
+public fun <C> argumentDescription(description: String = ""): ArgumentDescription<C> =
     if (description.isEmpty()) ArgumentDescription.empty() else ArgumentDescription.of(description)

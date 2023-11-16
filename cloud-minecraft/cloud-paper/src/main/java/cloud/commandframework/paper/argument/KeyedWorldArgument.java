@@ -56,7 +56,7 @@ public final class KeyedWorldArgument<C> extends CommandArgument<C, World> {
     KeyedWorldArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new Parser<>(), World.class, suggestionProvider, defaultDescription);
     }

@@ -37,6 +37,7 @@ import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.SimpleCloudKey;
 import io.leangen.geantyref.TypeToken;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -85,22 +86,22 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
      * @since 1.8.0
      */
     @API(status = API.Status.EXPERIMENTAL, since = "1.8.0")
-    public static final CloudKey<Set<CommandFlag<?>>> PARSED_FLAGS = SimpleCloudKey.of("__parsed_flags__",
-            new TypeToken<Set<CommandFlag<?>>>(){});
+    public static final CloudKey<Set<CommandFlag<?, ?>>> PARSED_FLAGS = SimpleCloudKey.of("__parsed_flags__",
+            new TypeToken<Set<CommandFlag<?, ?>>>(){});
 
     private static final String FLAG_ARGUMENT_NAME = "flags";
 
-    private final Collection<@NonNull CommandFlag<?>> flags;
+    private final Collection<@NonNull CommandFlag<C, ?>> flags;
 
     /**
      * Construct a new flag argument
      *
      * @param flags Flags
      */
-    public FlagArgument(final Collection<CommandFlag<?>> flags) {
+    public FlagArgument(final Collection<CommandFlag<C, ?>> flags) {
         super(
                 FLAG_ARGUMENT_NAME,
-                new FlagArgumentParser<>(flags.toArray(new CommandFlag<?>[0])),
+                new FlagArgumentParser<>(new ArrayList<>(flags)),
                 Object.class
         );
         this.flags = flags;
@@ -111,7 +112,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
      *
      * @return Unmodifiable view of flags
      */
-    public @NonNull Collection<@NonNull CommandFlag<?>> getFlags() {
+    public @NonNull Collection<@NonNull CommandFlag<C, ?>> getFlags() {
         return Collections.unmodifiableCollection(this.flags);
     }
 
@@ -119,9 +120,9 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
     @API(status = API.Status.STABLE)
     public static final class FlagArgumentParser<C> implements ArgumentParser<C, Object> {
 
-        private final CommandFlag<?>[] flags;
+        private final Collection<CommandFlag<C, ?>> flags;
 
-        private FlagArgumentParser(final @NonNull CommandFlag<?>[] flags) {
+        private FlagArgumentParser(final @NonNull Collection<CommandFlag<C, ?>> flags) {
             this.flags = flags;
         }
 
@@ -194,12 +195,12 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
             if (!lastArg.startsWith("-")) {
                 final String rawInput = commandContext.getRawInputJoined();
                 /* Collection containing all used flags */
-                final List<CommandFlag<?>> usedFlags = new LinkedList<>();
+                final List<CommandFlag<C, ?>> usedFlags = new LinkedList<>();
                 /* Find all "primary" flags, using --flag */
                 final Matcher primaryMatcher = FLAG_PRIMARY_PATTERN.matcher(rawInput);
                 while (primaryMatcher.find()) {
                     final String name = primaryMatcher.group("name");
-                    for (final CommandFlag<?> flag : this.flags) {
+                    for (final CommandFlag<C, ?> flag : this.flags) {
                         if (flag.getName().equalsIgnoreCase(name)) {
                             usedFlags.add(flag);
                             break;
@@ -210,7 +211,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 final Matcher aliasMatcher = FLAG_ALIAS_PATTERN.matcher(rawInput);
                 while (aliasMatcher.find()) {
                     final String name = aliasMatcher.group("name");
-                    for (final CommandFlag<?> flag : this.flags) {
+                    for (final CommandFlag<C, ?> flag : this.flags) {
                         for (final String alias : flag.getAliases()) {
                             /* Aliases are single-char strings */
                             if (name.contains(alias)) {
@@ -223,7 +224,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 /* Suggestions */
                 final List<Suggestion> suggestions = new LinkedList<>();
                 /* Recommend "primary" flags */
-                for (final CommandFlag<?> flag : this.flags) {
+                for (final CommandFlag<C, ?> flag : this.flags) {
                     if (usedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
                         continue;
                     }
@@ -235,7 +236,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 }
                 /* Recommend aliases */
                 final boolean suggestCombined = input.length() > 1 && input.charAt(0) == '-' && input.charAt(1) != '-';
-                for (final CommandFlag<?> flag : this.flags) {
+                for (final CommandFlag<C, ?> flag : this.flags) {
                     if (usedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
                         continue;
                     }
@@ -257,10 +258,10 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 }
                 return suggestions;
             } else {
-                CommandFlag<?> currentFlag = null;
+                CommandFlag<C, ?> currentFlag = null;
                 if (lastArg.startsWith("--")) { // --long
                     final String flagName = lastArg.substring(2);
-                    for (final CommandFlag<?> flag : this.flags) {
+                    for (final CommandFlag<C, ?> flag : this.flags) {
                         if (flagName.equalsIgnoreCase(flag.getName())) {
                             currentFlag = flag;
                             break;
@@ -268,7 +269,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     }
                 } else { // -x
                     final String flagName = lastArg.substring(1);
-                    for (final CommandFlag<?> flag : this.flags) {
+                    for (final CommandFlag<C, ?> flag : this.flags) {
                         for (final String alias : flag.getAliases()) {
                             if (alias.equalsIgnoreCase(flagName)) {
                                 currentFlag = flag;
@@ -300,7 +301,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
              * The current flag whose value is being parsed
              */
             @SuppressWarnings("unused")
-            private Optional<CommandFlag<?>> currentFlagBeingParsed = Optional.empty();
+            private Optional<CommandFlag<C, ?>> currentFlagBeingParsed = Optional.empty();
             /**
              * The name of the current flag being parsed, can be obsoleted in the future.
              * This name includes the - or -- prefix.
@@ -312,9 +313,9 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     final @NonNull CommandContext<@NonNull C> commandContext,
                     final @NonNull Queue<@NonNull String> inputQueue
             ) {
-                Set<CommandFlag<?>> parsedFlags = commandContext.computeIfAbsent(PARSED_FLAGS, k -> new HashSet());
+                Set<CommandFlag<?, ?>> parsedFlags = commandContext.computeIfAbsent(PARSED_FLAGS, k -> new HashSet());
 
-                CommandFlag<?> currentFlag = null;
+                CommandFlag<C, ?> currentFlag = null;
                 String currentFlagName = null;
 
                 String string;
@@ -334,7 +335,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
                         if (string.startsWith("--")) {
                             final String flagName = string.substring(2);
-                            for (final CommandFlag<?> flag : FlagArgumentParser.this.flags) {
+                            for (final CommandFlag<C, ?> flag : FlagArgumentParser.this.flags) {
                                 if (flagName.equalsIgnoreCase(flag.getName())) {
                                     currentFlag = flag;
                                     currentFlagName = string;
@@ -348,7 +349,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                                 for (int i = 0; i < flagName.length(); i++) {
                                     final String parsedFlag = Character.toString(flagName.charAt(i))
                                             .toLowerCase(Locale.ENGLISH);
-                                    for (final CommandFlag<?> candidateFlag : FlagArgumentParser.this.flags) {
+                                    for (final CommandFlag<C, ?> candidateFlag : FlagArgumentParser.this.flags) {
                                         if (candidateFlag.getCommandArgument() != null) {
                                             continue;
                                         }
@@ -384,7 +385,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                                 }
                                 continue;
                             } else {
-                                for (final CommandFlag<?> flag : FlagArgumentParser.this.flags) {
+                                for (final CommandFlag<C, ?> flag : FlagArgumentParser.this.flags) {
                                     for (final String alias : flag.getAliases()) {
                                         if (alias.equalsIgnoreCase(flagName)) {
                                             currentFlag = flag;

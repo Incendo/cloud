@@ -50,7 +50,7 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
             final float min,
             final float max,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new FloatParser<>(min, max), Float.class, suggestionProvider, defaultDescription);
         this.min = min;

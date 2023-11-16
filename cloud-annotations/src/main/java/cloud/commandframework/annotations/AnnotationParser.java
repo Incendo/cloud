@@ -99,10 +99,10 @@ public final class AnnotationParser<C> {
 
     private StringProcessor stringProcessor;
     private SyntaxParser syntaxParser;
-    private ArgumentExtractor argumentExtractor;
+    private ArgumentExtractor<C> argumentExtractor;
     private ArgumentAssembler<C> argumentAssembler;
     private FlagExtractor flagExtractor;
-    private FlagAssembler flagAssembler;
+    private FlagAssembler<C> flagAssembler;
     private CommandExtractor commandExtractor;
 
     /**
@@ -148,9 +148,9 @@ public final class AnnotationParser<C> {
         this.builderModifiers = new HashMap<>();
         this.commandMethodFactories = new HashMap<>();
         this.flagExtractor = new FlagExtractorImpl(this);
-        this.flagAssembler = new FlagAssemblerImpl(manager);
+        this.flagAssembler = new FlagAssemblerImpl<>(manager);
         this.syntaxParser = new SyntaxParserImpl();
-        this.argumentExtractor = new ArgumentExtractorImpl();
+        this.argumentExtractor = new ArgumentExtractorImpl<>();
         this.argumentAssembler = new ArgumentAssemblerImpl<>(this);
         this.commandExtractor = new CommandExtractorImpl(this);
         this.registerAnnotationMapper(CommandDescription.class, d ->
@@ -402,7 +402,7 @@ public final class AnnotationParser<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull ArgumentExtractor argumentExtractor() {
+    public @NonNull ArgumentExtractor<C> argumentExtractor() {
         return this.argumentExtractor;
     }
 
@@ -413,7 +413,7 @@ public final class AnnotationParser<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public void argumentExtractor(final @NonNull ArgumentExtractor argumentExtractor) {
+    public void argumentExtractor(final @NonNull ArgumentExtractor<C> argumentExtractor) {
         this.argumentExtractor = argumentExtractor;
     }
 
@@ -468,7 +468,7 @@ public final class AnnotationParser<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull FlagAssembler flagAssembler() {
+    public @NonNull FlagAssembler<C> flagAssembler() {
         return this.flagAssembler;
     }
 
@@ -479,7 +479,7 @@ public final class AnnotationParser<C> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public void flagAssembler(final @NonNull FlagAssembler flagAssembler) {
+    public void flagAssembler(final @NonNull FlagAssembler<C> flagAssembler) {
         this.flagAssembler = flagAssembler;
     }
 
@@ -699,9 +699,12 @@ public final class AnnotationParser<C> {
                 commandDescriptor.syntax().get(0).getMinor(),
                 metaBuilder.build()
         );
-        final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(commandDescriptor.syntax(), method);
+        final Collection<ArgumentDescriptor<C>> arguments = this.argumentExtractor.extractArguments(
+                commandDescriptor.syntax(),
+                method
+        );
         final Collection<FlagDescriptor> flagDescriptors = this.flagExtractor.extractFlags(method);
-        final Collection<CommandFlag<?>> flags = flagDescriptors.stream()
+        final Collection<CommandFlag<C, ?>> flags = flagDescriptors.stream()
                 .map(this.flagAssembler()::assembleFlag)
                 .collect(Collectors.toList());
         final Map<String, CommandComponent<C>> commandComponents = this.constructComponents(arguments, commandDescriptor);
@@ -781,7 +784,7 @@ public final class AnnotationParser<C> {
             builder = builder.hidden();
         }
         /* Apply flags */
-        for (final CommandFlag<?> flag : flags) {
+        for (final CommandFlag<C, ?> flag : flags) {
             builder = builder.flag(flag);
         }
 
@@ -810,7 +813,7 @@ public final class AnnotationParser<C> {
     }
 
     private @NonNull Map<@NonNull String, @NonNull CommandComponent<C>> constructComponents(
-            final @NonNull Collection<@NonNull ArgumentDescriptor> arguments,
+            final @NonNull Collection<@NonNull ArgumentDescriptor<C>> arguments,
             final @NonNull CommandDescriptor commandDescriptor
     ) {
         return arguments.stream()

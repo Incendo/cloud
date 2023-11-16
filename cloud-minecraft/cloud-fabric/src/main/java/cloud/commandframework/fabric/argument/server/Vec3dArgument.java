@@ -44,7 +44,7 @@ public final class Vec3dArgument<C> extends CommandArgument<C, Coordinates> {
     Vec3dArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription,
+            final @NonNull ArgumentDescription<C> defaultDescription,
             final boolean centerIntegers
     ) {
         super(

@@ -51,7 +51,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
             final short min,
             final short max,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new ShortParser<>(min, max), Short.class, suggestionProvider, defaultDescription);
         this.min = min;

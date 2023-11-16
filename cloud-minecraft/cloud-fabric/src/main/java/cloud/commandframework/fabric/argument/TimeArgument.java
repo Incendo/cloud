@@ -41,7 +41,7 @@ public final class TimeArgument<C> extends CommandArgument<C, MinecraftTime> {
     TimeArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,

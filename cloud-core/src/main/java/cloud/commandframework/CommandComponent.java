@@ -40,7 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class CommandComponent<C> {
 
     private final CommandArgument<C, ?> argument;
-    private final ArgumentDescription description;
+    private final ArgumentDescription<C> description;
     private final boolean required;
     private final DefaultValue<C, ?> defaultValue;
 
@@ -55,7 +55,7 @@ public final class CommandComponent<C> {
      */
     private CommandComponent(
             final @NonNull CommandArgument<C, ?> argument,
-            final @NonNull ArgumentDescription description,
+            final @NonNull ArgumentDescription<C> description,
             final boolean required,
             final @Nullable DefaultValue<C, ?> defaultValue
     ) {
@@ -78,26 +78,10 @@ public final class CommandComponent<C> {
      * Gets the command component description
      *
      * @return command component description
-     * @deprecated for removal since 1.4.0. Use {@link #argumentDescription()} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public @NonNull Description description() {
-        if (this.description instanceof Description) {
-            return (Description) this.description;
-        } else {
-            return new Description(this.description.getDescription());
-        }
-    }
-
-    /**
-     * Gets the command component description
-     *
-     * @return command component description
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @NonNull ArgumentDescription argumentDescription() {
+    public @NonNull ArgumentDescription<C> argumentDescription() {
         return this.description;
     }
 
@@ -186,7 +170,7 @@ public final class CommandComponent<C> {
     public @NonNull CommandComponent<C> copy() {
         return new CommandComponent<>(
                 this.argument().copy(),
-                this.description(),
+                this.argumentDescription(),
                 this.required(),
                 this.defaultValue()
         );
@@ -204,7 +188,7 @@ public final class CommandComponent<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public static <C> @NonNull CommandComponent<C> required(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
+            final @NonNull ArgumentDescription<C> commandDescription
     ) {
         return new CommandComponent<C>(commandArgument, commandDescription, true, null);
     }
@@ -222,7 +206,7 @@ public final class CommandComponent<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public static <C> @NonNull CommandComponent<C> optional(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription,
+            final @NonNull ArgumentDescription<C> commandDescription,
             final @Nullable DefaultValue<C, ?> defaultValue
     ) {
         return new CommandComponent<C>(commandArgument, commandDescription, false, defaultValue);
@@ -240,7 +224,7 @@ public final class CommandComponent<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public static <C> @NonNull CommandComponent<C> optional(
             final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
+            final @NonNull ArgumentDescription<C> commandDescription
     ) {
         return new CommandComponent<C>(commandArgument, commandDescription, false, null);
     }

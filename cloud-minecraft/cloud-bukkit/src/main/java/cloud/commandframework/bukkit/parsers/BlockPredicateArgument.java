@@ -66,7 +66,7 @@ public final class BlockPredicateArgument<C> extends CommandArgument<C, BlockPre
     private BlockPredicateArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(name, new Parser<>(), BlockPredicate.class, suggestionProvider, defaultDescription);
     }

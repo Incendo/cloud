@@ -163,9 +163,9 @@ class CommandManagerTest {
         assertThat(TypeToken.get(int.class)).isEqualTo(components.get(3).argument().getValueType());
 
         // Check description is set for all components, is empty when not specified
-        assertThat(components.get(0).argumentDescription().getDescription()).isEmpty();
-        assertThat(components.get(1).argumentDescription().getDescription()).isEmpty();
-        assertThat(components.get(2).argumentDescription().getDescription()).isEqualTo("detaildescription");
-        assertThat(components.get(3).argumentDescription().getDescription()).isEqualTo("argumentdescription");
+        assertThat(components.get(0).argumentDescription().description(new TestCommandSender())).isEmpty();
+        assertThat(components.get(1).argumentDescription().description(new TestCommandSender())).isEmpty();
+        assertThat(components.get(2).argumentDescription().description(new TestCommandSender())).isEqualTo("detaildescription");
+        assertThat(components.get(3).argumentDescription().description(new TestCommandSender())).isEqualTo("argumentdescription");
     }
 }

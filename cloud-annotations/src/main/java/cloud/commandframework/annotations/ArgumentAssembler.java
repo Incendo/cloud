@@ -45,6 +45,6 @@ public interface ArgumentAssembler<C> {
      */
     @NonNull CommandComponent<C> assembleArgument(
             @NonNull SyntaxFragment syntaxFragment,
-            @NonNull ArgumentDescriptor descriptor
+            @NonNull ArgumentDescriptor<C> descriptor
     );
 }

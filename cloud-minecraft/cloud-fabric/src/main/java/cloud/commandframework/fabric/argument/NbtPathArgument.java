@@ -42,7 +42,7 @@ public final class NbtPathArgument<C> extends CommandArgument<C, net.minecraft.c
     NbtPathArgument(
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @NonNull ArgumentDescription<C> defaultDescription
     ) {
         super(
                 name,
