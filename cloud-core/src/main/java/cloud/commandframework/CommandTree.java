@@ -24,6 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
@@ -386,16 +387,25 @@ public final class CommandTree<C> {
             return Pair.of(null, null);
         }
 
+        // This stores the argument value for this argument.
+        Object argumentValue = null;
+
         // Flag arguments need to be skipped over, so that further defaults are handled
         if (commandInput.isEmpty() && !(child.argument() instanceof FlagArgument)) {
             final CommandComponent<C> childComponent = Objects.requireNonNull(child.component());
             if (childComponent.hasDefaultValue()) {
-                return this.attemptParseUnambiguousChild(
-                        parsedArguments,
-                        commandContext,
-                        root,
-                        commandInput.appendString(childComponent.defaultValue())
-                );
+                final DefaultValue<C, ?> defaultValue = childComponent.defaultValue();
+
+                if (defaultValue instanceof DefaultValue.ParsedDefaultValue) {
+                    return this.attemptParseUnambiguousChild(
+                            parsedArguments,
+                            commandContext,
+                            root,
+                            commandInput.appendString(((DefaultValue.ParsedDefaultValue<C, ?>) defaultValue).value())
+                    );
+                } else {
+                    argumentValue = defaultValue.evaluateDefault(commandContext);
+                }
             } else if (!child.component().required()) {
                 if (childComponent.argument().getOwningCommand() == null) {
                     // If there are multiple children with different owning commands then it's ambiguous and
@@ -476,10 +486,26 @@ public final class CommandTree<C> {
         }
 
         final CommandArgument<C, ?> argument = Objects.requireNonNull(child.argument());
-        final ArgumentParseResult<?> result = this.parseArgument(commandContext, argument, commandInput);
 
-        if (result.getParsedValue().isPresent()) {
-            commandContext.store(argument.getName(), result.getParsedValue().get());
+        if (argumentValue == null) {
+            final ArgumentParseResult<?> result = this.parseArgument(commandContext, argument, commandInput);
+            if (result.getParsedValue().isPresent()) {
+                argumentValue = result.getParsedValue().get();
+            } else if (result.getFailure().isPresent()) {
+                return Pair.of(null, new ArgumentParseException(
+                        result.getFailure().get(),
+                        commandContext.getSender(),
+                        this.getChain(child)
+                                .stream()
+                                .filter(node -> node.component() != null)
+                                .map(CommandNode::component)
+                                .collect(Collectors.toList())
+                ));
+            }
+        }
+
+        if (argumentValue != null) {
+            commandContext.store(argument.getName(), argumentValue);
             if (child.isLeaf()) {
                 if (commandInput.isEmpty()) {
                     return Pair.of(argument.getOwningCommand(), null);
@@ -500,16 +526,6 @@ public final class CommandTree<C> {
 
             parsedArguments.add(Objects.requireNonNull(child.component()));
             return this.parseCommand(parsedArguments, commandContext, commandInput, child);
-        } else if (result.getFailure().isPresent()) {
-            return Pair.of(null, new ArgumentParseException(
-                    result.getFailure().get(),
-                    commandContext.getSender(),
-                    this.getChain(child)
-                        .stream()
-                        .filter(node -> node.component() != null)
-                        .map(CommandNode::component)
-                        .collect(Collectors.toList())
-            ));
         }
 
         return Pair.of(null, null);
