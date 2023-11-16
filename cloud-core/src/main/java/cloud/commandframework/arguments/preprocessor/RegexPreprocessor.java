@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.preprocessor;
 
+import cloud.commandframework.arguments.ArgumentPreprocessor;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
@@ -30,7 +31,6 @@ import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
@@ -43,8 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
-        @NonNull ArgumentParseResult<Boolean>> {
+public final class RegexPreprocessor<C> implements ArgumentPreprocessor<C> {
 
     private final String rawPattern;
     private final Predicate<@NonNull String> predicate;
@@ -87,7 +86,7 @@ public final class RegexPreprocessor<C> implements BiFunction<@NonNull CommandCo
     }
 
     @Override
-    public @NonNull ArgumentParseResult<Boolean> apply(
+    public @NonNull ArgumentParseResult<Boolean> preprocess(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput commandInput
     ) {

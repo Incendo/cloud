@@ -23,32 +23,26 @@
 //
 package cloud.commandframework.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import cloud.commandframework.arguments.parser.ParserParameters;
+import java.lang.annotation.Annotation;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Annotation version of adding {@link cloud.commandframework.arguments.preprocessor.RegexPreprocessor}
- * as a preprocessor using {@link cloud.commandframework.arguments.CommandArgument#addPreprocessor(cloud.commandframework.arguments.ArgumentPreprocessor)}
+ * Maps annotations to {@link ParserParameters parser parameters}.
+ *
+ * @param <A> annotation type
+ * @since 2.0.0
  */
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Regex {
+@API(status = API.Status.STABLE, since = "2.0.0")
+@FunctionalInterface
+public interface AnnotationMapper<A extends Annotation> {
 
     /**
-     * Regular expression pattern
+     * Maps the given {@code annotation} to {@link ParserParameters parser parameters}.
      *
-     * @return Pattern
+     * @param annotation the annotation
+     * @return the mapped parser parameters
      */
-    @NonNull String value();
-
-    /**
-     * Key for the caption used to generate the failure exception.
-     * Defaults to {@link cloud.commandframework.captions.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
-     *
-     * @return Failure caption key
-     */
-    @NonNull String failureCaption() default "argument.parse.failure.regex";
+    @NonNull ParserParameters mapAnnotation(@NonNull A annotation);
 }

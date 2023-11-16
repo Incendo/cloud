@@ -23,32 +23,19 @@
 //
 package cloud.commandframework.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Annotation version of adding {@link cloud.commandframework.arguments.preprocessor.RegexPreprocessor}
- * as a preprocessor using {@link cloud.commandframework.arguments.CommandArgument#addPreprocessor(cloud.commandframework.arguments.ArgumentPreprocessor)}
- */
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Regex {
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface CommandMethodExecutionHandlerFactory<C> {
 
     /**
-     * Regular expression pattern
+     * Creates an execution handler from the given {@code context}.
      *
-     * @return Pattern
+     * @param context the context
+     * @return the execution handler
      */
-    @NonNull String value();
-
-    /**
-     * Key for the caption used to generate the failure exception.
-     * Defaults to {@link cloud.commandframework.captions.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
-     *
-     * @return Failure caption key
-     */
-    @NonNull String failureCaption() default "argument.parse.failure.regex";
+    @NonNull MethodCommandExecutionHandler<C> createExecutionHandler(
+            MethodCommandExecutionHandler.@NonNull CommandMethodContext<C> context
+    );
 }
