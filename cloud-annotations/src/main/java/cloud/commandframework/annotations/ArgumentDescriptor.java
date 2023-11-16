@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
-public final class ArgumentDescriptor {
+public final class ArgumentDescriptor implements Descriptor {
 
     private final Parameter parameter;
     private final String name;
@@ -80,6 +80,7 @@ public final class ArgumentDescriptor {
      *
      * @return the argument name
      */
+    @Override
     public @NonNull String name() {
         if (this.name.equals(AnnotationParser.INFERRED_ARGUMENT_NAME)) {
             return this.parameter.getName();

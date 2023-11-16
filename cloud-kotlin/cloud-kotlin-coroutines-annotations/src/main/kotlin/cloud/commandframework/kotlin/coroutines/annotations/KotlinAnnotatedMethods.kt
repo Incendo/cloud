@@ -27,6 +27,7 @@ import cloud.commandframework.annotations.AnnotationParser
 import cloud.commandframework.annotations.MethodCommandExecutionHandler
 import cloud.commandframework.context.CommandContext
 import cloud.commandframework.execution.CommandExecutionCoordinator
+import io.leangen.geantyref.GenericTypeReflector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
@@ -37,7 +38,12 @@ import java.util.function.Predicate
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.reflect.KParameter
 import kotlin.reflect.full.callSuspend
+import kotlin.reflect.full.callSuspendBy
+import kotlin.reflect.full.instanceParameter
+import kotlin.reflect.full.valueParameters
+import kotlin.reflect.jvm.javaType
 import kotlin.reflect.jvm.kotlinFunction
 
 /**
@@ -45,12 +51,14 @@ import kotlin.reflect.jvm.kotlinFunction
  *
  * @param scope coroutine scope
  * @param context coroutine context
+ * @param onlyForSuspending whether the Kotlin execution handler should only be used for suspending functions
  * @return annotation parser
  * @since 1.6.0
  */
 public fun <C> AnnotationParser<C>.installCoroutineSupport(
     scope: CoroutineScope = GlobalScope,
-    context: CoroutineContext = EmptyCoroutineContext
+    context: CoroutineContext = EmptyCoroutineContext,
+    onlyForSuspending: Boolean = false
 ): AnnotationParser<C> {
     if (manager().commandExecutionCoordinator() is CommandExecutionCoordinator.SimpleCoordinator) {
         RuntimeException(
@@ -60,7 +68,13 @@ public fun <C> AnnotationParser<C>.installCoroutineSupport(
             .printStackTrace()
     }
 
-    val predicate = Predicate<Method> { it.kotlinFunction?.isSuspend == true }
+    val predicate = Predicate<Method> { method ->
+        if (onlyForSuspending) {
+            method.kotlinFunction?.isSuspend == true
+        } else {
+            method.kotlinFunction != null
+        }
+    }
     registerCommandExecutionMethodFactory(predicate) {
         KotlinMethodCommandExecutionHandler(scope, context, it)
     }
@@ -78,20 +92,68 @@ private class KotlinMethodCommandExecutionHandler<C>(
 
     override fun executeFuture(commandContext: CommandContext<C>): CompletableFuture<Void?> {
         val instance = context().instance()
+
+        val kFunction = requireNotNull(context().method().kotlinFunction)
+        val valueParameters = kFunction.valueParameters.associateBy(KParameter::name)
+
+        // If there are no optional parameters then we pass by position. This means that everything will work just fine
+        // even if the parameter names are scrambled by Java.
+        if (valueParameters.values.none(KParameter::isOptional)) {
+            val params = createParameterValues(
+                commandContext,
+                commandContext.flags(),
+                paramsWithoutContinuation
+            ).map(ParameterValue::value)
+            return coroutineScope.future(this@KotlinMethodCommandExecutionHandler.coroutineContext) {
+                try {
+                    kFunction.callSuspend(instance, *params.toTypedArray())
+                } catch (e: InvocationTargetException) { // unwrap invocation exception
+                    e.cause?.let { throw it } ?: throw e // if cause exists, throw, else rethrow invocation exception
+                }
+                null
+            }
+        }
+
+        val instanceParameter = kFunction.instanceParameter?.let { mapOf(it to instance) } ?: emptyMap()
+
+        // We then get the parameter values and try to match them up with the KParameter values. If Java is set to compile
+        // with the parameter names intact, then the first if statement will catch it and everything will be easy. However,
+        // if this is not the case then we try to match up the parameters by comparing the argument/flag names, and lastly
+        // by comparing the types of the parameters.
         val params = createParameterValues(
             commandContext,
             commandContext.flags(),
             paramsWithoutContinuation
-        )
+        ).associate { parameterValue ->
+            val descriptor = parameterValue.descriptor()
+            val parameter: KParameter = if (parameterValue.parameter().name in valueParameters) {
+                requireNotNull(valueParameters[parameterValue.parameter().name])
+            } else if (descriptor != null && descriptor.name() in valueParameters) {
+                requireNotNull(valueParameters[descriptor.name()])
+            } else {
+                requireNotNull(valueParameters.values.firstOrNull { kParam -> kParam.hasType(parameterValue.parameter().type) }) {
+                    "could not find parameter ${parameterValue.parameter().name} of type ${parameterValue.parameter().type}, " +
+                        "kParameters: ${valueParameters.entries.joinToString { "${it.key} (${it.value.type.javaType})" } }"
+                }
+            }
+            parameter to parameterValue.value()
+        }.filter { (parameter, value) ->
+            value != null || (!parameter.isOptional)
+        } + instanceParameter
 
         // We need to propagate exceptions to the caller.
         return coroutineScope.future(this@KotlinMethodCommandExecutionHandler.coroutineContext) {
             try {
-                context().method().kotlinFunction!!.callSuspend(instance, *params.toTypedArray())
+                kFunction.callSuspendBy(params)
             } catch (e: InvocationTargetException) { // unwrap invocation exception
                 e.cause?.let { throw it } ?: throw e // if cause exists, throw, else rethrow invocation exception
             }
             null
         }
+    }
+
+    private fun KParameter.hasType(clazz: Class<*>): Boolean {
+        val javaType = GenericTypeReflector.erase(type.javaType)
+        return javaType == clazz
     }
 }
