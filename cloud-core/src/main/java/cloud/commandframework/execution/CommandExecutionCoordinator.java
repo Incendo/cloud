@@ -26,11 +26,11 @@ package cloud.commandframework.execution;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandTree;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.services.State;
 import cloud.commandframework.types.tuples.Pair;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import org.apiguardian.api.API;
@@ -74,12 +74,12 @@ public abstract class CommandExecutionCoordinator<C> {
      * Coordinate the execution of a command and return the result
      *
      * @param commandContext Command context
-     * @param input          Command input
+     * @param commandInput   Command input
      * @return Future that completes with the result
      */
     public abstract @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(
             @NonNull CommandContext<C> commandContext,
-            @NonNull Queue<@NonNull String> input
+            @NonNull CommandInput commandInput
     );
 
     /**
@@ -108,12 +108,12 @@ public abstract class CommandExecutionCoordinator<C> {
         @Override
         public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> input
+                final @NonNull CommandInput commandInput
         ) {
             final CompletableFuture<CommandResult<C>> completableFuture = new CompletableFuture<>();
             try {
                 final @NonNull Pair<@Nullable Command<C>, @Nullable Exception> pair =
-                        this.getCommandTree().parse(commandContext, input);
+                        this.getCommandTree().parse(commandContext, commandInput);
                 if (pair.getSecond() != null) {
                     completableFuture.completeExceptionally(pair.getSecond());
                 } else {

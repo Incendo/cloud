@@ -29,13 +29,12 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apiguardian.api.API;
@@ -248,22 +247,12 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         @Override
         public @NonNull ArgumentParseResult<Integer> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(IntegerParser.class, commandContext));
+            if (!commandInput.isValidInteger(this.min, this.max)) {
+                return ArgumentParseResult.failure(new IntegerParseException(commandInput.peekString(), this, commandContext));
             }
-            try {
-                final int value = Integer.parseInt(input);
-                if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new IntegerParseException(input, this, commandContext));
-                }
-                inputQueue.remove();
-                return ArgumentParseResult.success(value);
-            } catch (final Exception e) {
-                return ArgumentParseResult.failure(new IntegerParseException(input, this, commandContext));
-            }
+            return ArgumentParseResult.success(commandInput.readInteger());
         }
 
         /**

@@ -26,7 +26,7 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
-import java.util.LinkedList;
+import cloud.commandframework.context.CommandInput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,30 +52,30 @@ class CharacterParserTest {
     @Test
     void Parse_ValidChar_SuccessfulParse() {
         // Arrange
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf("a");
+        final CommandInput commandInput = CommandInput.of("a");
 
         // Act
         final ArgumentParseResult<Character> result = this.parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue('a');
 
-        assertThat(input).isEmpty();
+        assertThat(commandInput.isEmpty()).isTrue();
     }
 
     @Test
     void Parse_TooLongString_FailedParse() {
         // Arrange
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf("aa");
+        final CommandInput commandInput = CommandInput.of("aa");
 
         // Act
         final ArgumentParseResult<Character> result = this.parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert

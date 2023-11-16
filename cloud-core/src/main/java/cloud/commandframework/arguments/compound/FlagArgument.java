@@ -33,6 +33,7 @@ import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.SimpleCloudKey;
@@ -45,12 +46,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Container for flag parsing logic. This should not be be used directly.
@@ -128,59 +129,50 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         @Override
         public @NonNull ArgumentParseResult<@NonNull Object> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
             final FlagParser parser = new FlagParser();
-            return parser.parse(commandContext, inputQueue);
+            return parser.parse(commandContext, commandInput);
         }
 
         /**
-         * Parse command input to figure out what flag is currently being
+         * Parses command input to figure out what flag is currently being
          * typed at the end of the input queue. If no flag value is being
          * inputted, returns {@link Optional#empty()}.<br>
          * <br>
          * Will consume all but the last element from the input queue.
          *
          * @param commandContext Command context
-         * @param inputQueue     The input queue of arguments
+         * @param commandInput   The input arguments
          * @return current flag being typed, or {@code empty()} if none is
          */
+        @API(status = API.Status.STABLE, since = "2.0.0")
         public @NonNull Optional<String> parseCurrentFlag(
                 final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
             /* If empty, nothing to do */
-            if (inputQueue.isEmpty()) {
+            if (commandInput.isEmpty()) {
                 return Optional.empty();
             }
 
             /* Before parsing, retrieve the last known input of the queue */
-            String lastInputValue = "";
-            for (String input : inputQueue) {
-                lastInputValue = input;
-            }
+            final String lastInputValue = commandInput.tokenize().getLast();
 
             /* Parse, but ignore the result of parsing */
             final FlagParser parser = new FlagParser();
-            parser.parse(commandContext, inputQueue);
+            parser.parse(commandContext, commandInput);
 
             /*
              * If the parser parsed the entire queue, restore the last typed
              * input obtained earlier.
              */
-            if (inputQueue.isEmpty()) {
-                inputQueue.add(lastInputValue);
+            if (commandInput.isEmpty()) {
+                final int count = lastInputValue.length();
+                commandInput.moveCursor(-count);
             }
 
-            /*
-             * Map to name of the flag.
-             *
-             * Note: legacy API made it that FLAG_META stores not the flag name,
-             * but the - or -- prefixed name or alias of the flag(s) instead.
-             * This can be removed in the future.
-             */
-            //return parser.currentFlagBeingParsed.map(CommandFlag::getName);
-            return parser.currentFlagNameBeingParsed;
+            return Optional.ofNullable(parser.lastParsedFlag());
         }
 
         @Override
@@ -268,11 +260,11 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     }
                 } else { // -x
                     final String flagName = lastArg.substring(1);
-                    for (final CommandFlag<?> flag : this.flags) {
+                    outer: for (final CommandFlag<?> flag : this.flags) {
                         for (final String alias : flag.getAliases()) {
                             if (alias.equalsIgnoreCase(flagName)) {
                                 currentFlag = flag;
-                                break;
+                                break outer;
                             }
                         }
                     }
@@ -296,176 +288,176 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
          */
         private class FlagParser {
 
-            /**
-             * The current flag whose value is being parsed
-             */
-            @SuppressWarnings("unused")
-            private Optional<CommandFlag<?>> currentFlagBeingParsed = Optional.empty();
-            /**
-             * The name of the current flag being parsed, can be obsoleted in the future.
-             * This name includes the - or -- prefix.
-             */
-            private Optional<String> currentFlagNameBeingParsed = Optional.empty();
+            private String lastParsedFlag;
 
             @SuppressWarnings({"unchecked", "rawtypes"})
             public @NonNull ArgumentParseResult<@NonNull Object> parse(
                     final @NonNull CommandContext<@NonNull C> commandContext,
-                    final @NonNull Queue<@NonNull String> inputQueue
+                    final @NonNull CommandInput commandInput
             ) {
-                Set<CommandFlag<?>> parsedFlags = commandContext.computeIfAbsent(PARSED_FLAGS, k -> new HashSet());
+                final Set<CommandFlag<?>> parsedFlags = commandContext.computeIfAbsent(PARSED_FLAGS, k -> new HashSet());
 
-                CommandFlag<?> currentFlag = null;
-                String currentFlagName = null;
+                while (!commandInput.isEmpty()) {
+                    final String string = commandInput.peekString();
 
-                String string;
-                while ((string = inputQueue.peek()) != null) {
-                    /* No longer typing the value of the current flag */
-                    this.currentFlagBeingParsed = Optional.empty();
-                    this.currentFlagNameBeingParsed = Optional.empty();
-
-                    if (!string.startsWith("-") && currentFlag == null) {
-                        /* Not flag waiting to be parsed */
+                    // If we're not starting a new flag then we're outside the scope of this parser. We exit.
+                    if (!string.startsWith("-")) {
                         return ArgumentParseResult.success(FLAG_PARSE_RESULT_OBJECT);
-                    } else if (currentFlag == null) {
-                        /* Parse next flag name to set */
+                    }
 
-                        /* Remove flag argument from input queue */
-                        inputQueue.poll();
+                    // We're definitely not supplying anything to the flag.
+                    this.lastParsedFlag = null;
 
-                        if (string.startsWith("--")) {
-                            final String flagName = string.substring(2);
-                            for (final CommandFlag<?> flag : FlagArgumentParser.this.flags) {
-                                if (flagName.equalsIgnoreCase(flag.getName())) {
-                                    currentFlag = flag;
-                                    currentFlagName = string;
-                                    break;
+                    // We figure out which flag we're dealing with.
+                    if (string.startsWith("--")) {
+                        commandInput.moveCursor(2);
+                    } else {
+                        commandInput.moveCursor(1);
+                    }
+
+                    final String flagName = commandInput.readString();
+                    CommandFlag<?> flag = null;
+
+                    if (string.startsWith("--")) {
+                        for (final CommandFlag<?> flagCandidate : FlagArgumentParser.this.flags) {
+                            if (flagName.equalsIgnoreCase(flagCandidate.getName())) {
+                                flag = flagCandidate;
+                                break;
+                            }
+                        }
+                    } else if (flagName.length() == 1) {
+                        outer: for (final CommandFlag<?> flagCandidate: FlagArgumentParser.this.flags) {
+                            for (final String alias : flagCandidate.getAliases()) {
+                                if (alias.equalsIgnoreCase(flagName)) {
+                                    flag = flagCandidate;
+                                    break outer;
                                 }
                             }
-                        } else {
-                            final String flagName = string.substring(1);
-                            if (flagName.length() > 1) {
-                                boolean oneAdded = false;
-                                for (int i = 0; i < flagName.length(); i++) {
-                                    final String parsedFlag = Character.toString(flagName.charAt(i))
-                                            .toLowerCase(Locale.ENGLISH);
-                                    for (final CommandFlag<?> candidateFlag : FlagArgumentParser.this.flags) {
-                                        if (candidateFlag.getCommandArgument() != null) {
-                                            continue;
-                                        }
-
-                                       if (candidateFlag.getAliases().contains(parsedFlag)) {
-                                           if (parsedFlags.contains(candidateFlag)
-                                                   && candidateFlag.mode() != CommandFlag.FlagMode.REPEATABLE) {
-                                               return ArgumentParseResult.failure(new FlagParseException(
-                                                       string,
-                                                       FailureReason.DUPLICATE_FLAG,
-                                                       commandContext
-                                               ));
-                                           } else if (!commandContext.hasPermission(candidateFlag.permission())) {
-                                               return ArgumentParseResult.failure(new FlagParseException(
-                                                       string,
-                                                       FailureReason.NO_PERMISSION,
-                                                       commandContext
-                                               ));
-                                           }
-                                           parsedFlags.add(candidateFlag);
-                                           commandContext.flags().addPresenceFlag(candidateFlag);
-                                           oneAdded = true;
-                                       }
-                                    }
+                        }
+                    } else {
+                        boolean flagFound = false;
+                        for (int i = 0; i < flagName.length(); i++) {
+                            final String parsedFlag = Character.toString(flagName.charAt(i)).toLowerCase(Locale.ENGLISH);
+                            for (final CommandFlag<?> candidateFlag : FlagArgumentParser.this.flags) {
+                                // Argument flags cannot use the shorthand form in this way.
+                                if (candidateFlag.getCommandArgument() != null) {
+                                    continue;
                                 }
-                                /* We need to parse at least one flag */
-                                if (!oneAdded) {
+
+                                if (!candidateFlag.getAliases().contains(parsedFlag)) {
+                                    continue;
+                                }
+
+                                if (parsedFlags.contains(candidateFlag) && candidateFlag.mode() != CommandFlag.FlagMode.REPEATABLE) {
                                     return ArgumentParseResult.failure(new FlagParseException(
                                             string,
-                                            FailureReason.NO_FLAG_STARTED,
+                                            FailureReason.DUPLICATE_FLAG,
+                                            commandContext
+                                    ));
+                                } else if (!commandContext.hasPermission(candidateFlag.permission())) {
+                                    return ArgumentParseResult.failure(new FlagParseException(
+                                            string,
+                                            FailureReason.NO_PERMISSION,
                                             commandContext
                                     ));
                                 }
-                                continue;
-                            } else {
-                                for (final CommandFlag<?> flag : FlagArgumentParser.this.flags) {
-                                    for (final String alias : flag.getAliases()) {
-                                        if (alias.equalsIgnoreCase(flagName)) {
-                                            currentFlag = flag;
-                                            currentFlagName = string;
-                                            break;
-                                        }
-                                    }
-                                }
+
+                                commandContext.flags().addPresenceFlag(candidateFlag);
+                                parsedFlags.add(candidateFlag);
+                                flagFound = true;
                             }
                         }
-                        if (currentFlag == null) {
-                            return ArgumentParseResult.failure(new FlagParseException(
-                                    string,
-                                    FailureReason.UNKNOWN_FLAG,
-                                    commandContext
-                            ));
-                        } else if (parsedFlags.contains(currentFlag) && currentFlag.mode() != CommandFlag.FlagMode.REPEATABLE) {
-                            return ArgumentParseResult.failure(new FlagParseException(
-                                    string,
-                                    FailureReason.DUPLICATE_FLAG,
-                                    commandContext
-                            ));
-                        } else if (!commandContext.hasPermission(currentFlag.permission())) {
-                            return ArgumentParseResult.failure(new FlagParseException(
-                                    string,
-                                    FailureReason.NO_PERMISSION,
-                                    commandContext
-                            ));
-                        }
-                        parsedFlags.add(currentFlag);
-                        if (currentFlag.getCommandArgument() == null) {
-                            /* It's a presence flag */
-                            commandContext.flags().addPresenceFlag(currentFlag);
-                            /* We don't want to parse a value for this flag */
-                            currentFlag = null;
-                        }
-                    } else {
-                        /* Mark this flag as the one currently being typed */
-                        this.currentFlagBeingParsed = Optional.of(currentFlag);
-                        this.currentFlagNameBeingParsed = Optional.of(currentFlagName);
 
-                        // Don't attempt to parse empty strings
-                        if (inputQueue.peek().isEmpty()) {
+                        if (!flagFound) {
                             return ArgumentParseResult.failure(new FlagParseException(
-                                    currentFlag.getName(),
-                                    FailureReason.MISSING_ARGUMENT,
+                                    string,
+                                    FailureReason.NO_FLAG_STARTED,
                                     commandContext
                             ));
                         }
 
-                        final ArgumentParseResult<?> result =
-                                ((CommandArgument) currentFlag.getCommandArgument())
-                                        .getParser()
-                                        .parse(
-                                                commandContext,
-                                                inputQueue
-                                        );
-                        if (result.getFailure().isPresent()) {
-                            return ArgumentParseResult.failure(result.getFailure().get());
-                        } else if (result.getParsedValue().isPresent()) {
-                            final CommandFlag erasedFlag = currentFlag;
-                            final Object value = result.getParsedValue().get();
-                            commandContext.flags().addValueFlag(erasedFlag, value);
-                            currentFlag = null;
-                        } else {
-                            throw new IllegalStateException("Neither result or value were present. Panicking.");
-                        }
+                        // This type of flag can never have a value. We move on to the next flag.
+                        continue;
                     }
+
+                    if (flag == null) {
+                        return ArgumentParseResult.failure(new FlagParseException(
+                                string,
+                                FailureReason.UNKNOWN_FLAG,
+                                commandContext
+                        ));
+                    } else if (parsedFlags.contains(flag) && flag.mode() != CommandFlag.FlagMode.REPEATABLE) {
+                        return ArgumentParseResult.failure(new FlagParseException(
+                                string,
+                                FailureReason.DUPLICATE_FLAG,
+                                commandContext
+                        ));
+                    } else if (!commandContext.hasPermission(flag.permission())) {
+                        return ArgumentParseResult.failure(new FlagParseException(
+                                string,
+                                FailureReason.NO_PERMISSION,
+                                commandContext
+                        ));
+                    }
+
+                    // The flag has no argument, so we're done.
+                    if (flag.getCommandArgument() == null) {
+                        commandContext.flags().addPresenceFlag(flag);
+                        parsedFlags.add(flag);
+                        continue;
+                    }
+
+                    // If the command input ends with a space then we set lastParsedFlag before checking if the command
+                    // input is empty. This is because this means that the sender has actually started
+                    // completing the value.
+                    if (commandInput.hasRemainingInput() && commandInput.peek() == ' ') {
+                        // Indicate that we parsed the flag and that we're trying to populate the value for it.
+                        this.lastParsedFlag = string;
+                    }
+
+                    // If there is no input (a space cannot be parsed into anything) then
+                    // we cannot complete this flag.
+                    if (commandInput.isEmpty(true /* ignoreWhitespace */)) {
+                        return ArgumentParseResult.failure(new FlagParseException(
+                                flag.getName(),
+                                FailureReason.MISSING_ARGUMENT,
+                                commandContext
+                        ));
+                    }
+
+                    // Indicate that we parsed the flag and that we're trying to populate the value for it.
+                    this.lastParsedFlag = string;
+
+                    // We then attempt to parse the flag.
+                    final ArgumentParseResult<?> result =
+                            ((CommandArgument) flag.getCommandArgument())
+                                    .getParser()
+                                    .parse(
+                                            commandContext,
+                                            commandInput
+                                    );
+
+                    if (result.getFailure().isPresent()) {
+                        return ArgumentParseResult.failure(result.getFailure().get());
+                    } else if (!result.getParsedValue().isPresent()) {
+                        throw new IllegalStateException("Neither result or value were present. Panicking.");
+                    }
+
+                    // We store the parsed flag in the context. We do ugly erasure here because generics :)
+                    commandContext.flags().addValueFlag(((CommandFlag) flag), (Object) result.getParsedValue().get());
+                    // At this point we know the flag parsed successfully.
+                    parsedFlags.add(flag);
+
+                    // We're no longer parsing a flag.
+                    this.lastParsedFlag = null;
                 }
 
-                /* Queue ran out while a flag argument needs to be parsed still */
-                if (currentFlag != null) {
-                    return ArgumentParseResult.failure(new FlagParseException(
-                            currentFlag.getName(),
-                            FailureReason.MISSING_ARGUMENT,
-                            commandContext
-                    ));
-                }
-
-                /* We've consumed everything */
+                // We've consumed everything!
                 return ArgumentParseResult.success(FLAG_PARSE_RESULT_OBJECT);
+            }
+
+            private @Nullable String lastParsedFlag() {
+                return this.lastParsedFlag;
             }
         }
     }

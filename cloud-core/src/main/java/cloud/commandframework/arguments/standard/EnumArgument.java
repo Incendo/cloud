@@ -31,12 +31,12 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -151,10 +151,10 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
         @Override
         public @NonNull ArgumentParseResult<E> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         EnumParser.class,
                         commandContext
@@ -163,7 +163,7 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
 
             for (final E value : this.allowedValues) {
                 if (value.name().equalsIgnoreCase(input)) {
-                    inputQueue.remove();
+                    commandInput.readString();
                     return ArgumentParseResult.success(value);
                 }
             }

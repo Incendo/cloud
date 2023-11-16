@@ -25,7 +25,7 @@ package cloud.commandframework.arguments;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
-import java.util.Queue;
+import cloud.commandframework.context.CommandInput;
 import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -43,7 +43,7 @@ public interface ArgumentPreprocessor<C> {
      * @since 2.0.0
      */
     static <C> @NonNull ArgumentPreprocessor<C> wrap(
-            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>> function
     ) {
         return function::apply;
@@ -54,12 +54,12 @@ public interface ArgumentPreprocessor<C> {
      * <p>
      * If the preprocessor fails then the command parsing will fail immediately.
      *
-     * @param context    the command context
-     * @param inputQueue the current input queue
+     * @param context      the command context
+     * @param commandInput the current command input
      * @return the result
      */
     @NonNull ArgumentParseResult<Boolean> preprocess(
             @NonNull CommandContext<C> context,
-            @NonNull Queue<@NonNull String> inputQueue
+            @NonNull CommandInput commandInput
     );
 }

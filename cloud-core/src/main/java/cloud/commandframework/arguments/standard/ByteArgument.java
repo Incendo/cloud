@@ -29,11 +29,10 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -195,22 +194,12 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         @Override
         public @NonNull ArgumentParseResult<Byte> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(ByteParser.class, commandContext));
+            if (!commandInput.isValidByte(this.min, this.max)) {
+                return ArgumentParseResult.failure(new ByteParseException(commandInput.peekString(), this, commandContext));
             }
-            try {
-                final byte value = Byte.parseByte(input);
-                if (value < this.min || value > this.max) {
-                    return ArgumentParseResult.failure(new ByteParseException(input, this, commandContext));
-                }
-                inputQueue.remove();
-                return ArgumentParseResult.success(value);
-            } catch (final Exception e) {
-                return ArgumentParseResult.failure(new ByteParseException(input, this, commandContext));
-            }
+            return ArgumentParseResult.success(commandInput.readByte());
         }
 
         @Override

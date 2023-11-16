@@ -32,11 +32,11 @@ import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -133,23 +133,22 @@ public final class OfflinePlayerArgument<C> extends CommandArgument<C, OfflinePl
         @SuppressWarnings("deprecation")
         public @NonNull ArgumentParseResult<OfflinePlayer> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         OfflinePlayerParser.class,
                         commandContext
                 ));
             }
 
-            final OfflinePlayer player = Bukkit.getOfflinePlayer(input);
+            final OfflinePlayer player = Bukkit.getOfflinePlayer(commandInput.readString());
 
             if (!player.hasPlayedBefore() && !player.isOnline()) {
                 return ArgumentParseResult.failure(new OfflinePlayerParseException(input, commandContext));
             }
 
-            inputQueue.remove();
             return ArgumentParseResult.success(player);
         }
 

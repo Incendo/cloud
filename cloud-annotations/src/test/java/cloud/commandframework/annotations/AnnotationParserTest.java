@@ -38,6 +38,7 @@ import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.ElementType;
@@ -50,9 +51,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
@@ -177,7 +176,7 @@ class AnnotationParserTest {
         );
         Assertions.assertEquals("yay", parser.parse(
                 context,
-                new LinkedList<>()
+                CommandInput.empty()
         ).getParsedValue().orElse(new CustomType("")).toString());
         Assertions.assertTrue(parser.suggestions(
                 context,
@@ -216,7 +215,7 @@ class AnnotationParserTest {
     }
 
     @Parser(suggestions = "cows")
-    public CustomType customTypeParser(final CommandContext<TestCommandSender> context, final Queue<String> input) {
+    public CustomType customTypeParser(final CommandContext<TestCommandSender> context, final CommandInput input) {
         return new CustomType("yay");
     }
 

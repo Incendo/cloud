@@ -31,13 +31,11 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
-import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.ParserException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -148,14 +146,9 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
     @API(status = API.Status.STABLE)
     public static final class BooleanParser<C> implements ArgumentParser<C, Boolean> {
 
-        private static final List<String> STRICT = Arrays.asList("TRUE", "FALSE");
-        private static final List<String> LIBERAL = Arrays.asList("TRUE", "YES", "ON", "FALSE", "NO", "OFF");
-        private static final List<String> LIBERAL_TRUE = Arrays.asList("TRUE", "YES", "ON");
-        private static final List<String> LIBERAL_FALSE = Arrays.asList("FALSE", "NO", "OFF");
-
-        private static final List<String> STRICT_LOWER = STRICT
+        private static final List<String> STRICT_LOWER = CommandInput.BOOLEAN_STRICT
                 .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
-        private static final List<String> LIBERAL_LOWER = LIBERAL
+        private static final List<String> LIBERAL_LOWER = CommandInput.BOOLEAN_LIBERAL
                 .stream().map(s -> s.toLowerCase(Locale.ROOT)).collect(Collectors.toList());
 
         private final boolean liberal;
@@ -172,43 +165,12 @@ public final class BooleanArgument<C> extends CommandArgument<C, Boolean> {
         @Override
         public @NonNull ArgumentParseResult<Boolean> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
-                return ArgumentParseResult.failure(new NoInputProvidedException(
-                        BooleanParser.class,
-                        commandContext
-                ));
+            if (!commandInput.isValidBoolean(this.liberal)) {
+                return ArgumentParseResult.failure(new BooleanParseException(commandInput.peekString(), this.liberal, commandContext));
             }
-
-            if (!this.liberal) {
-                if (input.equalsIgnoreCase("true")) {
-                    inputQueue.remove();
-                    return ArgumentParseResult.success(true);
-                }
-
-                if (input.equalsIgnoreCase("false")) {
-                    inputQueue.remove();
-                    return ArgumentParseResult.success(false);
-                }
-
-                return ArgumentParseResult.failure(new BooleanParseException(input, false, commandContext));
-            }
-
-            final String uppercaseInput = input.toUpperCase();
-
-            if (LIBERAL_TRUE.contains(uppercaseInput)) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(true);
-            }
-
-            if (LIBERAL_FALSE.contains(uppercaseInput)) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(false);
-            }
-
-            return ArgumentParseResult.failure(new BooleanParseException(input, true, commandContext));
+            return ArgumentParseResult.success(commandInput.readBoolean());
         }
 
         @Override

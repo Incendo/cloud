@@ -31,10 +31,10 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Objects;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -115,22 +115,18 @@ public final class CharArgument<C> extends CommandArgument<C, Character> {
         @Override
         public @NonNull ArgumentParseResult<Character> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            if (commandInput.peekString().isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         CharacterParser.class,
                         commandContext
                 ));
+            } else if (commandInput.peekString().length() != 1) {
+                return ArgumentParseResult.failure(new CharParseException(commandInput.peekString(), commandContext));
             }
 
-            if (input.length() != 1) {
-                return ArgumentParseResult.failure(new CharParseException(input, commandContext));
-            }
-
-            inputQueue.remove();
-            return ArgumentParseResult.success(input.charAt(0));
+            return ArgumentParseResult.success(commandInput.read());
         }
 
         @Override

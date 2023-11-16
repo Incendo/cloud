@@ -25,8 +25,8 @@ package cloud.commandframework.arguments.parser;
 
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.BiFunction;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -66,9 +66,9 @@ public final class MappedArgumentParser<C, I, O> implements ArgumentParser<C, O>
     @Override
     public @NonNull ArgumentParseResult<@NonNull O> parse(
             @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final Queue<@NonNull String> inputQueue
-    ) {
-        final ArgumentParseResult<@NonNull I> baseResult = this.base.parse(commandContext, inputQueue);
+            @NonNull final CommandInput commandInput
+            ) {
+        final ArgumentParseResult<@NonNull I> baseResult = this.base.parse(commandContext, commandInput);
         return baseResult.flatMapParsedValue(value -> this.mapper.apply(commandContext, value));
     }
 

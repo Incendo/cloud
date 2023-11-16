@@ -32,6 +32,7 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.ArgumentContext;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -57,7 +58,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -125,13 +125,6 @@ public final class CommandTree<C> {
         return new CommandTree<>(commandManager);
     }
 
-    private static @NonNull String stringOrEmpty(final @Nullable String string) {
-        if (string == null) {
-            return "";
-        }
-        return string;
-    }
-
     /**
      * Returns the command manager that was used to create this command tree
      *
@@ -181,12 +174,14 @@ public final class CommandTree<C> {
      * Attempts to parse string input into a command
      *
      * @param commandContext Command context instance
-     * @param args           Input
+     * @param commandInput   Input
      * @return parsed command, if one could be found
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull Pair<@Nullable Command<C>, @Nullable Exception> parse(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull Queue<@NonNull String> args
+            final @NonNull CommandInput commandInput
     ) {
         // Special case for empty command trees.
         if (this.internalTree.isLeaf() && this.internalTree.component() == null) {
@@ -195,7 +190,7 @@ public final class CommandTree<C> {
                     new NoSuchCommandException(
                             commandContext.getSender(),
                             new ArrayList<>(),
-                            stringOrEmpty(args.peek())
+                            commandInput.peekString()
                     )
             );
         }
@@ -203,7 +198,7 @@ public final class CommandTree<C> {
         final Pair<@Nullable Command<C>, @Nullable Exception> pair = this.parseCommand(
                 new ArrayList<>(),
                 commandContext,
-                args,
+                commandInput,
                 this.internalTree
         );
         if (pair.getFirst() != null) {
@@ -226,7 +221,7 @@ public final class CommandTree<C> {
     private @NonNull Pair<@Nullable Command<C>, @Nullable Exception> parseCommand(
             final @NonNull List<@NonNull CommandComponent<C>> parsedArguments,
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull Queue<@NonNull String> commandQueue,
+            final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> root
     ) {
         final CommandPermission permission = this.findMissingPermission(commandContext.getSender(), root);
@@ -246,7 +241,7 @@ public final class CommandTree<C> {
                 parsedArguments,
                 commandContext,
                 root,
-                commandQueue
+                commandInput
         );
         if (parsedChild.getFirst() != null || parsedChild.getSecond() != null) {
             return parsedChild;
@@ -255,7 +250,7 @@ public final class CommandTree<C> {
         // There are 0 or more static arguments as children. No variable child arguments are present
         if (root.children().isEmpty()) {
             final CommandArgument<C, ?> rootArgument = root.argument();
-            if (rootArgument == null || rootArgument.getOwningCommand() == null || !commandQueue.isEmpty()) {
+            if (rootArgument == null || rootArgument.getOwningCommand() == null || !commandInput.isEmpty()) {
                 // Too many arguments. We have a unique path, so we can send the entire context
                 return Pair.of(null, new InvalidSyntaxException(
                         this.commandManager.commandSyntaxFormatter()
@@ -284,21 +279,24 @@ public final class CommandTree<C> {
                 final ArgumentContext<C, ?> argumentContext = commandContext.createArgumentContext(argument);
 
                 // Copy the current queue so that we can deduce the captured input.
-                final List<String> currentQueue = new LinkedList<>(commandQueue);
+                final CommandInput currentInput = commandInput.copy();
 
                 argumentContext.markStart();
                 commandContext.setCurrentArgument(argument);
 
-                final ArgumentParseResult<?> result = argument.getParser().parse(commandContext, commandQueue);
+                final ArgumentParseResult<?> result = argument.getParser().parse(commandContext, commandInput);
                 argumentContext.markEnd();
                 argumentContext.success(!result.getFailure().isPresent());
 
-                currentQueue.removeAll(commandQueue);
-                argumentContext.consumedInput(currentQueue);
+                final List<String> consumedTokens = currentInput.tokenize();
+                consumedTokens.removeAll(commandInput.tokenize());
+                argumentContext.consumedInput(consumedTokens);
 
                 if (result.getParsedValue().isPresent()) {
                     parsedArguments.add(component);
-                    return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
+                    return this.parseCommand(parsedArguments, commandContext, commandInput, child);
+                } else if (result.getFailure().isPresent()) {
+                    commandInput.cursor(currentInput.cursor());
                 }
             }
         }
@@ -308,13 +306,13 @@ public final class CommandTree<C> {
             return Pair.of(null, new NoSuchCommandException(
                     commandContext.getSender(),
                     this.getChain(root).stream().map(CommandNode::component).collect(Collectors.toList()),
-                    stringOrEmpty(commandQueue.peek())
+                    commandInput.peekString()
             ));
         }
 
         // If we couldn't match a child, check if there's a command attached and execute it
         final CommandArgument<C, ?> rootArgument = root.argument();
-        if (rootArgument != null && rootArgument.getOwningCommand() != null && commandQueue.isEmpty()) {
+        if (rootArgument != null && rootArgument.getOwningCommand() != null && commandInput.isEmpty()) {
             final Command<C> command = rootArgument.getOwningCommand();
             if (!this.commandManager().hasPermission(
                     commandContext.getSender(),
@@ -349,12 +347,12 @@ public final class CommandTree<C> {
             final @NonNull List<@NonNull CommandComponent<C>> parsedArguments,
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandNode<C> root,
-            final @NonNull Queue<String> commandQueue
+            final @NonNull CommandInput commandInput
     ) {
         final List<CommandNode<C>> children = root.children();
 
         // Check whether it matches any of the static arguments If so, do not attempt parsing as a dynamic argument
-        if (!commandQueue.isEmpty() && this.matchesLiteral(children, commandQueue.peek())) {
+        if (!commandInput.isEmpty() && this.matchesLiteral(children, commandInput.peekString())) {
             return Pair.of(null, null);
         }
 
@@ -372,7 +370,7 @@ public final class CommandTree<C> {
 
         // Check if we're allowed to execute the child command. If not, exit
         final CommandPermission permission = this.findMissingPermission(commandContext.getSender(), child);
-        if (!commandQueue.isEmpty() && permission != null) {
+        if (!commandInput.isEmpty() && permission != null) {
             return Pair.of(null, new NoPermissionException(
                     permission,
                     commandContext.getSender(),
@@ -393,13 +391,18 @@ public final class CommandTree<C> {
         Object argumentValue = null;
 
         // Flag arguments need to be skipped over, so that further defaults are handled
-        if (commandQueue.isEmpty() && !(child.argument() instanceof FlagArgument)) {
+        if (commandInput.isEmpty() && !(child.argument() instanceof FlagArgument)) {
             final CommandComponent<C> childComponent = Objects.requireNonNull(child.component());
             if (childComponent.hasDefaultValue()) {
                 final DefaultValue<C, ?> defaultValue = childComponent.defaultValue();
 
                 if (defaultValue instanceof DefaultValue.ParsedDefaultValue) {
-                    commandQueue.add(((DefaultValue.ParsedDefaultValue<C, ?>) defaultValue).value());
+                    return this.attemptParseUnambiguousChild(
+                            parsedArguments,
+                            commandContext,
+                            root,
+                            commandInput.appendString(((DefaultValue.ParsedDefaultValue<C, ?>) defaultValue).value())
+                    );
                 } else {
                     argumentValue = defaultValue.evaluateDefault(commandContext);
                 }
@@ -485,7 +488,7 @@ public final class CommandTree<C> {
         final CommandArgument<C, ?> argument = Objects.requireNonNull(child.argument());
 
         if (argumentValue == null) {
-            final ArgumentParseResult<?> result = this.parseArgument(commandContext, argument, commandQueue);
+            final ArgumentParseResult<?> result = this.parseArgument(commandContext, argument, commandInput);
             if (result.getParsedValue().isPresent()) {
                 argumentValue = result.getParsedValue().get();
             } else if (result.getFailure().isPresent()) {
@@ -504,7 +507,7 @@ public final class CommandTree<C> {
         if (argumentValue != null) {
             commandContext.store(argument.getName(), argumentValue);
             if (child.isLeaf()) {
-                if (commandQueue.isEmpty()) {
+                if (commandInput.isEmpty()) {
                     return Pair.of(argument.getOwningCommand(), null);
                 }
 
@@ -522,7 +525,7 @@ public final class CommandTree<C> {
             }
 
             parsedArguments.add(Objects.requireNonNull(child.component()));
-            return this.parseCommand(parsedArguments, commandContext, commandQueue, child);
+            return this.parseCommand(parsedArguments, commandContext, commandInput, child);
         }
 
         return Pair.of(null, null);
@@ -540,24 +543,29 @@ public final class CommandTree<C> {
     private @NonNull ArgumentParseResult<?> parseArgument(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandArgument<C, ?> argument,
-            final @NonNull Queue<@NonNull String> commandQueue
+            final @NonNull CommandInput commandInput
     ) {
         final ArgumentContext<C, ?> argumentContext = commandContext.createArgumentContext(argument);
         argumentContext.markStart();
 
         final ArgumentParseResult<?> result;
-        final ArgumentParseResult<Boolean> preParseResult = argument.preprocess(commandContext, commandQueue);
+        final ArgumentParseResult<Boolean> preParseResult = argument.preprocess(commandContext, commandInput);
         if (!preParseResult.getFailure().isPresent() && preParseResult.getParsedValue().orElse(false)) {
             commandContext.setCurrentArgument(argument);
 
             // Copy the current queue so that we can deduce the captured input.
-            final List<String> currentQueue = new LinkedList<>(commandQueue);
+            final CommandInput currentInput = commandInput.copy();
 
-            result = argument.getParser().parse(commandContext, commandQueue);
+            result = argument.getParser().parse(commandContext, commandInput);
 
             // We remove all remaining queue, and then we'll have a list of the captured input.
-            currentQueue.removeAll(commandQueue);
-            argumentContext.consumedInput(currentQueue);
+            final List<String> consumedInput = currentInput.tokenize();
+            consumedInput.removeAll(commandInput.tokenize());
+            argumentContext.consumedInput(consumedInput);
+
+            if (result.getFailure().isPresent()) {
+                commandInput.cursor(currentInput.cursor());
+            }
         } else {
             result = preParseResult;
         }
@@ -572,23 +580,23 @@ public final class CommandTree<C> {
      * Returns suggestions from the input queue
      *
      * @param context      Context instance
-     * @param commandQueue Input queue
+     * @param commandInput Input
      * @return String suggestions. These should be filtered based on {@link String#startsWith(String)}
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull List<@NonNull Suggestion> getSuggestions(
             final @NonNull CommandContext<C> context,
-            final @NonNull Queue<@NonNull String> commandQueue
+            final @NonNull CommandInput commandInput
     ) {
         final SuggestionContext<C> suggestionContext = new SuggestionContext<>(context);
-        return this.getSuggestions(suggestionContext, commandQueue, this.internalTree).suggestions();
+        return this.getSuggestions(suggestionContext, commandInput, this.internalTree).suggestions();
     }
 
     @SuppressWarnings("MixedMutabilityReturnType")
     private @NonNull SuggestionContext<C> getSuggestions(
             final @NonNull SuggestionContext<C> context,
-            final @NonNull Queue<@NonNull String> commandQueue,
+            final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> root
     ) {
         // If the sender isn't allowed to access the root node, no suggestions are needed
@@ -603,8 +611,8 @@ public final class CommandTree<C> {
 
         // Try to see if any of the static literals can be parsed (matches exactly)
         // If so, enter that node of the command tree for deeper suggestions
-        if (!staticArguments.isEmpty() && !commandQueue.isEmpty()) {
-            final Queue<String> commandQueueCopy = new LinkedList<>(commandQueue);
+        if (!staticArguments.isEmpty() && !commandInput.isEmpty(true /* ignoringWhitespace */)) {
+            final CommandInput commandInputCopy = commandInput.copy();
             for (CommandNode<C> child : staticArguments) {
                 final CommandArgument<C, ?> childArgument = child.argument();
                 if (childArgument == null) {
@@ -614,29 +622,32 @@ public final class CommandTree<C> {
                 context.commandContext().setCurrentArgument(childArgument);
                 final ArgumentParseResult<?> result = childArgument.getParser().parse(
                         context.commandContext(),
-                        commandQueue
+                        commandInput
                 );
+
+                if (result.getFailure().isPresent()) {
+                    commandInput.cursor(commandInputCopy.cursor());
+                }
 
                 if (!result.getParsedValue().isPresent()) {
                     continue;
                 }
 
-                if (commandQueue.isEmpty()) {
+                if (commandInput.isEmpty()) {
                     // We've already matched one exactly, no use looking further
                     break;
                 }
 
-                return this.getSuggestions(context, commandQueue, child);
+                return this.getSuggestions(context, commandInput, child);
             }
 
             // Restore original queue
-            commandQueue.clear();
-            commandQueue.addAll(commandQueueCopy);
+            commandInput.cursor(commandInputCopy.cursor());
         }
 
         // Calculate suggestions for the literal arguments
-        if (commandQueue.size() <= 1) {
-            final String literalValue = stringOrEmpty(commandQueue.peek());
+        if (commandInput.remainingTokens() <= 1) {
+            final String literalValue = commandInput.peekString().replace(" ", "");
             for (final CommandNode<C> node : staticArguments) {
                 this.addSuggestionsForLiteralArgument(context, node, literalValue);
             }
@@ -647,7 +658,7 @@ public final class CommandTree<C> {
             if (child.argument() == null || child.argument() instanceof StaticArgument) {
                 continue;
             }
-            this.addSuggestionsForDynamicArgument(context, commandQueue, child);
+            this.addSuggestionsForDynamicArgument(context, commandInput, child);
         }
 
         return context;
@@ -685,7 +696,7 @@ public final class CommandTree<C> {
     @SuppressWarnings("unchecked")
     private @NonNull SuggestionContext<C> addSuggestionsForDynamicArgument(
             final @NonNull SuggestionContext<C> context,
-            final @NonNull Queue<@NonNull String> commandQueue,
+            final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> child
     ) {
         final CommandArgument<C, ?> argument = child.argument();
@@ -696,46 +707,46 @@ public final class CommandTree<C> {
         if (argument instanceof CompoundArgument) {
             // If we're working with a compound argument then we attempt to pop the required arguments from the input queue.
             final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) argument;
-            this.popRequiredArguments(context.commandContext(), commandQueue, compoundArgument);
+            this.popRequiredArguments(context.commandContext(), commandInput, compoundArgument);
         } else if (argument.getParser() instanceof FlagArgument.FlagArgumentParser) {
             // Use the flag argument parser to deduce what flag is being suggested right now
             // If empty, then no flag value is being typed, and the different flag options should
             // be suggested instead.
             final FlagArgument.FlagArgumentParser<C> parser = (FlagArgument.FlagArgumentParser<C>) argument.getParser();
-            final Optional<String> lastFlag = parser.parseCurrentFlag(context.commandContext(), commandQueue);
+            final Optional<String> lastFlag = parser.parseCurrentFlag(context.commandContext(), commandInput);
             if (lastFlag.isPresent()) {
                 context.commandContext().store(FlagArgument.FLAG_META_KEY, lastFlag.get());
             } else {
                 context.commandContext().remove(FlagArgument.FLAG_META_KEY);
             }
-        } else if (commandQueue.size() <= argument.getParser().getRequestedArgumentCount()) {
+        } else if (commandInput.remainingTokens() <= argument.getParser().getRequestedArgumentCount()) {
             // If the input queue contains fewer arguments than requested by the parser, then the parser will
             // need to be given the opportunity to provide suggestions. We store all provided arguments
             // so that the parser can use these to give contextual suggestions.
             for (int i = 0; i < argument.getParser().getRequestedArgumentCount() - 1
-                    && commandQueue.size() > 1; i++) {
+                    && commandInput.remainingTokens() > 1; i++) {
                 context.commandContext().store(
                         String.format("%s_%d", argument.getName(), i),
-                        commandQueue.remove()
+                        commandInput.readString()
                 );
             }
         }
 
-        if (commandQueue.isEmpty()) {
+        if (commandInput.isEmpty()) {
             return context;
-        } else if (commandQueue.size() == 1) {
-            return this.addArgumentSuggestions(context, child, commandQueue.peek());
+        } else if (commandInput.remainingTokens() == 1) {
+            return this.addArgumentSuggestions(context, child, commandInput.peekString());
         } else if (child.isLeaf() && child.argument() instanceof CompoundArgument) {
-            return this.addArgumentSuggestions(context, child, ((LinkedList<String>) commandQueue).getLast());
+            return this.addArgumentSuggestions(context, child, commandInput.tokenize().getLast());
         }
 
         // Store original input command queue before the parsers below modify it
-        final Queue<String> commandQueueOriginal = new LinkedList<>(commandQueue);
+        final CommandInput commandInputOriginal = commandInput.copy();
 
         // START: Preprocessing
         final ArgumentParseResult<Boolean> preParseResult = argument.preprocess(
                 context.commandContext(),
-                commandQueue
+                commandInput
         );
         final boolean preParseSuccess = !preParseResult.getFailure().isPresent()
                 && preParseResult.getParsedValue().orElse(false);
@@ -744,30 +755,36 @@ public final class CommandTree<C> {
         if (preParseSuccess) {
             // START: Parsing
             context.commandContext().setCurrentArgument(child.argument());
-            final ArgumentParseResult<?> result = child.argument().getParser().parse(context.commandContext(), commandQueue);
+
+            final CommandInput preParseInput = commandInput.copy();
+
+            final ArgumentParseResult<?> result = child.argument().getParser().parse(context.commandContext(), commandInput);
             final Optional<?> parsedValue = result.getParsedValue();
             final boolean parseSuccess = parsedValue.isPresent();
 
+            if (result.getFailure().isPresent()) {
+                commandInput.cursor(preParseInput.cursor());
+            }
+
             // It's the last node, we don't care for success or not as we don't need to delegate to a child
             if (child.isLeaf()) {
-                if (!commandQueue.isEmpty()) {
+                if (!commandInput.isEmpty()) {
                     return context;
                 }
 
                 // Greedy parser took all the input, we can restore and just ask for suggestions
-                commandQueue.addAll(commandQueueOriginal);
-                this.addArgumentSuggestions(context, child, String.join(" ", commandQueue));
+                commandInput.cursor(commandInputOriginal.cursor());
+                this.addArgumentSuggestions(context, child, commandInput.remainingInput());
             }
 
-            if (parseSuccess && !commandQueue.isEmpty()) {
+            if (parseSuccess && !commandInput.isEmpty()) {
                 // the current argument at the position is parsable and there are more arguments following
                 context.commandContext().store(child.argument().getName(), parsedValue.get());
-                return this.getSuggestions(context, commandQueue, child);
-            } else if (!parseSuccess && commandQueueOriginal.size() > 1) {
+                return this.getSuggestions(context, commandInput, child);
+            } else if (!parseSuccess && commandInputOriginal.remainingTokens() > 1) {
                 // at this point there should normally be no need to reset the command queue as we expect
                 // users to only take out an argument if the parse succeeded. Just to be sure we reset anyway
-                commandQueue.clear();
-                commandQueue.addAll(commandQueueOriginal);
+                commandInput.cursor(commandInputOriginal.cursor());
 
                 // there are more arguments following but the current argument isn't matching - there
                 // is no need to collect any further suggestions
@@ -777,17 +794,16 @@ public final class CommandTree<C> {
         }
 
         // Restore original command input queue
-        commandQueue.clear();
-        commandQueue.addAll(commandQueueOriginal);
+        commandInput.cursor(commandInputOriginal.cursor());
 
-        if (!preParseSuccess && commandQueue.size() > 1) {
+        if (!preParseSuccess && commandInput.remainingTokens() > 1) {
             // The preprocessor denied the argument, and there are more arguments following the current one
             // Therefore we shouldn't list the suggestions of the current argument, as clearly the suggestions of
             // one of the following arguments is requested
             return context;
         }
 
-        return this.addArgumentSuggestions(context, child, commandQueue.peek());
+        return this.addArgumentSuggestions(context, child, commandInput.peekString());
     }
 
     /**
@@ -795,21 +811,21 @@ public final class CommandTree<C> {
      * {@code commandQueue} fewer than the required arguments then no arguments are popped
      *
      * @param commandContext   the command context
-     * @param commandQueue     the input queue
+     * @param commandInput     the input
      * @param compoundArgument the compound argument
      */
     private void popRequiredArguments(
             final @NonNull CommandContext<C> commandContext,
-            final @NonNull Queue<@NonNull String> commandQueue,
+            final @NonNull CommandInput commandInput,
             final @NonNull CompoundArgument<?, C, ?> compoundArgument
     ) {
         /* See how many arguments it requires */
         final int requiredArguments = compoundArgument.getParserTuple().getSize();
         /* Figure out whether we even need to care about this */
-        if (commandQueue.size() <= requiredArguments) {
+        if (commandInput.remainingTokens() <= requiredArguments) {
             /* Attempt to pop as many arguments from the stack as possible */
-            for (int i = 0; i < requiredArguments - 1 && commandQueue.size() > 1; i++) {
-                commandQueue.remove();
+            for (int i = 0; i < requiredArguments - 1 && commandInput.remainingTokens() > 1; i++) {
+                commandInput.readString();
                 commandContext.store(PARSING_ARGUMENT_KEY, i + 2);
             }
         }

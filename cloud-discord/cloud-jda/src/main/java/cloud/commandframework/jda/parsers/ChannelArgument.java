@@ -29,10 +29,10 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -180,10 +180,10 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
         @Override
         public @NonNull ArgumentParseResult<MessageChannel> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         MessageParser.class,
                         commandContext
@@ -209,7 +209,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
 
                     try {
                         final ArgumentParseResult<MessageChannel> channel = this.channelFromId(event, input, id);
-                        inputQueue.remove();
+                        commandInput.readString();
                         return channel;
                     } catch (final ChannelNotFoundException | NumberFormatException e) {
                         exception = e;
@@ -224,7 +224,7 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
             if (this.modes.contains(ParserMode.ID)) {
                 try {
                     final ArgumentParseResult<MessageChannel> result = this.channelFromId(event, input, input);
-                    inputQueue.remove();
+                    commandInput.readString();
                     return result;
                 } catch (final ChannelNotFoundException | NumberFormatException e) {
                     exception = e;
@@ -234,12 +234,12 @@ public final class ChannelArgument<C> extends CommandArgument<C, MessageChannel>
             if (this.modes.contains(ParserMode.NAME)) {
                 final List<TextChannel> channels = event.getGuild().getTextChannelsByName(input, true);
 
-                if (channels.size() == 0) {
+                if (channels.isEmpty()) {
                     exception = new ChannelNotFoundException(input);
                 } else if (channels.size() > 1) {
                     exception = new TooManyChannelsFoundParseException(input);
                 } else {
-                    inputQueue.remove();
+                    commandInput.readString();
                     return ArgumentParseResult.success(channels.get(0));
                 }
             }

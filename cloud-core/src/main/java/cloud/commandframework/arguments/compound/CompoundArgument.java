@@ -28,10 +28,10 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.types.tuples.Tuple;
 import io.leangen.geantyref.TypeToken;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.apiguardian.api.API;
@@ -129,12 +129,12 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
         @Override
         public @NonNull ArgumentParseResult<O> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
             final Object[] output = new Object[this.parsers.length];
             for (int i = 0; i < this.parsers.length; i++) {
                 @SuppressWarnings("unchecked") final ArgumentParser<C, ?> parser = (ArgumentParser<C, ?>) this.parsers[i];
-                final ArgumentParseResult<?> result = parser.parse(commandContext, inputQueue);
+                final ArgumentParseResult<?> result = parser.parse(commandContext, commandInput);
                 if (result.getFailure().isPresent()) {
                     /* Return the failure */
                     return ArgumentParseResult.failure(result.getFailure().get());

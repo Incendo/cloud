@@ -26,6 +26,7 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.util.Collections;
 import java.util.LinkedList;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ class StringParserTest {
                 StringArgument.StringMode.GREEDY_FLAG_YIELDING,
                 (context, input) -> Collections.emptyList()
         );
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(
+        final CommandInput commandInput = CommandInput.of(ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",
                 "a",
@@ -58,19 +59,19 @@ class StringParserTest {
                 "more",
                 "flag",
                 "content"
-        );
+        ));
 
         // Act
         final ArgumentParseResult<String> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue("this is a string");
 
-        assertThat(input).containsExactly("--flag", "more", "flag", "content");
+        assertThat(commandInput.tokenize()).containsExactly("--flag", "more", "flag", "content");
     }
 
     @Test
@@ -80,7 +81,7 @@ class StringParserTest {
                 StringArgument.StringMode.GREEDY_FLAG_YIELDING,
                 (context, input) -> Collections.emptyList()
         );
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(
+        final CommandInput commandInput = CommandInput.of(ArgumentTestHelper.linkedListOf(
                 "this",
                 "is",
                 "a",
@@ -89,18 +90,18 @@ class StringParserTest {
                 "-l",
                 "-a",
                 "-g"
-        );
+        ));
 
         // Act
         final ArgumentParseResult<String> result = parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue("this is a string");
 
-        assertThat(input).containsExactly("-f", "-l", "-a", "-g");
+        assertThat(commandInput.tokenize()).containsExactly("-f", "-l", "-a", "-g");
     }
 }

@@ -32,11 +32,11 @@ import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -127,23 +127,22 @@ public final class PlayerArgument<C> extends CommandArgument<C, Player> {
         @SuppressWarnings("deprecation")
         public @NonNull ArgumentParseResult<Player> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         PlayerParser.class,
                         commandContext
                 ));
             }
 
-            Player player = Bukkit.getPlayer(input);
+            Player player = Bukkit.getPlayer(commandInput.readString());
 
             if (player == null) {
                 return ArgumentParseResult.failure(new PlayerParseException(input, commandContext));
             }
 
-            inputQueue.remove();
             return ArgumentParseResult.success(player);
         }
 

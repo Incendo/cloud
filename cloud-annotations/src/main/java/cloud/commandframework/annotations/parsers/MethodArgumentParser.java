@@ -28,11 +28,11 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Queue;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -68,11 +68,11 @@ public final class MethodArgumentParser<C, T> implements ArgumentParser<C, T> {
     @SuppressWarnings("unchecked")
     public @NonNull ArgumentParseResult<@NonNull T> parse(
             final @NonNull CommandContext<@NonNull C> commandContext,
-            final @NonNull Queue<@NonNull String> inputQueue
+            final @NonNull CommandInput commandInput
     ) {
         try {
             return ArgumentParseResult.success(
-                    (T) this.methodHandle.invokeWithArguments(commandContext, inputQueue)
+                    (T) this.methodHandle.invokeWithArguments(commandContext, commandInput)
             );
         } catch (final Throwable t) {
             return ArgumentParseResult.failure(t);

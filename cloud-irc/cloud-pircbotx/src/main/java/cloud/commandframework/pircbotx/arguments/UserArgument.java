@@ -30,11 +30,11 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.pircbotx.PircBotXCommandManager;
 import io.leangen.geantyref.TypeToken;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -130,10 +130,10 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
         @Override
         public @NonNull ArgumentParseResult<@NonNull User> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         UserArgumentParser.class,
                         commandContext
@@ -142,8 +142,7 @@ public final class UserArgument<C> extends CommandArgument<C, User> {
             final PircBotX pircBotX = commandContext.get(PircBotXCommandManager.PIRCBOTX_META_KEY);
             final User user;
             try {
-                user = pircBotX.getUserChannelDao().getUser(input);
-                inputQueue.remove();
+                user = pircBotX.getUserChannelDao().getUser(commandInput.readString());
             } catch (final DaoException exception) {
                 return ArgumentParseResult.failure(
                         new UserParseException(

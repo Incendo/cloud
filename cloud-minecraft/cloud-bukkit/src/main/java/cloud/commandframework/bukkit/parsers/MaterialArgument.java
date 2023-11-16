@@ -31,11 +31,11 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.bukkit.Material;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -116,19 +116,18 @@ public class MaterialArgument<C> extends CommandArgument<C, Material> {
         @Override
         public @NonNull ArgumentParseResult<Material> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            String input = inputQueue.peek();
-            if (input == null) {
+            if (commandInput.peekString().isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         MaterialParser.class,
                         commandContext
                 ));
             }
 
+            final String input = commandInput.readString();
             try {
                 final Material material = Material.valueOf(input.toUpperCase());
-                inputQueue.remove();
                 return ArgumentParseResult.success(material);
             } catch (final IllegalArgumentException exception) {
                 return ArgumentParseResult.failure(new MaterialParseException(input, commandContext));

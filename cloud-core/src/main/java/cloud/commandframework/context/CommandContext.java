@@ -583,23 +583,25 @@ public class CommandContext<C> {
     }
 
     /**
-     * Get the raw input.
+     * Returns a copy of the raw input
      *
-     * @return Raw input in token form
+     * @return raw input
+     * @since 2.0.0
      */
-    public @NonNull LinkedList<@NonNull String> getRawInput() {
-        return this.getOrDefault("__raw_input__", new LinkedList<>());
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandInput rawInput() {
+        return this.getOrDefault("__raw_input__", CommandInput.empty()).copy();
     }
 
     /**
      * Get the raw input as a joined string
      *
-     * @return {@link #getRawInput()} joined with {@code " "} as the delimiter
+     * @return {@link #rawInput()} joined with {@code " "} as the delimiter
      * @since 1.1.0
      */
     @API(status = API.Status.STABLE, since = "1.1.0")
     public @NonNull String getRawInputJoined() {
-        return String.join(" ", this.getRawInput());
+        return this.rawInput().remainingInput();
     }
 
     /**

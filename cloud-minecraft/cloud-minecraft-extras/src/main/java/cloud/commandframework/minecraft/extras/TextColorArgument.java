@@ -29,6 +29,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.types.tuples.Pair;
@@ -37,7 +38,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.regex.Pattern;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -107,46 +107,39 @@ public final class TextColorArgument<C> extends CommandArgument<C, TextColor> {
         @Override
         public @NonNull ArgumentParseResult<@NonNull TextColor> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         TextColorParser.class,
                         commandContext
                 ));
             }
             if (LEGACY_PREDICATE.matcher(input).matches()) {
-                final char code = input.substring(1).toLowerCase().charAt(0);
+                commandInput.moveCursor(1);
+                final char code = Character.toLowerCase(commandInput.read());
                 for (final Pair<Character, NamedTextColor> pair : COLORS) {
                     if (pair.getFirst() == code) {
-                        inputQueue.remove();
-                        return ArgumentParseResult.success(
-                                pair.getSecond()
-                        );
+                        return ArgumentParseResult.success(pair.getSecond());
                     }
                 }
+                // If we didn't match the input, we move back.
+                commandInput.moveCursor(-2);
             }
             for (final Pair<Character, NamedTextColor> pair : COLORS) {
-                if (pair.getSecond().toString().equalsIgnoreCase(input)) {
-                    inputQueue.remove();
-                    return ArgumentParseResult.success(
-                            pair.getSecond()
-                    );
+                if (pair.getSecond().toString().equalsIgnoreCase(commandInput.peekString())) {
+                    commandInput.readString();
+                    return ArgumentParseResult.success(pair.getSecond());
                 }
             }
-            if (HEX_PREDICATE.matcher(input).matches()) {
-                inputQueue.remove();
-                return ArgumentParseResult.success(
-                        TextColor.color(Integer.parseInt(input.startsWith("#") ? input.substring(1) : input, 16))
-                );
+            if (HEX_PREDICATE.matcher(commandInput.peekString()).matches()) {
+                if (commandInput.peek() == '#') {
+                    commandInput.moveCursor(1);
+                }
+                return ArgumentParseResult.success(TextColor.color(commandInput.readInteger(16)));
             }
-            return ArgumentParseResult.failure(
-                    new TextColorParseException(
-                            commandContext,
-                            input
-                    )
-            );
+            return ArgumentParseResult.failure(new TextColorParseException(commandContext, input));
         }
 
         @Override

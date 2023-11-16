@@ -30,6 +30,7 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.velocity.VelocityCaptionKeys;
@@ -39,7 +40,6 @@ import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
@@ -58,7 +58,7 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
             final @NonNull String name,
             final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription,
-            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
+            final @NonNull Collection<@NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors
     ) {
         super(
@@ -134,16 +134,18 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
         @Override
         public @NonNull ArgumentParseResult<@NonNull RegisteredServer> parse(
                 final @NonNull CommandContext<@NonNull C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         ServerParser.class,
                         commandContext
                 ));
             }
-            final RegisteredServer server = commandContext.<ProxyServer>get("ProxyServer").getServer(input).orElse(null);
+            final RegisteredServer server = commandContext.<ProxyServer>get("ProxyServer")
+                    .getServer(commandInput.readString())
+                    .orElse(null);
             if (server == null) {
                 return ArgumentParseResult.failure(
                         new ServerParseException(
@@ -152,7 +154,6 @@ public final class ServerArgument<C> extends CommandArgument<C, RegisteredServer
                         )
                 );
             }
-            inputQueue.remove();
             return ArgumentParseResult.success(server);
         }
 

@@ -31,6 +31,7 @@ import cloud.commandframework.bukkit.BukkitCommandContextKeys;
 import cloud.commandframework.bukkit.internal.CraftBukkitReflection;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import com.google.common.base.Suppliers;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -50,7 +51,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
@@ -166,7 +166,7 @@ final class SelectorUtils {
 
         protected ArgumentParseResult<T> legacyParse(
                 final CommandContext<C> commandContext,
-                final Queue<String> inputQueue
+                final CommandInput commandInput
         ) {
             return ArgumentParseResult.failure(new SelectorParseException(
                     "",
@@ -186,12 +186,12 @@ final class SelectorUtils {
         @Override
         public ArgumentParseResult<T> parse(
                 final CommandContext<C> commandContext,
-                final Queue<String> inputQueue
+                final CommandInput commandInput
         ) {
             if (this.modernParser != null) {
-                return this.modernParser.parse(commandContext, inputQueue);
+                return this.modernParser.parse(commandContext, commandInput);
             }
-            return this.legacyParse(commandContext, inputQueue);
+            return this.legacyParse(commandContext, commandInput);
         }
 
         @Override
@@ -280,24 +280,22 @@ final class SelectorUtils {
         @Override
         public ArgumentParseResult<T> parse(
                 final CommandContext<C> commandContext,
-                final Queue<String> inputQueue
+                final CommandInput commandInput
         ) {
-            final List<String> originalInputQueue = new ArrayList<>(inputQueue);
+            final CommandInput originalCommandInput = commandInput.copy();
 
-            final ArgumentParseResult<Object> result = this.wrappedBrigadierParser.parse(commandContext, inputQueue);
+            final ArgumentParseResult<Object> result = this.wrappedBrigadierParser.parse(commandContext, commandInput);
             if (result.getFailure().isPresent()) {
                 return ArgumentParseResult.failure(result.getFailure().get());
             } else if (result.getParsedValue().isPresent()) {
                 try {
-                    final int consumed = originalInputQueue.size() - inputQueue.size();
-                    final String input = String.join(" ", originalInputQueue.subList(0, consumed));
+                    final String input = originalCommandInput.difference(commandInput);
                     return ArgumentParseResult.success(this.mapper.mapResult(
                             input,
                             new EntitySelectorWrapper(commandContext, result.getParsedValue().get())
                     ));
                 } catch (final CommandSyntaxException ex) {
-                    inputQueue.clear();
-                    inputQueue.addAll(originalInputQueue);
+                    commandInput.cursor(originalCommandInput.cursor());
                     return ArgumentParseResult.failure(ex);
                 } catch (final Exception ex) {
                     throw rethrow(ex);

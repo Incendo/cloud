@@ -29,8 +29,8 @@ import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import java.util.Queue;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import org.apiguardian.api.API;
@@ -87,10 +87,11 @@ public final class RegexPreprocessor<C> implements ArgumentPreprocessor<C> {
 
     @Override
     public @NonNull ArgumentParseResult<Boolean> preprocess(
-            final @NonNull CommandContext<C> context, final @NonNull Queue<@NonNull String> strings
+            final @NonNull CommandContext<C> context,
+            final @NonNull CommandInput commandInput
     ) {
-        final String head = strings.peek();
-        if (head == null) {
+        final String head = commandInput.peekString();
+        if (head.isEmpty()) {
             return ArgumentParseResult.failure(new NoInputProvidedException(
                     RegexPreprocessor.class,
                     context

@@ -31,11 +31,11 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import org.apiguardian.api.API;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -124,10 +124,10 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
         @SuppressWarnings("deprecation")
         public @NonNull ArgumentParseResult<Enchantment> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         EnchantmentParser.class,
                         commandContext
@@ -137,10 +137,9 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
             final NamespacedKey key;
             try {
                 if (input.contains(":")) {
-                    final String[] splitInput = input.split(":");
-                    key = new NamespacedKey(splitInput[0], splitInput[1]);
+                    key = new NamespacedKey(commandInput.readUntilAndSkip(':'), commandInput.readString());
                 } else {
-                    key = NamespacedKey.minecraft(input);
+                    key = NamespacedKey.minecraft(commandInput.readString());
                 }
             } catch (final Exception ex) {
                 return ArgumentParseResult.failure(new EnchantmentParseException(input, commandContext));
@@ -150,7 +149,6 @@ public class EnchantmentArgument<C> extends CommandArgument<C, Enchantment> {
             if (enchantment == null) {
                 return ArgumentParseResult.failure(new EnchantmentParseException(input, commandContext));
             }
-            inputQueue.remove();
             return ArgumentParseResult.success(enchantment);
         }
 

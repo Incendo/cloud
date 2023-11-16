@@ -56,6 +56,7 @@ import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgume
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.SimpleCaptionRegistry;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
@@ -417,8 +418,8 @@ public final class ExamplePlugin extends JavaPlugin {
                         StringArrayArgument.of(
                                 "args",
                                 (context, lastString) -> {
-                                    final List<String> allArgs = context.getRawInput();
-                                    if (allArgs.size() > 1 && allArgs.get(1).equals("curry")) {
+                                    final CommandInput allArgs = context.rawInput();
+                                    if (allArgs.remainingTokens() > 1 && allArgs.readString().equals("curry")) {
                                         return Collections.singletonList(Suggestion.simple("hot"));
                                     }
                                     return Collections.emptyList();

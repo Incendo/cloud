@@ -31,10 +31,10 @@ import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.StandardCaptionKeys;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.UUID;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -120,10 +120,10 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
         @Override
         public @NonNull ArgumentParseResult<UUID> parse(
                 final @NonNull CommandContext<C> commandContext,
-                final @NonNull Queue<@NonNull String> inputQueue
+                final @NonNull CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.peekString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(
                         UUIDParser.class,
                         commandContext
@@ -131,8 +131,7 @@ public final class UUIDArgument<C> extends CommandArgument<C, UUID> {
             }
 
             try {
-                UUID uuid = UUID.fromString(input);
-                inputQueue.remove();
+                final UUID uuid = UUID.fromString(commandInput.readString());
                 return ArgumentParseResult.success(uuid);
             } catch (IllegalArgumentException e) {
                 return ArgumentParseResult.failure(new UUIDParseException(input, commandContext));

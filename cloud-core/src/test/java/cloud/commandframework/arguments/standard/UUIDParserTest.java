@@ -26,7 +26,7 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.context.CommandContext;
-import java.util.LinkedList;
+import cloud.commandframework.context.CommandInput;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,30 +54,30 @@ class UUIDParserTest {
     void Parse_ValidUUID_SuccessfulParse() {
         // Arrange
         final UUID inputUUID = UUID.randomUUID();
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf(inputUUID.toString());
+        final CommandInput commandInput = CommandInput.of(inputUUID.toString());
 
         // Act
         final ArgumentParseResult<UUID> result = this.parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
         assertThat(result.getFailure()).isEmpty();
         assertThat(result.getParsedValue()).hasValue(inputUUID);
 
-        assertThat(input).isEmpty();
+        assertThat(commandInput.isEmpty()).isTrue();
     }
 
     @Test
     void Parse_NonUUID_FailedParse() {
         // Arrange
-        final LinkedList<String> input = ArgumentTestHelper.linkedListOf("non-uuid");
+        final CommandInput commandInput = CommandInput.of("non-uuid");
 
         // Act
         final ArgumentParseResult<UUID> result = this.parser.parse(
                 this.context,
-                input
+                commandInput
         );
 
         // Assert
