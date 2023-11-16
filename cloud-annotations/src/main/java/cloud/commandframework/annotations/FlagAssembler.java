@@ -23,29 +23,23 @@
 //
 package cloud.commandframework.annotations;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.List;
+import cloud.commandframework.arguments.flags.CommandFlag;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Extracts {@link ArgumentDescriptor argument descriptors} from {@link Method methods}.
+ * Assembles {@link CommandFlag flags} from {@link FlagDescriptor flag descriptors}.
  *
  * @since 2.0.0
  */
 @API(status = API.Status.STABLE, since = "2.0.0")
-public interface ArgumentExtractor {
+public interface FlagAssembler {
 
     /**
-     * Extracts the arguments from the given {@code method}.
+     * Assembles a flag from the given {@code descriptor}.
      *
-     * @param syntax the syntax of the command
-     * @param method the method
-     * @return the extracted arguments
+     * @param descriptor the descriptor
+     * @return the assembled flag
      */
-    @NonNull Collection<@NonNull ArgumentDescriptor> extractArguments(
-            @NonNull List<@NonNull SyntaxFragment> syntax,
-            @NonNull Method method
-    );
+    @NonNull CommandFlag<?> assembleFlag(@NonNull FlagDescriptor descriptor);
 }

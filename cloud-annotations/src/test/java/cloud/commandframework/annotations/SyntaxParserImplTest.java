@@ -30,15 +30,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests the correct functioning of the {@link SyntaxParser}, which parses
+ * Tests the correct functioning of the {@link SyntaxParserImpl}, which parses
  * command syntax into a List of {@link SyntaxFragment}
  */
-public class SyntaxParserTest {
+public class SyntaxParserImplTest {
 
     @Test
     void testParseWithAliases() {
-        List<SyntaxFragment> fragments = new SyntaxParser().apply(
-                "literal|litalias1|litalias2 <requirement> [optional]");
+        List<SyntaxFragment> fragments = new SyntaxParserImpl().parseSyntax(
+                null,
+                "literal|litalias1|litalias2 <requirement> [optional]"
+        );
 
         Assertions.assertEquals(3, fragments.size());
 
@@ -60,8 +62,10 @@ public class SyntaxParserTest {
 
     @Test
     void testParse() {
-        List<SyntaxFragment> fragments = new SyntaxParser().apply(
-                "literal <requirement> [optional]");
+        List<SyntaxFragment> fragments = new SyntaxParserImpl().parseSyntax(
+                null,
+                "literal <requirement> [optional]"
+        );
 
         Assertions.assertEquals(3, fragments.size());
 
@@ -83,8 +87,10 @@ public class SyntaxParserTest {
 
     @Test
     void testParseSpecialCharacters() {
-        List<SyntaxFragment> fragments = new SyntaxParser().apply(
-                "l_itera-l|with_ali-as <r_equiremen-t> [o_ptiona-l]");
+        List<SyntaxFragment> fragments = new SyntaxParserImpl().parseSyntax(
+                null,
+                "l_itera-l|with_ali-as <r_equiremen-t> [o_ptiona-l]"
+        );
 
         Assertions.assertEquals(3, fragments.size());
 

@@ -23,116 +23,26 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.parser.ParserRegistry;
-import cloud.commandframework.arguments.suggestion.SuggestionProvider;
-import cloud.commandframework.permission.Permission;
-import io.leangen.geantyref.GenericTypeReflector;
-import io.leangen.geantyref.TypeToken;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.function.Function;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class FlagExtractor implements Function<@NonNull Method, Collection<@NonNull CommandFlag<?>>> {
+/**
+ * Extractor that extracts {@link FlagDescriptor flag descriptors} from command methods.
+ * <p>
+ * The flag instances are then assembled by a {@link FlagAssembler}.
+ *
+ * @since 2.0.0
+ */
+@API(status = API.Status.STABLE, since = "2.0.0")
+public interface FlagExtractor {
 
-    private final CommandManager<?> commandManager;
-    private final AnnotationParser<?> annotationParser;
-
-    FlagExtractor(
-            final @NonNull CommandManager<?> commandManager,
-            final @NonNull AnnotationParser<?> annotationParser
-    ) {
-        this.commandManager = commandManager;
-        this.annotationParser = annotationParser;
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public @NonNull Collection<@NonNull CommandFlag<?>> apply(final @NonNull Method method) {
-        final Collection<CommandFlag<?>> flags = new LinkedList<>();
-        for (final Parameter parameter : method.getParameters()) {
-            if (!parameter.isAnnotationPresent(Flag.class)) {
-                continue;
-            }
-            final Flag flag = parameter.getAnnotation(Flag.class);
-            final String flagName = this.annotationParser.processString(flag.value());
-
-            CommandFlag.Builder<Void> builder = this.commandManager
-                    .flagBuilder(this.annotationParser.processString(flagName))
-                    .withDescription(ArgumentDescription.of(this.annotationParser.processString(flag.description())))
-                    .withAliases(this.annotationParser.processStrings(flag.aliases()))
-                    .withPermission(Permission.of(this.annotationParser.processString(flag.permission())));
-            if (flag.repeatable()) {
-                builder = builder.asRepeatable();
-            }
-
-            if (parameter.getType().equals(boolean.class)) {
-                flags.add(builder.build());
-            } else {
-                final TypeToken<?> token;
-                if (flag.repeatable() && Collection.class.isAssignableFrom(parameter.getType())) {
-                    token = TypeToken.get(GenericTypeReflector.getTypeParameter(
-                            parameter.getParameterizedType(),
-                            Collection.class.getTypeParameters()[0]
-                    ));
-                } else {
-                    token = TypeToken.get(parameter.getType());
-                }
-
-                if (token.equals(TypeToken.get(boolean.class))) {
-                    flags.add(builder.build());
-                    continue;
-                }
-
-                final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
-                final ParserRegistry<?> registry = this.commandManager.parserRegistry();
-                final ArgumentParser<?, ?> parser;
-                final String parserName = this.annotationParser.processString(flag.parserName());
-                if (parserName.isEmpty()) {
-                    parser = registry.createParser(token, registry.parseAnnotations(token, annotations))
-                            .orElse(null);
-                } else {
-                    parser = registry.createParser(parserName, registry.parseAnnotations(token, annotations))
-                            .orElse(null);
-                }
-                if (parser == null) {
-                    throw new IllegalArgumentException(
-                            String.format("Cannot find parser for type '%s' for flag '%s' in method '%s'",
-                                    parameter.getType().getCanonicalName(), flagName, method.getName()
-                            ));
-                }
-                final SuggestionProvider<?> suggestionProvider;
-                final String suggestions = this.annotationParser.processString(flag.suggestions());
-                if (!suggestions.isEmpty()) {
-                    suggestionProvider = registry.getSuggestionProvider(suggestions).orElse(null);
-                } else {
-                    suggestionProvider = null;
-                }
-                final CommandArgument.Builder argumentBuilder0 = CommandArgument.ofType(
-                        parameter.getType(),
-                        flagName
-                );
-                final CommandArgument.Builder argumentBuilder = argumentBuilder0
-                        .manager(this.commandManager)
-                        .withParser(parser);
-                final CommandArgument argument;
-                if (suggestionProvider != null) {
-                    argument = argumentBuilder.withSuggestionProvider(suggestionProvider).build();
-                } else {
-                    argument = argumentBuilder.build();
-                }
-                flags.add(builder.withArgument(argument).build());
-            }
-        }
-        return flags;
-    }
+    /**
+     * Extracts the flags from the given {@code method}.
+     *
+     * @param method the method
+     * @return the extracted flags
+     */
+    @NonNull Collection<@NonNull FlagDescriptor> extractFlags(@NonNull Method method);
 }
