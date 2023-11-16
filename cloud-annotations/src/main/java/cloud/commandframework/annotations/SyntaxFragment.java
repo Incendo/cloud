@@ -24,18 +24,29 @@
 package cloud.commandframework.annotations;
 
 import java.util.List;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Public since 1.7.0.
+ * Represents the fragment of the syntax making up a command.
+ *
+ * @since 1.7.0
  */
+@API(status = API.Status.STABLE, since = "1.7.0")
 public final class SyntaxFragment {
 
     private final String major;
     private final List<String> minor;
     private final ArgumentMode argumentMode;
 
-    SyntaxFragment(
+    /**
+     * Creates a new syntax fragment
+     *
+     * @param major        the major portion of the fragment
+     * @param minor        the minor portions of the fragment
+     * @param argumentMode the argument mode of the fragment
+     */
+    public SyntaxFragment(
             final @NonNull String major,
             final @NonNull List<@NonNull String> minor,
             final @NonNull ArgumentMode argumentMode

@@ -72,6 +72,11 @@ public final class MethodSuggestionProvider<C> implements SuggestionProvider<C> 
                 suggestions = (List<?>) output;
             } else if (output instanceof Collection) {
                 suggestions = new ArrayList<>((Collection<?>) output);
+            } else if (output instanceof Iterable) {
+                suggestions = new ArrayList<>();
+                for (final Object suggestion : ((Iterable<?>) output)) {
+                    ((List<Object>) suggestions).add(suggestion);
+                }
             } else if (output instanceof Stream) {
                 suggestions = ((Stream<?>) output).collect(Collectors.toList());
             } else {
