@@ -898,7 +898,11 @@ public final class AnnotationParser<C> {
         } else if (argumentDescriptor.defaultValue() == null) {
             return CommandComponent.optional(builtArgument, description);
         } else {
-            return CommandComponent.optional(builtArgument, description, DefaultValue.parsed(this.processString(argumentDescriptor.defaultValue())));
+            return CommandComponent.optional(
+                    builtArgument,
+                    description,
+                    DefaultValue.parsed(this.processString(argumentDescriptor.defaultValue()))
+            );
         }
     }
 
