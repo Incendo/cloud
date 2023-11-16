@@ -23,32 +23,24 @@
 //
 package cloud.commandframework.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import cloud.commandframework.Command;
+import java.lang.annotation.Annotation;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Annotation version of adding {@link cloud.commandframework.arguments.preprocessor.RegexPreprocessor}
- * as a preprocessor using {@link cloud.commandframework.arguments.CommandArgument#addPreprocessor(cloud.commandframework.arguments.ArgumentPreprocessor)}
- */
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Regex {
+@API(status = API.Status.STABLE, since = "2.0.0")
+@FunctionalInterface
+public interface BuilderModifier<A extends Annotation, C> {
 
     /**
-     * Regular expression pattern
+     * Modifies the command {@code builder} and returns the updated builder.
      *
-     * @return Pattern
+     * @param annotation the annotation instance
+     * @param builder    the existing builder
+     * @return the updated builder
      */
-    @NonNull String value();
-
-    /**
-     * Key for the caption used to generate the failure exception.
-     * Defaults to {@link cloud.commandframework.captions.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
-     *
-     * @return Failure caption key
-     */
-    @NonNull String failureCaption() default "argument.parse.failure.regex";
+    Command.@NonNull Builder<C> modifyBuilder(
+            @NonNull A annotation,
+            Command.@NonNull Builder<C> builder
+    );
 }

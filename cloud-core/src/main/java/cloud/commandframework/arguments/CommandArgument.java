@@ -42,6 +42,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -88,8 +89,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * Argument preprocessors that allows for extensions to existing argument types
      * without having to update all parsers
      */
-    private final Collection<BiFunction<@NonNull CommandContext<C>,
-            @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors;
+    private final Collection<@NonNull ArgumentPreprocessor<C>> argumentPreprocessors;
 
     /**
      * A description that will be used when registering this argument if no override is provided.
@@ -134,7 +134,9 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                 ? buildDefaultSuggestionProvider(this)
                 : suggestionProvider;
         this.defaultDescription = Objects.requireNonNull(defaultDescription, "Default description may not be null");
-        this.argumentPreprocessors = new LinkedList<>(argumentPreprocessors);
+        this.argumentPreprocessors = argumentPreprocessors.stream()
+                .map(ArgumentPreprocessor::wrap)
+                .collect(Collectors.toCollection(LinkedList::new));
         this.key = SimpleCloudKey.of(this.name, this.valueType);
     }
 
@@ -322,17 +324,18 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     }
 
     /**
-     * Register a new preprocessor. If all preprocessor has succeeding {@link ArgumentParseResult results}
+     * Registers a new preprocessor. If all preprocessor has succeeding {@link ArgumentParseResult results}
      * that all return {@code true}, the argument will be passed onto the parser.
      * <p>
      * It is important that the preprocessor doesn't pop any input. Instead, it should only peek.
      *
      * @param preprocessor Preprocessor
      * @return {@code this}
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull @This CommandArgument<C, T> addPreprocessor(
-            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
-                    @NonNull ArgumentParseResult<Boolean>> preprocessor
+            final @NonNull ArgumentPreprocessor<C> preprocessor
     ) {
         this.argumentPreprocessors.add(preprocessor);
         return this;
@@ -350,9 +353,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @NonNull CommandContext<C> context,
             final @NonNull Queue<String> input
     ) {
-        for (final BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
-                @NonNull ArgumentParseResult<Boolean>> preprocessor : this.argumentPreprocessors) {
-            final ArgumentParseResult<Boolean> result = preprocessor.apply(
+        for (final ArgumentPreprocessor<C> preprocessor : this.argumentPreprocessors) {
+            final ArgumentParseResult<Boolean> result = preprocessor.preprocess(
                     context,
                     input
             );

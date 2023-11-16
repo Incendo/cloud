@@ -21,34 +21,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-package cloud.commandframework.annotations;
+package cloud.commandframework.arguments;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
+import cloud.commandframework.context.CommandContext;
+import java.util.Queue;
+import java.util.function.BiFunction;
+import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-/**
- * Annotation version of adding {@link cloud.commandframework.arguments.preprocessor.RegexPreprocessor}
- * as a preprocessor using {@link cloud.commandframework.arguments.CommandArgument#addPreprocessor(cloud.commandframework.arguments.ArgumentPreprocessor)}
- */
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Regex {
+@API(status = API.Status.STABLE, since = "2.0.0")
+@FunctionalInterface
+public interface ArgumentPreprocessor<C> {
 
     /**
-     * Regular expression pattern
+     * Wraps the given {@code function} in a preprocessor.
      *
-     * @return Pattern
+     * @param function the function
+     * @return the wrapped function
+     * @param <C> the command sender type
+     * @since 2.0.0
      */
-    @NonNull String value();
+    static <C> @NonNull ArgumentPreprocessor<C> wrap(
+            final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull Queue<String>,
+                    @NonNull ArgumentParseResult<Boolean>> function
+    ) {
+        return function::apply;
+    }
 
     /**
-     * Key for the caption used to generate the failure exception.
-     * Defaults to {@link cloud.commandframework.captions.StandardCaptionKeys#ARGUMENT_PARSE_FAILURE_REGEX}
+     * Pre-processes the associated argument.
+     * <p>
+     * If the preprocessor fails then the command parsing will fail immediately.
      *
-     * @return Failure caption key
+     * @param context    the command context
+     * @param inputQueue the current input queue
+     * @return the result
      */
-    @NonNull String failureCaption() default "argument.parse.failure.regex";
+    @NonNull ArgumentParseResult<Boolean> preprocess(
+            @NonNull CommandContext<C> context,
+            @NonNull Queue<@NonNull String> inputQueue
+    );
 }

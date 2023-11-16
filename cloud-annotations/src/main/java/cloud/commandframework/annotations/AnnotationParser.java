@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
@@ -32,19 +31,14 @@ import cloud.commandframework.annotations.injection.RawArgs;
 import cloud.commandframework.annotations.parsers.MethodArgumentParser;
 import cloud.commandframework.annotations.parsers.Parser;
 import cloud.commandframework.annotations.processing.CommandContainerProcessor;
-import cloud.commandframework.annotations.specifier.Completions;
 import cloud.commandframework.annotations.suggestions.MethodSuggestionProvider;
 import cloud.commandframework.annotations.suggestions.Suggestions;
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.flags.CommandFlag;
-import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.preprocessor.RegexPreprocessor;
-import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.context.CommandContext;
@@ -52,6 +46,7 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
+import cloud.commandframework.types.tuples.Pair;
 import io.leangen.geantyref.GenericTypeReflector;
 import io.leangen.geantyref.TypeToken;
 import java.io.BufferedReader;
@@ -70,10 +65,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -88,6 +81,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  *
  * @param <C> Command sender type
  */
+@SuppressWarnings("unused")
 public final class AnnotationParser<C> {
 
     /**
@@ -96,19 +90,17 @@ public final class AnnotationParser<C> {
     public static final String INFERRED_ARGUMENT_NAME = "__INFERRED_ARGUMENT_NAME__";
 
     private final CommandManager<C> manager;
-    private final Map<Class<? extends Annotation>, Function<? extends Annotation, ParserParameters>> annotationMappers;
-    private final Map<Class<? extends Annotation>, Function<? extends Annotation, BiFunction<@NonNull CommandContext<C>,
-            @NonNull Queue<@NonNull String>, @NonNull ArgumentParseResult<Boolean>>>> preprocessorMappers;
-    private final Map<Class<? extends Annotation>, BiFunction<? extends Annotation, Command.Builder<C>, Command.Builder<C>>>
-            builderModifiers;
-    private final Map<Predicate<Method>, Function<MethodCommandExecutionHandler.CommandMethodContext<C>,
-            MethodCommandExecutionHandler<C>>> commandMethodFactories;
+    private final Map<Class<? extends Annotation>, AnnotationMapper<?>> annotationMappers;
+    private final Map<Class<? extends Annotation>, PreprocessorMapper<?, C>> preprocessorMappers;
+    private final Map<Class<? extends Annotation>, BuilderModifier<?, C>> builderModifiers;
+    private final Map<Predicate<Method>, CommandMethodExecutionHandlerFactory<C>> commandMethodFactories;
     private final TypeToken<C> commandSenderType;
     private final MetaFactory metaFactory;
 
     private StringProcessor stringProcessor;
     private SyntaxParser syntaxParser;
     private ArgumentExtractor argumentExtractor;
+    private ArgumentAssembler<C> argumentAssembler;
     private FlagExtractor flagExtractor;
     private FlagAssembler flagAssembler;
     private CommandExtractor commandExtractor;
@@ -121,7 +113,7 @@ public final class AnnotationParser<C> {
      * @param metaMapper         Function that is used to create {@link CommandMeta} instances from annotations on the
      *                           command methods. These annotations will be mapped to
      *                           {@link ParserParameter}. Mappers for the
-     *                           parser parameters can be registered using {@link #registerAnnotationMapper(Class, Function)}
+     *                           parser parameters can be registered using {@link #registerAnnotationMapper(Class, AnnotationMapper)}
      */
     public AnnotationParser(
             final @NonNull CommandManager<C> manager,
@@ -139,7 +131,7 @@ public final class AnnotationParser<C> {
      * @param metaMapper        Function that is used to create {@link CommandMeta} instances from annotations on the
      *                          command methods. These annotations will be mapped to
      *                          {@link ParserParameter}. Mappers for the
-     *                          parser parameters can be registered using {@link #registerAnnotationMapper(Class, Function)}
+     *                          parser parameters can be registered using {@link #registerAnnotationMapper(Class, AnnotationMapper)}
      * @since 1.7.0
      */
     @API(status = API.Status.STABLE, since = "1.7.0")
@@ -159,6 +151,7 @@ public final class AnnotationParser<C> {
         this.flagAssembler = new FlagAssemblerImpl(manager);
         this.syntaxParser = new SyntaxParserImpl();
         this.argumentExtractor = new ArgumentExtractorImpl();
+        this.argumentAssembler = new ArgumentAssemblerImpl<>(this);
         this.commandExtractor = new CommandExtractorImpl(this);
         this.registerAnnotationMapper(CommandDescription.class, d ->
                 ParserParameters.single(StandardParameters.DESCRIPTION, this.processString(d.value())));
@@ -244,15 +237,16 @@ public final class AnnotationParser<C> {
      * Registers a new command execution method factory. This allows for the registration of
      * custom command method execution strategies.
      *
-     * @param predicate The predicate that decides whether to apply the custom execution handler to the given method
-     * @param function  The function that produces the command execution handler
-     * @since 1.6.0
+     * @param predicate the predicate that decides whether to apply the custom execution handler to the given method
+     * @param factory   the function that produces the command execution handler
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public void registerCommandExecutionMethodFactory(
             final @NonNull Predicate<@NonNull Method> predicate,
-            final @NonNull Function<MethodCommandExecutionHandler.CommandMethodContext<C>, MethodCommandExecutionHandler<C>> function
+            final @NonNull CommandMethodExecutionHandlerFactory<C> factory
     ) {
-        this.commandMethodFactories.put(predicate, function);
+        this.commandMethodFactories.put(predicate, factory);
     }
 
     /**
@@ -269,7 +263,7 @@ public final class AnnotationParser<C> {
      */
     public <A extends Annotation> void registerBuilderModifier(
             final @NonNull Class<A> annotation,
-            final @NonNull BiFunction<A, Command.Builder<C>, Command.Builder<C>> builderModifier
+            final @NonNull BuilderModifier<A, C> builderModifier
     ) {
         this.builderModifiers.put(annotation, builderModifier);
     }
@@ -283,25 +277,36 @@ public final class AnnotationParser<C> {
      */
     public <A extends Annotation> void registerAnnotationMapper(
             final @NonNull Class<A> annotation,
-            final @NonNull Function<@NonNull A,
-                    @NonNull ParserParameters> mapper
+            final @NonNull AnnotationMapper<A> mapper
     ) {
         this.annotationMappers.put(annotation, mapper);
     }
 
     /**
-     * Register a preprocessor mapper
+     * Registers a preprocessor mapper
      *
-     * @param annotation         Annotation class
-     * @param preprocessorMapper Preprocessor mapper
-     * @param <A>                Annotation type
+     * @param annotation         annotation class
+     * @param preprocessorMapper preprocessor mapper
+     * @param <A>                annotation type
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public <A extends Annotation> void registerPreprocessorMapper(
             final @NonNull Class<A> annotation,
-            final @NonNull Function<A, BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
-                    @NonNull ArgumentParseResult<Boolean>>> preprocessorMapper
+            final @NonNull PreprocessorMapper<A, C> preprocessorMapper
     ) {
         this.preprocessorMappers.put(annotation, preprocessorMapper);
+    }
+
+    /**
+     * Returns an unmodifiable view of the preprocessor mappers.
+     *
+     * @return the preprocessor mappers
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Map<@NonNull Class<? extends Annotation>, @NonNull PreprocessorMapper<?, C>> preprocessorMappers() {
+        return Collections.unmodifiableMap(this.preprocessorMappers);
     }
 
     /**
@@ -410,6 +415,28 @@ public final class AnnotationParser<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public void argumentExtractor(final @NonNull ArgumentExtractor argumentExtractor) {
         this.argumentExtractor = argumentExtractor;
+    }
+
+    /**
+     * Returns the argument assembler.
+     *
+     * @return the argument assembler
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull ArgumentAssembler<C> argumentAssembler() {
+        return this.argumentAssembler;
+    }
+
+    /**
+     * Sets the argument assembler
+     *
+     * @param argumentAssembler new argument assembler
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void argumentAssembler(final @NonNull ArgumentAssembler<C> argumentAssembler) {
+        this.argumentAssembler = argumentAssembler;
     }
 
     /**
@@ -642,272 +669,185 @@ public final class AnnotationParser<C> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private @NonNull Collection<@NonNull Command<C>> construct(
             final @NonNull Object instance,
             final @NonNull Collection<@NonNull CommandDescriptor> commandDescriptors
     ) {
+        return commandDescriptors.stream()
+                .flatMap(descriptor -> this.constructCommands(instance, descriptor).stream())
+                .collect(Collectors.toList());
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private @NonNull Collection<@NonNull Command<C>> constructCommands(
+            final @NonNull Object instance,
+            final @NonNull CommandDescriptor commandDescriptor
+    ) {
         final AnnotationAccessor classAnnotations = AnnotationAccessor.of(instance.getClass());
-        final Collection<Command<C>> commands = new ArrayList<>();
-        for (final CommandDescriptor commandDescriptor : commandDescriptors) {
-            final Method method = commandDescriptor.method();
-            @SuppressWarnings("rawtypes") final CommandManager manager = this.manager;
-            final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
-                    .with(this.metaFactory.apply(method));
-            if (methodOrClassHasAnnotation(method, Confirmation.class)) {
-                metaBuilder.with(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true);
-            }
+        final List<Command<C>> commands = new ArrayList<>();
 
-            @SuppressWarnings("rawtypes")
-            Command.Builder builder = manager.commandBuilder(
-                    commandDescriptor.commandToken(),
-                    commandDescriptor.syntax().get(0).getMinor(),
-                    metaBuilder.build()
-            );
-            final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(commandDescriptor.syntax(), method);
-            final Collection<FlagDescriptor> flagDescriptors = this.flagExtractor.extractFlags(method);
-            final Collection<CommandFlag<?>> flags = flagDescriptors.stream()
-                    .map(this.flagAssembler()::assembleFlag)
-                    .collect(Collectors.toList());
+        final Method method = commandDescriptor.method();
+        final CommandManager<C> manager = this.manager;
+        final SimpleCommandMeta.Builder metaBuilder = SimpleCommandMeta.builder()
+                .with(this.metaFactory.apply(method));
+        if (methodOrClassHasAnnotation(method, Confirmation.class)) {
+            metaBuilder.with(CommandConfirmationManager.META_CONFIRMATION_REQUIRED, true);
+        }
 
-            final Map<String, CommandComponent<C>> commandComponents = new HashMap<>();
-            /* Go through all annotated parameters and build up the argument tree */
-            for (final ArgumentDescriptor argumentPair : arguments) {
-                final String argumentName = this.processString(argumentPair.name());
-                final CommandComponent<C> component = this.buildComponent(
-                        method,
-                        this.findSyntaxFragment(commandDescriptor.syntax(), argumentName),
-                        argumentPair
-                );
-                commandComponents.put(component.argument().getName(), component);
-            }
-            boolean commandNameFound = false;
-            /* Build the command tree */
-            for (final SyntaxFragment token : commandDescriptor.syntax()) {
-                if (!commandNameFound) {
-                    commandNameFound = true;
-                    continue;
-                }
-                if (token.getArgumentMode() == ArgumentMode.LITERAL) {
-                    builder = builder.literal(token.getMajor(), token.getMinor().toArray(new String[0]));
-                } else {
-                    final CommandComponent<C> component = commandComponents.get(token.getMajor());
-                    if (component == null) {
-                        throw new IllegalArgumentException(String.format(
-                                "Found no mapping for argument '%s' in method '%s'",
-                                token.getMajor(), method.getName()
-                        ));
-                    }
+        Command.Builder<C> builder = manager.commandBuilder(
+                commandDescriptor.commandToken(),
+                commandDescriptor.syntax().get(0).getMinor(),
+                metaBuilder.build()
+        );
+        final Collection<ArgumentDescriptor> arguments = this.argumentExtractor.extractArguments(commandDescriptor.syntax(), method);
+        final Collection<FlagDescriptor> flagDescriptors = this.flagExtractor.extractFlags(method);
+        final Collection<CommandFlag<?>> flags = flagDescriptors.stream()
+                .map(this.flagAssembler()::assembleFlag)
+                .collect(Collectors.toList());
+        final Map<String, CommandComponent<C>> commandComponents = this.constructComponents(arguments, commandDescriptor);
 
-                    builder = builder.argument(component);
-                }
+        boolean commandNameFound = false;
+        /* Build the command tree */
+        for (final SyntaxFragment token : commandDescriptor.syntax()) {
+            if (!commandNameFound) {
+                commandNameFound = true;
+                continue;
             }
-            /* Try to find the command sender type */
-            Class<? extends C> senderType = null;
-            for (final Parameter parameter : method.getParameters()) {
-                if (parameter.isAnnotationPresent(Argument.class)) {
-                    continue;
+            if (token.getArgumentMode() == ArgumentMode.LITERAL) {
+                builder = builder.literal(token.getMajor(), token.getMinor().toArray(new String[0]));
+            } else {
+                final CommandComponent<C> component = commandComponents.get(token.getMajor());
+                if (component == null) {
+                    throw new IllegalArgumentException(String.format(
+                            "Found no mapping for argument '%s' in method '%s'",
+                            token.getMajor(), method.getName()
+                    ));
                 }
-                if (GenericTypeReflector.isSuperType(this.commandSenderType.getType(), parameter.getType())) {
-                    senderType = (Class<? extends C>) parameter.getType();
+
+                builder = builder.argument(component);
+            }
+        }
+        /* Try to find the command sender type */
+        Class<? extends C> senderType = null;
+        for (final Parameter parameter : method.getParameters()) {
+            if (parameter.isAnnotationPresent(Argument.class)) {
+                continue;
+            }
+            if (GenericTypeReflector.isSuperType(this.commandSenderType.getType(), parameter.getType())) {
+                senderType = (Class<? extends C>) parameter.getType();
+                break;
+            }
+        }
+
+        final CommandPermission commandPermission = getMethodOrClassAnnotation(method, CommandPermission.class);
+        if (commandPermission != null) {
+            builder = builder.permission(this.processString(commandPermission.value()));
+        }
+
+        if (commandDescriptor.requiredSender() != Object.class) {
+            builder = builder.senderType((Class<? extends C>) commandDescriptor.requiredSender());
+        } else if (senderType != null) {
+            builder = builder.senderType(senderType);
+        }
+        try {
+            final MethodCommandExecutionHandler.CommandMethodContext<C> context =
+                    new MethodCommandExecutionHandler.CommandMethodContext<>(
+                            instance,
+                            commandComponents,
+                            arguments,
+                            flagDescriptors,
+                            method,
+                            this /* annotationParser */
+                    );
+
+            /* Create the command execution handler */
+            CommandExecutionHandler<C> commandExecutionHandler = new MethodCommandExecutionHandler<>(context);
+            for (final Map.Entry<Predicate<Method>, CommandMethodExecutionHandlerFactory<C>> entry
+                    : this.commandMethodFactories.entrySet()) {
+                if (entry.getKey().test(method)) {
+                    commandExecutionHandler = entry.getValue().createExecutionHandler(context);
+
+                    /* Once we have our custom handler, we stop */
                     break;
                 }
             }
 
-            final CommandPermission commandPermission = getMethodOrClassAnnotation(method, CommandPermission.class);
-            if (commandPermission != null) {
-                builder = builder.permission(this.processString(commandPermission.value()));
-            }
-
-            if (commandDescriptor.requiredSender() != Object.class) {
-                builder = builder.senderType(commandDescriptor.requiredSender());
-            } else if (senderType != null) {
-                builder = builder.senderType(senderType);
-            }
-            try {
-                final MethodCommandExecutionHandler.CommandMethodContext<C> context =
-                        new MethodCommandExecutionHandler.CommandMethodContext<>(
-                                instance,
-                                commandComponents,
-                                arguments,
-                                flagDescriptors,
-                                method,
-                                this /* annotationParser */
-                        );
-
-                /* Create the command execution handler */
-                CommandExecutionHandler<C> commandExecutionHandler = new MethodCommandExecutionHandler<>(context);
-                for (final Map.Entry<Predicate<Method>, Function<MethodCommandExecutionHandler.CommandMethodContext<C>,
-                        MethodCommandExecutionHandler<C>>> entry
-                        : this.commandMethodFactories.entrySet()) {
-                    if (entry.getKey().test(method)) {
-                        commandExecutionHandler = entry.getValue().apply(context);
-
-                        /* Once we have our custom handler, we stop */
-                        break;
-                    }
-                }
-
-                builder = builder.handler(commandExecutionHandler);
-            } catch (final Exception e) {
-                throw new RuntimeException("Failed to construct command execution handler", e);
-            }
-            /* Check if the command should be hidden */
-            if (methodOrClassHasAnnotation(method, Hidden.class)) {
-                builder = builder.hidden();
-            }
-            /* Apply flags */
-            for (final CommandFlag<?> flag : flags) {
-                builder = builder.flag(flag);
-            }
-
-            /* Apply builder modifiers */
-            for (final Annotation annotation
-                    : AnnotationAccessor.of(classAnnotations, AnnotationAccessor.of(method)).annotations()) {
-                @SuppressWarnings("rawtypes") final BiFunction builderModifier = this.builderModifiers.get(
-                        annotation.annotationType()
-                );
-                if (builderModifier == null) {
-                    continue;
-                }
-                builder = (Command.Builder<C>) builderModifier.apply(annotation, builder);
-            }
-
-            /* Construct and register the command */
-            final Command<C> builtCommand = builder.build();
-            commands.add(builtCommand);
-            /* Check if we need to construct a proxy */
-            if (method.isAnnotationPresent(ProxiedBy.class)) {
-                final ProxiedBy proxyAnnotation = method.getAnnotation(ProxiedBy.class);
-                final String proxy = this.processString(proxyAnnotation.value());
-                if (proxy.contains(" ")) {
-                    throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
-                }
-                Command.Builder<C> proxyBuilder = manager.commandBuilder(proxy, builtCommand.getCommandMeta())
-                        .proxies(builtCommand);
-                if (proxyAnnotation.hidden()) {
-                    proxyBuilder = proxyBuilder.hidden();
-                }
-                manager.command(proxyBuilder.build());
-            }
+            builder = builder.handler(commandExecutionHandler);
+        } catch (final Exception e) {
+            throw new RuntimeException("Failed to construct command execution handler", e);
         }
+        /* Check if the command should be hidden */
+        if (methodOrClassHasAnnotation(method, Hidden.class)) {
+            builder = builder.hidden();
+        }
+        /* Apply flags */
+        for (final CommandFlag<?> flag : flags) {
+            builder = builder.flag(flag);
+        }
+
+        /* Apply builder modifiers */
+        for (final Annotation annotation
+                : AnnotationAccessor.of(classAnnotations, AnnotationAccessor.of(method)).annotations()) {
+            @SuppressWarnings("rawtypes")
+            final BuilderModifier builderModifier = this.builderModifiers.get(
+                    annotation.annotationType()
+            );
+            if (builderModifier == null) {
+                continue;
+            }
+            builder = (Command.Builder<C>) builderModifier.modifyBuilder(annotation, builder);
+        }
+
+        /* Construct and register the command */
+        final Command<C> builtCommand = builder.build();
+        commands.add(builtCommand);
+
+        if (method.isAnnotationPresent(ProxiedBy.class)) {
+            manager.command(this.constructProxy(method.getAnnotation(ProxiedBy.class), builtCommand));
+        }
+
         return commands;
+    }
+
+    private @NonNull Map<@NonNull String, @NonNull CommandComponent<C>> constructComponents(
+            final @NonNull Collection<@NonNull ArgumentDescriptor> arguments,
+            final @NonNull CommandDescriptor commandDescriptor
+    ) {
+        return arguments.stream()
+                .map(argumentDescriptor -> this.argumentAssembler.assembleArgument(
+                        this.findSyntaxFragment(commandDescriptor.syntax(), this.processString(argumentDescriptor.name())),
+                        argumentDescriptor
+                )).map(component -> Pair.of(component.argument().getName(), component))
+                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+    }
+
+    private @NonNull Command<C> constructProxy(
+            final @NonNull ProxiedBy proxyAnnotation,
+            final @NonNull Command<C> command
+    ) {
+        final String proxy = this.processString(proxyAnnotation.value());
+        if (proxy.contains(" ")) {
+            throw new IllegalArgumentException("@ProxiedBy proxies may only contain single literals");
+        }
+        Command.Builder<C> proxyBuilder = this.manager.commandBuilder(proxy, command.getCommandMeta())
+                .proxies(command);
+        if (proxyAnnotation.hidden()) {
+            proxyBuilder = proxyBuilder.hidden();
+        }
+        return proxyBuilder.build();
     }
 
     private @NonNull SyntaxFragment findSyntaxFragment(
             final @NonNull List<@NonNull SyntaxFragment> fragments,
             final @NonNull String argumentName
     ) {
-        for (final SyntaxFragment fragment : fragments) {
-            if (fragment.getArgumentMode() != ArgumentMode.LITERAL
-                    && fragment.getMajor().equals(argumentName)) {
-                return fragment;
-            }
-        }
-        throw new IllegalArgumentException("Argument is not declared in syntax: " + argumentName);
+        return fragments.stream().filter(fragment -> fragment.getArgumentMode() != ArgumentMode.LITERAL)
+                .filter(fragment -> fragment.getMajor().equals(argumentName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Argument is not declared in syntax: " + argumentName));
     }
 
-    @SuppressWarnings("unchecked")
-    private @NonNull CommandComponent<C> buildComponent(
-            final @NonNull Method method,
-            final @Nullable SyntaxFragment syntaxFragment,
-            final @NonNull ArgumentDescriptor argumentDescriptor
-    ) {
-        final Parameter parameter = argumentDescriptor.parameter();
-        final Collection<Annotation> annotations = Arrays.asList(parameter.getAnnotations());
-        final TypeToken<?> token = TypeToken.get(parameter.getParameterizedType());
-        final ParserParameters parameters = this.manager.parserRegistry()
-                .parseAnnotations(token, annotations);
-        /* Create the argument parser */
-        final ArgumentParser<C, ?> parser;
-        if (argumentDescriptor.parserName() == null) {
-            parser = this.manager.parserRegistry()
-                    .createParser(token, parameters)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            String.format("Parameter '%s' in method '%s' "
-                                            + "has parser '%s' but no parser exists "
-                                            + "for that type",
-                                    parameter.getName(), method.getName(),
-                                    token.getType().getTypeName()
-                            )));
-        } else {
-            parser = this.manager.parserRegistry()
-                    .createParser(this.processString(argumentDescriptor.parserName()), parameters)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            String.format("Parameter '%s' in method '%s' "
-                                            + "has parser '%s' but no parser exists "
-                                            + "for that type",
-                                    parameter.getName(), method.getName(),
-                                    token.getType().getTypeName()
-                            )));
-        }
-        /* Check whether the corresponding method parameter actually exists */
-        final String argumentName = this.processString(argumentDescriptor.name());
-        if (syntaxFragment == null || syntaxFragment.getArgumentMode() == ArgumentMode.LITERAL) {
-            throw new IllegalArgumentException(String.format(
-                    "Invalid command argument '%s' in method '%s': "
-                            + "Missing syntax mapping", argumentName, method.getName()));
-        }
-        /* Create the argument builder */
-        @SuppressWarnings("rawtypes") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
-                parameter.getType(),
-                argumentName
-        );
-        /* Check for Completions annotation */
-        final Completions completions = parameter.getDeclaredAnnotation(Completions.class);
-        if (completions != null) {
-            final List<Suggestion> suggestions = Arrays.stream(
-                    completions.value().replace(" ", "").split(",")
-            ).map(Suggestion::simple).collect(Collectors.toList());
-            argumentBuilder.withSuggestionProvider((commandContext, input) -> suggestions);
-        } else if (argumentDescriptor.suggestions() != null) {
-            final String suggestionProviderName = this.processString(argumentDescriptor.suggestions());
-            final Optional<SuggestionProvider<C>> suggestionsFunction =
-                    this.manager.parserRegistry().getSuggestionProvider(suggestionProviderName);
-            argumentBuilder.withSuggestionProvider(
-                    suggestionsFunction.orElseThrow(() ->
-                            new IllegalArgumentException(String.format(
-                                    "There is no suggestion provider with name '%s'. Did you forget to register it?",
-                                    suggestionProviderName
-                            )))
-            );
-        }
-        /* Build the argument */
-        final CommandArgument<C, ?> builtArgument = argumentBuilder.manager(this.manager).withParser(parser).build();
-        /* Add preprocessors */
-        for (final Annotation annotation : annotations) {
-            @SuppressWarnings("rawtypes") final Function preprocessorMapper =
-                    this.preprocessorMappers.get(annotation.annotationType());
-            if (preprocessorMapper != null) {
-                final BiFunction<@NonNull CommandContext<C>, @NonNull Queue<@NonNull String>,
-                        @NonNull ArgumentParseResult<Boolean>> preprocessor = (BiFunction<CommandContext<C>,
-                        Queue<String>, ArgumentParseResult<Boolean>>) preprocessorMapper.apply(annotation);
-                builtArgument.addPreprocessor(preprocessor);
-            }
-        }
-
-        final ArgumentDescription description;
-        if (argumentDescriptor.description() == null) {
-            description = ArgumentDescription.empty();
-        } else {
-            description = argumentDescriptor.description();
-        }
-
-        if (syntaxFragment.getArgumentMode() == ArgumentMode.REQUIRED) {
-            return CommandComponent.required(builtArgument, description);
-        } else if (argumentDescriptor.defaultValue() == null) {
-            return CommandComponent.optional(builtArgument, description);
-        } else {
-            return CommandComponent.optional(
-                    builtArgument,
-                    description,
-                    DefaultValue.parsed(this.processString(argumentDescriptor.defaultValue()))
-            );
-        }
-    }
-
-    @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>,
-            @NonNull Function<@NonNull ? extends Annotation, @NonNull ParserParameters>> getAnnotationMappers() {
+    @NonNull Map<@NonNull Class<@NonNull ? extends Annotation>, AnnotationMapper<?>> annotationMappers() {
         return this.annotationMappers;
     }
 }

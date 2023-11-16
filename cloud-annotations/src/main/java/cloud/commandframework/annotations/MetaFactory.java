@@ -47,10 +47,10 @@ class MetaFactory implements Function<@NonNull Method, @NonNull CommandMeta> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public @NonNull CommandMeta apply(final @NonNull Method method) {
         final ParserParameters parameters = ParserParameters.empty();
-        this.annotationParser.getAnnotationMappers().forEach((annotationClass, mapper) -> {
+        this.annotationParser.annotationMappers().forEach((annotationClass, mapper) -> {
             final Annotation annotation = AnnotationParser.getMethodOrClassAnnotation(method, annotationClass);
             if (annotation != null) {
-                parameters.merge((ParserParameters) ((Function) mapper).apply(annotation));
+                parameters.merge(((AnnotationMapper) mapper).mapAnnotation(annotation));
             }
         });
         return this.metaMapper.apply(parameters);
