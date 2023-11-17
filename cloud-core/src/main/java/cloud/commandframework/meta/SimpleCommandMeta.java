@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -76,23 +75,6 @@ public class SimpleCommandMeta extends CommandMeta {
     }
 
     @Override
-    @Deprecated
-    public final @NonNull Optional<String> getValue(final @NonNull String key) {
-        final Object result = this.metaMap.get(key);
-        if (result != null && !(result instanceof String)) {
-            throw new IllegalArgumentException("Key '" + key + "' has been used for a new typed command meta and contains a "
-                    + "non-string value!");
-        }
-        return Optional.ofNullable((String) result);
-    }
-
-    @Override
-    @Deprecated
-    public final @NonNull String getOrDefault(final @NonNull String key, final @NonNull String defaultValue) {
-        return this.getValue(key).orElse(defaultValue);
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public final @NonNull <V> Optional<V> get(final @NonNull Key<V> key) {
         final Object value = this.metaMap.get(key.getName());
@@ -115,17 +97,6 @@ public class SimpleCommandMeta extends CommandMeta {
     @Override
     public final <V> @NonNull V getOrDefault(final @NonNull Key<V> key, final @NonNull V defaultValue) {
         return this.get(key).orElse(defaultValue);
-    }
-
-    @Override
-    @Deprecated
-    public final @NonNull Map<@NonNull String, @NonNull String> getAll() {
-        return this.metaMap.entrySet()
-                .stream().filter(ent -> ent.getValue() instanceof String)
-                .collect(Collectors.<Map.Entry<String, Object>, String, String>toMap(
-                        Map.Entry::getKey,
-                        ent -> ent.getValue().toString()
-                ));
     }
 
     @Override
