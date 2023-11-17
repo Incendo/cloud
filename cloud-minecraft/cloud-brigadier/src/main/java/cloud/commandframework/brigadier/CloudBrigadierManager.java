@@ -422,7 +422,7 @@ public final class CloudBrigadierManager<C, S> {
                                 "permission",
                                 Permission.empty()
                         )));
-        if (forceRegister || (node.argument() != null && node.component().owningCommand() != null)) {
+        if (forceRegister || (node.component() != null && node.component().owningCommand() != null)) {
             literalArgumentBuilder.executes(executor);
         }
         literalArgumentBuilder.executes(executor);
@@ -461,7 +461,7 @@ public final class CloudBrigadierManager<C, S> {
                                         Permission.empty()
                                 )
                 ));
-        if (cloudCommand.argument() != null && cloudCommand.component().owningCommand() != null) {
+        if (cloudCommand.component() != null && cloudCommand.component().owningCommand() != null) {
             literalArgumentBuilder.executes(executor);
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
@@ -481,8 +481,7 @@ public final class CloudBrigadierManager<C, S> {
             final SuggestionProvider<S> suggestionProvider
     ) {
         if (root.argument() instanceof CompoundArgument) {
-            @SuppressWarnings("unchecked") final CompoundArgument<?, C, ?> compoundArgument =
-                    (CompoundArgument<?, C, ?>) root.argument();
+            final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) root.argument();
             final Object[] parsers = compoundArgument.getParserTuple().toArray();
             final Object[] types = compoundArgument.getTypes().toArray();
             final Object[] names = compoundArgument.getNames().toArray();

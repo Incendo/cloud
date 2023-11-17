@@ -232,8 +232,8 @@ public final class CommandHelpHandler<C> {
                     /* We might still be able to match an argument */
                     CommandNode<C> potentialVariable = null;
                     for (final CommandNode<C> child : head.children()) {
-                        if (child.component().type() != CommandComponent.ComponentType.LITERAL) {
-                            if (child.argument() != null) {
+                        if (child.component() == null || child.component().type() != CommandComponent.ComponentType.LITERAL) {
+                            if (child.component() != null) {
                                 potentialVariable = child;
                             }
                             continue;

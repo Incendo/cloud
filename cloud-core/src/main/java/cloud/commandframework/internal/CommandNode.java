@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -140,7 +141,7 @@ public final class CommandNode<C> {
      *
      * @return the component
      */
-    public @Nullable CommandComponent<C> component() {
+    public @MonotonicNonNull CommandComponent<C> component() {
         return this.component;
     }
 

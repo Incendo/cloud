@@ -269,7 +269,7 @@ public final class CommandTree<C> {
             while (childIterator.hasNext()) {
                 final CommandNode<C> child = childIterator.next();
 
-                if (child.argument() == null) {
+                if (child.component() == null) {
                     continue;
                 }
 
@@ -358,7 +358,7 @@ public final class CommandTree<C> {
         // If it does not match a literal, try to find the one argument node, if it exists
         // The ambiguity check guarantees that only one will be present
         final List<CommandNode<C>> argumentNodes = children.stream()
-                .filter(n -> (n.argument() != null && n.component().type() != CommandComponent.ComponentType.LITERAL))
+                .filter(n -> (n.component() != null && n.component().type() != CommandComponent.ComponentType.LITERAL))
                 .collect(Collectors.toList());
         if (argumentNodes.size() > 1) {
             throw new IllegalStateException("Unexpected ambiguity detected, number of dynamic child nodes should not exceed 1");
@@ -382,7 +382,7 @@ public final class CommandTree<C> {
         }
 
         // If the child has no argument it cannot be executed, so we exit
-        if (child.argument() == null) {
+        if (child.component() == null) {
             return Pair.of(null, null);
         }
 
@@ -905,7 +905,7 @@ public final class CommandTree<C> {
                 CommandNode<C> tempNode = node.getChild(component);
                 if (tempNode == null) {
                     tempNode = node.addChild(component);
-                } else if (component.type() == CommandComponent.ComponentType.LITERAL && tempNode.argument() != null) {
+                } else if (component.type() == CommandComponent.ComponentType.LITERAL && tempNode.component() != null) {
                     for (final String alias : component.aliases()) {
                         ((StaticArgument<C>) Objects.requireNonNull(tempNode.argument())).registerAlias(alias);
                     }
@@ -1095,7 +1095,7 @@ public final class CommandTree<C> {
                     child,
                     node.children()
                             .stream()
-                            .filter(n -> n.argument() != null)
+                            .filter(n -> n.component() != null)
                             .collect(Collectors.toList())
             );
         }
@@ -1119,7 +1119,7 @@ public final class CommandTree<C> {
                             child,
                             node.children()
                                     .stream()
-                                    .filter(n -> n.argument() != null)
+                                    .filter(n -> n.component() != null)
                                     .collect(Collectors.toList())
                     );
                 }
@@ -1141,7 +1141,7 @@ public final class CommandTree<C> {
     ) {
         final List<CommandNode<C>> leaves = new LinkedList<>();
         if (node.isLeaf()) {
-            if (node.argument() != null) {
+            if (node.component() != null) {
                 leaves.add(node);
             }
         } else {
@@ -1160,7 +1160,7 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> node
     ) {
         return this.getLeavesRaw(node).stream()
-                .filter(n -> n.argument() != null)
+                .filter(n -> n.component() != null)
                 .collect(Collectors.toList());
     }
 
