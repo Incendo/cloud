@@ -76,19 +76,6 @@ public final class AsynchronousCommandExecutionCoordinator<C> extends CommandExe
         return new Builder<>();
     }
 
-    /**
-     * Create a new {@link Builder} instance
-     *
-     * @param <C> Command sender type
-     * @return Builder
-     * @deprecated prefer {@link #builder()}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C> @NonNull Builder<C> newBuilder() {
-        return new Builder<>();
-    }
-
     @Override
     public @NonNull CompletableFuture<CommandResult<C>> coordinateExecution(
             final @NonNull CommandContext<C> commandContext,
