@@ -540,7 +540,7 @@ public final class CloudBrigadierManager<C, S> {
         } else {
             // Register argument
             final Pair<ArgumentType<?>, SuggestionProvider<S>> pair = this.getArgument(
-                    root.argument().getValueType(),
+                    root.component().valueType(),
                     root.component().parser()
             );
             final SuggestionProvider<S> provider = pair.getSecond() == delegateSuggestions()

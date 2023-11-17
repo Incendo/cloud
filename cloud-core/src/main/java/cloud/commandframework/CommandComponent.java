@@ -27,6 +27,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import io.leangen.geantyref.TypeToken;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -51,6 +52,7 @@ public final class CommandComponent<C> {
     private final ArgumentDescription description;
     private final ComponentType componentType;
     private final DefaultValue<C, ?> defaultValue;
+    private final TypeToken<?> valueType;
 
     private Command<C> owningCommand;
 
@@ -59,6 +61,7 @@ public final class CommandComponent<C> {
         final @NonNull Collection<@NonNull String> aliases,
         final @NonNull Collection<@NonNull String> alternativeAliases,
         final @NonNull CommandArgument<C, ?> argument,
+        final @NonNull TypeToken<?> valueType,
         final @NonNull ArgumentDescription description,
         final @NonNull ComponentType componentType,
         final @Nullable DefaultValue<C, ?> defaultValue
@@ -67,6 +70,7 @@ public final class CommandComponent<C> {
         this.aliases = aliases;
         this.alternativeAliases = alternativeAliases;
         this.argument = argument;
+        this.valueType = valueType;
         this.componentType = componentType;
         this.description = description;
         this.defaultValue = defaultValue;
@@ -83,6 +87,7 @@ public final class CommandComponent<C> {
                 aliases(argument),
                 alternativeAliases(argument),
                 argument,
+                argument.getValueType(),
                 description,
                 type(argument, required),
                 defaultValue
@@ -96,6 +101,17 @@ public final class CommandComponent<C> {
      */
     public @NonNull CommandArgument<C, ?> argument() {
         return this.argument;
+    }
+
+    /**
+     * Returns the type of the values produced by the {@link #parser()}.
+     *
+     * @return the types of the values produced by the parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull TypeToken<?> valueType() {
+        return this.valueType;
     }
 
     /**

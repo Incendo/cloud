@@ -160,7 +160,7 @@ class CommandManagerTest {
         assertThat(components.get(3).name()).isEqualTo("argument");
 
         // Check argument is indeed a command argument
-        assertThat(TypeToken.get(int.class)).isEqualTo(components.get(3).argument().getValueType());
+        assertThat(TypeToken.get(int.class)).isEqualTo(components.get(3).valueType());
 
         // Check description is set for all components, is empty when not specified
         assertThat(components.get(0).argumentDescription().getDescription()).isEmpty();
