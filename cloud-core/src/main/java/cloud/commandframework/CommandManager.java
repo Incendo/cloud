@@ -29,7 +29,6 @@ import cloud.commandframework.arguments.CommandSuggestionEngine;
 import cloud.commandframework.arguments.CommandSyntaxFormatter;
 import cloud.commandframework.arguments.DelegatingCommandSuggestionEngineFactory;
 import cloud.commandframework.arguments.StandardCommandSyntaxFormatter;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameter;
@@ -510,7 +509,7 @@ public abstract class CommandManager<C> {
                 .stream()
                 .map(CommandNode::component)
                 .filter(Objects::nonNull)
-                .filter(component -> component.argument() instanceof StaticArgument)
+                .filter(component -> component.type() == CommandComponent.ComponentType.LITERAL)
                 .map(CommandComponent::name)
                 .collect(Collectors.toList());
     }

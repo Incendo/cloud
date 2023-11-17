@@ -26,7 +26,6 @@ package cloud.commandframework.brigadier;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -531,7 +530,7 @@ public final class CloudBrigadierManager<C, S> {
             return argumentBuilders[0];
         }
         final ArgumentBuilder<S, ?> argumentBuilder;
-        if (root.argument() instanceof StaticArgument) {
+        if (root.component().type() == CommandComponent.ComponentType.LITERAL) {
             argumentBuilder = LiteralArgumentBuilder.<S>literal(root.component().name())
                     .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.nodeMeta()
                             .getOrDefault(
@@ -631,7 +630,7 @@ public final class CloudBrigadierManager<C, S> {
 
         for (final Suggestion suggestion : suggestions) {
             String tooltip = component.name();
-            if (!(component.argument() instanceof StaticArgument)) {
+            if (component.type() != CommandComponent.ComponentType.LITERAL) {
                 if (component.required()) {
                     tooltip = '<' + tooltip + '>';
                 } else {

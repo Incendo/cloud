@@ -60,17 +60,17 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
         final Iterator<CommandComponent<C>> iterator = commandComponents.iterator();
         while (iterator.hasNext()) {
             final CommandComponent<C> commandComponent = iterator.next();
-            if (commandComponent.argument() instanceof StaticArgument) {
-                formattingInstance.appendLiteral((StaticArgument<C>) commandComponent.argument());
+            if (commandComponent.type() == CommandComponent.ComponentType.LITERAL) {
+                formattingInstance.appendLiteral(commandComponent);
             } else if (commandComponent.argument() instanceof CompoundArgument) {
                 formattingInstance.appendCompound(commandComponent, (CompoundArgument<?, ?, ?>) commandComponent.argument());
             } else if (commandComponent.argument() instanceof FlagArgument) {
                 formattingInstance.appendFlag((FlagArgument<?>) commandComponent.argument());
             } else {
                 if (commandComponent.required()) {
-                    formattingInstance.appendRequired(commandComponent.argument());
+                    formattingInstance.appendRequired(commandComponent);
                 } else {
-                    formattingInstance.appendOptional(commandComponent.argument());
+                    formattingInstance.appendOptional(commandComponent);
                 }
             }
             if (iterator.hasNext()) {
@@ -85,12 +85,22 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 while (childIterator.hasNext()) {
                     final CommandNode<C> child = childIterator.next();
 
-                    if (child.argument() instanceof StaticArgument) {
-                        formattingInstance.appendName(child.argument().getName());
-                    } else if (child.component().required()) {
-                        formattingInstance.appendRequired(child.argument());
-                    } else {
-                        formattingInstance.appendOptional(child.argument());
+                    if (child.component() == null) {
+                        continue;
+                    }
+
+                    switch (child.component().type()) {
+                        case LITERAL:
+                            formattingInstance.appendName(child.component().name());
+                            break;
+                        case REQUIRED_VARIABLE:
+                            formattingInstance.appendRequired(child.component());
+                            break;
+                        case OPTIONAL_VARIABLE:
+                            formattingInstance.appendOptional(child.component());
+                            break;
+                        default:
+                            break;
                     }
 
                     if (childIterator.hasNext()) {
@@ -106,15 +116,15 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             } else if (component.argument() instanceof FlagArgument) {
                 formattingInstance.appendBlankSpace();
                 formattingInstance.appendFlag((FlagArgument<?>) component.argument());
-            } else if (component.argument() instanceof StaticArgument) {
+            } else if (component.type() == CommandComponent.ComponentType.LITERAL) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendLiteral((StaticArgument<?>) component.argument());
+                formattingInstance.appendLiteral(component);
             } else {
                 formattingInstance.appendBlankSpace();
                 if (component.required()) {
-                    formattingInstance.appendRequired(component.argument());
+                    formattingInstance.appendRequired(component);
                 } else {
-                    formattingInstance.appendOptional(component.argument());
+                    formattingInstance.appendOptional(component);
                 }
             }
             tail = tail.children().get(0);
@@ -157,8 +167,8 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @param literal Literal to append
          */
-        public void appendLiteral(final @NonNull StaticArgument<?> literal) {
-            this.appendName(literal.getName());
+        public void appendLiteral(final @NonNull CommandComponent<?> literal) {
+            this.appendName(literal.name());
         }
 
         /**
@@ -226,9 +236,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @param argument Required argument
          */
-        public void appendRequired(final @NonNull CommandArgument<?, ?> argument) {
+        public void appendRequired(final @NonNull CommandComponent<?> argument) {
             this.builder.append(this.getRequiredPrefix());
-            this.appendName(argument.getName());
+            this.appendName(argument.name());
             this.builder.append(this.getRequiredSuffix());
         }
 
@@ -237,9 +247,9 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          *
          * @param argument Optional argument
          */
-        public void appendOptional(final @NonNull CommandArgument<?, ?> argument) {
+        public void appendOptional(final @NonNull CommandComponent<?> argument) {
             this.builder.append(this.getOptionalPrefix());
-            this.appendName(argument.getName());
+            this.appendName(argument.name());
             this.builder.append(this.getOptionalSuffix());
         }
 

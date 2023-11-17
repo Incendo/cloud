@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.meta.CommandMeta;
 import java.util.ArrayList;
@@ -233,7 +232,7 @@ public final class CommandHelpHandler<C> {
                     /* We might still be able to match an argument */
                     CommandNode<C> potentialVariable = null;
                     for (final CommandNode<C> child : head.children()) {
-                        if (!(child.argument() instanceof StaticArgument)) {
+                        if (child.component().type() != CommandComponent.ComponentType.LITERAL) {
                             if (child.argument() != null) {
                                 potentialVariable = child;
                             }

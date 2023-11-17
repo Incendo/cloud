@@ -1224,7 +1224,7 @@ public class Command<C> {
         public @NonNull Builder<C> proxies(final @NonNull Command<C> command) {
             Builder<C> builder = this;
             for (final CommandComponent<C> component : command.components()) {
-                if (component.argument() instanceof StaticArgument) {
+                if (component.type() == CommandComponent.ComponentType.LITERAL) {
                     continue;
                 }
                 final CommandComponent<C> componentCopy = component.copy();

@@ -47,7 +47,7 @@ public final class CommandComponent<C> {
     private final Collection<String> alternativeAliases;
     private final CommandArgument<C, ?> argument;
     private final ArgumentDescription description;
-    private final boolean required;
+    private final ComponentType componentType;
     private final DefaultValue<C, ?> defaultValue;
 
     private CommandComponent(
@@ -56,15 +56,15 @@ public final class CommandComponent<C> {
         final @NonNull Collection<@NonNull String> alternativeAliases,
         final @NonNull CommandArgument<C, ?> argument,
         final @NonNull ArgumentDescription description,
-        final boolean required,
+        final @NonNull ComponentType componentType,
         final @Nullable DefaultValue<C, ?> defaultValue
     ) {
         this.name = name;
         this.aliases = aliases;
         this.alternativeAliases = alternativeAliases;
         this.argument = argument;
+        this.componentType = componentType;
         this.description = description;
-        this.required = required;
         this.defaultValue = defaultValue;
     }
 
@@ -80,7 +80,7 @@ public final class CommandComponent<C> {
                 alternativeAliases(argument),
                 argument,
                 description,
-                required,
+                type(argument, required),
                 defaultValue
         );
     }
@@ -153,7 +153,7 @@ public final class CommandComponent<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public boolean required() {
-        return this.required;
+        return this.componentType.required();
     }
 
     /**
@@ -166,7 +166,18 @@ public final class CommandComponent<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public boolean optional() {
-        return !this.required;
+        return this.componentType.optional();
+    }
+
+    /**
+     * Returns the type of the component
+     *
+     * @return the component type
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull ComponentType type() {
+        return this.componentType;
     }
 
     /**
@@ -213,8 +224,8 @@ public final class CommandComponent<C> {
 
     @Override
     public @NonNull String toString() {
-        return String.format("%s{argument=%s,description=%s,required=%s,defaultValue=%s}", this.getClass().getSimpleName(),
-                this.argument, this.description, this.required, this.defaultValue
+        return String.format("%s{argument=%s,description=%s,type=%s,defaultValue=%s}", this.getClass().getSimpleName(),
+                this.argument, this.description, this.componentType, this.defaultValue
         );
     }
 
@@ -299,5 +310,64 @@ public final class CommandComponent<C> {
             return ((StaticArgument<?>) argument).getAlternativeAliases();
         }
         return Collections.emptySet();
+    }
+
+    private static @NonNull ComponentType type(final @NonNull CommandArgument<?, ?> argument, final boolean required) {
+        if (argument instanceof StaticArgument) {
+            return ComponentType.LITERAL;
+        } else if (required) {
+            return ComponentType.REQUIRED_VARIABLE;
+        } else {
+            return ComponentType.OPTIONAL_VARIABLE;
+        }
+    }
+
+
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public enum ComponentType {
+        /**
+         * A literal component that can be parsed by its name, or any of its aliases.
+         */
+        LITERAL(true /* required */),
+        /**
+         * A required variable argument that is parsed into an object.
+         */
+        REQUIRED_VARIABLE(true /* required */),
+        /**
+         * An optional variable that is parsed into an object if present. May have a default fallback value.
+         */
+        OPTIONAL_VARIABLE(false /* required */);
+
+        private final boolean required;
+
+        ComponentType(final boolean required) {
+            this.required = required;
+        }
+
+        /**
+         * Returns whether the component is required
+         * <p>
+         * This always returns the opposite of {@link #optional()}.
+         *
+         * @return whether the component is required
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public boolean required() {
+            return this.required;
+        }
+
+        /**
+         * Returns whether the component is optional
+         * <p>
+         * This always returns the opposite of {@link #required()}.
+         *
+         * @return whether the component is optional
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public boolean optional() {
+            return !this.required;
+        }
     }
 }

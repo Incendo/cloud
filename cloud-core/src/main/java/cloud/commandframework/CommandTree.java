@@ -157,7 +157,7 @@ public final class CommandTree<C> {
     public @Nullable CommandNode<C> getNamedNode(final @Nullable String name) {
         for (final CommandNode<C> node : this.rootNodes()) {
             final CommandComponent<C> component = node.component();
-            if (component == null || !(component.argument() instanceof StaticArgument)) {
+            if (component == null || !(component.type() == CommandComponent.ComponentType.LITERAL)) {
                 continue;
             }
             for (final String alias : component.aliases()) {
@@ -358,7 +358,7 @@ public final class CommandTree<C> {
         // If it does not match a literal, try to find the one argument node, if it exists
         // The ambiguity check guarantees that only one will be present
         final List<CommandNode<C>> argumentNodes = children.stream()
-                .filter(n -> (n.argument() != null && !(n.argument() instanceof StaticArgument)))
+                .filter(n -> (n.argument() != null && n.component().type() != CommandComponent.ComponentType.LITERAL))
                 .collect(Collectors.toList());
         if (argumentNodes.size() > 1) {
             throw new IllegalStateException("Unexpected ambiguity detected, number of dynamic child nodes should not exceed 1");
@@ -533,9 +533,9 @@ public final class CommandTree<C> {
 
     private boolean matchesLiteral(final @NonNull List<@NonNull CommandNode<C>> children, final @NonNull String input) {
         return children.stream()
-                .filter(n -> n.argument() instanceof StaticArgument)
                 .map(CommandNode::component)
                 .filter(Objects::nonNull)
+                .filter(n -> n.type() == CommandComponent.ComponentType.LITERAL)
                 .flatMap(arg -> Stream.concat(Stream.of(arg.name()), arg.aliases().stream()))
                 .anyMatch(arg -> arg.equals(input));
     }
@@ -606,7 +606,8 @@ public final class CommandTree<C> {
 
         final List<CommandNode<C>> children = root.children();
         final List<CommandNode<C>> staticArguments = children.stream()
-                .filter(n -> n.argument() instanceof StaticArgument)
+                .filter(n -> n.component() != null)
+                .filter(n -> n.component().type() == CommandComponent.ComponentType.LITERAL)
                 .collect(Collectors.toList());
 
         // Try to see if any of the static literals can be parsed (matches exactly)
@@ -655,7 +656,7 @@ public final class CommandTree<C> {
 
         // Calculate suggestions for the variable argument, if one exists
         for (final CommandNode<C> child : root.children()) {
-            if (child.argument() == null || child.argument() instanceof StaticArgument) {
+            if (child.component() == null || child.component().type() == CommandComponent.ComponentType.LITERAL) {
                 continue;
             }
             this.addSuggestionsForDynamicArgument(context, commandInput, child);
@@ -904,7 +905,7 @@ public final class CommandTree<C> {
                 CommandNode<C> tempNode = node.getChild(component);
                 if (tempNode == null) {
                     tempNode = node.addChild(component);
-                } else if (component.argument() instanceof StaticArgument && tempNode.argument() != null) {
+                } else if (component.type() == CommandComponent.ComponentType.LITERAL && tempNode.argument() != null) {
                     for (final String alias : component.aliases()) {
                         ((StaticArgument<C>) Objects.requireNonNull(tempNode.argument())).registerAlias(alias);
                     }
@@ -947,7 +948,7 @@ public final class CommandTree<C> {
         // Append flags after the last static argument
         if (this.commandManager.getSetting(CommandManager.ManagerSettings.LIBERAL_FLAG_PARSING)) {
             for (int i = components.size() - 1; i >= 0; i--) {
-                if (components.get(i).argument() instanceof StaticArgument) {
+                if (components.get(i).type() == CommandComponent.ComponentType.LITERAL) {
                     return i;
                 }
             }
@@ -1003,8 +1004,8 @@ public final class CommandTree<C> {
      */
     public void verifyAndRegister() {
         // All top level commands are supposed to be registered in the command manager
-        this.internalTree.children().stream().map(CommandNode::argument).forEach(commandArgument -> {
-            if (!(commandArgument instanceof StaticArgument)) {
+        this.internalTree.children().stream().map(CommandNode::component).forEach(component -> {
+            if (component.type() != CommandComponent.ComponentType.LITERAL) {
                 throw new IllegalStateException("Top level command argument cannot be a variable");
             }
         });
@@ -1083,7 +1084,8 @@ public final class CommandTree<C> {
         // List of child nodes that are not static arguments, but (parsed) variable ones
         final List<CommandNode<C>> childVariableArguments = node.children()
                 .stream()
-                .filter(n -> (n.argument() != null && !(n.argument() instanceof StaticArgument)))
+                .filter(n -> n.component() != null)
+                .filter(n -> n.component().type() != CommandComponent.ComponentType.LITERAL)
                 .collect(Collectors.toList());
 
         // If more than one child node exists with a variable argument, fail
@@ -1102,7 +1104,8 @@ public final class CommandTree<C> {
         // List of child nodes that are static arguments, with fixed values
         final List<CommandNode<C>> childStaticArguments = node.children()
                 .stream()
-                .filter(n -> n.argument() instanceof StaticArgument)
+                .filter(n -> n.component() != null)
+                .filter(n -> n.component().type() == CommandComponent.ComponentType.LITERAL)
                 .collect(Collectors.toList());
 
         // Check none of the static arguments are equal to another one

@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
@@ -174,7 +172,7 @@ class CommandHelpHandlerTest {
             //TODO: Use CommandManager syntax for this
             StringBuilder syntax = new StringBuilder();
             for (CommandComponent<TestCommandSender> component : verbose.getCommand().components()) {
-                if (component.argument() instanceof StaticArgument) {
+                if (component.type() == CommandComponent.ComponentType.LITERAL) {
                     syntax.append(component.name());
                 } else if (component.required()) {
                     syntax.append('<').append(component.name()).append('>');
