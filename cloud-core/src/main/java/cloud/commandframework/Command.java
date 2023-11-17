@@ -423,29 +423,6 @@ public class Command<C> {
         /**
          * Add command meta to the internal command meta map
          *
-         * @param key   Meta key
-         * @param value Meta value
-         * @return New builder instance using the inserted meta key-value pair
-         * @deprecated for removal since 1.2.0, use the typesafe variant at {@link #meta(CommandMeta.Key, Object)} instead.
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.2.0")
-        public @NonNull Builder<C> meta(final @NonNull String key, final @NonNull String value) {
-            final CommandMeta commandMeta = SimpleCommandMeta.builder().with(this.commandMeta).with(key, value).build();
-            return new Builder<>(
-                    this.commandManager,
-                    commandMeta,
-                    this.senderType,
-                    this.commandComponents,
-                    this.commandExecutionHandler,
-                    this.commandPermission,
-                    this.flags
-            );
-        }
-
-        /**
-         * Add command meta to the internal command meta map
-         *
          * @param <V>   Meta value type
          * @param key   Meta key
          * @param value Meta value
