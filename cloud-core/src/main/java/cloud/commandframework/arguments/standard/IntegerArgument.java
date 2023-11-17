@@ -316,26 +316,6 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         private final IntegerParser<?> parser;
 
         /**
-         * Construct a new integer parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #IntegerParseException(String, IntegerParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public IntegerParseException(
-                final @NonNull String input,
-                final int min,
-                final int max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new IntegerParser<>(min, max), commandContext);
-        }
-
-        /**
          * Create a new {@link IntegerParseException}.
          *
          * @param input          input string

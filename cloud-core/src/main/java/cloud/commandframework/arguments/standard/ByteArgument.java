@@ -267,26 +267,6 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         private final ByteParser<?> parser;
 
         /**
-         * Construct a new byte parse exception
-         *
-         * @param input   String input
-         * @param min     Minimum value
-         * @param max     Maximum value
-         * @param context Command context
-         * @deprecated use {@link #ByteParseException(String, ByteParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public ByteParseException(
-                final @NonNull String input,
-                final byte min,
-                final byte max,
-                final @NonNull CommandContext<?> context
-        ) {
-            this(input, new ByteParser<>(min, max), context);
-        }
-
-        /**
          * Create a new {@link ByteParseException}.
          *
          * @param input   input string

@@ -260,25 +260,6 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         private final DoubleParser<?> parser;
 
         /**
-         * Construct a new double parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #DoubleParseException(String, DoubleParser, CommandContext)} instead
-         */
-        @Deprecated
-        public DoubleParseException(
-                final @NonNull String input,
-                final double min,
-                final double max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new DoubleParser<>(min, max), commandContext);
-        }
-
-        /**
          * Create a new {@link DoubleParseException}.
          *
          * @param input          input string

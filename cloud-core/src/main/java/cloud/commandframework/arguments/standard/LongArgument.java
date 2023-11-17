@@ -262,26 +262,6 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         private final LongParser<?> parser;
 
         /**
-         * Construct a new long parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #LongParseException(String, LongParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public LongParseException(
-                final @NonNull String input,
-                final long min,
-                final long max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new LongParser<>(min, max), commandContext);
-        }
-
-        /**
          * Create a new {@link LongParseException}.
          *
          * @param input          input string

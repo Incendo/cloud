@@ -262,26 +262,6 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         private final ShortParser<?> parser;
 
         /**
-         * Construct a new short parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #ShortParseException(String, ShortParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public ShortParseException(
-                final @NonNull String input,
-                final short min,
-                final short max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new ShortParser<>(min, max), commandContext);
-        }
-
-        /**
          * Create a new {@link ShortParseException}.
          *
          * @param input          input string

@@ -257,26 +257,6 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         private final FloatParser<?> parser;
 
         /**
-         * Construct a new float parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #FloatParseException(String, FloatParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public FloatParseException(
-                final @NonNull String input,
-                final float min,
-                final float max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new FloatParser<>(min, max), commandContext);
-        }
-
-        /**
          * Create a new {@link FloatParseException}.
          *
          * @param input          input string
