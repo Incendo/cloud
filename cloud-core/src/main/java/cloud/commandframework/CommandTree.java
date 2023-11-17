@@ -30,9 +30,9 @@ import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import cloud.commandframework.context.ArgumentContext;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.context.ParsingContext;
 import cloud.commandframework.exceptions.AmbiguousNodeException;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -273,23 +273,22 @@ public final class CommandTree<C> {
                     continue;
                 }
 
-                final CommandArgument<C, ?> argument = Objects.requireNonNull(child.argument());
                 final CommandComponent<C> component = Objects.requireNonNull(child.component());
-                final ArgumentContext<C, ?> argumentContext = commandContext.createArgumentContext(argument);
+                final ParsingContext<C> parsingContext = commandContext.createParsingContext(component);
 
                 // Copy the current queue so that we can deduce the captured input.
                 final CommandInput currentInput = commandInput.copy();
 
-                argumentContext.markStart();
-                commandContext.setCurrentArgument(argument);
+                parsingContext.markStart();
+                commandContext.currentComponent(component);
 
                 final ArgumentParseResult<?> result = component.parser().parse(commandContext, commandInput);
-                argumentContext.markEnd();
-                argumentContext.success(!result.getFailure().isPresent());
+                parsingContext.markEnd();
+                parsingContext.success(!result.getFailure().isPresent());
 
                 final List<String> consumedTokens = currentInput.tokenize();
                 consumedTokens.removeAll(commandInput.tokenize());
-                argumentContext.consumedInput(consumedTokens);
+                parsingContext.consumedInput(consumedTokens);
 
                 if (result.getParsedValue().isPresent()) {
                     parsedArguments.add(component);
@@ -390,7 +389,7 @@ public final class CommandTree<C> {
         Object argumentValue = null;
 
         // Flag arguments need to be skipped over, so that further defaults are handled
-        if (commandInput.isEmpty() && !(child.argument() instanceof FlagArgument)) {
+        if (commandInput.isEmpty() && !(child.component().type() == CommandComponent.ComponentType.FLAG)) {
             final CommandComponent<C> childComponent = Objects.requireNonNull(child.component());
             if (childComponent.hasDefaultValue()) {
                 final DefaultValue<C, ?> defaultValue = childComponent.defaultValue();
@@ -544,13 +543,13 @@ public final class CommandTree<C> {
             final @NonNull CommandComponent<C> component,
             final @NonNull CommandInput commandInput
     ) {
-        final ArgumentContext<C, ?> argumentContext = commandContext.createArgumentContext(component.argument());
-        argumentContext.markStart();
+        final ParsingContext<C> parsingContext = commandContext.createParsingContext(component);
+        parsingContext.markStart();
 
         final ArgumentParseResult<?> result;
-        final ArgumentParseResult<Boolean> preParseResult = component.argument().preprocess(commandContext, commandInput);
+        final ArgumentParseResult<Boolean> preParseResult = component.preprocess(commandContext, commandInput);
         if (!preParseResult.getFailure().isPresent() && preParseResult.getParsedValue().orElse(false)) {
-            commandContext.setCurrentArgument(component.argument());
+            commandContext.currentComponent(component);
 
             // Copy the current queue so that we can deduce the captured input.
             final CommandInput currentInput = commandInput.copy();
@@ -560,7 +559,7 @@ public final class CommandTree<C> {
             // We remove all remaining queue, and then we'll have a list of the captured input.
             final List<String> consumedInput = currentInput.tokenize();
             consumedInput.removeAll(commandInput.tokenize());
-            argumentContext.consumedInput(consumedInput);
+            parsingContext.consumedInput(consumedInput);
 
             if (result.getFailure().isPresent()) {
                 commandInput.cursor(currentInput.cursor());
@@ -569,8 +568,8 @@ public final class CommandTree<C> {
             result = preParseResult;
         }
 
-        argumentContext.markEnd();
-        argumentContext.success(!result.getFailure().isPresent());
+        parsingContext.markEnd();
+        parsingContext.success(!result.getFailure().isPresent());
 
         return result;
     }
@@ -615,12 +614,11 @@ public final class CommandTree<C> {
             final CommandInput commandInputCopy = commandInput.copy();
             for (CommandNode<C> child : staticArguments) {
                 final CommandComponent<C> childComponent = child.component();
-                final CommandArgument<C, ?> childArgument = child.argument();
-                if (childArgument == null || childComponent == null) {
+                if (childComponent == null) {
                     continue;
                 }
 
-                context.commandContext().setCurrentArgument(childArgument);
+                context.commandContext().currentComponent(childComponent);
                 final ArgumentParseResult<?> result = childComponent.parser().parse(
                         context.commandContext(),
                         commandInput
@@ -680,11 +678,9 @@ public final class CommandTree<C> {
         if (this.findMissingPermission(context.commandContext().getSender(), node) != null) {
             return;
         }
-        final CommandArgument<C, ?> argument = Objects.requireNonNull(node.argument());
-        context.commandContext().setCurrentArgument(argument);
-        final List<Suggestion> suggestionsToAdd = argument
-                .suggestionProvider()
-                .suggestions(context.commandContext(), input);
+        final CommandComponent<C> component = Objects.requireNonNull(node.component());
+        context.commandContext().currentComponent(component);
+        final List<Suggestion> suggestionsToAdd = component.suggestionProvider().suggestions(context.commandContext(), input);
         for (Suggestion suggestion : suggestionsToAdd) {
             if (suggestion.suggestion().equals(input) || !suggestion.suggestion().startsWith(input)) {
                 continue;
@@ -700,16 +696,16 @@ public final class CommandTree<C> {
             final @NonNull CommandInput commandInput,
             final @NonNull CommandNode<C> child
     ) {
-        final CommandArgument<C, ?> argument = child.argument();
         final CommandComponent<C> component = child.component();
-        if (argument == null || component == null) {
+        if (component == null) {
             return context;
         }
 
-        if (argument instanceof CompoundArgument) {
+        if (component.parser() instanceof CompoundArgument.CompoundParser) {
             // If we're working with a compound argument then we attempt to pop the required arguments from the input queue.
-            final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) argument;
-            this.popRequiredArguments(context.commandContext(), commandInput, compoundArgument);
+            final CompoundArgument.CompoundParser<?, C, ?> compoundParser =
+                    (CompoundArgument.CompoundParser<?, C, ?>) component.parser();
+            this.popRequiredArguments(context.commandContext(), commandInput, compoundParser);
         } else if (component.parser() instanceof FlagArgument.FlagArgumentParser) {
             // Use the flag argument parser to deduce what flag is being suggested right now
             // If empty, then no flag value is being typed, and the different flag options should
@@ -738,7 +734,7 @@ public final class CommandTree<C> {
             return context;
         } else if (commandInput.remainingTokens() == 1) {
             return this.addArgumentSuggestions(context, child, commandInput.peekString());
-        } else if (child.isLeaf() && child.argument() instanceof CompoundArgument) {
+        } else if (child.isLeaf() && child.component().parser() instanceof CompoundArgument.CompoundParser) {
             return this.addArgumentSuggestions(context, child, commandInput.tokenize().getLast());
         }
 
@@ -746,7 +742,7 @@ public final class CommandTree<C> {
         final CommandInput commandInputOriginal = commandInput.copy();
 
         // START: Preprocessing
-        final ArgumentParseResult<Boolean> preParseResult = argument.preprocess(
+        final ArgumentParseResult<Boolean> preParseResult = component.preprocess(
                 context.commandContext(),
                 commandInput
         );
@@ -756,7 +752,7 @@ public final class CommandTree<C> {
 
         if (preParseSuccess) {
             // START: Parsing
-            context.commandContext().setCurrentArgument(child.argument());
+            context.commandContext().currentComponent(child.component());
 
             final CommandInput preParseInput = commandInput.copy();
 
@@ -809,20 +805,20 @@ public final class CommandTree<C> {
     }
 
     /**
-     * Removes as many arguments from the {@code commandQueue} as the given {@code compoundArgument} requires. If the
+     * Removes as many arguments from the {@code commandQueue} as the given {@code compoundParser} requires. If the
      * {@code commandQueue} fewer than the required arguments then no arguments are popped
      *
-     * @param commandContext   the command context
-     * @param commandInput     the input
-     * @param compoundArgument the compound argument
+     * @param commandContext  the command context
+     * @param commandInput    the input
+     * @param compoundParser the compound parser
      */
     private void popRequiredArguments(
             final @NonNull CommandContext<C> commandContext,
             final @NonNull CommandInput commandInput,
-            final @NonNull CompoundArgument<?, C, ?> compoundArgument
+            final CompoundArgument.@NonNull CompoundParser<?, C, ?> compoundParser
     ) {
         /* See how many arguments it requires */
-        final int requiredArguments = compoundArgument.getParserTuple().getSize();
+        final int requiredArguments = compoundParser.parsers().length;
         /* Figure out whether we even need to care about this */
         if (commandInput.remainingTokens() <= requiredArguments) {
             /* Attempt to pop as many arguments from the stack as possible */
@@ -847,12 +843,12 @@ public final class CommandTree<C> {
             final @NonNull CommandNode<C> node,
             final @NonNull String text
     ) {
-        final CommandArgument<C, ?> argument = Objects.requireNonNull(node.argument());
+        final CommandComponent<C> component = Objects.requireNonNull(node.component());
 
-        this.addArgumentSuggestions(context, argument, text);
+        this.addArgumentSuggestions(context, component, text);
 
         // When suggesting a flag, potentially suggest following nodes too
-        final boolean isParsingFlag = argument instanceof FlagArgument
+        final boolean isParsingFlag = component.type() == CommandComponent.ComponentType.FLAG
                 && !node.children().isEmpty() // Has children
                 && !text.startsWith("-") // Not a flag
                 && !context.commandContext().getOptional(FlagArgument.FLAG_META_KEY).isPresent();
@@ -862,8 +858,7 @@ public final class CommandTree<C> {
         }
 
         for (final CommandNode<C> child : node.children()) {
-            final CommandArgument<C, ?> childArgument = Objects.requireNonNull(child.argument());
-            this.addArgumentSuggestions(context, childArgument, text);
+            this.addArgumentSuggestions(context, Objects.requireNonNull(child.component()), text);
         }
 
         return context;
@@ -872,19 +867,18 @@ public final class CommandTree<C> {
     /**
      * Adds the suggestions for the given {@code argument} to the given {@code context}
      *
-     * @param context  the suggestion context
-     * @param argument the argument to get suggestions from
-     * @param text     the input from the sender
+     * @param context   the suggestion context
+     * @param component the component to get suggestions from
+     * @param text      the input from the sender
      */
     private void addArgumentSuggestions(
             final @NonNull SuggestionContext<C> context,
-            final @NonNull CommandArgument<C, ?> argument,
+            final @NonNull CommandComponent<C> component,
             final @NonNull String text
     ) {
-        context.commandContext().setCurrentArgument(argument);
-        context.addSuggestions(argument.suggestionProvider().suggestions(context.commandContext(), text));
+        context.commandContext().currentComponent(component);
+        context.addSuggestions(component.suggestionProvider().suggestions(context.commandContext(), text));
     }
-
 
     /**
      * Inserts a new command into the command tree and then verifies the integrity of the tree
@@ -907,7 +901,7 @@ public final class CommandTree<C> {
                     tempNode = node.addChild(component);
                 } else if (component.type() == CommandComponent.ComponentType.LITERAL && tempNode.component() != null) {
                     for (final String alias : component.aliases()) {
-                        ((StaticArgument<C>) Objects.requireNonNull(tempNode.argument())).registerAlias(alias);
+                        ((StaticArgument.StaticArgumentParser<C>) tempNode.component().parser()).insertAlias(alias);
                     }
                 }
                 if (!node.children().isEmpty()) {
@@ -1090,6 +1084,7 @@ public final class CommandTree<C> {
         // If more than one child node exists with a variable argument, fail
         if (childVariableArguments.size() > 1) {
             final CommandNode<C> child = childVariableArguments.get(0);
+
             throw new AmbiguousNodeException(
                     node,
                     child,

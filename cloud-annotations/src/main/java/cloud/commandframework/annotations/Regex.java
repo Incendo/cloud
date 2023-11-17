@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
+import cloud.commandframework.arguments.ComponentPreprocessor;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Annotation version of adding {@link cloud.commandframework.arguments.preprocessor.RegexPreprocessor}
- * as a preprocessor using {@link cloud.commandframework.arguments.CommandArgument#addPreprocessor(cloud.commandframework.arguments.ArgumentPreprocessor)}
+ * as a preprocessor using {@link cloud.commandframework.CommandComponent#addPreprocessor(ComponentPreprocessor)}
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

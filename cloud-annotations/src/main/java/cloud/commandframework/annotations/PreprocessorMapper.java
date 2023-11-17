@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.arguments.ArgumentPreprocessor;
+import cloud.commandframework.arguments.ComponentPreprocessor;
 import java.lang.annotation.Annotation;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -32,10 +32,10 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public interface PreprocessorMapper<A extends Annotation, C> {
 
     /**
-     * Maps the given {@code annotation} to a {@link ArgumentPreprocessor argument preprocessor}.
+     * Maps the given {@code annotation} to a {@link ComponentPreprocessor argument preprocessor}.
      *
      * @param annotation the annotation
      * @return the argument preprocessor
      */
-    @NonNull ArgumentPreprocessor<C> mapAnnotation(@NonNull A annotation);
+    @NonNull ComponentPreprocessor<C> mapAnnotation(@NonNull A annotation);
 }

@@ -23,8 +23,7 @@
 //
 package cloud.commandframework.context;
 
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.CommandComponent;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -33,19 +32,19 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@API(status = API.Status.MAINTAINED, since = "1.9.0")
-public final class ArgumentContext<C, T> {
+@API(status = API.Status.MAINTAINED, since = "2.0.0")
+public final class ParsingContext<C> {
 
-    private final CommandArgument<@NonNull C, @NonNull T> argument;
+    private final CommandComponent<@NonNull C> component;
     private final List<String> consumedInput = new LinkedList<>();
 
     /**
-     * Construct an ArgumentContext object with the given argument.
+     * Construct an ParsingContext object with the given argument.
      *
-     * @param argument the command argument to be assigned to the ArgumentContext
+     * @param component the command component to be assigned to the ParsingContext
      */
-    public ArgumentContext(final @NonNull CommandArgument<@NonNull C, @NonNull T> argument) {
-        this.argument = argument;
+    public ParsingContext(final @NonNull CommandComponent<@NonNull C> component) {
+        this.component = component;
     }
 
     private long startTime = -1;
@@ -54,16 +53,16 @@ public final class ArgumentContext<C, T> {
     private boolean success;
 
     /**
-     * Return the associated argument.
+     * Return the associated component.
      *
-     * @return the argument
+     * @return the component
      */
-    public @NonNull CommandArgument<@NonNull C, @NonNull T> argument() {
-        return this.argument;
+    public @NonNull CommandComponent<C> component() {
+        return this.component;
     }
 
     /**
-     * Return the duration taken to parse the argument.
+     * Return the duration taken to parse the component.
      *
      * @return the argument parse duration
      */
@@ -141,7 +140,7 @@ public final class ArgumentContext<C, T> {
      * @return the exact alias, or {@code null}
      */
     public @Nullable String exactAlias() {
-        if (!this.success || !(this.argument instanceof StaticArgument)) {
+        if (!this.success || this.component.type() != CommandComponent.ComponentType.LITERAL) {
             return null;
         }
         return this.consumedInput.get(0);

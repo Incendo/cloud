@@ -199,7 +199,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         @Override
         public boolean registerCommand(@NonNull final Command<C> command) {
-            return this.registeredCommands.add((Command<C>) command);
+            return this.registeredCommands.add(command);
         }
 
         private void registerAllCommands(

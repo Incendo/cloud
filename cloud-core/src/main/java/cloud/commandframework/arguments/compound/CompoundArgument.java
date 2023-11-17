@@ -47,10 +47,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 @API(status = API.Status.STABLE)
 public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, O> {
 
-    private final Tuple types;
-    private final Tuple names;
-    private final Tuple parserTuple;
-
     /**
      * Construct a Compound Argument
      *
@@ -73,57 +69,116 @@ public class CompoundArgument<T extends Tuple, C, O> extends CommandArgument<C, 
     ) {
         super(
                 name,
-                new CompoundParser<>(parserTuple, mapper, tupleFactory),
+                new CompoundParser<>(names, types, parserTuple, mapper, tupleFactory),
                 valueType,
                 null
         );
-        this.parserTuple = parserTuple;
-        this.names = names;
-        this.types = types;
     }
 
-    /**
-     * Get the tuple containing the internal parsers
-     *
-     * @return Internal parsers
-     */
-    public @NonNull Tuple getParserTuple() {
-        return this.parserTuple;
+    private CompoundArgument(
+            final @NonNull String name,
+            final @NonNull Object @NonNull[] names,
+            final @NonNull Object @NonNull[] parserTuple,
+            final @NonNull Object @NonNull[] types,
+            final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
+            final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory,
+            final @NonNull TypeToken<O> valueType
+    ) {
+        super(
+                name,
+                new CompoundParser<>(names, types, parserTuple, mapper, tupleFactory),
+                valueType,
+                null
+        );
     }
 
-    /**
-     * Get the argument names
-     *
-     * @return Argument names
-     */
-    public @NonNull Tuple getNames() {
-        return this.names;
+    @Override
+    public final @NonNull CompoundArgument<T, C, O> copy() {
+        final CompoundParser<T, C, O> parser = this.getParser();
+        return new CompoundArgument<>(
+                this.getName(),
+                this.getParser().names(),
+                this.getParser().parsers(),
+                this.getParser().types(),
+                parser.mapper,
+                parser.tupleFactory,
+                this.getValueType()
+        );
     }
 
-    /**
-     * Get the parser types
-     *
-     * @return Parser types
-     */
-    public @NonNull Tuple getTypes() {
-        return this.types;
+    @Override
+    @SuppressWarnings("unchecked")
+    public final @NonNull CompoundParser<T, C, O> getParser() {
+        return (CompoundParser<T, C, O>) super.getParser();
     }
 
+    public static final class CompoundParser<T extends Tuple, C, O> implements ArgumentParser<C, O> {
 
-    private static final class CompoundParser<T extends Tuple, C, O> implements ArgumentParser<C, O> {
-
+        private final Object[] names;
+        private final Object[] types;
         private final Object[] parsers;
         private final BiFunction<C, T, O> mapper;
         private final Function<Object[], T> tupleFactory;
 
         private CompoundParser(
+                final @NonNull Tuple names,
+                final @NonNull Tuple types,
                 final @NonNull Tuple parserTuple,
                 final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
                 final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory
         ) {
+            this.names = names.toArray();
+            this.types = types.toArray();
             this.parsers = parserTuple.toArray();
             this.mapper = mapper;
             this.tupleFactory = tupleFactory;
+        }
+
+        private CompoundParser(
+                final @NonNull Object @NonNull[] names,
+                final @NonNull Object @NonNull[] types,
+                final @NonNull Object @NonNull[] parserTuple,
+                final @NonNull BiFunction<@NonNull C, @NonNull T, @NonNull O> mapper,
+                final @NonNull Function<@NonNull Object[], @NonNull T> tupleFactory
+        ) {
+            this.names = names;
+            this.types = types;
+            this.parsers = parserTuple;
+            this.mapper = mapper;
+            this.tupleFactory = tupleFactory;
+        }
+
+        /**
+         * Returns the argument names
+         *
+         * @return the argument names
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Object @NonNull[] names() {
+            return this.names;
+        }
+
+        /**
+         * Returns the argument parsers
+         *
+         * @return the argument parsers
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Object @NonNull[] parsers() {
+            return this.parsers;
+        }
+
+        /**
+         * Returns the parser types
+         *
+         * @return parser types
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Object @NonNull[] types() {
+            return this.types;
         }
 
         @Override

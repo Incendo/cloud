@@ -26,8 +26,8 @@ package cloud.commandframework.annotations;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.specifier.Completions;
-import cloud.commandframework.arguments.ArgumentPreprocessor;
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
@@ -119,17 +119,6 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
         final CommandArgument<C, ?> builtArgument = argumentBuilder.manager(this.annotationParser.manager())
                 .withParser(parser)
                 .build();
-        /* Add preprocessors */
-        for (final Annotation annotation : annotations) {
-            @SuppressWarnings("rawtypes") final PreprocessorMapper preprocessorMapper =
-                    this.annotationParser.preprocessorMappers().get(annotation.annotationType());
-            if (preprocessorMapper != null) {
-                final ArgumentPreprocessor<C> preprocessor = (ArgumentPreprocessor<C>) preprocessorMapper.mapAnnotation(
-                        annotation
-                );
-                builtArgument.addPreprocessor(preprocessor);
-            }
-        }
 
         final ArgumentDescription description;
         if (descriptor.description() == null) {
@@ -138,16 +127,30 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
             description = descriptor.description();
         }
 
+        final CommandComponent<C> component;
         if (syntaxFragment.getArgumentMode() == ArgumentMode.REQUIRED) {
-            return CommandComponent.required(builtArgument, description);
+            component = CommandComponent.required(builtArgument, description);
         } else if (descriptor.defaultValue() == null) {
-            return CommandComponent.optional(builtArgument, description);
+            component = CommandComponent.optional(builtArgument, description);
         } else {
-            return CommandComponent.optional(
+            component = CommandComponent.optional(
                     builtArgument,
                     description,
                     DefaultValue.parsed(this.annotationParser.processString(descriptor.defaultValue()))
             );
         }
+
+        for (final Annotation annotation : annotations) {
+            @SuppressWarnings("rawtypes") final PreprocessorMapper preprocessorMapper =
+                    this.annotationParser.preprocessorMappers().get(annotation.annotationType());
+            if (preprocessorMapper != null) {
+                final ComponentPreprocessor<C> preprocessor = (ComponentPreprocessor<C>) preprocessorMapper.mapAnnotation(
+                        annotation
+                );
+                component.addPreprocessor(preprocessor);
+            }
+        }
+
+        return component;
     }
 }

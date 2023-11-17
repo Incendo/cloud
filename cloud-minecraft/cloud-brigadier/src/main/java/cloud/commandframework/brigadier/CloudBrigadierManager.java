@@ -480,11 +480,12 @@ public final class CloudBrigadierManager<C, S> {
             final com.mojang.brigadier.@NonNull Command<S> executor,
             final SuggestionProvider<S> suggestionProvider
     ) {
-        if (root.argument() instanceof CompoundArgument) {
-            final CompoundArgument<?, C, ?> compoundArgument = (CompoundArgument<?, C, ?>) root.argument();
-            final Object[] parsers = compoundArgument.getParserTuple().toArray();
-            final Object[] types = compoundArgument.getTypes().toArray();
-            final Object[] names = compoundArgument.getNames().toArray();
+        if (root.component().parser() instanceof CompoundArgument.CompoundParser) {
+            final CompoundArgument.CompoundParser<?, C, ?> compoundParser =
+                    (CompoundArgument.CompoundParser<?, C, ?>) root.component().parser();
+            final Object[] parsers = compoundParser.parsers();
+            final Object[] types = compoundParser.types();
+            final Object[] names = compoundParser.names();
 
             /* Build nodes backwards */
             final ArgumentBuilder<S, ?>[] argumentBuilders = new ArgumentBuilder[parsers.length];

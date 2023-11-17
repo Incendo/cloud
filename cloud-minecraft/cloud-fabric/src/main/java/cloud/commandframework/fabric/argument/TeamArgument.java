@@ -29,13 +29,13 @@ import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.scores.PlayerTeam;
@@ -108,10 +108,10 @@ public final class TeamArgument<C> extends CommandArgument<C, PlayerTeam> {
         @Override
         protected @NonNull ArgumentParseResult<String> parseIntermediate(
                 @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                @NonNull final CommandInput commandInput
         ) {
-            final String input = inputQueue.peek();
-            if (input == null) {
+            final String input = commandInput.readString();
+            if (input.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(TeamParser.class, commandContext));
             }
             return ArgumentParseResult.success(input);

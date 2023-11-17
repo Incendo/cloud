@@ -26,8 +26,8 @@ package cloud.commandframework.fabric.argument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.fabric.FabricCommandContextKeys;
-import java.util.Queue;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -46,10 +46,10 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
     @Override
     public @NonNull ArgumentParseResult<@NonNull R> parse(
             @NonNull final CommandContext<@NonNull C> commandContext,
-            @NonNull final Queue<@NonNull String> inputQueue
+            @NonNull final CommandInput commandInput
     ) {
         final SharedSuggestionProvider source = commandContext.get(FabricCommandContextKeys.NATIVE_COMMAND_SOURCE);
-        final ArgumentParseResult<I> intermediate = this.parseIntermediate(commandContext, inputQueue);
+        final ArgumentParseResult<I> intermediate = this.parseIntermediate(commandContext, commandInput);
 
         return intermediate.flatMapParsedValue(value -> {
             if (source instanceof CommandSourceStack) {
@@ -64,7 +64,7 @@ abstract class SidedArgumentParser<C, I, R> implements ArgumentParser<C, R> {
 
     protected abstract @NonNull ArgumentParseResult<@NonNull I> parseIntermediate(
             @NonNull CommandContext<@NonNull C> commandContext,
-            @NonNull Queue<@NonNull String> inputQueue
+            @NonNull CommandInput commandInput
     );
 
     /**

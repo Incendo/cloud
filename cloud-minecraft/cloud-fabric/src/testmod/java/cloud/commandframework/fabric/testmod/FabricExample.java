@@ -209,11 +209,10 @@ public final class FabricExample implements ModInitializer {
                         .map(Suggestion::simple)
                         .collect(Collectors.toList()))
                 .withParser((ctx, inputQueue) -> {
-                    final ModMetadata meta = FabricLoader.getInstance().getModContainer(inputQueue.peek())
+                    final ModMetadata meta = FabricLoader.getInstance().getModContainer(inputQueue.readString())
                             .map(ModContainer::getMetadata)
                             .orElse(null);
                     if (meta != null) {
-                        inputQueue.remove();
                         return ArgumentParseResult.success(meta);
                     }
                     return ArgumentParseResult.failure(new IllegalArgumentException(String.format(

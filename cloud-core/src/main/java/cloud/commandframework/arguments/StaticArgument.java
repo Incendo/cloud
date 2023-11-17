@@ -28,8 +28,8 @@ import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +50,10 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         super(name, new StaticArgumentParser<>(name, aliases), String.class);
     }
 
+    private StaticArgument(final @NonNull String name, final @NonNull Collection<@NonNull String> aliases) {
+        super(name, new StaticArgumentParser<>(name, aliases), String.class);
+    }
+
     /**
      * Create a new static argument instance for a required command argument
      *
@@ -65,35 +69,18 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         return new StaticArgument<>(name, aliases);
     }
 
-    /**
-     * Register a new alias
-     *
-     * @param alias New alias
-     */
-    public void registerAlias(final @NonNull String alias) {
-        ((StaticArgumentParser<C>) this.getParser()).insertAlias(alias);
+    @Override
+    public @NonNull CommandArgument<C, String> copy() {
+        return new StaticArgument<>(this.getName(), this.getParser().alternativeAliases());
     }
 
-    /**
-     * Get an immutable view of the aliases
-     *
-     * @return Immutable view of the argument aliases
-     */
-    public @NonNull Set<@NonNull String> getAliases() {
-        return Collections.unmodifiableSet(((StaticArgumentParser<C>) this.getParser()).getAcceptedStrings());
+    @Override
+    @SuppressWarnings("unchecked")
+    public @NonNull StaticArgumentParser<C> getParser() {
+        return (StaticArgumentParser<C>) super.getParser();
     }
 
-    /**
-     * Get an immutable list of all aliases that are not the main literal
-     *
-     * @return Immutable view of the optional argument aliases
-     */
-    public @NonNull List<@NonNull String> getAlternativeAliases() {
-        return Collections.unmodifiableList(new ArrayList<>(((StaticArgumentParser<C>) this.getParser()).alternativeAliases));
-    }
-
-
-    private static final class StaticArgumentParser<C> implements ArgumentParser<C, String> {
+    public static final class StaticArgumentParser<C> implements ArgumentParser<C, String> {
 
         private final Set<String> allAcceptedAliases = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         private final Set<String> alternativeAliases = new HashSet<>();
@@ -105,6 +92,13 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
             this.allAcceptedAliases.add(this.name);
             this.allAcceptedAliases.addAll(Arrays.asList(aliases));
             this.alternativeAliases.addAll(Arrays.asList(aliases));
+        }
+
+        private StaticArgumentParser(final @NonNull String name, final @NonNull Collection<String> aliases) {
+            this.name = name;
+            this.allAcceptedAliases.add(this.name);
+            this.allAcceptedAliases.addAll(aliases);
+            this.alternativeAliases.addAll(aliases);
         }
 
         @Override
@@ -135,12 +129,31 @@ public final class StaticArgument<C> extends CommandArgument<C, String> {
         }
 
         /**
-         * Get the accepted strings
+         * Returns the aliases, if relevant.
+         * <p>
+         * Only literal components may have aliases. If this is a non-literal
+         * component then an empty collection is returned.
          *
-         * @return Accepted strings
+         * @return unmodifiable view of the aliases
+         * @since 2.0.0
          */
-        public @NonNull Set<@NonNull String> getAcceptedStrings() {
-            return this.allAcceptedAliases;
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Collection<@NonNull String> aliases() {
+            return Collections.unmodifiableCollection(this.allAcceptedAliases);
+        }
+
+        /**
+         * Returns the aliases excluding the name, if relevant.
+         * <p>
+         * Only literal components may have aliases. If this is a non-literal
+         * component then an empty collection is returned.
+         *
+         * @return unmodifiable view of the aliases
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Collection<@NonNull String> alternativeAliases() {
+            return Collections.unmodifiableCollection(this.alternativeAliases);
         }
 
         /**

@@ -23,8 +23,7 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.context.ArgumentContext;
-import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.ParsingContext;
 import cloud.commandframework.execution.CommandResult;
 import java.util.Collection;
 import org.junit.jupiter.api.Assertions;
@@ -66,8 +65,8 @@ final class CommandPerformanceTest {
         long elapsedTime = 0L;
         int amount = 0;
         for (int i = 0; i < 100000; i++) {
-            for (final ArgumentContext<?, ?> argumentContext : result.getCommandContext().argumentContexts()) {
-                elapsedTime += argumentContext.parseDuration().toNanos();
+            for (final ParsingContext<?> parsingContext : result.getCommandContext().parsingContexts()) {
+                elapsedTime += parsingContext.parseDuration().toNanos();
                 amount += 1;
             }
         }

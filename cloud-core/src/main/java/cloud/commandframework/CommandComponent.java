@@ -24,10 +24,17 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.arguments.compound.FlagArgument;
+import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.suggestion.SuggestionProvider;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import io.leangen.geantyref.TypeToken;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -35,6 +42,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * A single literal or argument component of a command
@@ -43,37 +51,56 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @since 1.3.0
  */
 @API(status = API.Status.STABLE, since = "1.3.0")
-public final class CommandComponent<C> {
+public final class CommandComponent<C> implements Comparable<CommandComponent<C>> {
 
     private final String name;
-    private final Collection<String> aliases;
-    private final Collection<String> alternativeAliases;
-    private final CommandArgument<C, ?> argument;
+    private final ArgumentParser<C, ?> parser;
     private final ArgumentDescription description;
     private final ComponentType componentType;
     private final DefaultValue<C, ?> defaultValue;
     private final TypeToken<?> valueType;
+    private final SuggestionProvider<C> suggestionProvider;
+    private final Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors;
 
     private Command<C> owningCommand;
 
     private CommandComponent(
         final @NonNull String name,
-        final @NonNull Collection<@NonNull String> aliases,
-        final @NonNull Collection<@NonNull String> alternativeAliases,
-        final @NonNull CommandArgument<C, ?> argument,
+        final @NonNull ArgumentParser<C, ?> parser,
         final @NonNull TypeToken<?> valueType,
         final @NonNull ArgumentDescription description,
         final @NonNull ComponentType componentType,
-        final @Nullable DefaultValue<C, ?> defaultValue
+        final @Nullable DefaultValue<C, ?> defaultValue,
+        final @NonNull SuggestionProvider<C> suggestionProvider,
+        final @NonNull Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors
     ) {
         this.name = name;
-        this.aliases = aliases;
-        this.alternativeAliases = alternativeAliases;
-        this.argument = argument;
+        this.parser = parser;
         this.valueType = valueType;
         this.componentType = componentType;
         this.description = description;
         this.defaultValue = defaultValue;
+        this.suggestionProvider = suggestionProvider;
+        this.componentPreprocessors = new ArrayList<>(componentPreprocessors);
+    }
+
+    private CommandComponent(
+            final @NonNull CommandArgument<C, ?> argument,
+            final @NonNull ArgumentDescription description,
+            final boolean required,
+            final @Nullable DefaultValue<C, ?> defaultValue,
+            final @NonNull Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors
+    ) {
+        this(
+                argument.getName(),
+                argument.getParser(),
+                argument.getValueType(),
+                description,
+                type(argument, required),
+                defaultValue,
+                argument.suggestionProvider(),
+                componentPreprocessors
+        );
     }
 
     private CommandComponent(
@@ -82,25 +109,7 @@ public final class CommandComponent<C> {
             final boolean required,
             final @Nullable DefaultValue<C, ?> defaultValue
     ) {
-        this(
-                argument.getName(),
-                aliases(argument),
-                alternativeAliases(argument),
-                argument,
-                argument.getValueType(),
-                description,
-                type(argument, required),
-                defaultValue
-        );
-    }
-
-    /**
-     * Gets the command component argument details
-     *
-     * @return command component argument details
-     */
-    public @NonNull CommandArgument<C, ?> argument() {
-        return this.argument;
+        this(argument, description, required, defaultValue, argument.argumentPreprocessors());
     }
 
     /**
@@ -122,7 +131,7 @@ public final class CommandComponent<C> {
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull ArgumentParser<C, ?> parser() {
-        return this.argument.getParser();
+        return this.parser;
     }
 
     /**
@@ -139,28 +148,37 @@ public final class CommandComponent<C> {
     /**
      * Returns the aliases, if relevant.
      * <p>
-     * Only literal components may have aliases. If this is anon-literal
+     * Only literal components may have aliases. If this is a non-literal
      * component then an empty collection is returned.
      *
      * @return unmodifiable view of the aliases
      * @since 2.0.0
      */
+    @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull Collection<@NonNull String> aliases() {
-        return Collections.unmodifiableCollection(this.aliases);
+        if (this.parser() instanceof StaticArgument.StaticArgumentParser) {
+            return ((StaticArgument.StaticArgumentParser<C>) this.parser()).aliases();
+        }
+        return Collections.emptyList();
     }
 
     /**
      * Returns the aliases excluding the {@link #name() name}, if relevant.
      * <p>
-     * Only literal components may have aliases. If this is anon-literal
+     * Only literal components may have aliases. If this is a non-literal
      * component then an empty collection is returned.
      *
      * @return unmodifiable view of the aliases
      * @since 2.0.0
      */
+    @SuppressWarnings("unchecked")
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull Collection<@NonNull String> alternativeAliases() {
-        return Collections.unmodifiableCollection(this.alternativeAliases);
+        if (this.parser() instanceof StaticArgument.StaticArgumentParser) {
+            return ((StaticArgument.StaticArgumentParser<C>) this.parser()).alternativeAliases();
+        }
+        return Collections.emptyList();
     }
 
     /**
@@ -236,6 +254,17 @@ public final class CommandComponent<C> {
     }
 
     /**
+     * Returns the suggestion provider for this argument
+     *
+     * @return the suggestion provider
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull SuggestionProvider<C> suggestionProvider() {
+        return this.suggestionProvider;
+    }
+
+    /**
      * Returns the command that owns this component.
      *
      * @return the owning command
@@ -260,9 +289,53 @@ public final class CommandComponent<C> {
         this.owningCommand = owningCommand;
     }
 
+    /**
+     * Registers a new preprocessor. If all preprocessor has succeeding {@link ArgumentParseResult results}
+     * that all return {@code true}, the component will be passed onto the parser.
+     * <p>
+     * It is important that the preprocessor doesn't pop any input. Instead, it should only peek.
+     *
+     * @param preprocessor Preprocessor
+     * @return {@code this}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull @This CommandComponent<C> addPreprocessor(
+            final @NonNull ComponentPreprocessor<C> preprocessor
+    ) {
+        this.componentPreprocessors.add(preprocessor);
+        return this;
+    }
+
+    /**
+     * Preprocess command input. This will immediately forward any failed component parse results.
+     * If none fails, a {@code true} result will be returned
+     *
+     * @param context Command context
+     * @param input   Remaining command input. None will be popped
+     * @return parsing error, or argument containing {@code true}
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull ArgumentParseResult<Boolean> preprocess(
+            final @NonNull CommandContext<C> context,
+            final @NonNull CommandInput input
+    ) {
+        for (final ComponentPreprocessor<C> preprocessor : this.componentPreprocessors) {
+            final ArgumentParseResult<Boolean> result = preprocessor.preprocess(
+                    context,
+                    input
+            );
+            if (result.getFailure().isPresent()) {
+                return result;
+            }
+        }
+        return ArgumentParseResult.success(true);
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(this.argument(), this.argumentDescription());
+        return Objects.hash(this.name(), this.valueType());
     }
 
     @Override
@@ -271,8 +344,7 @@ public final class CommandComponent<C> {
             return true;
         } else if (o instanceof CommandComponent) {
             final CommandComponent<?> that = (CommandComponent<?>) o;
-            return this.argument().equals(that.argument())
-                    && this.argumentDescription().equals(that.argumentDescription());
+            return this.name().equals(that.name()) && this.valueType().equals(that.valueType());
         } else {
             return false;
         }
@@ -280,8 +352,12 @@ public final class CommandComponent<C> {
 
     @Override
     public @NonNull String toString() {
-        return String.format("%s{argument=%s,description=%s,type=%s,defaultValue=%s}", this.getClass().getSimpleName(),
-                this.argument, this.description, this.componentType, this.defaultValue
+        return String.format(
+                "%s{name=%s,type=%s,valueType=%s",
+                this.getClass().getSimpleName(),
+                this.name(),
+                this.type(),
+                this.valueType().getType().getTypeName()
         );
     }
 
@@ -294,10 +370,14 @@ public final class CommandComponent<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull CommandComponent<C> copy() {
         return new CommandComponent<>(
-                this.argument().copy(),
+                this.name(),
+                this.parser(),
+                this.valueType(),
                 this.argumentDescription(),
-                this.required(),
-                this.defaultValue()
+                this.type(),
+                this.defaultValue(),
+                this.suggestionProvider(),
+                this.componentPreprocessors
         );
     }
 
@@ -354,28 +434,30 @@ public final class CommandComponent<C> {
         return new CommandComponent<>(commandArgument, commandDescription, false, null);
     }
 
-    private static @NonNull Collection<@NonNull String> aliases(final @NonNull CommandArgument<?, ?> argument) {
-        if (argument instanceof StaticArgument) {
-            return ((StaticArgument<?>) argument).getAliases();
-        }
-        return Collections.emptySet();
-    }
-
-    private static @NonNull Collection<@NonNull String> alternativeAliases(final @NonNull CommandArgument<?, ?> argument) {
-        if (argument instanceof StaticArgument) {
-            return ((StaticArgument<?>) argument).getAlternativeAliases();
-        }
-        return Collections.emptySet();
-    }
-
     private static @NonNull ComponentType type(final @NonNull CommandArgument<?, ?> argument, final boolean required) {
-        if (argument instanceof StaticArgument) {
+        if (argument.getParser() instanceof StaticArgument.StaticArgumentParser) {
             return ComponentType.LITERAL;
+        } else if (argument.getParser() instanceof FlagArgument.FlagArgumentParser) {
+            return ComponentType.FLAG;
         } else if (required) {
             return ComponentType.REQUIRED_VARIABLE;
         } else {
             return ComponentType.OPTIONAL_VARIABLE;
         }
+    }
+
+    @Override
+    public int compareTo(final @NonNull CommandComponent<C> other) {
+        if (this.type() == ComponentType.LITERAL) {
+            if (other.type() == ComponentType.LITERAL) {
+                return this.name().compareTo(other.name());
+            }
+            return -1;
+        }
+        if (other.type() == ComponentType.LITERAL) {
+            return 1;
+        }
+        return 0;
     }
 
 
@@ -392,7 +474,11 @@ public final class CommandComponent<C> {
         /**
          * An optional variable that is parsed into an object if present. May have a default fallback value.
          */
-        OPTIONAL_VARIABLE(false /* required */);
+        OPTIONAL_VARIABLE(false /* required */),
+        /**
+         * An optional argument that represents multiple command flags.
+         */
+        FLAG(false /* required */);
 
         private final boolean required;
 

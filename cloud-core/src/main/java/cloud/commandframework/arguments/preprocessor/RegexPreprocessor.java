@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.arguments.preprocessor;
 
-import cloud.commandframework.arguments.ArgumentPreprocessor;
+import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionVariable;
@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @SuppressWarnings("unused")
 @API(status = API.Status.STABLE)
-public final class RegexPreprocessor<C> implements ArgumentPreprocessor<C> {
+public final class RegexPreprocessor<C> implements ComponentPreprocessor<C> {
 
     private final String rawPattern;
     private final Predicate<@NonNull String> predicate;

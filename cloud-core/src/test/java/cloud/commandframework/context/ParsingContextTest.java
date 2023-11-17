@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 
-class ArgumentContextTest {
+class ParsingContextTest {
 
     private CommandManager<TestCommandSender> commandManager;
 
@@ -63,9 +63,9 @@ class ArgumentContextTest {
 
         // Assert
         final CommandContext<TestCommandSender> context = result.getCommandContext();
-        assertThat(context.argumentContext("test").consumedInput()).containsExactly("t");
-        assertThat(context.argumentContext("int").consumedInput()).containsExactly("1337");
-        assertThat(context.argumentContext("string").consumedInput()).containsExactly("roflmao", "xd");
+        assertThat(context.parsingContext("test").consumedInput()).containsExactly("t");
+        assertThat(context.parsingContext("int").consumedInput()).containsExactly("1337");
+        assertThat(context.parsingContext("string").consumedInput()).containsExactly("roflmao", "xd");
     }
 
     @Test
@@ -86,8 +86,8 @@ class ArgumentContextTest {
 
         // Assert
         final CommandContext<TestCommandSender> context = result.getCommandContext();
-        assertThat(context.argumentContext("test").exactAlias()).isEqualTo("t");
-        assertThat(context.argumentContext("foo").exactAlias()).isEqualTo("f");
-        assertThat(context.argumentContext("bar").exactAlias()).isEqualTo("bar");
+        assertThat(context.parsingContext("test").exactAlias()).isEqualTo("t");
+        assertThat(context.parsingContext("foo").exactAlias()).isEqualTo("f");
+        assertThat(context.parsingContext("bar").exactAlias()).isEqualTo("bar");
     }
 }

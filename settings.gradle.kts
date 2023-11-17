@@ -98,6 +98,7 @@ setupMinecraftModule("cloud-velocity")
 //setupMinecraftModule("cloud-sponge")
 setupMinecraftModule("cloud-sponge7")
 setupMinecraftModule("cloud-minecraft-extras")
+setupMinecraftModule("cloud-fabric")
 
 // IRC Modules
 setupIrcModule("cloud-pircbotx")
@@ -110,6 +111,7 @@ setupExampleModule("example-jda")
 /*
 
 // Minecraft Modules
+setupMinecraftModule("cloud-fabric")
 
 */
 

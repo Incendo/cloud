@@ -23,13 +23,13 @@
 //
 package cloud.commandframework.fabric.argument;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import cloud.commandframework.fabric.FabricCaptionKeys;
@@ -39,7 +39,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.Registry;
@@ -67,15 +66,13 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
             final @NonNull String name,
             final @NonNull ResourceKey<? extends Registry<V>> registry,
             final @NonNull TypeToken<V> valueType,
-            final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @Nullable SuggestionProvider<C> suggestionProvider
     ) {
         super(
                 name,
                 new Parser<>(registry),
                 valueType,
-                suggestionProvider,
-                defaultDescription
+                suggestionProvider
         );
     }
 
@@ -161,20 +158,19 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
         @Override
         public @NonNull ArgumentParseResult<@NonNull V> parse(
                 @NonNull final CommandContext<@NonNull C> commandContext,
-                @NonNull final Queue<@NonNull String> inputQueue
+                @NonNull final CommandInput commandInput
         ) {
-            final String possibleIdentifier = inputQueue.peek();
-            if (possibleIdentifier == null) {
+            final String possibleIdentifier = commandInput.peekString();
+            if (possibleIdentifier.isEmpty()) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(RegistryEntryArgument.class, commandContext));
             }
 
             final ResourceLocation key;
             try {
-                key = ResourceLocation.read(new StringReader(possibleIdentifier));
+                key = ResourceLocation.read(new StringReader(commandInput.readString()));
             } catch (final CommandSyntaxException ex) {
                 return ArgumentParseResult.failure(ex);
             }
-            inputQueue.poll();
 
             final Registry<V> registry = this.resolveRegistry(commandContext);
             if (registry == null) {
@@ -262,8 +258,7 @@ public class RegistryEntryArgument<C, V> extends CommandArgument<C, V> {
                     this.getName(),
                     this.registryIdent,
                     this.getValueType(),
-                    this.suggestionProvider(),
-                    this.getDefaultDescription()
+                    this.suggestionProvider()
             );
         }
     }

@@ -109,10 +109,11 @@ class StringProcessingTest {
         final List<CommandComponent<TestCommandSender>> components = command.components();
         assertThat(components).hasSize(3);
 
-        final FlagArgument<TestCommandSender> flagArgument = (FlagArgument<TestCommandSender>) components.get(2).argument();
-        assertThat(flagArgument).isNotNull();
+        final FlagArgument.FlagArgumentParser<TestCommandSender> flagParser =
+                (FlagArgument.FlagArgumentParser<TestCommandSender>) components.get(2).parser();
+        assertThat(flagParser).isNotNull();
 
-        final List<CommandFlag<?>> flags = new ArrayList<>(flagArgument.getFlags());
+        final List<CommandFlag<?>> flags = new ArrayList<>(flagParser.flags());
         assertThat(flags).hasSize(1);
         assertThat(flags.get(0).getName()).isEqualTo(testFlagName);
     }

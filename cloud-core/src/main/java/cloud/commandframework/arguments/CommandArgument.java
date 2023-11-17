@@ -88,17 +88,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * Argument preprocessors that allows for extensions to existing argument types
      * without having to update all parsers
      */
-    private final Collection<@NonNull ArgumentPreprocessor<C>> argumentPreprocessors;
-
-    /**
-     * A description that will be used when registering this argument if no override is provided.
-     */
-    private final ArgumentDescription defaultDescription;
-
-    /**
-     * Whether or not the argument has been used before
-     */
-    private boolean argumentRegistered = false;
+    private final Collection<@NonNull ComponentPreprocessor<C>> argumentPreprocessors;
 
     /**
      * Construct a new command argument
@@ -130,9 +120,8 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         this.suggestionProvider = suggestionProvider == null
                 ? buildDefaultSuggestionProvider(this)
                 : suggestionProvider;
-        this.defaultDescription = Objects.requireNonNull(defaultDescription, "Default description may not be null");
         this.argumentPreprocessors = argumentPreprocessors.stream()
-                .map(ArgumentPreprocessor::wrap)
+                .map(ComponentPreprocessor::wrap)
                 .collect(Collectors.toCollection(LinkedList::new));
         this.key = SimpleCloudKey.of(this.name, this.valueType);
     }
@@ -184,27 +173,6 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     /**
      * Construct a new command argument
      *
-     * @param name               The argument name
-     * @param parser             The argument parser
-     * @param valueType          Type produced by the parser
-     * @param suggestionProvider Suggestion provider
-     * @param defaultDescription Default description to use when registering
-     * @since 1.4.0
-     */
-    @API(status = API.Status.STABLE, since = "1.4.0")
-    public CommandArgument(
-            final @NonNull String name,
-            final @NonNull ArgumentParser<C, T> parser,
-            final @NonNull TypeToken<T> valueType,
-            final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
-    ) {
-        this(name, parser, valueType, suggestionProvider, defaultDescription, Collections.emptyList());
-    }
-
-    /**
-     * Construct a new command argument
-     *
      * @param name                The argument name
      * @param parser              The argument parser
      * @param valueType           Type produced by the parser
@@ -237,7 +205,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             final @Nullable SuggestionProvider<C> suggestionProvider,
             final @NonNull ArgumentDescription defaultDescription
     ) {
-        this(name, parser, TypeToken.get(valueType), suggestionProvider, defaultDescription);
+        this(name, parser, TypeToken.get(valueType), suggestionProvider);
     }
 
     /**
@@ -297,7 +265,18 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     }
 
     /**
-     * Get the command argument name;
+     * Returns the preprocessors.
+     *
+     * @return unmodifiable view of the preprocessors
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Collection<@NonNull ComponentPreprocessor<C>> argumentPreprocessors() {
+        return Collections.unmodifiableCollection(this.argumentPreprocessors);
+    }
+
+    /**
+     * Get the command argument name.
      *
      * @return Argument name
      */
@@ -332,34 +311,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull @This CommandArgument<C, T> addPreprocessor(
-            final @NonNull ArgumentPreprocessor<C> preprocessor
+            final @NonNull ComponentPreprocessor<C> preprocessor
     ) {
         this.argumentPreprocessors.add(preprocessor);
         return this;
-    }
-
-    /**
-     * Preprocess command input. This will immediately forward any failed argument parse results.
-     * If none fails, a {@code true} result will be returned
-     *
-     * @param context Command context
-     * @param input   Remaining command input. None will be popped
-     * @return Parsing error, or argument containing {@code true}
-     */
-    public @NonNull ArgumentParseResult<Boolean> preprocess(
-            final @NonNull CommandContext<C> context,
-            final @NonNull CommandInput input
-    ) {
-        for (final ArgumentPreprocessor<C> preprocessor : this.argumentPreprocessors) {
-            final ArgumentParseResult<Boolean> result = preprocessor.preprocess(
-                    context,
-                    input
-            );
-            if (result.getFailure().isPresent()) {
-                return result;
-            }
-        }
-        return ArgumentParseResult.success(true);
     }
 
     /**
@@ -371,15 +326,6 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     @API(status = API.Status.STABLE, since = "2.0.0")
     public final @NonNull SuggestionProvider<C> suggestionProvider() {
         return this.suggestionProvider;
-    }
-
-    /**
-     * Get the default description to use when registering and no other is provided.
-     *
-     * @return the default description
-     */
-    public final @NonNull ArgumentDescription getDefaultDescription() {
-        return this.defaultDescription;
     }
 
     @Override
@@ -434,27 +380,10 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         CommandArgument.Builder<C, T> builder = ofType(this.valueType, this.name);
         builder = builder.withSuggestionProvider(this.suggestionProvider);
         builder = builder.withParser(this.parser);
-        builder = builder.withDefaultDescription(this.defaultDescription);
-
-        return builder.build();
+        final CommandArgument<C, T> argument = builder.build();
+        this.argumentPreprocessors.forEach(argument::addPreprocessor);
+        return argument;
     }
-
-    /**
-     * Check whether the argument has been used in a command
-     *
-     * @return {@code true} if the argument has been used in a command, else {@code false}
-     */
-    public boolean isArgumentRegistered() {
-        return this.argumentRegistered;
-    }
-
-    /**
-     * Indicate that the argument has been associated with a command
-     */
-    public void setArgumentRegistered() {
-        this.argumentRegistered = true;
-    }
-
 
     /**
      * Mutable builder for {@link CommandArgument} instances. Builders should extend {@link TypedBuilder} instead of this class.
@@ -471,7 +400,6 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         private CommandManager<C> manager;
         private ArgumentParser<C, T> parser;
         private SuggestionProvider<C> suggestionProvider;
-        private @NonNull ArgumentDescription defaultDescription = ArgumentDescription.empty();
 
         private final Collection<BiFunction<@NonNull CommandContext<C>,
                 @NonNull String, @NonNull ArgumentParseResult<Boolean>>> argumentPreprocessors = new LinkedList<>();
@@ -528,23 +456,6 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         }
 
         /**
-         * Set the default description to be used for this argument.
-         *
-         * <p>The default description is used when no other description is provided for a certain argument.</p>
-         *
-         * @param defaultDescription The default description
-         * @return Builder instance
-         * @since 1.4.0
-         */
-        @API(status = API.Status.STABLE, since = "1.4.0")
-        public @NonNull @This Builder<@NonNull C, @NonNull T> withDefaultDescription(
-                final @NonNull ArgumentDescription defaultDescription
-        ) {
-            this.defaultDescription = Objects.requireNonNull(defaultDescription, "Default description may not be null");
-            return this;
-        }
-
-        /**
          * Construct a command argument from the builder settings
          *
          * @return Constructed argument
@@ -565,8 +476,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
                     this.name,
                     this.parser,
                     this.valueType,
-                    this.suggestionProvider,
-                    this.defaultDescription
+                    this.suggestionProvider
             );
         }
 
@@ -583,7 +493,7 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
         }
 
         protected final @NonNull ArgumentDescription getDefaultDescription() {
-            return this.defaultDescription;
+            return ArgumentDescription.empty();
         }
 
         protected final @NonNull TypeToken<T> getValueType() {

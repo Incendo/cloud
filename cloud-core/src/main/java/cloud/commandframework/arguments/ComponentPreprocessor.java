@@ -32,7 +32,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE, since = "2.0.0")
 @FunctionalInterface
-public interface ArgumentPreprocessor<C> {
+public interface ComponentPreprocessor<C> {
 
     /**
      * Wraps the given {@code function} in a preprocessor.
@@ -42,7 +42,7 @@ public interface ArgumentPreprocessor<C> {
      * @param <C> the command sender type
      * @since 2.0.0
      */
-    static <C> @NonNull ArgumentPreprocessor<C> wrap(
+    static <C> @NonNull ComponentPreprocessor<C> wrap(
             final @NonNull BiFunction<@NonNull CommandContext<C>, @NonNull CommandInput,
                     @NonNull ArgumentParseResult<Boolean>> function
     ) {
@@ -50,7 +50,7 @@ public interface ArgumentPreprocessor<C> {
     }
 
     /**
-     * Pre-processes the associated argument.
+     * Pre-processes the associated component.
      * <p>
      * If the preprocessor fails then the command parsing will fail immediately.
      *

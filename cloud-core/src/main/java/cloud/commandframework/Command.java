@@ -77,7 +77,6 @@ public class Command<C> {
      * @since 1.3.0
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
-    @SuppressWarnings("unchecked")
     public Command(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @NonNull CommandExecutionHandler<@NonNull C> commandExecutionHandler,
@@ -92,7 +91,7 @@ public class Command<C> {
 
         this.flagComponent =
                 this.components.stream()
-                        .filter(ca -> ca.argument() instanceof FlagArgument)
+                        .filter(ca -> ca.type() == CommandComponent.ComponentType.FLAG)
                         .findFirst()
                         .orElse(null);
 
@@ -265,18 +264,19 @@ public class Command<C> {
     }
 
     /**
-     * Returns the flag argument for this command, or null if no flags are supported.
+     * Returns the flag parser for this command, or null if no flags are supported.
      *
-     * @return flag argument or null
-     * @since 1.8.0
+     * @return flag parser or null
+     * @since 2.0.0
      */
     @SuppressWarnings("unchecked")
-    @API(status = API.Status.STABLE, since = "1.8.0")
-    public @Nullable FlagArgument<@NonNull C> flagArgument() {
-        if (this.flagComponent() == null) {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public FlagArgument.@Nullable FlagArgumentParser<@NonNull C> flagParser() {
+        final CommandComponent<C> flagComponent = this.flagComponent();
+        if (flagComponent == null) {
             return null;
         }
-        return (FlagArgument<C>) this.flagComponent().argument();
+        return (FlagArgument.FlagArgumentParser<C>) flagComponent.parser();
     }
 
     /**
@@ -313,26 +313,6 @@ public class Command<C> {
      */
     public @NonNull CommandMeta getCommandMeta() {
         return this.commandMeta;
-    }
-
-    /**
-     * Get the description for an argument
-     *
-     * @param argument Argument
-     * @return Argument description
-     * @throws IllegalArgumentException If the command argument does not exist
-     * @deprecated More than one matching command argument may exist per command.
-     *         Use {@link #components()} and search in that, instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED)
-    public @NonNull String getArgumentDescription(final @NonNull CommandArgument<C, ?> argument) {
-        for (final CommandComponent<C> component : this.components) {
-            if (component.argument().equals(argument)) {
-                return component.argumentDescription().getDescription();
-            }
-        }
-        throw new IllegalArgumentException("Command argument not found: " + argument);
     }
 
     @Override
@@ -644,7 +624,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> required(
                 final @NonNull CommandArgument<C, T> argument
         ) {
-            return this.argument(CommandComponent.required(argument, argument.getDefaultDescription()));
+            return this.argument(CommandComponent.required(argument, ArgumentDescription.empty()));
         }
 
         /**
@@ -680,7 +660,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CommandArgument<C, T> argument
         ) {
-            return this.argument(CommandComponent.optional(argument, argument.getDefaultDescription()));
+            return this.argument(CommandComponent.optional(argument, ArgumentDescription.empty()));
         }
 
         /**
@@ -718,7 +698,7 @@ public class Command<C> {
                 final @NonNull CommandArgument<C, T> argument,
                 final @NonNull DefaultValue<C, T> defaultValue
         ) {
-            return this.argument(CommandComponent.optional(argument, argument.getDefaultDescription(), defaultValue));
+            return this.argument(CommandComponent.optional(argument, ArgumentDescription.empty(), defaultValue));
         }
 
         /**
@@ -792,8 +772,7 @@ public class Command<C> {
         /**
          * Adds the given {@code argument} to the command
          * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
+         * The component will be copied using {@link CommandComponent#copy()} before being inserted into the command tree.
          *
          * @param argument Argument to add
          * @return New builder instance with the command argument inserted into the argument list
@@ -803,13 +782,8 @@ public class Command<C> {
         public @NonNull Builder<C> argument(
                 final @NonNull CommandComponent<C> argument
         ) {
-            if (argument.argument().isArgumentRegistered()) {
-                throw new IllegalArgumentException("The provided argument has already been associated with a command."
-                        + " Use CommandComponent#copy to create a copy of the argument.");
-            }
-            argument.argument().setArgumentRegistered();
             final List<CommandComponent<C>> commandComponents = new ArrayList<>(this.commandComponents);
-            commandComponents.add(argument);
+            commandComponents.add(argument.copy());
             return new Builder<>(
                     this.commandManager,
                     this.commandMeta,

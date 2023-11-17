@@ -24,7 +24,6 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.CommandArgument;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -125,18 +124,6 @@ public final class CommandNode<C> {
     }
 
     /**
-     * Returns the argument contained in this node.
-     *
-     * @return the argument
-     */
-    public @Nullable CommandArgument<C, ?> argument() {
-        if (this.component == null) {
-            return null;
-        }
-        return this.component().argument();
-    }
-
-    /**
      * Returns the component contained in this node.
      *
      * @return the component
@@ -164,10 +151,10 @@ public final class CommandNode<C> {
     }
 
     /**
-     * Sorts the child nodes using their {@link #argument() arguments}.
+     * Sorts the child nodes using their {@link #component() components}.
      */
     public void sortChildren() {
-        this.children.sort(Comparator.comparing(CommandNode::argument));
+        this.children.sort(Comparator.comparing(CommandNode::component));
     }
 
     @Override
@@ -179,12 +166,12 @@ public final class CommandNode<C> {
             return false;
         }
         final CommandNode<?> node = (CommandNode<?>) o;
-        return Objects.equals(this.argument(), node.argument());
+        return Objects.equals(this.component(), node.component());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.argument());
+        return Objects.hash(this.component());
     }
 
     @Override

@@ -522,10 +522,7 @@ class CommandTreeTest {
         this.commandManager.command(this.commandManager.commandBuilder("one").required(argument));
 
         // Act & Assert
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> this.commandManager.command(this.commandManager.commandBuilder("two").required(argument))
-        );
+        this.commandManager.command(this.commandManager.commandBuilder("two").required(argument));
     }
 
     @Test

@@ -23,7 +23,6 @@
 //
 package cloud.commandframework.fabric.argument;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.brigadier.argument.WrappedBrigadierParser;
@@ -47,15 +46,13 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
 
     AxisArgument(
             final @NonNull String name,
-            final @Nullable SuggestionProvider<C> suggestionProvider,
-            final @NonNull ArgumentDescription defaultDescription
+            final @Nullable SuggestionProvider<C> suggestionProvider
     ) {
         super(
                 name,
                 new WrappedBrigadierParser<>(SwizzleArgument.swizzle()),
                 TYPE,
-                suggestionProvider,
-                defaultDescription
+                suggestionProvider
         );
     }
 
@@ -106,8 +103,7 @@ public final class AxisArgument<C> extends CommandArgument<C, EnumSet<Direction.
         public @NonNull AxisArgument<C> build() {
             return new AxisArgument<>(
                     this.getName(),
-                    this.suggestionProvider(),
-                    this.getDefaultDescription()
+                    this.suggestionProvider()
             );
         }
     }

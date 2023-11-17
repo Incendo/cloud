@@ -51,7 +51,6 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
     public final @NonNull String apply(
             final @NonNull List<@NonNull CommandComponent<C>> commandComponents,
             final @Nullable CommandNode<C> node
@@ -62,10 +61,12 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
             final CommandComponent<C> commandComponent = iterator.next();
             if (commandComponent.type() == CommandComponent.ComponentType.LITERAL) {
                 formattingInstance.appendLiteral(commandComponent);
-            } else if (commandComponent.argument() instanceof CompoundArgument) {
-                formattingInstance.appendCompound(commandComponent, (CompoundArgument<?, ?, ?>) commandComponent.argument());
-            } else if (commandComponent.argument() instanceof FlagArgument) {
-                formattingInstance.appendFlag((FlagArgument<?>) commandComponent.argument());
+            } else if (commandComponent.parser() instanceof CompoundArgument.CompoundParser) {
+                final CompoundArgument.CompoundParser<?, ?, ?> compoundParser =
+                        (CompoundArgument.CompoundParser<?, ?, ?>) commandComponent.parser();
+                formattingInstance.appendCompound(commandComponent, compoundParser);
+            } else if (commandComponent.type() == CommandComponent.ComponentType.FLAG) {
+                formattingInstance.appendFlag((FlagArgument.FlagArgumentParser<?>) commandComponent.parser());
             } else {
                 if (commandComponent.required()) {
                     formattingInstance.appendRequired(commandComponent);
@@ -110,12 +111,14 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 break;
             }
             final CommandComponent<C> component = tail.children().get(0).component();
-            if (component.argument() instanceof CompoundArgument) {
+            if (component.parser() instanceof CompoundArgument.CompoundParser) {
+                final CompoundArgument.CompoundParser<?, ?, ?> compoundParser =
+                        (CompoundArgument.CompoundParser<?, ?, ?>) component.parser();
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendCompound(component, (CompoundArgument<?, ?, ?>) component.argument());
-            } else if (component.argument() instanceof FlagArgument) {
+                formattingInstance.appendCompound(component, compoundParser);
+            } else if (component.type() == CommandComponent.ComponentType.FLAG) {
                 formattingInstance.appendBlankSpace();
-                formattingInstance.appendFlag((FlagArgument<?>) component.argument());
+                formattingInstance.appendFlag((FlagArgument.FlagArgumentParser<?>) component.parser());
             } else if (component.type() == CommandComponent.ComponentType.LITERAL) {
                 formattingInstance.appendBlankSpace();
                 formattingInstance.appendLiteral(component);
@@ -175,18 +178,18 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
          * Append a compound argument to the syntax string
          *
          * @param component The component that contained the argument
-         * @param argument  Compound argument to append
+         * @param parser    Compound argument to append
          * @since 2.0.0
          */
         @API(status = API.Status.STABLE, since = "2.0.0")
         public void appendCompound(
                 final @NonNull CommandComponent<?> component,
-                final @NonNull CompoundArgument<?, ?, ?> argument
+                final CompoundArgument.@NonNull CompoundParser<?, ?, ?> parser
         ) {
             final String prefix = component.required() ? this.getRequiredPrefix() : this.getOptionalPrefix();
             final String suffix = component.required() ? this.getRequiredSuffix() : this.getOptionalSuffix();
             this.builder.append(prefix);
-            final Object[] names = argument.getNames().toArray();
+            final Object[] names = parser.names();
             for (int i = 0; i < names.length; i++) {
                 this.builder.append(prefix);
                 this.appendName(names[i].toString());
@@ -199,15 +202,15 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
         }
 
         /**
-         * Append a flag argument
+         * Appends a flag argument
          *
-         * @param flagArgument Flag argument
+         * @param flagParser flag parser
          */
-        public void appendFlag(final @NonNull FlagArgument<?> flagArgument) {
+        public void appendFlag(final FlagArgument.@NonNull FlagArgumentParser<?> flagParser) {
             this.builder.append(this.getOptionalPrefix());
 
-            final Iterator<CommandFlag<?>> flagIterator = flagArgument
-                    .getFlags()
+            final Iterator<CommandFlag<?>> flagIterator = flagParser
+                    .flags()
                     .iterator();
 
             while (flagIterator.hasNext()) {

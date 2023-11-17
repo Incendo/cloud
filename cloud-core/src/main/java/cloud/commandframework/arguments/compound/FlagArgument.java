@@ -94,7 +94,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
     public FlagArgument(final Collection<CommandFlag<?>> flags) {
         super(
                 FLAG_ARGUMENT_NAME,
-                new FlagArgumentParser<>(flags.toArray(new CommandFlag<?>[0])),
+                new FlagArgumentParser<>(flags),
                 Object.class
         );
         this.flags = flags;
@@ -109,14 +109,30 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
         return Collections.unmodifiableCollection(this.flags);
     }
 
+    @Override
+    public @NonNull FlagArgumentParser<C> getParser() {
+        return (FlagArgumentParser<C>) super.getParser();
+    }
+
 
     @API(status = API.Status.STABLE)
     public static final class FlagArgumentParser<C> implements ArgumentParser<C, Object> {
 
-        private final CommandFlag<?>[] flags;
+        private final Collection<@NonNull CommandFlag<?>> flags;
 
-        private FlagArgumentParser(final @NonNull CommandFlag<?>[] flags) {
+        private FlagArgumentParser(final @NonNull Collection<@NonNull CommandFlag<?>> flags) {
             this.flags = flags;
+        }
+
+        /**
+         * Returns the recognized flags.
+         *
+         * @return unmodifiable view of flags
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Collection<@NonNull CommandFlag<?>> flags() {
+            return Collections.unmodifiableCollection(this.flags);
         }
 
         @Override

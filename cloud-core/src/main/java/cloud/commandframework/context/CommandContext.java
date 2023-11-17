@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.context;
 
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.annotations.AnnotationAccessor;
 import cloud.commandframework.arguments.CommandArgument;
@@ -57,7 +58,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class CommandContext<C> {
 
     private final CaptionVariableReplacementHandler captionVariableReplacementHandler;
-    private final List<ArgumentContext<C, ?>> argumentContexts = new LinkedList<>();
+    private final List<ParsingContext<C>> parsingContexts = new LinkedList<>();
     private final FlagContext flagContext = FlagContext.create();
     private final Map<CloudKey<?>, Object> internalStorage = new HashMap<>();
     private final C commandSender;
@@ -65,7 +66,7 @@ public class CommandContext<C> {
     private final CaptionRegistry<C> captionRegistry;
     private final CommandManager<C> commandManager;
 
-    private CommandArgument<C, ?> currentArgument = null;
+    private CommandComponent<C> currentComponent = null;
 
     /**
      * Create a new command context instance
@@ -424,39 +425,11 @@ public class CommandContext<C> {
      * @param <T>       Argument type
      * @return Stored value
      * @throws NullPointerException If no such value is stored
-     */
-    public <T extends @NonNull Object> T get(final @NonNull CommandArgument<C, T> keyHolder) {
-        return this.get(keyHolder.getKey());
-    }
-
-    /**
-     * Get a required argument from the context. This will throw an exception
-     * if there's no value associated with the given argument
-     *
-     * @param keyHolder Holder of the identifying key
-     * @param <T>       Argument type
-     * @return Stored value
-     * @throws NullPointerException If no such value is stored
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
     public <T extends @NonNull Object> T get(final @NonNull CloudKeyHolder<T> keyHolder) {
         return this.get(keyHolder.getKey());
-    }
-
-    /**
-     * Get a value if it exists, else return the provided default value
-     *
-     * @param argument     Argument
-     * @param defaultValue Default value
-     * @param <T>          Argument type
-     * @return Stored value, or supplied default value
-     */
-    public <T> T getOrDefault(
-            final @NonNull CommandArgument<C, @NonNull T> argument,
-            final T defaultValue
-    ) {
-        return this.<T>getOptional(argument.getName()).orElse(defaultValue);
     }
 
     /**
@@ -492,6 +465,23 @@ public class CommandContext<C> {
     }
 
     /**
+     * Get a value if it exists, else return the provided default value
+     *
+     * @param key          Cloud key
+     * @param defaultValue Default value
+     * @param <T>          Value type
+     * @return Argument, or supplied default value
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public <T> T getOrDefault(
+            final @NonNull CloudKeyHolder<@NonNull T> key,
+            final T defaultValue
+    ) {
+        return this.getOptional(key).orElse(defaultValue);
+    }
+
+    /**
      * Get a value if it exists, else return the value supplied by the given supplier
      *
      * @param key             Cloud key
@@ -520,6 +510,23 @@ public class CommandContext<C> {
     @API(status = API.Status.STABLE, since = "1.4.0")
     public <T> T getOrSupplyDefault(
             final @NonNull CloudKey<@NonNull T> key,
+            final @NonNull Supplier<T> defaultSupplier
+    ) {
+        return this.getOptional(key).orElseGet(defaultSupplier);
+    }
+
+    /**
+     * Get a value if it exists, else return the value supplied by the given supplier
+     *
+     * @param key             Cloud key
+     * @param defaultSupplier Supplier of default value
+     * @param <T>             Value type
+     * @return Argument, or supplied default value
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public <T> T getOrSupplyDefault(
+            final @NonNull CloudKeyHolder<@NonNull T> key,
             final @NonNull Supplier<T> defaultSupplier
     ) {
         return this.getOptional(key).orElseGet(defaultSupplier);
@@ -567,72 +574,71 @@ public class CommandContext<C> {
     }
 
     /**
-     * Create an argument context instance for the given argument
+     * Create a parsing context instance for the given component
      *
-     * @param argument the argument
+     * @param component the component
      * @return the created context
-     * @param <T> the type of the argument
-     * @since 1.9.0
+     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "1.9.0")
-    public <T> @NonNull ArgumentContext<C, T> createArgumentContext(final @NonNull CommandArgument<C, T> argument) {
-        final ArgumentContext<C, T> argumentContext = new ArgumentContext<>(argument);
-        this.argumentContexts.add(argumentContext);
-        return argumentContext;
+    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    public @NonNull ParsingContext<C> createParsingContext(final @NonNull CommandComponent<C> component) {
+        final ParsingContext<C> parsingContext = new ParsingContext<>(component);
+        this.parsingContexts.add(parsingContext);
+        return parsingContext;
     }
 
     /**
-     * Returns the context for the given argument
+     * Returns the context for the given component
      *
-     * @param argument the argument
+     * @param component the component
      * @return the context
-     * @param <T> the type of the argument
-     * @since 1.9.0
+     * @param <T> the type of the component
+     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "1.9.0")
-    @SuppressWarnings("unchecked")
-    public <T> @NonNull ArgumentContext<C, T> argumentContext(final @NonNull CommandArgument<C, T> argument) {
-        return this.argumentContexts.stream().filter(context -> context.argument().equals(argument))
+    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    public <T> @NonNull ParsingContext<C> parsingContext(final @NonNull CommandComponent<C> component) {
+        return this.parsingContexts.stream()
+                .filter(context -> context.component().equals(component))
                 .findFirst()
-                .map(context -> (ArgumentContext<C, T>) context)
                 .orElseThrow(NoSuchElementException::new);
     }
 
     /**
-     * Returns the context for the argument at the given position
+     * Returns the context for the component at the given position
      *
      * @param position the position
      * @return the context
-     * @since 1.9.0
+     * @since 2.0.0
      */
     @API(status = API.Status.MAINTAINED, since = "1.9.0")
-    public @NonNull ArgumentContext<C, ?> argumentContext(final int position) {
-        return this.argumentContexts.get(position);
+    public @NonNull ParsingContext<C> parsingContext(final int position) {
+        return this.parsingContexts.get(position);
     }
 
     /**
-     * Return the context for the argument with the given name.
+     * Return the context for the component with the given name.
      *
      * @param name the name
      * @return the context
-     * @since 1.9.0
+     * @since 2.0.0
      */
     @API(status = API.Status.MAINTAINED, since = "1.9.0")
-    public @NonNull ArgumentContext<C, ?> argumentContext(final String name) {
-        return this.argumentContexts.stream().filter(context -> context.argument().getName().equals(name))
+    public @NonNull ParsingContext<C> parsingContext(final String name) {
+        return this.parsingContexts.stream()
+                .filter(context -> context.component().name().equals(name))
                 .findFirst()
                 .orElseThrow(NoSuchElementException::new);
     }
 
     /**
-     * Return an unmodifiable view of the stored argument contexts
+     * Return an unmodifiable view of the stored parsing contexts
      *
      * @return the contexts
-     * @since 1.9.0
+     * @since 2.0.0
      */
-    @API(status = API.Status.MAINTAINED, since = "1.9.0")
-    public @NonNull List<@NonNull ArgumentContext<@NonNull C, @NonNull ?>> argumentContexts() {
-        return Collections.unmodifiableList(this.argumentContexts);
+    @API(status = API.Status.MAINTAINED, since = "2.0.0")
+    public @NonNull List<@NonNull ParsingContext<@NonNull C>> parsingContexts() {
+        return Collections.unmodifiableList(this.parsingContexts);
     }
 
     /**
@@ -645,29 +651,29 @@ public class CommandContext<C> {
     }
 
     /**
-     * Get the argument that is currently being parsed for this command context.
+     * Returns the component that is currently being parsed for this command context.
      * This value will be updated whenever the context is used to provide new
      * suggestions or parse a new command argument
      *
-     * @return Currently parsing {@link CommandArgument} or {@code null}
-     * @since 1.2.0
+     * @return the {@link CommandComponent} that is currently being parsed, or {@code null}
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    public @Nullable CommandArgument<C, ?> getCurrentArgument() {
-        return this.currentArgument;
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @Nullable CommandComponent<C> currentComponent() {
+        return this.currentComponent;
     }
 
     /**
-     * Set the argument that is currently being parsed for this command context.
+     * Sets the component that is currently being parsed for this command context.
      * This value should be updated whenever the context is used to provide new
      * suggestions or parse a new command argument
      *
-     * @param argument Currently parsing {@link CommandArgument} or {@code null}
-     * @since 1.2.0
+     * @param component the component that is currently being parsed, or {@code null}
+     * @since 2.0.0
      */
-    @API(status = API.Status.STABLE, since = "1.2.0")
-    public void setCurrentArgument(final @Nullable CommandArgument<C, ?> argument) {
-        this.currentArgument = argument;
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void currentComponent(final @Nullable CommandComponent<C> component) {
+        this.currentComponent = component;
     }
 
     /**
