@@ -71,13 +71,6 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
     public static final Object FLAG_PARSE_RESULT_OBJECT = new Object();
     /**
      * Meta data for the last argument that was suggested
-     *
-     * @deprecated Use {@link #FLAG_META_KEY} instead
-     */
-    @Deprecated
-    public static final String FLAG_META = "__last_flag__";
-    /**
-     * Meta data for the last argument that was suggested
      */
     public static final CloudKey<String> FLAG_META_KEY = SimpleCloudKey.of("__last_flag__", TypeToken.get(String.class));
 

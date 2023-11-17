@@ -24,7 +24,6 @@
 package cloud.commandframework.context;
 
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.captions.CaptionRegistry;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -35,23 +34,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 @API(status = API.Status.STABLE)
 public interface CommandContextFactory<C> {
-
-    /**
-     * Create a new command context
-     *
-     * @param suggestions     Whether or not the sender is requesting suggestions
-     * @param sender          Command sender
-     * @param captionRegistry Caption registry
-     * @return Command context
-     * @deprecated Provide a command manager instead of a caption registry
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.3.0")
-    @NonNull CommandContext<C> create(
-            boolean suggestions,
-            @NonNull C sender,
-            @NonNull CaptionRegistry<C> captionRegistry
-    );
 
     /**
      * Create a new command context

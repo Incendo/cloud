@@ -78,22 +78,6 @@ public final class CommandComponent<C> {
      * Gets the command component description
      *
      * @return command component description
-     * @deprecated for removal since 1.4.0. Use {@link #argumentDescription()} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public @NonNull Description description() {
-        if (this.description instanceof Description) {
-            return (Description) this.description;
-        } else {
-            return new Description(this.description.getDescription());
-        }
-    }
-
-    /**
-     * Gets the command component description
-     *
-     * @return command component description
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -186,7 +170,7 @@ public final class CommandComponent<C> {
     public @NonNull CommandComponent<C> copy() {
         return new CommandComponent<>(
                 this.argument().copy(),
-                this.description(),
+                this.argumentDescription(),
                 this.required(),
                 this.defaultValue()
         );

@@ -71,20 +71,6 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
     }
 
     /**
-     * Create a new builder
-     *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return builder(name);
-    }
-
-    /**
      * Create a new required {@link ByteArgument}.
      *
      * @param name Argument name
@@ -268,26 +254,6 @@ public final class ByteArgument<C> extends CommandArgument<C, Byte> {
         private static final long serialVersionUID = -4724241304872989208L;
 
         private final ByteParser<?> parser;
-
-        /**
-         * Construct a new byte parse exception
-         *
-         * @param input   String input
-         * @param min     Minimum value
-         * @param max     Maximum value
-         * @param context Command context
-         * @deprecated use {@link #ByteParseException(String, ByteParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public ByteParseException(
-                final @NonNull String input,
-                final byte min,
-                final byte max,
-                final @NonNull CommandContext<?> context
-        ) {
-            this(input, new ByteParser<>(min, max), context);
-        }
 
         /**
          * Create a new {@link ByteParseException}.

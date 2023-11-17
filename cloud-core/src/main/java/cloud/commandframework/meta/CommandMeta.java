@@ -69,29 +69,6 @@ public abstract class CommandMeta {
     }
 
     /**
-     * Get the value associated with a key
-     *
-     * @param key Key
-     * @return Optional that may contain the associated value
-     * @deprecated for removal since 1.3.0, see typesafe variant at {@link #get(Key)} instead
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.3.0")
-    public abstract @NonNull Optional<String> getValue(@NonNull String key);
-
-    /**
-     * Get the value if it exists, else return the default value
-     *
-     * @param key          Key
-     * @param defaultValue Default value
-     * @return Value, or default value
-     * @deprecated for removal since 1.3.0, see typesafe variant at {@link #getOrDefault(Key, Object)} instead
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.3.0")
-    public abstract @NonNull String getOrDefault(@NonNull String key, @NonNull String defaultValue);
-
-    /**
      * Get the value associated with a key.
      *
      * @param <V> Value type
@@ -113,16 +90,6 @@ public abstract class CommandMeta {
      */
     @API(status = API.Status.STABLE, since = "1.3.0")
     public abstract <V> @NonNull V getOrDefault(@NonNull Key<V> key, @NonNull V defaultValue);
-
-    /**
-     * Get a copy of the meta map
-     *
-     * @return Copy of meta map
-     * @deprecated for removal since 1.3.0, use {@link #getAllValues()} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.3.0")
-    public abstract @NonNull Map<@NonNull String, @NonNull String> getAll();
 
     /**
      * Get a copy of the meta map, without type information.

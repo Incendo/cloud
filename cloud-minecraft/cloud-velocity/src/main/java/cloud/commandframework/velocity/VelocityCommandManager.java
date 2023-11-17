@@ -46,7 +46,6 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import io.leangen.geantyref.TypeToken;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * {@link CommandManager} implementation for Velocity.
@@ -74,27 +73,9 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     private final Function<C, CommandSource> backwardsCommandSenderMapper;
 
     /**
-     * Create a new command manager instance.
-     *
-     * @param proxyServer                  ProxyServer instance
-     * @param commandExecutionCoordinator  Coordinator provider
-     * @param commandSenderMapper          Function that maps {@link CommandSource} to the command sender type
-     * @param backwardsCommandSenderMapper Function that maps the command sender type to {@link CommandSource}
-     */
-    @Deprecated
-    public VelocityCommandManager(
-            final @NonNull ProxyServer proxyServer,
-            final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,
-            final @NonNull Function<@NonNull C, @NonNull CommandSource> backwardsCommandSenderMapper
-    ) {
-        this(null, proxyServer, commandExecutionCoordinator, commandSenderMapper, backwardsCommandSenderMapper);
-    }
-
-    /**
      * Create a new command manager instance
      *
-     * @param plugin                       Container for the owning plugin. Nullable for backwards compatibility
+     * @param plugin                       Container for the owning plugin
      * @param proxyServer                  ProxyServer instance
      * @param commandExecutionCoordinator  Coordinator provider
      * @param commandSenderMapper          Function that maps {@link CommandSource} to the command sender type
@@ -103,7 +84,7 @@ public class VelocityCommandManager<C> extends CommandManager<C> implements Brig
     @Inject
     @SuppressWarnings("unchecked")
     public VelocityCommandManager(
-            final @Nullable PluginContainer plugin,
+            final @NonNull PluginContainer plugin,
             final @NonNull ProxyServer proxyServer,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
             final @NonNull Function<@NonNull CommandSource, @NonNull C> commandSenderMapper,

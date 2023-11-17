@@ -71,20 +71,6 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
     }
 
     /**
-     * Create a new builder
-     *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return builder(name);
-    }
-
-    /**
      * Create a new required {@link ShortArgument}.
      *
      * @param name Argument name
@@ -263,26 +249,6 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
         private static final long serialVersionUID = -478674263339091032L;
 
         private final ShortParser<?> parser;
-
-        /**
-         * Construct a new short parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #ShortParseException(String, ShortParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public ShortParseException(
-                final @NonNull String input,
-                final short min,
-                final short max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new ShortParser<>(min, max), commandContext);
-        }
 
         /**
          * Create a new {@link ShortParseException}.

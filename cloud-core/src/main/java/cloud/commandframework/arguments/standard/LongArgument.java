@@ -71,20 +71,6 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
     }
 
     /**
-     * Create a new builder
-     *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return builder(name);
-    }
-
-    /**
      * Create a new required {@link LongArgument}.
      *
      * @param name Argument name
@@ -263,26 +249,6 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
         private static final long serialVersionUID = 4366856282301198232L;
 
         private final LongParser<?> parser;
-
-        /**
-         * Construct a new long parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #LongParseException(String, LongParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public LongParseException(
-                final @NonNull String input,
-                final long min,
-                final long max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new LongParser<>(min, max), commandContext);
-        }
 
         /**
          * Create a new {@link LongParseException}.

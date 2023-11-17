@@ -56,19 +56,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class CommandConfirmationManager<C> {
 
     /**
-     * Meta data stored for commands that require confirmation
-     *
-     * @deprecated for removal since 1.3.0. Use {@link #META_CONFIRMATION_REQUIRED} instead.
-     */
-    @Deprecated
-    public static final String CONFIRMATION_REQUIRED_META = "__REQUIRE_CONFIRMATION__";
-
-    private static final CommandMeta.Key<String> LEGACY_CONFIRMATION_META = CommandMeta.Key.of(
-            String.class,
-            CONFIRMATION_REQUIRED_META
-    );
-
-    /**
      * Metadata stored for commands that require confirmation
      *
      * @since 1.3.0
@@ -76,8 +63,7 @@ public class CommandConfirmationManager<C> {
     @API(status = API.Status.STABLE, since = "1.3.0")
     public static final CommandMeta.Key<Boolean> META_CONFIRMATION_REQUIRED = CommandMeta.Key.of(
             Boolean.class,
-            "cloud:require_confirmation",
-            meta -> meta.get(LEGACY_CONFIRMATION_META).map(Boolean::valueOf).orElse(null)
+            "cloud:require_confirmation"
     );
     private static final int MAXIMUM_PENDING_SIZE = 100;
 

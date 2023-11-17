@@ -84,19 +84,6 @@ public final class CommandFlag<T> {
     }
 
     /**
-     * Create a new flag builder
-     *
-     * @param name Flag name
-     * @return Flag builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static @NonNull Builder<Void> newBuilder(final @NonNull String name) {
-        return new Builder<>(name);
-    }
-
-    /**
      * Get the flag name
      *
      * @return Flag name
@@ -122,22 +109,6 @@ public final class CommandFlag<T> {
     @API(status = API.Status.STABLE, since = "1.7.0")
     public @NonNull FlagMode mode() {
         return this.mode;
-    }
-
-    /**
-     * Get the flag description
-     *
-     * @return Flag description
-     * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public cloud.commandframework.@NonNull Description getDescription() {
-        if (this.description instanceof cloud.commandframework.Description) {
-            return ((cloud.commandframework.Description) this.description);
-        } else {
-            return cloud.commandframework.Description.of(this.description.getDescription());
-        }
     }
 
     /**
@@ -268,19 +239,6 @@ public final class CommandFlag<T> {
                     this.commandArgument,
                     this.mode
             );
-        }
-
-        /**
-         * Create a new builder instance using the given flag description
-         *
-         * @param description Flag description
-         * @return New builder instance
-         * @deprecated for removal since 1.4.0. Use {@link #withDescription(ArgumentDescription)} instead.
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public @NonNull Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
-            return this.withDescription((ArgumentDescription) description);
         }
 
         /**

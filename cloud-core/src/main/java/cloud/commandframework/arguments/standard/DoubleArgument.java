@@ -70,20 +70,6 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
     }
 
     /**
-     * Create a new builder
-     *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return builder(name);
-    }
-
-    /**
      * Create a new required {@link DoubleArgument}.
      *
      * @param name Argument name
@@ -261,25 +247,6 @@ public final class DoubleArgument<C> extends CommandArgument<C, Double> {
         private static final long serialVersionUID = 1764554911581976586L;
 
         private final DoubleParser<?> parser;
-
-        /**
-         * Construct a new double parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #DoubleParseException(String, DoubleParser, CommandContext)} instead
-         */
-        @Deprecated
-        public DoubleParseException(
-                final @NonNull String input,
-                final double min,
-                final double max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new DoubleParser<>(min, max), commandContext);
-        }
 
         /**
          * Create a new {@link DoubleParseException}.

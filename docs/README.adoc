@@ -222,7 +222,7 @@ String arguments can be constructed using:
 
 * `StringArgument.optional(name, mode)`: Optional string argument of specified type
 
-Furthermore, a string argument builder can be constructed using `StringArgument.newBuilder(name)`.
+Furthermore, a string argument builder can be constructed using `StringArgument.builder(name)`.
 This allows you to provide a custom suggestion generator, using `StringArgument.Builder#withSuggestionProvider(BiFunction<CommandContext<C>, List<String>>)`.
 
 ===== byte/short/int/long
@@ -245,7 +245,7 @@ Integer arguments can be constructed using:
 
 * `IntegerArgument.optional(name, default)`: Optional integer argument without a range, with a default value
 
-Furthermore, an integer argument builder can be constructed using `IntegerArgument.newBuilder(name)`. This allows you to provide a
+Furthermore, an integer argument builder can be constructed using `IntegerArgument.builder(name)`. This allows you to provide a
  custom suggestion generator, using `IntegerArgument.Builder#withSuggestionProvider(SuggestionProvider<C>)`, and set minimum and
  maximum values.
 
@@ -267,7 +267,7 @@ Floating point arguments can be constructed using:
 
 * `FloatArgument.optional(name, default)`: Optional float argument without a range, with a default value
 
-Furthermore, a floating-point argument builder can be constructed using `FloatArgument.newBuilder(name)`. This allows you to
+Furthermore, a floating-point argument builder can be constructed using `FloatArgument.builder(name)`. This allows you to
 provide a custom suggestion generator, using `FloatArgument.Builder#withSuggestionProvider(SuggestionProvider<C>)`, and set
 minimum and maximum values.
 
@@ -457,7 +457,7 @@ reusable across multiple commands (unlike command arguments).
 [source,java]
 ----
 final CommandFlag<Float> yawFlag = CommandFlag
-    .newBuilder("yaw")
+    .builder("yaw")
     .withArgument(FloatArgument.of("yaw"))
     .build();
 manager.command(

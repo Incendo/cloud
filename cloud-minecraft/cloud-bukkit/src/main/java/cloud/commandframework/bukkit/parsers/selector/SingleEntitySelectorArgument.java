@@ -57,20 +57,6 @@ public final class SingleEntitySelectorArgument<C> extends CommandArgument<C, Si
     }
 
     /**
-     * Create a new builder
-     *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return builder(name);
-    }
-
-    /**
      * Create a new {@link Builder}.
      *
      * @param name argument name

@@ -80,25 +80,6 @@ public class EnumArgument<C, E extends Enum<E>> extends CommandArgument<C, E> {
     }
 
     /**
-     * Create a new builder
-     *
-     * @param enumClass enum class
-     * @param name      Name of the argument
-     * @param <C>       Command sender type
-     * @param <E>       enum type
-     * @return Created builder
-     * @deprecated prefer {@link #builder(Class, String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C, E extends Enum<E>> @NonNull Builder<C, E> newBuilder(
-            final @NonNull Class<E> enumClass,
-            final @NonNull String name
-    ) {
-        return builder(enumClass, name);
-    }
-
-    /**
      * Create a new required command argument
      *
      * @param enumClass Enum class

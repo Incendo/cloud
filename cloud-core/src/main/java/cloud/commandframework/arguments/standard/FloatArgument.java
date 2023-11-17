@@ -70,20 +70,6 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
     }
 
     /**
-     * Create a new builder
-     *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return builder(name);
-    }
-
-    /**
      * Create a new required {@link FloatArgument}.
      *
      * @param name Argument name
@@ -258,26 +244,6 @@ public final class FloatArgument<C> extends CommandArgument<C, Float> {
         private static final long serialVersionUID = -1162983846751812292L;
 
         private final FloatParser<?> parser;
-
-        /**
-         * Construct a new float parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #FloatParseException(String, FloatParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public FloatParseException(
-                final @NonNull String input,
-                final float min,
-                final float max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new FloatParser<>(min, max), commandContext);
-        }
 
         /**
          * Create a new {@link FloatParseException}.

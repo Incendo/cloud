@@ -84,20 +84,6 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
     }
 
     /**
-     * Create a new builder
-     *
-     * @param name Name of the argument
-     * @param <C>  Command sender type
-     * @return Created builder
-     * @deprecated prefer {@link #builder(String)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.8.0")
-    @Deprecated
-    public static <C> @NonNull Builder<C> newBuilder(final @NonNull String name) {
-        return builder(name);
-    }
-
-    /**
      * Create a new required {@link IntegerArgument}.
      *
      * @param name Argument name
@@ -317,26 +303,6 @@ public final class IntegerArgument<C> extends CommandArgument<C, Integer> {
         private static final long serialVersionUID = -6933923056628373853L;
 
         private final IntegerParser<?> parser;
-
-        /**
-         * Construct a new integer parse exception
-         *
-         * @param input          String input
-         * @param min            Minimum value
-         * @param max            Maximum value
-         * @param commandContext Command context
-         * @deprecated use {@link #IntegerParseException(String, IntegerParser, CommandContext)} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.5.0")
-        public IntegerParseException(
-                final @NonNull String input,
-                final int min,
-                final int max,
-                final @NonNull CommandContext<?> commandContext
-        ) {
-            this(input, new IntegerParser<>(min, max), commandContext);
-        }
 
         /**
          * Create a new {@link IntegerParseException}.

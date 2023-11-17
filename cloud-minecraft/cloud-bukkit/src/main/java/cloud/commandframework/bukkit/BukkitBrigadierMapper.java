@@ -295,45 +295,4 @@ public final class BukkitBrigadierMapper<C> {
     private static @NonNull StringArgumentType fallbackType() {
         return StringArgumentType.word();
     }
-
-    /**
-     * Attempt to register a mapping between a type and a NMS argument type
-     *
-     * @param type        Type to map
-     * @param constructor Constructor that construct the NMS argument type
-     * @deprecated use {@link #mapSimpleNMS(TypeToken, String)} instead
-     */
-    @Deprecated
-    public void mapSimpleNMS(
-            final @NonNull Class<?> type,
-            final @NonNull Constructor<?> constructor
-    ) {
-        this.brigadierManager.registerDefaultArgumentTypeSupplier(type, () -> {
-            try {
-                return (ArgumentType<?>) constructor.newInstance();
-            } catch (final ReflectiveOperationException e) {
-                this.commandManager.getOwningPlugin().getLogger().log(
-                        Level.WARNING,
-                        String.format("Failed to map brigadier argument type '%s'", type.getCanonicalName()),
-                        e
-                );
-                return fallbackType();
-            }
-        });
-    }
-
-    /**
-     * Attempt to register a mapping between a type and a NMS argument type
-     *
-     * @param type                 Type to map
-     * @param argumentTypeSupplier Supplier of the NMS argument type
-     * @deprecated use {@link #mapNMS(TypeToken, Supplier)} instead
-     */
-    @Deprecated
-    public void mapComplexNMS(
-            final @NonNull Class<?> type,
-            final @NonNull Supplier<ArgumentType<?>> argumentTypeSupplier
-    ) {
-        this.brigadierManager.registerDefaultArgumentTypeSupplier(type, argumentTypeSupplier);
-    }
 }

@@ -56,6 +56,7 @@ import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgume
 import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorArgument;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.FilteringCommandSuggestionProcessor;
+import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.tasks.TaskFactory;
 import cloud.commandframework.tasks.TaskRecipe;
 import io.leangen.geantyref.TypeToken;
@@ -63,7 +64,6 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import org.apiguardian.api.API;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -260,9 +260,8 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
      * @return Meta data
      */
     @Override
-    @SuppressWarnings("deprecation")
-    public @NonNull BukkitCommandMeta createDefaultCommandMeta() {
-        return BukkitCommandMetaBuilder.builder().withDescription("").build();
+    public @NonNull CommandMeta createDefaultCommandMeta() {
+        return CommandMeta.simple().with(CommandMeta.DESCRIPTION, "").build();
     }
 
     /**
@@ -306,19 +305,6 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
                                     + "running too old a version of Minecraft (Brigadier is implemented in 1.13 and newer).")
             );
         }
-    }
-
-    /**
-     * Query for a specific capability
-     *
-     * @param capability Capability
-     * @return {@code true} if the manager has the given capability, else {@code false}
-     * @deprecated for removal since 1.7.0. Use the new standard {@link #hasCapability(CloudCapability)} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.7.0")
-    public final boolean queryCapability(final @NonNull CloudBukkitCapabilities capability) {
-        return capability.capable();
     }
 
     /**

@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.common.returnsreceiver.qual.This;
@@ -42,11 +41,6 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 public class SimpleCommandMeta extends CommandMeta {
 
     private final Map<String, Object> metaMap;
-
-    @Deprecated
-    protected SimpleCommandMeta(final @NonNull Map<@NonNull String, @NonNull String> metaMap) {
-        this.metaMap = Collections.unmodifiableMap(metaMap);
-    }
 
     protected SimpleCommandMeta(final SimpleCommandMeta source) {
         this.metaMap = source.metaMap;
@@ -76,23 +70,6 @@ public class SimpleCommandMeta extends CommandMeta {
     }
 
     @Override
-    @Deprecated
-    public final @NonNull Optional<String> getValue(final @NonNull String key) {
-        final Object result = this.metaMap.get(key);
-        if (result != null && !(result instanceof String)) {
-            throw new IllegalArgumentException("Key '" + key + "' has been used for a new typed command meta and contains a "
-                    + "non-string value!");
-        }
-        return Optional.ofNullable((String) result);
-    }
-
-    @Override
-    @Deprecated
-    public final @NonNull String getOrDefault(final @NonNull String key, final @NonNull String defaultValue) {
-        return this.getValue(key).orElse(defaultValue);
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public final @NonNull <V> Optional<V> get(final @NonNull Key<V> key) {
         final Object value = this.metaMap.get(key.getName());
@@ -115,17 +92,6 @@ public class SimpleCommandMeta extends CommandMeta {
     @Override
     public final <V> @NonNull V getOrDefault(final @NonNull Key<V> key, final @NonNull V defaultValue) {
         return this.get(key).orElse(defaultValue);
-    }
-
-    @Override
-    @Deprecated
-    public final @NonNull Map<@NonNull String, @NonNull String> getAll() {
-        return this.metaMap.entrySet()
-                .stream().filter(ent -> ent.getValue() instanceof String)
-                .collect(Collectors.<Map.Entry<String, Object>, String, String>toMap(
-                        Map.Entry::getKey,
-                        ent -> ent.getValue().toString()
-                ));
     }
 
     @Override
@@ -174,24 +140,6 @@ public class SimpleCommandMeta extends CommandMeta {
             } else {
                 this.map.putAll(commandMeta.getAllValues());
             }
-            return this;
-        }
-
-        /**
-         * Store a new key-value pair in the meta map
-         *
-         * @param key   Key
-         * @param value Value
-         * @return Builder instance
-         * @deprecated For removal since 1.3.0, use {@link #with(Key, Object) the typesafe alternative} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.3.0")
-        public @NonNull @This Builder with(
-                final @NonNull String key,
-                final @NonNull String value
-        ) {
-            this.map.put(key, value);
             return this;
         }
 
