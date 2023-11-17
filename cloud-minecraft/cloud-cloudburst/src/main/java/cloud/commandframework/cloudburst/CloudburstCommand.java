@@ -32,7 +32,7 @@ import cloud.commandframework.exceptions.InvalidSyntaxException;
 import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.meta.CommandMeta;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.CompletionException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.command.CommandSender;
@@ -53,7 +53,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
 
     CloudburstCommand(
             final @NonNull String label,
-            final @NonNull List<@NonNull String> aliases,
+            final @NonNull Collection<@NonNull String> aliases,
             final @NonNull Command<C> cloudCommand,
             final @NonNull CommandComponent<C> command,
             final @NonNull CloudburstCommandManager<C> manager

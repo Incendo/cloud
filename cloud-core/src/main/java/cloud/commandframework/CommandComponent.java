@@ -25,6 +25,9 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
+import cloud.commandframework.arguments.StaticArgument;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -40,6 +43,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class CommandComponent<C> {
 
     private final String name;
+    private final Collection<String> aliases;
+    private final Collection<String> alternativeAliases;
     private final CommandArgument<C, ?> argument;
     private final ArgumentDescription description;
     private final boolean required;
@@ -47,12 +52,16 @@ public final class CommandComponent<C> {
 
     private CommandComponent(
         final @NonNull String name,
+        final @NonNull Collection<@NonNull String> aliases,
+        final @NonNull Collection<@NonNull String> alternativeAliases,
         final @NonNull CommandArgument<C, ?> argument,
         final @NonNull ArgumentDescription description,
         final boolean required,
         final @Nullable DefaultValue<C, ?> defaultValue
     ) {
         this.name = name;
+        this.aliases = aliases;
+        this.alternativeAliases = alternativeAliases;
         this.argument = argument;
         this.description = description;
         this.required = required;
@@ -65,7 +74,15 @@ public final class CommandComponent<C> {
             final boolean required,
             final @Nullable DefaultValue<C, ?> defaultValue
     ) {
-        this(argument.getName(), argument, description, required, defaultValue);
+        this(
+                argument.getName(),
+                aliases(argument),
+                alternativeAliases(argument),
+                argument,
+                description,
+                required,
+                defaultValue
+        );
     }
 
     /**
@@ -86,6 +103,33 @@ public final class CommandComponent<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public @NonNull String name() {
         return this.name;
+    }
+
+    /**
+     * Returns the aliases, if relevant.
+     * <p>
+     * Only literal components may have aliases. If this is anon-literal
+     * component then an empty collection is returned.
+     *
+     * @return unmodifiable view of the aliases
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull Collection<@NonNull String> aliases() {
+        return Collections.unmodifiableCollection(this.aliases);
+    }
+
+    /**
+     * Returns the aliases excluding the {@link #name() name}, if relevant.
+     * <p>
+     * Only literal components may have aliases. If this is anon-literal
+     * component then an empty collection is returned.
+     *
+     * @return unmodifiable view of the aliases
+     * @since 2.0.0
+     */
+    public @NonNull Collection<@NonNull String> alternativeAliases() {
+        return Collections.unmodifiableCollection(this.alternativeAliases);
     }
 
     /**
@@ -204,7 +248,7 @@ public final class CommandComponent<C> {
             final @NonNull CommandArgument<C, ?> commandArgument,
             final @NonNull ArgumentDescription commandDescription
     ) {
-        return new CommandComponent<C>(commandArgument, commandDescription, true, null);
+        return new CommandComponent<>(commandArgument, commandDescription, true, null);
     }
 
     /**
@@ -223,7 +267,7 @@ public final class CommandComponent<C> {
             final @NonNull ArgumentDescription commandDescription,
             final @Nullable DefaultValue<C, ?> defaultValue
     ) {
-        return new CommandComponent<C>(commandArgument, commandDescription, false, defaultValue);
+        return new CommandComponent<>(commandArgument, commandDescription, false, defaultValue);
     }
 
     /**
@@ -240,6 +284,20 @@ public final class CommandComponent<C> {
             final @NonNull CommandArgument<C, ?> commandArgument,
             final @NonNull ArgumentDescription commandDescription
     ) {
-        return new CommandComponent<C>(commandArgument, commandDescription, false, null);
+        return new CommandComponent<>(commandArgument, commandDescription, false, null);
+    }
+
+    private static @NonNull Collection<@NonNull String> aliases(final @NonNull CommandArgument<?, ?> argument) {
+        if (argument instanceof StaticArgument) {
+            return ((StaticArgument<?>) argument).getAliases();
+        }
+        return Collections.emptySet();
+    }
+
+    private static @NonNull Collection<@NonNull String> alternativeAliases(final @NonNull CommandArgument<?, ?> argument) {
+        if (argument instanceof StaticArgument) {
+            return ((StaticArgument<?>) argument).getAlternativeAliases();
+        }
+        return Collections.emptySet();
     }
 }

@@ -24,7 +24,6 @@
 package cloud.commandframework.javacord;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -84,7 +83,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
         messageContent = messageContent.substring(commandPrefix.length());
 
         final String finalContent = messageContent;
-        if (((StaticArgument<C>) this.command.argument()).getAliases()
+        if (this.command.aliases()
                 .stream()
                 .map(String::toLowerCase)
                 .noneMatch(commandAlias -> finalContent.toLowerCase().startsWith(commandAlias))) {

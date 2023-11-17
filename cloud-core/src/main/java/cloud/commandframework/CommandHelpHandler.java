@@ -158,8 +158,7 @@ public final class CommandHelpHandler<C> {
             final Command<C> command = entry.getCommand();
 
             final CommandComponent<C> component = command.rootComponent();
-            @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) component.argument();
-            for (final String alias : staticArgument.getAliases()) {
+            for (final String alias : component.aliases()) {
                 if (alias.toLowerCase(Locale.ENGLISH).startsWith(rootFragment.toLowerCase(Locale.ENGLISH))) {
                     availableCommands.add(command);
                     availableCommandLabels.add(component.name());
@@ -167,7 +166,7 @@ public final class CommandHelpHandler<C> {
                 }
             }
 
-            for (final String alias : staticArgument.getAliases()) {
+            for (final String alias : component.aliases()) {
                 if (alias.equalsIgnoreCase(rootFragment)) {
                     exactMatch = true;
                     break;
@@ -240,9 +239,7 @@ public final class CommandHelpHandler<C> {
                             }
                             continue;
                         }
-                        @SuppressWarnings("unchecked") final StaticArgument<C> childArgument = (StaticArgument<C>) child
-                                .argument();
-                        for (final String childAlias : childArgument.getAliases()) {
+                        for (final String childAlias : child.component().aliases()) {
                             if (childAlias.equalsIgnoreCase(queryFragments[index])) {
                                 head = child;
                                 continue outer;

@@ -30,7 +30,6 @@ import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.specifier.Quoted;
 import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.annotations.suggestions.Suggestions;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.standard.IntegerArgument;
@@ -50,15 +49,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+
+import static com.google.common.truth.Truth.assertThat;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AnnotationParserTest {
@@ -191,11 +190,8 @@ class AnnotationParserTest {
 
         // Find the root command that we are looking for.
         for (final Command<TestCommandSender> command : commands) {
-            final StaticArgument<?> argument = (StaticArgument<?>) command.rootComponent().argument();
-
-            if (argument.getAliases().contains("acommand")) {
-                final Set<String> requiredAliases = new HashSet<>(Arrays.asList("acommand", "analias", "anotheralias"));
-                Assertions.assertEquals(requiredAliases, argument.getAliases());
+            if (command.rootComponent().aliases().contains("acommand")) {
+                assertThat(command.rootComponent().aliases()).containsExactly("acommand", "analias", "anotheralias");
 
                 return;
             }

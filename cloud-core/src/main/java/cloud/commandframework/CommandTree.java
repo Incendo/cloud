@@ -156,12 +156,11 @@ public final class CommandTree<C> {
     @SuppressWarnings("unchecked")
     public @Nullable CommandNode<C> getNamedNode(final @Nullable String name) {
         for (final CommandNode<C> node : this.rootNodes()) {
-            final CommandArgument<C, ?> argument = node.argument();
-            if (!(argument instanceof StaticArgument)) {
+            final CommandComponent<C> component = node.component();
+            if (component == null || !(component.argument() instanceof StaticArgument)) {
                 continue;
             }
-            final StaticArgument<C> staticArgument = (StaticArgument<C>) argument;
-            for (final String alias : staticArgument.getAliases()) {
+            for (final String alias : component.aliases()) {
                 if (alias.equalsIgnoreCase(name)) {
                     return node;
                 }
@@ -535,9 +534,9 @@ public final class CommandTree<C> {
     private boolean matchesLiteral(final @NonNull List<@NonNull CommandNode<C>> children, final @NonNull String input) {
         return children.stream()
                 .filter(n -> n.argument() instanceof StaticArgument)
-                .map(n -> (StaticArgument<?>) n.argument())
+                .map(CommandNode::component)
                 .filter(Objects::nonNull)
-                .flatMap(arg -> Stream.concat(Stream.of(arg.getName()), arg.getAliases().stream()))
+                .flatMap(arg -> Stream.concat(Stream.of(arg.name()), arg.aliases().stream()))
                 .anyMatch(arg -> arg.equals(input));
     }
 
@@ -906,7 +905,7 @@ public final class CommandTree<C> {
                 if (tempNode == null) {
                     tempNode = node.addChild(component);
                 } else if (component.argument() instanceof StaticArgument && tempNode.argument() != null) {
-                    for (final String alias : ((StaticArgument<C>) component.argument()).getAliases()) {
+                    for (final String alias : component.aliases()) {
                         ((StaticArgument<C>) Objects.requireNonNull(tempNode.argument())).registerAlias(alias);
                     }
                 }
@@ -1110,8 +1109,7 @@ public final class CommandTree<C> {
         // This is done by filling a set and checking there are no duplicates
         final Set<String> checkedLiterals = new HashSet<>();
         for (final CommandNode<C> child : childStaticArguments) {
-            final StaticArgument<C> staticArgument = (StaticArgument<C>) child.argument();
-            for (final String nameOrAlias : staticArgument.getAliases()) {
+            for (final String nameOrAlias : child.component().aliases()) {
                 if (!checkedLiterals.add(nameOrAlias)) {
                     // Same literal value, ambiguity detected
                     throw new AmbiguousNodeException(

@@ -71,6 +71,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiPredicate;
@@ -78,7 +79,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -614,9 +614,9 @@ public final class CloudBrigadierManager<C, S> {
         final List<Suggestion> suggestions = new ArrayList<>(suggestionsUnfiltered);
         if (parentNode != null) {
             final Set<String> siblingLiterals = parentNode.children().stream()
-                    .map(cloud.commandframework.internal.CommandNode::argument)
-                    .flatMap(arg -> (arg instanceof StaticArgument)
-                            ? ((StaticArgument<C>) arg).getAliases().stream() : Stream.empty())
+                    .map(cloud.commandframework.internal.CommandNode::component)
+                    .filter(Objects::nonNull)
+                    .flatMap(commandComponent -> commandComponent.aliases().stream())
                     .collect(Collectors.toSet());
 
             suggestions.removeIf(suggestion -> siblingLiterals.contains(suggestion.suggestion()));

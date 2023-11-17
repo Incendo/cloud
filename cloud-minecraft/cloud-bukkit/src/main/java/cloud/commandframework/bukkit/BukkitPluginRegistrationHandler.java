@@ -26,7 +26,6 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -82,11 +81,9 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         final String label = component.name();
         final String namespacedLabel = this.getNamespacedLabel(label);
 
-        @SuppressWarnings("unchecked") final List<String> aliases = new ArrayList<>(
-                ((StaticArgument<C>) component.argument()).getAlternativeAliases()
-        );
+        final List<String> aliases = new ArrayList<>(component.alternativeAliases());
 
-        @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
+        final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
                 label,
                 aliases,
                 command,
@@ -140,7 +137,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
         }
         ((BukkitCommand<C>) registeredCommand).disable();
 
-        final List<String> aliases = new ArrayList<>(((StaticArgument<C>) component.argument()).getAlternativeAliases());
+        final List<String> aliases = new ArrayList<>(component.alternativeAliases());
         final Set<String> registeredAliases = new HashSet<>();
 
         for (final String alias : aliases) {

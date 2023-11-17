@@ -25,7 +25,6 @@ package cloud.commandframework.sponge7;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.google.common.collect.ImmutableList;
 import java.util.HashMap;
@@ -46,7 +45,6 @@ final class SpongePluginRegistrationHandler<C> implements CommandRegistrationHan
     @Override
     public boolean registerCommand(final @NonNull Command<C> command) {
         final CommandComponent<C> component = command.rootComponent();
-        final StaticArgument<?> commandArgument = (StaticArgument<?>) component.argument();
         if (this.registeredCommands.containsKey(component)) {
             return false;
         }
@@ -61,7 +59,7 @@ final class SpongePluginRegistrationHandler<C> implements CommandRegistrationHan
         return Sponge.getGame().getCommandManager().register(
                 this.manager.getOwningPlugin(),
                 callable,
-                ImmutableList.copyOf(commandArgument.getAliases())
+                ImmutableList.copyOf(component.aliases())
         ).isPresent();
     }
 }

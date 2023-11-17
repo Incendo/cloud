@@ -25,7 +25,6 @@ package cloud.commandframework.fabric;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.mojang.brigadier.CommandDispatcher;
@@ -163,7 +162,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         ) {
             final RootCommandNode<FabricClientCommandSource> rootNode = dispatcher.getRoot();
             final CommandComponent<C> component = command.rootComponent();
-            final StaticArgument<C> first = ((StaticArgument<C>) component.argument());
             final CommandNode<FabricClientCommandSource> baseNode = this.commandManager()
                     .brigadierManager()
                     .createLiteralCommandNode(
@@ -183,7 +181,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
             rootNode.addChild(baseNode);
 
-            for (final String alias : first.getAlternativeAliases()) {
+            for (final String alias : component.alternativeAliases()) {
                 rootNode.addChild(buildRedirect(alias, baseNode));
             }
         }
@@ -200,7 +198,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public boolean registerCommand(@NonNull final Command<C> command) {
             return this.registeredCommands.add((Command<C>) command);
         }
@@ -235,7 +232,6 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
             final CommandComponent<C> component = command.rootComponent();
-            @SuppressWarnings("unchecked") final StaticArgument<C> first = ((StaticArgument<C>) component.argument());
             final CommandNode<CommandSourceStack> baseNode = this.commandManager().brigadierManager().createLiteralCommandNode(
                     component.name(),
                     command,
@@ -249,7 +245,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
             dispatcher.addChild(baseNode);
 
-            for (final String alias : first.getAlternativeAliases()) {
+            for (final String alias : component.alternativeAliases()) {
                 dispatcher.addChild(buildRedirect(alias, baseNode));
             }
         }

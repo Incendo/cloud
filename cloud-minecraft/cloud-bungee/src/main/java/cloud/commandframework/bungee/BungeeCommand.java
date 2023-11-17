@@ -24,7 +24,6 @@
 package cloud.commandframework.bungee;
 
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
@@ -62,7 +61,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
         super(
                 command.name(),
                 cloudCommand.getCommandPermission().toString(),
-                ((StaticArgument<C>) command.argument()).getAlternativeAliases().toArray(new String[0])
+                command.alternativeAliases().toArray(new String[0])
         );
         this.command = command;
         this.manager = manager;

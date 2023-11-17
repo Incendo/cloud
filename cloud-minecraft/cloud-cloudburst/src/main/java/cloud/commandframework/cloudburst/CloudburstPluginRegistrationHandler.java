@@ -25,7 +25,6 @@ package cloud.commandframework.cloudburst;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +56,7 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
         final Plugin plugin = this.cloudburstCommandManager.getOwningPlugin();
         final CloudburstCommand<C> cloudburstCommand = new CloudburstCommand<>(
                 component.name(),
-                ((StaticArgument<C>) component.argument()).getAlternativeAliases(),
+                component.alternativeAliases(),
                 command,
                 component,
                 this.cloudburstCommandManager

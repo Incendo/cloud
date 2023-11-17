@@ -25,14 +25,13 @@ package cloud.commandframework.velocity;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
-import java.util.List;
+import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationHandler<C> {
@@ -61,7 +60,7 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
     @SuppressWarnings("unchecked")
     public boolean registerCommand(final @NonNull Command<C> command) {
         final CommandComponent<C> component = command.rootComponent();
-        final List<String> aliases = ((StaticArgument<C>) component.argument()).getAlternativeAliases();
+        final Collection<String> aliases = component.alternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
                 this.brigadierManager.createLiteralCommandNode(
                         command.rootComponent().name(),
