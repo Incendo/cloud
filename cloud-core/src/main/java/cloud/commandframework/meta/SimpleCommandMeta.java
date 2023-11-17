@@ -42,11 +42,6 @@ public class SimpleCommandMeta extends CommandMeta {
 
     private final Map<String, Object> metaMap;
 
-    @Deprecated
-    protected SimpleCommandMeta(final @NonNull Map<@NonNull String, @NonNull String> metaMap) {
-        this.metaMap = Collections.unmodifiableMap(metaMap);
-    }
-
     protected SimpleCommandMeta(final SimpleCommandMeta source) {
         this.metaMap = source.metaMap;
     }
