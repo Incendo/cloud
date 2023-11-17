@@ -151,24 +151,6 @@ public class SimpleCommandMeta extends CommandMeta {
         /**
          * Store a new key-value pair in the meta map
          *
-         * @param key   Key
-         * @param value Value
-         * @return Builder instance
-         * @deprecated For removal since 1.3.0, use {@link #with(Key, Object) the typesafe alternative} instead
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.3.0")
-        public @NonNull @This Builder with(
-                final @NonNull String key,
-                final @NonNull String value
-        ) {
-            this.map.put(key, value);
-            return this;
-        }
-
-        /**
-         * Store a new key-value pair in the meta map
-         *
          * @param <V>   Value type
          * @param key   Key
          * @param value Value
