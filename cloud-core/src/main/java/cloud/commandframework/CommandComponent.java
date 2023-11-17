@@ -26,6 +26,7 @@ package cloud.commandframework;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.arguments.parser.ArgumentParser;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -92,6 +93,17 @@ public final class CommandComponent<C> {
      */
     public @NonNull CommandArgument<C, ?> argument() {
         return this.argument;
+    }
+
+    /**
+     * Returns the parser.
+     *
+     * @return the parser
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull ArgumentParser<C, ?> parser() {
+        return this.argument.getParser();
     }
 
     /**

@@ -28,7 +28,6 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandHelpHandler;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.CommandArgument;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -519,7 +518,6 @@ public final class MinecraftHelp<C> {
 
             while (iterator.hasNext()) {
                 final CommandComponent<C> component = iterator.next();
-                final CommandArgument<C, ?> argument = component.argument();
 
                 final String syntax = this.commandManager.commandSyntaxFormatter()
                         .apply(Collections.singletonList(component), null);
