@@ -35,7 +35,6 @@ import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.permission.CommandPermission;
-import cloud.commandframework.types.tuples.Pair;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,7 +44,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -567,41 +565,6 @@ public class CommandContext<C> {
     }
 
     /**
-     * Create an argument timing for a specific argument
-     *
-     * @param argument Argument
-     * @return Created timing instance
-     *
-     * @deprecated This has been replaced by {@link #createArgumentContext(CommandArgument)}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.9.0")
-    @Deprecated
-    public @NonNull ArgumentTiming createTiming(final @NonNull CommandArgument<C, ?> argument) {
-        return new ArgumentTiming();
-    }
-
-    /**
-     * Get an immutable view of the argument timings map
-     *
-     * @return Argument timings
-     * @deprecated Replaced with {@link #argumentContexts()}
-     */
-    @API(status = API.Status.DEPRECATED, since = "1.9.0")
-    @Deprecated
-    public @NonNull Map<CommandArgument<@NonNull C, @NonNull ?>, ArgumentTiming> getArgumentTimings() {
-        return this.argumentContexts.stream()
-                .map(context -> Pair.of(
-                                context.argument(),
-                                new ArgumentTiming(
-                                        context.startTime(),
-                                        context.endTime(),
-                                        context.success()
-                                )
-                        )
-                ).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-    }
-
-    /**
      * Create an argument context instance for the given argument
      *
      * @param argument the argument
@@ -722,97 +685,5 @@ public class CommandContext<C> {
             );
         }
         return this.commandManager.parameterInjectorRegistry().getInjectable(clazz, this, AnnotationAccessor.empty());
-    }
-
-
-    /**
-     * Used to track performance metrics related to command parsing. This is attached
-     * to the command context, as this depends on the command context that is being
-     * parsed.
-     * <p>
-     * The times are measured in nanoseconds.
-     *
-     * @deprecated Superseded by {@link ArgumentContext}
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.9.0")
-    public static final class ArgumentTiming {
-
-        private long start;
-        private long end;
-        private boolean success;
-
-        /**
-         * Creates a new argument timing instance
-         *
-         * @param start   Start time (in nanoseconds)
-         * @param end     End time (in nanoseconds)
-         * @param success Whether the argument was parsed successfully
-         */
-        public ArgumentTiming(final long start, final long end, final boolean success) {
-            this.start = start;
-            this.end = end;
-            this.success = success;
-        }
-
-        /**
-         * Creates a new argument timing instance without an end time
-         *
-         * @param start Start time (in nanoseconds)
-         */
-        @SuppressWarnings("unused")
-        public ArgumentTiming(final long start) {
-            this(start, -1, false);
-        }
-
-        /**
-         * Creates a new argument timing instance
-         */
-        public ArgumentTiming() {
-            this(-1, -1, false);
-        }
-
-        /**
-         * Get the elapsed time
-         *
-         * @return Elapsed time (in nanoseconds)
-         */
-        public long getElapsedTime() {
-            if (this.end == -1) {
-                throw new IllegalStateException("No end time has been registered");
-            } else if (this.start == -1) {
-                throw new IllegalStateException("No start time has been registered");
-            }
-            return this.end - this.start;
-        }
-
-        /**
-         * Set the end time
-         *
-         * @param end     End time (in nanoseconds)
-         * @param success Whether the argument was parsed successfully
-         */
-        public void setEnd(final long end, final boolean success) {
-            this.end = end;
-            this.success = success;
-        }
-
-        /**
-         * Set the start time
-         *
-         * @param start Start time (in nanoseconds)
-         */
-        public void setStart(final long start) {
-            this.start = start;
-        }
-
-        /**
-         * Check whether the value was parsed successfully
-         *
-         * @return {@code true} if the value was parsed successfully, {@code false} if not
-         */
-        public boolean wasSuccess() {
-            return this.success;
-        }
     }
 }
