@@ -31,7 +31,6 @@ import cloud.commandframework.captions.Caption;
 import cloud.commandframework.captions.CaptionRegistry;
 import cloud.commandframework.captions.CaptionVariable;
 import cloud.commandframework.captions.CaptionVariableReplacementHandler;
-import cloud.commandframework.captions.SimpleCaptionVariableReplacementHandler;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.CloudKeyHolder;
 import cloud.commandframework.keys.SimpleCloudKey;
@@ -73,19 +72,6 @@ public class CommandContext<C> {
     /**
      * Create a new command context instance
      *
-     * @param commandSender   Sender of the command
-     * @param captionRegistry Caption registry
-     * @deprecated Provide a command manager instead of a caption registry
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.3.0")
-    public CommandContext(final @NonNull C commandSender, final @NonNull CaptionRegistry<C> captionRegistry) {
-        this(false, commandSender, captionRegistry);
-    }
-
-    /**
-     * Create a new command context instance
-     *
      * @param commandSender  Sender of the command
      * @param commandManager Command manager
      * @since 1.3.0
@@ -93,28 +79,6 @@ public class CommandContext<C> {
     @API(status = API.Status.STABLE, since = "1.3.0")
     public CommandContext(final @NonNull C commandSender, final @NonNull CommandManager<C> commandManager) {
         this(false, commandSender, commandManager);
-    }
-
-    /**
-     * Create a new command context instance
-     *
-     * @param suggestions     Whether the context is created for command suggestions
-     * @param commandSender   Sender of the command
-     * @param captionRegistry Caption registry
-     * @deprecated Provide a command manager instead of a caption registry
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.3.0")
-    public CommandContext(
-            final boolean suggestions,
-            final @NonNull C commandSender,
-            final @NonNull CaptionRegistry<C> captionRegistry
-    ) {
-        this.commandSender = commandSender;
-        this.suggestions = suggestions;
-        this.captionRegistry = captionRegistry;
-        this.captionVariableReplacementHandler = new SimpleCaptionVariableReplacementHandler();
-        this.commandManager = null;
     }
 
     /**
