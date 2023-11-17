@@ -4,10 +4,6 @@ plugins {
     alias(libs.plugins.run.velocity)
 }
 
-indra {
-    javaVersions().target(11) // Velocity 3 requires Java 11
-}
-
 tasks {
     shadowJar {
         dependencies {

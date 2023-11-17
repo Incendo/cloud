@@ -56,7 +56,7 @@ final class CommandExtractorImpl implements CommandExtractor {
             if (commandMethod == null) {
                 continue;
             }
-            if (!method.isAccessible()) {
+            if (!method.canAccess(instance)) {
                 method.setAccessible(true);
             }
             if (Modifier.isStatic(method.getModifiers())) {
