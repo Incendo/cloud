@@ -24,7 +24,7 @@
 package cloud.commandframework.internal;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.CommandComponent;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -32,18 +32,21 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * Utility that registers commands natively for whatever
  * platform the library is used in. This can do nothing, if
  * the target platform does not have its own concept of commands
+ *
+ * @param <C> command sender type
  */
 @FunctionalInterface
 @API(status = API.Status.STABLE)
-public interface CommandRegistrationHandler {
+public interface CommandRegistrationHandler<C> {
 
     /**
      * Create a new {@link CommandRegistrationHandler} that does nothing
      *
+     * @param <C> command sender type
      * @return Constructed registration
      */
-    static @NonNull CommandRegistrationHandler nullCommandRegistrationHandler() {
-        return new NullCommandRegistrationHandler();
+    static <C> @NonNull CommandRegistrationHandler<C> nullCommandRegistrationHandler() {
+        return new NullCommandRegistrationHandler<>();
     }
 
     /**
@@ -53,31 +56,32 @@ public interface CommandRegistrationHandler {
      * @return {@code true} if the command was registered successfully,
      *         else {@code false}
      */
-    boolean registerCommand(@NonNull Command<?> command);
+    boolean registerCommand(@NonNull Command<C> command);
 
     /**
      * Requests that the given {@code rootCommand} should be unregistered.
      *
      * @param rootCommand The command to delete
-     * @since 1.7.0
+     * @since 2.0.0
      */
-    default void unregisterRootCommand(final @NonNull StaticArgument<?> rootCommand) {
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    default void unregisterRootCommand(final @NonNull CommandComponent<C> rootCommand) {
     }
 
 
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    final class NullCommandRegistrationHandler implements CommandRegistrationHandler {
+    final class NullCommandRegistrationHandler<C> implements CommandRegistrationHandler<C> {
 
         private NullCommandRegistrationHandler() {
         }
 
         @Override
-        public boolean registerCommand(final @NonNull Command<?> command) {
+        public boolean registerCommand(final @NonNull Command<C> command) {
             return true;
         }
 
         @Override
-        public void unregisterRootCommand(final @NonNull StaticArgument<?> rootCommand) {
+        public void unregisterRootCommand(final @NonNull CommandComponent<C> rootCommand) {
         }
     }
 }

@@ -110,7 +110,7 @@ setupExampleModule("example-jda")
 /*
 
 // Minecraft Modules
-setupMinecraftModule("cloud-fabric")
+
 */
 
 fun setupIrcModule(name: String) =

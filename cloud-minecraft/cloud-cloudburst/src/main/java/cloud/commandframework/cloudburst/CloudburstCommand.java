@@ -24,7 +24,7 @@
 package cloud.commandframework.cloudburst;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
 import cloud.commandframework.exceptions.InvalidCommandSenderException;
@@ -48,14 +48,14 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
                     + "Please contact the server administrators if you believe that this is in error.";
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
-    private final CommandArgument<C, ?> command;
+    private final CommandComponent<C> command;
     private final CloudburstCommandManager<C> manager;
 
     CloudburstCommand(
             final @NonNull String label,
             final @NonNull List<@NonNull String> aliases,
             final @NonNull Command<C> cloudCommand,
-            final @NonNull CommandArgument<C, ?> command,
+            final @NonNull CommandComponent<C> command,
             final @NonNull CloudburstCommandManager<C> manager
     ) {
         super(manager.getOwningPlugin(), CommandData.builder(label)
@@ -74,7 +74,7 @@ final class CloudburstCommand<C> extends PluginCommand<Plugin> {
             final String[] strings
     ) {
         /* Join input */
-        final StringBuilder builder = new StringBuilder(this.command.getName());
+        final StringBuilder builder = new StringBuilder(this.command.name());
         for (final String string : strings) {
             builder.append(" ").append(string);
         }

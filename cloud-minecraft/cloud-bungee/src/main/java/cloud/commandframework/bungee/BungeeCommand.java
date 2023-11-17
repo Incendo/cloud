@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.bungee;
 
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.ArgumentParseException;
@@ -51,18 +51,18 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
     private final BungeeCommandManager<C> manager;
-    private final CommandArgument<C, ?> command;
+    private final CommandComponent<C> command;
 
     @SuppressWarnings("unchecked")
     BungeeCommand(
             final cloud.commandframework.@NonNull Command<C> cloudCommand,
-            final @NonNull CommandArgument<C, ?> command,
+            final @NonNull CommandComponent<C> command,
             final @NonNull BungeeCommandManager<C> manager
     ) {
         super(
-                command.getName(),
+                command.name(),
                 cloudCommand.getCommandPermission().toString(),
-                ((StaticArgument<C>) command).getAlternativeAliases().toArray(new String[0])
+                ((StaticArgument<C>) command.argument()).getAlternativeAliases().toArray(new String[0])
         );
         this.command = command;
         this.manager = manager;
@@ -71,7 +71,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
     @Override
     public void execute(final CommandSender commandSender, final String[] strings) {
         /* Join input */
-        final StringBuilder builder = new StringBuilder(this.command.getName());
+        final StringBuilder builder = new StringBuilder(this.command.name());
         for (final String string : strings) {
             builder.append(" ").append(string);
         }
@@ -173,7 +173,7 @@ public final class BungeeCommand<C> extends Command implements TabExecutor {
             final CommandSender sender,
             final String[] args
     ) {
-        final StringBuilder builder = new StringBuilder(this.command.getName());
+        final StringBuilder builder = new StringBuilder(this.command.name());
         for (final String string : args) {
             builder.append(" ").append(string);
         }

@@ -154,10 +154,10 @@ class CommandManagerTest {
 
         // Argument configuration, we know component has the same argument so no need to test those
         // TODO: Aliases
-        assertThat(components.get(0).argument().getName()).isEqualTo("component");
-        assertThat(components.get(1).argument().getName()).isEqualTo("literal");
-        assertThat(components.get(2).argument().getName()).isEqualTo("detail");
-        assertThat(components.get(3).argument().getName()).isEqualTo("argument");
+        assertThat(components.get(0).name()).isEqualTo("component");
+        assertThat(components.get(1).name()).isEqualTo("literal");
+        assertThat(components.get(2).name()).isEqualTo("detail");
+        assertThat(components.get(3).name()).isEqualTo("argument");
 
         // Check argument is indeed a command argument
         assertThat(TypeToken.get(int.class)).isEqualTo(components.get(3).argument().getValueType());

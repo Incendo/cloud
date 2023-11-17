@@ -817,7 +817,7 @@ public final class AnnotationParser<C> {
                 .map(argumentDescriptor -> this.argumentAssembler.assembleArgument(
                         this.findSyntaxFragment(commandDescriptor.syntax(), this.processString(argumentDescriptor.name())),
                         argumentDescriptor
-                )).map(component -> Pair.of(component.argument().getName(), component))
+                )).map(component -> Pair.of(component.name(), component))
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
     }
 

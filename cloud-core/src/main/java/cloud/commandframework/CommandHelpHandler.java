@@ -90,8 +90,8 @@ public final class CommandHelpHandler<C> {
     public @NonNull List<@NonNull String> getLongestSharedChains() {
         final List<String> chains = new ArrayList<>();
         this.commandManager.commandTree().rootNodes().forEach(node ->
-                chains.add(Objects.requireNonNull(node.argument())
-                        .getName() + this.commandManager
+                chains.add(Objects.requireNonNull(node.component())
+                        .name() + this.commandManager
                         .commandSyntaxFormatter()
                         .apply(
                                 Collections
@@ -156,12 +156,13 @@ public final class CommandHelpHandler<C> {
 
         for (final VerboseHelpEntry<C> entry : commands) {
             final Command<C> command = entry.getCommand();
-            @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) command.components()
-                    .get(0).argument();
+
+            final CommandComponent<C> component = command.components().get(0);
+            @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) component.argument();
             for (final String alias : staticArgument.getAliases()) {
                 if (alias.toLowerCase(Locale.ENGLISH).startsWith(rootFragment.toLowerCase(Locale.ENGLISH))) {
                     availableCommands.add(command);
-                    availableCommandLabels.add(staticArgument.getName());
+                    availableCommandLabels.add(component.name());
                     break;
                 }
             }
@@ -173,10 +174,10 @@ public final class CommandHelpHandler<C> {
                 }
             }
 
-            if (rootFragment.equalsIgnoreCase(staticArgument.getName())) {
+            if (rootFragment.equalsIgnoreCase(component.name())) {
                 availableCommandLabels.clear();
                 availableCommands.clear();
-                availableCommandLabels.add(staticArgument.getName());
+                availableCommandLabels.add(component.name());
                 availableCommands.add(command);
                 break;
             }

@@ -24,17 +24,16 @@
 package cloud.commandframework.javacord;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.javacord.api.listener.message.MessageCreateListener;
 
-final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler {
+final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler<C> {
 
-    private final Map<CommandArgument<?, ?>, JavacordCommand<C>> registeredCommands = new HashMap<>();
+    private final Map<CommandComponent<C>, JavacordCommand<C>> registeredCommands = new HashMap<>();
 
     private JavacordCommandManager<C> javacordCommandManager;
 
@@ -46,24 +45,24 @@ final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler
     }
 
     @Override
-    public boolean registerCommand(final @NonNull Command<?> command) {
+    public boolean registerCommand(final @NonNull Command<C> command) {
         /* We only care about the root command argument */
-        final CommandArgument<?, ?> commandArgument = command.components().get(0).argument();
-        if (this.registeredCommands.containsKey(commandArgument)) {
+        final CommandComponent<C> component = command.components().get(0);
+        if (this.registeredCommands.containsKey(component)) {
             return false;
         }
         @SuppressWarnings("unchecked") final JavacordCommand<C> javacordCommand = new JavacordCommand<>(
-                (CommandArgument<C, ?>) commandArgument,
+                component,
                 this.javacordCommandManager
         );
-        this.registeredCommands.put(commandArgument, javacordCommand);
+        this.registeredCommands.put(component, javacordCommand);
         this.javacordCommandManager.getDiscordApi().addMessageCreateListener(javacordCommand);
         return true;
     }
 
     @Override
     public void unregisterRootCommand(
-            final @NonNull StaticArgument<?> rootCommand
+            final @NonNull CommandComponent<C> rootCommand
     ) {
         final JavacordCommand<C> command = this.registeredCommands.get(rootCommand);
         if (command == null) {

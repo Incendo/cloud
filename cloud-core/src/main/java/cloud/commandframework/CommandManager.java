@@ -73,6 +73,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -112,7 +113,7 @@ public abstract class CommandManager<C> {
     private CommandSyntaxFormatter<C> commandSyntaxFormatter = new StandardCommandSyntaxFormatter<>();
     private CommandSuggestionProcessor<C> commandSuggestionProcessor =
             new FilteringCommandSuggestionProcessor<>(FilteringCommandSuggestionProcessor.Filter.startsWith(true));
-    private CommandRegistrationHandler commandRegistrationHandler;
+    private CommandRegistrationHandler<C> commandRegistrationHandler;
     private CaptionRegistry<C> captionRegistry;
     private final AtomicReference<RegistrationState> state = new AtomicReference<>(RegistrationState.BEFORE_REGISTRATION);
 
@@ -133,7 +134,7 @@ public abstract class CommandManager<C> {
      */
     protected CommandManager(
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull CommandRegistrationHandler commandRegistrationHandler
+            final @NonNull CommandRegistrationHandler<C> commandRegistrationHandler
     ) {
         this.commandTree = CommandTree.newTree(this);
         this.commandExecutionCoordinator = commandExecutionCoordinator.apply(this.commandTree);
@@ -340,12 +341,12 @@ public abstract class CommandManager<C> {
      * @return the command registration handler
      * @since 1.7.0
      */
-    public @NonNull CommandRegistrationHandler commandRegistrationHandler() {
+    public @NonNull CommandRegistrationHandler<C> commandRegistrationHandler() {
         return this.commandRegistrationHandler;
     }
 
     @API(status = API.Status.STABLE, since = "1.7.0")
-    protected final void commandRegistrationHandler(final @NonNull CommandRegistrationHandler commandRegistrationHandler) {
+    protected final void commandRegistrationHandler(final @NonNull CommandRegistrationHandler<C> commandRegistrationHandler) {
         this.requireState(RegistrationState.BEFORE_REGISTRATION);
         this.commandRegistrationHandler = commandRegistrationHandler;
     }
@@ -481,13 +482,13 @@ public abstract class CommandManager<C> {
 
         // Mark the command for deletion.
         final CommandNode<C> node = this.commandTree.getNamedNode(rootCommand);
-        if (node == null) {
+        if (node == null || node.component() == null) {
             // If the node doesn't exist, we don't really need to delete it...
             return;
         }
 
         // The registration handler gets to act before we destruct the command.
-        this.commandRegistrationHandler.unregisterRootCommand((StaticArgument<?>) node.argument());
+        this.commandRegistrationHandler.unregisterRootCommand(node.component());
 
         // We then delete it from the tree.
         this.commandTree.deleteRecursively(node, true, this.commands::remove);
@@ -507,10 +508,10 @@ public abstract class CommandManager<C> {
     public @NonNull Collection<@NonNull String> rootCommands() {
         return this.commandTree.rootNodes()
                 .stream()
-                .map(CommandNode::argument)
-                .filter(arg -> arg instanceof StaticArgument)
-                .map(arg -> (StaticArgument<C>) arg)
-                .map(StaticArgument::getName)
+                .map(CommandNode::component)
+                .filter(Objects::nonNull)
+                .filter(component -> component.argument() instanceof StaticArgument)
+                .map(CommandComponent::name)
                 .collect(Collectors.toList());
     }
 

@@ -39,30 +39,33 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @API(status = API.Status.STABLE, since = "1.3.0")
 public final class CommandComponent<C> {
 
+    private final String name;
     private final CommandArgument<C, ?> argument;
     private final ArgumentDescription description;
     private final boolean required;
     private final DefaultValue<C, ?> defaultValue;
 
-    /**
-     * Initializes a new CommandComponent
-     *
-     * @param argument     Command Component Argument
-     * @param description  Command Component Description
-     * @param required     Whether the command is required
-     * @param defaultValue Default value used when an optional argument is omitted, should be {@code null} of
-     * {@link #required()} is {@code true}
-     */
+    private CommandComponent(
+        final @NonNull String name,
+        final @NonNull CommandArgument<C, ?> argument,
+        final @NonNull ArgumentDescription description,
+        final boolean required,
+        final @Nullable DefaultValue<C, ?> defaultValue
+    ) {
+        this.name = name;
+        this.argument = argument;
+        this.description = description;
+        this.required = required;
+        this.defaultValue = defaultValue;
+    }
+
     private CommandComponent(
             final @NonNull CommandArgument<C, ?> argument,
             final @NonNull ArgumentDescription description,
             final boolean required,
             final @Nullable DefaultValue<C, ?> defaultValue
     ) {
-        this.argument = argument;
-        this.description = description;
-        this.required = required;
-        this.defaultValue = defaultValue;
+        this(argument.getName(), argument, description, required, defaultValue);
     }
 
     /**
@@ -72,6 +75,17 @@ public final class CommandComponent<C> {
      */
     public @NonNull CommandArgument<C, ?> argument() {
         return this.argument;
+    }
+
+    /**
+     * Returns the name of the component.
+     *
+     * @return the component name
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull String name() {
+        return this.name;
     }
 
     /**

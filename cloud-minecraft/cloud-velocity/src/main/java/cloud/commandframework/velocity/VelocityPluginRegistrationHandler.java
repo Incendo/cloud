@@ -24,7 +24,7 @@
 package cloud.commandframework.velocity;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.context.CommandContext;
@@ -35,7 +35,7 @@ import com.velocitypowered.api.command.CommandSource;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationHandler {
+final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationHandler<C> {
 
     private CloudBrigadierManager<C, CommandSource> brigadierManager;
     private VelocityCommandManager<C> manager;
@@ -59,13 +59,13 @@ final class VelocityPluginRegistrationHandler<C> implements CommandRegistrationH
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean registerCommand(final @NonNull Command<?> command) {
-        final CommandArgument<?, ?> argument = command.components().get(0).argument();
-        final List<String> aliases = ((StaticArgument<C>) argument).getAlternativeAliases();
+    public boolean registerCommand(final @NonNull Command<C> command) {
+        final CommandComponent<C> component = command.components().get(0);
+        final List<String> aliases = ((StaticArgument<C>) component.argument()).getAlternativeAliases();
         final BrigadierCommand brigadierCommand = new BrigadierCommand(
                 this.brigadierManager.createLiteralCommandNode(
-                        command.components().get(0).argument().getName(),
-                        (Command<C>) command,
+                        command.components().get(0).name(),
+                        command,
                         (c, p) -> this.manager.hasPermission(
                                 this.manager.commandSenderMapper().apply(c),
                                 p

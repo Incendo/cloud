@@ -99,15 +99,14 @@ public class Command<C> {
         // Enforce ordering of command arguments
         boolean foundOptional = false;
         for (final CommandComponent<C> component : this.components) {
-            final CommandArgument<C, ?> argument = component.argument();
-            if (argument.getName().isEmpty()) {
-                throw new IllegalArgumentException("Argument names may not be empty");
+            if (component.name().isEmpty()) {
+                throw new IllegalArgumentException("Component names may not be empty");
             }
             if (foundOptional && component.required()) {
                 throw new IllegalArgumentException(
                         String.format(
-                                "Command argument '%s' cannot be placed after an optional argument",
-                                argument.getName()
+                                "Command component '%s' cannot be placed after an optional argument",
+                                component.name()
                         ));
             } else if (!component.required()) {
                 foundOptional = true;
@@ -329,7 +328,7 @@ public class Command<C> {
     public final String toString() {
         final StringBuilder stringBuilder = new StringBuilder();
         for (final CommandComponent<C> component : this.components()) {
-            stringBuilder.append(component.argument().getName()).append(' ');
+            stringBuilder.append(component.name()).append(' ');
         }
         final String build = stringBuilder.toString();
         return build.substring(0, build.length() - 1);

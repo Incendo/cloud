@@ -175,11 +175,11 @@ class CommandHelpHandlerTest {
             StringBuilder syntax = new StringBuilder();
             for (CommandComponent<TestCommandSender> component : verbose.getCommand().components()) {
                 if (component.argument() instanceof StaticArgument) {
-                    syntax.append(component.argument().getName());
+                    syntax.append(component.name());
                 } else if (component.required()) {
-                    syntax.append('<').append(component.argument().getName()).append('>');
+                    syntax.append('<').append(component.name()).append('>');
                 } else {
-                    syntax.append('[').append(component.argument().getName()).append(']');
+                    syntax.append('[').append(component.name()).append(']');
                 }
                 syntax.append(' ');
             }

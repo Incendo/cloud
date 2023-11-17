@@ -64,7 +64,7 @@ public final class NoSuchCommandException extends CommandParseException {
             if (commandComponent == null) {
                 continue;
             }
-            builder.append(" ").append(commandComponent.argument().getName());
+            builder.append(" ").append(commandComponent.name());
         }
         return String.format("Unrecognized command input '%s' following chain%s", this.suppliedCommand, builder.toString());
     }

@@ -55,7 +55,7 @@ public final class TestUtils {
         @SuppressWarnings("unused") // mocked via mockito
         protected TestCommandSenderCommandManager(
                 final @NonNull Function<@NonNull CommandTree<TestCommandSender>, @NonNull CommandExecutionCoordinator<TestCommandSender>> commandExecutionCoordinator,
-                final @NonNull CommandRegistrationHandler commandRegistrationHandler
+                final @NonNull CommandRegistrationHandler<TestCommandSender> commandRegistrationHandler
         ) {
             super(commandExecutionCoordinator, commandRegistrationHandler);
         }

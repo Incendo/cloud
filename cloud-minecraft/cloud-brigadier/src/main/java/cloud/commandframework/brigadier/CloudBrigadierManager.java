@@ -408,7 +408,7 @@ public final class CloudBrigadierManager<C, S> {
             final com.mojang.brigadier.@NonNull Command<S> executor
     ) {
         final cloud.commandframework.internal.CommandNode<C> node = this.commandManager
-                .commandTree().getNamedNode(cloudCommand.components().get(0).argument().getName());
+                .commandTree().getNamedNode(cloudCommand.components().get(0).name());
         final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(
                 context,
                 null, /* parent node, null for the literal command node root */
@@ -532,7 +532,7 @@ public final class CloudBrigadierManager<C, S> {
         }
         final ArgumentBuilder<S, ?> argumentBuilder;
         if (root.argument() instanceof StaticArgument) {
-            argumentBuilder = LiteralArgumentBuilder.<S>literal(root.argument().getName())
+            argumentBuilder = LiteralArgumentBuilder.<S>literal(root.component().name())
                     .requires(sender -> permissionChecker.test(sender, (CommandPermission) root.nodeMeta()
                             .getOrDefault(
                                     "permission",
@@ -553,7 +553,7 @@ public final class CloudBrigadierManager<C, S> {
                     builder
             ) : pair.getSecond();
             argumentBuilder = RequiredArgumentBuilder
-                    .<S, Object>argument(root.argument().getName(), (ArgumentType<Object>) pair.getFirst())
+                    .<S, Object>argument(root.component().name(), (ArgumentType<Object>) pair.getFirst())
                     .suggests(provider)
                     .requires(sender -> permissionChecker.test(
                             sender,
@@ -630,7 +630,7 @@ public final class CloudBrigadierManager<C, S> {
         }
 
         for (final Suggestion suggestion : suggestions) {
-            String tooltip = component.argument().getName();
+            String tooltip = component.name();
             if (!(component.argument() instanceof StaticArgument)) {
                 if (component.required()) {
                     tooltip = '<' + tooltip + '>';

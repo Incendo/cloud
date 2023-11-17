@@ -24,7 +24,7 @@
 package cloud.commandframework.sponge7;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
@@ -62,12 +62,12 @@ final class CloudCommandCallable<C> implements CommandCallable {
     );
     private static final Text MESSAGE_UNKNOWN_COMMAND = Text.of("Unknown command. Type \"/help\" for help.");
 
-    private final CommandArgument<?, ?> command;
+    private final CommandComponent<C> command;
     private final Command<C> cloudCommand;
     private final SpongeCommandManager<C> manager;
 
     CloudCommandCallable(
-            final CommandArgument<?, ?> command,
+            final CommandComponent<C> command,
             final Command<C> cloudCommand,
             final SpongeCommandManager<C> manager
     ) {
@@ -178,9 +178,9 @@ final class CloudCommandCallable<C> implements CommandCallable {
 
     private String formatCommand(final String arguments) {
         if (arguments.isEmpty()) {
-            return this.command.getName();
+            return this.command.name();
         } else {
-            return this.command.getName() + " " + arguments;
+            return this.command.name() + " " + arguments;
         }
     }
 
@@ -216,7 +216,7 @@ final class CloudCommandCallable<C> implements CommandCallable {
     public Text getUsage(final @NonNull CommandSource source) {
         return Text.of(this.manager.commandSyntaxFormatter().apply(
                 Collections.emptyList(),
-                this.manager.commandTree().getNamedNode(this.command.getName())
+                this.manager.commandTree().getNamedNode(this.command.name())
         ));
     }
 }

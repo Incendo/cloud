@@ -24,8 +24,8 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.lang.reflect.Field;
@@ -46,9 +46,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.help.GenericCommandHelpTopic;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler {
+public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHandler<C> {
 
-    private final Map<CommandArgument<?, ?>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
+    private final Map<CommandComponent<C>, org.bukkit.command.Command> registeredCommands = new HashMap<>();
     private final Set<String> recognizedAliases = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
     private Map<String, org.bukkit.command.Command> bukkitCommands;
@@ -72,25 +72,25 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
     }
 
     @Override
-    public final boolean registerCommand(final @NonNull Command<?> command) {
+    public final boolean registerCommand(final @NonNull Command<C> command) {
         /* We only care about the root command argument */
-        final CommandArgument<?, ?> commandArgument = command.components().get(0).argument();
+        final CommandComponent<C> component = command.components().get(0);
         if (!(this.bukkitCommandManager.commandRegistrationHandler() instanceof CloudCommodoreManager)
-                && this.registeredCommands.containsKey(commandArgument)) {
+                && this.registeredCommands.containsKey(component)) {
             return false;
         }
-        final String label = commandArgument.getName();
+        final String label = component.name();
         final String namespacedLabel = this.getNamespacedLabel(label);
 
         @SuppressWarnings("unchecked") final List<String> aliases = new ArrayList<>(
-                ((StaticArgument<C>) commandArgument).getAlternativeAliases()
+                ((StaticArgument<C>) component.argument()).getAlternativeAliases()
         );
 
         @SuppressWarnings("unchecked") final BukkitCommand<C> bukkitCommand = new BukkitCommand<>(
                 label,
                 aliases,
-                (Command<C>) command,
-                (CommandArgument<C, ?>) commandArgument,
+                command,
+                component,
                 this.bukkitCommandManager
         );
 
@@ -125,22 +125,22 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             newAliases.forEach(alias -> this.registerExternal(alias, command, bukkitCommand));
         }
 
-        this.registeredCommands.put(commandArgument, bukkitCommand);
+        this.registeredCommands.put(component, bukkitCommand);
         return true;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public final void unregisterRootCommand(
-            final @NonNull StaticArgument<?> rootCommand
+            final @NonNull CommandComponent<C> component
     ) {
-        final org.bukkit.command.Command registeredCommand = this.registeredCommands.get(rootCommand);
+        final org.bukkit.command.Command registeredCommand = this.registeredCommands.get(component);
         if (registeredCommand == null) {
             return;
         }
         ((BukkitCommand<C>) registeredCommand).disable();
 
-        final List<String> aliases = new ArrayList<>(rootCommand.getAlternativeAliases());
+        final List<String> aliases = new ArrayList<>(((StaticArgument<C>) component.argument()).getAlternativeAliases());
         final Set<String> registeredAliases = new HashSet<>();
 
         for (final String alias : aliases) {
@@ -150,20 +150,20 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
             }
         }
 
-        if (this.bukkitCommandExists(rootCommand.getName())) {
-            registeredAliases.add(rootCommand.getName());
+        if (this.bukkitCommandExists(component.name())) {
+            registeredAliases.add(component.name());
         }
-        registeredAliases.add(this.getNamespacedLabel(rootCommand.getName()));
+        registeredAliases.add(this.getNamespacedLabel(component.name()));
 
-        this.bukkitCommands.remove(rootCommand.getName());
-        this.bukkitCommands.remove(this.getNamespacedLabel(rootCommand.getName()));
+        this.bukkitCommands.remove(component.name());
+        this.bukkitCommands.remove(this.getNamespacedLabel(component.name()));
 
         this.recognizedAliases.removeAll(registeredAliases);
         if (this.bukkitCommandManager.getSplitAliases()) {
             registeredAliases.forEach(this::unregisterExternal);
         }
 
-        this.registeredCommands.remove(rootCommand);
+        this.registeredCommands.remove(component);
 
         if (this.bukkitCommandManager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
             // Once the command has been unregistered, we need to refresh the command list for all online players.

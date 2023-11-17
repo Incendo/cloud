@@ -24,7 +24,7 @@
 package cloud.commandframework.sponge7;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import com.google.common.collect.ImmutableList;
@@ -34,29 +34,29 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 
-final class SpongePluginRegistrationHandler<C> implements CommandRegistrationHandler {
+final class SpongePluginRegistrationHandler<C> implements CommandRegistrationHandler<C> {
 
     private @MonotonicNonNull SpongeCommandManager<C> manager;
-    private final Map<CommandArgument<?, ?>, CloudCommandCallable<C>> registeredCommands = new HashMap<>();
+    private final Map<CommandComponent<C>, CloudCommandCallable<C>> registeredCommands = new HashMap<>();
 
     void initialize(final SpongeCommandManager<C> manager) {
         this.manager = manager;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public boolean registerCommand(final @NonNull Command<?> command) {
-        final StaticArgument<?> commandArgument = (StaticArgument<?>) command.components().get(0).argument();
-        if (this.registeredCommands.containsKey(commandArgument)) {
+    public boolean registerCommand(final @NonNull Command<C> command) {
+        final CommandComponent<C> component = command.components().get(0);
+        final StaticArgument<?> commandArgument = (StaticArgument<?>) component.argument();
+        if (this.registeredCommands.containsKey(component)) {
             return false;
         }
 
         final CloudCommandCallable<C> callable = new CloudCommandCallable<>(
-                commandArgument,
-                (Command<C>) command,
+                component,
+                command,
                 this.manager
         );
-        this.registeredCommands.put(commandArgument, callable);
+        this.registeredCommands.put(component, callable);
 
         return Sponge.getGame().getCommandManager().register(
                 this.manager.getOwningPlugin(),

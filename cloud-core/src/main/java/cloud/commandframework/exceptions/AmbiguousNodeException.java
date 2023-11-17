@@ -24,8 +24,8 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.CommandTree;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.internal.CommandNode;
 import java.util.Iterator;
 import java.util.List;
 import org.apiguardian.api.API;
@@ -42,9 +42,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class AmbiguousNodeException extends IllegalStateException {
 
     private static final long serialVersionUID = -200207173805584709L;
-    private final CommandArgument<?, ?> parentNode;
-    private final CommandArgument<?, ?> ambiguousNode;
-    private final List<CommandArgument<?, ?>> children;
+    private final CommandNode<?> parentNode;
+    private final CommandNode<?> ambiguousNode;
+    private final List<CommandNode<?>> children;
 
     /**
      * Construct a new ambiguous node exception
@@ -55,9 +55,9 @@ public final class AmbiguousNodeException extends IllegalStateException {
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
     public AmbiguousNodeException(
-            final @Nullable CommandArgument<?, ?> parentNode,
-            final @NonNull CommandArgument<?, ?> ambiguousNode,
-            final @NonNull List<@NonNull CommandArgument<?, ?>> children
+            final @Nullable CommandNode<?> parentNode,
+            final @NonNull CommandNode<?> ambiguousNode,
+            final @NonNull List<@NonNull CommandNode<?>> children
     ) {
         this.parentNode = parentNode;
         this.ambiguousNode = ambiguousNode;
@@ -69,7 +69,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      *
      * @return Parent node
      */
-    public @Nullable CommandArgument<?, ?> getParentNode() {
+    public @Nullable CommandNode<?> getParentNode() {
         return this.parentNode;
     }
 
@@ -78,7 +78,7 @@ public final class AmbiguousNodeException extends IllegalStateException {
      *
      * @return Ambiguous node
      */
-    public @NonNull CommandArgument<?, ?> getAmbiguousNode() {
+    public @NonNull CommandNode<?> getAmbiguousNode() {
         return this.ambiguousNode;
     }
 
@@ -87,20 +87,20 @@ public final class AmbiguousNodeException extends IllegalStateException {
      *
      * @return Child nodes
      */
-    public @NonNull List<@NonNull CommandArgument<?, ?>> getChildren() {
+    public @NonNull List<@NonNull CommandNode<?>> getChildren() {
         return this.children;
     }
 
     @Override
     public String getMessage() {
         final StringBuilder stringBuilder = new StringBuilder("Ambiguous Node: ")
-                .append(this.ambiguousNode.getName())
+                .append(this.ambiguousNode.component().name())
                 .append(" cannot be added as a child to ")
-                .append(this.parentNode == null ? "<root>" : this.parentNode.getName())
+                .append(this.parentNode == null ? "<root>" : this.parentNode.component().name())
                 .append(" (All children: ");
-        final Iterator<CommandArgument<?, ?>> childIterator = this.children.iterator();
+        final Iterator<CommandNode<?>> childIterator = this.children.iterator();
         while (childIterator.hasNext()) {
-            stringBuilder.append(childIterator.next().getName());
+            stringBuilder.append(childIterator.next().component().name());
             if (childIterator.hasNext()) {
                 stringBuilder.append(", ");
             }

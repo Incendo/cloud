@@ -24,7 +24,7 @@
 package cloud.commandframework.bukkit;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
@@ -59,7 +59,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             + "Please contact the server administrators if you believe that this is in error.";
     private static final String MESSAGE_UNKNOWN_COMMAND = "Unknown command. Type \"/help\" for help.";
 
-    private final CommandArgument<C, ?> command;
+    private final CommandComponent<C> command;
     private final BukkitCommandManager<C> manager;
     private final Command<C> cloudCommand;
 
@@ -69,7 +69,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             final @NonNull String label,
             final @NonNull List<@NonNull String> aliases,
             final @NonNull Command<C> cloudCommand,
-            final @NonNull CommandArgument<C, ?> command,
+            final @NonNull CommandComponent<C> command,
             final @NonNull BukkitCommandManager<C> manager
     ) {
         super(
@@ -81,8 +81,8 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
         this.command = command;
         this.manager = manager;
         this.cloudCommand = cloudCommand;
-        if (this.command.getOwningCommand() != null) {
-            this.setPermission(this.command.getOwningCommand().getCommandPermission().toString());
+        if (this.command.argument().getOwningCommand() != null) {
+            this.setPermission(this.command.argument().getOwningCommand().getCommandPermission().toString());
         }
         this.disabled = false;
     }
@@ -93,7 +93,7 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
             final @NonNull String alias,
             final @NonNull String @NonNull [] args
     ) throws IllegalArgumentException {
-        final StringBuilder builder = new StringBuilder(this.command.getName());
+        final StringBuilder builder = new StringBuilder(this.command.name());
         for (final String string : args) {
             builder.append(" ").append(string);
         }
@@ -231,6 +231,6 @@ final class BukkitCommand<C> extends org.bukkit.command.Command implements Plugi
     }
 
     private @Nullable CommandNode<C> namedNode() {
-        return this.manager.commandTree().getNamedNode(this.command.getName());
+        return this.manager.commandTree().getNamedNode(this.command.name());
     }
 }

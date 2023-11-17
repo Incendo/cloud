@@ -24,12 +24,12 @@
 package cloud.commandframework.exceptions;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Thrown when a {@link CommandArgument}
+ * Thrown when a {@link CommandComponent}
  * that is registered as a leaf node, does not contain an owning {@link Command}
  */
 @SuppressWarnings({"unused", "serial"})
@@ -37,17 +37,17 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public final class NoCommandInLeafException extends IllegalStateException {
 
     private static final long serialVersionUID = 3373529875213310821L;
-    private final CommandArgument<?, ?> commandArgument;
+    private final CommandComponent<?> commandComponent;
 
     /**
      * Create a new no command in leaf exception instance
      *
-     * @param commandArgument Command argument that caused the exception
+     * @param commandComponent Command argument that caused the exception
      */
     @API(status = API.Status.INTERNAL, consumers = "cloud.commandframework.*")
-    public NoCommandInLeafException(final @NonNull CommandArgument<?, ?> commandArgument) {
-        super(String.format("Leaf node '%s' does not have associated owning command", commandArgument.getName()));
-        this.commandArgument = commandArgument;
+    public NoCommandInLeafException(final @NonNull CommandComponent<?> commandComponent) {
+        super(String.format("Leaf node '%s' does not have associated owning command", commandComponent.name()));
+        this.commandComponent = commandComponent;
     }
 
     /**
@@ -55,7 +55,7 @@ public final class NoCommandInLeafException extends IllegalStateException {
      *
      * @return Command argument
      */
-    public @NonNull CommandArgument<?, ?> getCommandArgument() {
-        return this.commandArgument;
+    public @NonNull CommandComponent<?> getCommandComponent() {
+        return this.commandComponent;
     }
 }

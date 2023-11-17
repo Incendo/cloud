@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.fabric.argument.FabricArgumentParsers;
 import cloud.commandframework.internal.CommandRegistrationHandler;
@@ -56,7 +57,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  * @param <C> command sender type
  * @param <S> native sender type
  */
-abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionProvider> implements CommandRegistrationHandler {
+abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionProvider> implements CommandRegistrationHandler<C> {
 
     private @MonotonicNonNull FabricCommandManager<C, S> commandManager;
 
@@ -117,8 +118,8 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         @Override
         @SuppressWarnings("unchecked")
-        public boolean registerCommand(final @NonNull Command<?> command) {
-            this.registeredCommands.add((Command<C>) command);
+        public boolean registerCommand(final @NonNull Command<C> command) {
+            this.registeredCommands.add(command);
             if (this.registerEventFired) {
                 final ClientPacketListener connection = Minecraft.getInstance().getConnection();
                 if (connection == null) {
@@ -132,7 +133,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                         this.commandManager(),
                         CommandBuildContext.simple(connection.registryAccess(), connection.enabledFeatures()),
                         false,
-                        () -> this.registerClientCommand(dispatcher, (Command<C>) command)
+                        () -> this.registerClientCommand(dispatcher, command)
                 );
             }
             return true;
@@ -161,11 +162,12 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
                 final Command<C> command
         ) {
             final RootCommandNode<FabricClientCommandSource> rootNode = dispatcher.getRoot();
-            final StaticArgument<C> first = ((StaticArgument<C>) command.components().get(0).argument());
+            final CommandComponent<C> component = command.components().get(0);
+            final StaticArgument<C> first = ((StaticArgument<C>) component.argument());
             final CommandNode<FabricClientCommandSource> baseNode = this.commandManager()
                     .brigadierManager()
                     .createLiteralCommandNode(
-                            first.getName(),
+                            component.name(),
                             command,
                             (src, perm) -> this.commandManager().hasPermission(
                                     this.commandManager().commandSourceMapper().apply(src),
@@ -199,7 +201,7 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
 
         @Override
         @SuppressWarnings("unchecked")
-        public boolean registerCommand(@NonNull final Command<?> command) {
+        public boolean registerCommand(@NonNull final Command<C> command) {
             return this.registeredCommands.add((Command<C>) command);
         }
 
@@ -232,9 +234,10 @@ abstract class FabricCommandRegistrationHandler<C, S extends SharedSuggestionPro
         }
 
         private void registerCommand(final RootCommandNode<CommandSourceStack> dispatcher, final Command<C> command) {
-            @SuppressWarnings("unchecked") final StaticArgument<C> first = ((StaticArgument<C>) command.components().get(0).argument());
+            final CommandComponent<C> component = command.components().get(0);
+            @SuppressWarnings("unchecked") final StaticArgument<C> first = ((StaticArgument<C>) component.argument());
             final CommandNode<CommandSourceStack> baseNode = this.commandManager().brigadierManager().createLiteralCommandNode(
-                    first.getName(),
+                    component.name(),
                     command,
                     (src, perm) -> this.commandManager().hasPermission(
                             this.commandManager().commandSourceMapper().apply(src),

@@ -24,7 +24,7 @@
 package cloud.commandframework.cloudburst;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.HashMap;
@@ -33,9 +33,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.cloudburstmc.server.Server;
 import org.cloudburstmc.server.plugin.Plugin;
 
-class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandler {
+class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandler<C> {
 
-    private final Map<CommandArgument<?, ?>, org.cloudburstmc.server.command.Command> registeredCommands = new HashMap<>();
+    private final Map<CommandComponent<C>, org.cloudburstmc.server.command.Command> registeredCommands = new HashMap<>();
 
     private CloudburstCommandManager<C> cloudburstCommandManager;
 
@@ -48,21 +48,21 @@ class CloudburstPluginRegistrationHandler<C> implements CommandRegistrationHandl
 
     @Override
     @SuppressWarnings("unchecked")
-    public final boolean registerCommand(final @NonNull Command<?> command) {
+    public final boolean registerCommand(final @NonNull Command<C> command) {
         /* We only care about the root command argument */
-        final CommandArgument<?, ?> commandArgument = command.components().get(0).argument();
-        if (this.registeredCommands.containsKey(commandArgument)) {
+        final CommandComponent<C> component = command.components().get(0);
+        if (this.registeredCommands.containsKey(component)) {
             return false;
         }
         final Plugin plugin = this.cloudburstCommandManager.getOwningPlugin();
         final CloudburstCommand<C> cloudburstCommand = new CloudburstCommand<>(
-                commandArgument.getName(),
-                ((StaticArgument<C>) commandArgument).getAlternativeAliases(),
-                (Command<C>) command,
-                (CommandArgument<C, ?>) commandArgument,
+                component.name(),
+                ((StaticArgument<C>) component.argument()).getAlternativeAliases(),
+                command,
+                component,
                 this.cloudburstCommandManager
         );
-        this.registeredCommands.put(commandArgument, cloudburstCommand);
+        this.registeredCommands.put(component, cloudburstCommand);
         Server.getInstance().getCommandRegistry().register(plugin, cloudburstCommand);
         return true;
     }

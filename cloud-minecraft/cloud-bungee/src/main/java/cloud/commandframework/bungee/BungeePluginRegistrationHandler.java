@@ -24,15 +24,15 @@
 package cloud.commandframework.bungee;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.internal.CommandRegistrationHandler;
 import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-final class BungeePluginRegistrationHandler<C> implements CommandRegistrationHandler {
+final class BungeePluginRegistrationHandler<C> implements CommandRegistrationHandler<C> {
 
-    private final Map<CommandArgument<?, ?>, net.md_5.bungee.api.plugin.Command> registeredCommands = new HashMap<>();
+    private final Map<CommandComponent<C>, net.md_5.bungee.api.plugin.Command> registeredCommands = new HashMap<>();
 
     private BungeeCommandManager<C> bungeeCommandManager;
 
@@ -44,18 +44,18 @@ final class BungeePluginRegistrationHandler<C> implements CommandRegistrationHan
     }
 
     @Override
-    public boolean registerCommand(final @NonNull Command<?> command) {
+    public boolean registerCommand(final @NonNull Command<C> command) {
         /* We only care about the root command argument */
-        final CommandArgument<?, ?> commandArgument = command.components().get(0).argument();
-        if (this.registeredCommands.containsKey(commandArgument)) {
+        final CommandComponent<C> component = command.components().get(0);
+        if (this.registeredCommands.containsKey(component)) {
             return false;
         }
-        @SuppressWarnings("unchecked") final BungeeCommand<C> bungeeCommand = new BungeeCommand<>(
-                (Command<C>) command,
-                (CommandArgument<C, ?>) commandArgument,
+        final BungeeCommand<C> bungeeCommand = new BungeeCommand<>(
+                command,
+                component,
                 this.bungeeCommandManager
         );
-        this.registeredCommands.put(commandArgument, bungeeCommand);
+        this.registeredCommands.put(component, bungeeCommand);
         this.bungeeCommandManager.getOwningPlugin().getProxy().getPluginManager()
                 .registerCommand(this.bungeeCommandManager.getOwningPlugin(), bungeeCommand);
         return true;

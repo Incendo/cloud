@@ -23,7 +23,7 @@
 //
 package cloud.commandframework.javacord;
 
-import cloud.commandframework.arguments.CommandArgument;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.exceptions.ArgumentParseException;
 import cloud.commandframework.exceptions.CommandExecutionException;
@@ -46,10 +46,10 @@ public class JavacordCommand<C> implements MessageCreateListener {
     private static final String MESSAGE_NO_PERMS = "I'm sorry, but you do not have the permission to do this :/";
 
     private final JavacordCommandManager<C> manager;
-    private final CommandArgument<C, ?> command;
+    private final CommandComponent<C> command;
 
     JavacordCommand(
-            final @NonNull CommandArgument<C, ?> command,
+            final @NonNull CommandComponent<C> command,
             final @NonNull JavacordCommandManager<C> manager
     ) {
         this.command = command;
@@ -84,7 +84,7 @@ public class JavacordCommand<C> implements MessageCreateListener {
         messageContent = messageContent.substring(commandPrefix.length());
 
         final String finalContent = messageContent;
-        if (((StaticArgument<C>) this.command).getAliases()
+        if (((StaticArgument<C>) this.command.argument()).getAliases()
                 .stream()
                 .map(String::toLowerCase)
                 .noneMatch(commandAlias -> finalContent.toLowerCase().startsWith(commandAlias))) {

@@ -93,7 +93,7 @@ public class PircBotXCommandManager<C> extends CommandManager<C> {
     public PircBotXCommandManager(
             final @NonNull PircBotX pircBotX,
             final @NonNull Function<@NonNull CommandTree<C>, @NonNull CommandExecutionCoordinator<C>> commandExecutionCoordinator,
-            final @NonNull CommandRegistrationHandler commandRegistrationHandler,
+            final @NonNull CommandRegistrationHandler<C> commandRegistrationHandler,
             final @NonNull BiFunction<C, String, Boolean> permissionFunction,
             final @NonNull Function<User, C> userMapper,
             final @NonNull String commandPrefix
