@@ -167,29 +167,6 @@ public class Command<C> {
      * @param aliases     Command aliases
      * @param <C>         Command sender type
      * @return Command builder
-     * @deprecated for removal since 1.4.0. Use {@link #newBuilder(String, CommandMeta, ArgumentDescription, String...)} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public static <C> @NonNull Builder<C> newBuilder(
-            final @NonNull String commandName,
-            final @NonNull CommandMeta commandMeta,
-            final @NonNull Description description,
-            final @NonNull String... aliases
-    ) {
-        return newBuilder(commandName, commandMeta, (ArgumentDescription) description, aliases);
-    }
-
-    /**
-     * Create a new command builder. Is recommended to use the builder methods
-     * in {@link CommandManager} rather than invoking this method directly.
-     *
-     * @param commandName Base command argument
-     * @param commandMeta Command meta instance
-     * @param description Command description
-     * @param aliases     Command aliases
-     * @param <C>         Command sender type
-     * @return Command builder
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
@@ -521,25 +498,6 @@ public class Command<C> {
                 final @NonNull String... aliases
         ) {
             return this.required(StaticArgument.of(main, aliases));
-        }
-
-        /**
-         * Inserts a required {@link StaticArgument} into the command chain
-         *
-         * @param main        Main argument name
-         * @param description Literal description
-         * @param aliases     Argument aliases
-         * @return New builder instance with the modified command chain
-         * @deprecated for removal since 1.4.0. Use {@link #literal(String, ArgumentDescription, String...)} instead.
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public @NonNull Builder<C> literal(
-                final @NonNull String main,
-                final @NonNull Description description,
-                final @NonNull String... aliases
-        ) {
-            return this.required(StaticArgument.of(main, aliases), description);
         }
 
         /**

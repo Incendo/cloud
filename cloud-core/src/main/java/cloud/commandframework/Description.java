@@ -29,12 +29,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * {@link CommandArgument} description
- *
- * @deprecated to become package-private since 1.4.0. Use {@link ArgumentDescription} instead.
  */
-@Deprecated
-@API(status = API.Status.DEPRECATED, since = "1.4.0")
-public final class Description implements ArgumentDescription {
+@API(status = API.Status.INTERNAL, since = "2.0.0")
+final class Description implements ArgumentDescription {
 
     /**
      * Empty command description
@@ -45,29 +42,6 @@ public final class Description implements ArgumentDescription {
 
     Description(final @NonNull String description) {
         this.description = description;
-    }
-
-    /**
-     * Get an empty command description
-     *
-     * @return Command description
-     * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#empty()}
-     */
-    @Deprecated
-    public static @NonNull Description empty() {
-        return EMPTY;
-    }
-
-    /**
-     * Create a command description instance
-     *
-     * @param string Command description
-     * @return Created command description
-     * @deprecated for removal since 1.4.0. See {@link ArgumentDescription#of(String)}
-     */
-    @Deprecated
-    public static @NonNull Description of(final @NonNull String string) {
-        return new Description(string);
     }
 
     /**

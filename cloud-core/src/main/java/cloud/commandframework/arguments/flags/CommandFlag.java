@@ -125,22 +125,6 @@ public final class CommandFlag<T> {
     }
 
     /**
-     * Get the flag description
-     *
-     * @return Flag description
-     * @deprecated for removal since 1.4.0. Use {@link #getArgumentDescription()} instead.
-     */
-    @Deprecated
-    @API(status = API.Status.DEPRECATED, since = "1.4.0")
-    public cloud.commandframework.@NonNull Description getDescription() {
-        if (this.description instanceof cloud.commandframework.Description) {
-            return ((cloud.commandframework.Description) this.description);
-        } else {
-            return cloud.commandframework.Description.of(this.description.getDescription());
-        }
-    }
-
-    /**
      * Get the flag description.
      *
      * @return Flag description
@@ -268,19 +252,6 @@ public final class CommandFlag<T> {
                     this.commandArgument,
                     this.mode
             );
-        }
-
-        /**
-         * Create a new builder instance using the given flag description
-         *
-         * @param description Flag description
-         * @return New builder instance
-         * @deprecated for removal since 1.4.0. Use {@link #withDescription(ArgumentDescription)} instead.
-         */
-        @Deprecated
-        @API(status = API.Status.DEPRECATED, since = "1.4.0")
-        public @NonNull Builder<T> withDescription(final cloud.commandframework.@NonNull Description description) {
-            return this.withDescription((ArgumentDescription) description);
         }
 
         /**
