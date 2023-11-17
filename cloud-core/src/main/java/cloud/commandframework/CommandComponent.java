@@ -23,16 +23,18 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
+import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
+import cloud.commandframework.keys.CloudKey;
 import io.leangen.geantyref.TypeToken;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,6 +66,17 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
 
     private Command<C> owningCommand;
 
+    /**
+     * Creates a new mutable builder.
+     *
+     * @param <C> the command sender type
+     * @param <T> the component value type
+     * @return the builder
+     */
+    public static <C, T> @NonNull Builder<C, T> builder() {
+        return new Builder<C, T>();
+    }
+
     private CommandComponent(
         final @NonNull String name,
         final @NonNull ArgumentParser<C, ?> parser,
@@ -82,34 +95,6 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
         this.defaultValue = defaultValue;
         this.suggestionProvider = suggestionProvider;
         this.componentPreprocessors = new ArrayList<>(componentPreprocessors);
-    }
-
-    private CommandComponent(
-            final @NonNull CommandArgument<C, ?> argument,
-            final @NonNull ArgumentDescription description,
-            final boolean required,
-            final @Nullable DefaultValue<C, ?> defaultValue,
-            final @NonNull Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors
-    ) {
-        this(
-                argument.getName(),
-                argument.getParser(),
-                argument.getValueType(),
-                description,
-                type(argument, required),
-                defaultValue,
-                argument.suggestionProvider(),
-                componentPreprocessors
-        );
-    }
-
-    private CommandComponent(
-            final @NonNull CommandArgument<C, ?> argument,
-            final @NonNull ArgumentDescription description,
-            final boolean required,
-            final @Nullable DefaultValue<C, ?> defaultValue
-    ) {
-        this(argument, description, required, defaultValue, argument.argumentPreprocessors());
     }
 
     /**
@@ -381,71 +366,6 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
         );
     }
 
-    /**
-     * Creates a new required component with the provided argument and description
-     *
-     * @param <C>                Command sender type
-     * @param commandArgument    Command Component Argument
-     * @param commandDescription Command Component Description
-     * @return new CommandComponent
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull CommandComponent<C> required(
-            final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
-    ) {
-        return new CommandComponent<>(commandArgument, commandDescription, true, null);
-    }
-
-    /**
-     * Creates a new optional component with the provided argument, description and default value
-     *
-     * @param <C>                Command sender type
-     * @param commandArgument    Command Component Argument
-     * @param commandDescription Command Component Description
-     * @param defaultValue       The default value, or {@code null}
-     * @return new CommandComponent
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull CommandComponent<C> optional(
-            final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription,
-            final @Nullable DefaultValue<C, ?> defaultValue
-    ) {
-        return new CommandComponent<>(commandArgument, commandDescription, false, defaultValue);
-    }
-
-    /**
-     * Creates a new optional component with the provided argument and description, and no default value
-     *
-     * @param <C>                Command sender type
-     * @param commandArgument    Command Component Argument
-     * @param commandDescription Command Component Description
-     * @return new CommandComponent
-     * @since 2.0.0
-     */
-    @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull CommandComponent<C> optional(
-            final @NonNull CommandArgument<C, ?> commandArgument,
-            final @NonNull ArgumentDescription commandDescription
-    ) {
-        return new CommandComponent<>(commandArgument, commandDescription, false, null);
-    }
-
-    private static @NonNull ComponentType type(final @NonNull CommandArgument<?, ?> argument, final boolean required) {
-        if (argument.getParser() instanceof StaticArgument.StaticArgumentParser) {
-            return ComponentType.LITERAL;
-        } else if (argument.getParser() instanceof FlagArgument.FlagArgumentParser) {
-            return ComponentType.FLAG;
-        } else if (required) {
-            return ComponentType.REQUIRED_VARIABLE;
-        } else {
-            return ComponentType.OPTIONAL_VARIABLE;
-        }
-    }
-
     @Override
     public int compareTo(final @NonNull CommandComponent<C> other) {
         if (this.type() == ComponentType.LITERAL) {
@@ -458,6 +378,243 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
             return 1;
         }
         return 0;
+    }
+
+
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static class Builder<C, T> {
+
+        private CommandManager<C> commandManager;
+        private String name;
+        private ArgumentParser<C, T> parser;
+        private ArgumentDescription description = ArgumentDescription.empty();
+        private boolean required = true;
+        private DefaultValue<C, ?> defaultValue;
+        private TypeToken<T> valueType;
+        private SuggestionProvider<C> suggestionProvider;
+        private final Collection<@NonNull ComponentPreprocessor<C>> componentPreprocessors = new ArrayList<>();
+
+        /**
+         * Sets the command manager, which will be used to create a parser if none is provided.
+         *
+         * @param commandManager the command manager
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> commandManager(final @Nullable CommandManager<C> commandManager) {
+            this.commandManager = commandManager;
+            return this;
+        }
+
+        /**
+         * Sets the name and the value type to the values contained in the given {@code cloudKey}.
+         *
+         * @param cloudKey the key
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> key(final @NonNull CloudKey<T> cloudKey) {
+            return this.name(cloudKey.getName()).valueType(cloudKey.getType());
+        }
+
+        /**
+         * Sets the {@code name}.
+         *
+         * @param name the name
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> name(final @NonNull String name) {
+            this.name = name;
+            return this;
+        }
+
+        /**
+         * Sets the {@code valueType}.
+         *
+         * @param valueType the value type
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> valueType(final @NonNull TypeToken<T> valueType) {
+            this.valueType = valueType;
+            return this;
+        }
+
+        /**
+         * Sets the {@code valueType}.
+         *
+         * @param valueType the value type
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> valueType(final @NonNull Class<T> valueType) {
+            return this.valueType(TypeToken.get(valueType));
+        }
+
+        /**
+         * Sets the {@code parser} and {@code valueType}.
+         *
+         * @param parserDescriptor descriptor of the parser
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> parser(final @NonNull ParserDescriptor<C, T> parserDescriptor) {
+            return this.parser(parserDescriptor.parser()).valueType(parserDescriptor.valueType());
+        }
+
+        /**
+         * Sets the {@code defaultValue}. This should not be set if {@code required} is {@code true}.
+         *
+         * @param defaultValue the default value
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> defaultValue(final @Nullable DefaultValue<C, T> defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        /**
+         * Sets whether the component is required. Defaults to {@code true}.
+         *
+         * @param required whether component is required
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> required(final boolean required) {
+            this.required = required;
+            return this;
+        }
+
+        /**
+         * Sets {@code required} to {@code true}.
+         *
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> required() {
+            return this.required(true);
+        }
+
+        /**
+         * Sets {@code required} to {@code false}.
+         *
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> optional() {
+            return this.required(false);
+        }
+
+        /**
+         * Sets {@code required} to {@code true} and updates the {@code defaultValue}.
+         *
+         * @param defaultValue the default value
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> optional(final @Nullable DefaultValue<C, T> defaultValue) {
+            return this.optional().defaultValue(defaultValue);
+        }
+
+        /**
+         * Sets the {@code description}. Defaults to {@link ArgumentDescription#empty()}.
+         *
+         * @param description the description
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> description(final @NonNull ArgumentDescription description) {
+            this.description = description;
+            return this;
+        }
+
+        /**
+         * Sets the {@code suggestionProvider}. Defaults to {@code parser}.
+         *
+         * @param suggestionProvider the suggestion provider
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> suggestionProvider(final @Nullable SuggestionProvider<C> suggestionProvider) {
+            this.suggestionProvider = suggestionProvider;
+            return this;
+        }
+
+        /**
+         * Adds the {@code preprocessor}.
+         *
+         * @param preprocessor the preprocessor
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> preprocessor(final @NonNull ComponentPreprocessor<C> preprocessor) {
+            this.componentPreprocessors.add(preprocessor);
+            return this;
+        }
+
+        /**
+         * Adds the {@code preprocessors}.
+         *
+         * @param preprocessors the preprocessors
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> preprocessors(final @NonNull Collection<ComponentPreprocessor<C>> preprocessors) {
+            this.componentPreprocessors.addAll(preprocessors);
+            return this;
+        }
+
+        /**
+         * Sets the {@code parser}. If no parser is set and the {@code manager} has been set then the default
+         * parser for the {@code valueType} will be used instead.
+         * <p>
+         * If both {@code parser} and {@code manager} are null it will not be possible to parse the component.
+         *
+         * @param parser the parser
+         * @return {@code this}
+         */
+        public @NonNull @This Builder<C, T> parser(final @NonNull ArgumentParser<C, T> parser) {
+            this.parser = parser;
+            return this;
+        }
+
+        /**
+         * Builds a command component using this builder.
+         * <p>
+         * Each invocation produces a unique component.
+         *
+         * @return the built component
+         */
+        public @NonNull CommandComponent<C> build() {
+            ArgumentParser<C, T> parser = null;
+            if (this.parser != null) {
+                parser = this.parser;
+            } else if (this.commandManager != null) {
+               parser = this.commandManager.parserRegistry()
+                       .createParser(this.valueType, ParserParameters.empty())
+                       .orElse(null);
+            }
+            if (parser == null) {
+                parser = (c, i) -> ArgumentParseResult
+                        .failure(new UnsupportedOperationException("No parser was specified"));
+            }
+
+            final ComponentType componentType;
+            if (this.parser instanceof StaticArgument.StaticArgumentParser) {
+                componentType = ComponentType.LITERAL;
+            } else if (this.parser instanceof FlagArgument.FlagArgumentParser) {
+                componentType = ComponentType.FLAG;
+            } else if (this.required) {
+                componentType = ComponentType.REQUIRED_VARIABLE;
+            } else {
+                componentType = ComponentType.OPTIONAL_VARIABLE;
+            }
+
+            final SuggestionProvider<C> suggestionProvider;
+            if (this.suggestionProvider == null) {
+                suggestionProvider = parser;
+            } else {
+                suggestionProvider = this.suggestionProvider;
+            }
+
+            return new CommandComponent<>(
+                    this.name,
+                    parser,
+                    Objects.requireNonNull(this.valueType, "valueType"),
+                    Objects.requireNonNull(this.description, "description"),
+                    componentType,
+                    this.defaultValue,
+                    suggestionProvider,
+                    Objects.requireNonNull(this.componentPreprocessors, "componentPreprocessors")
+            );
+        }
     }
 
 

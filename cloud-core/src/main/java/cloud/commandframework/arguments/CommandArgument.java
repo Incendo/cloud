@@ -27,6 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.context.CommandContext;
@@ -262,6 +263,17 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
     @Override
     public final @NonNull CloudKey<T> getKey() {
         return this.key;
+    }
+
+    /**
+     * Returns a descriptor that describes this argument.
+     *
+     * @return the descriptor
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull ParserDescriptor<C, T> parserDescriptor() {
+        return ParserDescriptor.of(this.parser, this.valueType);
     }
 
     /**

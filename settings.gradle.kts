@@ -108,12 +108,6 @@ setupExampleModule("example-bukkit")
 setupExampleModule("example-bungee")
 setupExampleModule("example-velocity")
 setupExampleModule("example-jda")
-/*
-
-// Minecraft Modules
-setupMinecraftModule("cloud-fabric")
-
-*/
 
 fun setupIrcModule(name: String) =
         setupSubproject(name, file("cloud-irc/$name"))

@@ -175,7 +175,14 @@ public class Command<C> {
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
-        commands.add(CommandComponent.required(StaticArgument.of(commandName, aliases), description));
+        final StaticArgument<C> staticArgument = StaticArgument.of(commandName, aliases);
+        commands.add(
+                CommandComponent.<C, String>builder()
+                        .key(staticArgument.getKey())
+                        .parser(staticArgument.parserDescriptor())
+                        .description(description)
+                        .build()
+        );
         return new Builder<>(
                 null,
                 commandMeta,
@@ -203,7 +210,13 @@ public class Command<C> {
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
-        commands.add(CommandComponent.required(StaticArgument.of(commandName, aliases), ArgumentDescription.empty()));
+        final StaticArgument<C> staticArgument = StaticArgument.of(commandName, aliases);
+        commands.add(
+                CommandComponent.<C, String>builder()
+                        .key(staticArgument.getKey())
+                        .parser(staticArgument.parserDescriptor())
+                        .build()
+        );
         return new Builder<>(
                 null,
                 commandMeta,
@@ -502,7 +515,7 @@ public class Command<C> {
                 final @NonNull CommandArgument<C, T> argument,
                 final @NonNull ArgumentDescription description
         ) {
-            return this.argument(CommandComponent.required(argument, description));
+            return this.argument(this.argumentToComponent(argument).description(description));
         }
 
         /**
@@ -522,7 +535,7 @@ public class Command<C> {
                 final CommandArgument.@NonNull Builder<C, T> argument,
                 final @NonNull ArgumentDescription description
         ) {
-            return this.argument(CommandComponent.required(argument.build(), description));
+            return this.argument(this.argumentToComponent(argument.build()).description(description));
         }
 
         /**
@@ -542,7 +555,7 @@ public class Command<C> {
                 final @NonNull CommandArgument<C, T> argument,
                 final @NonNull ArgumentDescription description
         ) {
-            return this.argument(CommandComponent.optional(argument, description));
+            return this.argument(this.argumentToComponent(argument).optional().description(description));
         }
 
         /**
@@ -562,7 +575,7 @@ public class Command<C> {
                 final CommandArgument.@NonNull Builder<C, T> argument,
                 final @NonNull ArgumentDescription description
         ) {
-            return this.argument(CommandComponent.optional(argument.build(), description));
+            return this.argument(this.argumentToComponent(argument.build()).optional().description(description));
         }
 
         /**
@@ -584,7 +597,7 @@ public class Command<C> {
                 final @NonNull ArgumentDescription description,
                 final @NonNull DefaultValue<C, T> defaultValue
         ) {
-            return this.argument(CommandComponent.optional(argument, description, defaultValue));
+            return this.argument(this.argumentToComponent(argument).optional(defaultValue).description(description));
         }
 
         /**
@@ -606,7 +619,7 @@ public class Command<C> {
                 final @NonNull ArgumentDescription description,
                 final @NonNull DefaultValue<C, T> defaultValue
         ) {
-            return this.argument(CommandComponent.optional(argument.build(), description, defaultValue));
+            return this.argument(this.argumentToComponent(argument.build()).optional().description(description));
         }
 
         /**
@@ -624,7 +637,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> required(
                 final @NonNull CommandArgument<C, T> argument
         ) {
-            return this.argument(CommandComponent.required(argument, ArgumentDescription.empty()));
+            return this.argument(this.argumentToComponent(argument));
         }
 
         /**
@@ -660,7 +673,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final @NonNull CommandArgument<C, T> argument
         ) {
-            return this.argument(CommandComponent.optional(argument, ArgumentDescription.empty()));
+            return this.argument(this.argumentToComponent(argument).optional());
         }
 
         /**
@@ -678,7 +691,7 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final CommandArgument.@NonNull Builder<C, T> argument
         ) {
-            return this.optional(argument.build());
+            return this.argument(this.argumentToComponent(argument.build()).optional());
         }
 
         /**
@@ -698,7 +711,7 @@ public class Command<C> {
                 final @NonNull CommandArgument<C, T> argument,
                 final @NonNull DefaultValue<C, T> defaultValue
         ) {
-            return this.argument(CommandComponent.optional(argument, ArgumentDescription.empty(), defaultValue));
+            return this.argument(this.argumentToComponent(argument).optional(defaultValue));
         }
 
         /**
@@ -718,7 +731,7 @@ public class Command<C> {
                 final CommandArgument.@NonNull Builder<C, T> argument,
                 final @NonNull DefaultValue<C, T> defaultValue
         ) {
-            return this.optional(argument.build(), defaultValue);
+            return this.argument(this.argumentToComponent(argument.build()).optional(defaultValue));
         }
 
         /**
@@ -742,7 +755,7 @@ public class Command<C> {
                 builder.manager(this.commandManager);
             }
             builderConsumer.accept(builder);
-            return this.required(builder.build());
+            return this.argument(this.argumentToComponent(builder.build()));
         }
 
         /**
@@ -766,7 +779,7 @@ public class Command<C> {
                 builder.manager(this.commandManager);
             }
             builderConsumer.accept(builder);
-            return this.optional(builder.build());
+            return this.argument(this.argumentToComponent(builder.build()).optional());
         }
 
         /**
@@ -794,6 +807,32 @@ public class Command<C> {
                     this.flags
             );
         }
+
+        /**
+         * Adds the given {@code argument} to the command
+         * <p>
+         * The component will be copied using {@link CommandComponent#copy()} before being inserted into the command tree.
+         *
+         * @param builder builder that builds the component to add
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> argument(
+                final CommandComponent.Builder<C, ?> builder
+        ) {
+            return this.argument(builder.build());
+        }
+
+        private <T> CommandComponent.@NonNull Builder<C, T> argumentToComponent(final @NonNull CommandArgument<C, T> argument) {
+            return CommandComponent.<C, T>builder()
+                    .commandManager(this.commandManager)
+                    .key(argument.getKey())
+                    .parser(argument.parserDescriptor())
+                    .suggestionProvider(argument.suggestionProvider())
+                    .preprocessors(argument.argumentPreprocessors());
+        }
+
 
         // Compound helper methods
 
@@ -1262,7 +1301,7 @@ public class Command<C> {
             /* Construct flag node */
             if (!this.flags.isEmpty()) {
                 final FlagArgument<C> flagArgument = new FlagArgument<>(this.flags);
-                commandComponents.add(CommandComponent.optional(flagArgument, ArgumentDescription.of("Command flags")));
+                commandComponents.add(this.argumentToComponent(flagArgument).description(ArgumentDescription.of("Command flags")).build());
             }
             return new Command<>(
                     Collections.unmodifiableList(commandComponents),

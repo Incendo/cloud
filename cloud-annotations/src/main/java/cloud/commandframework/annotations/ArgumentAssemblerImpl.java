@@ -23,10 +23,8 @@
 //
 package cloud.commandframework.annotations;
 
-import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.annotations.specifier.Completions;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.ComponentPreprocessor;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -91,23 +89,27 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
             throw new IllegalArgumentException(String.format(
                     "Invalid command argument '%s': Missing syntax mapping", argumentName));
         }
-        /* Create the argument builder */
-        @SuppressWarnings("rawtypes") final CommandArgument.Builder argumentBuilder = CommandArgument.ofType(
-                parameter.getType(),
-                argumentName
-        );
+
+        @SuppressWarnings("rawtypes")
+        final CommandComponent.Builder componentBuilder = CommandComponent.builder();
+        componentBuilder.commandManager(this.annotationParser.manager())
+                .valueType(parameter.getType())
+                .name(argumentName)
+                .parser(parser)
+                .required(syntaxFragment.getArgumentMode() == ArgumentMode.REQUIRED);
+
         /* Check for Completions annotation */
         final Completions completions = parameter.getDeclaredAnnotation(Completions.class);
         if (completions != null) {
             final List<Suggestion> suggestions = Arrays.stream(
                     completions.value().replace(" ", "").split(",")
             ).map(Suggestion::simple).collect(Collectors.toList());
-            argumentBuilder.withSuggestionProvider((commandContext, input) -> suggestions);
+            componentBuilder.suggestionProvider((commandContext, input) -> suggestions);
         } else if (descriptor.suggestions() != null) {
             final String suggestionProviderName = this.annotationParser.processString(descriptor.suggestions());
             final Optional<SuggestionProvider<C>> suggestionsFunction =
                     this.annotationParser.manager().parserRegistry().getSuggestionProvider(suggestionProviderName);
-            argumentBuilder.withSuggestionProvider(
+            componentBuilder.suggestionProvider(
                     suggestionsFunction.orElseThrow(() ->
                             new IllegalArgumentException(String.format(
                                     "There is no suggestion provider with name '%s'. Did you forget to register it?",
@@ -115,29 +117,13 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
                             )))
             );
         }
-        /* Build the argument */
-        final CommandArgument<C, ?> builtArgument = argumentBuilder.manager(this.annotationParser.manager())
-                .withParser(parser)
-                .build();
 
-        final ArgumentDescription description;
-        if (descriptor.description() == null) {
-            description = ArgumentDescription.empty();
-        } else {
-            description = descriptor.description();
+        if (descriptor.description() != null) {
+            componentBuilder.description(descriptor.description());
         }
 
-        final CommandComponent<C> component;
-        if (syntaxFragment.getArgumentMode() == ArgumentMode.REQUIRED) {
-            component = CommandComponent.required(builtArgument, description);
-        } else if (descriptor.defaultValue() == null) {
-            component = CommandComponent.optional(builtArgument, description);
-        } else {
-            component = CommandComponent.optional(
-                    builtArgument,
-                    description,
-                    DefaultValue.parsed(this.annotationParser.processString(descriptor.defaultValue()))
-            );
+        if (syntaxFragment.getArgumentMode() == ArgumentMode.OPTIONAL && descriptor.defaultValue() != null) {
+            componentBuilder.defaultValue(DefaultValue.parsed(this.annotationParser.processString(descriptor.defaultValue())));
         }
 
         for (final Annotation annotation : annotations) {
@@ -147,10 +133,10 @@ final class ArgumentAssemblerImpl<C> implements ArgumentAssembler<C> {
                 final ComponentPreprocessor<C> preprocessor = (ComponentPreprocessor<C>) preprocessorMapper.mapAnnotation(
                         annotation
                 );
-                component.addPreprocessor(preprocessor);
+                componentBuilder.preprocessor(preprocessor);
             }
         }
 
-        return component;
+        return componentBuilder.build();
     }
 }
