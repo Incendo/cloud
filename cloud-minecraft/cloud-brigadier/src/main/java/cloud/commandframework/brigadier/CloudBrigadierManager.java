@@ -408,7 +408,7 @@ public final class CloudBrigadierManager<C, S> {
             final com.mojang.brigadier.@NonNull Command<S> executor
     ) {
         final cloud.commandframework.internal.CommandNode<C> node = this.commandManager
-                .commandTree().getNamedNode(cloudCommand.components().get(0).name());
+                .commandTree().getNamedNode(cloudCommand.rootComponent().name());
         final SuggestionProvider<S> provider = (context, builder) -> this.buildSuggestions(
                 context,
                 null, /* parent node, null for the literal command node root */

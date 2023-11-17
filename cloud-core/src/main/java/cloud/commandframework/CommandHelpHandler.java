@@ -157,7 +157,7 @@ public final class CommandHelpHandler<C> {
         for (final VerboseHelpEntry<C> entry : commands) {
             final Command<C> command = entry.getCommand();
 
-            final CommandComponent<C> component = command.components().get(0);
+            final CommandComponent<C> component = command.rootComponent();
             @SuppressWarnings("unchecked") final StaticArgument<C> staticArgument = (StaticArgument<C>) component.argument();
             for (final String alias : staticArgument.getAliases()) {
                 if (alias.toLowerCase(Locale.ENGLISH).startsWith(rootFragment.toLowerCase(Locale.ENGLISH))) {

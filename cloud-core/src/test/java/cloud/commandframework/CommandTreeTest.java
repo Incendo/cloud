@@ -493,7 +493,7 @@ class CommandTreeTest {
                 CommandInput.of("literalwithvariable argthatdoesnotmatch")
         );
         assertThat(variableResult.getSecond()).isNull();
-        assertThat(variableResult.getFirst().components().get(0).name()).isEqualTo("literalwithvariable");
+        assertThat(variableResult.getFirst().rootComponent().name()).isEqualTo("literalwithvariable");
         assertThat(variableResult.getFirst().components().get(1).name()).isEqualTo("variable");
 
         /* Try parsing with the main name literal, which should match the literal command */
@@ -502,7 +502,7 @@ class CommandTreeTest {
                 CommandInput.of("literalwithvariable literal")
         );
         assertThat(literalResult.getSecond()).isNull();
-        assertThat(literalResult.getFirst().components().get(0).name()).isEqualTo("literalwithvariable");
+        assertThat(literalResult.getFirst().rootComponent().name()).isEqualTo("literalwithvariable");
         assertThat(literalResult.getFirst().components().get(1).name()).isEqualTo("literal");
 
         /* Try parsing with the alias of the literal, which should match the literal command */
@@ -511,7 +511,7 @@ class CommandTreeTest {
                 CommandInput.of("literalwithvariable literalalias")
         );
         assertThat(literalAliasResult.getSecond()).isNull();
-        assertThat(literalAliasResult.getFirst().components().get(0).name()).isEqualTo("literalwithvariable");
+        assertThat(literalAliasResult.getFirst().rootComponent().name()).isEqualTo("literalwithvariable");
         assertThat(literalAliasResult.getFirst().components().get(1).name()).isEqualTo("literal");
     }
 

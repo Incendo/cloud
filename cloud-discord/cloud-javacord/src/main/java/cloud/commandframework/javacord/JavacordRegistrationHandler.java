@@ -47,7 +47,7 @@ final class JavacordRegistrationHandler<C> implements CommandRegistrationHandler
     @Override
     public boolean registerCommand(final @NonNull Command<C> command) {
         /* We only care about the root command argument */
-        final CommandComponent<C> component = command.components().get(0);
+        final CommandComponent<C> component = command.rootComponent();
         if (this.registeredCommands.containsKey(component)) {
             return false;
         }

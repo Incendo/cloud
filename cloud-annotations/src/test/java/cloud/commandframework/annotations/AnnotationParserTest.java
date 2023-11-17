@@ -191,7 +191,7 @@ class AnnotationParserTest {
 
         // Find the root command that we are looking for.
         for (final Command<TestCommandSender> command : commands) {
-            final StaticArgument<?> argument = (StaticArgument<?>) command.components().get(0).argument();
+            final StaticArgument<?> argument = (StaticArgument<?>) command.rootComponent().argument();
 
             if (argument.getAliases().contains("acommand")) {
                 final Set<String> requiredAliases = new HashSet<>(Arrays.asList("acommand", "analias", "anotheralias"));

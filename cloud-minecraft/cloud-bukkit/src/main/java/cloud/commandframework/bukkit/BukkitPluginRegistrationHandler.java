@@ -74,7 +74,7 @@ public class BukkitPluginRegistrationHandler<C> implements CommandRegistrationHa
     @Override
     public final boolean registerCommand(final @NonNull Command<C> command) {
         /* We only care about the root command argument */
-        final CommandComponent<C> component = command.components().get(0);
+        final CommandComponent<C> component = command.rootComponent();
         if (!(this.bukkitCommandManager.commandRegistrationHandler() instanceof CloudCommodoreManager)
                 && this.registeredCommands.containsKey(component)) {
             return false;

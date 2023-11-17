@@ -228,6 +228,17 @@ public class Command<C> {
     }
 
     /**
+     * Returns the first command component.
+     *
+     * @return the root component
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @NonNull CommandComponent<C> rootComponent() {
+        return this.components.get(0);
+    }
+
+    /**
      * Return a mutable copy of the command components, ignoring flag arguments.
      *
      * @return argument list
