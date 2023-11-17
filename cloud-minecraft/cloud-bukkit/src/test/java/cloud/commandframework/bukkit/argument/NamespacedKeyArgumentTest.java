@@ -24,19 +24,26 @@
 package cloud.commandframework.bukkit.argument;
 
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.bukkit.BukkitCaptionRegistryFactory;
+import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import org.bukkit.NamespacedKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 
+@ExtendWith(MockitoExtension.class)
 @SuppressWarnings("deprecation")
 class NamespacedKeyArgumentTest {
+
+    @Mock
+    private BukkitCommandManager<Object> commandManager;
 
     private CommandContext<Object> commandContext;
 
@@ -45,7 +52,7 @@ class NamespacedKeyArgumentTest {
         this.commandContext = new StandardCommandContextFactory<>().create(
                 false /* suggestions */,
                 new Object(),
-                new BukkitCaptionRegistryFactory<>().create()
+                this.commandManager
         );
     }
 

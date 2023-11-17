@@ -23,8 +23,8 @@
 //
 package cloud.commandframework.bukkit.util;
 
-import cloud.commandframework.bukkit.BukkitCaptionRegistryFactory;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
+import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.StandardCommandContextFactory;
 import java.lang.reflect.Field;
@@ -46,6 +46,9 @@ public abstract class ServerTest {
     @Mock
     private CommandSender commandSender;
 
+    @Mock
+    private BukkitCommandManager<CommandSender> commandManager;
+
     private CommandContext<CommandSender> commandContext;
 
     @BeforeEach
@@ -60,7 +63,7 @@ public abstract class ServerTest {
         this.commandContext = new StandardCommandContextFactory<CommandSender>().create(
                 false /* suggestions */,
                 this.commandSender,
-                new BukkitCaptionRegistryFactory<CommandSender>().create()
+                this.commandManager
         );
         this.commandContext.set(BukkitCommandContextKeys.BUKKIT_COMMAND_SENDER, this.commandSender);
     }
