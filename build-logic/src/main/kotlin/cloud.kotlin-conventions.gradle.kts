@@ -11,12 +11,12 @@ kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
-    coreLibrariesVersion = "1.5.31"
+    coreLibrariesVersion = "1.9.20"
     target {
         compilations.configureEach {
             kotlinOptions {
                 jvmTarget = "1.8"
-                languageVersion = "1.5"
+                languageVersion = "1.9"
             }
         }
     }

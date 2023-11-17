@@ -1,28 +1,28 @@
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
-versions = { id = "com.github.ben-manes.versions", version = "0.48.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.49.0" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-task" }
 run-velocity = { id = "xyz.jpenilla.run-velocity", version.ref = "run-task" }
 run-waterfall = { id = "xyz.jpenilla.run-waterfall", version.ref = "run-task" }
 
 [versions]
-run-task = "2.2.0"
+run-task = "2.2.2"
 checkstyle = "10.5.0"
-checkerQual = "3.38.0"
-errorprone = "2.16"
+checkerQual = "3.40.0"
+errorprone = "2.23.0"
 geantyref = "1.3.14"
-jmh = "1.36"
+jmh = "1.37"
 apiguardian = "1.1.2"
 immutables = "2.10.0"
 
 # integration
-guice = "4.2.3"
+guice = "7.0.0"
 
 # kotlin
-kotlin = "1.7.22"
-dokka = "1.7.20"
-coroutines = "1.5.2"
+kotlin = "1.9.20"
+dokka = "1.9.10"
+coroutines = "1.7.3"
 ktlint = "0.50.0"
 
 # discord
@@ -34,15 +34,15 @@ pircbotx = "12f5639c5d"
 
 # minecraft
 guava = "21.0-jre"
-brigadier = "1.0.17"
+brigadier = "1.0.18"
 bukkit = "1.13.2-R0.1-SNAPSHOT"
 commodore = "2.2"
 bungeecord = "1.8-SNAPSHOT"
 cloudburst = "1.0.0-SNAPSHOT"
-adventureApi = "4.9.3"
+adventureApi = "4.14.0"
 adventurePlatform = "4.3.1"
 paperApi = "1.16.5-R0.1-SNAPSHOT"
-velocityApi = "3.1.0"
+velocityApi = "3.1.1"
 spongeApi7 = "7.3.0"
 jetbrainsAnnotations = "23.0.0"
 fabricMinecraft = "1.19.4"
@@ -51,12 +51,12 @@ fabricApi = "0.87.0+1.19.4"
 fabricPermissionsApi = "0.2-SNAPSHOT"
 
 # testing
-jupiterEngine = "5.10.0"
-mockitoCore = "4.9.0"
-mockitoKotlin = "4.1.0"
-mockitoJupiter = "4.9.0"
-truth = "1.1.3"
-compileTesting = "0.20"
+jupiterEngine = "5.10.1"
+mockitoCore = "5.7.0"
+mockitoKotlin = "5.1.0"
+mockitoJupiter = "5.7.0"
+truth = "1.1.5"
+compileTesting = "0.21.0"
 
 # build-logic
 indra = "3.1.3"
