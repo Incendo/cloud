@@ -321,33 +321,6 @@ public final class CloudBrigadierManager<C, S> {
     }
 
     /**
-     * Register a cloud-Brigadier mapping
-     *
-     * @param argumentType      cloud argument parser type
-     * @param nativeSuggestions Whether or not Brigadier suggestions should be used
-     * @param mapper            mapper function
-     * @param <T>               cloud argument value type
-     * @param <K>               cloud argument type
-     * @param <O>               Brigadier argument type value
-     * @deprecated for removal since 1.5.0, use {@link #registerMapping(TypeToken, Consumer)} instead.
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public <T, K extends ArgumentParser<C, T>, O> void registerMapping(
-            final @NonNull TypeToken<K> argumentType,
-            final boolean nativeSuggestions,
-            final @NonNull Function<@NonNull ? extends K,
-                    @NonNull ? extends ArgumentType<O>> mapper
-    ) {
-        this.registerMapping(argumentType, builder -> {
-            builder.to((Function<K, ? extends ArgumentType<?>>) mapper);
-            if (!nativeSuggestions) {
-                builder.cloudSuggestions();
-            }
-        });
-    }
-
-    /**
      * Register a cloud-Brigadier mapping.
      *
      * @param parserType The cloud argument parser type
