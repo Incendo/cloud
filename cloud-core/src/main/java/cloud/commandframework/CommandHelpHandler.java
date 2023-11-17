@@ -215,12 +215,12 @@ public final class CommandHelpHandler<C> {
             ++index;
             traversedNodes.add(head.component());
 
-            if (head.component() != null && head.argument().getOwningCommand() != null) {
+            if (head.component() != null && head.component().owningCommand() != null) {
                 if (head.isLeaf() || index == queryFragments.length) {
-                    if (recipient == null || this.commandManager.hasPermission(recipient, head.argument()
-                            .getOwningCommand()
+                    if (recipient == null || this.commandManager.hasPermission(recipient, head.component()
+                            .owningCommand()
                             .getCommandPermission())) {
-                        return new VerboseHelpTopic<>(head.argument().getOwningCommand());
+                        return new VerboseHelpTopic<>(head.component().owningCommand());
                     }
                 }
             }
@@ -261,11 +261,11 @@ public final class CommandHelpHandler<C> {
 
                     final List<CommandComponent<C>> traversedNodesSub = new LinkedList<>(traversedNodes);
                     if (recipient == null
-                            || child.argument() == null
-                            || child.argument().getOwningCommand() == null
+                            || child.component() == null
+                            || child.component().owningCommand() == null
                             || this.commandManager.hasPermission(
                             recipient,
-                            child.argument().getOwningCommand().getCommandPermission()
+                            child.component().owningCommand().getCommandPermission()
                     )) {
                         traversedNodesSub.add(child.component());
                         childSuggestions.add(this.commandManager.commandSyntaxFormatter().apply(traversedNodesSub, child));
@@ -285,7 +285,7 @@ public final class CommandHelpHandler<C> {
         /* Check node is itself a command that is visible */
         final CommandComponent<C> component = node.component();
         if (component != null) {
-            final Command<C> owningCommand = component.argument().getOwningCommand();
+            final Command<C> owningCommand = component.owningCommand();
             if (owningCommand != null && this.commandPredicate.test(owningCommand)) {
                 return true;
             }

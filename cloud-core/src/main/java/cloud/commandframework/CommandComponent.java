@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -50,6 +51,8 @@ public final class CommandComponent<C> {
     private final ArgumentDescription description;
     private final ComponentType componentType;
     private final DefaultValue<C, ?> defaultValue;
+
+    private Command<C> owningCommand;
 
     private CommandComponent(
         final @NonNull String name,
@@ -214,6 +217,31 @@ public final class CommandComponent<C> {
     @API(status = API.Status.STABLE, since = "2.0.0")
     public boolean hasDefaultValue() {
         return this.optional() && this.defaultValue() != null;
+    }
+
+    /**
+     * Returns the command that owns this component.
+     *
+     * @return the owning command
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @MonotonicNonNull Command<C> owningCommand() {
+        return this.owningCommand;
+    }
+
+    /**
+     * Sets the command that owns this component.
+     *
+     * @param owningCommand the command
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public void owningCommand(final @NonNull Command<C> owningCommand) {
+        if (this.owningCommand != null) {
+            throw new IllegalStateException("Cannot replace owning command");
+        }
+        this.owningCommand = owningCommand;
     }
 
     @Override

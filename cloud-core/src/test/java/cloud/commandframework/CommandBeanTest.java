@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.meta.CommandMeta;
@@ -47,7 +45,6 @@ class CommandBeanTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testCommandBeanRegistration() {
         // Arrange
         final TestCommandBean testCommandBean = new TestCommandBean();
@@ -59,10 +56,10 @@ class CommandBeanTest {
         final CommandNode<TestCommandSender> node = this.commandManager.commandTree().getNamedNode("test");
         assertThat(node).isNotNull();
 
-        final CommandArgument<TestCommandSender, ?> argument = node.argument();
-        assertThat(argument).isNotNull();
+        final CommandComponent<TestCommandSender> component = node.component();
+        assertThat(component).isNotNull();
 
-        final Command<TestCommandSender> command = argument.getOwningCommand();
+        final Command<TestCommandSender> command = component.owningCommand();
         assertThat(command).isNotNull();
         assertThat(command.nonFlagArguments().get(0).aliases()).containsExactly("t", "test");
         assertThat(command.getCommandMeta().getOrDefault(META_KEY, "otherValue")).isEqualTo("value");

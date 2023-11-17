@@ -24,7 +24,6 @@
 package cloud.commandframework.arguments;
 
 import cloud.commandframework.ArgumentDescription;
-import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
@@ -100,8 +99,6 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
      * Whether or not the argument has been used before
      */
     private boolean argumentRegistered = false;
-
-    private Command<C> owningCommand;
 
     /**
      * Construct a new command argument
@@ -363,27 +360,6 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
             }
         }
         return ArgumentParseResult.success(true);
-    }
-
-    /**
-     * Get the owning command
-     *
-     * @return Owning command
-     */
-    public @Nullable Command<C> getOwningCommand() {
-        return this.owningCommand;
-    }
-
-    /**
-     * Set the owning command
-     *
-     * @param owningCommand Owning command
-     */
-    public void setOwningCommand(final @NonNull Command<C> owningCommand) {
-        if (this.owningCommand != null) {
-            throw new IllegalStateException("Cannot replace owning command");
-        }
-        this.owningCommand = owningCommand;
     }
 
     /**

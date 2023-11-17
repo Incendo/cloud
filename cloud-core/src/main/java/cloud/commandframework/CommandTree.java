@@ -248,8 +248,8 @@ public final class CommandTree<C> {
 
         // There are 0 or more static arguments as children. No variable child arguments are present
         if (root.children().isEmpty()) {
-            final CommandArgument<C, ?> rootArgument = root.argument();
-            if (rootArgument == null || rootArgument.getOwningCommand() == null || !commandInput.isEmpty()) {
+            final CommandComponent<C> rootComponent = root.component();
+            if (rootComponent == null || rootComponent.owningCommand() == null || !commandInput.isEmpty()) {
                 // Too many arguments. We have a unique path, so we can send the entire context
                 return Pair.of(null, new InvalidSyntaxException(
                         this.commandManager.commandSyntaxFormatter()
@@ -261,7 +261,7 @@ public final class CommandTree<C> {
                         .collect(Collectors.toList())
                 ));
             }
-            return Pair.of(rootArgument.getOwningCommand(), null);
+            return Pair.of(rootComponent.owningCommand(), null);
         }
 
         final Iterator<CommandNode<C>> childIterator = root.children().iterator();
@@ -310,9 +310,9 @@ public final class CommandTree<C> {
         }
 
         // If we couldn't match a child, check if there's a command attached and execute it
-        final CommandArgument<C, ?> rootArgument = root.argument();
-        if (rootArgument != null && rootArgument.getOwningCommand() != null && commandInput.isEmpty()) {
-            final Command<C> command = rootArgument.getOwningCommand();
+        final CommandComponent<C> rootComponent = root.component();
+        if (rootComponent != null && rootComponent.owningCommand() != null && commandInput.isEmpty()) {
+            final Command<C> command = rootComponent.owningCommand();
             if (!this.commandManager().hasPermission(
                     commandContext.getSender(),
                     command.getCommandPermission()
@@ -327,7 +327,7 @@ public final class CommandTree<C> {
                                 .collect(Collectors.toList())
                 ));
             }
-            return Pair.of(rootArgument.getOwningCommand(), null);
+            return Pair.of(rootComponent.owningCommand(), null);
         }
 
         // We know that there's no command, and we also cannot match any of the children
@@ -406,24 +406,24 @@ public final class CommandTree<C> {
                     argumentValue = defaultValue.evaluateDefault(commandContext);
                 }
             } else if (!child.component().required()) {
-                if (childComponent.argument().getOwningCommand() == null) {
+                if (childComponent.owningCommand() == null) {
                     // If there are multiple children with different owning commands then it's ambiguous and
                     // not allowed, therefore we're able to pick any child command, as long as we can find it
                     CommandNode<C> node = child;
                     while (!node.isLeaf()) {
                         node = node.children().get(0);
-                        final CommandArgument<C, ?> nodeArgument = node.argument();
-                        if (nodeArgument != null && nodeArgument.getOwningCommand() != null) {
-                            childComponent.argument().setOwningCommand(nodeArgument.getOwningCommand());
+                        final CommandComponent<C> nodeComponent = node.component();
+                        if (nodeComponent != null && nodeComponent.owningCommand() != null) {
+                            childComponent.owningCommand(nodeComponent.owningCommand());
                         }
                     }
                 }
-                return Pair.of(childComponent.argument().getOwningCommand(), null);
+                return Pair.of(childComponent.owningCommand(), null);
             } else if (child.isLeaf()) {
-                final CommandArgument<C, ?> rootArgument = root.argument();
-                if (rootArgument == null || rootArgument.getOwningCommand() == null) {
+                final CommandComponent<C> rootComponent = root.component();
+                if (rootComponent == null || rootComponent.owningCommand() == null) {
                     final List<CommandComponent<C>> components = Objects.requireNonNull(
-                            childComponent.argument().getOwningCommand()
+                            childComponent.owningCommand()
                     ).components();
                     return Pair.of(null, new InvalidSyntaxException(
                             this.commandManager.commandSyntaxFormatter().apply(components, child),
@@ -436,7 +436,7 @@ public final class CommandTree<C> {
                     ));
                 }
 
-                final Command<C> command = rootArgument.getOwningCommand();
+                final Command<C> command = rootComponent.owningCommand();
                 if (this.commandManager().hasPermission(commandContext.getSender(), command.getCommandPermission())) {
                     return Pair.of(command, null);
                 }
@@ -451,8 +451,8 @@ public final class CommandTree<C> {
                 ));
             } else {
                 // The child is not a leaf, but may have an intermediary executor, attempt to use it
-                final CommandArgument<C, ?> rootArgument = root.argument();
-                if (rootArgument == null || rootArgument.getOwningCommand() == null) {
+                final CommandComponent<C> rootComponent = root.component();
+                if (rootComponent == null || rootComponent.owningCommand() == null) {
                     // Child does not have a command, and so we cannot proceed
                     return Pair.of(null, new InvalidSyntaxException(
                             this.commandManager.commandSyntaxFormatter()
@@ -467,7 +467,7 @@ public final class CommandTree<C> {
                 }
 
                 // If the sender has permission to use the command, then we're completely done
-                final Command<C> command = Objects.requireNonNull(rootArgument.getOwningCommand());
+                final Command<C> command = Objects.requireNonNull(rootComponent.owningCommand());
                 if (this.commandManager().hasPermission(commandContext.getSender(), command.getCommandPermission())) {
                     return Pair.of(command, null);
                 }
@@ -507,7 +507,7 @@ public final class CommandTree<C> {
             commandContext.store(component.name(), argumentValue);
             if (child.isLeaf()) {
                 if (commandInput.isEmpty()) {
-                    return Pair.of(component.argument().getOwningCommand(), null);
+                    return Pair.of(component.owningCommand(), null);
                 }
 
                 // Too many arguments. We have a unique path, so we can send the entire context
@@ -923,15 +923,16 @@ public final class CommandTree<C> {
                 }
             }
 
-            final CommandArgument<C, ?> nodeArgument = node.argument();
-            if (nodeArgument != null) {
-                if (nodeArgument.getOwningCommand() != null) {
+            final CommandComponent<C> nodeComponent = node.component();
+            if (nodeComponent != null) {
+                if (nodeComponent.owningCommand() != null) {
                     throw new IllegalStateException(String.format(
                             "Duplicate command chains detected. Node '%s' already has an owning command (%s)",
-                            node, nodeArgument.getOwningCommand()
+                            node, nodeComponent.owningCommand()
                     ));
                 }
-                nodeArgument.setOwningCommand(command);
+
+                nodeComponent.owningCommand(command);
             }
 
             this.verifyAndRegister();
@@ -975,8 +976,8 @@ public final class CommandTree<C> {
             return this.commandManager.hasPermission(sender, permission) ? null : permission;
         }
         if (node.isLeaf()) {
-            final CommandArgument<C, ?> argument = Objects.requireNonNull(node.argument(), "argument");
-            final Command<C> command = Objects.requireNonNull(argument.getOwningCommand(), "command");
+            final CommandComponent<C> component = Objects.requireNonNull(node.component(), "component");
+            final Command<C> command = Objects.requireNonNull(component.owningCommand(), "command");
             return this.commandManager.hasPermission(
                     sender,
                     command.getCommandPermission()
@@ -1014,10 +1015,10 @@ public final class CommandTree<C> {
 
         // Verify that all leaf nodes have command registered
         this.getLeaves(this.internalTree).forEach(leaf -> {
-            if (leaf.argument().getOwningCommand() == null) {
+            if (leaf.component().owningCommand() == null) {
                 throw new NoCommandInLeafException(leaf.component());
             } else {
-                final Command<C> owningCommand = leaf.argument().getOwningCommand();
+                final Command<C> owningCommand = leaf.component().owningCommand();
                 this.commandManager.commandRegistrationHandler().registerCommand(owningCommand);
             }
         });
@@ -1032,7 +1033,7 @@ public final class CommandTree<C> {
      */
     private void updatePermission(final @NonNull CommandNode<C> node) {
         // noinspection all
-        final CommandPermission commandPermission = node.argument().getOwningCommand().getCommandPermission();
+        final CommandPermission commandPermission = node.component().owningCommand().getCommandPermission();
         /* All leaves must necessarily have an owning command */
         node.nodeMeta().put("permission", commandPermission);
         // Get chain and order it tail->head then skip the tail (leaf node)
@@ -1052,10 +1053,8 @@ public final class CommandTree<C> {
             }
 
             /* Now also check if there's a command handler attached to an upper level node */
-            if (commandArgumentNode.argument() != null && commandArgumentNode
-                    .argument()
-                    .getOwningCommand() != null) {
-                final Command<C> command = commandArgumentNode.argument().getOwningCommand();
+            if (commandArgumentNode.component() != null && commandArgumentNode.component().owningCommand() != null) {
+                final Command<C> command = commandArgumentNode.component().owningCommand();
                 if (this
                         .commandManager()
                         .getSetting(CommandManager.ManagerSettings.ENFORCE_INTERMEDIARY_PERMISSIONS)) {
@@ -1201,8 +1200,8 @@ public final class CommandTree<C> {
             this.deleteRecursively(child, false, commandConsumer);
         }
 
-        final @Nullable CommandArgument<C, ?> value = node.argument();
-        final @Nullable Command<C> owner = value == null ? null : value.getOwningCommand();
+        final @Nullable CommandComponent<C> component = node.component();
+        final @Nullable Command<C> owner = component == null ? null : component.owningCommand();
         if (owner != null) {
             commandConsumer.accept(owner);
         }

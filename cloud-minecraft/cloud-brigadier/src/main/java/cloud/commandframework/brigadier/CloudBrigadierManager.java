@@ -422,7 +422,7 @@ public final class CloudBrigadierManager<C, S> {
                                 "permission",
                                 Permission.empty()
                         )));
-        if (forceRegister || (node.argument() != null && node.argument().getOwningCommand() != null)) {
+        if (forceRegister || (node.argument() != null && node.component().owningCommand() != null)) {
             literalArgumentBuilder.executes(executor);
         }
         literalArgumentBuilder.executes(executor);
@@ -461,7 +461,7 @@ public final class CloudBrigadierManager<C, S> {
                                         Permission.empty()
                                 )
                 ));
-        if (cloudCommand.argument() != null && cloudCommand.argument().getOwningCommand() != null) {
+        if (cloudCommand.argument() != null && cloudCommand.component().owningCommand() != null) {
             literalArgumentBuilder.executes(executor);
         }
         final LiteralCommandNode<S> constructedRoot = literalArgumentBuilder.build();
