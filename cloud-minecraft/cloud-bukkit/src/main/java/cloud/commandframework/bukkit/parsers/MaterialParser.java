@@ -36,6 +36,7 @@ import cloud.commandframework.exceptions.parsing.NoInputProvidedException;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.bukkit.Material;
@@ -81,7 +82,7 @@ public final class MaterialParser<C> implements ArgumentParser<C, Material> {
 
         final String input = commandInput.readString();
         try {
-            final Material material = Material.valueOf(input.toUpperCase());
+            final Material material = Material.valueOf(input.toUpperCase(Locale.ROOT));
             return ArgumentParseResult.success(material);
         } catch (final IllegalArgumentException exception) {
             return ArgumentParseResult.failure(new MaterialParseException(input, commandContext));

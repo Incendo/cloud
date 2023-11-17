@@ -259,6 +259,7 @@ public final class MinecraftExceptionHandler<C> {
      * @param manager        the manager instance
      * @param audienceMapper the mapper that maps command sender to audience instances
      */
+    @SuppressWarnings("deprecation") // adventure's replacement for the deprecated method only exists in Minecraft 1.19+
     public void apply(
             final @NonNull CommandManager<C> manager,
             final @NonNull Function<@NonNull C, @NonNull Audience> audienceMapper

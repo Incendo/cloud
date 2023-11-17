@@ -428,6 +428,7 @@ final class SelectorUtils {
             this.selector = selector;
         }
 
+        @SuppressWarnings("LockOnNonEnclosingClassLiteral")
         private static Methods methods(final CommandContext<?> commandContext, final Object selector) {
             if (methods == null) {
                 synchronized (Methods.class) {
