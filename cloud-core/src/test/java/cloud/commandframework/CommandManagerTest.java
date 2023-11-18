@@ -24,7 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
@@ -97,7 +97,7 @@ class CommandManagerTest {
                 .build();
         final Command<TestCommandSender> commandC = this.commandManager.commandBuilder("test")
                 .literal("c")
-                .optional(IntegerArgument.of("opt"))
+                .optional("opt", IntegerParser.integer())
                 .handler(handlerC)
                 .build();
 

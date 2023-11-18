@@ -23,7 +23,7 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
@@ -57,7 +57,7 @@ class CommandHelpHandlerTest {
                 .with(CommandMeta.DESCRIPTION, "Command with variables")
                 .build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
-                required(IntegerArgument.of("int"), ArgumentDescription.of("A number")).build());
+                required("int", IntegerParser.integer(), ArgumentDescription.of("A number")).build());
         manager.command(manager.commandBuilder("test").required(StringArgument.of("potato")));
 
         manager.command(manager.commandBuilder("vec")

@@ -23,7 +23,7 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.internal.CommandNode;
 import cloud.commandframework.meta.CommandMeta;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -80,7 +80,7 @@ class CommandBeanTest {
 
         @Override
         protected void configure(final Command.@NonNull Builder<TestCommandSender> builder) {
-            builder.required(IntegerArgument.of("argument"));
+            builder.required("argument", IntegerParser.integer());
         }
     }
 }

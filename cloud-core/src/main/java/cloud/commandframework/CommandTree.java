@@ -24,7 +24,7 @@
 package cloud.commandframework;
 
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.arguments.LiteralParser;
 import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -69,7 +69,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Tree containing all commands and command paths.
  * <p>
  * All {@link Command commands} consists of unique paths made out of {@link CommandComponent components}.
- * These arguments may be {@link StaticArgument literals} or variables. Command may either be required
+ * These arguments may be literals or variables. Command may either be required
  * or optional, with the requirement that no optional argument precedes a required argument.
  * <p>
  * The {@link Command commands} are stored in this tree and the nodes of tree consists of the command
@@ -898,7 +898,7 @@ public final class CommandTree<C> {
                     tempNode = node.addChild(component);
                 } else if (component.type() == CommandComponent.ComponentType.LITERAL && tempNode.component() != null) {
                     for (final String alias : component.aliases()) {
-                        ((StaticArgument.StaticArgumentParser<C>) tempNode.component().parser()).insertAlias(alias);
+                        ((LiteralParser<C>) tempNode.component().parser()).insertAlias(alias);
                     }
                 }
                 if (!node.children().isEmpty()) {

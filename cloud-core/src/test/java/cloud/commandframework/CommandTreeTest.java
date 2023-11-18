@@ -28,7 +28,7 @@ import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.context.CommandContext;
@@ -90,7 +90,7 @@ class CommandTreeTest {
         ).command(
                 this.commandManager.commandBuilder("test", SimpleCommandMeta.empty())
                         .literal("opt")
-                        .optional(IntegerArgument.of("num"), DefaultValue.constant(defaultInputNumber))
+                        .optional("num", IntegerParser.integer(), DefaultValue.constant(defaultInputNumber))
                         .build()
         );
 
@@ -135,7 +135,7 @@ class CommandTreeTest {
         final Command<TestCommandSender> command = this.commandManager.commandBuilder(
                         "test", Collections.singleton("other"), SimpleCommandMeta.empty()
                 ).literal("opt", "öpt")
-                .optional(IntegerArgument.of("num"), DefaultValue.constant(defaultInputNumber))
+                .optional("num", IntegerParser.integer(), DefaultValue.constant(defaultInputNumber))
                 .build();
         this.commandManager.command(command);
 
@@ -212,7 +212,7 @@ class CommandTreeTest {
         final Command<TestCommandSender> toProxy = this.commandManager.commandBuilder("test")
                 .literal("unproxied")
                 .required(StringArgument.of("string"))
-                .required(IntegerArgument.of("int"))
+                .required("int", IntegerParser.integer())
                 .literal("anotherliteral")
                 .handler(executionHandler)
                 .build();
@@ -232,7 +232,7 @@ class CommandTreeTest {
         when(executionHandler.executeFuture(any())).thenReturn(CompletableFuture.completedFuture(null));
 
         final CommandFlag<Integer> num = this.commandManager.flagBuilder("num")
-                .withComponent(IntegerArgument.of("num"))
+                .withComponent(IntegerParser.integer())
                 .build();
 
         this.commandManager.command(this.commandManager.commandBuilder("flags")
@@ -414,7 +414,7 @@ class CommandTreeTest {
         );
         assertThrows(AmbiguousNodeException.class, () ->
                 this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                        .required(IntegerArgument.of("integer"))));
+                        .required("integer", IntegerParser.integer())));
         this.setup();
 
         // Literal and argument can co-exist, not ambiguous
@@ -432,7 +432,7 @@ class CommandTreeTest {
                 .literal("literal2"));
 
         this.commandManager.command(this.commandManager.commandBuilder("ambiguous")
-                .required(IntegerArgument.of("integer")));
+                .required("integer", IntegerParser.integer()));
         this.setup();
 
         // Two literals with the same name can not co-exist, causes 'duplicate command chains' error

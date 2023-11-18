@@ -25,7 +25,7 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.StaticArgument;
+import cloud.commandframework.arguments.LiteralParser;
 import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.compound.FlagArgument;
@@ -177,11 +177,11 @@ public class Command<C> {
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
-        final StaticArgument<C> staticArgument = StaticArgument.of(commandName, aliases);
+        final ParserDescriptor<C, String> staticParser = LiteralParser.literal(commandName, aliases);
         commands.add(
                 CommandComponent.<C, String>builder()
-                        .key(staticArgument.getKey())
-                        .parser(staticArgument.parserDescriptor())
+                        .name(commandName)
+                        .parser(staticParser)
                         .description(description)
                         .build()
         );
@@ -212,11 +212,11 @@ public class Command<C> {
             final @NonNull String... aliases
     ) {
         final List<CommandComponent<C>> commands = new ArrayList<>();
-        final StaticArgument<C> staticArgument = StaticArgument.of(commandName, aliases);
+        final ParserDescriptor<C, String> staticParser = LiteralParser.literal(commandName, aliases);
         commands.add(
                 CommandComponent.<C, String>builder()
-                        .key(staticArgument.getKey())
-                        .parser(staticArgument.parserDescriptor())
+                        .name(commandName)
+                        .parser(staticParser)
                         .build()
         );
         return new Builder<>(
@@ -469,7 +469,7 @@ public class Command<C> {
         }
 
         /**
-         * Inserts a required {@link StaticArgument} into the command chain
+         * Inserts a required literal into the command chain
          *
          * @param main    Main argument name
          * @param aliases Argument aliases
@@ -479,11 +479,11 @@ public class Command<C> {
                 final @NonNull String main,
                 final @NonNull String... aliases
         ) {
-            return this.required(StaticArgument.of(main, aliases));
+            return this.required(main, LiteralParser.literal(main, aliases));
         }
 
         /**
-         * Inserts a required {@link StaticArgument} into the command chain
+         * Inserts a required literal into the command chain
          *
          * @param main        Main argument name
          * @param description Literal description
@@ -497,7 +497,7 @@ public class Command<C> {
                 final @NonNull ArgumentDescription description,
                 final @NonNull String... aliases
         ) {
-            return this.required(StaticArgument.of(main, aliases), description);
+            return this.required(main, LiteralParser.literal(main, aliases), description);
         }
 
         /**
@@ -515,6 +515,66 @@ public class Command<C> {
                 final @NonNull ArgumentDescription description
         ) {
             return this.argument(this.argumentToComponent(argument).description(description));
+        }
+
+        /**
+         * Marks the {@code builder} as required and adds it to the command.
+         *
+         * @param name    the name that will be inserted into the builder
+         * @param builder the component builder
+         * @return New builder instance with the command argument inserted into the argument list
+         */
+        @SuppressWarnings({"rawtypes"})
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> required(
+                final @NonNull String name,
+                final CommandComponent.@NonNull Builder builder
+        ) {
+            return this.argument(builder.name(name).required());
+        }
+
+        /**
+         * Marks the {@code builder} as required and adds it to the command.
+         *
+         * @param name    the name that will be inserted into the builder
+         * @param builder the component builder
+         * @return New builder instance with the command argument inserted into the argument list
+         */
+        @SuppressWarnings({"rawtypes"})
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final CommandComponent.@NonNull Builder builder
+        ) {
+            return this.argument(builder.name(name).optional());
+        }
+
+        /**
+         * Marks the {@code builder} as required and adds it to the command.
+         *
+         * @param builder the component builder
+         * @return New builder instance with the command argument inserted into the argument list
+         */
+        @SuppressWarnings({"rawtypes"})
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> required(
+                final CommandComponent.@NonNull Builder builder
+        ) {
+            return this.argument(builder.required());
+        }
+
+        /**
+         * Marks the {@code builder} as required and adds it to the command.
+         *
+         * @param builder the component builder
+         * @return New builder instance with the command argument inserted into the argument list
+         */
+        @SuppressWarnings({"rawtypes"})
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public @NonNull Builder<C> optional(
+                final CommandComponent.@NonNull Builder builder
+        ) {
+            return this.argument(builder.optional());
         }
 
         /**
@@ -1047,11 +1107,12 @@ public class Command<C> {
          * @return New builder instance with the command argument inserted into the argument list
          * @since 2.0.0
          */
+        @SuppressWarnings({"unchecked", "rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
         public @NonNull Builder<C> argument(
-                final CommandComponent.Builder<C, ?> builder
+                final CommandComponent.Builder<?, ?> builder
         ) {
-            return this.argument(builder.build());
+            return this.argument((CommandComponent) builder.build());
         }
 
         private <T> CommandComponent.@NonNull Builder<C, T> argumentToComponent(final @NonNull CommandArgument<C, T> argument) {

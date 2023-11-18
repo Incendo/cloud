@@ -23,20 +23,21 @@
 //
 package cloud.commandframework.arguments.standard;
 
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.NumberParseException;
-import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 @API(status = API.Status.STABLE)
 public final class IntegerParser<C> implements ArgumentParser<C, Integer> {
@@ -68,6 +69,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer> {
      * @return the created parser
      * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static <C> @NonNull ParserDescriptor<C, Integer> integer() {
         return integer(IntegerParser.DEFAULT_MINIMUM, IntegerParser.DEFAULT_MAXIMUM);
     }
@@ -102,6 +104,16 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer> {
             final int maxValue
     ) {
         return ParserDescriptor.of(new IntegerParser<>(minValue, maxValue), Integer.class);
+    }
+
+    /**
+     * Returns a {@link CommandComponent.Builder} using {@link #integer()} as the parser.
+     *
+     * @param <C> the command sender type
+     * @return the component builder
+     */
+    public static <C> CommandComponent.@NonNull Builder<C, Integer> integerComponent() {
+        return CommandComponent.<C, Integer>builder().parser(integer());
     }
 
     private final int min;

@@ -32,7 +32,7 @@ import cloud.commandframework.annotations.specifier.Range;
 import cloud.commandframework.annotations.suggestions.Suggestions;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
@@ -88,7 +88,7 @@ class AnnotationParserTest {
         /* Register a builder modifier */
         annotationParser.registerBuilderModifier(
                 IntegerArgumentInjector.class,
-                (injector, builder) -> builder.required(IntegerArgument.of(injector.value()))
+                (injector, builder) -> builder.required(injector.value(), IntegerParser.integer())
         );
         /* Parse the class. Required for both testMethodConstruction() and testNamedSuggestionProvider() */
         commands = new ArrayList<>();

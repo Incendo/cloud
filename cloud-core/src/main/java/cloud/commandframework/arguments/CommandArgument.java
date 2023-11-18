@@ -359,14 +359,14 @@ public class CommandArgument<C, T> implements Comparable<CommandArgument<?, ?>>,
 
     @Override
     public final int compareTo(final @NonNull CommandArgument<?, ?> o) {
-        if (this instanceof StaticArgument) {
-            if (o instanceof StaticArgument) {
+        if (this.parser instanceof LiteralParser) {
+            if (o.parser instanceof LiteralParser) {
                 return this.getName().compareTo(o.getName());
             } else {
                 return -1;
             }
         } else {
-            if (o instanceof StaticArgument) {
+            if (o.parser instanceof LiteralParser) {
                 return 1;
             } else {
                 return 0;
