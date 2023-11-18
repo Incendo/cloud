@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Utility that formats chains of {@link CommandArgument command arguments} into syntax strings
+ * Utility that formats chains of {@link CommandComponent command components} into syntax strings
  *
  * @param <C> Command sender type
  */

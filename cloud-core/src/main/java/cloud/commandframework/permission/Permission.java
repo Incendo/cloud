@@ -30,7 +30,7 @@ import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * {@link cloud.commandframework.arguments.CommandArgument} permission
+ * {@link cloud.commandframework.CommandComponent} permission
  */
 @API(status = API.Status.STABLE)
 public final class Permission implements CommandPermission {

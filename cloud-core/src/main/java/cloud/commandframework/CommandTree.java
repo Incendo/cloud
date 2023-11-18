@@ -23,7 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.StaticArgument;
 import cloud.commandframework.arguments.compound.CompoundArgument;
@@ -69,12 +68,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Tree containing all commands and command paths.
  * <p>
- * All {@link Command commands} consists of unique paths made out of {@link CommandArgument arguments}.
+ * All {@link Command commands} consists of unique paths made out of {@link CommandComponent components}.
  * These arguments may be {@link StaticArgument literals} or variables. Command may either be required
  * or optional, with the requirement that no optional argument precedes a required argument.
  * <p>
  * The {@link Command commands} are stored in this tree and the nodes of tree consists of the command
- * {@link CommandArgument arguments}. Each leaf node of the tree should contain a fully parsed
+ * {@link CommandComponent components}. Each leaf node of the tree should contain a fully parsed
  * {@link Command}. It is thus possible to walk the tree and determine whether the supplied
  * input from a command sender constitutes a proper command.
  * <p>
@@ -153,7 +152,6 @@ public final class CommandTree<C> {
      * @param name root node name
      * @return the found root node, or {@code null}
      */
-    @SuppressWarnings("unchecked")
     public @Nullable CommandNode<C> getNamedNode(final @Nullable String name) {
         for (final CommandNode<C> node : this.rootNodes()) {
             final CommandComponent<C> component = node.component();
@@ -392,7 +390,7 @@ public final class CommandTree<C> {
         if (commandInput.isEmpty() && !(child.component().type() == CommandComponent.ComponentType.FLAG)) {
             final CommandComponent<C> childComponent = Objects.requireNonNull(child.component());
             if (childComponent.hasDefaultValue()) {
-                final DefaultValue<C, ?> defaultValue = childComponent.defaultValue();
+                final DefaultValue<C, ?> defaultValue = Objects.requireNonNull(childComponent.defaultValue(), "defaultValue");
 
                 if (defaultValue instanceof DefaultValue.ParsedDefaultValue) {
                     return this.attemptParseUnambiguousChild(
@@ -688,7 +686,6 @@ public final class CommandTree<C> {
             context.addSuggestion(suggestion);
         }
     }
-
 
     @SuppressWarnings("unchecked")
     private @NonNull SuggestionContext<C> addSuggestionsForDynamicArgument(
@@ -1068,7 +1065,6 @@ public final class CommandTree<C> {
      * @param node the node
      * @throws AmbiguousNodeException if the node breaks some ambiguity contract
      */
-    @SuppressWarnings("unchecked")
     private void checkAmbiguity(final @NonNull CommandNode<C> node) throws AmbiguousNodeException {
         if (node.isLeaf()) {
             return;

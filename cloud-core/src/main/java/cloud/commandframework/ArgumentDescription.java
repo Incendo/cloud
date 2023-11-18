@@ -23,14 +23,13 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
 import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * A description for a {@link CommandArgument}
+ * A description for a {@link CommandComponent}
  *
  * @since 1.4.0
  */
@@ -42,7 +41,6 @@ public interface ArgumentDescription {
      *
      * @return Command description
      */
-    @SuppressWarnings("deprecation")
     static @NonNull ArgumentDescription empty() {
         return Description.EMPTY;
     }
@@ -53,7 +51,6 @@ public interface ArgumentDescription {
      * @param string Command description
      * @return Created command description
      */
-    @SuppressWarnings("deprecation")
     static @NonNull ArgumentDescription of(final @NonNull String string) {
         if (requireNonNull(string, "string").isEmpty()) {
             return Description.EMPTY;
@@ -70,7 +67,7 @@ public interface ArgumentDescription {
     @NonNull String getDescription();
 
     /**
-     * Get whether or not this description contains contents.
+     * Get whether this description contains contents.
      *
      * @return if this description is empty or not
      */
