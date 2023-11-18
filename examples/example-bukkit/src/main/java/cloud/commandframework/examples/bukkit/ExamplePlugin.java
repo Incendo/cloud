@@ -41,7 +41,6 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.standard.EnumArgument;
-import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
@@ -107,6 +106,7 @@ import org.bukkit.util.Vector;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static net.kyori.adventure.text.Component.text;
 
 /**
@@ -341,7 +341,7 @@ public final class ExamplePlugin extends JavaPlugin {
         this.manager.command(this.manager.commandBuilder("give")
                 .senderType(Player.class)
                 .required(MaterialArgument.of("material"))
-                .required("amount", IntegerParser.integer())
+                .required("amount", integerParser())
                 .handler(c -> {
                     final Material material = c.get("material");
                     final int amount = c.get("amount");
@@ -359,7 +359,7 @@ public final class ExamplePlugin extends JavaPlugin {
         this.manager.command(builder.literal("enchant")
                 .senderType(Player.class)
                 .required(EnchantmentArgument.of("enchant"))
-                .required("level", IntegerParser.integer())
+                .required("level", integerParser())
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Player player = ((Player) ctx.getSender());
                     player.getInventory().getItemInMainHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));

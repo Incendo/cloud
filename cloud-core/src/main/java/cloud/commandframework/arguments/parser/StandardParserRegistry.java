@@ -28,7 +28,7 @@ import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.annotations.specifier.Liberal;
 import cloud.commandframework.annotations.specifier.Quoted;
 import cloud.commandframework.annotations.specifier.Range;
-import cloud.commandframework.arguments.standard.BooleanArgument;
+import cloud.commandframework.arguments.standard.BooleanParser;
 import cloud.commandframework.arguments.standard.ByteArgument;
 import cloud.commandframework.arguments.standard.CharArgument;
 import cloud.commandframework.arguments.standard.DoubleArgument;
@@ -183,7 +183,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
         });
         this.registerParserSupplier(TypeToken.get(Boolean.class), options -> {
             final boolean liberal = options.get(StandardParameters.LIBERAL, false);
-            return new BooleanArgument.BooleanParser<>(liberal);
+            return new BooleanParser<>(liberal);
         });
         this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDArgument.UUIDParser<>());
         this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationArgument.Parser<>());

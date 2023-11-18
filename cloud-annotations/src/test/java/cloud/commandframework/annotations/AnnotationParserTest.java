@@ -88,7 +88,7 @@ class AnnotationParserTest {
         /* Register a builder modifier */
         annotationParser.registerBuilderModifier(
                 IntegerArgumentInjector.class,
-                (injector, builder) -> builder.required(injector.value(), IntegerParser.integer())
+                (injector, builder) -> builder.required(injector.value(), IntegerParser.integerParser())
         );
         /* Parse the class. Required for both testMethodConstruction() and testNamedSuggestionProvider() */
         commands = new ArrayList<>();

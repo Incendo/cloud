@@ -30,8 +30,8 @@ import java.lang.annotation.Target;
 import org.apiguardian.api.API;
 
 /**
- * Annotation used to set the parsing mode of a {@link cloud.commandframework.arguments.standard.BooleanArgument boolean
- * argument} to liberal.
+ * Annotation used to set the parsing mode of a {@link cloud.commandframework.arguments.standard.BooleanParser boolean
+ * parser} to liberal.
  *
  * @since 1.6.0
  */

@@ -70,8 +70,8 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, Integer> integer() {
-        return integer(IntegerParser.DEFAULT_MINIMUM, IntegerParser.DEFAULT_MAXIMUM);
+    public static <C> @NonNull ParserDescriptor<C, Integer> integerParser() {
+        return integerParser(IntegerParser.DEFAULT_MINIMUM, IntegerParser.DEFAULT_MAXIMUM);
     }
 
     /**
@@ -83,7 +83,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, Integer> integer(
+    public static <C> @NonNull ParserDescriptor<C, Integer> integerParser(
             final int minValue
     ) {
         return ParserDescriptor.of(new IntegerParser<>(minValue, IntegerParser.DEFAULT_MAXIMUM), Integer.class);
@@ -99,7 +99,7 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer> {
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public static <C> @NonNull ParserDescriptor<C, Integer> integer(
+    public static <C> @NonNull ParserDescriptor<C, Integer> integerParser(
             final int minValue,
             final int maxValue
     ) {
@@ -107,13 +107,15 @@ public final class IntegerParser<C> implements ArgumentParser<C, Integer> {
     }
 
     /**
-     * Returns a {@link CommandComponent.Builder} using {@link #integer()} as the parser.
+     * Returns a {@link CommandComponent.Builder} using {@link #integerParser()} as the parser.
      *
      * @param <C> the command sender type
      * @return the component builder
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static <C> CommandComponent.@NonNull Builder<C, Integer> integerComponent() {
-        return CommandComponent.<C, Integer>builder().parser(integer());
+        return CommandComponent.<C, Integer>builder().parser(integerParser());
     }
 
     private final int min;

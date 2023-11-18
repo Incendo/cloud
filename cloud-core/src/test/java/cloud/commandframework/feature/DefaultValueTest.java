@@ -26,7 +26,6 @@ package cloud.commandframework.feature;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.DefaultValue;
-import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.execution.CommandResult;
 import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.keys.SimpleCloudKey;
@@ -34,6 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -51,7 +51,7 @@ class DefaultValueTest {
         // Arrange
         final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
         this.commandManager.command(
-                this.commandManager.commandBuilder("test").optional(key, IntegerParser.integer(), DefaultValue.constant(5))
+                this.commandManager.commandBuilder("test").optional(key, integerParser(), DefaultValue.constant(5))
         );
 
         // Act
@@ -67,7 +67,7 @@ class DefaultValueTest {
         final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
         final DefaultValue<TestCommandSender, Integer> defaultValue = ctx -> ThreadLocalRandom.current().nextInt();
         this.commandManager.command(
-                this.commandManager.commandBuilder("test").optional(key, IntegerParser.integer(), defaultValue)
+                this.commandManager.commandBuilder("test").optional(key, integerParser(), defaultValue)
         );
 
         // Act
@@ -82,7 +82,7 @@ class DefaultValueTest {
         // Arrange
         final CloudKey<Integer> key = SimpleCloudKey.of("int", Integer.class);
         this.commandManager.command(
-                this.commandManager.commandBuilder("test").optional(key, IntegerParser.integer(), DefaultValue.parsed("5"))
+                this.commandManager.commandBuilder("test").optional(key, integerParser(), DefaultValue.parsed("5"))
         );
 
         // Act

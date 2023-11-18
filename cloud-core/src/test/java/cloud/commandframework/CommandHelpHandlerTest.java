@@ -57,7 +57,7 @@ class CommandHelpHandlerTest {
                 .with(CommandMeta.DESCRIPTION, "Command with variables")
                 .build();
         manager.command(manager.commandBuilder("test", meta2).literal("int").
-                required("int", IntegerParser.integer(), ArgumentDescription.of("A number")).build());
+                required("int", IntegerParser.integerParser(), ArgumentDescription.of("A number")).build());
         manager.command(manager.commandBuilder("test").required(StringArgument.of("potato")));
 
         manager.command(manager.commandBuilder("vec")

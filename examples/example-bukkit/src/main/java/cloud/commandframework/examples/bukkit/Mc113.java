@@ -42,7 +42,7 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.framework.qual.DefaultQualifier;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integer;
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 
 @DefaultQualifier(NonNull.class)
 final class Mc113 {
@@ -62,7 +62,7 @@ final class Mc113 {
                 .required(BlockPredicateArgument.of("predicate"))
                 .literal("with")
                 .required(MaterialArgument.of("block")) // todo: use BlockDataArgument
-                .required("radius", integer(1 /* minValue */))
+                .required("radius", integerParser(1 /* minValue */))
                 .handler(this::executeReplace));
 
         this.manager.command(builder.literal("test_item")

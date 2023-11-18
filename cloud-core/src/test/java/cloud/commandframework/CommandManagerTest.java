@@ -39,6 +39,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -97,7 +98,7 @@ class CommandManagerTest {
                 .build();
         final Command<TestCommandSender> commandC = this.commandManager.commandBuilder("test")
                 .literal("c")
-                .optional("opt", IntegerParser.integer())
+                .optional("opt", integerParser())
                 .handler(handlerC)
                 .build();
 

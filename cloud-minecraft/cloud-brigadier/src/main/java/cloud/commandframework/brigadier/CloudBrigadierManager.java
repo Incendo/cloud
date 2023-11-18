@@ -30,7 +30,7 @@ import cloud.commandframework.arguments.compound.CompoundArgument;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.MappedArgumentParser;
-import cloud.commandframework.arguments.standard.BooleanArgument;
+import cloud.commandframework.arguments.standard.BooleanParser;
 import cloud.commandframework.arguments.standard.ByteArgument;
 import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
@@ -204,7 +204,7 @@ public final class CloudBrigadierManager<C, S> {
             return LongArgumentType.longArg(longParser.getMin(), longParser.getMax());
         }));
         /* Map boolean to BoolArgumentType */
-        this.registerMapping(new TypeToken<BooleanArgument.BooleanParser<C>>() {
+        this.registerMapping(new TypeToken<BooleanParser<C>>() {
         }, builder -> builder.toConstant(BoolArgumentType.bool()));
         /* Map String properly to StringArgumentType */
         this.registerMapping(new TypeToken<StringArgument.StringParser<C>>() {

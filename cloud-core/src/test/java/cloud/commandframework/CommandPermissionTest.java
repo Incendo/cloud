@@ -23,6 +23,7 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.keys.SimpleCloudKey;
 import cloud.commandframework.meta.CommandMeta;
@@ -39,7 +40,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integer;
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -66,7 +67,7 @@ class CommandPermissionTest {
     @Test
     void testComplexPermissions() {
         manager.command(manager.commandBuilder("first").permission("first"));
-        manager.command(manager.commandBuilder("first").required("second", integer()).permission("second"));
+        manager.command(manager.commandBuilder("first").required("second", integerParser()).permission("second"));
 
         manager.executeCommand(new TestCommandSender(), "first").join();
 

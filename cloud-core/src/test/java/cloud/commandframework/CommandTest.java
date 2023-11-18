@@ -23,11 +23,12 @@
 //
 package cloud.commandframework;
 
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static cloud.commandframework.arguments.standard.IntegerParser.integer;
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static com.google.common.truth.Truth.assertThat;
 
 class CommandTest {
@@ -47,8 +48,8 @@ class CommandTest {
     void ensureOrdering() {
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 Command.newBuilder("test", SimpleCommandMeta.empty())
-                        .optional("something", integer())
-                        .required("somethingelse", integer())
+                        .optional("something", integerParser())
+                        .required("somethingelse", integerParser())
                         .build()
         );
     }

@@ -25,9 +25,9 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.DurationArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
@@ -47,8 +47,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static cloud.commandframework.arguments.standard.ArgumentTestHelper.suggestionList;
-import static cloud.commandframework.arguments.standard.IntegerParser.integer;
+import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerComponent;
+import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -71,7 +72,7 @@ class CommandSuggestionsTest {
                 .literal("comb")
                 .required(StringArgument.<TestCommandSender>builder("str")
                         .withSuggestionProvider((c, s) -> suggestionList("one", "two")))
-                .optional("num", integer(1, 95)));
+                .optional("num", integerParser(1, 95)));
         this.manager.command(manager.commandBuilder("test")
                 .literal("alt")
                 .required("num", integerComponent().suggestionProvider((c, s) -> suggestionList("3", "33", "333"))));
@@ -80,7 +81,7 @@ class CommandSuggestionsTest {
                 .requiredArgumentPair("com", Pair.of("x", "y"), Pair.of(Integer.class, TestEnum.class),
                         ArgumentDescription.empty()
                 )
-                .required("int", integer()));
+                .required("int", integerParser()));
 
         this.manager.command(manager.commandBuilder("com2")
                 .requiredArgumentPair("com", Pair.of("x", "enum"),
@@ -97,13 +98,13 @@ class CommandSuggestionsTest {
                         )
                 )
                 .flag(manager.flagBuilder("presence").withAliases("p"))
-                .flag(manager.flagBuilder("single").withComponent(integer())));
+                .flag(manager.flagBuilder("single").withComponent(integerParser())));
 
-        this.manager.command(manager.commandBuilder("numbers").required("num", integer()));
-        this.manager.command(manager.commandBuilder("numberswithfollowingargument").required("num", integer())
-                .required(BooleanArgument.of("another_argument")));
+        this.manager.command(manager.commandBuilder("numbers").required("num", integerParser()));
+        this.manager.command(manager.commandBuilder("numberswithfollowingargument").required("num", integerParser())
+                .required("another_argument", booleanParser()));
         this.manager.command(manager.commandBuilder("numberswithmin")
-                .required("num", integer(5, 100)));
+                .required("num", integerParser(5, 100)));
         this.manager.command(manager.commandBuilder("partial")
                 .required(
                         StringArgument.<TestCommandSender>builder("arg")
@@ -238,7 +239,7 @@ class CommandSuggestionsTest {
         // Arrange
         this.manager = createManager();
         this.manager.command(manager.commandBuilder("flags")
-                .required("num", integer())
+                .required("num", IntegerParser.integerParser())
                 .flag(manager.flagBuilder("enum")
                         .withComponent(EnumArgument.of(TestEnum.class, "enum"))
                         .build())
@@ -259,7 +260,7 @@ class CommandSuggestionsTest {
         // Arrange
         this.manager = createManager();
         this.manager.command(manager.commandBuilder("flags")
-                .required("num", integer())
+                .required("num", IntegerParser.integerParser())
                 .flag(manager.flagBuilder("enum")
                         .withComponent(EnumArgument.of(TestEnum.class, "enum"))
                         .build())
@@ -280,7 +281,7 @@ class CommandSuggestionsTest {
         // Arrange
         this.manager = createManager();
         this.manager.command(manager.commandBuilder("flags")
-                .required("num", integer())
+                .required("num", IntegerParser.integerParser())
                 .flag(manager.flagBuilder("enum")
                         .withComponent(EnumArgument.of(TestEnum.class, "enum"))
                         .build())

@@ -80,7 +80,7 @@ class CommandBeanTest {
 
         @Override
         protected void configure(final Command.@NonNull Builder<TestCommandSender> builder) {
-            builder.required("argument", IntegerParser.integer());
+            builder.required("argument", IntegerParser.integerParser());
         }
     }
 }
