@@ -90,7 +90,7 @@ class CommandSuggestionsTest {
 
         this.manager.command(manager.commandBuilder("flags3")
                 .flag(manager.flagBuilder("compound")
-                        .withArgument(
+                        .withComponent(
                                 ArgumentTriplet.of(manager, "triplet",
                                         Triplet.of("x", "y", "z"),
                                         Triplet.of(int.class, int.class, int.class)
@@ -99,7 +99,7 @@ class CommandSuggestionsTest {
                 )
                 .flag(manager.flagBuilder("presence").withAliases("p"))
                 .flag(manager.flagBuilder("single")
-                        .withArgument(IntegerArgument.of("value"))));
+                        .withComponent(IntegerArgument.of("value"))));
 
         this.manager.command(manager.commandBuilder("numbers").required(IntegerArgument.of("num")));
         this.manager.command(manager.commandBuilder("numberswithfollowingargument").required(IntegerArgument.of("num"))
@@ -243,7 +243,7 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("flags")
                 .required(IntegerArgument.of("num"))
                 .flag(manager.flagBuilder("enum")
-                        .withArgument(EnumArgument.of(TestEnum.class, "enum"))
+                        .withComponent(EnumArgument.of(TestEnum.class, "enum"))
                         .build())
                 .flag(manager.flagBuilder("static")
                         .build())
@@ -264,7 +264,7 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("flags")
                 .required(IntegerArgument.of("num"))
                 .flag(manager.flagBuilder("enum")
-                        .withArgument(EnumArgument.of(TestEnum.class, "enum"))
+                        .withComponent(EnumArgument.of(TestEnum.class, "enum"))
                         .build())
                 .flag(manager.flagBuilder("static")
                         .build())
@@ -285,7 +285,7 @@ class CommandSuggestionsTest {
         this.manager.command(manager.commandBuilder("flags")
                 .required(IntegerArgument.of("num"))
                 .flag(manager.flagBuilder("enum")
-                        .withArgument(EnumArgument.of(TestEnum.class, "enum"))
+                        .withComponent(EnumArgument.of(TestEnum.class, "enum"))
                         .build())
                 .flag(manager.flagBuilder("static")
                         .build())
@@ -776,7 +776,7 @@ class CommandSuggestionsTest {
         this.manager.command(
                 this.manager.commandBuilder("command")
                         .flag(manager.flagBuilder("flag").withAliases("f")
-                                .withArgument(EnumArgument.of(TestEnum.class, "test")).build())
+                                .withComponent(EnumArgument.of(TestEnum.class, "test")).build())
                         .flag(manager.flagBuilder("flog").build())
         );
 

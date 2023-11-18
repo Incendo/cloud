@@ -48,12 +48,15 @@ import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * A single literal or argument component of a command
+ * <p>
+ * This class does not preserve the type of the underlying parser.
+ * If you need access to the underlying types, use {@link TypedCommandComponent}.
  *
  * @param <C> Command sender type
  * @since 1.3.0
  */
 @API(status = API.Status.STABLE, since = "1.3.0")
-public final class CommandComponent<C> implements Comparable<CommandComponent<C>> {
+public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
 
     private final String name;
     private final ArgumentParser<C, ?> parser;
@@ -77,7 +80,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
         return new Builder<C, T>();
     }
 
-    private CommandComponent(
+    CommandComponent(
         final @NonNull String name,
         final @NonNull ArgumentParser<C, ?> parser,
         final @NonNull TypeToken<?> valueType,
@@ -126,7 +129,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull String name() {
+    public final @NonNull String name() {
         return this.name;
     }
 
@@ -141,7 +144,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      */
     @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull Collection<@NonNull String> aliases() {
+    public final @NonNull Collection<@NonNull String> aliases() {
         if (this.parser() instanceof StaticArgument.StaticArgumentParser) {
             return ((StaticArgument.StaticArgumentParser<C>) this.parser()).aliases();
         }
@@ -159,7 +162,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      */
     @SuppressWarnings("unchecked")
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull Collection<@NonNull String> alternativeAliases() {
+    public final @NonNull Collection<@NonNull String> alternativeAliases() {
         if (this.parser() instanceof StaticArgument.StaticArgumentParser) {
             return ((StaticArgument.StaticArgumentParser<C>) this.parser()).alternativeAliases();
         }
@@ -173,7 +176,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 1.4.0
      */
     @API(status = API.Status.STABLE, since = "1.4.0")
-    public @NonNull ArgumentDescription argumentDescription() {
+    public final @NonNull ArgumentDescription argumentDescription() {
         return this.description;
     }
 
@@ -186,7 +189,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public boolean required() {
+    public final boolean required() {
         return this.componentType.required();
     }
 
@@ -199,7 +202,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public boolean optional() {
+    public final boolean optional() {
         return this.componentType.optional();
     }
 
@@ -210,7 +213,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull ComponentType type() {
+    public final @NonNull ComponentType type() {
         return this.componentType;
     }
 
@@ -234,7 +237,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public boolean hasDefaultValue() {
+    public final boolean hasDefaultValue() {
         return this.optional() && this.defaultValue() != null;
     }
 
@@ -245,7 +248,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull SuggestionProvider<C> suggestionProvider() {
+    public final @NonNull SuggestionProvider<C> suggestionProvider() {
         return this.suggestionProvider;
     }
 
@@ -256,7 +259,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @MonotonicNonNull Command<C> owningCommand() {
+    public final @MonotonicNonNull Command<C> owningCommand() {
         return this.owningCommand;
     }
 
@@ -267,7 +270,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public void owningCommand(final @NonNull Command<C> owningCommand) {
+    public final void owningCommand(final @NonNull Command<C> owningCommand) {
         if (this.owningCommand != null) {
             throw new IllegalStateException("Cannot replace owning command");
         }
@@ -285,7 +288,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull @This CommandComponent<C> addPreprocessor(
+    public final @NonNull @This CommandComponent<C> addPreprocessor(
             final @NonNull ComponentPreprocessor<C> preprocessor
     ) {
         this.componentPreprocessors.add(preprocessor);
@@ -302,7 +305,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
      * @since 2.0.0
      */
     @API(status = API.Status.STABLE, since = "2.0.0")
-    public @NonNull ArgumentParseResult<Boolean> preprocess(
+    public final @NonNull ArgumentParseResult<Boolean> preprocess(
             final @NonNull CommandContext<C> context,
             final @NonNull CommandInput input
     ) {
@@ -318,13 +321,17 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
         return ArgumentParseResult.success(true);
     }
 
+    protected final @NonNull Collection<@NonNull ComponentPreprocessor<C>> preprocessors() {
+        return Collections.unmodifiableCollection(this.componentPreprocessors);
+    }
+
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(this.name(), this.valueType());
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public final boolean equals(final Object o) {
         if (this == o) {
             return true;
         } else if (o instanceof CommandComponent) {
@@ -336,7 +343,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
     }
 
     @Override
-    public @NonNull String toString() {
+    public final @NonNull String toString() {
         return String.format(
                 "%s{name=%s,type=%s,valueType=%s",
                 this.getClass().getSimpleName(),
@@ -362,12 +369,12 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
                 this.type(),
                 this.defaultValue(),
                 this.suggestionProvider(),
-                this.componentPreprocessors
+                this.preprocessors()
         );
     }
 
     @Override
-    public int compareTo(final @NonNull CommandComponent<C> other) {
+    public final int compareTo(final @NonNull CommandComponent<C> other) {
         if (this.type() == ComponentType.LITERAL) {
             if (other.type() == ComponentType.LITERAL) {
                 return this.name().compareTo(other.name());
@@ -572,7 +579,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
          *
          * @return the built component
          */
-        public @NonNull CommandComponent<C> build() {
+        public @NonNull TypedCommandComponent<C, T> build() {
             ArgumentParser<C, T> parser = null;
             if (this.parser != null) {
                 parser = this.parser;
@@ -604,7 +611,7 @@ public final class CommandComponent<C> implements Comparable<CommandComponent<C>
                 suggestionProvider = this.suggestionProvider;
             }
 
-            return new CommandComponent<>(
+            return new TypedCommandComponent<>(
                     this.name,
                     parser,
                     Objects.requireNonNull(this.valueType, "valueType"),

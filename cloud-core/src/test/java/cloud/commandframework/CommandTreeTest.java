@@ -232,7 +232,7 @@ class CommandTreeTest {
         when(executionHandler.executeFuture(any())).thenReturn(CompletableFuture.completedFuture(null));
 
         final CommandFlag<Integer> num = this.commandManager.flagBuilder("num")
-                .withArgument(IntegerArgument.of("num"))
+                .withComponent(IntegerArgument.of("num"))
                 .build();
 
         this.commandManager.command(this.commandManager.commandBuilder("flags")
@@ -244,7 +244,7 @@ class CommandTreeTest {
                         .build())
                 .flag(num)
                 .flag(this.commandManager.flagBuilder("enum")
-                        .withArgument(EnumArgument.of(FlagEnum.class, "enum")))
+                        .withComponent(EnumArgument.of(FlagEnum.class, "enum")))
                 .handler(executionHandler)
                 .build());
 

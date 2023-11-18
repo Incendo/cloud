@@ -25,7 +25,9 @@ package cloud.commandframework.kotlin
 
 import cloud.commandframework.ArgumentDescription
 import cloud.commandframework.Command
+import cloud.commandframework.CommandComponent
 import cloud.commandframework.CommandManager
+import cloud.commandframework.TypedCommandComponent
 import cloud.commandframework.arguments.CommandArgument
 import cloud.commandframework.execution.CommandExecutionHandler
 import cloud.commandframework.kotlin.extension.command
@@ -485,85 +487,88 @@ public class MutableCommandBuilder<C : Any>(
     }
 
     /**
-     * Add a new flag argument to this command
+     * Add a new flag component to this command
      *
      * @param name name of the flag
      * @param aliases flag aliases
      * @param description description of the flag
-     * @param argumentSupplier argument supplier for the flag
+     * @param componentSupplier component supplier for the flag
+     * @param <T> the component value type
      * @return this mutable builder
      * @since 1.4.0
      */
-    public fun flag(
+    public fun <T> flag(
         name: String,
         aliases: Array<String> = emptyArray(),
         description: ArgumentDescription = ArgumentDescription.empty(),
-        argumentSupplier: () -> CommandArgument<C, *>
+        componentSupplier: () -> TypedCommandComponent<C, T>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
             this.commandManager
                 .flagBuilder(name)
                 .withAliases(*aliases)
                 .withDescription(description)
-                .withArgument(argumentSupplier())
+                .withComponent(componentSupplier())
                 .build()
         )
     }
 
     /**
-     * Add a new flag argument to this command
+     * Add a new flag component to this command
      *
      * @param name name of the flag
      * @param aliases flag aliases
      * @param description description of the flag
-     * @param argument argument for the flag
+     * @param component component for the flag
+     * @param <T> the component value type
      * @return this mutable builder
      * @since 1.4.0
      */
-    public fun flag(
+    public fun <T> flag(
         name: String,
         aliases: Array<String> = emptyArray(),
         description: ArgumentDescription = ArgumentDescription.empty(),
-        argument: CommandArgument<C, *>
+        component: TypedCommandComponent<C, T>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
             this.commandManager
                 .flagBuilder(name)
                 .withAliases(*aliases)
                 .withDescription(description)
-                .withArgument(argument)
+                .withComponent(component)
                 .build()
         )
     }
 
     /**
-     * Add a new flag argument to this command
+     * Add a new flag component to this command
      *
      * @param name name of the flag
      * @param aliases flag aliases
      * @param description description of the flag
-     * @param argumentBuilder command argument builder for the flag
+     * @param componentBuilder command component builder for the flag
+     * @param <T> the component value type
      * @return this mutable builder
      * @since 1.4.0
      */
-    public fun flag(
+    public fun <T> flag(
         name: String,
         aliases: Array<String> = emptyArray(),
         description: ArgumentDescription = ArgumentDescription.empty(),
-        argumentBuilder: CommandArgument.Builder<C, *>
+        componentBuilder: CommandComponent.Builder<C, T>
     ): MutableCommandBuilder<C> = mutate {
         it.flag(
             this.commandManager
                 .flagBuilder(name)
                 .withAliases(*aliases)
                 .withDescription(description)
-                .withArgument(argumentBuilder)
+                .withComponent(componentBuilder)
                 .build()
         )
     }
 
     /**
-     * Add a new presence flag argument to this command
+     * Add a new presence flag component to this command
      *
      * @param name name of the flag
      * @param aliases flag aliases

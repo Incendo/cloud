@@ -52,7 +52,7 @@ class RepeatableFlagTest {
                         .flag(
                                 this.commandManager.flagBuilder("flag")
                                         .asRepeatable()
-                                        .withArgument(StringArgument.single("string"))
+                                        .withComponent(StringArgument.single("string"))
                         )
         );
 

@@ -24,6 +24,8 @@
 package cloud.commandframework.arguments.flags;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.CommandComponent;
+import cloud.commandframework.TypedCommandComponent;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
@@ -37,13 +39,13 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A flag is an optional command argument that may have an associated parser,
+ * A flag is an optional command component that may have an associated parser,
  * and is identified by its name. Essentially, it's a mixture of a command literal
- * and an optional variable command argument.
+ * and an optional variable command component.
  *
- * @param <T> Command argument type. {@link Void} is used when no argument is present.
+ * @param <T> Command component type. {@link Void} is used when no component is present.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedTypeParameter"})
 @API(status = API.Status.STABLE)
 public final class CommandFlag<T> {
 
@@ -53,21 +55,21 @@ public final class CommandFlag<T> {
     private final @NonNull CommandPermission permission;
     private final @NonNull FlagMode mode;
 
-    private final @Nullable CommandArgument<?, T> commandArgument;
+    private final @Nullable TypedCommandComponent<?, T> commandComponent;
 
     private CommandFlag(
             final @NonNull String name,
             final @NonNull String @NonNull [] aliases,
             final @NonNull ArgumentDescription description,
             final @NonNull CommandPermission permission,
-            final @Nullable CommandArgument<?, T> commandArgument,
+            final @Nullable TypedCommandComponent<?, T> commandComponent,
             final @NonNull FlagMode mode
     ) {
         this.name = Objects.requireNonNull(name, "name cannot be null");
         this.aliases = Objects.requireNonNull(aliases, "aliases cannot be null");
         this.description = Objects.requireNonNull(description, "description cannot be null");
         this.permission = Objects.requireNonNull(permission, "permission cannot be null");
-        this.commandArgument = commandArgument;
+        this.commandComponent = commandComponent;
         this.mode = Objects.requireNonNull(mode, "mode cannot be null");
     }
 
@@ -123,12 +125,14 @@ public final class CommandFlag<T> {
     }
 
     /**
-     * Get the command argument, if it exists
+     * Returns the command component, if it exists
      *
-     * @return Command argument, or {@code null}
+     * @return Command component, or {@code null}
+     * @since 2.0.0
      */
-    public @Nullable CommandArgument<?, T> getCommandArgument() {
-        return this.commandArgument;
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public @Nullable CommandComponent<?> commandComponent() {
+        return this.commandComponent;
     }
 
     /**
@@ -172,7 +176,7 @@ public final class CommandFlag<T> {
         private final String[] aliases;
         private final ArgumentDescription description;
         private final CommandPermission permission;
-        private final CommandArgument<?, T> commandArgument;
+        private final TypedCommandComponent<?, T> commandComponent;
         private final FlagMode mode;
 
         private Builder(
@@ -180,14 +184,14 @@ public final class CommandFlag<T> {
                 final @NonNull String[] aliases,
                 final @NonNull ArgumentDescription description,
                 final @NonNull CommandPermission permission,
-                final @Nullable CommandArgument<?, T> commandArgument,
+                final @Nullable TypedCommandComponent<?, T> commandComponent,
                 final @NonNull FlagMode mode
         ) {
             this.name = name;
             this.aliases = aliases;
             this.description = description;
             this.permission = permission;
-            this.commandArgument = commandArgument;
+            this.commandComponent = commandComponent;
             this.mode = mode;
         }
 
@@ -236,7 +240,7 @@ public final class CommandFlag<T> {
                     filteredAliases.toArray(new String[0]),
                     this.description,
                     this.permission,
-                    this.commandArgument,
+                    this.commandComponent,
                     this.mode
             );
         }
@@ -250,29 +254,50 @@ public final class CommandFlag<T> {
          */
         @API(status = API.Status.STABLE, since = "1.4.0")
         public @NonNull Builder<T> withDescription(final @NonNull ArgumentDescription description) {
-            return new Builder<>(this.name, this.aliases, description, this.permission, this.commandArgument, this.mode);
+            return new Builder<>(this.name, this.aliases, description, this.permission, this.commandComponent, this.mode);
         }
 
         /**
-         * Create a new builder instance using the given command argument
+         * Create a new builder instance using the given command component
          *
-         * @param argument Command argument
-         * @param <N>      New argument type
+         * @param component Command component
+         * @param <N>     New component type
          * @return New builder instance
          */
-        public <N> @NonNull Builder<N> withArgument(final @NonNull CommandArgument<?, N> argument) {
-            return new Builder<>(this.name, this.aliases, this.description, this.permission, argument, this.mode);
+        public <N> @NonNull Builder<N> withComponent(final @NonNull TypedCommandComponent<?, N> component) {
+            return new Builder<>(this.name, this.aliases, this.description, this.permission, component, this.mode);
+        }
+
+        // TODO(City): Remove this.
+        /**
+         * Create a new builder instance using the given command component
+         *
+         * @param component Command component
+         * @param <N>     New component type
+         * @return New builder instance
+         */
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        public <N> @NonNull Builder<N> withComponent(final @NonNull CommandArgument<?, N> component) {
+            final CommandComponent.Builder builder = CommandComponent.builder();
+            return new Builder<>(
+                    this.name,
+                    this.aliases,
+                    this.description,
+                    this.permission,
+                    builder.key(component.getKey()).parser(component.parserDescriptor()).build(),
+                    this.mode
+            );
         }
 
         /**
-         * Create a new builder instance using the given command argument
+         * Create a new builder instance using the given command component
          *
-         * @param builder Command argument builder. {@link CommandArgument.Builder#build()} will be invoked.
-         * @param <N>     New argument type
+         * @param builder Command component builder. {@link CommandComponent.Builder#build()} will be invoked.
+         * @param <N>     New component type
          * @return New builder instance
          */
-        public <N> @NonNull Builder<N> withArgument(final CommandArgument.@NonNull Builder<?, N> builder) {
-            return this.withArgument(builder.build());
+        public <N> @NonNull Builder<N> withComponent(final CommandComponent.@NonNull Builder<?, N> builder) {
+            return this.withComponent(builder.build());
         }
 
         /**
@@ -284,7 +309,7 @@ public final class CommandFlag<T> {
          */
         @API(status = API.Status.STABLE, since = "1.6.0")
         public @NonNull Builder<T> withPermission(final @NonNull CommandPermission permission) {
-            return new Builder<>(this.name, this.aliases, this.description, permission, this.commandArgument, this.mode);
+            return new Builder<>(this.name, this.aliases, this.description, permission, this.commandComponent, this.mode);
         }
 
         /**
@@ -300,7 +325,7 @@ public final class CommandFlag<T> {
                     this.aliases,
                     this.description,
                     this.permission,
-                    this.commandArgument,
+                    this.commandComponent,
                     FlagMode.REPEATABLE
             );
         }
@@ -316,7 +341,7 @@ public final class CommandFlag<T> {
                     this.aliases,
                     this.description,
                     this.permission,
-                    this.commandArgument,
+                    this.commandComponent,
                     this.mode
             );
         }

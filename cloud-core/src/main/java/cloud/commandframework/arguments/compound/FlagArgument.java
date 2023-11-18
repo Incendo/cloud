@@ -23,6 +23,7 @@
 //
 package cloud.commandframework.arguments.compound;
 
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -245,7 +246,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     }
 
                     for (final String alias : flag.getAliases()) {
-                        if (suggestCombined && flag.getCommandArgument() == null) {
+                        if (suggestCombined && flag.commandComponent() == null) {
                             suggestions.add(Suggestion.simple(String.format("%s%s", input, alias)));
                         } else {
                             suggestions.add(Suggestion.simple(String.format("-%s", alias)));
@@ -280,8 +281,8 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                 }
                 if (currentFlag != null
                         && commandContext.hasPermission(currentFlag.permission())
-                        && currentFlag.getCommandArgument() != null) {
-                    return (List<Suggestion>) ((SuggestionProvider) currentFlag.getCommandArgument().suggestionProvider())
+                        && currentFlag.commandComponent() != null) {
+                    return (List<Suggestion>) ((SuggestionProvider) currentFlag.commandComponent().suggestionProvider())
                             .suggestions(commandContext, input);
                 }
             }
@@ -349,7 +350,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                             final String parsedFlag = Character.toString(flagName.charAt(i)).toLowerCase(Locale.ENGLISH);
                             for (final CommandFlag<?> candidateFlag : FlagArgumentParser.this.flags) {
                                 // Argument flags cannot use the shorthand form in this way.
-                                if (candidateFlag.getCommandArgument() != null) {
+                                if (candidateFlag.commandComponent() != null) {
                                     continue;
                                 }
 
@@ -410,7 +411,7 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
                     }
 
                     // The flag has no argument, so we're done.
-                    if (flag.getCommandArgument() == null) {
+                    if (flag.commandComponent() == null) {
                         commandContext.flags().addPresenceFlag(flag);
                         parsedFlags.add(flag);
                         continue;
@@ -439,8 +440,8 @@ public final class FlagArgument<C> extends CommandArgument<C, Object> {
 
                     // We then attempt to parse the flag.
                     final ArgumentParseResult<?> result =
-                            ((CommandArgument) flag.getCommandArgument())
-                                    .getParser()
+                            ((CommandComponent<C>) flag.commandComponent())
+                                    .parser()
                                     .parse(
                                             commandContext,
                                             commandInput

@@ -217,10 +217,10 @@ public class StandardCommandSyntaxFormatter<C> implements CommandSyntaxFormatter
                 final CommandFlag<?> flag = flagIterator.next();
                 this.appendName(String.format("--%s", flag.getName()));
 
-                if (flag.getCommandArgument() != null) {
+                if (flag.commandComponent() != null) {
                     this.builder.append(' ');
                     this.builder.append(this.getOptionalPrefix());
-                    this.appendName(flag.getCommandArgument().getName());
+                    this.appendName(flag.commandComponent().name());
                     this.builder.append(this.getOptionalSuffix());
                 }
 

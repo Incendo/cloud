@@ -48,7 +48,7 @@ class Issue321 {
                 commandManager.commandBuilder("command")
                         .flag(
                                 commandManager.flagBuilder("flag1")
-                                        .withArgument(
+                                        .withComponent(
                                                 StringArrayArgument.of(
                                                         "array",
                                                         true /* flagYielding */,
@@ -57,7 +57,7 @@ class Issue321 {
                                         )
                         ).flag(
                                 commandManager.flagBuilder("flag2")
-                                        .withArgument(
+                                        .withComponent(
                                                 StringArrayArgument.of(
                                                         "array",
                                                         true /* flagYielding */,

@@ -24,8 +24,8 @@
 package cloud.commandframework.annotations;
 
 import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.CommandComponent;
 import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.parser.ParserRegistry;
@@ -115,19 +115,14 @@ final class FlagAssemblerImpl implements FlagAssembler {
         } else {
             suggestionProvider = null;
         }
-        final CommandArgument.Builder argumentBuilder0 = CommandArgument.ofType(
-                descriptor.parameter().getType(),
-                descriptor.name()
-        );
-        final CommandArgument.Builder argumentBuilder = argumentBuilder0
-                .manager(this.commandManager)
-                .withParser(parser);
-        final CommandArgument argument;
+        final CommandComponent.Builder componentBuilder = CommandComponent.builder();
+        componentBuilder.commandManager(this.commandManager)
+                .name(descriptor.name())
+                .valueType(descriptor.parameter().getType())
+                .parser(parser);
         if (suggestionProvider != null) {
-            argument = argumentBuilder.withSuggestionProvider(suggestionProvider).build();
-        } else {
-            argument = argumentBuilder.build();
+            componentBuilder.suggestionProvider(suggestionProvider);
         }
-        return builder.withArgument(argument).build();
+        return builder.withComponent(componentBuilder.build()).build();
     }
 }
