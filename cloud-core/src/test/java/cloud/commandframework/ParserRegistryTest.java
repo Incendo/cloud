@@ -29,7 +29,7 @@ import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.ParserRegistry;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.parser.StandardParserRegistry;
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import io.leangen.geantyref.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
@@ -105,10 +105,10 @@ public class ParserRegistryTest {
                 parserParameters
         ).orElseThrow(() -> new NullPointerException("No parser found"));
 
-        assertThat(parser).isInstanceOf(IntegerArgument.IntegerParser.class);
+        assertThat(parser).isInstanceOf(IntegerParser.class);
 
-        @SuppressWarnings("unchecked") final IntegerArgument.IntegerParser<TestCommandSender> integerParser =
-                (IntegerArgument.IntegerParser<TestCommandSender>) parser;
+        @SuppressWarnings("unchecked") final IntegerParser<TestCommandSender> integerParser =
+                (IntegerParser<TestCommandSender>) parser;
 
         assertThat(integerParser.getMin()).isEqualTo(RANGE_MIN);
         assertThat(integerParser.getMax()).isEqualTo(RANGE_MAX);

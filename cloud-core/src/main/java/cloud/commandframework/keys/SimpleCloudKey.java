@@ -66,6 +66,22 @@ public final class SimpleCloudKey<@NonNull T> implements CloudKey<T> {
     }
 
     /**
+     * Create a new simple cloud key
+     *
+     * @param name The name of the key
+     * @param type The type of the value represented by the key
+     * @param <T>  The generic type of the value represented by the key
+     * @return The created key instance
+     * @since 2.0.0
+     */
+    public static <@NonNull T> CloudKey<T> of(
+            final @NonNull String name,
+            final @NonNull Class<T> type
+    ) {
+        return new SimpleCloudKey<>(name, TypeToken.get(type));
+    }
+
+    /**
      * Create a new type-less simple cloud key
      *
      * @param name The name of the key

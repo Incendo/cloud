@@ -27,7 +27,7 @@ import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
 import cloud.commandframework.arguments.parser.ArgumentParser;
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.suggestion.SuggestionProvider;
 import cloud.commandframework.bukkit.BukkitCaptionKeys;
 import cloud.commandframework.bukkit.BukkitCommandContextKeys;
@@ -264,7 +264,7 @@ public final class LocationArgument<C> extends CommandArgument<C, Location> {
                 prefix = "";
                 workingInput = input;
             }
-            return IntegerArgument.IntegerParser.getSuggestions(
+            return IntegerParser.getSuggestions(
                     Integer.MIN_VALUE,
                     Integer.MAX_VALUE,
                     workingInput

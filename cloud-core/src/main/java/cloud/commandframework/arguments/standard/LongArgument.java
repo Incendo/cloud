@@ -237,7 +237,7 @@ public final class LongArgument<C> extends CommandArgument<C, Long> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
+            return IntegerParser.getSuggestions(this.min, this.max, input);
         }
     }
 

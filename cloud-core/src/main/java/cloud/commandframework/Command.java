@@ -30,7 +30,9 @@ import cloud.commandframework.arguments.compound.ArgumentPair;
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.compound.FlagArgument;
 import cloud.commandframework.arguments.flags.CommandFlag;
+import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.execution.CommandExecutionHandler;
+import cloud.commandframework.keys.CloudKey;
 import cloud.commandframework.meta.CommandMeta;
 import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.permission.CommandPermission;
@@ -500,9 +502,6 @@ public class Command<C> {
 
         /**
          * Adds the given required {@code argument} to the command
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument    Argument to add
          * @param description Description of the argument
@@ -520,9 +519,6 @@ public class Command<C> {
 
         /**
          * Adds the given required {@code argument} to the command
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument    Argument to add
          * @param description Description of the argument
@@ -540,9 +536,6 @@ public class Command<C> {
 
         /**
          * Adds the given optional {@code argument} to the command with no default value
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument    Argument to add
          * @param description Description of the argument
@@ -560,9 +553,6 @@ public class Command<C> {
 
         /**
          * Adds the given optional {@code argument} to the command with no default value
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument    Argument to add
          * @param description Description of the argument
@@ -580,9 +570,6 @@ public class Command<C> {
 
         /**
          * Adds the given optional {@code argument} to the command
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument     Argument to add
          * @param description  Description of the argument
@@ -602,9 +589,6 @@ public class Command<C> {
 
         /**
          * Adds the given optional {@code argument} to the command
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument     Argument to add
          * @param description  Description of the argument
@@ -624,9 +608,6 @@ public class Command<C> {
 
         /**
          * Adds the given required {@code argument} to the command
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument Argument to add
          * @param <T>      Argument type
@@ -641,10 +622,271 @@ public class Command<C> {
         }
 
         /**
+         * Adds the given required argument to the command
+         *
+         * @param name   the name of the argument
+         * @param parser the parser
+         * @param <T>    the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser
+        ) {
+            return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).build());
+        }
+
+        /**
+         * Adds the given required argument to the command
+         *
+         * @param name   the name of the argument
+         * @param parser the parser
+         * @param <T>    the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser
+        ) {
+            return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).build());
+        }
+
+        /**
+         * Adds the given required argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param description the description of the argument
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).description(description).build());
+        }
+
+        /**
+         * Adds the given required argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param description the description of the argument
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> required(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).description(description).build());
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name   the name of the argument
+         * @param parser the parser
+         * @param <T>    the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser
+        ) {
+            return this.argument(CommandComponent.<C, T>builder().name(name).parser(parser).optional().build());
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name   the name of the argument
+         * @param parser the parser
+         * @param <T>    the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser
+        ) {
+            return this.argument(CommandComponent.<C, T>builder().key(name).parser(parser).optional().build());
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param description the description of the argument
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .description(description)
+                            .optional()
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name        the name of the argument
+         * @param parser      the parser
+         * @param description the description of the argument
+         * @param <T>         the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .description(description)
+                            .optional()
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name         the name of the argument
+         * @param parser       the parser
+         * @param defaultValue the default value
+         * @param <T>          the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull DefaultValue<C, T> defaultValue
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .optional(defaultValue)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name         the name of the argument
+         * @param parser       the parser
+         * @param defaultValue the default value
+         * @param <T>          the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull DefaultValue<C, T> defaultValue
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .optional(defaultValue)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name         the name of the argument
+         * @param parser       the parser
+         * @param defaultValue the default value
+         * @param description  the description of the argument
+         * @param <T>          the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull String name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .name(name)
+                            .parser(parser)
+                            .optional(defaultValue)
+                            .description(description)
+                            .build()
+            );
+        }
+
+        /**
+         * Adds the given optional argument to the command
+         *
+         * @param name         the name of the argument
+         * @param parser       the parser
+         * @param defaultValue the default value
+         * @param description  the description of the argument
+         * @param <T>          the type produced by the parser
+         * @return New builder instance with the command argument inserted into the argument list
+         * @since 2.0.0
+         */
+        @API(status = API.Status.STABLE, since = "2.0.0")
+        public <T> @NonNull Builder<C> optional(
+                final @NonNull CloudKey<T> name,
+                final @NonNull ParserDescriptor<C, T> parser,
+                final @NonNull DefaultValue<C, T> defaultValue,
+                final @NonNull ArgumentDescription description
+        ) {
+            return this.argument(
+                    CommandComponent.<C, T>builder()
+                            .key(name)
+                            .parser(parser)
+                            .optional(defaultValue)
+                            .description(description)
+                            .build()
+            );
+        }
+
+        /**
          * Adds the given required {@code argument} to the command
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument Argument to add
          * @param <T>      Argument type
@@ -660,9 +902,6 @@ public class Command<C> {
 
         /**
          * Adds the given optional {@code argument} to the command with no default value
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument Argument to add
          * @param <T>      Argument type
@@ -678,9 +917,6 @@ public class Command<C> {
 
         /**
          * Adds the given optional {@code argument} to the command with no default value
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument Argument to add
          * @param <T>      Argument type
@@ -696,9 +932,6 @@ public class Command<C> {
 
         /**
          * Adds the given optional {@code argument} to the command
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument     Argument to add
          * @param defaultValue The default value that gets used when the argument is omitted
@@ -716,9 +949,6 @@ public class Command<C> {
 
         /**
          * Adds the given optional {@code argument} to the command
-         * <p>
-         * After this method has been invoked, the component may not be inserted into another command builder. If you want
-         * to reuse the component you need to invoke {@link CommandComponent#copy()}
          *
          * @param argument     Argument to add
          * @param defaultValue The default value that gets used when the argument is omitted

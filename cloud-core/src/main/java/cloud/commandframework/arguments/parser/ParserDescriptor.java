@@ -50,6 +50,22 @@ public final class ParserDescriptor<C, T> {
         return new ParserDescriptor<>(parser, valueType);
     }
 
+    /**
+     * Creates a new parser descriptor.
+     *
+     * @param <C> the command sender type
+     * @param <T> the type of values produced by the parser
+     * @param parser    the parser
+     * @param valueType the type of values produced by the parser
+     * @return the created descriptor
+     */
+    public static <C, T> @NonNull ParserDescriptor<C, T> of(
+            final @NonNull ArgumentParser<C, T> parser,
+            final @NonNull Class<T> valueType
+    ) {
+        return new ParserDescriptor<>(parser, TypeToken.get(valueType));
+    }
+
     private ParserDescriptor(final @NonNull ArgumentParser<C, T> parser, final @NonNull TypeToken<T> valueType) {
         this.parser = parser;
         this.valueType = valueType;

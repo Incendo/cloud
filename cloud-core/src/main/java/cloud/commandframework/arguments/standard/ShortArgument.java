@@ -195,7 +195,7 @@ public final class ShortArgument<C> extends CommandArgument<C, Short> {
                 final @NonNull CommandContext<C> commandContext,
                 final @NonNull String input
         ) {
-            return IntegerArgument.IntegerParser.getSuggestions(this.min, this.max, input);
+            return IntegerParser.getSuggestions(this.min, this.max, input);
         }
 
         /**

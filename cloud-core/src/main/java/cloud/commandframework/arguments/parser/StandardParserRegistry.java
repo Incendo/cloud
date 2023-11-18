@@ -35,7 +35,7 @@ import cloud.commandframework.arguments.standard.DoubleArgument;
 import cloud.commandframework.arguments.standard.DurationArgument;
 import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.FloatArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.LongArgument;
 import cloud.commandframework.arguments.standard.ShortArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
@@ -126,7 +126,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
                         (short) options.get(StandardParameters.RANGE_MAX, Short.MAX_VALUE)
                 ));
         this.registerParserSupplier(TypeToken.get(Integer.class), options ->
-                new IntegerArgument.IntegerParser<>(
+                new IntegerParser<>(
                         (int) options.get(StandardParameters.RANGE_MIN, Integer.MIN_VALUE),
                         (int) options.get(StandardParameters.RANGE_MAX, Integer.MAX_VALUE)
                 ));

@@ -41,7 +41,7 @@ import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserParameters;
 import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.standard.EnumArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
@@ -341,7 +341,7 @@ public final class ExamplePlugin extends JavaPlugin {
         this.manager.command(this.manager.commandBuilder("give")
                 .senderType(Player.class)
                 .required(MaterialArgument.of("material"))
-                .required(IntegerArgument.of("amount"))
+                .required("amount", IntegerParser.integer())
                 .handler(c -> {
                     final Material material = c.get("material");
                     final int amount = c.get("amount");
@@ -359,7 +359,7 @@ public final class ExamplePlugin extends JavaPlugin {
         this.manager.command(builder.literal("enchant")
                 .senderType(Player.class)
                 .required(EnchantmentArgument.of("enchant"))
-                .required(IntegerArgument.of("level"))
+                .required("level", IntegerParser.integer())
                 .handler(c -> this.manager.taskRecipe().begin(c).synchronous(ctx -> {
                     final Player player = ((Player) ctx.getSender());
                     player.getInventory().getItemInMainHand().addEnchantment(ctx.get("enchant"), ctx.get("level"));

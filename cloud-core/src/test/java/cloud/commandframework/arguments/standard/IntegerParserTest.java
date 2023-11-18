@@ -48,9 +48,9 @@ class IntegerParserTest {
     @Test
     void Parse_NoMinMax_SuccessfulParse() {
         // Arrange
-        final IntegerArgument.IntegerParser<TestCommandSender> parser = new IntegerArgument.IntegerParser<>(
-                IntegerArgument.IntegerParser.DEFAULT_MINIMUM,
-                IntegerArgument.IntegerParser.DEFAULT_MAXIMUM
+        final IntegerParser<TestCommandSender> parser = new IntegerParser<>(
+                IntegerParser.DEFAULT_MINIMUM,
+                IntegerParser.DEFAULT_MAXIMUM
         );
 
         final int intInput = ThreadLocalRandom.current().nextInt();
@@ -72,9 +72,9 @@ class IntegerParserTest {
     @Test
     void Parse_ValueBelowMin_FailedParse() {
         // Arrange
-        final IntegerArgument.IntegerParser<TestCommandSender> parser = new IntegerArgument.IntegerParser<>(
+        final IntegerParser<TestCommandSender> parser = new IntegerParser<>(
                 5 /* min */,
-                IntegerArgument.IntegerParser.DEFAULT_MAXIMUM
+                IntegerParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -84,7 +84,7 @@ class IntegerParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new IntegerArgument.IntegerParseException(
+        assertThat(result.getFailure()).hasValue(new IntegerParser.IntegerParseException(
                 "4",
                 parser,
                 this.context
@@ -95,8 +95,8 @@ class IntegerParserTest {
     @Test
     void Parse_ValueAboveMax_FailedParse() {
         // Arrange
-        final IntegerArgument.IntegerParser<TestCommandSender> parser = new IntegerArgument.IntegerParser<>(
-                IntegerArgument.IntegerParser.DEFAULT_MINIMUM,
+        final IntegerParser<TestCommandSender> parser = new IntegerParser<>(
+                IntegerParser.DEFAULT_MINIMUM,
                 5 /* max */
         );
 
@@ -107,7 +107,7 @@ class IntegerParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new IntegerArgument.IntegerParseException(
+        assertThat(result.getFailure()).hasValue(new IntegerParser.IntegerParseException(
                 "6",
                 parser,
                 this.context
@@ -118,9 +118,9 @@ class IntegerParserTest {
     @Test
     void Parse_NonIntegerInput_FailedParse() {
         // Arrange
-        final IntegerArgument.IntegerParser<TestCommandSender> parser = new IntegerArgument.IntegerParser<>(
-                IntegerArgument.IntegerParser.DEFAULT_MINIMUM,
-                IntegerArgument.IntegerParser.DEFAULT_MAXIMUM
+        final IntegerParser<TestCommandSender> parser = new IntegerParser<>(
+                IntegerParser.DEFAULT_MINIMUM,
+                IntegerParser.DEFAULT_MAXIMUM
         );
 
         // Act
@@ -130,7 +130,7 @@ class IntegerParserTest {
         );
 
         // Assert
-        assertThat(result.getFailure()).hasValue(new IntegerArgument.IntegerParseException(
+        assertThat(result.getFailure()).hasValue(new IntegerParser.IntegerParseException(
                 "cow",
                 parser,
                 this.context
@@ -141,9 +141,9 @@ class IntegerParserTest {
     @Test
     void Suggestions_EmptyInput_ExpectedSuggestions() {
         // Arrange
-        final IntegerArgument.IntegerParser<TestCommandSender> parser = new IntegerArgument.IntegerParser<>(
-                IntegerArgument.IntegerParser.DEFAULT_MINIMUM,
-                IntegerArgument.IntegerParser.DEFAULT_MAXIMUM
+        final IntegerParser<TestCommandSender> parser = new IntegerParser<>(
+                IntegerParser.DEFAULT_MINIMUM,
+                IntegerParser.DEFAULT_MAXIMUM
         );
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
@@ -164,9 +164,9 @@ class IntegerParserTest {
     @Test
     void Suggestions_NegativeSignInput_ExpectedSuggestions() {
         // Arrange
-        final IntegerArgument.IntegerParser<TestCommandSender> parser = new IntegerArgument.IntegerParser<>(
-                IntegerArgument.IntegerParser.DEFAULT_MINIMUM,
-                IntegerArgument.IntegerParser.DEFAULT_MAXIMUM
+        final IntegerParser<TestCommandSender> parser = new IntegerParser<>(
+                IntegerParser.DEFAULT_MINIMUM,
+                IntegerParser.DEFAULT_MAXIMUM
         );
 
         final List<Suggestion> expectedSuggestions = new ArrayList<>();
