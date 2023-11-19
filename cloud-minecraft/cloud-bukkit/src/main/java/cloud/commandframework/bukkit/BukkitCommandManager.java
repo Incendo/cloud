@@ -32,7 +32,6 @@ import cloud.commandframework.brigadier.CloudBrigadierManager;
 import cloud.commandframework.bukkit.annotation.specifier.AllowEmptySelection;
 import cloud.commandframework.bukkit.annotation.specifier.DefaultNamespace;
 import cloud.commandframework.bukkit.annotation.specifier.RequireExplicitNamespace;
-import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.arguments.selector.MultipleEntitySelector;
 import cloud.commandframework.bukkit.arguments.selector.MultiplePlayerSelector;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
@@ -44,6 +43,7 @@ import cloud.commandframework.bukkit.parsers.EnchantmentParser;
 import cloud.commandframework.bukkit.parsers.ItemStackParser;
 import cloud.commandframework.bukkit.parsers.ItemStackPredicateParser;
 import cloud.commandframework.bukkit.parsers.MaterialParser;
+import cloud.commandframework.bukkit.parsers.NamespacedKeyParser;
 import cloud.commandframework.bukkit.parsers.OfflinePlayerParser;
 import cloud.commandframework.bukkit.parsers.PlayerParser;
 import cloud.commandframework.bukkit.parsers.WorldParser;
@@ -187,7 +187,7 @@ public class BukkitCommandManager<C> extends CommandManager<C> implements Brigad
         );
 
         if (CraftBukkitReflection.classExists("org.bukkit.NamespacedKey")) {
-            this.registerParserSupplierFor(NamespacedKeyArgument.class);
+            this.registerParserSupplierFor(NamespacedKeyParser.class);
             this.parserRegistry().registerAnnotationMapper(
                     RequireExplicitNamespace.class,
                     (annotation, type) -> ParserParameters.single(BukkitParserParameters.REQUIRE_EXPLICIT_NAMESPACE, true)

@@ -26,7 +26,6 @@ package cloud.commandframework.bukkit;
 import cloud.commandframework.arguments.parser.ArgumentParser;
 import cloud.commandframework.arguments.standard.UUIDParser;
 import cloud.commandframework.brigadier.CloudBrigadierManager;
-import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.internal.CommandBuildContextSupplier;
 import cloud.commandframework.bukkit.internal.MinecraftArgumentTypes;
 import cloud.commandframework.bukkit.internal.RegistryReflection;
@@ -34,6 +33,7 @@ import cloud.commandframework.bukkit.parsers.BlockPredicateArgument;
 import cloud.commandframework.bukkit.parsers.EnchantmentParser;
 import cloud.commandframework.bukkit.parsers.ItemStackParser;
 import cloud.commandframework.bukkit.parsers.ItemStackPredicateParser;
+import cloud.commandframework.bukkit.parsers.NamespacedKeyParser;
 import cloud.commandframework.bukkit.parsers.location.Location2DArgument;
 import cloud.commandframework.bukkit.parsers.location.LocationArgument;
 import cloud.commandframework.bukkit.parsers.selector.MultipleEntitySelectorArgument;
@@ -88,7 +88,7 @@ public final class BukkitBrigadierMapper<C> {
             // < 1.16
         }
         /* Map NamespacedKey */
-        this.mapSimpleNMS(new TypeToken<NamespacedKeyArgument.Parser<C>>() {
+        this.mapSimpleNMS(new TypeToken<NamespacedKeyParser<C>>() {
         }, "resource_location", true);
         /* Map Enchantment */
         try {

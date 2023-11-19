@@ -51,7 +51,7 @@ public final class BukkitParserParameters {
             create("allow_empty_selector_result", TypeToken.get(Boolean.class));
 
     /**
-     * Sets to require explicit namespaces for {@link cloud.commandframework.bukkit.argument.NamespacedKeyArgument}
+     * Sets to require explicit namespaces for {@link cloud.commandframework.bukkit.parsers.NamespacedKeyParser}
      * (i.e. 'test' will be rejected but 'test:test' will pass).
      *
      * @since 1.7.0
@@ -60,7 +60,7 @@ public final class BukkitParserParameters {
             create("require_explicit_namespace", TypeToken.get(Boolean.class));
 
     /**
-     * Sets a custom default namespace for {@link cloud.commandframework.bukkit.argument.NamespacedKeyArgument}.
+     * Sets a custom default namespace for {@link cloud.commandframework.bukkit.parsers.NamespacedKeyParser}.
      * Without this annotation the default is {@link org.bukkit.NamespacedKey#MINECRAFT}.
      *
      * @since 1.7.0

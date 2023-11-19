@@ -42,7 +42,6 @@ import cloud.commandframework.arguments.parser.StandardParameters;
 import cloud.commandframework.arguments.suggestion.Suggestion;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
-import cloud.commandframework.bukkit.argument.NamespacedKeyArgument;
 import cloud.commandframework.bukkit.arguments.selector.SingleEntitySelector;
 import cloud.commandframework.bukkit.data.ProtoItemStack;
 import cloud.commandframework.bukkit.parsers.selector.SingleEntitySelectorArgument;
@@ -106,6 +105,7 @@ import static cloud.commandframework.arguments.standard.IntegerParser.integerPar
 import static cloud.commandframework.arguments.standard.StringArrayParser.stringArrayParser;
 import static cloud.commandframework.bukkit.parsers.EnchantmentParser.enchantmentParser;
 import static cloud.commandframework.bukkit.parsers.MaterialParser.materialParser;
+import static cloud.commandframework.bukkit.parsers.NamespacedKeyParser.namespacedKeyParser;
 import static cloud.commandframework.bukkit.parsers.WorldParser.worldParser;
 import static net.kyori.adventure.text.Component.text;
 
@@ -484,7 +484,7 @@ public final class ExamplePlugin extends JavaPlugin {
 
         this.manager.command(this.manager.commandBuilder("example")
                 .literal("namespacedkey")
-                .required(NamespacedKeyArgument.of("key"))
+                .required("key", namespacedKeyParser())
                 .handler(ctx -> {
                     final NamespacedKey namespacedKey = ctx.get("key");
                     final String key = namespacedKey.getNamespace() + ":" + namespacedKey.getKey();
