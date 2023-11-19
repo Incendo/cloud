@@ -25,7 +25,6 @@ package cloud.commandframework;
 
 import cloud.commandframework.arguments.compound.ArgumentTriplet;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
-import cloud.commandframework.arguments.standard.DurationArgument;
 import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.arguments.standard.StringArrayArgument;
@@ -47,6 +46,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static cloud.commandframework.arguments.standard.ArgumentTestHelper.suggestionList;
 import static cloud.commandframework.arguments.standard.BooleanParser.booleanParser;
+import static cloud.commandframework.arguments.standard.DurationParser.durationParser;
 import static cloud.commandframework.arguments.standard.EnumParser.enumParser;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerComponent;
 import static cloud.commandframework.arguments.standard.IntegerParser.integerParser;
@@ -467,7 +467,7 @@ class CommandSuggestionsTest {
     void testDurations(final @NonNull String input, final @NonNull List<@NonNull Suggestion> expectedSuggestions) {
         // Arrange
         this.manager = createManager();
-        this.manager.command(manager.commandBuilder("duration").required(DurationArgument.of("duration")));
+        this.manager.command(manager.commandBuilder("duration").required("duration", durationParser()));
 
         // Act
         final List<Suggestion> suggestions = this.manager.suggest(new TestCommandSender(), input);

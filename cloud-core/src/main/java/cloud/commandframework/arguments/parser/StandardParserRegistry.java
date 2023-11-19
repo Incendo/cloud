@@ -32,7 +32,7 @@ import cloud.commandframework.arguments.standard.BooleanParser;
 import cloud.commandframework.arguments.standard.ByteParser;
 import cloud.commandframework.arguments.standard.CharacterParser;
 import cloud.commandframework.arguments.standard.DoubleParser;
-import cloud.commandframework.arguments.standard.DurationArgument;
+import cloud.commandframework.arguments.standard.DurationParser;
 import cloud.commandframework.arguments.standard.EnumParser;
 import cloud.commandframework.arguments.standard.FloatParser;
 import cloud.commandframework.arguments.standard.IntegerParser;
@@ -186,7 +186,7 @@ public final class StandardParserRegistry<C> implements ParserRegistry<C> {
             return new BooleanParser<>(liberal);
         });
         this.registerParserSupplier(TypeToken.get(UUID.class), options -> new UUIDArgument.UUIDParser<>());
-        this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationArgument.Parser<>());
+        this.registerParserSupplier(TypeToken.get(Duration.class), options -> new DurationParser<>());
     }
 
     private static boolean isPrimitive(final @NonNull TypeToken<?> type) {

@@ -26,7 +26,6 @@ package cloud.commandframework.arguments.standard;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.TestCommandSender;
 import cloud.commandframework.arguments.suggestion.Suggestion;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -34,9 +33,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static cloud.commandframework.arguments.standard.ArgumentTestHelper.suggestionList;
+import static cloud.commandframework.arguments.standard.DurationParser.durationParser;
 import static cloud.commandframework.util.TestUtils.createManager;
 
-public class DurationArgumentSuggestionsTest {
+class DurationParserSuggestionsTest {
 
     private static CommandManager<TestCommandSender> manager;
 
@@ -44,9 +44,8 @@ public class DurationArgumentSuggestionsTest {
     static void setupManager() {
         manager = createManager();
         manager.command(manager.commandBuilder("duration")
-                .required(DurationArgument.of("duration")));
+                .required("duration", durationParser()));
     }
-
 
     @Test
     void testDurationSuggestions() {
