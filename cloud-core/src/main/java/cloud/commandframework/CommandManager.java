@@ -704,7 +704,7 @@ public abstract class CommandManager<C> {
     }
 
     /**
-     * Create a new command argument builder.
+     * Create a new command component builder.
      * <p>
      * This will also invoke {@link CommandArgument.Builder#manager(CommandManager)}
      * so that the argument is associated with the calling command manager. This allows for parser inference based on
@@ -713,13 +713,15 @@ public abstract class CommandManager<C> {
      * @param type Argument type
      * @param name Argument name
      * @param <T>  Generic argument name
-     * @return Argument builder
+     * @return Component builder
+     * @since 2.0.0
      */
-    public <T> CommandArgument.@NonNull Builder<C, T> argumentBuilder(
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public <T> CommandComponent.@NonNull Builder<C, T> componentBuilder(
             final @NonNull Class<T> type,
             final @NonNull String name
     ) {
-        return CommandArgument.<C, T>ofType(type, name).manager(this);
+        return CommandComponent.<C, T>ofType(type, name).commandManager(this);
     }
 
     /**

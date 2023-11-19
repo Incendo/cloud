@@ -179,7 +179,7 @@ class CommandTreeTest {
 
         this.commandManager.command(
                 this.commandManager.commandBuilder("default")
-                        .required(this.commandManager.argumentBuilder(Integer.class, "int"))
+                        .required(this.commandManager.componentBuilder(Integer.class, "int"))
                         .handler(executionHandler)
                         .build()
         );

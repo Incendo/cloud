@@ -24,6 +24,7 @@
 package cloud.commandframework.fabric.testmod;
 
 import cloud.commandframework.Command;
+import cloud.commandframework.TypedCommandComponent;
 import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.DefaultValue;
 import cloud.commandframework.arguments.parser.ArgumentParseResult;
@@ -204,13 +205,13 @@ public final class FabricExample implements ModInitializer {
             ctx.getSender().sendSuccess(text, false);
         }));
 
-        final CommandArgument<CommandSourceStack, ModMetadata> modMetadata = manager.argumentBuilder(ModMetadata.class, "mod")
-                .withSuggestionProvider((ctx, input) -> FabricLoader.getInstance().getAllMods().stream()
+        final TypedCommandComponent<CommandSourceStack, ModMetadata> modMetadata = manager.componentBuilder(ModMetadata.class, "mod")
+                .suggestionProvider((ctx, input) -> FabricLoader.getInstance().getAllMods().stream()
                         .map(ModContainer::getMetadata)
                         .map(ModMetadata::getId)
                         .map(Suggestion::simple)
                         .collect(Collectors.toList()))
-                .withParser((ctx, inputQueue) -> {
+                .parser((ctx, inputQueue) -> {
                     final ModMetadata meta = FabricLoader.getInstance().getModContainer(inputQueue.readString())
                             .map(ModContainer::getMetadata)
                             .orElse(null);
@@ -224,7 +225,7 @@ public final class FabricExample implements ModInitializer {
                 })
                 .build();
 
-        manager.command(mods.required(modMetadata)
+        manager.command(mods.argument(modMetadata)
                 .handler(ctx -> {
                     final ModMetadata meta = ctx.get(modMetadata);
                     final MutableComponent text = Component.literal("")

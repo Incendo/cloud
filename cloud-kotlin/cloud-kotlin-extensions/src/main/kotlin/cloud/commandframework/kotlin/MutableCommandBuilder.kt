@@ -522,32 +522,6 @@ public class MutableCommandBuilder<C : Any>(
     /**
      * Add a new argument to this command
      *
-     * @param argument argument to add
-     * @param description description of the argument
-     * @return this mutable builder
-     * @since 1.4.0
-     */
-    public fun required(
-        argument: CommandArgument.Builder<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
-    ): MutableCommandBuilder<C> = mutate { it.required(argument, description) }
-
-    /**
-     * Add a new argument to this command
-     *
-     * @param argument argument to add
-     * @param description description of the argument
-     * @return this mutable builder
-     * @since 1.4.0
-     */
-    public fun optional(
-        argument: CommandArgument.Builder<C, *>,
-        description: ArgumentDescription = ArgumentDescription.empty()
-    ): MutableCommandBuilder<C> = mutate { it.optional(argument, description) }
-
-    /**
-     * Add a new argument to this command
-     *
      * @param description description of the argument
      * @param argumentSupplier supplier of the argument to add
      * @return this mutable builder

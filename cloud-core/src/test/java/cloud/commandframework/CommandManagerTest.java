@@ -23,8 +23,6 @@
 //
 package cloud.commandframework;
 
-import cloud.commandframework.arguments.CommandArgument;
-import cloud.commandframework.arguments.standard.IntegerParser;
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionHandler;
@@ -143,8 +141,8 @@ class CommandManagerTest {
                 .literal("literal", "literalalias")
                 .literal("detail", ArgumentDescription.of("detaildescription"))
                 .required(
-                        CommandArgument.ofType(int.class, "argument"),
-                        ArgumentDescription.of("argumentdescription")
+                        CommandComponent.ofType(int.class, "argument")
+                                .description(ArgumentDescription.of("argumentdescription"))
                 )
                 .build();
         this.commandManager.command(command);

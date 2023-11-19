@@ -579,23 +579,6 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required {@code argument} to the command
-         *
-         * @param argument    Argument to add
-         * @param description Description of the argument
-         * @param <T>         Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> required(
-                final CommandArgument.@NonNull Builder<C, T> argument,
-                final @NonNull ArgumentDescription description
-        ) {
-            return this.argument(this.argumentToComponent(argument.build()).description(description));
-        }
-
-        /**
          * Adds the given optional {@code argument} to the command with no default value
          *
          * @param argument    Argument to add
@@ -610,23 +593,6 @@ public class Command<C> {
                 final @NonNull ArgumentDescription description
         ) {
             return this.argument(this.argumentToComponent(argument).optional().description(description));
-        }
-
-        /**
-         * Adds the given optional {@code argument} to the command with no default value
-         *
-         * @param argument    Argument to add
-         * @param description Description of the argument
-         * @param <T>         Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> optional(
-                final CommandArgument.@NonNull Builder<C, T> argument,
-                final @NonNull ArgumentDescription description
-        ) {
-            return this.argument(this.argumentToComponent(argument.build()).optional().description(description));
         }
 
         /**
@@ -1244,85 +1210,6 @@ public class Command<C> {
         }
 
         /**
-         * Adds the given required {@code argument} to the command
-         *
-         * @param argument Argument to add
-         * @param <T>      Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> required(
-                final CommandArgument.@NonNull Builder<C, T> argument
-        ) {
-            return this.required(argument.build());
-        }
-
-        /**
-         * Adds the given optional {@code argument} to the command with no default value
-         *
-         * @param argument Argument to add
-         * @param <T>      Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> optional(
-                final @NonNull CommandArgument<C, T> argument
-        ) {
-            return this.argument(this.argumentToComponent(argument).optional());
-        }
-
-        /**
-         * Adds the given optional {@code argument} to the command with no default value
-         *
-         * @param argument Argument to add
-         * @param <T>      Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> optional(
-                final CommandArgument.@NonNull Builder<C, T> argument
-        ) {
-            return this.argument(this.argumentToComponent(argument.build()).optional());
-        }
-
-        /**
-         * Adds the given optional {@code argument} to the command
-         *
-         * @param argument     Argument to add
-         * @param defaultValue The default value that gets used when the argument is omitted
-         * @param <T>          Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> optional(
-                final @NonNull CommandArgument<C, T> argument,
-                final @NonNull DefaultValue<C, T> defaultValue
-        ) {
-            return this.argument(this.argumentToComponent(argument).optional(defaultValue));
-        }
-
-        /**
-         * Adds the given optional {@code argument} to the command
-         *
-         * @param argument     Argument to add
-         * @param defaultValue The default value that gets used when the argument is omitted
-         * @param <T>          Argument type
-         * @return New builder instance with the command argument inserted into the argument list
-         * @since 2.0.0
-         */
-        @API(status = API.Status.STABLE, since = "2.0.0")
-        public <T> @NonNull Builder<C> optional(
-                final CommandArgument.@NonNull Builder<C, T> argument,
-                final @NonNull DefaultValue<C, T> defaultValue
-        ) {
-            return this.argument(this.argumentToComponent(argument.build()).optional(defaultValue));
-        }
-
-        /**
          * Adds a new required command argument by interacting with a constructed command argument builder
          *
          * @param clazz           Argument class
@@ -1336,14 +1223,11 @@ public class Command<C> {
         public <T> @NonNull Builder<C> required(
                 final @NonNull Class<T> clazz,
                 final @NonNull String name,
-                final @NonNull Consumer<CommandArgument.Builder<C, T>> builderConsumer
+                final @NonNull Consumer<CommandComponent.Builder<C, T>> builderConsumer
         ) {
-            final CommandArgument.Builder<C, T> builder = CommandArgument.ofType(clazz, name);
-            if (this.commandManager != null) {
-                builder.manager(this.commandManager);
-            }
+            final CommandComponent.Builder<C, T> builder = CommandComponent.ofType(clazz, name);
             builderConsumer.accept(builder);
-            return this.argument(this.argumentToComponent(builder.build()));
+            return this.argument(builder);
         }
 
         /**
@@ -1360,14 +1244,11 @@ public class Command<C> {
         public <T> @NonNull Builder<C> optional(
                 final @NonNull Class<T> clazz,
                 final @NonNull String name,
-                final @NonNull Consumer<CommandArgument.Builder<C, T>> builderConsumer
+                final @NonNull Consumer<CommandComponent.Builder<C, T>> builderConsumer
         ) {
-            final CommandArgument.Builder<C, T> builder = CommandArgument.ofType(clazz, name);
-            if (this.commandManager != null) {
-                builder.manager(this.commandManager);
-            }
+            final CommandComponent.Builder<C, T> builder = CommandComponent.ofType(clazz, name);
             builderConsumer.accept(builder);
-            return this.argument(this.argumentToComponent(builder.build()).optional());
+            return this.argument(builder.optional());
         }
 
         /**
@@ -1408,9 +1289,9 @@ public class Command<C> {
         @SuppressWarnings({"unchecked", "rawtypes"})
         @API(status = API.Status.STABLE, since = "2.0.0")
         public @NonNull Builder<C> argument(
-                final CommandComponent.Builder<?, ?> builder
+                final CommandComponent.Builder builder
         ) {
-            return this.argument((CommandComponent) builder.build());
+            return this.argument((CommandComponent) builder.commandManager(this.commandManager).build());
         }
 
         private <T> CommandComponent.@NonNull Builder<C, T> argumentToComponent(final @NonNull CommandArgument<C, T> argument) {

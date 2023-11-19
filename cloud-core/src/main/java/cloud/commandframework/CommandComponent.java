@@ -75,9 +75,29 @@ public class CommandComponent<C> implements Comparable<CommandComponent<C>> {
      * @param <C> the command sender type
      * @param <T> the component value type
      * @return the builder
+     * @since 2.0.0
      */
+    @API(status = API.Status.STABLE, since = "2.0.0")
     public static <C, T> @NonNull Builder<C, T> builder() {
         return new Builder<>();
+    }
+
+    /**
+     * Creates a new mutable builder.
+     *
+     * @param <C> the command sender type
+     * @param <T> the component value type
+     * @param clazz the type of the component
+     * @param name the name of the component
+     * @return the builder
+     * @since 2.0.0
+     */
+    @API(status = API.Status.STABLE, since = "2.0.0")
+    public static <C, T> @NonNull Builder<C, T> ofType(
+            final @NonNull Class<T> clazz,
+            final @NonNull String name
+    ) {
+        return CommandComponent.<C, T>builder().valueType(clazz).name(name);
     }
 
     CommandComponent(
