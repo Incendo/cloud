@@ -26,7 +26,6 @@ package cloud.commandframework.arguments.flags;
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.CommandComponent;
 import cloud.commandframework.TypedCommandComponent;
-import cloud.commandframework.arguments.CommandArgument;
 import cloud.commandframework.arguments.parser.ParserDescriptor;
 import cloud.commandframework.permission.CommandPermission;
 import cloud.commandframework.permission.Permission;
@@ -285,28 +284,6 @@ public final class CommandFlag<T> {
                     this.description,
                     this.permission,
                     builder.name(this.name).parser(parserDescriptor).build(),
-                    this.mode
-            );
-        }
-
-
-        // TODO(City): Remove this.
-        /**
-         * Create a new builder instance using the given command component
-         *
-         * @param component Command component
-         * @param <N>     New component type
-         * @return New builder instance
-         */
-        @SuppressWarnings({"rawtypes", "unchecked"})
-        public <N> @NonNull Builder<N> withComponent(final @NonNull CommandArgument<?, N> component) {
-            final CommandComponent.Builder builder = CommandComponent.builder();
-            return new Builder<>(
-                    this.name,
-                    this.aliases,
-                    this.description,
-                    this.permission,
-                    builder.key(component.getKey()).parser(component.parserDescriptor()).build(),
                     this.mode
             );
         }
